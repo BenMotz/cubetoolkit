@@ -4,14 +4,11 @@ from django.db import models
 
 class Event(models.Model):
 
-    class Meta:
-        db_table = 'Events'
-
     name = models.CharField(max_length=256)
     copy = models.CharField(max_length=4096)
     copy_summary = models.CharField(max_length=4096)
 
-    image = models.CharField()
+    image = models.CharField(max_length=256)
     image_credit = models.CharField(max_length=64)
 
     # Event type?
@@ -29,9 +26,10 @@ class Event(models.Model):
     created_at = models.DateTimeField()
     updated_at = models.DateTimeField()
 
-class Showing(models.Model):
     class Meta:
-        db_table = 'Showings'
+        db_table = 'Events'
+
+class Showing(models.Model):
 
     event = models.ForeignKey('Event')
 
@@ -50,18 +48,33 @@ class Showing(models.Model):
     created_at = models.DateTimeField()
     updated_at = models.DateTimeField()
 
-class DiaryIdea(models.Model):
     class Meta:
-        db_table = 'DiaryIdeas'
-    month = models.DateTime()
+        db_table = 'Showings'
+
+class DiaryIdea(models.Model):
+    month = models.DateTimeField()
     ideas = models.CharField(max_length=16384, default="")
     
     created_at = models.DateTimeField()
     updated_at = models.DateTimeField()
     
-class EventType(models.Model):
     class Meta:
-        db_table = 'EventsTypes'
+        db_table = 'DiaryIdeas'
+
+class Role(models.Model):
+
+    name = models.CharField(max_length=32)
+    description = models.CharField(max_length=64)
+    shortcode = models.CharField(max_length=8)
+
+    # Can this role be added to the rota?
+    rota = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'Roles'
+
+class EventType(models.Model):
+
     name = models.CharField(max_length=32)
     shortname = models.CharField(max_length=32)
     description = models.CharField(max_length=64)
@@ -69,13 +82,7 @@ class EventType(models.Model):
     created_at = models.DateTimeField()
     updated_at = models.DateTimeField()
 
-class Role(models.Model):
+    roles = models.ManyToManyField(Role, db_table='EventTypes_Roles')
+
     class Meta:
-        db_table = 'Roles'
-
-    name = models.CharField(max_length=32)
-    description = models.CharField(max_length=64)
-    shortcode = models.CharField(max_length=8)
-
-    rota = models.BooleanField(default=False)
-
+        db_table = 'EventTypes'
