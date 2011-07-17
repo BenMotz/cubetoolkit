@@ -1,4 +1,5 @@
 # Django settings for cube project.
+import programme
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -109,6 +110,7 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
+    programme,
     # disabled for now;
     #'django.contrib.auth',
     #'django.contrib.contenttypes',
