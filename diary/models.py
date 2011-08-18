@@ -2,6 +2,21 @@ from django.db import models
 
 # Create your models here.
 
+
+class Role(models.Model):
+    name = models.CharField(max_length=32, blank=False)
+    description = models.CharField(max_length=64, null=True)
+    shortcode = models.CharField(max_length=8, blank=False)
+
+    # Can this role be added to the rota?
+    rota = models.BooleanField(default=False)
+
+    class Meta:
+        db_table = 'Roles'
+
+    def __unicode__(self):
+        return self.name
+
 class Event(models.Model):
 
     name = models.CharField(max_length=256, blank=False)
@@ -19,7 +34,6 @@ class Event(models.Model):
     
     booked_by = models.CharField(max_length=64, blank=False)
 
-    confirmed = models.BooleanField(default=False)
     cancelled = models.BooleanField(default=False)
     outside_hire = models.BooleanField(default=False)
     private = models.BooleanField(default=False)
@@ -29,6 +43,8 @@ class Event(models.Model):
 
     class Meta:
         db_table = 'Events'
+    def __unicode__(self):
+        return "%s (%d)" % (self.name, self.id)
 
 class Showing(models.Model):
 
@@ -39,17 +55,27 @@ class Showing(models.Model):
     extra_copy = models.CharField(max_length=4096, null=True)
     extra_copy_summary = models.CharField(max_length=4096, null=True)
 
+    confirmed = models.BooleanField(default=False)
     hide_in_programme = models.BooleanField(default=False)
     cancelled = models.BooleanField(default=False)
     discounted = models.BooleanField(default=False)
 
     # sales tables?
+
+    # Rota entries
+    roles = models.ManyToManyField(Role, through='RotaEntry')
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'Showings'
+
+    def __unicode__(self):
+        if self.start is not None and self.id is not None and self.event is not None:
+            return "%s - %s (%d)" % (self.start.strftime("%H:%M %d/%m/%y"), self.event.name, self.id) 
+        else:
+            return "[uninitialised]"
 
 class DiaryIdea(models.Model):
     month = models.DateField()
@@ -60,18 +86,8 @@ class DiaryIdea(models.Model):
     
     class Meta:
         db_table = 'DiaryIdeas'
-
-class Role(models.Model):
-
-    name = models.CharField(max_length=32, blank=False)
-    description = models.CharField(max_length=64, null=True)
-    shortcode = models.CharField(max_length=8, blank=False)
-
-    # Can this role be added to the rota?
-    rota = models.BooleanField(default=False)
-
-    class Meta:
-        db_table = 'Roles'
+    def __unicode__(self):
+        return "%d/%d" % (self.month.month, self.month.year)
 
 class EventType(models.Model):
 
@@ -82,8 +98,27 @@ class EventType(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    # Default roles for this event
     roles = models.ManyToManyField(Role, db_table='EventTypes_Roles')
 
     class Meta:
         db_table = 'EventTypes'
 
+    def __unicode__(self):
+        return self.name
+
+class RotaEntry(models.Model):
+    role = models.ForeignKey(Role)
+    showing = models.ForeignKey(Showing)
+
+    required = models.BooleanField(default=True)
+    rank = models.IntegerField(default=1)
+
+    #created_at = models.DateTimeField(auto_now_add=True)
+    #updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'RotaEntries'
+
+    def __unicode__(self):
+        return "%s %d" % (unicode(role), rank)
