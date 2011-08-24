@@ -2,8 +2,17 @@
 import sys
 import datetime
 import MySQLdb
+import re
 
 import diary.models
+
+def titlecase(string):
+#   return string.title() # Really doesn't cope with apostrophes.
+#   return " ".join([ word.capitalize() for word in  "This is the voice".split() ])
+    if string is str:
+        return re.sub("(^|\s)(\S)", lambda match : match.group(1) + match.group(2).upper(), string)
+    else:
+        return string
 
 def connect():
     conn = MySQLdb.connect (host = "localhost",
@@ -32,6 +41,26 @@ def html_ify(string):
 
 event_tot = 0
 
+def import_event_roles(connection, showings, legacy_event_id, role_map):
+    cursor = connection.cursor()
+
+    # *cough*
+    result_count = cursor.execute("SELECT * from roles_merged WHERE event_id = %s", legacy_event_id)
+
+    for ev in cursor:
+        event_id = ev[0]
+        col_no = 1
+        for role_col in ev[1:]:
+            if role_col == 1L:
+                for s in showings:
+                    rota_entry = diary.models.RotaEntry()
+                    rota_entry.role_id = role_map[col_no]
+                    rota_entry.showing_id = s.id
+                    rota_entry.save()
+            col_no += 1
+
+    cursor.close()
+
 def import_event_showings(connection, event, legacy_event_id):
     global event_tot
     # Some slightly funky logic to do the mapping:
@@ -39,6 +68,8 @@ def import_event_showings(connection, event, legacy_event_id):
     aggregate_hire = False 
     cancelled_list = []
     private_list = []
+
+    all_showings = []
     
 
     cursor = connection.cursor()
@@ -50,6 +81,7 @@ def import_event_showings(connection, event, legacy_event_id):
     for r in results:
 
         s = diary.models.Showing()
+        all_showings.append(s)
         s.event = event
         s.start = r[0]
         
@@ -85,10 +117,9 @@ def import_event_showings(connection, event, legacy_event_id):
 
     cursor.close()
 
-def import_event_roles():
-    pass
+    return all_showings
 
-def import_events(connection):
+def import_events(connection, role_map):
     cursor = connection.cursor()
     results = cursor.execute("SELECT event_id, event_name, copy, copy_summary, duration, image_credits, terms FROM events ORDER BY event_id")
 
@@ -99,7 +130,7 @@ def import_events(connection):
     for r in cursor.fetchall():
         e = diary.models.Event()
 
-        e.name = decode(r[1])
+        e.name = titlecase(decode(r[1]))
         e.copy = html_ify(decode(r[2]))
         e.copy_summary = decode(r[3])
         
@@ -110,11 +141,12 @@ def import_events(connection):
             durn_min = int_def(durn_min,0)
             e.duration = datetime.time(durn_hour, durn_min) 
 
-        e.image_credits = decode(r[5])
+        e.image_credits = titlecase(decode(r[5]))
         e.terms = decode(r[6])
         e.save()
 
-        import_event_showings(connection, e, r[0])
+        showings = import_event_showings(connection, e, r[0])
+        import_event_roles(connection, showings, r[0], role_map)
 
         # Print % progress
         count += 1
@@ -127,10 +159,35 @@ def import_events(connection):
 
     print "%d events" % event_tot
 
+def create_roles(connection):
+    roles = []
+    cursor = connection.cursor()
+    
+    count = cursor.execute("SELECT * FROM roles_merged LIMIT 1")
+    if count != 1:
+        print "Nothing in the 'roles_merged' table!"
+        cursor.close()
+        return None 
+
+    for column in cursor.description[1:]:
+        role = diary.models.Role()
+        role.name = titlecase(column[0]).replace("_", " ")
+        print role.name
+        role.save()
+        roles.append(role.id)
+
+    print "Created %d roles" % (len(cursor.description))
+
+    cursor.close()
+
+    return roles
 
 def main():
     conn = connect()
-    import_events(conn)
+    role_map = create_roles(conn)
+    if role_map is None:
+        return
+    import_events(conn, role_map)
     conn.close ()
 
 if __name__ == "__main__":
