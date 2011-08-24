@@ -4,9 +4,9 @@ from django.db import models
 
 
 class Role(models.Model):
-    name = models.CharField(max_length=32, blank=False)
+    name = models.CharField(max_length=64, blank=False)
     description = models.CharField(max_length=64, null=True)
-    shortcode = models.CharField(max_length=8, blank=False)
+    shortcode = models.CharField(max_length=8, null=True)
 
     # Can this role be added to the rota?
     rota = models.BooleanField(default=False)
