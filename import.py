@@ -49,12 +49,13 @@ def import_event_roles(connection, showings, legacy_event_id, role_map):
 
     for ev in cursor:
         event_id = ev[0]
-        col_no = 1
+        col_no = 0
         for role_col in ev[1:]:
             if role_col == 1L:
                 for s in showings:
                     rota_entry = diary.models.RotaEntry()
                     rota_entry.role_id = role_map[col_no]
+
                     rota_entry.showing_id = s.id
                     rota_entry.save()
             col_no += 1
@@ -172,11 +173,9 @@ def create_roles(connection):
     for column in cursor.description[1:]:
         role = diary.models.Role()
         role.name = titlecase(column[0]).replace("_", " ")
-        print role.name
         role.save()
+        print "%s: %d" % (role.name, role.id)
         roles.append(role.id)
-
-    print "Created %d roles" % (len(cursor.description))
 
     cursor.close()
 
@@ -187,6 +186,7 @@ def main():
     role_map = create_roles(conn)
     if role_map is None:
         return
+
     import_events(conn, role_map)
     conn.close ()
 
