@@ -1,18 +1,17 @@
 from django.conf.urls.defaults import patterns, include, url
 
-# Uncomment the next two lines to enable the admin:
-# from django.contrib import admin
-# admin.autodiscover()
 
-urlpatterns = patterns('',
-    url(r'programme/', include('cube.diary.urls')),
-    # Examples:
-    # url(r'^$', 'cube.views.home', name='home'),
-    # url(r'^cube/', include('cube.foo.urls')),
+urlpatterns = patterns( 'cube.diary.views',
+    # View lists of event for various time/dates
+    url('^$', 'view_diary', name="default-view" ),
+    url('^(?P<year>\d{4})$', 'view_diary', name="year-view"),
+    url('^(?P<year>\d{4})/(?P<month>\d{1,2})$', 'view_diary', name="month-view"),
+    url('^(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})', 'view_diary', name="day-view"),
 
-    # Uncomment the admin/doc line below to enable admin documentation:
-    # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
-    # Uncomment the next line to enable the admin:
-    # url(r'^admin/', include(admin.site.urls)),
+    # Individual showing
+    url('^showing/id/(?P<showing_id>\d+)$', 'view_showing', name="single-showing-view"),
+    # All showings for a given event
+    url('^event/id/(?P<event_id>\d+)$', 'view_event', name="single-event-view"),
 )
+
+
