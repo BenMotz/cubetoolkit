@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}
+{{ event_list_name }}
+{% endblock %}
+
+{% block body %}
+
+{% include "event_common.html" %}
+
+{% for showing in showings %}
+<p>{% include "showing_details.html" %}</p>
+{% empty %}
+<p>No showings!</p>
+{% endfor %}
+
+{% endblock %}
+

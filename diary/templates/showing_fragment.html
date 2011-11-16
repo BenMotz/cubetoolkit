@@ -1,0 +1,17 @@
+<div class="event">
+<span id="showing_{{ showing.id }}">
+<h2>{{ showing.event.name|capfirst}}</h2>
+
+{% if showing.event.image %}
+<img src="{{ showing.event.image }}" alt="Picture for event {{ showing.event.name }}">
+{% if showing.event.image_credit %}
+<p class="image_caption">{{ showing.event.image_credit }}</p>
+{% endif %}
+{% endif %}
+
+{% include "showing_time_fragment.html" %}
+
+<p>{{showing.event.copy|safe}}</p>
+<p>[<a href="#top">top of page</a>]</p>
+</span> 
+</div>

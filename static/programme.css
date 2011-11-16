@@ -1,0 +1,96 @@
+/* This looks horrible. */
+
+body {
+	font-family: sans-serif;
+	color: black;
+	background-color: #0065C9;
+	padding-left: 8px;
+}
+
+img.cubelogo {
+	text-align: center;
+	border: none;
+}
+.programme {
+	background-color: white;
+	margin-left: 10%;
+	margin-right: 10%;
+	padding: 10px;
+	width: 80%;
+	border: thin solid black;
+}
+h1.programme_title {
+	font-size: 1.1cm;
+	padding: 0;
+	margin: 1mm;
+	border-bottom: thin solid black;	
+}
+p.table_key {
+	font-weight: bold;
+	color: gray;
+}
+.row_year h1 {
+	font-size: 0.6cm;
+	margin: 0;	
+}
+.row_month h2 {
+	font-size: 0.5cm;
+	margin: 1px 0 3mm 4mm;
+}
+table.summary {
+	border-collapse: collapse;
+}
+td {
+	padding: 2mm;
+}
+table.summary td {
+	padding-top: 0; padding-bottom: 0;
+	vertical-align: bottom;
+}
+tr.row_weekstart td {
+	border-top: thick solid #efefef;
+	padding-top: 3mm;
+}
+td.cell_day_today {
+	text-align: right;
+	padding-left: 1.2cm;
+	font-weight: bold;
+	color: red;
+}
+td.cell_endofday { }
+td.cell_month { padding-left: 0.6cm; }
+td.cell_day {
+	text-align: right;
+	padding-left: 1.2cm;
+}
+td.cell_time { }
+td.cell_event { }
+td.table_gap {
+	width: 0.5cm;
+	border-bottom: thin dotted black;
+}
+.cancelled { color: red; }
+.discounted { color: green; }
+
+.event {
+	background-image: url(line.jpg);
+	background-repeat: repeat-x;
+	background-color: white;
+	margin-left: 10%;
+	margin-right: 10%;
+	margin-top: 20px;
+	padding: 10px;
+	width: 80%;
+	border: thin solid gray;
+}
+.event h2 {
+	margin: 0;
+}
+.event img {
+	border: none;
+}
+p.image_caption {
+	font-style: italic;
+}
+
+

@@ -1,0 +1,15 @@
+
+<span id="event_{{ event.id }}">
+<h1>{{ event.name|capfirst}}</h1>
+
+{% if event.image %}
+<img src="{{ event.image }}" alt="Picture for event {{ event.name }}">
+{% if event.image_credit %}
+<p class="image_credit">{{ event.image_credit }}</p>
+{% endif %}
+{% endif %}
+
+<p>{{event.copy|safe}}</p>
+
+</span> 
+

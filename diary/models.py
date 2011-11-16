@@ -52,6 +52,10 @@ class Showing(models.Model):
 
     start = models.DateTimeField()
 
+    @property
+    def start_date(self):
+        return self.start.date()
+
     extra_copy = models.CharField(max_length=4096, null=True)
     extra_copy_summary = models.CharField(max_length=4096, null=True)
 
