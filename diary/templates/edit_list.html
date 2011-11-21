@@ -1,22 +1,40 @@
 {% extends "base.html" %}
 
 {% block title %}
-{{ event_list_name }}
+Editing {{ event_list_name }}
 {% endblock %}
 
 {% block css %}
-<link rel="stylesheet" href="/static/programme.css" type="text/css" title="Preferred" media="screen,projection">
+<style>
+  .private {
+  font-style: italic;
+  }
+  .external {
+  font-weight: bold;
+  }
+  .discounted {
+    color: #a000FF;
+  }
+  .cancelled {
+    color: red;
+  }
+</style>
 {% endblock %}
 
 {% block body %}
 
 <p><a name="top"></a></p>
-<div class="programme"><a href="http://www.cubecinema.com/"><img class="cubelogo" src="/static/prog_logo_captioned.png" alt="Cube Programme"></a>
 
-<p align='center'><a href="{% url day-view year=start.year day=start.day month=start.month %}?daysahead=30">See 1 month</a> | 
-<a href="{% url day-view year=start.year day=start.day month=start.month %}?daysahead=60">See 2 months</a> | 
-<a href="{% url day-view year=start.year day=start.day month=start.month %}?daysahead=90">See 3 months</a></p>
+<h4>Key:</h4>
+<p><span class="private">Private events are in italics</span><br>
+<span class="external">Outside hires are bolded</span><br>
+<span class="discounted">Discounted events (like TTT) are magenta</span><br>
+<span class="cancelled">Cancelled events are red</span></p>
 
+<div class="programme"><p align='center'><a href="{% url day-edit year=start.year day=start.day month=start.month %}?daysahead=30">See 1 month</a> | 
+<a href="{% url cube.diary.views.view_diary year=start.year day=start.day month=start.month %}?daysahead=60">See 2 months</a> | 
+<a href="{% url cube.diary.views.view_diary year=start.year day=start.day month=start.month %}?daysahead=90">See 3 months</a></p>
+<p><a href=" ">New event</a></p>
 <table class="summary">
 {% for showing in showings %}
     {% ifchanged %}<tr class="row_year"><td colspan="4"><h1>{{ showing.start|date:"Y" }} </h1></td></tr>{% endifchanged %}
@@ -37,10 +55,5 @@
 </table>
 </div>
 
-<div class="details">
-{% for showing in showings %}
-{% include "showing_fragment.html" %}
-{% endfor %}
-</div>
 {% endblock %}
 

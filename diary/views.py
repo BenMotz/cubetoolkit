@@ -11,10 +11,13 @@ from cube.diary.models import Showing, Event
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-def view_diary(request, year=None, month=None, day=None):
+def _get_date_range(year, month, day):
+    pass
+
+
+def view_diary(request, year=None, month=None, day=None, edit=False):
     context = { }
     days_ahead = None
-
 
     if day is not None and month is None:
         raise Http404("Invalid request; cant specify day and no month")
@@ -59,7 +62,15 @@ def view_diary(request, year=None, month=None, day=None):
     # Do query:
     context['showings'] = Showing.objects.filter(confirmed=True).filter(hide_in_programme=False).filter(start__range=[startdate, enddate]).filter(event__private=False).order_by('start')
 
-    return render_to_response('indexed_showing_list.html', context)
+    if edit:
+        template = 'edit_list.html'
+    else:
+        template = 'indexed_showing_list.html'
+
+    return render_to_response(template, context)
+
+def edit_diary(request, year=None, day=None, month=None):
+    pass
 
 def view_showing(request, showing_id=None):
     context = {}
