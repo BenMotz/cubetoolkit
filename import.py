@@ -126,7 +126,7 @@ def import_ideas(connection):
 
     for r in cursor.fetchall():
         i, created = diary.models.DiaryIdea.objects.get_or_create(month=r[0])
-        i.idea = r[1]
+        i.ideas = r[1]
         i.save()
 
     cursor.close()
