@@ -120,6 +120,17 @@ def import_event_showings(connection, event, legacy_event_id):
 
     return all_showings
 
+def import_ideas(connection):
+    cursor = connection.cursor()
+    results = cursor.execute("SELECT date, ideas FROM ideas ORDER BY date")
+
+    for r in cursor.fetchall():
+        i, created = diary.models.DiaryIdea.objects.get_or_create(month=r[0])
+        i.idea = r[1]
+        i.save()
+
+    cursor.close()
+
 def import_events(connection, role_map):
     cursor = connection.cursor()
     results = cursor.execute("SELECT event_id, event_name, copy, copy_summary, duration, image_credits, terms FROM events ORDER BY event_id")
@@ -188,6 +199,7 @@ def main():
         return
 
     import_events(conn, role_map)
+    import_ideas(conn)
     conn.close ()
 
 if __name__ == "__main__":
