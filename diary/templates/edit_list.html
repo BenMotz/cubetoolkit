@@ -32,24 +32,25 @@ Editing {{ event_list_name }}
 <span class="cancelled">Cancelled events are red</span></p>
 
 <div class="programme"><p align='center'><a href="{% url day-edit year=start.year day=start.day month=start.month %}?daysahead=30">See 1 month</a> | 
-<a href="{% url cube.diary.views.view_diary year=start.year day=start.day month=start.month %}?daysahead=60">See 2 months</a> | 
-<a href="{% url cube.diary.views.view_diary year=start.year day=start.day month=start.month %}?daysahead=90">See 3 months</a></p>
+<a href="{% url day-edit year=start.year day=start.day month=start.month %}?daysahead=60">See 2 months</a> | 
+<a href="{% url day-edit year=start.year day=start.day month=start.month %}?daysahead=90">See 3 months</a></p>
 <p><a href=" ">New event</a></p>
 <table class="summary">
-{% for showing in showings %}
-    {% ifchanged %}<tr class="row_year"><td colspan="4"><h1>{{ showing.start|date:"Y" }} </h1></td></tr>{% endifchanged %}
-    {% ifchanged %}<tr class="row_month"><td colspan="4"><h2>{{ showing.start|date:"F" }}</h2></td></tr>{% endifchanged %}
-    {% ifchanged %}
-        <tr><td colspan="4">&nbsp;</td></tr>
-        {% if showing.start.weekday == 0 %}<tr class="row_weekstart"> {% else %} <tr class="row_day"> {% endif %}
-        {% if showing.start_date == today %}<td class="cell_day_today">{% else %}<td class="day_today">{% endif %}
-        {{ showing.start|date:"D"}}&nbsp;{{ showing.start|date:"j" }}
-        </td>
-    {% else %}
-        <tr><td>&nbsp;</td>
+
+
+{% for day, showings in dates.items %}
+    {% ifchanged %}<tr class="row_year"><td colspan="4"><h1>{{ day|date:"Y" }} </h1></td></tr>{% endifchanged %}
+    {% ifchanged %}<tr class="row_month"><td colspan="4"><h2>{{ day|date:"F" }}</h2></td></tr>
+    <tr><td><a href="">IDEAS</a></td><td rowspan="3">xx{{ ideas }} xx</td></tr>
     {% endifchanged %}
-    <td class="cell_time">{{showing.start|date:"H:i"}}</td><td class="table_gap">&nbsp;</td>
-    <td class="cell_event"><a href="#showing_{{showing.id}}">{% if showing.discounted %}<span class="discounted">{% endif %}{% if showing.cancelled %}<span class="cancelled">{% endif %}{{ showing.event.name|capfirst }}{% if showing.cancelled %} (CANCELLED) </span>{% endif %}{% if showing.discounted %} (Discount)</span>{% endif %}</a></td></tr>
+    <tr class="row_day"><td class="cell_day"> {{ day|date:"D"}}&nbsp;{{ day|date:"j" }}</td>
+
+    {% for showing in showings %}
+    <td>{{ showing.start|date:"H:i" }}</td><td class="table_gap">&nbsp;</td><td>{{ showing.event.booked_by }} <a href="">{{ showing.event.name }}</a></td></tr>
+    <tr><td>&nbsp;</td>
+    {% endfor %}
+    <td colspan="3">&nbsp;</td></tr>
+
 {% endfor %}
 
 </table>

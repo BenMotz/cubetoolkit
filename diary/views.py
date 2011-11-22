@@ -1,24 +1,18 @@
 import datetime
 import calendar
 import logging
+from collections import OrderedDict
 
 import django.core.exceptions
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response, get_object_or_404
 
-from cube.diary.models import Showing, Event
+from cube.diary.models import Showing, Event, DiaryIdea
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-def _get_date_range(year, month, day):
-    pass
-
-
-def view_diary(request, year=None, month=None, day=None, edit=False):
-    context = { }
-    days_ahead = None
-
+def _get_date_range(year, month, day, user_days_ahead):
     if day is not None and month is None:
         raise Http404("Invalid request; cant specify day and no month")
 
@@ -29,17 +23,16 @@ def view_diary(request, year=None, month=None, day=None, edit=False):
     except ValueError:
         raise Http404("Invalid values")
 
-    logger.debug("view_diary: day %s, month %s, year %s, span %s days", str(day), str(month), str(year), str(days_ahead))
-
+    logger.debug("view_diary: day %s, month %s, year %s, span %s days", str(day), str(month), str(year), str(user_days_ahead))
 
     if day:
-        startdate = datetime.datetime(year, month, day)
+        startdate = datetime.date(year, month, day)
         days_ahead = 1
     elif month:
-        startdate = datetime.datetime(year, month, 1)
+        startdate = datetime.date(year, month, 1)
         days_ahead = calendar.monthrange(year, month)[1]
     elif year:
-        startdate = datetime.datetime(year, 1, 1)
+        startdate = datetime.date(year, 1, 1)
         days_ahead = 365
         if calendar.isleap(year):
             days_ahead += 1 
@@ -47,13 +40,19 @@ def view_diary(request, year=None, month=None, day=None, edit=False):
         startdate = datetime.date.today()
         days_ahead = 30 # default
 
-    # If days_ahead was provided in the request, use that instead of default
-    if 'daysahead' in request.GET:
+    if user_days_ahead:
         try:
-            days_ahead = int(request.GET['daysahead'], 10)
+            days_ahead = int(user_days_ahead)
         except (ValueError, TypeError):
             pass
 
+
+    return startdate, days_ahead
+
+def view_diary(request, year=None, month=None, day=None):
+    context = { }
+    query_days_ahead = request.GET.get('daysahead', None)
+    startdate, days_ahead = _get_date_range(year, month, day, query_days_ahead)
     enddate = startdate + datetime.timedelta(days=days_ahead)
 
     context['today'] = datetime.date.today()
@@ -62,15 +61,37 @@ def view_diary(request, year=None, month=None, day=None, edit=False):
     # Do query:
     context['showings'] = Showing.objects.filter(confirmed=True).filter(hide_in_programme=False).filter(start__range=[startdate, enddate]).filter(event__private=False).order_by('start')
 
-    if edit:
-        template = 'edit_list.html'
-    else:
-        template = 'indexed_showing_list.html'
+    return render_to_response('indexed_showing_list.html', context)
 
-    return render_to_response(template, context)
+def edit_diary_list(request, year=None, day=None, month=None):
+    context = { }
+    # Sort out date range to display
+    query_days_ahead = request.GET.get('daysahead', None)
+    startdate, days_ahead = _get_date_range(year, month, day, query_days_ahead)
+    enddate = startdate + datetime.timedelta(days=days_ahead)
 
-def edit_diary(request, year=None, day=None, month=None):
-    pass
+    # Get all showings in the date range
+    showings = Showing.objects.filter(start__range=[startdate, enddate]).order_by('start').select_related()
+    # Build a dict with all the dates in the range as keys and empty lists as values
+    dates = OrderedDict([ ((startdate + datetime.timedelta(days=days)), []) for days in xrange(days_ahead) ])
+    # Put showings in the dict (so days without showings will have an empty dict)
+    for showing in showings:
+        dates[showing.start.date()].append(showing)
+
+    # Get all 'ideas' in date range:
+    idea_list = DiaryIdea.objects.filter(month__range=[startdate, enddate]).order_by('month').select_related()
+    ideas = {}
+    for idea in idea_list:
+#        logging.info("%s: %s" % (str(idea), idea.ideas[0:50]))
+        logging.info("%s: %s" % (str(idea), str(idea.ideas)))
+        ideas[idea.month] = idea.ideas
+
+    context['ideas'] = ideas
+    context['dates'] = dates
+    context['event_list_name'] = "Diary for %s to %s" % (str(startdate), str(enddate))
+    context['start'] = startdate
+
+    return render_to_response('edit_list.html', context)
 
 def view_showing(request, showing_id=None):
     context = {}
