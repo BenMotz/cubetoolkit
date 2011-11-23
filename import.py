@@ -3,6 +3,7 @@ import sys
 import datetime
 import MySQLdb
 import re
+import logging
 
 import diary.models
 
@@ -19,11 +20,12 @@ def connect():
                            user = "cube-import",
                            passwd = "spanner",
                            db = "toolkit",
-#use_unicode = True,
+                           use_unicode = True,
                            )
     return conn
 
-def decode(string):
+def _decode(string):
+    return string
     if string is None:
         return None
     else:
@@ -41,16 +43,19 @@ def html_ify(string):
         result = "<p>" + string.strip().replace("\r\n","<br>") + "</p>" 
     return result
 
+def markdown_ify(string):
+    return string
+
 event_tot = 0
 
 def import_event_roles(connection, showings, legacy_event_id, role_map):
     cursor = connection.cursor()
 
     # *cough*
-    result_count = cursor.execute("SELECT * from roles_merged WHERE event_id = %s", legacy_event_id)
+    cursor.execute("SELECT * from roles_merged WHERE event_id = %s", legacy_event_id)
 
     for ev in cursor:
-        event_id = ev[0]
+        # event_id = ev[0]
         col_no = 0
         for role_col in ev[1:]:
             if role_col == 1L:
@@ -128,8 +133,7 @@ def import_ideas(connection):
 
     for r in cursor.fetchall():
         i, created = diary.models.DiaryIdea.objects.get_or_create(month=r[0])
-        i.ideas = r[1].decode("windows-1252")
-#        i.ideas = r[1].decode("iso-8859-15")
+        i.ideas = _decode(r[1])
         i.save()
 
     cursor.close()
@@ -141,23 +145,27 @@ def import_events(connection, role_map):
     count = 0
     tenpc = results / 100
     pc = 1
-    print "%d results" % (results)
+    logging.info("%d events" % (results))
     for r in cursor.fetchall():
         e = diary.models.Event()
 
-        e.name = titlecase(decode(r[1]))
-        e.copy = html_ify(decode(r[2].decode("windows-1252")))
-        e.copy_summary = decode(r[3])
-        
+        e.name = titlecase(r[1])
+        if r[2] is not None:
+            e.copy = markdown_ify(_decode(r[2]))
+        else:
+            logging.error("Missing copy for event [%s] %s", r[0], e.name)
+            e.copy = ''
+        e.copy_summary = _decode(r[3])
+ 
         # Duration:
         if r[4] is not None and r[4] != '':
-            durn_hour, durn_min  = decode(r[4]).split('/')
+            durn_hour, durn_min  = _decode(r[4]).split('/')
             durn_hour = int_def(durn_hour,0)
             durn_min = int_def(durn_min,0)
             e.duration = datetime.time(durn_hour, durn_min) 
 
-        e.image_credits = titlecase(decode(r[5]))
-        e.terms = decode(r[6])
+        e.image_credits = titlecase(_decode(r[5]))
+        e.terms = _decode(r[6])
         e.save()
 
         showings = import_event_showings(connection, e, r[0])
@@ -172,7 +180,7 @@ def import_events(connection, role_map):
 
     cursor.close()
 
-    print "%d events" % event_tot
+    logging.info("%d events" % event_tot)
 
 def create_roles(connection):
     roles = []
@@ -180,7 +188,7 @@ def create_roles(connection):
     
     count = cursor.execute("SELECT * FROM roles_merged LIMIT 1")
     if count != 1:
-        print "Nothing in the 'roles_merged' table!"
+        logging.warning("Nothing in the 'roles_merged' table!")
         cursor.close()
         return None 
 
@@ -188,7 +196,7 @@ def create_roles(connection):
         role = diary.models.Role()
         role.name = titlecase(column[0]).replace("_", " ")
         role.save()
-        print "%s: %d" % (role.name, role.id)
+        logging.info("%s: %d" % (role.name, role.id))
         roles.append(role.id)
 
     cursor.close()
