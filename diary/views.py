@@ -83,7 +83,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
     ideas = {}
     for idea in idea_list:
 #        logging.info("%s: %s" % (str(idea), idea.ideas[0:50]))
-        logging.info("%s: %s" % (str(idea), str(idea.ideas)))
+        logging.info("%s: %s" % (str(idea), idea.ideas))
         ideas[idea.month] = idea.ideas
 
     context['ideas'] = ideas

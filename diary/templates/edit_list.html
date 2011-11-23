@@ -41,7 +41,7 @@ Editing {{ event_list_name }}
 {% for day, showings in dates.items %}
     {% ifchanged %}<tr class="row_year"><td colspan="4"><h1>{{ day|date:"Y" }} </h1></td></tr>{% endifchanged %}
     {% ifchanged %}<tr class="row_month"><td colspan="4"><h2>{{ day|date:"F" }}</h2></td></tr>
-    <tr><td><a href="">IDEAS</a></td><td rowspan="3">xx{{ ideas }} xx</td></tr>
+    <tr><td><a href="">IDEAS</a></td><td rowspan="3">xx{{ ideas.day }} xx</td></tr>
     {% endifchanged %}
     <tr class="row_day"><td class="cell_day"> {{ day|date:"D"}}&nbsp;{{ day|date:"j" }}</td>
 
