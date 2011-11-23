@@ -78,13 +78,22 @@ def edit_diary_list(request, year=None, day=None, month=None):
     for showing in showings:
         dates[showing.start.date()].append(showing)
 
-    # Get all 'ideas' in date range:
-    idea_list = DiaryIdea.objects.filter(month__range=[startdate, enddate]).order_by('month').select_related()
+    # Get all 'ideas' in date range. Fiddle the date range to be from the start
+    # of the month in startdate, so the idea for that month gets included:
+    idea_startdate = datetime.date(day=1, month=startdate.month, year=startdate.year)
+    idea_list = DiaryIdea.objects.filter(month__range=[idea_startdate, enddate]).order_by('month').select_related()
+    logging.info(str(idea_list))
     ideas = {}
+    # Assemble into dict, with keys that will match the keys in the showings
+    # dict
     for idea in idea_list:
-#        logging.info("%s: %s" % (str(idea), idea.ideas[0:50]))
-        logging.info("%s: %s" % (str(idea), idea.ideas))
+        idea.ideas = idea.ideas.replace("\n", "<br>")
         ideas[idea.month] = idea.ideas
+    # Fiddle so that the idea for the first month is displayed, even if 
+    # startdate is after the first day of the month:
+    if idea_startdate not in showings:
+        ideas[startdate] = idea_list[0].ideas
+
 
     context['ideas'] = ideas
     context['dates'] = dates

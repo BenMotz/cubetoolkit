@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load hash_filter %}
 
 {% block title %}
 Editing {{ event_list_name }}
@@ -24,7 +25,6 @@ Editing {{ event_list_name }}
 {% block body %}
 
 <p><a name="top"></a></p>
-
 <h4>Key:</h4>
 <p><span class="private">Private events are in italics</span><br>
 <span class="external">Outside hires are bolded</span><br>
@@ -41,8 +41,10 @@ Editing {{ event_list_name }}
 {% for day, showings in dates.items %}
     {% ifchanged %}<tr class="row_year"><td colspan="4"><h1>{{ day|date:"Y" }} </h1></td></tr>{% endifchanged %}
     {% ifchanged %}<tr class="row_month"><td colspan="4"><h2>{{ day|date:"F" }}</h2></td></tr>
-    <tr><td><a href="">IDEAS</a></td><td rowspan="3">xx{{ ideas.day }} xx</td></tr>
     {% endifchanged %}
+    {% if day in ideas %}
+    <tr><td><a href="">IDEAS</a></td><td colspan="3">{{ ideas|lookup:day|safe }}</td></tr>
+    {% endif %}
     <tr class="row_day"><td class="cell_day"> {{ day|date:"D"}}&nbsp;{{ day|date:"j" }}</td>
 
     {% for showing in showings %}
