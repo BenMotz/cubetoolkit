@@ -24,13 +24,6 @@ def connect():
                            )
     return conn
 
-def _decode(string):
-    return string
-    if string is None:
-        return None
-    else:
-        return string.decode("Windows-1252")
-
 def int_def(string, default):
     try:
         return int(string)
@@ -133,7 +126,7 @@ def import_ideas(connection):
 
     for r in cursor.fetchall():
         i, created = diary.models.DiaryIdea.objects.get_or_create(month=r[0])
-        i.ideas = _decode(r[1])
+        i.ideas = r[1]
         i.save()
 
     cursor.close()
@@ -151,21 +144,21 @@ def import_events(connection, role_map):
 
         e.name = titlecase(r[1])
         if r[2] is not None:
-            e.copy = markdown_ify(_decode(r[2]))
+            e.copy = markdown_ify(r[2])
         else:
             logging.error("Missing copy for event [%s] %s", r[0], e.name)
             e.copy = ''
-        e.copy_summary = _decode(r[3])
+        e.copy_summary = r[3]
  
         # Duration:
         if r[4] is not None and r[4] != '':
-            durn_hour, durn_min  = _decode(r[4]).split('/')
+            durn_hour, durn_min  = r[4].split('/')
             durn_hour = int_def(durn_hour,0)
             durn_min = int_def(durn_min,0)
             e.duration = datetime.time(durn_hour, durn_min) 
 
-        e.image_credits = titlecase(_decode(r[5]))
-        e.terms = _decode(r[6])
+        e.image_credits = titlecase(r[5])
+        e.terms = r[6]
         e.save()
 
         showings = import_event_showings(connection, e, r[0])
