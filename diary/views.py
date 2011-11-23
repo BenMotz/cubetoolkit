@@ -87,7 +87,6 @@ def edit_diary_list(request, year=None, day=None, month=None):
     # Assemble into dict, with keys that will match the keys in the showings
     # dict
     for idea in idea_list:
-        idea.ideas = idea.ideas.replace("\n", "<br>")
         ideas[idea.month] = idea.ideas
     # Fiddle so that the idea for the first month is displayed, even if 
     # startdate is after the first day of the month:
