@@ -18,7 +18,9 @@ def connect():
     conn = MySQLdb.connect (host = "localhost",
                            user = "cube-import",
                            passwd = "spanner",
-                           db = "toolkit")
+                           db = "toolkit",
+#use_unicode = True,
+                           )
     return conn
 
 def decode(string):
@@ -126,7 +128,8 @@ def import_ideas(connection):
 
     for r in cursor.fetchall():
         i, created = diary.models.DiaryIdea.objects.get_or_create(month=r[0])
-        i.ideas = r[1]
+        i.ideas = r[1].decode("windows-1252")
+#        i.ideas = r[1].decode("iso-8859-15")
         i.save()
 
     cursor.close()
@@ -143,7 +146,7 @@ def import_events(connection, role_map):
         e = diary.models.Event()
 
         e.name = titlecase(decode(r[1]))
-        e.copy = html_ify(decode(r[2]))
+        e.copy = html_ify(decode(r[2].decode("windows-1252")))
         e.copy_summary = decode(r[3])
         
         # Duration:
