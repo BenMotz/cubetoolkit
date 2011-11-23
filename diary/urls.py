@@ -8,13 +8,17 @@ urlpatterns = patterns( 'cube.diary.views',
     url('^(?P<year>\d{4})/(?P<month>\d{1,2})$', 'view_diary', name="month-view"),
     url('^(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})', 'view_diary', name="day-view"),
 
-    # As above, but editing:
+    # As above, but lists of events for editing:
     url('^edit$', 'edit_diary_list', name="default-edit", ),
     url('^edit/(?P<year>\d{4})$', 'edit_diary_list', name="year-edit", ),
     url('^edit/(?P<year>\d{4})/(?P<month>\d{1,2})$', 'edit_diary_list', name="month-edit", ),
     url('^edit/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})', 'edit_diary_list', name="day-edit", ),
 
-    # Individual showing
+    # Edit individual showings / events:
+    url('^edit/event/id/(?P<event_id>\d+)$', 'edit_event', name="single-event-edit"),
+    url('^edit/showing/id/(?P<showing_id>\d+)$', 'edit_showing', name="single-showing-edit"),
+
+    # View individual showing
     url('^showing/id/(?P<showing_id>\d+)$', 'view_showing', name="single-showing-view"),
     # All showings for a given event
     url('^event/id/(?P<event_id>\d+)$', 'view_event', name="single-event-view"),

@@ -101,6 +101,12 @@ def edit_diary_list(request, year=None, day=None, month=None):
 
     return render_to_response('edit_list.html', context)
 
+def edit_showing(request, showing_id=None):
+    return HttpResponse("Edit showing")
+
+def edit_event(request, event_id=None):
+    return HttpResponse("Edit event")
+
 def view_showing(request, showing_id=None):
     context = {}
     context['showing'] = get_object_or_404(Showing, id=showing_id)
