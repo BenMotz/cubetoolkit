@@ -6,8 +6,10 @@ from collections import OrderedDict
 import django.core.exceptions
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response, get_object_or_404
+from django.template import RequestContext
 
 from cube.diary.models import Showing, Event, DiaryIdea
+import cube.diary.forms
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -106,6 +108,24 @@ def edit_showings(request, event_id=None):
 
 def edit_event(request, event_id=None):
     return HttpResponse("Edit event")
+
+def edit_ideas(request, year=None, month=None):
+    context = {}
+    year = int(year)
+    month = int(month)
+
+    instance = DiaryIdea.objects.get(month=datetime.date(year=year, month=month, day=1))
+    if request.method == 'POST':
+        form = cube.diary.forms.DiaryIdeaForm(request.POST)
+        if form.is_valid():
+            return HttpResponse("Lovely")
+    else:
+        form = cube.diary.forms.DiaryIdeaForm(instance=instance)
+
+    context['form'] = form
+    context['month'] = instance.month
+
+    return render_to_response('form_idea.html', RequestContext(request, context))
 
 def view_showing(request, showing_id=None):
     context = {}

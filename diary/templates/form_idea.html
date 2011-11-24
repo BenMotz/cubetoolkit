@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}
+Edit ideas
+{% endblock %}
+
+{% block body %}
+<form aaction="{% url edit-ideas month=month.month year=month.year %}" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="SUBMIT TO XATHROS" />
+</form>
+
+{% endblock %}

@@ -17,6 +17,7 @@ urlpatterns = patterns( 'cube.diary.views',
     # Edit individual showings / events:
     url('^edit/event/id/(?P<event_id>\d+)$', 'edit_event', name="edit-event-details"),
     url('^edit/event/id/(?P<event_id>\d+)/showings$', 'edit_showings', name="edit-event-showings"),
+    url('^edit/ideas/(?P<year>\d{4})/(?P<month>\d{1,2})$', 'edit_ideas', name="edit-ideas"),
 
 #    url('^edit/event/new$', 'new_event'
 

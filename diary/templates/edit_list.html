@@ -44,7 +44,7 @@ Editing {{ event_list_name }}
     {% ifchanged %}<tr class="row_month"><td colspan="4"><h2>{{ day|date:"F" }}</h2></td></tr>
     {% endifchanged %}
     {% if day in ideas %}
-    <tr><td><a href="">IDEAS</a></td><td colspan="3">{{ ideas|lookup:day|markdown }}</td></tr>
+    <tr><td><a href="{% url edit-ideas year=day.year month=day.month %}">IDEAS</a></td><td colspan="3">{{ ideas|lookup:day|markdown }}</td></tr>
     {% endif %}
     <tr class="row_day"><td class="cell_day"> {{ day|date:"D"}}&nbsp;{{ day|date:"j" }}</td>
 

@@ -20,8 +20,8 @@ class Role(models.Model):
 class Event(models.Model):
 
     name = models.CharField(max_length=256, blank=False)
-    copy = models.CharField(max_length=8192, null=True)
-    copy_summary = models.CharField(max_length=4096, null=True)
+    copy = models.TextField(max_length=8192, null=True)
+    copy_summary = models.TextField(max_length=4096, null=True)
 
     image = models.FileField(upload_to="event", max_length=256, null=True)
     image_credit = models.CharField(max_length=64, null=True)
@@ -29,8 +29,8 @@ class Event(models.Model):
     # Event type?
     duration = models.TimeField(null=True)
     
-    terms = models.CharField(max_length=4096, null=True)
-    notes = models.CharField(max_length=4096, null=True)
+    terms = models.TextField(max_length=4096, null=True)
+    notes = models.TextField(max_length=4096, null=True)
 
     cancelled = models.BooleanField(default=False)
     outside_hire = models.BooleanField(default=False)
@@ -56,8 +56,8 @@ class Showing(models.Model):
     def start_date(self):
         return self.start.date()
 
-    extra_copy = models.CharField(max_length=4096, null=True)
-    extra_copy_summary = models.CharField(max_length=4096, null=True)
+    extra_copy = models.TextField(max_length=4096, null=True)
+    extra_copy_summary = models.TextField(max_length=4096, null=True)
 
     confirmed = models.BooleanField(default=False)
     hide_in_programme = models.BooleanField(default=False)
@@ -83,7 +83,7 @@ class Showing(models.Model):
 
 class DiaryIdea(models.Model):
     month = models.DateField()
-    ideas = models.CharField(max_length=16384, null=True)
+    ideas = models.TextField(max_length=16384, null=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
