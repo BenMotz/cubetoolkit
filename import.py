@@ -85,6 +85,8 @@ def import_event_showings(connection, event, legacy_event_id):
         all_showings.append(s)
         s.event = event
         s.start = r[0]
+        if r[2] is not None:
+            s.booked_by = titlecase(r[2])
         
         s.confirmed = bool(r[3])
 

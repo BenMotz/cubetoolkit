@@ -90,7 +90,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
         ideas[idea.month] = idea.ideas
     # Fiddle so that the idea for the first month is displayed, even if 
     # startdate is after the first day of the month:
-    if idea_startdate not in showings:
+    if idea_startdate not in showings and len(idea_list) > 0:
         ideas[startdate] = idea_list[0].ideas
 
 
@@ -101,7 +101,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
 
     return render_to_response('edit_list.html', context)
 
-def edit_showing(request, showing_id=None):
+def edit_showings(request, event_id=None):
     return HttpResponse("Edit showing")
 
 def edit_event(request, event_id=None):

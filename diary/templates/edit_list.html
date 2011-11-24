@@ -49,7 +49,25 @@ Editing {{ event_list_name }}
     <tr class="row_day"><td class="cell_day"> {{ day|date:"D"}}&nbsp;{{ day|date:"j" }}</td>
 
     {% for showing in showings %}
-    <td>{{ showing.start|date:"H:i" }}</td><td class="table_gap">&nbsp;</td><td>{{ showing.event.booked_by }} <a href="">{{ showing.event.name }}</a></td></tr>
+    <td>
+    <a href="{% url edit-event-showings event_id=showing.event.pk %}">{{ showing.start|date:"H:i" }}</a>
+    </td>
+    <td class="table_gap">&nbsp;</td>
+    <td>{{ showing.booked_by }} <a href="{% url edit-event-details event_id=showing.event.pk %}">
+    {% if showing.cancelled or showing.event.cancelled %} <span class="cancelled"> {% endif %}
+    {% if showing.discounted %} <span class="discounted"> {% endif %}
+    {% if showing.event.private %} <span class="private"> {% endif %}
+    {% if showing.event.outside_hire %}<span class="external">{% endif %}
+    {% if showing.confirmed %}
+    {{ showing.event.name|upper }}
+    {% else %}
+    {{ showing.event.name }}
+    {% endif %}
+    {% if showing.event.outside_hire %}</span>{% endif %}
+    {% if showing.event.private %} </span> {% endif %}
+    {% if showing.discounted %} </span> {% endif %}
+    {% if showing.cancelled or showing.event.cancelled %} </span> {% endif %}
+    </a></td></tr>
     <tr><td>&nbsp;</td>
     {% endfor %}
     <td colspan="3">&nbsp;</td></tr>

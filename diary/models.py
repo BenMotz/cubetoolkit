@@ -31,8 +31,6 @@ class Event(models.Model):
     
     terms = models.CharField(max_length=4096, null=True)
     notes = models.CharField(max_length=4096, null=True)
-    
-    booked_by = models.CharField(max_length=64, blank=False)
 
     cancelled = models.BooleanField(default=False)
     outside_hire = models.BooleanField(default=False)
@@ -52,6 +50,8 @@ class Showing(models.Model):
 
     start = models.DateTimeField()
 
+    booked_by = models.CharField(max_length=64, blank=False)
+
     @property
     def start_date(self):
         return self.start.date()
@@ -68,7 +68,7 @@ class Showing(models.Model):
 
     # Rota entries
     roles = models.ManyToManyField(Role, through='RotaEntry')
-    
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
