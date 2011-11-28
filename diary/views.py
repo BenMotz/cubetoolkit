@@ -4,9 +4,10 @@ import logging
 from collections import OrderedDict
 
 import django.core.exceptions
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
+from django.core.urlresolvers import reverse
 
 from cube.diary.models import Showing, Event, DiaryIdea
 import cube.diary.forms
@@ -116,9 +117,10 @@ def edit_ideas(request, year=None, month=None):
 
     instance = DiaryIdea.objects.get(month=datetime.date(year=year, month=month, day=1))
     if request.method == 'POST':
-        form = cube.diary.forms.DiaryIdeaForm(request.POST)
+        form = cube.diary.forms.DiaryIdeaForm(request.POST, instance=instance)
         if form.is_valid():
-            return HttpResponse("Lovely")
+            form.save()
+            return HttpResponseRedirect(reverse('default-edit'))
     else:
         form = cube.diary.forms.DiaryIdeaForm(instance=instance)
 

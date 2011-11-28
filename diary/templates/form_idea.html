@@ -1,14 +1,28 @@
 {% extends "base.html" %}
 
 {% block title %}
-Edit ideas
+Edit ideas for {{ month|date:"F Y"}}
 {% endblock %}
+{% block css %}
+<style>
+    textarea { width: 90%;}
+</style>
+{% endblock css %}
 
 {% block body %}
-<form aaction="{% url edit-ideas month=month.month year=month.year %}" method="post">
+<h1>Programming ideas for {{month|date:"F Y"}}</h1>
+{{ form.name_of_field.errors }}
+<form action="{% url edit-ideas month=month.month year=month.year %}" method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <input type="submit" value="SUBMIT TO XATHROS" />
+    <input type="submit" value="Update" />
 </form>
 
+<p>To put in links:<code>[link text](web address)</code><br>
+
+eg;<br>
+<code>[Cube cinema](http://www.cubecinema.com/)</code> = <a href="http://www.cubecinema.com/">Cube cinema</a><br>
+or;<br>
+<code>[http://www.google.com](http://www.google.com)</code> = <a href="http://www.google.com">http://www.google.com</a><br>
+</p>
 {% endblock %}

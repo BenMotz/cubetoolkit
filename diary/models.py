@@ -82,7 +82,7 @@ class Showing(models.Model):
             return "[uninitialised]"
 
 class DiaryIdea(models.Model):
-    month = models.DateField()
+    month = models.DateField(editable=False)
     ideas = models.TextField(max_length=16384, null=True)
     
     created_at = models.DateTimeField(auto_now_add=True)
