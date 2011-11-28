@@ -23,7 +23,7 @@ h1.programme_title {
 	font-size: 1.1cm;
 	padding: 0;
 	margin: 1mm;
-	border-bottom: thin solid black;	
+	border-bottom: thin solid black;
 }
 p.table_key {
 	font-weight: bold;
@@ -73,7 +73,7 @@ td.table_gap {
 .discounted { color: green; }
 
 .event {
-	background-image: url(line.jpg);
+	background-image: url(../diary/line.jpg);
 	background-repeat: repeat-x;
 	background-color: white;
 	margin-left: 10%;
