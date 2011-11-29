@@ -1,3 +1,4 @@
+{% load markup %}
 <div class="event">
 <span id="showing_{{ showing.id }}">
 <h2>{{ showing.event.name|capfirst}}</h2>
@@ -11,7 +12,7 @@
 
 {% include "showing_time_fragment.html" %}
 
-<p>{{showing.event.copy|safe}}</p>
+<p>{{showing.event.copy|markdown}}</p>
 <p>[<a href="#top">top of page</a>]</p>
 </span> 
 </div>
