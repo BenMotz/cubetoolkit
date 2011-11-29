@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}
+Details for: {{ event.name }}
+{% endblock %}
+
+{% block body %}
+<h1>Details for {{ event.name }}</h1>
+{% for showing in event.showings.all %}
+<p>Booked for: {{ showing.start|date:"H:i d/m/Y"  }} </p>
+{% endfor %}
+
+{{ form.name_of_field.errors }}
+<form action="{% url edit-event-details event_id=event.id %}" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Update" />
+</form>
+
+{% endblock %}
+

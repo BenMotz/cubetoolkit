@@ -108,14 +108,29 @@ def edit_showings(request, event_id=None):
     return HttpResponse("Edit showing")
 
 def edit_event(request, event_id=None):
-    return HttpResponse("Edit event")
+    event = get_object_or_404(Event, id=event_id)
+
+    if request.method == 'POST':
+        form = cube.diary.forms.EventForm(request.POST, instance=event)
+        if form.is_valid():
+            form.save()
+    else:
+        form = cube.diary.forms.EventForm(instance=event)
+
+
+    context = {
+            'event' : event,
+            'form' : form,
+            }
+
+    return render_to_response('form_event.html', RequestContext(request, context))
 
 def edit_ideas(request, year=None, month=None):
     context = {}
     year = int(year)
     month = int(month)
 
-    instance = DiaryIdea.objects.get(month=datetime.date(year=year, month=month, day=1))
+    instance = DiaryIdea.objects.get_or_create(month=datetime.date(year=year, month=month, day=1))
     if request.method == 'POST':
         form = cube.diary.forms.DiaryIdeaForm(request.POST, instance=instance)
         if form.is_valid():
