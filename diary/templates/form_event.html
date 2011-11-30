@@ -10,10 +10,10 @@ Details for: {{ event.name }}
         text-align: right;
         padding-right: 5pt;
         float: left;
-        width: 100pt;
+        width: 15%;
     }
     form textarea, form input[type=text] {
-        width: 500pt;
+        width: 80%;
     }
 </style>
 {% endblock %}
@@ -24,7 +24,6 @@ Details for: {{ event.name }}
 <p>Booked for: {{ showing.start|date:"H:i d/m/Y"  }} </p>
 {% endfor %}
 
-{{ form.name_of_field.errors }}
 <form action="{% url edit-event-details event_id=event.id %}" method="post">
     {% csrf_token %}
     {{ form.as_p }}
