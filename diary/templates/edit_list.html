@@ -50,23 +50,17 @@ Editing {{ event_list_name }}
 
     {% for showing in showings %}
     <td>
-    <a href="{% url edit-event-showings event_id=showing.event.pk %}">{{ showing.start|date:"H:i" }}</a>
+    <a href="{% url edit-showing showing_id=showing.pk %}">{{ showing.start|date:"H:i" }}</a>
     </td>
     <td class="table_gap">&nbsp;</td>
     <td>{{ showing.booked_by }} <a href="{% url edit-event-details event_id=showing.event.pk %}">
-    {% if showing.cancelled or showing.event.cancelled %} <span class="cancelled"> {% endif %}
-    {% if showing.discounted %} <span class="discounted"> {% endif %}
-    {% if showing.event.private %} <span class="private"> {% endif %}
-    {% if showing.event.outside_hire %}<span class="external">{% endif %}
-    {% if showing.confirmed %}
-    {{ showing.event.name|upper }}
-    {% else %}
-    {{ showing.event.name }}
-    {% endif %}
-    {% if showing.event.outside_hire %}</span>{% endif %}
-    {% if showing.event.private %} </span> {% endif %}
-    {% if showing.discounted %} </span> {% endif %}
-    {% if showing.cancelled or showing.event.cancelled %} </span> {% endif %}
+    <span class="{% if showing.cancelled or showing.event.cancelled %}cancelled{% endif %}{% if showing.discounted %} discounted{% endif %}{% if showing.event.private %} private{% endif %}{% if showing.event.outside_hire %} external{% endif %}">
+        {% if showing.confirmed %}
+        {{ showing.event.name|upper }}
+        {% else %}
+        {{ showing.event.name }}
+        {% endif %}
+    </span>
     </a></td></tr>
     <tr><td>&nbsp;</td>
     {% endfor %}

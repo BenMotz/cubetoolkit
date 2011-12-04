@@ -9,3 +9,10 @@ class EventForm(forms.ModelForm):
     class Meta(object):
         model = cube.diary.models.Event
 
+class ShowingForm(forms.ModelForm):
+    class Meta(object):
+        model = cube.diary.models.Showing
+        # Exclude these for now:
+        exclude = ('event', 'extra_copy', 'extra_copy_summary', 'booked_by')
+
+

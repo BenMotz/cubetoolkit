@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block title %}
+Details for: {{ event.name }}
+{% endblock %}
+{% block css %}
+<style>
+    form label {
+        font-weight: bold;
+        vertical-align: top;
+        text-align: right;
+        padding-right: 5pt;
+        float: left;
+        width: 15%;
+    }
+    form textarea, form input[type=text] {
+        width: 80%;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<h1>Booking</h1>
+<h2>Edit</h2>
+
+<form action="{% url edit-showing showing_id=showing.id %}" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Update" />
+</form>
+
+<h2>Clone (add) Booking</h2>
+
+
+
+
+{% endblock %}
+

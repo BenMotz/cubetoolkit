@@ -122,7 +122,6 @@ TEMPLATE_DIRS = (
 
 INSTALLED_APPS = (
     'diary',
-    'programme',
     # disabled for now;
     #'django.contrib.auth',
     #'django.contrib.contenttypes',

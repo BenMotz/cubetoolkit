@@ -104,11 +104,26 @@ def edit_diary_list(request, year=None, day=None, month=None):
 
     return render_to_response('edit_list.html', context)
 
-def edit_showings(request, event_id=None):
-    return HttpResponse("Edit showing")
+def edit_showing(request, showing_id=None):
+    showing = get_object_or_404(Showing, pk=showing_id)
+
+    if request.method == 'POST':
+        form = cube.diary.forms.ShowingForm(request.POST, instance=showing)
+        if form.is_valid():
+            form.save()
+    else:
+        form = cube.diary.forms.ShowingForm(instance=showing)
+
+    context = {
+            'showing' : showing,
+            'form' : form,
+            }
+
+    return render_to_response('form_showing.html', RequestContext(request, context))
+
 
 def edit_event(request, event_id=None):
-    event = get_object_or_404(Event, id=event_id)
+    event = get_object_or_404(Event, pk=event_id)
 
     if request.method == 'POST':
         form = cube.diary.forms.EventForm(request.POST, instance=event)
