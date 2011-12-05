@@ -114,6 +114,25 @@ class EventType(models.Model):
         return self.name
 
 class RotaEntry(models.Model):
+
+    def __init__(self, *args, **kwargs):
+        # Allow a template keyword arg to be supplied. If it is, copy rota
+        # details across (except for the showing id, if that's set separately)
+        if 'template' in kwargs:
+            template = kwargs.pop('template')
+        else:
+            template = None
+
+        super(RotaEntry, self).__init__(*args, **kwargs)
+
+        if 'template' in kwargs:
+            # Only use the showing from the template if one hasn't been set yet
+            if self.showing is None:
+                self.showing = template.showing 
+            self.role = template.role
+            self.required = template.required
+            self.rank = template.rank
+
     role = models.ForeignKey(Role)
     showing = models.ForeignKey(Showing)
 
@@ -127,4 +146,4 @@ class RotaEntry(models.Model):
         db_table = 'RotaEntries'
 
     def __unicode__(self):
-        return "%s %d" % (unicode(role), rank)
+        return "%s %d" % (unicode(self.role), self.rank)

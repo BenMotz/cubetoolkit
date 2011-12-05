@@ -15,6 +15,10 @@ Details for: {{ event.name }}
     form textarea, form input[type=text] {
         width: 80%;
     }
+    form p {
+        margin-top: 3px;
+        margin-bottom: 3px;
+    }
 </style>
 {% endblock %}
 
@@ -30,7 +34,11 @@ Details for: {{ event.name }}
 
 <h2>Clone (add) Booking</h2>
 
-
+<form action="{% url add-showing event_id=showing.event.id %}?copy_rota_from={{showing.id}}" method="post">
+    {% csrf_token %}
+    {{ new_showing_form.as_p }}
+    <input type="submit" value="Add" />
+</form>
 
 
 {% endblock %}

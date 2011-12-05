@@ -9,7 +9,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 
-from cube.diary.models import Showing, Event, DiaryIdea
+from cube.diary.models import Showing, Event, DiaryIdea, RotaEntry
 import cube.diary.forms
 
 logger = logging.getLogger(__name__)
@@ -104,6 +104,32 @@ def edit_diary_list(request, year=None, day=None, month=None):
 
     return render_to_response('edit_list.html', context)
 
+def add_showing(request, event_id):
+    if request.method != 'POST':
+        return HttpResponse('Invalid request!', 405) # 405 = Method not allowed
+    # Create form using submitted data:
+    form = cube.diary.forms.ShowingForm(request.POST)
+    if form.is_valid():
+        # Submitted data will have basic time & canceled/private info, but need
+        # to set the event id and rota information manually, so don't commit
+        # the new object immediately:
+        new_showing = form.save(commit=False)
+        # Set event ID:
+        new_showing.event_id = event_id
+        # Create showing
+        new_showing.save()
+        # If a showing_id was supplied, clone the rota from that:
+        copy_rota_from = request.POST.get('copy_rota_from', None)
+        if copy_rota_from:
+            source_showing = Showing.objects.get(pk=copy_rota_from)
+            for rota_entry in source_showing.rotaentry_set.all():
+                RotaEntry(showing=new_showing, template=rota_entry).save()
+
+        return HttpResponseRedirect(reverse('default-edit'))
+    else:
+        return HttpResponse("Failed adding showing", status=400)
+
+
 def edit_showing(request, showing_id=None):
     showing = get_object_or_404(Showing, pk=showing_id)
 
@@ -113,10 +139,17 @@ def edit_showing(request, showing_id=None):
             form.save()
     else:
         form = cube.diary.forms.ShowingForm(instance=showing)
+    # Also create a form for "cloning" the showing (ie. adding another one),
+    # but initialise it with values from existing event, but a day later...
+    new_showing_template = Showing.objects.get(pk=showing.pk)
+    new_showing_template.pk = None
+    new_showing_template.start += datetime.timedelta(days=1)
+    new_showing_form = cube.diary.forms.ShowingForm(instance=new_showing_template)
 
     context = {
             'showing' : showing,
             'form' : form,
+            'new_showing_form' : new_showing_form,
             }
 
     return render_to_response('form_showing.html', RequestContext(request, context))
@@ -145,6 +178,8 @@ def edit_ideas(request, year=None, month=None):
     year = int(year)
     month = int(month)
 
+    # Use get or create in order to silently create the ideas entry if it
+    # didn't already exist:
     instance = DiaryIdea.objects.get_or_create(month=datetime.date(year=year, month=month, day=1))
     if request.method == 'POST':
         form = cube.diary.forms.DiaryIdeaForm(request.POST, instance=instance)
