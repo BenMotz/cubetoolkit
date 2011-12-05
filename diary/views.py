@@ -61,8 +61,9 @@ def view_diary(request, year=None, month=None, day=None):
     context['today'] = datetime.date.today()
     context['start'] = startdate
     context['event_list_name'] = "Events for %s" % "/".join( [ str(s) for s in (day, month, year) if s ])
-    # Do query:
-    context['showings'] = Showing.objects.filter(confirmed=True).filter(hide_in_programme=False).filter(start__range=[startdate, enddate]).filter(event__private=False).order_by('start')
+    # Do query. select_related() on the end encourages it to get the
+    # associated showing/event data, to reduce the number of SQL queries
+    context['showings'] = Showing.objects.filter(confirmed=True).filter(hide_in_programme=False).filter(start__range=[startdate, enddate]).filter(event__private=False).order_by('start').select_related()
 
     return render_to_response('indexed_showing_list.html', context)
 
@@ -108,7 +109,7 @@ def add_showing(request, event_id):
     if request.method != 'POST':
         return HttpResponse('Invalid request!', 405) # 405 = Method not allowed
     # Create form using submitted data:
-    form = cube.diary.forms.ShowingForm(request.POST)
+    form = cube.diary.forms.NewShowingForm(request.POST)
     if form.is_valid():
         # Submitted data will have basic time & canceled/private info, but need
         # to set the event id and rota information manually, so don't commit
@@ -121,6 +122,7 @@ def add_showing(request, event_id):
         # If a showing_id was supplied, clone the rota from that:
         copy_rota_from = request.POST.get('copy_rota_from', None)
         if copy_rota_from:
+            # XXX This doesn't quite work...
             source_showing = Showing.objects.get(pk=copy_rota_from)
             for rota_entry in source_showing.rotaentry_set.all():
                 RotaEntry(showing=new_showing, template=rota_entry).save()
@@ -136,7 +138,22 @@ def edit_showing(request, showing_id=None):
     if request.method == 'POST':
         form = cube.diary.forms.ShowingForm(request.POST, instance=showing)
         if form.is_valid():
-            form.save()
+            # Because Django can't cope with updating the rota automatically
+            # do this two-step commit=False / save thing, then manually wrangle
+            # the rota:
+            modified_showing = form.save(commit=False)
+            modified_showing.save()
+            # Now get list of selected roles;
+            selected_roles = dict(request.POST)['roles']
+            initial_set = { r.values()[0] for r in showing.rotaentry_set.values('role_id')}
+            print initial_set
+            # For each id, this will get the entry or create it:
+            for role_id in selected_roles:
+                role_id = int(role_id)
+                modified_showing.rotaentry_set.get_or_create(role_id = role_id)
+                initial_set.discard(role_id)
+            # Now remove any roles that we haven't seen:
+            modified_showing.rotaentry_set.filter(role__in = initial_set).delete()
     else:
         form = cube.diary.forms.ShowingForm(instance=showing)
     # Also create a form for "cloning" the showing (ie. adding another one),
@@ -144,7 +161,7 @@ def edit_showing(request, showing_id=None):
     new_showing_template = Showing.objects.get(pk=showing.pk)
     new_showing_template.pk = None
     new_showing_template.start += datetime.timedelta(days=1)
-    new_showing_form = cube.diary.forms.ShowingForm(instance=new_showing_template)
+    new_showing_form = cube.diary.forms.NewShowingForm(instance=new_showing_template)
 
     context = {
             'showing' : showing,
@@ -164,7 +181,6 @@ def edit_event(request, event_id=None):
             form.save()
     else:
         form = cube.diary.forms.EventForm(instance=event)
-
 
     context = {
             'event' : event,
@@ -206,4 +222,9 @@ def view_event(request, event_id=None):
     context['showings'] = context['event'].showing_set.all()
     return render_to_response('event.html', context)
 
+def delete_showing(request, showing_id):
+    if request.method == 'POST':
+        showing = Showing.objects.get(pk=showing_id)
+        showing.delete()
 
+    return HttpResponseRedirect(reverse('default-edit'))

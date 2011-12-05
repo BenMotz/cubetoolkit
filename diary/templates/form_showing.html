@@ -32,6 +32,14 @@ Details for: {{ event.name }}
     <input type="submit" value="Update" />
 </form>
 
+<h2>Delete</h2>
+
+<form action="{% url delete-showing showing_id=showing.id %}" method="post">
+    {% csrf_token %}
+    <input type="submit" value="Delete" />
+</form>
+
+
 <h2>Clone (add) Booking</h2>
 
 <form action="{% url add-showing event_id=showing.event.id %}?copy_rota_from={{showing.id}}" method="post">

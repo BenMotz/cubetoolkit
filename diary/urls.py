@@ -28,5 +28,8 @@ urlpatterns = patterns( 'cube.diary.views',
     url('^showing/id/(?P<showing_id>\d+)$', 'view_showing', name="single-showing-view"),
     # All showings for a given event
     url('^event/id/(?P<event_id>\d+)$', 'view_event', name="single-event-view"),
+
+    # Delete things
+    url('^edit/showing/id/(?P<showing_id>\d+)/delete$', 'delete_showing', name="delete-showing"),
 )
 
