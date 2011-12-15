@@ -20,10 +20,26 @@ Editing {{ event_list_name }}
   .cancelled {
     color: red;
   }
+  h3 { font-family: Arial; }
+
+  table { border-collapse: collapse; }
+  tr:nth-child(odd) td {
+      background-color: #d0d0d0;
+  }
+  tr:nth-child(even) td {
+      background-color: #c0c0c0;
+  }
+  td:first-child {
+      text-align: right;
+      width: 100px;
+      padding-right: 10px;
+  }
 </style>
 {% endblock %}
 
 {% block body %}
+<img src="/static/diary/diary_edit_list_header.gif" alt="Cube Microplex" width="150px">
+<h3>CUBE events diary</h3>
 
 <p><a name="top"></a></p>
 <h4>Key:</h4>
@@ -35,13 +51,12 @@ Editing {{ event_list_name }}
 <div class="programme"><p align='center'><a href="{% url day-edit year=start.year day=start.day month=start.month %}?daysahead=30">See 1 month</a> | 
 <a href="{% url day-edit year=start.year day=start.day month=start.month %}?daysahead=60">See 2 months</a> | 
 <a href="{% url day-edit year=start.year day=start.day month=start.month %}?daysahead=90">See 3 months</a></p>
-<p><a href=" ">New event</a></p>
 <table class="summary">
-
+    <tr><td></td><td colspan="3"><a href=" ">New event</a></td></tr>
 
 {% for day, showings in dates.items %}
-    {% ifchanged %}<tr class="row_year"><td colspan="4"><h1>{{ day|date:"Y" }} </h1></td></tr>{% endifchanged %}
-    {% ifchanged %}<tr class="row_month"><td colspan="4"><h2>{{ day|date:"F" }}</h2></td></tr>
+    {% ifchanged %}<tr class="row_year"><td><h1>{{ day|date:"Y" }} </h1></td><td colspan="3"></td></tr>{% endifchanged %}
+    {% ifchanged %}<tr class="row_month"><td><h2>{{ day|date:"F" }}</h2></td><td colspan="3"></td></tr></tr>
     {% endifchanged %}
     {% if day in ideas %}
     <tr><td><a href="{% url edit-ideas year=day.year month=day.month %}">IDEAS</a></td><td colspan="3">{{ ideas|lookup:day|markdown }}</td></tr>
@@ -59,7 +74,7 @@ Editing {{ event_list_name }}
         {{ showing.event.name|upper }}
         {% else %}
         {{ showing.event.name }}
-        {% endif %}
+        {% endif %}{% if showing.discounted %}(TTT){% endif %}
     </span>
     </a></td></tr>
     <tr><td>&nbsp;</td>
