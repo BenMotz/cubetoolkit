@@ -7,7 +7,7 @@ Editing {{ event_list_name }}
 {% endblock %}
 
 {% block css %}
-<style>
+<style type="text/css">
   .private {
   font-style: italic;
   }
@@ -35,6 +35,19 @@ Editing {{ event_list_name }}
       padding-right: 10px;
   }
 </style>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="/static/js/jquery.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+        // Change links in table to open in a new window:
+        $('table a').click(function(e) {
+            window.open(e.currentTarget.href,"edit_form","height=800,width=800,scrollbars,resizable,toolbar");
+            return false;
+        });
+});
+</script>
 {% endblock %}
 
 {% block body %}
