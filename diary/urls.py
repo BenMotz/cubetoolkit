@@ -1,4 +1,6 @@
 from django.conf.urls.defaults import patterns, include, url
+from django.views.generic import DetailView
+from diary.models import Event
 
 
 urlpatterns = patterns( 'cube.diary.views',
@@ -15,6 +17,10 @@ urlpatterns = patterns( 'cube.diary.views',
     url('^edit/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})', 'edit_diary_list', name="day-edit", ),
 
     # Edit individual showings / events:
+    url('^edit/event/id/(?P<pk>\d+)/view$',
+            DetailView.as_view(
+                model=Event,
+                template_name='event_edit_view.html'), name="edit-event-details-view"),
     url('^edit/event/id/(?P<event_id>\d+)$', 'edit_event', name="edit-event-details"),
 #    url('^edit/event/id/(?P<event_id>\d+)/showings$', 'edit_showings', name="edit-event-showings"),
     url('^edit/showing/id/(?P<showing_id>\d+)$', 'edit_showing', name="edit-showing"),

@@ -81,7 +81,7 @@ $(document).ready(function() {
     <a href="{% url edit-showing showing_id=showing.pk %}">{{ showing.start|date:"H:i" }}</a>
     </td>
     <td class="table_gap">&nbsp;</td>
-    <td>{{ showing.booked_by }} <a href="{% url edit-event-details event_id=showing.event.pk %}">
+    <td>{{ showing.booked_by }} <a href="{% url edit-event-details-view pk=showing.event.pk %}">
     <span class="{% if showing.cancelled or showing.event.cancelled %}cancelled{% endif %}{% if showing.discounted %} discounted{% endif %}{% if showing.event.private %} private{% endif %}{% if showing.event.outside_hire %} external{% endif %}">
         {% if showing.confirmed %}
         {{ showing.event.name|upper }}

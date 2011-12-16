@@ -179,6 +179,9 @@ def edit_event(request, event_id=None):
         form = cube.diary.forms.EventForm(request.POST, instance=event)
         if form.is_valid():
             form.save()
+        # Really, really dirty way to emulate the original functionality and
+        # close the popped up window
+        return HttpResponse("<!DOCTYPE html><html><head><title>-</title></head><body onload='self.close(); opener.location.reload(true);'></body></html>")
     else:
         form = cube.diary.forms.EventForm(instance=event)
 
