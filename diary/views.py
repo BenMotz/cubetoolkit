@@ -165,11 +165,11 @@ def add_event(request):
             date[0] = int(date[0], 10)
             date[1] = int(date[1], 10)
             date[2] = int(date[2], 10)
-            event_date = datetime.date(day=date[0], month=date[1], year=date[2])
+            event_start = datetime.datetime(hour=20, minute=0, day=date[0], month=date[1], year=date[2])
         except (ValueError, TypeError):
             return HttpResponse("Illegal date", status=400)
         # Creat form, render template:
-        form = cube.diary.forms.NewEventForm(initial={'start' : event_date})
+        form = cube.diary.forms.NewEventForm(initial={'start' : event_start})
         context = { 'form' : form }
         return render_to_response('form_new_event_and_showing.html', RequestContext(request, context))
     else:

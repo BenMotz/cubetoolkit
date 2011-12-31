@@ -1,3 +1,4 @@
+import datetime
 from django import forms
 import cube.diary.models
 
@@ -32,8 +33,8 @@ class NewShowingForm(forms.ModelForm):
 
 class NewEventForm(forms.Form):
     start = forms.DateTimeField(required=True)
-    duration = forms.TimeField(required=True)
-    number_of_days = forms.IntegerField(min_value=1, max_value=31, required=True)
+    duration = forms.TimeField(required=True, initial=datetime.time(hour=1))
+    number_of_days = forms.IntegerField(min_value=1, max_value=31, required=True, initial=1)
     event_name = forms.CharField(min_length=3, max_length=128, required=True)
     event_type = forms.ModelChoiceField(queryset=cube.diary.models.EventType.objects.all())
     booked_by = forms.CharField(min_length=1, max_length=128, required=True)
