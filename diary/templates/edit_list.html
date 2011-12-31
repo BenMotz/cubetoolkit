@@ -65,7 +65,7 @@ $(document).ready(function() {
 <a href="{% url day-edit year=start.year day=start.day month=start.month %}?daysahead=60">See 2 months</a> | 
 <a href="{% url day-edit year=start.year day=start.day month=start.month %}?daysahead=90">See 3 months</a></p>
 <table class="summary">
-    <tr><td></td><td colspan="3"><a href=" ">New event</a></td></tr>
+    <tr><td></td><td colspan="3"><a href="{% url add-event %}?date={{start|date:"j-m-Y"}}">New event</a></td></tr>
 
 {% for day, showings in dates.items %}
     {% ifchanged %}<tr class="row_year"><td><h1>{{ day|date:"Y" }} </h1></td><td colspan="3"></td></tr>{% endifchanged %}
@@ -74,7 +74,7 @@ $(document).ready(function() {
     {% if day in ideas %}
     <tr><td><a href="{% url edit-ideas year=day.year month=day.month %}">IDEAS</a></td><td colspan="3">{{ ideas|lookup:day|markdown }}</td></tr>
     {% endif %}
-    <tr class="row_day"><td class="cell_day"> {{ day|date:"D"}}&nbsp;{{ day|date:"j" }}</td>
+    <tr class="row_day"><td class="cell_day"><a href="{% url add-event %}?date={{day|date:"j-m-Y"}}">{{ day|date:"D"}}&nbsp;{{ day|date:"j" }}</a></td>
 
     {% for showing in showings %}
     <td>
@@ -87,7 +87,7 @@ $(document).ready(function() {
         {{ showing.event.name|upper }}
         {% else %}
         {{ showing.event.name }}
-        {% endif %}{% if showing.discounted %}(TTT){% endif %}
+        {% endif %}{% if showing.discounted %}(TTT){% endif %}{% if showing.cancelled or showing.event.cancelled %}(CANCELLED){% endif %}
     </span>
     </a></td></tr>
     <tr><td>&nbsp;</td>

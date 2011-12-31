@@ -153,6 +153,13 @@ def add_showing(request, event_id):
         else:
             return HttpResponse("Failed adding showing", status=400)
 
+def add_event(request):
+    if request.method == 'POST':
+        pass
+    elif request.method == 'GET':
+        pass
+    else:
+        return HttpResponse("Illegal method", status=405)
 
 def edit_showing(request, showing_id=None):
     showing = get_object_or_404(Showing, pk=showing_id)
