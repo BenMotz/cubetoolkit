@@ -15,6 +15,11 @@ import cube.diary.forms
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
+def _return_close_window():
+    # Really, really dirty way to emulate the original functionality and
+    # close the popped up window
+    return HttpResponse("<!DOCTYPE html><html><head><title>-</title></head><body onload='self.close(); opener.location.reload(true);'>Ok</body></html>")
+
 def _get_date_range(year, month, day, user_days_ahead):
     if day is not None and month is None:
         raise Http404("Invalid request; cant specify day and no month")
@@ -127,7 +132,7 @@ def add_showing(request, event_id):
             for rota_entry in source_showing.rotaentry_set.all():
                 RotaEntry(showing=new_showing, template=rota_entry).save()
 
-        return HttpResponseRedirect(reverse('default-edit'))
+        return _return_close_window()
     else:
         return HttpResponse("Failed adding showing", status=400)
 
@@ -179,9 +184,7 @@ def edit_event(request, event_id=None):
         form = cube.diary.forms.EventForm(request.POST, instance=event)
         if form.is_valid():
             form.save()
-        # Really, really dirty way to emulate the original functionality and
-        # close the popped up window
-        return HttpResponse("<!DOCTYPE html><html><head><title>-</title></head><body onload='self.close(); opener.location.reload(true);'></body></html>")
+            return _return_close_window()
     else:
         form = cube.diary.forms.EventForm(instance=event)
 
@@ -199,12 +202,12 @@ def edit_ideas(request, year=None, month=None):
 
     # Use get or create in order to silently create the ideas entry if it
     # didn't already exist:
-    instance = DiaryIdea.objects.get_or_create(month=datetime.date(year=year, month=month, day=1))
+    instance, created = DiaryIdea.objects.get_or_create(month=datetime.date(year=year, month=month, day=1))
     if request.method == 'POST':
         form = cube.diary.forms.DiaryIdeaForm(request.POST, instance=instance)
         if form.is_valid():
             form.save()
-            return HttpResponseRedirect(reverse('default-edit'))
+            return _return_close_window()
     else:
         form = cube.diary.forms.DiaryIdeaForm(instance=instance)
 
@@ -230,4 +233,4 @@ def delete_showing(request, showing_id):
         showing = Showing.objects.get(pk=showing_id)
         showing.delete()
 
-    return HttpResponseRedirect(reverse('default-edit'))
+    return _return_close_window()
