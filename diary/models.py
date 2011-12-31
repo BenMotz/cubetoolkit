@@ -21,9 +21,8 @@ class Event(models.Model):
 
     name = models.CharField(max_length=256, blank=False)
 
-    # Event type?
+    etype = models.ForeignKey('EventType', related_name='etype', null=True, blank=True)
     duration = models.TimeField(null=True)
-
 
     cancelled = models.BooleanField(default=False)
     outside_hire = models.BooleanField(default=False)
@@ -32,8 +31,8 @@ class Event(models.Model):
     image = models.FileField(upload_to="event", max_length=256, null=True, blank=True)
     image_credit = models.CharField(max_length=64, null=True, blank=True)
 
-    copy = models.TextField(max_length=8192, null=True)
-    copy_summary = models.TextField(max_length=4096, null=True)
+    copy = models.TextField(max_length=8192, null=True, blank=True)
+    copy_summary = models.TextField(max_length=4096, null=True, blank=True)
 
     terms = models.TextField(max_length=4096, null=True, blank=True)
     notes = models.TextField(max_length=4096, null=True, blank=True)
@@ -86,10 +85,10 @@ class Showing(models.Model):
 class DiaryIdea(models.Model):
     month = models.DateField(editable=False)
     ideas = models.TextField(max_length=16384, null=True)
-    
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    
+
     class Meta:
         db_table = 'DiaryIdeas'
     def __unicode__(self):
