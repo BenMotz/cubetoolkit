@@ -1,3 +1,5 @@
 #!/bin/sh
+# svn export --force svn+ssh://sparror.cubecinema.com/home/cube/svn-repo/TRUNK/cgi-bin/events/data/formats
+env DJANGO_SETTINGS_MODULE=settings python ./manage.py reset diary
 env DJANGO_SETTINGS_MODULE=settings ./import.py
 
