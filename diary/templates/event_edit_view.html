@@ -25,6 +25,9 @@ Details for: {{ event.name }}
 
 <div id="detail">
     <p class="d"><b>Name:</b>{{ event.name }} <a href="{% url edit-event-details event.pk %}">[edit]</a></p>
+    {% if event.etype %}
+    <p class="d"><b>Type:</b>{{ event.etype }} </p>
+    {% endif %}
 
 <p><b>Event image.</b><br>
 Todo</p>

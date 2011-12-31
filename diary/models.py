@@ -21,7 +21,7 @@ class Event(models.Model):
 
     name = models.CharField(max_length=256, blank=False)
 
-    etype = models.ForeignKey('EventType', related_name='etype', null=True, blank=True)
+    etype = models.ForeignKey('EventType', verbose_name='Event Type', related_name='etype', null=True, blank=True)
     duration = models.TimeField(null=True)
 
     cancelled = models.BooleanField(default=False)
