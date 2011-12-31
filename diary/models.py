@@ -1,7 +1,7 @@
+import logging
 from django.db import models
 
-# Create your models here.
-
+logger = logging.getLogger(__name__)
 
 class Role(models.Model):
     name = models.CharField(max_length=64, blank=False)
@@ -124,13 +124,14 @@ class RotaEntry(models.Model):
 
         super(RotaEntry, self).__init__(*args, **kwargs)
 
-        if 'template' in kwargs:
+        if template:
             # Only use the showing from the template if one hasn't been set yet
             if self.showing is None:
-                self.showing = template.showing 
+                self.showing = template.showing
             self.role = template.role
             self.required = template.required
             self.rank = template.rank
+            logger.info("Cloning rota entry from existing rota entry with role_id %d", template.role.pk)
 
     role = models.ForeignKey(Role)
     showing = models.ForeignKey(Showing)

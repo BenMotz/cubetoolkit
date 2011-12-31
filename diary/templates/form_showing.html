@@ -42,7 +42,7 @@ Details for: {{ event.name }}
 
 <h2>Clone (add) Booking</h2>
 
-<form action="{% url add-showing event_id=showing.event.id %}?copy_rota_from={{showing.id}}" method="post">
+<form action="{% url add-showing event_id=showing.event.id %}?copy_from={{showing.id}}" method="post">
     {% csrf_token %}
     {{ new_showing_form.as_p }}
     <input type="submit" value="Add" />

@@ -4,10 +4,9 @@ import logging
 from collections import OrderedDict
 
 import django.core.exceptions
-from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from django.core.urlresolvers import reverse
 
 from cube.diary.models import Showing, Event, DiaryIdea, RotaEntry
 import cube.diary.forms
@@ -113,6 +112,12 @@ def edit_diary_list(request, year=None, day=None, month=None):
 def add_showing(request, event_id):
     if request.method != 'POST':
         return HttpResponse('Invalid request!', 405) # 405 = Method not allowed
+    copy_from = request.GET.get('copy_from', None)
+    try:
+        copy_from = int(copy_from, 10)
+    except (TypeError, ValueError):
+        copy_from = None
+
     # Create form using submitted data:
     form = cube.diary.forms.NewShowingForm(request.POST)
     if form.is_valid():
@@ -125,16 +130,28 @@ def add_showing(request, event_id):
         # Create showing
         new_showing.save()
         # If a showing_id was supplied, clone the rota from that:
-        copy_rota_from = request.POST.get('copy_rota_from', None)
-        if copy_rota_from:
-            # XXX This doesn't quite work...
-            source_showing = Showing.objects.get(pk=copy_rota_from)
+        if copy_from:
+            source_showing = Showing.objects.get(pk=copy_from)
             for rota_entry in source_showing.rotaentry_set.all():
-                RotaEntry(showing=new_showing, template=rota_entry).save()
+                r = RotaEntry(showing=new_showing, template=rota_entry)
+                print "role_id:", r.role_id
+                r.save()
 
         return _return_close_window()
     else:
-        return HttpResponse("Failed adding showing", status=400)
+        # If copy_from was supplied, assume being called from "edit showing"
+        # form, and return that
+        if copy_from:
+            showing = get_object_or_404(Showing, pk=copy_from)
+            showing_form = cube.diary.forms.ShowingForm(instance=showing)
+            context = {
+                    'showing' : showing,
+                    'form' : showing_form,
+                    'new_showing_form' : form,
+                    }
+            return render_to_response('form_showing.html', RequestContext(request, context))
+        else:
+            return HttpResponse("Failed adding showing", status=400)
 
 
 def edit_showing(request, showing_id=None):
@@ -159,6 +176,8 @@ def edit_showing(request, showing_id=None):
                 initial_set.discard(role_id)
             # Now remove any roles that we haven't seen:
             modified_showing.rotaentry_set.filter(role__in = initial_set).delete()
+
+            return _return_close_window()
     else:
         form = cube.diary.forms.ShowingForm(instance=showing)
     # Also create a form for "cloning" the showing (ie. adding another one),
