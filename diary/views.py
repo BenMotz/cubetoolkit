@@ -155,9 +155,23 @@ def add_showing(request, event_id):
 
 def add_event(request):
     if request.method == 'POST':
-        pass
+        return HttpResponse("Not implemented", status=500)
     elif request.method == 'GET':
-        pass
+        # Marshal date out of the GET request:
+        date = request.GET.get('date', datetime.date.today().strftime("%d-%m-%Y"))
+        date = date.split("-")
+        assert(len(date) == 3) # Should probably do this better
+        try:
+            date[0] = int(date[0], 10)
+            date[1] = int(date[1], 10)
+            date[2] = int(date[2], 10)
+            event_date = datetime.date(day=date[0], month=date[1], year=date[2])
+        except (ValueError, TypeError):
+            return HttpResponse("Illegal date", status=400)
+        # Creat form, render template:
+        form = cube.diary.forms.NewEventForm(initial={'start' : event_date})
+        context = { 'form' : form }
+        return render_to_response('form_new_event_and_showing.html', RequestContext(request, context))
     else:
         return HttpResponse("Illegal method", status=405)
 
