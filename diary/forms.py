@@ -8,6 +8,13 @@ class DiaryIdeaForm(forms.ModelForm):
 class EventForm(forms.ModelForm):
     class Meta(object):
         model = cube.diary.models.Event
+        # Ensure soft wrapping is set for textareas:
+        widgets = {
+                'copy': forms.Textarea(attrs={'wrap':'soft'}),
+                'copy_summary': forms.Textarea(attrs={'wrap':'soft'}),
+                'terms': forms.Textarea(attrs={'wrap':'soft'}),
+                'notes': forms.Textarea(attrs={'wrap':'soft'}),
+                  }
 
 class ShowingForm(forms.ModelForm):
     class Meta(object):
