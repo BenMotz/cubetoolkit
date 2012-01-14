@@ -82,6 +82,11 @@ class Showing(models.Model):
         else:
             return "[uninitialised]"
 
+    def reset_rota_to_default(self):
+        """Clear any existing rota entries, and apply the default set of rota
+        entries for the associated Event type"""
+        pass
+
 class DiaryIdea(models.Model):
     month = models.DateField(editable=False)
     ideas = models.TextField(max_length=16384, null=True)

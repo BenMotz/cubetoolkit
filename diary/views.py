@@ -157,6 +157,26 @@ def add_event(request):
     if request.method == 'POST':
         form = cube.diary.forms.NewEventForm(request.POST)
         if form.is_valid():
+            print form.cleaned_data
+            new_event = Event(name=form.cleaned_data['event_name'],
+                              etype=form.cleaned_data['event_type'],
+                              duration=form.cleaned_data['duration'],
+                              outside_hire=form.cleaned_data['external'],
+                              private=form.cleaned_data['private'])
+            new_event.save()
+            showings = []
+            start = form.cleaned_data['start']
+            for n in range(0, form.cleaned_data['number_of_days']):
+                day_offset = datetime.timedelta(days=n)
+                new_showing = Showing(event=new_event,
+                                      start=(start + day_offset),
+                                      discounted=form.cleaned_data['discounted'],
+                                      confirmed=form.cleaned_data['confirmed'],
+                                      booked_by=form.cleaned_data['booked_by'],
+                                      )
+                new_showing.save()
+                new_showing.reset_rota_to_default()
+                showings.append(new_showing)
             return HttpResponse("Ok")
         else:
             context = { 'form' : form }
