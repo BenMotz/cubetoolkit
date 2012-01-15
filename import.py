@@ -54,13 +54,15 @@ def import_event_roles(connection, showings, legacy_event_id, role_map):
         # event_id = ev[0]
         col_no = 0
         for role_col in ev[1:]:
-            if role_col == 1L:
-                for s in showings:
-                    rota_entry = diary.models.RotaEntry()
-                    rota_entry.role_id = role_map[col_no]
+            if role_col is not None:
+                for rank in range(0,role_col):
+                    for s in showings:
+                        rota_entry = diary.models.RotaEntry()
+                        rota_entry.role_id = role_map[col_no]
+                        rota_entry.rank = rank + 1
 
-                    rota_entry.showing_id = s.id
-                    rota_entry.save()
+                        rota_entry.showing_id = s.id
+                        rota_entry.save()
             col_no += 1
 
     cursor.close()
