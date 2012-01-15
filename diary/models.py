@@ -85,6 +85,7 @@ class Showing(models.Model):
     def reset_rota_to_default(self):
         """Clear any existing rota entries, and apply the default set of rota
         entries for the associated Event type"""
+        # XXX TODO!
         pass
 
 class DiaryIdea(models.Model):

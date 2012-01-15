@@ -32,20 +32,23 @@ def _get_date_range(year, month, day, user_days_ahead):
 
     logger.debug("view_diary: day %s, month %s, year %s, span %s days", str(day), str(month), str(year), str(user_days_ahead))
 
-    if day:
-        startdate = datetime.date(year, month, day)
-        days_ahead = 1
-    elif month:
-        startdate = datetime.date(year, month, 1)
-        days_ahead = calendar.monthrange(year, month)[1]
-    elif year:
-        startdate = datetime.date(year, 1, 1)
-        days_ahead = 365
-        if calendar.isleap(year):
-            days_ahead += 1 
-    else:
-        startdate = datetime.date.today()
-        days_ahead = 30 # default
+    try:
+        if day:
+            startdate = datetime.date(year, month, day)
+            days_ahead = 1
+        elif month:
+            startdate = datetime.date(year, month, 1)
+            days_ahead = calendar.monthrange(year, month)[1]
+        elif year:
+            startdate = datetime.date(year, 1, 1)
+            days_ahead = 365
+            if calendar.isleap(year):
+                days_ahead += 1 
+        else:
+            startdate = datetime.date.today()
+            days_ahead = 30 # default
+    except ValueError:
+        raise Http404("Invalid date")
 
     if user_days_ahead:
         try:
@@ -299,3 +302,14 @@ def delete_showing(request, showing_id):
         showing.delete()
 
     return _return_close_window()
+
+def view_rota(request, year, month, day):
+    query_days_ahead = request.GET.get('daysahead', None)
+    start_date, days_ahead = _get_date_range(year, month, day, query_days_ahead)
+    end_date = start_date + datetime.timedelta(days=days_ahead)
+    showings = Showing.objects.filter(cancelled=False).filter(confirmed=True).filter(start__range=[start_date, end_date]).order_by('start').select_related()
+    context = {
+            'showings': showings,
+            }
+    return render_to_response('rota_view.html', context)
+
