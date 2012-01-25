@@ -3,7 +3,6 @@ import calendar
 import logging
 from collections import OrderedDict
 
-import django.core.exceptions
 from django.http import HttpResponse, Http404
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
@@ -20,6 +19,10 @@ def _return_close_window():
     return HttpResponse("<!DOCTYPE html><html><head><title>-</title></head><body onload='self.close(); opener.location.reload(true);'>Ok</body></html>")
 
 def _get_date_range(year, month, day, user_days_ahead):
+    """Support method to take fields read from HTTP request and return a tuple
+    (datetime, number_of_days)
+    If month or day are blank, they default to 1. If all three are blank it 
+    defaults to today"""
     if day is not None and month is None:
         raise Http404("Invalid request; cant specify day and no month")
 
@@ -180,7 +183,7 @@ def add_event(request):
                 new_showing.save()
                 new_showing.reset_rota_to_default()
                 showings.append(new_showing)
-            return HttpResponse("Ok")
+            return _return_close_window()
         else:
             context = { 'form' : form }
             return render_to_response('form_new_event_and_showing.html', RequestContext(request, context))
