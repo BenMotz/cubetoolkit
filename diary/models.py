@@ -83,10 +83,17 @@ class Showing(models.Model):
             return "[uninitialised]"
 
     def reset_rota_to_default(self):
-        """Clear any existing rota entries, and apply the default set of rota
-        entries for the associated Event type"""
-        # XXX TODO!
-        pass
+        """Clear any existing rota entries. If the associated event has an event
+        type defined then apply the default set of rota entries for that type"""
+
+        # Delete all existing rota entries (if any)
+        self.rotaentry_set.all().delete()
+
+        if self.event.etype is not None:
+            # Add a rota entry for each role in the event type:
+            for role in self.event.etype.roles.all():
+                RotaEntry(role=role, showing=self).save()
+
 
 class DiaryIdea(models.Model):
     month = models.DateField(editable=False)
