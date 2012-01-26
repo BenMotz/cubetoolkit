@@ -2,8 +2,20 @@
 {% block title %}
 Add a new event
 {% endblock %}
+{% block script %}
+<script type="text/javascript" src="/static/js/jquery.js"></script>
+<script type="text/javascript" src="/static/js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/static/js/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+        $('#id_start').datetimepicker({ dateFormat : 'yy-mm-dd', timeFormat : 'hh:mm:ss'});
+});
+</script>
+{% endblock %}
 {% block css %}
 <style>
+    @import url('/static/css/smoothness/jquery-ui.css');
+    @import url('/static/css/timepicker.css');
     form table {
         width: 80%;
         border-collapse: collapse;
