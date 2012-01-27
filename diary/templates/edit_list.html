@@ -8,6 +8,7 @@ Editing {{ event_list_name }}
 
 {% block css %}
 <style type="text/css">
+  @import url('/static/css/smoothness/jquery-ui.css');
   .private {
   font-style: italic;
   }
@@ -39,14 +40,33 @@ Editing {{ event_list_name }}
 
 {% block script %}
 <script type="text/javascript" src="/static/js/jquery.js"></script>
+<script type="text/javascript" src="/static/js/jquery-ui.min.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
+        // Add date picker:
+        $('#id_lookahead_to').datepicker({
+            dateFormat : 'dd-mm-yy',
+            onSelect : dateRangeSelected,
+            minDate : 0,
+        });
+
         // Change links in table to open in a new window:
         $('table a').click(function(e) {
             window.open(e.currentTarget.href,"edit_form","height=800,width=800,scrollbars,resizable,toolbar");
             return false;
         });
 });
+function dateRangeSelected(dateText, inst) {
+    var enddate = $.datepicker.parseDate('dd-mm-yy', dateText);
+    var startdate = new Date({{start.year}}, {{start.month}} - 1, {{start.day}});
+    console.log(startdate, enddate);
+    // Calculate days between those two dates:
+    var days_ahead = Math.ceil((enddate.getTime() - startdate.getTime())/86400000);
+    if(days_ahead <= 0) {
+        days_ahead = 0;
+    }
+    window.location.href = "{% url day-edit year=start.year day=start.day month=start.month %}?daysahead=" + days_ahead;
+}
 </script>
 {% endblock %}
 
@@ -64,6 +84,7 @@ $(document).ready(function() {
 <div class="programme"><p align='center'><a href="{% url day-edit year=start.year day=start.day month=start.month %}?daysahead=30">See 1 month</a> | 
 <a href="{% url day-edit year=start.year day=start.day month=start.month %}?daysahead=60">See 2 months</a> | 
 <a href="{% url day-edit year=start.year day=start.day month=start.month %}?daysahead=90">See 3 months</a></p>
+<p align='center'><label for="id_start">See from now until:</label> <input type="text" name="lookahead_to" value="{{ end|date:'j-m-Y'}}" id="id_lookahead_to" /></p>
 <table class="summary">
     <tr><td></td><td colspan="3"><a href="{% url add-event %}?date={{start|date:"j-m-Y"}}">New event</a></td></tr>
 

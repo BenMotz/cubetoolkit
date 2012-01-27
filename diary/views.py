@@ -112,6 +112,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
     context['dates'] = dates
     context['event_list_name'] = "Diary for %s to %s" % (str(startdate), str(enddate))
     context['start'] = startdate
+    context['end'] = enddate
 
     return render_to_response('edit_list.html', context)
 
