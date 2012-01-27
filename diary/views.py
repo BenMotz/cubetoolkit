@@ -3,9 +3,10 @@ import calendar
 import logging
 from collections import OrderedDict
 
-from django.http import HttpResponse, Http404
+from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
+from django.core.urlresolvers import reverse
 
 from cube.diary.models import Showing, Event, DiaryIdea, RotaEntry
 import cube.diary.forms
@@ -82,7 +83,20 @@ def edit_diary_list(request, year=None, day=None, month=None):
     # Sort out date range to display
     query_days_ahead = request.GET.get('daysahead', None)
     startdate, days_ahead = _get_date_range(year, month, day, query_days_ahead)
+    # Don't allow viewing of dates before today, to avoid editing of the past:
+    if startdate < datetime.date.today():
+        # Change startdate to today:
+        startdate = datetime.date.today()
+        # Redirect to the correct page:
+        new_url = ("%s?daysahead=%d" %
+                    (reverse('day-edit', kwargs={
+                               'year' : startdate.year,
+                               'month' : startdate.month,
+                               'day' : startdate.day}),
+                     days_ahead))
+        return HttpResponseRedirect(new_url)
     enddate = startdate + datetime.timedelta(days=days_ahead)
+
 
     # Get all showings in the date range
     showings = Showing.objects.filter(start__range=[startdate, enddate]).order_by('start').select_related()
