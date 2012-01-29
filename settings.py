@@ -8,6 +8,9 @@ logging.basicConfig(
     format = '%(asctime)s %(levelname)s %(message)s',
 )
 
+# Custom:
+SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
 APP_ROOT = '/home/ben/data/python/cube'
 
 # Django settings for cube project.
@@ -125,7 +128,7 @@ INSTALLED_APPS = (
     # disabled for now;
     #'django.contrib.auth',
     #'django.contrib.contenttypes',
-    #'django.contrib.sessions',
+    'django.contrib.sessions',
     #'django.contrib.sites',
     #'django.contrib.messages',
     #'django.contrib.staticfiles',
