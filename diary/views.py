@@ -14,6 +14,27 @@ import cube.diary.forms
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
+def require_read_auth(function):
+    """Decorator to apply to views that require the user to have provided the
+    "read" (or write) password"""
+    def req_read_auth_wrapper(request, *args, **kwargs):
+        auth = request.session.get('read_auth', False)
+        if auth:
+            return function(request, *args, **kwargs)
+        else:
+#            return HttpResponseRedirect(reverse('auth', kwargs={'type' : 'read'}))
+            return HttpResponse("DENIED!", status=401, mimetype="text/plain")
+    return req_read_auth_wrapper
+
+def require_write_auth(function):
+    """Decorator to apply to views that require the user to have provided the
+    "write" password"""
+    def req_write_auth_wrapper(request, *args, **kwargs):
+        auth = request.session.get('write_auth', False)
+        if auth:
+            return function(request, *args, **kwargs)
+    return req_write_auth_wrapper
+
 def _return_close_window():
     # Really, really dirty way to emulate the original functionality and
     # close the popped up window
@@ -78,6 +99,7 @@ def view_diary(request, year=None, month=None, day=None):
 
     return render_to_response('indexed_showing_list.html', context)
 
+@require_read_auth
 def edit_diary_list(request, year=None, day=None, month=None):
     context = { }
     # Sort out date range to display
@@ -130,6 +152,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
 
     return render_to_response('edit_list.html', context)
 
+@require_read_auth
 def add_showing(request, event_id):
     if request.method != 'POST':
         return HttpResponse('Invalid request!', 405) # 405 = Method not allowed
@@ -174,6 +197,7 @@ def add_showing(request, event_id):
         else:
             return HttpResponse("Failed adding showing", status=400)
 
+@require_write_auth
 def add_event(request):
     if request.method == 'POST':
         form = cube.diary.forms.NewEventForm(request.POST)
@@ -221,6 +245,7 @@ def add_event(request):
     else:
         return HttpResponse("Illegal method", status=405)
 
+@require_write_auth
 def edit_showing(request, showing_id=None):
     showing = get_object_or_404(Showing, pk=showing_id)
 
@@ -263,6 +288,7 @@ def edit_showing(request, showing_id=None):
     return render_to_response('form_showing.html', RequestContext(request, context))
 
 
+@require_write_auth
 def edit_event(request, event_id=None):
     event = get_object_or_404(Event, pk=event_id)
 
@@ -281,6 +307,7 @@ def edit_event(request, event_id=None):
 
     return render_to_response('form_event.html', RequestContext(request, context))
 
+@require_write_auth
 def edit_ideas(request, year=None, month=None):
     context = {}
     year = int(year)
@@ -314,6 +341,7 @@ def view_event(request, event_id=None):
     context['showings'] = context['event'].showing_set.all()
     return render_to_response('event.html', context)
 
+@require_write_auth
 def delete_showing(request, showing_id):
     if request.method == 'POST':
         showing = Showing.objects.get(pk=showing_id)
@@ -321,6 +349,7 @@ def delete_showing(request, showing_id):
 
     return _return_close_window()
 
+@require_read_auth
 def view_rota(request, year, month, day):
     query_days_ahead = request.GET.get('daysahead', None)
     start_date, days_ahead = _get_date_range(year, month, day, query_days_ahead)
