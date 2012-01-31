@@ -28,7 +28,8 @@ class Event(models.Model):
     outside_hire = models.BooleanField(default=False)
     private = models.BooleanField(default=False)
 
-    image = models.FileField(upload_to="event", max_length=256, null=True, blank=True)
+    image = models.ImageField(upload_to="event", max_length=256, null=True, blank=True)
+    image_thumbnail = models.ImageField(upload_to="event_thumbnails", max_length=256, null=True, blank=True)
     image_credit = models.CharField(max_length=64, null=True, blank=True)
 
     copy = models.TextField(max_length=8192, null=True, blank=True)
