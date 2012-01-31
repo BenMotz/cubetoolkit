@@ -11,10 +11,10 @@ logging.basicConfig(
 # Totally seekrit:
 # (To generate a new password hash:
 # import bcrypt
-# hashed = bcrypt.hashpw('password', bcrypt.gensalt(13))
+# hashed = bcrypt.hashpw('password', bcrypt.gensalt(12))
 # # -- adjust value in gensalt for available CPU power...)
 CUBE_AUTH = {
-        'read' : ( '$2a$11$Rkm6U9BYuAqIURD1n/LeHemGFTcOwxC6O7ZK4C65VI3fXwjdW87Qu', '$2a$12$p1Y1/08tElCxmUDSUasAAeTKzcpWhICQf8gcEdkIAL4rjUyKCWMz6' ),
+        'read' : ( '$2a$12$2xv8/PUuYW6yQGjPOQN7l./gbny1MskLYQnlrbvZNSr1el9NprJqa', '$2a$12$p1Y1/08tElCxmUDSUasAAeTKzcpWhICQf8gcEdkIAL4rjUyKCWMz6' ),
         'write' : ('$2a$12$re7bQximlvz0hcJCHnS.nOd11jIq.XsK8aSXTIQGFiXnIQ0WvIw5m', '$2a$12$kj2ftlD4U/m0z333dFixPuyvoyIohXy8hIbZDRk3TixYRtt7x/vlO'),
         # that's (username, password) in those tuples
         }
