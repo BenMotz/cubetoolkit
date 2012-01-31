@@ -11,41 +11,16 @@ from django.core.urlresolvers import reverse
 from cube.diary.models import Showing, Event, DiaryIdea, RotaEntry
 import cube.diary.forms
 
+from cube.auth.decorators import require_read_auth, require_write_auth
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
-
-def require_read_auth(function):
-    """Decorator to apply to views that require the user to have provided the
-    "read" (or write) password"""
-    def req_read_auth_wrapper(request, *args, **kwargs):
-        # Read *or* write auth:
-        auth = request.session.get('read_auth', False) or request.session.get('write_auth', False)
-        if auth:
-            return function(request, *args, **kwargs)
-        else:
-            # Store the original destination, before redirecting to the auth
-            request.session['next'] = request.path
-            return HttpResponseRedirect(reverse('auth', kwargs={'atype' : 'read'}))
-    return req_read_auth_wrapper
-
-def require_write_auth(function):
-    """Decorator to apply to views that require the user to have provided the
-    "write" password"""
-    def req_write_auth_wrapper(request, *args, **kwargs):
-        auth = request.session.get('write_auth', False)
-        if auth:
-            return function(request, *args, **kwargs)
-        else:
-            # Store the original destination, before redirecting to the auth
-            request.session['next'] = request.path
-            return HttpResponseRedirect(reverse('auth', kwargs={'atype' : 'write'}))
-    return req_write_auth_wrapper
-
 
 def _return_close_window():
     # Really, really dirty way to emulate the original functionality and
     # close the popped up window
     return HttpResponse("<!DOCTYPE html><html><head><title>-</title></head><body onload='self.close(); opener.location.reload(true);'>Ok</body></html>")
+
 
 def _get_date_range(year, month, day, user_days_ahead):
     """Support method to take fields read from HTTP request and return a tuple
