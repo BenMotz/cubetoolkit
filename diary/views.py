@@ -18,12 +18,14 @@ def require_read_auth(function):
     """Decorator to apply to views that require the user to have provided the
     "read" (or write) password"""
     def req_read_auth_wrapper(request, *args, **kwargs):
-        auth = request.session.get('read_auth', False)
+        # Read *or* write auth:
+        auth = request.session.get('read_auth', False) or request.session.get('write_auth', False)
         if auth:
             return function(request, *args, **kwargs)
         else:
-#            return HttpResponseRedirect(reverse('auth', kwargs={'type' : 'read'}))
-            return HttpResponse("DENIED!", status=401, mimetype="text/plain")
+            # Store the original destination, before redirecting to the auth
+            request.session['next'] = request.path
+            return HttpResponseRedirect(reverse('auth', kwargs={'atype' : 'read'}))
     return req_read_auth_wrapper
 
 def require_write_auth(function):
@@ -33,7 +35,12 @@ def require_write_auth(function):
         auth = request.session.get('write_auth', False)
         if auth:
             return function(request, *args, **kwargs)
+        else:
+            # Store the original destination, before redirecting to the auth
+            request.session['next'] = request.path
+            return HttpResponseRedirect(reverse('auth', kwargs={'atype' : 'write'}))
     return req_write_auth_wrapper
+
 
 def _return_close_window():
     # Really, really dirty way to emulate the original functionality and
@@ -202,7 +209,6 @@ def add_event(request):
     if request.method == 'POST':
         form = cube.diary.forms.NewEventForm(request.POST)
         if form.is_valid():
-            print form.cleaned_data
             new_event = Event(name=form.cleaned_data['event_name'],
                               etype=form.cleaned_data['event_type'],
                               duration=form.cleaned_data['duration'],

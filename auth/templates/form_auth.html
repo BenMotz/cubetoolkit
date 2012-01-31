@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}
+Login required
+{% endblock %}
+
+{% block body %}
+
+<h1>Login required for {{ atype }} access</h1>
+{{ form.name_of_field.errors }}
+{% if message %} <p id="message">{{ message }}</p>{% endif %}
+<form action="{% url auth atype=atype %}" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <input type="submit" value="Continue" />
+</form>
+{% endblock %}
+

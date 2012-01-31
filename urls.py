@@ -9,6 +9,7 @@ urlpatterns = patterns('',
     url(r'^programme/', include('cube.diary.urls')),
     url(r'^whatson/', include('cube.diary.urls')),
     url(r'^diary/', include('cube.diary.urls')),
+    url(r'^auth/', include('cube.auth.urls')),
     # Examples:
     # url(r'^$', 'cube.views.home', name='home'),
     # url(r'^cube/', include('cube.foo.urls')),

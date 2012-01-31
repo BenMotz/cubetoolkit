@@ -35,6 +35,14 @@ Editing {{ event_list_name }}
       width: 100px;
       padding-right: 10px;
   }
+  #logout {
+      border: thick solid black;
+      padding: 10px;
+      float: right;
+      position: absolute;
+      top: 0;
+      right: 10px;
+  }
 </style>
 {% endblock %}
 
@@ -73,6 +81,7 @@ function dateRangeSelected(dateText, inst) {
 {% block body %}
 <img src="/static/diary/diary_edit_list_header.gif" alt="Cube Microplex" width="150px">
 <h3>CUBE events diary</h3>
+<p id="logout"><a href="{% url logout %}">Log out</a></p>
 
 <p><a name="top"></a></p>
 <h4>Key:</h4>

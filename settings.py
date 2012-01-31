@@ -8,6 +8,17 @@ logging.basicConfig(
     format = '%(asctime)s %(levelname)s %(message)s',
 )
 
+# Totally seekrit:
+# (To generate a new password hash:
+# import bcrypt
+# hashed = bcrypt.hashpw('password', bcrypt.gensalt(13))
+# # -- adjust value in gensalt for available CPU power...)
+CUBE_AUTH = {
+        'read' : ( '$2a$11$Rkm6U9BYuAqIURD1n/LeHemGFTcOwxC6O7ZK4C65VI3fXwjdW87Qu', '$2a$12$p1Y1/08tElCxmUDSUasAAeTKzcpWhICQf8gcEdkIAL4rjUyKCWMz6' ),
+        'write' : ('$2a$12$re7bQximlvz0hcJCHnS.nOd11jIq.XsK8aSXTIQGFiXnIQ0WvIw5m', '$2a$12$kj2ftlD4U/m0z333dFixPuyvoyIohXy8hIbZDRk3TixYRtt7x/vlO'),
+        # that's (username, password) in those tuples
+        }
+
 # Custom:
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
@@ -120,7 +131,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    # os.path.join(APP_ROOT, 'templates'),
+    os.path.join(APP_ROOT, 'templates'),
 )
 
 INSTALLED_APPS = (
