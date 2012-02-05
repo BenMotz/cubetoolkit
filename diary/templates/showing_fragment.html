@@ -4,7 +4,7 @@
 <h2>{{ showing.event.name|capfirst}}</h2>
 
 {% if showing.event.image %}
-<img src="{{ showing.event.image }}" alt="Picture for event {{ showing.event.name }}">
+<img src="{{ showing.event.image_thumbnail.url }}" alt="Picture for event {{ showing.event.name }}">
 {% if showing.event.image_credit %}
 <p class="image_caption">{{ showing.event.image_credit }}</p>
 {% endif %}

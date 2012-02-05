@@ -10,6 +10,9 @@ import diary.models
 
 FORMATS_PATH="./formats"
 
+EVENT_IMAGES_PATH = "./media/event"
+EVENT_THUMB_IMAGES_PATH = "./media/event_thumbnails"
+
 def titlecase(string):
 #   return string.title() # Really doesn't cope with apostrophes.
 #   return " ".join([ word.capitalize() for word in  "This is the voice".split() ])
@@ -149,12 +152,15 @@ def import_events(connection, role_map):
     for r in cursor.fetchall():
         e = diary.models.Event()
 
+        # Name
         e.name = titlecase(r[1])
+        # Copy
         if r[2] is not None:
             e.copy = markdown_ify(r[2])
         else:
             logging.error("Missing copy for event [%s] %s", r[0], e.name)
             e.copy = ''
+        # Copy summary
         e.copy_summary = r[3]
  
         # Duration:
@@ -164,7 +170,19 @@ def import_events(connection, role_map):
             durn_min = int_def(durn_min,0)
             e.duration = datetime.time(durn_hour, durn_min) 
 
+        # Image
+        image_name = r[0].replace(" ","_") + ".jpg"
+        image_path = os.path.join(EVENT_IMAGES_PATH, image_name)
+        if os.path.exists(image_path):
+            e.image = image_name
+        # Thumbnail
+        image_path = os.path.join(EVENT_THUMB_IMAGES_PATH, image_name)
+        if os.path.exists(image_path):
+            e.image_thumbnail = image_name
+
+        # Image credits
         e.image_credits = titlecase(r[5])
+        # Terms
         e.terms = r[6]
         e.save()
 

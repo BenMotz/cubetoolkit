@@ -1,5 +1,9 @@
 #!/bin/sh
 # svn export --force svn+ssh://sparror.cubecinema.com/home/cube/svn-repo/TRUNK/cgi-bin/events/data/formats
+
+rsync -av --no-r ~/data/rails/toolkit/public/images/events/* ./media/event/
+rsync -av --no-r ~/data/rails/toolkit/public/images/events/thumb/* ./media/event_thumbnails/
+
 env DJANGO_SETTINGS_MODULE=settings python ./manage.py reset diary
 env DJANGO_SETTINGS_MODULE=settings ./import.py
 
