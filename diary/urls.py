@@ -1,6 +1,6 @@
 from django.conf.urls.defaults import patterns, include, url
 from django.views.generic import DetailView
-from diary.models import Event
+from cube.diary.models import Event
 
 
 urlpatterns = patterns( 'cube.diary.views',
