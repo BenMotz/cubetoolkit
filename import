@@ -4,6 +4,8 @@
 rsync -av --no-r ~/data/rails/toolkit/public/images/events/* ./media/event/
 rsync -av --no-r ~/data/rails/toolkit/public/images/events/thumb/* ./media/event_thumbnails/
 
+export PYTHONPATH=$PYTHONPATH:..
+
 env DJANGO_SETTINGS_MODULE=settings python ./manage.py reset diary
 env DJANGO_SETTINGS_MODULE=settings ./import.py
 

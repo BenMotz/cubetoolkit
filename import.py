@@ -10,8 +10,9 @@ import diary.models
 
 FORMATS_PATH="./formats"
 
-EVENT_IMAGES_PATH = "./media/event"
-EVENT_THUMB_IMAGES_PATH = "./media/event_thumbnails"
+MEDIA_PATH = "./media"
+EVENT_IMAGES_PATH = "event"
+EVENT_THUMB_IMAGES_PATH = "event_thumbnails"
 
 def titlecase(string):
 #   return string.title() # Really doesn't cope with apostrophes.
@@ -172,13 +173,13 @@ def import_events(connection, role_map):
 
         # Image
         image_name = r[0].replace(" ","_") + ".jpg"
-        image_path = os.path.join(EVENT_IMAGES_PATH, image_name)
+        image_path = os.path.join(MEDIA_PATH, EVENT_IMAGES_PATH, image_name)
         if os.path.exists(image_path):
-            e.image = image_name
+            e.image = os.path.join(EVENT_IMAGES_PATH, image_name)
         # Thumbnail
-        image_path = os.path.join(EVENT_THUMB_IMAGES_PATH, image_name)
+        image_path = os.path.join(MEDIA_PATH, EVENT_THUMB_IMAGES_PATH, image_name)
         if os.path.exists(image_path):
-            e.image_thumbnail = image_name
+            e.image_thumbnail = os.path.join(EVENT_THUMB_IMAGES_PATH, image_name)
 
         # Image credits
         e.image_credits = titlecase(r[5])
