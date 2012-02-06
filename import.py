@@ -182,7 +182,7 @@ def import_events(connection, role_map):
             e.image_thumbnail = os.path.join(EVENT_THUMB_IMAGES_PATH, image_name)
 
         # Image credits
-        e.image_credits = titlecase(r[5])
+        e.image_credit = titlecase(r[5])
         # Terms
         e.terms = r[6]
         e.save()
