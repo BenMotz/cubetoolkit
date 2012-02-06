@@ -30,7 +30,13 @@ Details for: {{ event.name }}
     {% endif %}
 
 <p><b>Event image.</b><br>
-Todo</p>
+{% if event.image %}
+<a href="{{ event.image.url }}"><img src="{{ event.image_thumbnail.url }}" alt="Picture for event {{ event.name }}"></a>
+{% if event.image_credit %}
+<p class="image_caption">{{ event.image_credit }}</p>
+{% endif %}
+{% endif %}
+</p>
 
 <p class="d"><b>Copy for "{{ event.name }}"</b></p>
 {{event.copy|markdown}}
