@@ -135,8 +135,8 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
-    'diary',
-    'auth',
+    'cube.diary',
+    'cube.auth',
     # disabled for now;
     #'django.contrib.auth',
     #'django.contrib.contenttypes',
