@@ -1,7 +1,7 @@
 import datetime
 import calendar
 import logging
-from collections import OrderedDict
+from cube.ordereddict import OrderedDict
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
@@ -240,7 +240,7 @@ def edit_showing(request, showing_id=None):
             modified_showing.save()
             # Now get list of selected roles;
             selected_roles = dict(request.POST)['roles']
-            initial_set = { r.values()[0] for r in showing.rotaentry_set.values('role_id')}
+            initial_set = set( r.values()[0] for r in showing.rotaentry_set.values('role_id'))
             print initial_set
             # For each id, this will get the entry or create it:
             for role_id in selected_roles:
