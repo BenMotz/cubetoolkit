@@ -27,9 +27,15 @@ def connect():
                            user = "cube-import",
                            passwd = "spanner",
                            db = "toolkit",
-                           use_unicode = True,
+#                           use_unicode = True,
                            )
     return conn
+
+def decode(string):
+    if string is str:
+        return string.decode('utf-8')
+    else:
+        return string
 
 def int_def(string, default):
     try:
@@ -95,7 +101,7 @@ def import_event_showings(connection, event, legacy_event_id):
         s.event = event
         s.start = r[0]
         if r[2] is not None:
-            s.booked_by = titlecase(r[2])
+            s.booked_by = titlecase(decode(r[2]))
         
         s.confirmed = bool(r[3])
 
@@ -137,7 +143,7 @@ def import_ideas(connection):
 
     for r in cursor.fetchall():
         i, created = diary.models.DiaryIdea.objects.get_or_create(month=r[0])
-        i.ideas = r[1]
+        i.ideas = decode(r[1])
         i.save()
 
     cursor.close()
@@ -151,6 +157,7 @@ def import_events(connection, role_map):
     pc = 1
     logging.info("%d events" % (results))
     for r in cursor.fetchall():
+        r = [ decode(item) for item in r ]
         e = diary.models.Event()
 
         # Name
