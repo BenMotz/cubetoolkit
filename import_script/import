@@ -1,11 +1,16 @@
 #!/bin/sh
 # svn export --force svn+ssh://sparror.cubecinema.com/home/cube/svn-repo/TRUNK/cgi-bin/events/data/formats
 
-rsync -av --no-r ~/data/rails/toolkit/public/images/events/* ./media/event/
-rsync -av --no-r ~/data/rails/toolkit/public/images/events/thumb/* ./media/event_thumbnails/
+set -e # Abort on errors
 
-export PYTHONPATH=$PYTHONPATH:..
+TOOLKIT_PATH=..
 
-env DJANGO_SETTINGS_MODULE=settings python ./manage.py reset diary
-env DJANGO_SETTINGS_MODULE=settings ./import.py
+#rsync -av --no-r ~/data/rails/toolkit/public/images/events/* $TOOOLKIT_PATH/media/event/
+#rsync -av --no-r ~/data/rails/toolkit/public/images/events/thumb/* $TOOLKIT_PATH/media/event_thumbnails/
+
+export PYTHONPATH=$PYTHONPATH:$TOOLKIT_PATH
+export DJANGO_SETTINGS_MODULE=settings
+
+python $TOOLKIT_PATH/manage.py reset diary
+python import.py
 

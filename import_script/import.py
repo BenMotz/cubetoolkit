@@ -6,7 +6,7 @@ import MySQLdb
 import re
 import logging
 
-import diary.models
+import toolkit.diary.models
 
 FORMATS_PATH="./formats"
 
@@ -67,7 +67,7 @@ def import_event_roles(connection, showings, legacy_event_id, role_map):
             if role_col is not None:
                 for rank in range(0,role_col):
                     for s in showings:
-                        rota_entry = diary.models.RotaEntry()
+                        rota_entry = toolkit.diary.models.RotaEntry()
                         rota_entry.role_id = role_map[col_no]
                         rota_entry.rank = rank + 1
 
@@ -96,7 +96,7 @@ def import_event_showings(connection, event, legacy_event_id):
     
     for r in results:
 
-        s = diary.models.Showing()
+        s = toolkit.diary.models.Showing()
         all_showings.append(s)
         s.event = event
         s.start = r[0]
@@ -142,7 +142,7 @@ def import_ideas(connection):
     results = cursor.execute("SELECT date, ideas FROM ideas ORDER BY date")
 
     for r in cursor.fetchall():
-        i, created = diary.models.DiaryIdea.objects.get_or_create(month=r[0])
+        i, created = toolkit.diary.models.DiaryIdea.objects.get_or_create(month=r[0])
         i.ideas = decode(r[1])
         i.save()
 
@@ -158,7 +158,7 @@ def import_events(connection, role_map):
     logging.info("%d events" % (results))
     for r in cursor.fetchall():
         r = [ decode(item) for item in r ]
-        e = diary.models.Event()
+        e = toolkit.diary.models.Event()
 
         # Name
         e.name = titlecase(r[1])
@@ -219,7 +219,7 @@ def create_roles(connection):
         return None 
 
     for column in cursor.description[1:]:
-        role = diary.models.Role()
+        role = toolkit.diary.models.Role()
         role.name = titlecase(column[0]).replace("_", " ")
         role.save()
         logging.info("%s: %d" % (role.name, role.id))
@@ -233,14 +233,14 @@ def create_roles(connection):
 # Create event templates using dict { event_template_name : [ list of role names] }
 def create_event_types(event_types):
     for e_type, roles in event_types.iteritems():
-        e_type_o, created = diary.models.EventType.objects.get_or_create(name=e_type)
+        e_type_o, created = toolkit.diary.models.EventType.objects.get_or_create(name=e_type)
         if created:
             logging.info("Created event type: %s", e_type)
             e_type_o.shortname = e_type
             e_type_o.save()
         assigned_roles_keys = set([r['pk'] for r in e_type_o.roles.values('pk')])
         for role in roles:
-            role = diary.models.Role.objects.get(name=role)
+            role = toolkit.diary.models.Role.objects.get(name=role)
             if role.pk not in assigned_roles_keys:
                 logging.info("Adding role %s to %s", role, e_type)
                 e_type_o.roles.add(role)
