@@ -1,0 +1,5 @@
+Django>=1.3.1
+Markdown
+MySQL-python
+bcrypt>=0.1
+python-dateutil
