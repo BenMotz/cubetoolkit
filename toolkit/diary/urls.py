@@ -1,9 +1,9 @@
 from django.conf.urls.defaults import patterns, include, url
 from django.views.generic import DetailView
-from cube.diary.models import Event
+from toolkit.diary.models import Event
 
 
-urlpatterns = patterns( 'cube.diary.views',
+urlpatterns = patterns( 'toolkit.diary.views',
     # View lists of event for various time/dates
     url('^$', 'view_diary', name="default-view"),
     url('^(?P<year>\d{4})$', 'view_diary', name="year-view"),

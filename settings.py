@@ -125,7 +125,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
 )
 
-ROOT_URLCONF = 'cube.urls'
+ROOT_URLCONF = 'toolkit.urls'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
@@ -135,8 +135,8 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
-    'cube.diary',
-    'cube.auth',
+    'toolkit.diary',
+    'toolkit.auth',
     # disabled for now;
     #'django.contrib.auth',
     #'django.contrib.contenttypes',
@@ -187,7 +187,7 @@ INSTALLED_APPS = (
 #             'level': 'ERROR',
 #             'propagate': True,
 #         },
-#         'cube.diary.views' : {
+#         'toolkit.diary.views' : {
 #             'handlers' : ['console',],
 #             'level' : 'DEBUG',
 #             'propagate' : True,

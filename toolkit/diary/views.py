@@ -1,17 +1,17 @@
 import datetime
 import calendar
 import logging
-from cube.ordereddict import OrderedDict
+from toolkit.ordereddict import OrderedDict
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 
-from cube.diary.models import Showing, Event, DiaryIdea, RotaEntry
-import cube.diary.forms
+from toolkit.diary.models import Showing, Event, DiaryIdea, RotaEntry
+import toolkit.diary.forms
 
-from cube.auth.decorators import require_read_auth, require_write_auth
+from toolkit.auth.decorators import require_read_auth, require_write_auth
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -145,7 +145,7 @@ def add_showing(request, event_id):
         copy_from = None
 
     # Create form using submitted data:
-    form = cube.diary.forms.NewShowingForm(request.POST)
+    form = toolkit.diary.forms.NewShowingForm(request.POST)
     if form.is_valid():
         # Submitted data will have basic time & canceled/private info, but need
         # to set the event id and rota information manually, so don't commit
@@ -169,7 +169,7 @@ def add_showing(request, event_id):
         # form, and return that
         if copy_from:
             showing = get_object_or_404(Showing, pk=copy_from)
-            showing_form = cube.diary.forms.ShowingForm(instance=showing)
+            showing_form = toolkit.diary.forms.ShowingForm(instance=showing)
             context = {
                     'showing' : showing,
                     'form' : showing_form,
@@ -182,7 +182,7 @@ def add_showing(request, event_id):
 @require_write_auth
 def add_event(request):
     if request.method == 'POST':
-        form = cube.diary.forms.NewEventForm(request.POST)
+        form = toolkit.diary.forms.NewEventForm(request.POST)
         if form.is_valid():
             new_event = Event(name=form.cleaned_data['event_name'],
                               etype=form.cleaned_data['event_type'],
@@ -220,7 +220,7 @@ def add_event(request):
         except (ValueError, TypeError):
             return HttpResponse("Illegal date", status=400)
         # Creat form, render template:
-        form = cube.diary.forms.NewEventForm(initial={'start' : event_start})
+        form = toolkit.diary.forms.NewEventForm(initial={'start' : event_start})
         context = { 'form' : form }
         return render_to_response('form_new_event_and_showing.html', RequestContext(request, context))
     else:
@@ -231,7 +231,7 @@ def edit_showing(request, showing_id=None):
     showing = get_object_or_404(Showing, pk=showing_id)
 
     if request.method == 'POST':
-        form = cube.diary.forms.ShowingForm(request.POST, instance=showing)
+        form = toolkit.diary.forms.ShowingForm(request.POST, instance=showing)
         if form.is_valid():
             # Because Django can't cope with updating the rota automatically
             # do this two-step commit=False / save thing, then manually wrangle
@@ -252,13 +252,13 @@ def edit_showing(request, showing_id=None):
 
             return _return_close_window()
     else:
-        form = cube.diary.forms.ShowingForm(instance=showing)
+        form = toolkit.diary.forms.ShowingForm(instance=showing)
     # Also create a form for "cloning" the showing (ie. adding another one),
     # but initialise it with values from existing event, but a day later...
     new_showing_template = Showing.objects.get(pk=showing.pk)
     new_showing_template.pk = None
     new_showing_template.start += datetime.timedelta(days=1)
-    new_showing_form = cube.diary.forms.NewShowingForm(instance=new_showing_template)
+    new_showing_form = toolkit.diary.forms.NewShowingForm(instance=new_showing_template)
 
     context = {
             'showing' : showing,
@@ -274,12 +274,12 @@ def edit_event(request, event_id=None):
     event = get_object_or_404(Event, pk=event_id)
 
     if request.method == 'POST':
-        form = cube.diary.forms.EventForm(request.POST, instance=event)
+        form = toolkit.diary.forms.EventForm(request.POST, instance=event)
         if form.is_valid():
             form.save()
             return _return_close_window()
     else:
-        form = cube.diary.forms.EventForm(instance=event)
+        form = toolkit.diary.forms.EventForm(instance=event)
 
     context = {
             'event' : event,
@@ -298,12 +298,12 @@ def edit_ideas(request, year=None, month=None):
     # didn't already exist:
     instance, created = DiaryIdea.objects.get_or_create(month=datetime.date(year=year, month=month, day=1))
     if request.method == 'POST':
-        form = cube.diary.forms.DiaryIdeaForm(request.POST, instance=instance)
+        form = toolkit.diary.forms.DiaryIdeaForm(request.POST, instance=instance)
         if form.is_valid():
             form.save()
             return _return_close_window()
     else:
-        form = cube.diary.forms.DiaryIdeaForm(instance=instance)
+        form = toolkit.diary.forms.DiaryIdeaForm(instance=instance)
 
     context['form'] = form
     context['month'] = instance.month
