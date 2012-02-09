@@ -3,3 +3,4 @@ Markdown
 MySQL-python
 bcrypt>=0.1
 python-dateutil
+south
