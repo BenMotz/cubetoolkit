@@ -5,16 +5,16 @@ import site
 VIRTUALENV="venv"
 
 # Get site root from this file's location:
-SITE_ROOT=os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+SITE_ROOT=os.path.abspath(os.path.dirname(__file__))
 
 # Add virtualenv path to site package root:
-site.addsitedir(os.path.join(SITE_ROOT, VIRTUALENV))
+site.addsitedir(os.path.join(SITE_ROOT, VIRTUALENV, "lib/python2.7/site-packages"))
 
 # Add site package root to start of pythonpath:
 sys.path.insert(0, SITE_ROOT)
 
 # Point Django to settings file:
-os.environ['DJANGO_SETTINGS_MODULE'] = 'toolkit.settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
 
 import django.core.handlers.wsgi
 application = django.core.handlers.wsgi.WSGIHandler()
