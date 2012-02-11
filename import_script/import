@@ -6,8 +6,8 @@ set -e # Abort on errors
 TOOLKIT_PATH=..
 IMAGE_PATH=~/data/rails/toolkit/public/images
 
-rsync -av --no-r $IMAGE_PATH/events/* $TOOLKIT_PATH/media/event/
-rsync -av --no-r $IMAGE_PATH/events/thumb/* $TOOLKIT_PATH/media/event_thumbnails/
+rsync -av --no-r $IMAGE_PATH/events/* $TOOLKIT_PATH/media/diary/
+rsync -av --no-r $IMAGE_PATH/events/thumb/* $TOOLKIT_PATH/media/diary_thumbnails/
 
 export PYTHONPATH=$PYTHONPATH:$TOOLKIT_PATH
 export DJANGO_SETTINGS_MODULE=settings

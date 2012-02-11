@@ -10,9 +10,9 @@ import toolkit.diary.models
 
 FORMATS_PATH="./formats"
 
-MEDIA_PATH = "./media"
-EVENT_IMAGES_PATH = "event"
-EVENT_THUMB_IMAGES_PATH = "event_thumbnails"
+MEDIA_PATH = "../media"
+EVENT_IMAGES_PATH = "diary"
+EVENT_THUMB_IMAGES_PATH = "diary_thumbnails"
 
 def titlecase(string):
 #   return string.title() # Really doesn't cope with apostrophes.
@@ -170,7 +170,7 @@ def import_events(connection, role_map):
             e.copy = ''
         # Copy summary
         e.copy_summary = r[3]
- 
+
         # Duration:
         if r[4] is not None and r[4] != '':
             durn_hour, durn_min  = r[4].split('/')
@@ -178,21 +178,32 @@ def import_events(connection, role_map):
             durn_min = int_def(durn_min,0)
             e.duration = datetime.time(durn_hour, durn_min) 
 
+        # Terms
+        e.terms = r[6]
+        e.save()
+
         # Image
         image_name = r[0].replace(" ","_") + ".jpg"
         image_path = os.path.join(MEDIA_PATH, EVENT_IMAGES_PATH, image_name)
         if os.path.exists(image_path):
-            e.image = os.path.join(EVENT_IMAGES_PATH, image_name)
+            # File exists, change path to relative to media root, as django expects
+            image_path = os.path.join(EVENT_IMAGES_PATH, image_name)
+        else:
+            image_path = None
         # Thumbnail
-        image_path = os.path.join(MEDIA_PATH, EVENT_THUMB_IMAGES_PATH, image_name)
-        if os.path.exists(image_path):
-            e.image_thumbnail = os.path.join(EVENT_THUMB_IMAGES_PATH, image_name)
-
-        # Image credits
-        e.image_credit = titlecase(r[5])
-        # Terms
-        e.terms = r[6]
-        e.save()
+        image_thumbnail_path = os.path.join(MEDIA_PATH, EVENT_THUMB_IMAGES_PATH, image_name)
+        if image_path and os.path.exists(image_thumbnail_path):
+            # As above, change path to relative to media root, as django expects
+            image_thumbnail_path = os.path.join(EVENT_THUMB_IMAGES_PATH, image_name)
+        else:
+            image_thumbnail_path = None
+        # If either image or thumbnail existed, create media item:
+        if image_path or image_thumbnail_path:
+            # Image credits
+            image_credit = titlecase(r[5])
+            media_item = toolkit.diary.models.MediaItem(media_file=image_path, thumbnail=image_thumbnail_path, credit=image_credit)
+            media_item.save()
+            e.media.add(media_item)
 
         showings = import_event_showings(connection, e, r[0])
         import_event_roles(connection, showings, r[0], role_map)
@@ -211,7 +222,7 @@ def import_events(connection, role_map):
 def create_roles(connection):
     roles = []
     cursor = connection.cursor()
-    
+
     count = cursor.execute("SELECT * FROM roles_merged LIMIT 1")
     if count != 1:
         logging.warning("Nothing in the 'roles_merged' table!")

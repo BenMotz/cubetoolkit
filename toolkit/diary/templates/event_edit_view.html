@@ -13,6 +13,10 @@ Details for: {{ event.name }}
     div#detail p.d {
         background-color: #d0d0d0;
     }
+    p.image_caption {
+        font-style: italic;
+    }
+
 </style>
 {% endblock %}
 
@@ -30,11 +34,9 @@ Details for: {{ event.name }}
     {% endif %}
 
 <p><b>Event image.</b><br>
-{% if event.image %}
-<a href="{{ event.image.url }}"><img src="{{ event.image_thumbnail.url }}" alt="Picture for event {{ event.name }}"></a>
-{% if event.image_credit %}
-<p class="image_caption">{{ event.image_credit }}</p>
-{% endif %}
+{% if event.media.all.0 %}
+<a href="{{ event.media.all.0.media_file.url }}"><img src="{{ event.media.all.0.thumbnail.url }}" alt="Picture for event {{ event.name }}"></a>
+<p class="image_caption">Image by: {{ event.media.all.0.credit }}</p>
 {% endif %}
 </p>
 

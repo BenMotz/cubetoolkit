@@ -1,5 +1,10 @@
 import logging
+import os.path
+
+import magic
+
 from django.db import models
+import django.conf
 
 logger = logging.getLogger(__name__)
 
@@ -17,6 +22,37 @@ class Role(models.Model):
     def __unicode__(self):
         return self.name
 
+class MediaItem(models.Model):
+    """Media (eg. video, audio, html fragment?). Currently to be assoicated
+    with events, in future with other things?"""
+
+    def __init__(self, *args, **kwargs):
+        if 'media_file' in kwargs and 'mimetype' not in kwargs:
+            m = magic.Magic(mime=True)
+            try:
+                file_path = os.path.join(django.conf.settings.MEDIA_ROOT, kwargs['media_file'])
+                kwargs['mimetype'] = m.from_file(file_path)
+            except IOError:
+                logging.error("Failed to determine mimetype of file {0}".format(file_path))
+                kwargs['mimetype'] = "application/octet-stream"
+        super(MediaItem, self).__init__(*args, **kwargs)
+
+    media_file = models.FileField(upload_to="diary", max_length=256, null=True, blank=True)
+    mimetype = models.CharField(max_length=64, null=True, blank=True)
+
+    thumbnail = models.ImageField(upload_to="diary_thumbnails", max_length=256, null=True, blank=True)
+    credit = models.CharField(max_length=64, null=True, blank=True, default="Internet scavenged")
+    caption = models.CharField(max_length=128, null=True, blank=True)
+
+    def validate_mime_type(self):
+        # See lib/python2.7/site-packages/django/forms/fields.py for how to do
+        # basic validation of PNGs / JPEGs
+        pass
+
+    def generate_thumbnail(self):
+        # Can use django.core.files.images.get_image_dimensions...
+        pass
+
 class Event(models.Model):
 
     name = models.CharField(max_length=256, blank=False)
@@ -28,9 +64,9 @@ class Event(models.Model):
     outside_hire = models.BooleanField(default=False)
     private = models.BooleanField(default=False)
 
-    image = models.ImageField(upload_to="event", max_length=256, null=True, blank=True)
-    image_thumbnail = models.ImageField(upload_to="event_thumbnails", max_length=256, null=True, blank=True)
-    image_credit = models.CharField(max_length=64, null=True, blank=True)
+    media = models.ManyToManyField(MediaItem, db_table='Event_MediaItems')
+    # primary_media_item = models.ForeignKey('MediaItem', related_name='+')
+    # related_name="+" means that given MediaItem won't have a backlink to this model
 
     copy = models.TextField(max_length=8192, null=True, blank=True)
     copy_summary = models.TextField(max_length=4096, null=True, blank=True)

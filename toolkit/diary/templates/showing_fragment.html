@@ -3,10 +3,10 @@
 <span id="showing_{{ showing.id }}">
 <h2>{{ showing.event.name|capfirst}}</h2>
 
-{% if showing.event.image_thumbnail %}
-<a href="{{ showing.event.image.url }}"><img src="{{ showing.event.image_thumbnail.url }}" alt="Picture for event {{ showing.event.name }}"></a>
-{% if showing.event.image_credit %}
-<p class="image_caption">{{ showing.event.image_credit }}</p>
+{% if showing.event.media.all.0 %}
+<a href="{{ showing.event.media.all.0.media_file.url }}"><img src="{{ showing.event.media.all.0.thumbnail.url }}" alt="Picture for event {{ showing.event.name }}"></a>
+{% if showing.event.media.all.0.credit %}
+<p class="image_caption">Image by: {{ showing.event.media.all.0.credit }}</p>
 {% endif %}
 {% endif %}
 <p>
