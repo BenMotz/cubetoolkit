@@ -18,6 +18,7 @@ def testing():
     env.user = "ben"
     env.hosts = ["localhost"]
     env.git_source = "ben@phonog.dyndns.org:data/python/cube"
+    env.settings = "settings_testing.py"
 
 def production():
     """Configure to deploy live"""
@@ -25,6 +26,7 @@ def production():
     env.site_root = "/home/users/toolkit/site"
     env.user = "cubetoolkit"
     env.hosts = ["toolkit.cubecinema.com"]
+    env.settings = "settings_live.py"
 
 def deploy_code():
     # Check that target is defined:
@@ -37,6 +39,7 @@ def deploy_code():
         target = os.path.join(env.site_root, CODE_DIR)
         run("rm -rf {0}".format(target))
         run("tar -xzf {0}".format(archive))
+        run("cp {0} settings.py".format(env.settings))
 
 def update_requirements():
     """ Update installed packages in remote virtualenv """
