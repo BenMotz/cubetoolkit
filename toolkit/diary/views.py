@@ -81,7 +81,6 @@ def view_diary(request, year=None, month=None, day=None):
     else:
         # Default title
         context['event_list_name'] = "Cube Programme"
-    logging.info("It's: {0} {1} {2}".format(day, month, year))
     # Do query. select_related() on the end encourages it to get the
     # associated showing/event data, to reduce the number of SQL queries
     context['showings'] = Showing.objects.filter(confirmed=True).filter(hide_in_programme=False).filter(start__range=[startdate, enddate]).filter(event__private=False).order_by('start').select_related()
