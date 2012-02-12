@@ -53,6 +53,9 @@ class MediaItem(models.Model):
         # Can use django.core.files.images.get_image_dimensions...
         pass
 
+    class Meta:
+        db_table = 'MediaItems'
+
 class Event(models.Model):
 
     name = models.CharField(max_length=256, blank=False)
@@ -65,7 +68,7 @@ class Event(models.Model):
     private = models.BooleanField(default=False)
 
     media = models.ManyToManyField(MediaItem, db_table='Event_MediaItems')
-    # primary_media_item = models.ForeignKey('MediaItem', related_name='+')
+    # primary_media = models.ForeignKey('MediaItem', related_name='+', null=True, blank=True)
     # related_name="+" means that given MediaItem won't have a backlink to this model
 
     copy = models.TextField(max_length=8192, null=True, blank=True)
