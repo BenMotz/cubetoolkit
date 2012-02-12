@@ -33,7 +33,8 @@ def deploy_code():
     require('site_root', provided_by = ('testing', 'production'))
 
     archive = "site_transfer.tgz"
-    local("git archive --format=tgz HEAD > {0}".format(archive))
+    # local("git archive --format=tgz HEAD > {0}".format(archive))
+    local('tar -czf {0} toolkit/ --exclude=".pyc"'.format(archive))
     put(archive, env.site_root)
     with cd(env.site_root):
         target = os.path.join(env.site_root, CODE_DIR)
