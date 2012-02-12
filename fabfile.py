@@ -52,7 +52,7 @@ def update_requirements():
 
 def restart_server():
     # ??
-    pass
+    run("sudo apache2ctl restart")
 
 ## Disabled, for destruction avoidance
 #def bootstrap():
@@ -78,4 +78,5 @@ def deploy():
 
     deploy_code()
     update_requirements()
+    restart_server()
 
