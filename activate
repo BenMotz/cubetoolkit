@@ -1,0 +1,2 @@
+source ./venv/bin/activate
+export DJANGO_SETTINGS_MODULE=settings
