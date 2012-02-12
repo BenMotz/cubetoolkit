@@ -3,12 +3,14 @@
 <span id="showing_{{ showing.id }}">
 <h2>{{ showing.event.name|capfirst}}</h2>
 
-{% if showing.event.media.all.0 %}
-<a href="{{ showing.event.media.all.0.media_file.url }}"><img src="{{ showing.event.media.all.0.thumbnail.url }}" alt="Picture for event {{ showing.event.name }}"></a>
-{% if showing.event.media.all.0.credit %}
-<p class="image_caption">Image by: {{ showing.event.media.all.0.credit }}</p>
+{% with showing.event.media.all.0 as media_item %}
+{% if media_item %}
+<a href="{{ media_item.media_file.url }}"><img src="{{ media_item.thumbnail.url }}" alt="Picture for event {{ showing.event.name }}"></a>
+{% if media_item.credit %}
+<p class="image_caption">Image by: {{ media_item.credit }}</p>
 {% endif %}
 {% endif %}
+{% endwith %}
 <p>
 {% include "showing_time_fragment.html" %}
 </p>
