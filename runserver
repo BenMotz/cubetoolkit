@@ -1,5 +1,5 @@
 #!/bin/bash
 
 source ./venv/bin/activate
-export DJANGO_SETTINGS_MODULE=settings
+export DJANGO_SETTINGS_MODULE=settings_devserver
 python manage.py runserver 0.0.0.0:8000
