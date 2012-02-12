@@ -32,4 +32,14 @@ TEMPLATE_DIRS = (
     os.path.join(APP_ROOT, 'templates'),
 )
 
+
+# Enable Debug mode, add in Django toolbar:
 DEBUG = True
+
+INTERNAL_IPS = ('127.0.0.1',)
+
+MIDDLEWARE_CLASSES = list(MIDDLEWARE_CLASSES)
+MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')
+INSTALLED_APPS = list(INSTALLED_APPS)
+INSTALLED_APPS.append('debug_toolbar')
+
