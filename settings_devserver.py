@@ -32,3 +32,4 @@ TEMPLATE_DIRS = (
     os.path.join(APP_ROOT, 'templates'),
 )
 
+DEBUG = True

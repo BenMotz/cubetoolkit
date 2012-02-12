@@ -22,7 +22,7 @@ CUBE_AUTH = {
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
 # Django settings for cube project.
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
