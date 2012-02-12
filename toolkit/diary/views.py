@@ -7,8 +7,9 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
+import django.conf
 
-from toolkit.diary.models import Showing, Event, DiaryIdea, RotaEntry
+from toolkit.diary.models import Showing, Event, DiaryIdea, RotaEntry, MediaItem
 import toolkit.diary.forms
 
 from toolkit.auth.decorators import require_read_auth, require_write_auth
@@ -81,9 +82,32 @@ def view_diary(request, year=None, month=None, day=None):
     else:
         # Default title
         context['event_list_name'] = "Cube Programme"
+
+    # Following is a bit more complex than it needs to be, but this is the
+    # highest traffic bit of the site, so this faffing cuts it down to 2
+    # queries...
+    # (Django's ORM is horribly limited)
+
     # Do query. select_related() on the end encourages it to get the
     # associated showing/event data, to reduce the number of SQL queries
-    context['showings'] = Showing.objects.filter(confirmed=True).filter(hide_in_programme=False).filter(start__range=[startdate, enddate]).filter(event__private=False).order_by('start').select_related()
+    showings = Showing.objects.filter(confirmed=True).filter(hide_in_programme=False).filter(start__range=[startdate, enddate]).filter(event__private=False).order_by('start').select_related()
+    # But that doesn't work for Many-Many relationships. To avoid a separate
+    # query for every single image, get all the image data here.
+    # First, build set of event ids:
+    event_ids = set(showing.event_id for showing in showings)
+    # Now build map of event_id -> mediaitems.
+    # This gets all the data into a simple dict, rather than into model objects
+    # as (because of limitations of Djangos ORM) you can't query for the MediaItems
+    # and also get the event_id that they correspond to returned. So instead do a 
+    # query that gets a dict of values from more than one table, and use that to
+    # build a dictionary mapping event.id to a few fields from MediaItems:
+    media = dict([ (m['event__id'], m) for m in MediaItem.objects.filter(event__id__in = event_ids).values('event__id','media_file','thumbnail','credit') ])
+
+    context['showings'] = showings
+    context['media'] = media
+    # This is prepended to filepaths from the MediaPaths table to use
+    # as a location for images:
+    context['media_url'] = django.conf.settings.MEDIA_URL
 
     return render_to_response('indexed_showing_list.html', context)
 
