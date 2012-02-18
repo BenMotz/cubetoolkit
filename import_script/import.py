@@ -11,9 +11,18 @@ import settings
 
 FORMATS_PATH="./formats"
 
-MEDIA_PATH = "../media"
+SITE_ROOT = ".."
+MEDIA_PATH = "media"
 EVENT_IMAGES_PATH = "diary"
 EVENT_THUMB_IMAGES_PATH = "diary_thumbnails"
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+
+# Set up logging:
+consoleHandler = logging.StreamHandler()
+consoleHandler.setLevel(logging.DEBUG)
+logger.addHandler(consoleHandler)
 
 def titlecase(string):
 #   return string.title() # Really doesn't cope with apostrophes.
@@ -156,7 +165,7 @@ def import_events(connection, role_map):
     count = 0
     tenpc = results / 100
     pc = 1
-    logging.info("%d events" % (results))
+    logger.info("%d events" % (results))
     for r in cursor.fetchall():
         r = [ decode(item) for item in r ]
         e = toolkit.diary.models.Event()
@@ -167,7 +176,7 @@ def import_events(connection, role_map):
         if r[2] is not None:
             e.copy = markdown_ify(r[2])
         else:
-            logging.error("Missing copy for event [%s] %s", r[0], e.name)
+            logger.error("Missing copy for event [%s] %s", r[0], e.name)
             e.copy = ''
         # Copy summary
         e.copy_summary = r[3]
@@ -185,14 +194,14 @@ def import_events(connection, role_map):
 
         # Image
         image_name = r[0].replace(" ","_") + ".jpg"
-        image_path = os.path.join(MEDIA_PATH, EVENT_IMAGES_PATH, image_name)
+        image_path = os.path.join(SITE_ROOT, MEDIA_PATH, EVENT_IMAGES_PATH, image_name)
         if os.path.exists(image_path):
             # File exists, change path to relative to media root, as django expects
             image_path = os.path.join(EVENT_IMAGES_PATH, image_name)
         else:
             image_path = None
         # Thumbnail
-        image_thumbnail_path = os.path.join(MEDIA_PATH, EVENT_THUMB_IMAGES_PATH, image_name)
+        image_thumbnail_path = os.path.join(SITE_ROOT, MEDIA_PATH, EVENT_THUMB_IMAGES_PATH, image_name)
         if image_path and os.path.exists(image_thumbnail_path):
             # As above, change path to relative to media root, as django expects
             image_thumbnail_path = os.path.join(EVENT_THUMB_IMAGES_PATH, image_name)
@@ -218,7 +227,7 @@ def import_events(connection, role_map):
 
     cursor.close()
 
-    logging.info("%d events" % event_tot)
+    logger.info("%d events" % event_tot)
 
 def create_roles(connection):
     roles = []
@@ -226,7 +235,7 @@ def create_roles(connection):
 
     count = cursor.execute("SELECT * FROM roles_merged LIMIT 1")
     if count != 1:
-        logging.warning("Nothing in the 'roles_merged' table!")
+        logger.warning("Nothing in the 'roles_merged' table!")
         cursor.close()
         return None 
 
@@ -234,7 +243,7 @@ def create_roles(connection):
         role = toolkit.diary.models.Role()
         role.name = titlecase(column[0]).replace("_", " ")
         role.save()
-        logging.info("%s: %d" % (role.name, role.id))
+        logger.info("%s: %d" % (role.name, role.id))
         roles.append(role.id)
 
     cursor.close()
@@ -247,14 +256,14 @@ def create_event_types(event_types):
     for e_type, roles in event_types.iteritems():
         e_type_o, created = toolkit.diary.models.EventType.objects.get_or_create(name=e_type)
         if created:
-            logging.info("Created event type: %s", e_type)
+            logger.info("Created event type: %s", e_type)
             e_type_o.shortname = e_type
             e_type_o.save()
         assigned_roles_keys = set([r['pk'] for r in e_type_o.roles.values('pk')])
         for role in roles:
             role = toolkit.diary.models.Role.objects.get(name=role)
             if role.pk not in assigned_roles_keys:
-                logging.info("Adding role %s to %s", role, e_type)
+                logger.info("Adding role %s to %s", role, e_type)
                 e_type_o.roles.add(role)
 
 # Read event templates from given path
@@ -270,10 +279,18 @@ def load_event_templates(path_to_formats):
                 for line in role_list_file:
                     role_list.append(clean(line))
             type_index[clean(event_type)] = role_list
-    logging.info("Loaded %d event types: %s", len(type_index), ",".join(type_index.keys()))
+    logger.info("Loaded %d event types: %s", len(type_index), ",".join(type_index.keys()))
     return type_index
 
 def main():
+    global SITE_ROOT
+    if len(sys.argv) == 1:
+        print "Usage: {0} [Path to site root]".format(sys.argv[0])
+        sys.exit(1)
+    SITE_ROOT = sys.argv[1]
+    if not os.path.isdir(SITE_ROOT):
+        print "{0} is not a valid path to a directory".format(SITE_ROOT)
+        sys.exit(2)
 
     conn = connect()
     # Create roles
@@ -288,7 +305,6 @@ def main():
     import_events(conn, role_map)
     import_ideas(conn)
     conn.close ()
-
 
 if __name__ == "__main__":
     main()

@@ -32,5 +32,5 @@ export PYTHONPATH=$PYTHONPATH:$TOOLKIT_PATH
 export DJANGO_SETTINGS_MODULE=settings
 
 python $TOOLKIT_PATH/manage.py reset diary --noinput
-python $TOOLKIT_PATH/import_script/import.py
+python $TOOLKIT_PATH/import_script/import.py $TOOLKIT_PATH
 
