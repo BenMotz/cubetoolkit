@@ -21,16 +21,18 @@ Details for: {{ event.name }}
         width: 75%;
         display: block;
     }
+
     span#image_edit {
         width: 75%;
         display: block;
-        padding-left: 15.5%;
+        border: thin solid red;
 
     }
     #image_edit label {
         display: inline;
         float: none;
         font-weight: bold;
+        border: thin solid blue;
     }
 </style>
 {% endblock %}
@@ -41,15 +43,17 @@ Details for: {{ event.name }}
 <p>Booked for: {{ showing.start|date:"H:i d/m/Y"  }} </p>
 {% endfor %}
 
-<form action="{% url edit-event-details event_id=event.id %}" method="post" enctype="multipart/form-data">
+<form action="{% url edit-event-details event_id=event.id %}" method="post">
     {% csrf_token %}
-    {{ form.as_p }}
+    {% for field in form.visible_fields %}
+    <p>{{field.errors }} {{ field.label_tag }} {{ field }}</p>
+    {% endfor %}
 
     <p>
-        {{ media_form.media_file.label_tag }}
-        <span id="image_edit">{{ media_form.media_file.errors }} {{ media_form.media_file }}</span>
+        <label>Image:</label>
+        <span id="image_edit">{{ media_form.media_file }}</span>
     </p>
-    <p>{{media_form.credit.errors }} {{ media_form.credit.label_tag }} {{ media_form.credit }}</p>
+    <p>{{ media_form.credit.label_tag }} {{ media_form.credit }}</p>
     <input type="submit" value="Update" />
 </form>
 

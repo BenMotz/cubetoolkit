@@ -1,3 +1,4 @@
+import os
 import datetime
 import calendar
 import logging
@@ -7,7 +8,7 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
-import django.conf
+from django.conf import settings
 
 from toolkit.diary.models import Showing, Event, DiaryIdea, RotaEntry, MediaItem
 import toolkit.diary.forms
@@ -107,7 +108,7 @@ def view_diary(request, year=None, month=None, day=None):
     context['media'] = media
     # This is prepended to filepaths from the MediaPaths table to use
     # as a location for images:
-    context['media_url'] = django.conf.settings.MEDIA_URL
+    context['media_url'] = settings.MEDIA_URL
 
     return render_to_response('indexed_showing_list.html', context)
 
@@ -144,7 +145,6 @@ def edit_diary_list(request, year=None, day=None, month=None):
     # of the month in startdate, so the idea for that month gets included:
     idea_startdate = datetime.date(day=1, month=startdate.month, year=startdate.year)
     idea_list = DiaryIdea.objects.filter(month__range=[idea_startdate, enddate]).order_by('month').select_related()
-    logging.info(str(idea_list))
     ideas = {}
     # Assemble into dict, with keys that will match the keys in the showings
     # dict
@@ -298,22 +298,80 @@ def edit_showing(request, showing_id=None):
 
     return render_to_response('form_showing.html', RequestContext(request, context))
 
-
 @require_write_auth
 def edit_event(request, event_id=None):
     event = get_object_or_404(Event, pk=event_id)
+    # For now only support a single media item:
+    if event.media.count() > 0:
+        media_item = event.media.all()[0]
+        initial_file = media_item.media_file
+    else:
+        media_item = MediaItem()
+        initial_file = None
+    print "Initial_file: {0}, type {1}.".format(initial_file, type(initial_file))
 
     if request.method == 'POST':
+        logger.info("Updating event {0}".format(event_id))
         form = toolkit.diary.forms.EventForm(request.POST, instance=event)
-        if form.is_valid():
+        media_form = toolkit.diary.forms.MediaItemForm(request.POST, request.FILES, instance=media_item)
+        if form.is_valid() and media_form.is_valid():
+            # First, save the form:
             form.save()
+            # Event didn't have a MediaItem associated...
+            update_thumbnail = False
+            if initial_file is None:
+                if media_form.cleaned_data['media_file']:
+                    # New item has been uploaded
+                    logger.info("Creating new MediaItem for file {0}, linked to event {1}".format(media_form.cleaned_data['media_file'], event.name))
+                    # New image uploaded. Save it:
+                    media_form.save()
+                    update_thumbnail = True
+                    # Add to event
+                    event.media.add(media_item)
+                    event.save()
+                else:
+                    # No file was uploaded, no initial media item, do nothing
+                    logger.info("No existing media file, no file uploaded, doing nothing")
+            # Event had a MediaItem associated initially:
+            else:
+                # File uploaded:
+                if media_form.cleaned_data['media_file']:
+                    if 'media_file' in request.FILES:
+                        logger.info("New media uploaded for MediaItem {0}: {1}".format(media_item.pk, media_form.cleaned_data['media_file']))
+                        try:
+                            logger.info("Deleting old image file: {0}".format(initial_file.file))
+                            if os.path.isfile(initial_file.file.name) and initial_file.file.name.startswith(settings.MEDIA_ROOT):
+                                os.unlink(initial_file.file.name)
+                        except (ValueError, OSError, IOError) as error:
+                            logger.error("Couldn't delete existing media file: {0}".format(error))
+                    else:
+                        logger.info("Updating MediaItem {0}, media content unchanged".format(media_item.pk))
+                    media_form.save()
+                    update_thumbnail = True
+                # if cleaned_data['media_file'] is False then the 'clear'
+                # checkbox was used:
+                else:
+                    # Clear the MediaItem from the event
+                    logger.info("Removing media file {0} from event {1}".format(initial_file, event.pk))
+                    # No file name provided and MediaItem already existed:
+                    # Image cleared. Remove it from the event:
+                    event.media.remove(media_item)
+                    event.save()
+                    # If the media item isn't associated with any events, delete it:
+                    #if media_item.event_set.count() == 0:
+                    #    media_item.delete()
+            if update_thumbnail:
+                media_item.autoset_mimetype()
+                media_item.update_thumbnail()
             return _return_close_window()
     else:
         form = toolkit.diary.forms.EventForm(instance=event)
+        media_form = toolkit.diary.forms.MediaItemForm(instance=media_item)
 
     context = {
             'event' : event,
             'form' : form,
+            'media_form' : media_form,
             }
 
     return render_to_response('form_event.html', RequestContext(request, context))

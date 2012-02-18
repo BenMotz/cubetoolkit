@@ -18,6 +18,9 @@ CUBE_AUTH = {
         # that's (username, password) in those tuples
         }
 
+# Slightly arbitrary (inherited) bounding box for thumbnails
+THUMBNAIL_SIZE = (250, 187)
+
 # Custom:
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 

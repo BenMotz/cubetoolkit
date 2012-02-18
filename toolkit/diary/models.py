@@ -2,6 +2,7 @@ import logging
 import os.path
 
 import magic
+import PIL.Image
 
 from django.db import models
 import django.conf
@@ -28,30 +29,71 @@ class MediaItem(models.Model):
 
     def __init__(self, *args, **kwargs):
         if 'media_file' in kwargs and 'mimetype' not in kwargs:
-            m = magic.Magic(mime=True)
-            try:
-                file_path = os.path.join(django.conf.settings.MEDIA_ROOT, kwargs['media_file'])
-                kwargs['mimetype'] = m.from_file(file_path)
-            except IOError:
-                logging.error("Failed to determine mimetype of file {0}".format(file_path))
-                kwargs['mimetype'] = "application/octet-stream"
+            kwargs['mimetype'] = self._detect_mime_type(os.path.join(django.conf.settings.MEDIA_ROOT, kwargs['media_file']))
         super(MediaItem, self).__init__(*args, **kwargs)
 
-    media_file = models.FileField(upload_to="diary", max_length=256, null=True, blank=True)
+    media_file = models.FileField(upload_to="diary", max_length=256, null=True, blank=True, verbose_name='Image file')
     mimetype = models.CharField(max_length=64, null=True, blank=True)
 
     thumbnail = models.ImageField(upload_to="diary_thumbnails", max_length=256, null=True, blank=True)
-    credit = models.CharField(max_length=64, null=True, blank=True, default="Internet scavenged")
+    credit = models.CharField(max_length=64, null=True, blank=True, default="Internet scavenged", verbose_name='Image credit')
     caption = models.CharField(max_length=128, null=True, blank=True)
 
-    def validate_mime_type(self):
+    def _detect_mime_type(self, file_path):
         # See lib/python2.7/site-packages/django/forms/fields.py for how to do
         # basic validation of PNGs / JPEGs
-        pass
+        m = magic.Magic(mime=True)
+        try:
+            mimetype = m.from_file(file_path)
+        except IOError:
+            logging.error("Failed to determine mimetype of file {0}".format(file_path))
+            mimetype = "application/octet-stream"
+        logging.debug("Mime type for {0} detected as {1}".format(file_path, mimetype))
+        return mimetype
 
-    def generate_thumbnail(self):
-        # Can use django.core.files.images.get_image_dimensions...
-        pass
+    def autoset_mimetype(self):
+        if self.media_file and self.media_file != '':
+            self.mimetype = self._detect_mime_type(self.media_file.file.name)
+
+    def update_thumbnail(self):
+        if not self.mimetype.startswith("image"):
+            logging.error("Creating thumbnails for non-image files not supported at this time")
+            # Maybe have some default image for audio/video?
+            return
+        # Delete old thumbnail, if any:
+        if self.thumbnail and self.thumbnail != '':
+            logging.info("Updating thumbnail for media item {0}, file {1}".format(self.pk, self.media_file))
+            try:
+                self.thumbnail.delete(save=False)
+            except (IOError, OSError) as ose:
+                logging.exception("Failed deleting old thumbnail: {0}".format(ose))
+        try:
+            im = PIL.Image.open(self.media_file.file.name)
+        except (IOError, OSError) as ioe:
+            logging.error("Failed to read image file: {0}".format(ioe))
+            return
+        try:
+            im.thumbnail(django.conf.settings.THUMBNAIL_SIZE, PIL.Image.ANTIALIAS)
+        except MemoryError :
+            logging.error("Out of memory trying to create thumbnail for {0}".format(self.media_file))
+        thumb_file = os.path.join(django.conf.settings.MEDIA_ROOT, "diary_thumbnails", os.path.basename(str(self.media_file)))
+        # Make sure thumbnail file ends in jpg, to avoid confusion:
+        if os.path.splitext(thumb_file.lower())[1] not in (u'.jpg',u'.jpeg'):
+            thumb_file += ".jpg"
+        try:
+            # Convert image to RGB (can't save Paletted images as jpgs) and 
+            # save thumbnail as JPEG:
+            im.convert("RGB").save(thumb_file, "JPEG")
+        except (IOError, OSError) as ioe:
+            logging.error("Failed saving thumbnail: {0}".format(ioe))
+            if os.path.exists(thumb_file):
+                try:
+                    os.unlink(thumb_file)
+                except (IOError, OSError) as ioe:
+                    pass
+            return
+        self.thumbnail = thumb_file
+        self.save()
 
     class Meta:
         db_table = 'MediaItems'

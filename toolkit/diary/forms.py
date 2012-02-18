@@ -16,6 +16,16 @@ class EventForm(forms.ModelForm):
                 'terms': forms.Textarea(attrs={'wrap':'soft'}),
                 'notes': forms.Textarea(attrs={'wrap':'soft'}),
                   }
+        exclude = ('media',)
+
+class MediaItemForm(forms.ModelForm):
+    class Meta(object):
+        model = toolkit.diary.models.MediaItem
+        widgets = {
+                'media_file' : forms.ClearableFileInput(attrs={'accept':'image/jpeg,image/gif,image/png'}),
+                  }
+        exclude = ('thumbnail', 'mimetype', 'caption')
+
 
 class ShowingForm(forms.ModelForm):
     class Meta(object):
