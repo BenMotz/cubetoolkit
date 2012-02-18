@@ -44,6 +44,6 @@ DATABASES = {
 
 # Following settings are used by the import script, can be discarded when
 # switch-over is finalised.
-IMPORT_SCRIPT_USER='cubetoolkit'
-IMPORT_SCRIPT_DATABASE='cubetoolkit'
+IMPORT_SCRIPT_USER='toolkitimport'
+IMPORT_SCRIPT_DATABASE='toolkitimport'
 
