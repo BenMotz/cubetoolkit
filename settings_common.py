@@ -1,13 +1,6 @@
-import logging
-import logging.config
 
-logging.basicConfig(
-#    level = logging.DEBUG,
-    level = logging.INFO,
-    format = '%(asctime)s %(levelname)s %(message)s',
-)
-
-# Totally seekrit:
+# Usernames / passwords::
+#
 # (To generate a new password hash:
 # import bcrypt
 # hashed = bcrypt.hashpw('password', bcrypt.gensalt(12))
@@ -20,6 +13,11 @@ CUBE_AUTH = {
 
 # Slightly arbitrary (inherited) bounding box for thumbnails
 THUMBNAIL_SIZE = (250, 187)
+
+###############################################################################
+#
+# Below here are Django settings
+#
 
 # Custom:
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
@@ -151,59 +149,6 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     'south',
-
     'django.contrib.markup',
 )
 
-# Sends an email to the site admins on every HTTP 500 error and logs everything
-# to /tmp/toolkit.log.
-# (Configuration on how it sends emails are in settings_* files)
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'verbose': {
-            'format': '%(asctime)s %(module)s %(funcName)s %(levelname)s : %(message)s'
-        },
-        'simple': {
-            'format': '%(levelname)s %(message)s'
-        },
-    },
-    'handlers': {
-        'console' : {
-            'level' : 'DEBUG',
-            'class' : 'logging.StreamHandler',
-            'formatter' : 'simple',
-        },
-        'file' : {
-            'level' : 'DEBUG',
-            'class' : 'logging.handlers.RotatingFileHandler',
-            'formatter' : 'verbose',
-            'filename' : '/tmp/toolkit.log',
-            'maxBytes' : 2048,
-            'backupCount' : 3,
-        },
-        'mail_admins': {
-            'level': 'ERROR',
-            'class': 'django.utils.log.AdminEmailHandler'
-        }
-    },
-    'loggers': {
-        'django.request': {
-            'handlers': ['mail_admins','file'],
-            'level': 'ERROR',
-            'propagate': True,
-        },
-#        'toolkit' : {
-#            'handlers' : ['console','file'],
-#            'level' : 'DEBUG',
-#            'propagate' : True,
-#        },
-        '' : {
-            'handlers' : ['console','file',],
-            'level' : 'DEBUG',
-            'propagate' : True,
-        },
-    }
-}
-logging.config.dictConfig(LOGGING)

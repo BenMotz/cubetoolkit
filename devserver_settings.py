@@ -35,7 +35,9 @@ TEMPLATE_DIRS = (
 # Enable Debug mode, add in Django toolbar:
 DEBUG = True
 
+# Django toolbar things:
 INTERNAL_IPS = ('127.0.0.1',)
+DEBUG_TOOLBAR_CONFIG = { 'INTERCEPT_REDIRECTS' : False, }
 
 MIDDLEWARE_CLASSES = list(MIDDLEWARE_CLASSES)
 MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')
@@ -46,3 +48,10 @@ INSTALLED_APPS.append('debug_toolbar')
 # switch-over is finalised.
 IMPORT_SCRIPT_USER='cube-import'
 IMPORT_SCRIPT_DATABASE='toolkit'
+
+# Enable logging to the console:
+logging.basicConfig(
+#    level = logging.DEBUG,
+    level = logging.INFO,
+    format = '%(asctime)s %(levelname)s %(message)s',
+)

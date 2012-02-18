@@ -5,6 +5,7 @@ import logging.config
 from settings_common import *
 
 APP_ROOT = '/var/www_toolkit/site'
+LOGGING_CONFIG_FILE = 'logging.conf'
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
@@ -28,3 +29,4 @@ TEMPLATE_DIRS = (
     os.path.join(APP_ROOT, 'templates'),
 )
 
+logging.config.fileConfig(LOGGING_CONFIG_FILE)
