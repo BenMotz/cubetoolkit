@@ -18,7 +18,7 @@ def testing():
     env.user = "ben"
     env.hosts = ["localhost"]
     env.git_source = "ben@phonog.dyndns.org:data/python/cube"
-    env.settings = "testing.settings.py"
+    env.settings = "testing_settings.py"
 
 def production():
     """Configure to deploy live"""
@@ -26,7 +26,7 @@ def production():
     env.site_root = "/home/users/toolkit/site"
     env.user = "cubetoolkit"
     env.hosts = ["toolkit.cubecinema.com"]
-    env.settings = "live.settings.py"
+    env.settings = "live_settings.py"
 
 def deploy_code():
     """Deploy code from git HEAD onto target"""
@@ -100,5 +100,5 @@ def deploy():
     deploy_code()
     deploy_static()
     update_requirements()
-    restart_server()
+#    restart_server()
 
