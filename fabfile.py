@@ -23,7 +23,7 @@ def testing():
 def production():
     """Configure to deploy live"""
     env.target = "production"
-    env.site_root = "/home/users/toolkit/site"
+    env.site_root = "/home/users/cubetoolkit/site"
     env.user = "cubetoolkit"
     env.hosts = ["toolkit.cubecinema.com"]
     env.settings = "live_settings.py"
