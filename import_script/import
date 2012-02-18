@@ -1,17 +1,36 @@
-#!/bin/sh
-svn export --force svn+ssh://cube@sparror.cubecinema.com/home/cube/svn-repo/TRUNK/cgi-bin/events/data/formats
+#!/bin/bash
 
 set -e # Abort on errors
 
-TOOLKIT_PATH=..
 IMAGE_PATH=~/data/rails/toolkit/public/images
 
+if [ $# -eq 0 ] ; then
+	echo "Usage: $0 [Path to site root] [Path to images, defaults to $IMAGE_PATH]"
+	exit 1
+fi
+
+if [ ! -d $1 ] ; then
+	echo "Error: $1 is not a directory"
+	exit 1
+fi
+
+if [ "" != "$2" ] ; then
+	IMAGE_PATH=$2
+fi
+
+# svn export --force svn+ssh://cube@sparror.cubecinema.com/home/cube/svn-repo/TRUNK/cgi-bin/events/data/formats
+
+TOOLKIT_PATH=$1
+
+echo "Rsyncing images from $IMAGE_PATH"
 rsync -av --no-r $IMAGE_PATH/events/* $TOOLKIT_PATH/media/diary/
 rsync -av --no-r $IMAGE_PATH/events/thumb/* $TOOLKIT_PATH/media/diary_thumbnails/
+
+source $TOOLKIT_PATH/venv/bin/activate
 
 export PYTHONPATH=$PYTHONPATH:$TOOLKIT_PATH
 export DJANGO_SETTINGS_MODULE=settings
 
 python $TOOLKIT_PATH/manage.py reset diary --noinput
-python import.py
+python $TOOLKIT_PATH/import_script/import.py
 

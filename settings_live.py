@@ -1,10 +1,19 @@
 import os.path
-import logging
-import logging.config
 
 from settings_common import *
 
 APP_ROOT = '/home/users/cubetoolkit/site'
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'cubetoolkit',
+        'USER': 'cubetoolkit',
+        'PASSWORD': 'hialpabg',
+        'HOST': '',
+        'PORT': '',
+    }
+}
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
@@ -28,3 +37,7 @@ TEMPLATE_DIRS = (
     os.path.join(APP_ROOT, 'templates'),
 )
 
+# Following settings are used by the import script, can be discarded when
+# switch-over is finalised.
+IMPORT_SCRIPT_USER='cubetoolkit'
+IMPORT_SCRIPT_DATABASE='cubetoolkit'

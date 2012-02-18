@@ -7,6 +7,7 @@ import re
 import logging
 
 import toolkit.diary.models
+import settings
 
 FORMATS_PATH="./formats"
 
@@ -24,9 +25,9 @@ def titlecase(string):
 
 def connect():
     conn = MySQLdb.connect (host = "localhost",
-                           user = "cube-import",
+                            user = settings.IMPORT_SCRIPT_USER,
                            passwd = "spanner",
-                           db = "toolkit",
+                           db = settings.IMPORT_SCRIPT_DATABASE,
 #                           use_unicode = True,
                            )
     return conn
