@@ -40,8 +40,9 @@ urlpatterns = patterns( 'toolkit.diary.views',
     url('^add/event$', 'add_event', name="add-event"),
 
     # View rota
-    url("""rota(/|/(?P<year>\d{4})/(?P<month>\d{1,2})/?(?P<day>(?<=/)\d{0,2})/?)?$""", 'view_rota', name="view_rota"),
+    url("""rota(/|/(?P<year>\d{4})/(?P<month>\d{1,2})/?(?P<day>(?<=/)\d{0,2})?/?)?$""", 'view_rota', name="view_rota"),
     # That slightly OTT regex will match:
     # "rota" "rota/" "rota/2001/01" "rota/2001/01/" "rota/2001/1/02" "rota/2001/1/2/"
+    # (ie needs at least year/month, not just a year)
 )
 
