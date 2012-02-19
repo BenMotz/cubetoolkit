@@ -67,7 +67,6 @@ $(document).ready(function() {
 function dateRangeSelected(dateText, inst) {
     var enddate = $.datepicker.parseDate('dd-mm-yy', dateText);
     var startdate = new Date({{start.year}}, {{start.month}} - 1, {{start.day}});
-    console.log(startdate, enddate);
     // Calculate days between those two dates:
     var days_ahead = Math.ceil((enddate.getTime() - startdate.getTime())/86400000);
     if(days_ahead <= 0) {
