@@ -138,26 +138,41 @@ def edit_diary_list(request, year=None, day=None, month=None):
 
     # Get all showings in the date range
     showings = Showing.objects.filter(start__range=[startdate, enddate]).order_by('start').select_related()
-    # Build a dict with all the dates in the range as keys and empty lists as values
-    dates = OrderedDict([ ((startdate + datetime.timedelta(days=days)), []) for days in xrange(days_ahead) ])
-    # Put showings in the dict (so days without showings will have an empty dict)
+    # Build two dicts, to hold the showings and the ideas. These dicts are
+    # initially empty, and get filled in if there are actually showings or
+    # ideas for those dates.
+    # This is done so that if dates don't have ideas/showings they still get
+    # shown in the list
+    dates = OrderedDict()
+    ideas = {startdate : ''} # Actually, I lied: start of visible list is not
+                             # neccesarily the 1st of the month, so make sure
+                             # that it gets an 'IDEAS' link shown
+    for days in xrange(days_ahead):
+        # Iterate through every date in the visible range, creating a dict
+        # entry for each
+        d = startdate + datetime.timedelta(days=days)
+        dates[d] = []
+        # If it's the 1st of the month, make sure there's an ideas entry
+        if d.day == 1:
+            ideas[d] = ''
+    # Now insert all the showings into the 'dates' dict
     for showing in showings:
         dates[showing.start.date()].append(showing)
+    # Dates without a showing will still be in the dates dict, so will still
+    # be shown
 
-    # Get all 'ideas' in date range. Fiddle the date range to be from the start
-    # of the month in startdate, so the idea for that month gets included:
+    # Now get all 'ideas' in date range. Fiddle the date range to be from the
+    # start of the month in startdate, so the idea for that month gets included:
     idea_startdate = datetime.date(day=1, month=startdate.month, year=startdate.year)
     idea_list = DiaryIdea.objects.filter(month__range=[idea_startdate, enddate]).order_by('month').select_related()
-    ideas = {}
-    # Assemble into dict, with keys that will match the keys in the showings
-    # dict
+    # Assemble into the idea dict, with keys that will match the keys in the 
+    # showings dict
     for idea in idea_list:
         ideas[idea.month] = idea.ideas
-    # Fiddle so that the idea for the first month is displayed, even if 
+    # Fiddle so that the idea for the first month is displayed, even if
     # startdate is after the first day of the month:
-    if idea_startdate not in showings and len(idea_list) > 0:
+    if idea_startdate not in showings and len(idea_list) > 0 and idea_list[0].month.month == startdate.month:
         ideas[startdate] = idea_list[0].ideas
-
 
     context['ideas'] = ideas
     context['dates'] = dates
