@@ -12,8 +12,8 @@ urlpatterns = patterns( 'toolkit.diary.views',
 
     # View lists of events for editing:
     url('^edit/?$', 'edit_diary_list', name="default-edit", ),
-    url('^edit/(?P<year>\d{4})$', 'edit_diary_list', name="year-edit", ),
-    url('^edit/(?P<year>\d{4})/(?P<month>\d{1,2})$', 'edit_diary_list', name="month-edit", ),
+    url('^edit/(?P<year>\d{4})/?$', 'edit_diary_list', name="year-edit", ),
+    url('^edit/(?P<year>\d{4})/(?P<month>\d{1,2})/?$', 'edit_diary_list', name="month-edit", ),
     url('^edit/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})', 'edit_diary_list', name="day-edit", ),
 
     # View individual showing
