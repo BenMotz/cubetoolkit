@@ -30,16 +30,18 @@ def _get_date_range(year, month, day, user_days_ahead):
     If month or day are blank, they default to 1. If all three are blank it 
     defaults to today"""
     if day is not None and month is None:
-        raise Http404("Invalid request; cant specify day and no month")
+        logger.error("Invalid request; can't specify day and no month")
+        raise Http404("Invalid request; can't specify day and no month")
 
     try:
         year = int(year) if year else None
         month = int(month) if month else None
         day = int(day) if day else None
     except ValueError:
+        logger.error("Invalid value requested in date range, one of day {0}, month {1}, year {2}".format(day, month, year))
         raise Http404("Invalid values")
 
-    logger.debug("view_diary: day %s, month %s, year %s, span %s days", str(day), str(month), str(year), str(user_days_ahead))
+    logger.debug("Range: day %s, month %s, year %s, span %s days", str(day), str(month), str(year), str(user_days_ahead))
 
     try:
         if day:
@@ -52,11 +54,12 @@ def _get_date_range(year, month, day, user_days_ahead):
             startdate = datetime.date(year, 1, 1)
             days_ahead = 365
             if calendar.isleap(year):
-                days_ahead += 1 
+                days_ahead += 1
         else:
             startdate = datetime.date.today()
             days_ahead = 30 # default
-    except ValueError:
+    except ValueError as vale:
+        logger.error("Invalid something requested in date range: {0}".format(vale))
         raise Http404("Invalid date")
 
     if user_days_ahead:
@@ -420,6 +423,7 @@ def delete_showing(request, showing_id):
 
 @require_read_auth
 def view_rota(request, year, month, day):
+    logger.debug("view_rota")
     query_days_ahead = request.GET.get('daysahead', None)
     start_date, days_ahead = _get_date_range(year, month, day, query_days_ahead)
     end_date = start_date + datetime.timedelta(days=days_ahead)

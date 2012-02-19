@@ -38,6 +38,10 @@ $(document).ready(function() {
             onSelect : dateRangeSelected,
             minDate : 0,
         });
+        $('#daterange')[0].onsubmit = function() {
+            dateRangeSelected();
+            return false;
+        }
 });
 function parse_date_from_control(control_id) {
     var text = $(control_id)[0].value;
@@ -57,9 +61,11 @@ function dateRangeSelected(dateText, inst) {
 {% endblock %}
 
 {% block body %}
-
+<form id='daterange'>
 <p align='center'><label for="id_from_date">Rota from </label><input type="text" name="from_date" value="{{ start_date|date:'j-m-Y'}}" id="id_from_date" />
-<label for="id_to_date"> to </label><input type="text" name="to_date" value="{{ end_date|date:'j-m-Y'}}" id="id_to_date" /></p>
+<label for="id_to_date"> to </label><input type="text" name="to_date" value="{{ end_date|date:'j-m-Y'}}" id="id_to_date" />
+ <input type="submit" value="Go" /></p>
+</form>
 <table border="0" cellspacing="0">
 
 {% for showing in showings %}
