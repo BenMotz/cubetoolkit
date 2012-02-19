@@ -6,6 +6,7 @@ CUBE role rota
 
 {% block css %}
 <style type="text/css">
+    @import url('/static/css/smoothness/jquery-ui.css');
     h1, h2 { margin: 1mm; }
     td.cell_day {
         font-weight: bold;
@@ -21,8 +22,44 @@ CUBE role rota
     td.rel { width: 3.5cm; text-align: right;}
 </style>
 {% endblock %}
+{% block script %}
+<script type="text/javascript" src="/static/js/jquery.js"></script>
+<script type="text/javascript" src="/static/js/jquery-ui.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+        // Add date picker:
+        $('#id_from_date').datepicker({
+            dateFormat : 'dd-mm-yy',
+            onSelect : dateRangeSelected,
+            minDate : 0,
+        });
+        $('#id_to_date').datepicker({
+            dateFormat : 'dd-mm-yy',
+            onSelect : dateRangeSelected,
+            minDate : 0,
+        });
+});
+function parse_date_from_control(control_id) {
+    var text = $(control_id)[0].value;
+    return $.datepicker.parseDate('dd-mm-yy', text);
+}
+function dateRangeSelected(dateText, inst) {
+    var from_date = parse_date_from_control('#id_from_date');
+    var to_date = parse_date_from_control('#id_to_date');
+    // Calculate days between those two dates:
+    var days_ahead = Math.ceil((to_date.getTime() - from_date.getTime())/86400000);
+    if(days_ahead <= 0) {
+        days_ahead = 0;
+    }
+    window.location.href = "{% url view_rota %}/" + (from_date.getYear() + 1900) + "/" + (from_date.getMonth() + 1) + "/" + from_date.getDate() +  "?daysahead=" + days_ahead;
+}
+</script>
+{% endblock %}
 
 {% block body %}
+
+<p align='center'><label for="id_from_date">Rota from </label><input type="text" name="from_date" value="{{ start_date|date:'j-m-Y'}}" id="id_from_date" />
+<label for="id_to_date"> to </label><input type="text" name="to_date" value="{{ end_date|date:'j-m-Y'}}" id="id_to_date" /></p>
 <table border="0" cellspacing="0">
 
 {% for showing in showings %}

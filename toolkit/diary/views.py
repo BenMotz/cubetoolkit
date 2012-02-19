@@ -425,6 +425,8 @@ def view_rota(request, year, month, day):
     end_date = start_date + datetime.timedelta(days=days_ahead)
     showings = Showing.objects.filter(cancelled=False).filter(confirmed=True).filter(start__range=[start_date, end_date]).order_by('start').select_related()
     context = {
+            'start_date' : start_date,
+            'end_date' : end_date,
             'showings': showings,
             }
     return render_to_response('rota_view.html', context)
