@@ -29,7 +29,7 @@ TEMPLATE_DIRS = (
     os.path.join(APP_ROOT, 'templates'),
 )
 
-logging.config.fileConfig(os.path.join(APP_PATH,LOGGING_CONFIG_FILE))
+logging.config.fileConfig(os.path.join(APP_ROOT,LOGGING_CONFIG_FILE))
 
 DATABASES = {
     'default': {
