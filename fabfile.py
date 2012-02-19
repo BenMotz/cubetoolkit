@@ -35,7 +35,7 @@ def deploy_code():
 
     archive = "site_transfer.tgz"
     local("git archive --format=tgz HEAD > {0}".format(archive))
-    # local('tar -czf {0} toolkit/ --exclude=".pyc"'.format(archive))
+    # local('tar -czf {0} . --exclude=media --exclude=venv --exclude={0} --exclude=".pyc"'.format(archive))
     put(archive, env.site_root)
     with cd(env.site_root):
         target = os.path.join(env.site_root, CODE_DIR)
@@ -49,6 +49,8 @@ def deploy_static():
     # Check that target is defined:
     require('site_root', provided_by = ('testing', 'production'))
 
+    # This isn't so much to put content there, but to delete anything that
+    # isn't needed or shouldn't be there.
     local('rsync -av --delete static/ {0}@{1}:{2}/static'.format(env.user, env.hosts[0], env.site_root))
 
 def deploy_media():
