@@ -5,3 +5,4 @@ bcrypt>=0.1
 python-dateutil
 south
 python-magic>=0.4.0
+mock
