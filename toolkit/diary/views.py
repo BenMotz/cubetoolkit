@@ -445,6 +445,11 @@ def view_event_field(request, field, year, month, day):
     start_date, days_ahead = _get_date_range(year, month, day, query_days_ahead)
     end_date = start_date + datetime.timedelta(days=days_ahead)
     showings = Showing.objects.filter(cancelled=False).filter(confirmed=True).filter(start__range=[start_date, end_date]).order_by('start').select_related()
+
+    if 'search' in request.GET:
+        search = request.GET['search']
+        logging.info("Search term: {0}".format(search))
+        showings = showings.filter(**{ 'event__' + field + '__icontains' : search })
     context = {
             'start_date' : start_date,
             'end_date' : end_date,
