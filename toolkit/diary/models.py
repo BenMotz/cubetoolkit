@@ -92,7 +92,7 @@ class MediaItem(models.Model):
                 except (IOError, OSError) as ioe:
                     pass
             return
-        self.thumbnail = thumb_file
+        self.thumbnail = os.path.relpath(thumb_file, django.conf.settings.MEDIA_ROOT)
         self.save()
 
     class Meta:
