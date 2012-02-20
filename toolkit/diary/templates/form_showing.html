@@ -9,6 +9,9 @@ Details for: {{ event.name }}
 <script type="text/javascript">
 $(document).ready(function() {
         $('#id_start').datetimepicker({ dateFormat : 'yy-mm-dd', timeFormat : 'hh:mm:ss', minDate : 0});
+        $('#delete_form').bind("submit", function() {
+            return confirm("Delete event: are you sure?");
+        });
 });
 </script>
 {% endblock %}
@@ -46,7 +49,7 @@ $(document).ready(function() {
 
 <h2>Delete</h2>
 
-<form action="{% url delete-showing showing_id=showing.id %}" method="post">
+<form id="delete_form" action="{% url delete-showing showing_id=showing.id %}" method="post">
     {% csrf_token %}
     <input type="submit" value="Delete" />
 </form>
