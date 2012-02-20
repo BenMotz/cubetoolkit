@@ -75,18 +75,18 @@ class UrlTests(TestCase):
                 self.assertEqual(view_mock.call_args[1][k], v)
             view_mock.reset_mock()
 
-    @patch('toolkit.diary.views.view_rota')
+    @patch('toolkit.diary.views.view_event_field')
     def test_diary_rota_urls(self, view_mock):
         # Test all basic diary URLs
 
         calls_to_test = {
-                '/diary/rota' : {},
-                '/diary/rota/' : {},
-                '/diary/rota/2012/12' : {'year' : '2012', 'month' : '12'},
-                '/diary/rota/2012/12/' : {'year' : '2012', 'month' : '12'},
-                '/diary/rota/2012/12/30' : {'year' : '2012', 'month' : '12', 'day' : '30'},
-                '/diary/rota/2012/12/30/' : {'year' : '2012', 'month' : '12', 'day' : '30'},
-                '/diary/rota/2012/12//' : {'year' : '2012', 'month' : '12', 'day' : ''},
+                '/diary/rota' : {'field' : 'rota', },
+                '/diary/rota/' : {'field' : 'rota',},
+                '/diary/rota/2012/12' : {'field' : 'rota','year' : '2012', 'month' : '12'},
+                '/diary/rota/2012/12/' : {'field' : 'rota', 'year' : '2012', 'month' : '12'},
+                '/diary/rota/2012/12/30' : {'field' : 'rota', 'year' : '2012', 'month' : '12', 'day' : '30'},
+                '/diary/rota/2012/12/30/' : {'field' : 'rota', 'year' : '2012', 'month' : '12', 'day' : '30'},
+                '/diary/rota/2012/12//' : {'field' : 'rota', 'year' : '2012', 'month' : '12', 'day' : ''},
                 }
         # (rota URLS must have at least year/month, not just a year!)
         for query,response in calls_to_test.iteritems():

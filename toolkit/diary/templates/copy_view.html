@@ -1,0 +1,75 @@
+{% extends "field_view_base.html" %}
+{% load markup %}
+
+{% block title %}
+CUBE programme of events - copy report
+{% endblock %}
+
+{% block css %}
+{{ block.super }}
+<style type="text/css">
+    p {
+        font-family: monospace;
+    }
+    div.index p {
+        white-space: pre;
+        padding: 0;
+        margin: 0;
+    }
+    div.index p.pad {
+        padding: 10pt;
+    }
+    div.index p.day {
+        padding-top: 10pt;
+    }
+
+    div.copy p.divider {
+        padding: 10pt;
+    }
+</style>
+{% endblock %}
+{% block script %}
+{{ block.super }}
+<script type="text/javascript">
+$(document).ready(function() {
+        // Change edit links to open in a new window:
+        $('.copy a').click(function(e) {
+            window.open(e.currentTarget.href,"edit_form","height=800,width=800,scrollbars,resizable,toolbar");
+            return false;
+        });
+});
+</script>
+{% endblock %}
+
+{% block body %}
+{{ block.super }}
+<img src="/static/diary/diary_edit_list_header.gif" alt="Cube Microplex" width="150px">
+<h3>CUBE programme of events - copy report</h3>
+<div class="index">
+<p class="pad">CUBE MICROPLEX</p>
+
+<p class="pad">Programme of events.</p>
+
+{% for showing in showings %}
+    {% ifchanged %}<p class="pad">{{ showing.start|date:"Y" }}</p>{% endifchanged %}
+    {% ifchanged %}<p class="pad">{{ showing.start|date:"F"|upper }}</p>{% endifchanged %}
+    {% ifchanged %}<p class="day">{{ showing.start|date:"D"}} {{ showing.start|date:"d" }}{% else %}
+    <p>      {% endifchanged %} {{showing.start|date:"H:i"}} ......... {% if showing.hide_in_programme or showing.event.private %}Closed for private event.{% else %}{{ showing.event.name|capfirst }}{% if showing.cancelled %} (CANCELLED){% endif %}{% if showing.discounted %} (TTT){% endif %}{% endif %}</p>
+{% endfor %}
+
+</div>
+<div class="copy">
+
+{% for showing in showings %}
+{% if not showing.event.private and not showing.hide_in_programme %}
+{% ifchanged %}
+<p class="divider">------------------------------------------------------------------------------</p>
+<p>{{ showing.event.name|upper }}</p>
+<p>{{ showing.event.copy|markdown }}</p>
+<p><a href="{% url edit-event-details showing.event.id %}">[edit]</a></p>
+{% endifchanged %}
+{% endif %}
+{% endfor %}
+
+</div>
+{% endblock %}

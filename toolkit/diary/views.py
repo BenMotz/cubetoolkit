@@ -437,8 +437,10 @@ def delete_showing(request, showing_id):
     return _return_close_window()
 
 @require_read_auth
-def view_rota(request, year, month, day):
-    logger.debug("view_rota")
+def view_event_field(request, field, year, month, day):
+    logger.debug("view_event_field: field {0}".format(field))
+    assert field in ('copy','terms', 'rota')
+
     query_days_ahead = request.GET.get('daysahead', None)
     start_date, days_ahead = _get_date_range(year, month, day, query_days_ahead)
     end_date = start_date + datetime.timedelta(days=days_ahead)
@@ -447,6 +449,8 @@ def view_rota(request, year, month, day):
             'start_date' : start_date,
             'end_date' : end_date,
             'showings': showings,
+            'event_field' : field,
             }
-    return render_to_response('rota_view.html', context)
+
+    return render_to_response('{0}_view.html'.format(field), context)
 

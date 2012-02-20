@@ -34,15 +34,15 @@ urlpatterns = patterns( 'toolkit.diary.views',
     url('^edit/ideas/(?P<year>\d{4})/(?P<month>\d{1,2})$', 'edit_ideas', name="edit-ideas"),
     # Add a new showing (to an existing event) - submission URL for edit-showing
     url('^add/event/id/(?P<event_id>\d+)/showing$', 'add_showing', name="add-showing"),
-    # Delete a showin
+    # Delete a showing
     url('^edit/showing/id/(?P<showing_id>\d+)/delete$', 'delete_showing', name="delete-showing"),
     # Add a new event + showing
     url('^add/event$', 'add_event', name="add-event"),
 
-    # View rota
-    url("""rota(/|/(?P<year>\d{4})/(?P<month>\d{1,2})/?(?P<day>(?<=/)\d{0,2})?/?)?$""", 'view_rota', name="view_rota"),
-    # That slightly OTT regex will match:
+    # The slightly OTT regex in the following will match:
     # "rota" "rota/" "rota/2001/01" "rota/2001/01/" "rota/2001/1/02" "rota/2001/1/2/"
     # (ie needs at least year/month, not just a year)
+    # View rota
+    url("""(?P<field>rota|copy|terms)(/|/(?P<year>\d{4})/(?P<month>\d{1,2})/?(?P<day>(?<=/)\d{0,2})?/?)?$""", 'view_event_field', name="view_event_field"),
 )
 
