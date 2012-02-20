@@ -10,7 +10,7 @@ from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
-from toolkit.diary.models import Showing, Event, DiaryIdea, RotaEntry, MediaItem
+from toolkit.diary.models import Showing, Event, DiaryIdea, RotaEntry, MediaItem, EventType
 import toolkit.diary.forms
 
 from toolkit.auth.decorators import require_read_auth, require_write_auth
@@ -71,7 +71,7 @@ def _get_date_range(year, month, day, user_days_ahead):
 
     return startdate, days_ahead
 
-def view_diary(request, year=None, month=None, day=None):
+def view_diary(request, year=None, month=None, day=None, event_type=None):
     context = { }
     query_days_ahead = request.GET.get('daysahead', None)
     startdate, days_ahead = _get_date_range(year, month, day, query_days_ahead)
@@ -95,6 +95,8 @@ def view_diary(request, year=None, month=None, day=None):
     # Do query. select_related() on the end encourages it to get the
     # associated showing/event data, to reduce the number of SQL queries
     showings = Showing.objects.filter(confirmed=True).filter(hide_in_programme=False).filter(start__range=[startdate, enddate]).filter(event__private=False).order_by('start').select_related()
+    if event_type:
+        showings = showings.filter(event__etype__shortname = event_type)
     # But that doesn't work for Many-Many relationships. To avoid a separate
     # query for every single image, get all the image data here.
     # First, build set of event ids:
