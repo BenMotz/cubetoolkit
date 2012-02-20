@@ -16,6 +16,9 @@ Details for: {{ event.name }}
     p.image_caption {
         font-style: italic;
     }
+    .pre {
+        white-space: pre;
+    }
 
 </style>
 {% endblock %}
@@ -49,7 +52,7 @@ Details for: {{ event.name }}
 <p><a href="{% url edit-event-details event.pk %}">[edit]</a></p>
 
 <p class="d"><b>Terms for "{{ event.name }}"</b></p>
-<p>{{event.terms}}</p>
+<p class="pre">{{event.terms}}</p>
 <p><a href="{% url edit-event-details event.pk %}">[edit]</a></p>
 
 <p class="d"><b>Other notes for "{{ event.name }}"</b></p>

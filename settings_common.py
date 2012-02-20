@@ -14,6 +14,19 @@ CUBE_AUTH = {
 # Slightly arbitrary (inherited) bounding box for thumbnails
 THUMBNAIL_SIZE = (250, 187)
 
+DEFAULT_TERMS_TEXT = """Contacts-
+Company-
+Address-
+Email-
+Ph No-
+Hire Fee (inclusive of VAT, if applicable) -
+Financial Deal (%/fee/split etc)-
+Deposit paid before the night (p/h only) -
+Amount needed to be collected (p/h only) -
+Special Terms -
+Tech needed -
+Additonal Info -"""
+
 ###############################################################################
 #
 # Below here are Django settings

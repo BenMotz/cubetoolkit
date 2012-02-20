@@ -116,7 +116,7 @@ class Event(models.Model):
     copy = models.TextField(max_length=8192, null=True, blank=True)
     copy_summary = models.TextField(max_length=4096, null=True, blank=True)
 
-    terms = models.TextField(max_length=4096, null=True, blank=True)
+    terms = models.TextField(max_length=4096, default=django.conf.settings.DEFAULT_TERMS_TEXT, null=True, blank=True)
     notes = models.TextField(max_length=4096, null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
