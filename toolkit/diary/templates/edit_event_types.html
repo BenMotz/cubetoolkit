@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}
+Editing Event types
+{% endblock %}
+
+{% block css %}
+<style type="text/css">
+  @import url('/static/css/smoothness/jquery-ui.css');
+  body {
+      font-family: sans-serif;
+      font-size: 9pt;
+  }
+  table {
+      border-collapse: collapse;
+      background: #ece1ff;
+  }
+  #c1, #c2 {
+      width: 20%;
+  }
+  th {
+      border-bottom: thin solid gray;
+      font-size: 12pt;
+      padding: 4pt;
+  }
+  td {
+      padding: 3pt;
+      border-left: thin dashed gray;
+  }
+  .roles {
+      border-bottom: thin solid gray;
+  }
+</style>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="/static/js/jquery.js"></script>
+<script type="text/javascript" src="/static/js/jquery-ui.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+});
+</script>
+{% endblock %}
+
+{% block body %}
+<h1>Event types</h1>
+<p><i>Note: 'Short name' is used for the generic event type, so should probably be 'film', 'music', 'party' or something like that</i></p>
+<table>
+<tr><th id="c1">Event type</th><th id="c2">Short name</th><th>Description</th></tr>
+<tr><td colspan="3">Add new:</td></tr>
+<tr><td> NAME </td><td>{{ etype.shortname }}</td><td> {{ etype.description }} </td></tr>
+<tr class="roles"><td colspan="3"></td></tr>
+
+{% for etype in types %}
+<tr><td>{{ etype.name }}</td><td>{{ etype.shortname }}</td><td> {{ etype.description }} </td></tr>
+<tr class="roles"><td colspan="3">
+{{ etype.roles.all }}
+</td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}
+

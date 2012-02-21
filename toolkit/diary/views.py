@@ -461,3 +461,7 @@ def view_event_field(request, field, year, month, day):
 
     return render_to_response('{0}_view.html'.format(field), context)
 
+def edit_event_types(request):
+    types = EventType.objects.all()
+    context = { 'types' : types }
+    return render_to_response('edit_event_types.html', RequestContext(request, context))
