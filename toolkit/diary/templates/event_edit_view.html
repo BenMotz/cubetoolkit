@@ -32,9 +32,12 @@ Details for: {{ event.name }}
 
 <div id="detail">
     <p class="d"><b>Name:</b>{{ event.name }} <a href="{% url edit-event-details event.pk %}">[edit]</a></p>
+    <p class="d"><b>Tags:</b> {{ event.tags.all|join:", " }}</p>
+    {% comment %}
     {% if event.template %}
-    <p class="d"><b>Type:</b>{{ event.template }} </p>
+    <p class="d"><b>Created from template:</b>{{ event.template }} </p>
     {% endif %}
+    {% endcomment %}
 
 <p><b>Event image.</b><br>
 {% if event.media.all.0 %}
