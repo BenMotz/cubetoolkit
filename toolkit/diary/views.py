@@ -10,7 +10,7 @@ from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
-from toolkit.diary.models import Showing, Event, DiaryIdea, RotaEntry, MediaItem, EventType
+from toolkit.diary.models import Showing, Event, DiaryIdea, RotaEntry, MediaItem, EventTemplate
 import toolkit.diary.forms
 
 from toolkit.auth.decorators import require_read_auth, require_write_auth
@@ -96,7 +96,7 @@ def view_diary(request, year=None, month=None, day=None, event_type=None):
     # associated showing/event data, to reduce the number of SQL queries
     showings = Showing.objects.filter(confirmed=True).filter(hide_in_programme=False).filter(start__range=[startdate, enddate]).filter(event__private=False).order_by('start').select_related()
     if event_type:
-        showings = showings.filter(event__etype__shortname = event_type)
+        showings = showings.filter(event__template__shortname = event_type)
     # But that doesn't work for Many-Many relationships. To avoid a separate
     # query for every single image, get all the image data here.
     # First, build set of event ids:
@@ -235,7 +235,7 @@ def add_event(request):
         form = toolkit.diary.forms.NewEventForm(request.POST)
         if form.is_valid():
             new_event = Event(name=form.cleaned_data['event_name'],
-                              etype=form.cleaned_data['event_type'],
+                              template=form.cleaned_data['event_template'],
                               duration=form.cleaned_data['duration'],
                               outside_hire=form.cleaned_data['external'],
                               private=form.cleaned_data['private'])
@@ -468,6 +468,6 @@ def view_event_field(request, field, year, month, day):
     return render_to_response('{0}_view.html'.format(field), context)
 
 def edit_event_types(request):
-    types = EventType.objects.all()
+    types = EventTemplate.objects.all()
     context = { 'types' : types }
     return render_to_response('edit_event_types.html', RequestContext(request, context))

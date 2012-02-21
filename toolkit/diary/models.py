@@ -100,11 +100,20 @@ class MediaItem(models.Model):
     class Meta:
         db_table = 'MediaItems'
 
+class EventTag(models.Model):
+    name = models.CharField(max_length=32, blank=False, null=False, unique=True)
+    class Meta:
+        db_table = 'EventTags'
+    def __unicode__(self):
+        return self.name
+
 class Event(models.Model):
 
     name = models.CharField(max_length=256, blank=False)
 
-    etype = models.ForeignKey('EventType', verbose_name='Event Type', related_name='etype', null=True, blank=True)
+    template = models.ForeignKey('EventTemplate', verbose_name='Event Type', related_name='template', null=True, blank=True)
+    tags = models.ManyToManyField(EventTag, db_table='Event_Tags')
+
     duration = models.TimeField(null=True)
 
     cancelled = models.BooleanField(default=False)
@@ -112,8 +121,6 @@ class Event(models.Model):
     private = models.BooleanField(default=False)
 
     media = models.ManyToManyField(MediaItem, db_table='Event_MediaItems')
-    # primary_media = models.ForeignKey('MediaItem', related_name='+', null=True, blank=True)
-    # related_name="+" means that given MediaItem won't have a backlink to this model
 
     copy = models.TextField(max_length=8192, null=True, blank=True)
     copy_summary = models.TextField(max_length=4096, null=True, blank=True)
@@ -173,9 +180,9 @@ class Showing(models.Model):
         # Delete all existing rota entries (if any)
         self.rotaentry_set.all().delete()
 
-        if self.event.etype is not None:
+        if self.event.template is not None:
             # Add a rota entry for each role in the event type:
-            for role in self.event.etype.roles.all():
+            for role in self.event.template.roles.all():
                 RotaEntry(role=role, showing=self).save()
 
 
@@ -191,7 +198,7 @@ class DiaryIdea(models.Model):
     def __unicode__(self):
         return "%d/%d" % (self.month.month, self.month.year)
 
-class EventType(models.Model):
+class EventTemplate(models.Model):
 
     name = models.CharField(max_length=32, blank=False)
     shortname = models.CharField(max_length=32, blank=False)
@@ -201,10 +208,11 @@ class EventType(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     # Default roles for this event
-    roles = models.ManyToManyField(Role, db_table='EventTypes_Roles')
+    roles = models.ManyToManyField(Role, db_table='EventTemplates_Roles')
+    tags = models.ManyToManyField(EventTag, db_table='EventTemplate_Tags')
 
     class Meta:
-        db_table = 'EventTypes'
+        db_table = 'EventTemplates'
 
     def __unicode__(self):
         return self.name

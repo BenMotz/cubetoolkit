@@ -254,7 +254,7 @@ def create_roles(connection):
 # Create event templates using dict { event_template_name : [ list of role names] }
 def create_event_types(event_types):
     for e_type, roles in event_types.iteritems():
-        e_type_o, created = toolkit.diary.models.EventType.objects.get_or_create(name=e_type)
+        e_type_o, created = toolkit.diary.models.EventTemplate.objects.get_or_create(name=e_type)
         if created:
             logger.info("Created event type: %s", e_type)
             e_type_o.shortname = e_type
@@ -281,6 +281,12 @@ def load_event_templates(path_to_formats):
             type_index[clean(event_type)] = role_list
     logger.info("Loaded %d event types: %s", len(type_index), ",".join(type_index.keys()))
     return type_index
+
+def create_default_tags():
+    tags = ('film','music','party','cabaret','indymedia','talk','meeting')
+    for tag in tags:
+        t = toolkit.diary.models.EventTag(name=tag)
+        t.save()
 
 def main():
     global SITE_ROOT

@@ -48,13 +48,13 @@ $(document).ready(function() {
 <table>
 <tr><th id="c1">Event type</th><th id="c2">Short name</th><th>Description</th></tr>
 <tr><td colspan="3">Add new:</td></tr>
-<tr><td> NAME </td><td>{{ etype.shortname }}</td><td> {{ etype.description }} </td></tr>
+<tr><td> NAME </td><td>{{ template.shortname }}</td><td> {{ template.description }} </td></tr>
 <tr class="roles"><td colspan="3"></td></tr>
 
-{% for etype in types %}
-<tr><td>{{ etype.name }}</td><td>{{ etype.shortname }}</td><td> {{ etype.description }} </td></tr>
+{% for template in types %}
+<tr><td>{{ template.name }}</td><td>{{ template.shortname }}</td><td> {{ template.description }} </td></tr>
 <tr class="roles"><td colspan="3">
-{{ etype.roles.all }}
+{{ template.roles.all }}
 </td>
 </tr>
 {% endfor %}
