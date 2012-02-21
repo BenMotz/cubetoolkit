@@ -212,7 +212,7 @@ def import_events(connection, role_map):
             # Image credits
             image_credit = titlecase(r[5])
             media_item = toolkit.diary.models.MediaItem(media_file=image_path, thumbnail=image_thumbnail_path, credit=image_credit)
-            media_item.save()
+            media_item.save(update_thumbnail=False)
             e.media.add(media_item)
 
         showings = import_event_showings(connection, e, r[0])

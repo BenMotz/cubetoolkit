@@ -27,11 +27,6 @@ class MediaItem(models.Model):
     """Media (eg. video, audio, html fragment?). Currently to be assoicated
     with events, in future with other things?"""
 
-    def __init__(self, *args, **kwargs):
-        if 'media_file' in kwargs and 'mimetype' not in kwargs:
-            kwargs['mimetype'] = self._detect_mime_type(os.path.join(django.conf.settings.MEDIA_ROOT, kwargs['media_file']))
-        super(MediaItem, self).__init__(*args, **kwargs)
-
     media_file = models.FileField(upload_to="diary", max_length=256, null=True, blank=True, verbose_name='Image file')
     mimetype = models.CharField(max_length=64, null=True, blank=True)
 
@@ -39,21 +34,28 @@ class MediaItem(models.Model):
     credit = models.CharField(max_length=64, null=True, blank=True, default="Internet scavenged", verbose_name='Image credit')
     caption = models.CharField(max_length=128, null=True, blank=True)
 
-    def _detect_mime_type(self, file_path):
-        # See lib/python2.7/site-packages/django/forms/fields.py for how to do
-        # basic validation of PNGs / JPEGs
-        m = magic.Magic(mime=True)
-        try:
-            mimetype = m.from_file(file_path)
-        except IOError:
-            logging.error("Failed to determine mimetype of file {0}".format(file_path))
-            mimetype = "application/octet-stream"
-        logging.debug("Mime type for {0} detected as {1}".format(file_path, mimetype))
-        return mimetype
+    def save(self, *args, **kwargs):
+        # Before saving, update thumbnail and mimetype
+        self.autoset_mimetype()
+        update_thumbnail = kwargs.pop('update_thumbnail', True)
+        result = super(MediaItem, self).save(*args, **kwargs)
+        # Update thumbnail after save, to ensure image has been written to disk
+        if update_thumbnail:
+            self.update_thumbnail()
+        return result
 
     def autoset_mimetype(self):
+        # See lib/python2.7/site-packages/django/forms/fields.py for how to do
+        # basic validation of PNGs / JPEGs
+        logging.info("set mimetpye: '{0}'".format(self.media_file))
         if self.media_file and self.media_file != '':
-            self.mimetype = self._detect_mime_type(self.media_file.file.name)
+            m = magic.Magic(mime=True)
+            try:
+                self.mimetype = m.from_buffer(self.media_file.file.read(4096))
+            except IOError:
+                logging.error("Failed to determine mimetype of file {0}".format(self.media_file.file.name))
+                self.mimetype = "application/octet-stream"
+            logging.debug("Mime type for {0} detected as {1}".format(self.media_file.file.name, self.mimetype))
 
     def update_thumbnail(self):
         if not self.mimetype.startswith("image"):
@@ -93,7 +95,7 @@ class MediaItem(models.Model):
                     pass
             return
         self.thumbnail = os.path.relpath(thumb_file, django.conf.settings.MEDIA_ROOT)
-        self.save()
+        self.save(update_thumbnail=False)
 
     class Meta:
         db_table = 'MediaItems'
