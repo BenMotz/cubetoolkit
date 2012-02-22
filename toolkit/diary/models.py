@@ -102,8 +102,23 @@ class MediaItem(models.Model):
 
 class EventTag(models.Model):
     name = models.CharField(max_length=32, blank=False, null=False, unique=True)
+    read_only = models.BooleanField(default=False, null=False)
+
     class Meta:
         db_table = 'EventTags'
+
+    def save(self, *args, **kwargs):
+        if self.pk and self.read_only:
+            return False
+        else:
+            return super(EventTag, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        if self.pk and self.read_only:
+            return False
+        else:
+            return super(EventTag, self).delete(*args, **kwargs)
+
     def __unicode__(self):
         return self.name
 

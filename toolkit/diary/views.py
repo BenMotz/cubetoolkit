@@ -1,4 +1,5 @@
 import os
+import re
 import datetime
 import calendar
 import logging
@@ -9,8 +10,9 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.conf import settings
+import django.db
 
-from toolkit.diary.models import Showing, Event, DiaryIdea, RotaEntry, MediaItem, EventTemplate
+from toolkit.diary.models import Showing, Event, DiaryIdea, RotaEntry, MediaItem, EventTemplate, EventTag
 import toolkit.diary.forms
 
 from toolkit.auth.decorators import require_read_auth, require_write_auth
@@ -96,7 +98,7 @@ def view_diary(request, year=None, month=None, day=None, event_type=None):
     # associated showing/event data, to reduce the number of SQL queries
     showings = Showing.objects.filter(confirmed=True).filter(hide_in_programme=False).filter(start__range=[startdate, enddate]).filter(event__private=False).order_by('start').select_related()
     if event_type:
-        showings = showings.filter(event__template__shortname = event_type)
+        showings = showings.filter(event__tags__name = event_type)
     # But that doesn't work for Many-Many relationships. To avoid a separate
     # query for every single image, get all the image data here.
     # First, build set of event ids:
@@ -467,7 +469,49 @@ def view_event_field(request, field, year, month, day):
 
     return render_to_response('{0}_view.html'.format(field), context)
 
-def edit_event_types(request):
-    types = EventTemplate.objects.all()
-    context = { 'types' : types }
-    return render_to_response('edit_event_types.html', RequestContext(request, context))
+def edit_event_templates(request):
+    templates = EventTemplate.objects.all()
+    context = { 'templates' : templates }
+    return render_to_response('edit_event_templates.html', RequestContext(request, context))
+
+def edit_event_tags(request):
+    tags = EventTag.objects.all()
+
+    if request.method != 'POST':
+        context = { 'tags' : tags}
+        return render_to_response('edit_event_tags.html', RequestContext(request, context))
+    # Data was posted
+
+    # First, pull out mapping of tag key : name
+    tags_submitted = {}
+    tag_re = re.compile("^tags\[([-\d]+)\]$")
+    for key, val in request.POST.iteritems():
+        m = tag_re.match(key)
+        if m:
+            tags_submitted[int(m.group(1),10)] = val.strip().lower()
+
+    # Build dict of existing tags:
+    tags_by_pk = dict( (tag.pk, tag) for tag in tags )
+    # Now update / add as appropriate
+    for pk, name in tags_submitted.iteritems():
+        extant_tag = tags_by_pk.pop(pk, None)
+        if extant_tag:
+            if extant_tag.name != name:
+                logger.info("Changing name of tag id {0} from {1} to {2}".format(extant_tag.pk, extant_tag.name, name))
+                extant_tag.name = name
+                extant_tag.save()
+        elif extant_tag is None:
+            new_tag = EventTag(name=name)
+            logger.info("Creating new tag {0}".format(name))
+            try:
+                new_tag.save()
+            except django.db.IntegrityError as ie:
+                logger.error("Failed adding tag {0}: {1}".format(name, ie))
+    # Any tags still in extant_tag should be deleted:
+    for tag in tags_by_pk.itervalues():
+        if not tag.read_only:
+            logger.info("Deleting tag {0} (key {1})".format(tag.name, tag.pk))
+            tag.delete()
+
+    return HttpResponse("OK")
+

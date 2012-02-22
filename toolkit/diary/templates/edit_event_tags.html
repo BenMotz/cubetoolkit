@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block title %}
+Editing Event types
+{% endblock %}
+
+{% block css %}
+<style type="text/css">
+  @import url('/static/css/smoothness/jquery-ui.css');
+  body {
+      font-family: sans-serif;
+      font-size: 9pt;
+  }
+  li {
+      list-style-type: none;
+      margin: 5pt;
+      line-height: 35pt;
+      padding: 7pt;
+      width: auto;
+      display: inline;
+      background: lightblue;
+  }
+  .unsaved {
+      background: lightgray;
+  }
+  span#save {
+      margin: 10pt;
+      padding: 5pt;
+  }
+  .del {
+      color: red;
+  }
+</style>
+{% endblock %}
+
+{% block script %}
+<!-- Screw progressive enhancement -->
+<script type="text/javascript" src="/static/js/jquery.js"></script>
+<script type="text/javascript" src="/static/js/jquery-ui.min.js"></script>
+<script type="text/javascript">
+var tags = { {% for tag in tags %}
+    '{{ tag.pk }}' : '{{ tag.name }}', {% endfor %}
+}
+var next_key = -1;
+var deletions = false;
+
+function submit() {
+    if(deletions) {
+        if(!confirm('You are about to delete one or more tags, which will untag all events that use that tag. This cannot be undone!')) {
+            return;
+        }
+    }
+    $('#save').button('disable').text('Saving...');
+    var tag_data = {
+        'csrfmiddlewaretoken' : '{{ csrf_token }}',
+        'tags' : tags,
+    };
+    $.post('{% url edit_event_tags %}', tag_data, function() {
+                window.location.href = '{% url edit_event_tags %}';
+            });
+
+}
+function add_tag() {
+    var inputfield = document.getElementById('new_tag');
+    var new_tag = $.trim(inputfield.value);
+    if(new_tag == '') {
+        return;
+    }
+    $('#additem').before('<li class="unsaved" id="tag_' + next_key + '" >' + new_tag + ' <a id="delete_' + next_key + '" href="#" class="del">X</a></li>');
+    $('#delete_' + next_key).click(delete_tag);
+    tags['' + next_key] = inputfield.value;
+    inputfield.value = "";
+    next_key -= 1;
+}
+
+function delete_tag(e) {
+    var key = e.target.id.split('_')[1];
+    if(key > 0) {
+        console.log(key);
+        deletions = true;
+    }
+    $('#tag_' + key).remove();
+    delete tags[key];
+}
+
+$(document).ready(function() {
+        $('#save').button().click(submit);
+        $('#add_button').click(add_tag);
+        $('.del').click(delete_tag);
+});
+</script>
+{% endblock %}
+
+{% block body %}
+<h1>Event tags</h1>
+<ul>
+    {% for tag in tags %}
+    <li id='tag_{{tag.pk}}'>{{tag.name}}{% if not tag.read_only %} <a id="delete_{{tag.pk}}" href="#" class="del">X</a>{% endif %}</li>
+    {% endfor %}
+    <li id="additem"><input id="new_tag" type="text" placeholder="New tag..." /> <a id="add_button" href="#">Add</a></li>
+</ul>
+<p><button id="save">Save changes</button></p>
+{% endblock %}
+

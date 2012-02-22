@@ -41,7 +41,8 @@ urlpatterns = patterns( 'toolkit.diary.views',
     url('^add/event$', 'add_event', name="add-event"),
 
     # Edit event types
-    url('^edit/eventtypes/', 'edit_event_types', name='edit_event_types'),
+    url('^edit/eventtemplates/', 'edit_event_templates', name='edit_event_templates'),
+    url('^edit/eventtags/', 'edit_event_tags', name='edit_event_tags'),
 
     # The slightly OTT regex in the following will match:
     # "rota" "rota/" "rota/2001/01" "rota/2001/01/" "rota/2001/1/02" "rota/2001/1/2/"

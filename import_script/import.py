@@ -283,9 +283,9 @@ def load_event_templates(path_to_formats):
     return type_index
 
 def create_default_tags():
-    tags = ('film','music','party','cabaret','indymedia','talk','meeting')
+    tags = ('film', 'music', 'party', 'cabaret', 'indymedia', 'talk', 'nanoplex', 'hkkp', 'bluescreen', 'meeting')
     for tag in tags:
-        t = toolkit.diary.models.EventTag(name=tag)
+        t = toolkit.diary.models.EventTag(name=tag, read_only=True)
         t.save()
 
 def main():
@@ -304,6 +304,8 @@ def main():
     # Create event templates
     event_templates = load_event_templates(FORMATS_PATH)
     create_event_types(event_templates)
+    # Create default tags
+    create_default_tags()
 
     if role_map is None:
         return
