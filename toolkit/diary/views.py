@@ -117,7 +117,7 @@ def view_diary(request, year=None, month=None, day=None, event_type=None):
     # as a location for images:
     context['media_url'] = settings.MEDIA_URL
 
-    return render_to_response('indexed_showing_list.html', context)
+    return render_to_response('view_showing_index.html', context)
 
 @require_read_auth
 def edit_diary_list(request, year=None, day=None, month=None):
@@ -184,7 +184,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
     context['start'] = startdate
     context['end'] = enddate
 
-    return render_to_response('edit_list.html', context)
+    return render_to_response('edit_event_index.html', context)
 
 @require_read_auth
 def add_showing(request, event_id):
@@ -430,13 +430,14 @@ def view_showing(request, showing_id=None):
     context = {}
     context['showing'] = get_object_or_404(Showing, id=showing_id)
     context['event'] = context['showing'].event
-    return render_to_response('showing.html', context)
+    return render_to_response('view_showing.html', context)
 
 def view_event(request, event_id=None):
     context = {}
     context['event'] = get_object_or_404(Event, id=event_id)
-    context['showings'] = context['event'].showing_set.all()
-    return render_to_response('event.html', context)
+
+    context['showings'] = context['event'].showings.all()
+    return render_to_response('view_event.html', context)
 
 @require_write_auth
 def delete_showing(request, showing_id):
@@ -467,7 +468,7 @@ def view_event_field(request, field, year, month, day):
             'event_field' : field,
             }
 
-    return render_to_response('{0}_view.html'.format(field), context)
+    return render_to_response('view_{0}.html'.format(field), context)
 
 def edit_event_templates(request):
     templates = EventTemplate.objects.all()
