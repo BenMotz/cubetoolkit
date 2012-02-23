@@ -1,0 +1,23 @@
+{% load markup %}
+{% load hash_filter %}
+<span id="event_{{ event.id }}">
+<h2>{{ event.name|capfirst}}</h2>
+
+{% with media|lookup:event.id as media_item %}
+{% if media_item %}
+<p><a href="{{ media_url }}{{ media_item.media_file }}"><img src="{{ media_url}}{{ media_item.thumbnail }}" alt="Picture for event {{ showing.event.name }}"></a></p>
+{% if media_item.credit %}
+<p class="image_caption">Image by: {{ media_item.credit }}</p>
+{% endif %}
+{% endif %}
+{% endwith %}
+
+<p>
+{% for showing in showings %}
+{% include "showing_time_fragment.html" %}<br>
+{% endfor %} 
+</p>
+
+<p>{{event.copy|markdown}}</p>
+
+</span> 

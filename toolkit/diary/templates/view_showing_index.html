@@ -31,15 +31,17 @@
         <tr><td>&nbsp;</td>
     {% endifchanged %}
     <td class="cell_time">{{showing.start|date:"H:i"}}</td><td class="table_gap">&nbsp;</td>
-    <td class="cell_event"><a href="#showing_{{showing.id}}">{% if showing.discounted %}<span class="discounted">{% endif %}{% if showing.cancelled %}<span class="cancelled">{% endif %}{{ showing.event.name|capfirst }}{% if showing.cancelled %} (CANCELLED) </span>{% endif %}{% if showing.discounted %} (Discount)</span>{% endif %}</a></td></tr>
+    <td class="cell_event"><a href="#event_{{showing.event.id}}">{% if showing.discounted %}<span class="discounted">{% endif %}{% if showing.cancelled %}<span class="cancelled">{% endif %}{{ showing.event.name|capfirst }}{% if showing.cancelled %} (CANCELLED) </span>{% endif %}{% if showing.discounted %} {% if showing.start.weekday == 1 %}(TTT){% else %}(Discount){% endif %}</span>{% endif %}</a></td></tr>
 {% endfor %}
 
 </table>
 </div>
-
 <div class="details">
-{% for showing in showings %}
-{% include "showing_fragment.html" %}
+{% for event, showings in events.iteritems %}
+<div class="event">
+{% include "event_fragment.html" %}
+<p>[<a href="#top">top of page</a>]</p>
+</div>
 {% endfor %}
 </div>
 {% endblock %}

@@ -110,9 +110,13 @@ def view_diary(request, year=None, month=None, day=None, event_type=None):
     # query that gets a dict of values from more than one table, and use that to
     # build a dictionary mapping event.id to a few fields from MediaItems:
     media = dict([ (m['event__id'], m) for m in MediaItem.objects.filter(event__id__in = event_ids).values('event__id','media_file','thumbnail','credit') ])
+    events = OrderedDict()
+    for showing in showings:
+        events.setdefault(showing.event, set()).add(showing)
 
     context['showings'] = showings
     context['media'] = media
+    context['events'] = events
     # This is prepended to filepaths from the MediaPaths table to use
     # as a location for images:
     context['media_url'] = settings.MEDIA_URL
