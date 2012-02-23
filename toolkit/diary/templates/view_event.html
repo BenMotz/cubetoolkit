@@ -2,16 +2,20 @@
 {% block title %}
 {{ event.name }}
 {% endblock %}
+{% block css %}
+<link rel="stylesheet" href="/static/css/programme.css" type="text/css" title="Preferred" media="screen,projection">
+{% endblock %}
 
 {% block body %}
+<div class="details">
+<div class="event">
 
 {% include "event_fragment.html" %}
-
-{% for showing in showings %}
-<p>{% include "showing_details.html" %}</p>
-{% empty %}
-<p>No showings!</p>
-{% endfor %}
+</div>
+</div>
+<div class="footer">
+<p><a href="http://www.cubecinema.com/">Home</a> | <a href="{% url default-view %}">What's on</a></p>
+</div>
 
 {% endblock %}
 

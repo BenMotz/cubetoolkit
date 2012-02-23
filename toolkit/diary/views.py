@@ -439,11 +439,17 @@ def view_showing(request, showing_id=None):
 def view_event(request, event_id=None, legacy_id=None):
     context = {}
     if event_id:
-        context['event'] = get_object_or_404(Event, id=event_id)
+        event = get_object_or_404(Event, id=event_id)
     else:
-        context['event'] = get_object_or_404(Event, legacy_id=legacy_id)
+        event = get_object_or_404(Event, legacy_id=legacy_id)
+    media = event.media.all()[0] if len(event.media.all()) > 0 else None
 
-    context['showings'] = context['event'].showings.all()
+    context = {
+            'event' : event,
+            'showings' : event.showings.all(),
+            'media' : { event.id : media },
+            'media_url' : settings.MEDIA_URL
+            }
     return render_to_response('view_event.html', context)
 
 @require_write_auth
