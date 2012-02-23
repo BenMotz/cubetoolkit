@@ -16,7 +16,7 @@ class EventForm(forms.ModelForm):
                 'terms': forms.Textarea(attrs={'wrap':'soft'}),
                 'notes': forms.Textarea(attrs={'wrap':'soft'}),
                   }
-        exclude = ('media',)
+        exclude = ('media','legacy_id',)
 
 class MediaItemForm(forms.ModelForm):
     class Meta(object):

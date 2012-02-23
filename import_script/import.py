@@ -169,6 +169,7 @@ def import_events(connection, role_map):
     for r in cursor.fetchall():
         r = [ decode(item) for item in r ]
         e = toolkit.diary.models.Event()
+        e.legacy_id = r[0]
 
         # Name
         e.name = titlecase(r[1])

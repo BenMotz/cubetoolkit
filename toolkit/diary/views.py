@@ -432,9 +432,12 @@ def view_showing(request, showing_id=None):
     context['event'] = context['showing'].event
     return render_to_response('view_showing.html', context)
 
-def view_event(request, event_id=None):
+def view_event(request, event_id=None, legacy_id=None):
     context = {}
-    context['event'] = get_object_or_404(Event, id=event_id)
+    if event_id:
+        context['event'] = get_object_or_404(Event, id=event_id)
+    else:
+        context['event'] = get_object_or_404(Event, legacy_id=legacy_id)
 
     context['showings'] = context['event'].showings.all()
     return render_to_response('view_event.html', context)

@@ -21,6 +21,8 @@ urlpatterns = patterns( 'toolkit.diary.views',
     url('^showing/id/(?P<showing_id>\d+)$', 'view_showing', name="single-showing-view"),
     # All showings for a given event
     url('^event/id/(?P<event_id>\d+)/$', 'view_event', name="single-event-view"),
+    # As above, for legacy event ID:
+    url('^event/oldid/(?P<legacy_id>\d+)/$', 'view_event', name="single-event-view-legacyid"),
 
     # Edit an event: view event before editing
     url('^edit/event/id/(?P<pk>\d+)/view$',

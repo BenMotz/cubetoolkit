@@ -126,6 +126,9 @@ class Event(models.Model):
 
     name = models.CharField(max_length=256, blank=False)
 
+    # This is the primary key used in the old perl/bdb system
+    legacy_id = models.CharField(max_length=256, null=True)
+
     template = models.ForeignKey('EventTemplate', verbose_name='Event Type', related_name='template', null=True, blank=True)
     tags = models.ManyToManyField(EventTag, db_table='Event_Tags')
 
