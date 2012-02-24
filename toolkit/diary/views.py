@@ -10,6 +10,7 @@ from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
 from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.forms.models import modelformset_factory
 import django.db
 
 from toolkit.diary.models import Showing, Event, DiaryIdea, RotaEntry, MediaItem, EventTemplate, EventTag
@@ -484,8 +485,26 @@ def view_event_field(request, field, year, month, day):
     return render_to_response('view_{0}.html'.format(field), context)
 
 def edit_event_templates(request):
-    templates = EventTemplate.objects.all()
-    context = { 'templates' : templates }
+    # Get data
+    # templates = EventTemplate.objects.all()
+    # context = { 'templates' : templates }
+    # Create formset
+    event_template_formset = modelformset_factory(EventTemplate, can_delete=True)
+
+    if request.method == 'POST':
+        formset = event_template_formset(request.POST)
+        print "FORM: ", formset.is_valid()
+        print formset.errors
+        if formset.is_valid():
+            logger.info("Event templates updated")
+            formset.save()
+            # Reset formset, so get another blank one at the
+            # end, deleted ones disappera, etc.
+            formset = event_template_formset()
+    else:
+        formset = event_template_formset()
+    context = { 'formset' : formset }
+
     return render_to_response('edit_event_templates.html', RequestContext(request, context))
 
 def edit_event_tags(request):

@@ -6,29 +6,29 @@ Editing Event types
 
 {% block css %}
 <style type="text/css">
-  @import url('/static/css/smoothness/jquery-ui.css');
   body {
       font-family: sans-serif;
       font-size: 9pt;
+      background: lightgray;
   }
-  table {
-      border-collapse: collapse;
-      background: #ece1ff;
+  .template_form {
+      border: thin dotted gray;
+      padding: 5px;
+      margin: 2%;
+      width: 300px;
+      display: inline-block;
+      background: white;
   }
-  #c1, #c2 {
-      width: 20%;
+  .header {
+      background: white;
+      margin: 2% 2% 5px 2%;
+      padding: 5px 10px 5px 10px;
   }
-  th {
-      border-bottom: thin solid gray;
-      font-size: 12pt;
-      padding: 4pt;
+  .warn {
+      color: red;
   }
-  td {
-      padding: 3pt;
-      border-left: thin dashed gray;
-  }
-  .roles {
-      border-bottom: thin solid gray;
+  .new_template {
+      background: pink;
   }
 </style>
 {% endblock %}
@@ -43,20 +43,26 @@ $(document).ready(function() {
 {% endblock %}
 
 {% block body %}
-<h1>Event types</h1>
-<table>
-<tr><th id="c1">Event type</th><th id="c2">Short name</th><th>Description</th></tr>
-<tr><td colspan="3">Add new:</td></tr>
-<tr><td> NAME </td><td>{{ template.shortname }}</td><td> {{ template.description }} </td></tr>
-<tr class="roles"><td colspan="3"></td></tr>
+<div class="header">
+<h1>Event templates</h1>
+<p>These templates are applied when an event is created: editing them will <b>not</b> affect existing events</p>
+<p>To add a new template, edit the blank template at the bottom of the page</p>
+<p class="warn">Changes cannot be automatically undone, please take care</p>
+</div>
 
-{% for template in types %}
-<tr><td>{{ template.name }}</td><td>{{ template.shortname }}</td><td> {{ template.description }} </td></tr>
-<tr class="roles"><td colspan="3">
-{{ template.roles.all }}
-</td>
-</tr>
-{% endfor %}
+<form method="post">
+{% csrf_token %}
+{{ formset.management_form }}
+{% for form in formset %}
+<div class="template_form {% if not form.id.value %}new_template{% endif %}">
+    <h2>{{ form.name.value|default_if_none:"New event template" }}</h2>
+<table>
+{{ form.as_table }}
 </table>
+<input type="submit" value="Save all changes to all templates" />
+</div>
+{% endfor %}
+</form>
+
 {% endblock %}
 

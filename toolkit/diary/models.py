@@ -28,9 +28,9 @@ class MediaItem(models.Model):
     with events, in future with other things?"""
 
     media_file = models.FileField(upload_to="diary", max_length=256, null=True, blank=True, verbose_name='Image file')
-    mimetype = models.CharField(max_length=64, null=True, blank=True)
+    mimetype = models.CharField(max_length=64, null=True, blank=True, editable=False)
 
-    thumbnail = models.ImageField(upload_to="diary_thumbnails", max_length=256, null=True, blank=True)
+    thumbnail = models.ImageField(upload_to="diary_thumbnails", max_length=256, null=True, blank=True, editable=False)
     credit = models.CharField(max_length=64, null=True, blank=True, default="Internet scavenged", verbose_name='Image credit')
     caption = models.CharField(max_length=128, null=True, blank=True)
 
@@ -102,7 +102,7 @@ class MediaItem(models.Model):
 
 class EventTag(models.Model):
     name = models.CharField(max_length=32, blank=False, null=False, unique=True)
-    read_only = models.BooleanField(default=False, null=False)
+    read_only = models.BooleanField(default=False, null=False, editable=False)
 
     class Meta:
         db_table = 'EventTags'
@@ -127,7 +127,7 @@ class Event(models.Model):
     name = models.CharField(max_length=256, blank=False)
 
     # This is the primary key used in the old perl/bdb system
-    legacy_id = models.CharField(max_length=256, null=True)
+    legacy_id = models.CharField(max_length=256, null=True, editable=False)
 
     template = models.ForeignKey('EventTemplate', verbose_name='Event Type', related_name='template', null=True, blank=True)
     tags = models.ManyToManyField(EventTag, db_table='Event_Tags')
@@ -218,16 +218,15 @@ class DiaryIdea(models.Model):
 
 class EventTemplate(models.Model):
 
-    name = models.CharField(max_length=32, blank=False)
-    shortname = models.CharField(max_length=32, blank=False)
-    description = models.CharField(max_length=64, null=True, blank=True)
+    name = models.CharField(max_length=32, blank=False, null=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     # Default roles for this event
     roles = models.ManyToManyField(Role, db_table='EventTemplates_Roles')
-    tags = models.ManyToManyField(EventTag, db_table='EventTemplate_Tags')
+    # Default tags for this event
+    tags = models.ManyToManyField(EventTag, db_table='EventTemplate_Tags', null=True, blank=True)
 
     class Meta:
         db_table = 'EventTemplates'
