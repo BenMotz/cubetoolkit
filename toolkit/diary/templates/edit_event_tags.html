@@ -21,6 +21,9 @@ Editing Event types
       background: lightblue;
   }
   .unsaved {
+      background: pink;
+  }
+  .read_only {
       background: lightgray;
   }
   span#save {
@@ -93,9 +96,13 @@ $(document).ready(function() {
 
 {% block body %}
 <h1>Event tags</h1>
+<p>Key: <span class="read_only">Read only</span> <span class="unsaved">Unsaved</span></p>
 <ul>
     {% for tag in tags %}
-    <li id='tag_{{tag.pk}}'>{{tag.name}}{% if not tag.read_only %} <a id="delete_{{tag.pk}}" href="#" class="del">X</a>{% endif %}</li>
+    {% if tag.read_only %}<li class="read_only" id='tag_{{tag.pk}}'>{{tag.name}}</li>
+    {% else %}
+    <li id='tag_{{tag.pk}}'>{{tag.name}} <a id="delete_{{tag.pk}}" href="#" class="del">X</a></li>
+    {% endif %}
     {% endfor %}
     <li id="additem"><input id="new_tag" type="text" placeholder="New tag..." /> <a id="add_button" href="#">Add</a></li>
 </ul>
