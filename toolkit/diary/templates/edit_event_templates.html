@@ -15,10 +15,13 @@ Editing Event types
       border: thin dotted gray;
       padding: 5px;
       margin: 2%;
-      width: 300px;
+      width: 400px;
       display: inline-block;
       background: white;
   }
+  .template_form table {
+      border-collapse: collapse;
+   }
   .header {
       background: white;
       margin: 2% 2% 5px 2%;
@@ -30,16 +33,11 @@ Editing Event types
   .new_template {
       background: pink;
   }
-</style>
-{% endblock %}
+  select {
+      width: 330px;
 
-{% block script %}
-<script type="text/javascript" src="/static/js/lib/jquery.min.js"></script>
-<script type="text/javascript" src="/static/js/lib/jquery-ui.min.js"></script>
-<script type="text/javascript">
-$(document).ready(function() {
-});
-</script>
+  }
+</style>
 {% endblock %}
 
 {% block body %}
