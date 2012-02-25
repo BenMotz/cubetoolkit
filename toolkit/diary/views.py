@@ -1,5 +1,6 @@
 import os
 import re
+import json
 import datetime
 import calendar
 import logging
@@ -18,13 +19,19 @@ import toolkit.diary.forms
 
 from toolkit.auth.decorators import require_read_auth, require_write_auth
 
+import toolkit.diary.edit_prefs
+
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
-def _return_close_window():
+def _return_to_editindex(request):
     # Really, really dirty way to emulate the original functionality and
     # close the popped up window
-    return HttpResponse("<!DOCTYPE html><html><head><title>-</title></head><body onload='self.close(); opener.location.reload(true);'>Ok</body></html>")
+    prefs = toolkit.diary.edit_prefs.get_preferences(request.session)
+    if prefs['popups'] == 'true':
+        return HttpResponse("<!DOCTYPE html><html><head><title>-</title></head><body onload='self.close(); opener.location.reload(true);'>Ok</body></html>")
+    else:
+        return HttpResponseRedirect(reverse("default-edit"))
 
 
 def _get_date_range(year, month, day, user_days_ahead):
@@ -188,8 +195,16 @@ def edit_diary_list(request, year=None, day=None, month=None):
     context['event_list_name'] = "Diary for %s to %s" % (str(startdate), str(enddate))
     context['start'] = startdate
     context['end'] = enddate
-
+    context['edit_prefs'] = toolkit.diary.edit_prefs.get_preferences(request.session)
     return render_to_response('edit_event_index.html', context)
+
+def set_edit_preferences(request):
+    print request.GET
+    # Store updated prefs
+    toolkit.diary.edit_prefs.set_preferences(request.session, request.GET)
+    # Retrieve prefs:
+    prefs = toolkit.diary.edit_prefs.get_preferences(request.session)
+    return HttpResponse(json.dumps(prefs), mimetype="application/json")
 
 @require_read_auth
 def add_showing(request, event_id):
@@ -220,7 +235,7 @@ def add_showing(request, event_id):
                 print "role_id:", r.role_id
                 r.save()
 
-        return _return_close_window()
+        return _return_to_editindex(request)
     else:
         # If copy_from was supplied, assume being called from "edit showing"
         # form, and return that
@@ -260,7 +275,7 @@ def add_event(request):
                 new_showing.save()
                 new_showing.reset_rota_to_default()
                 showings.append(new_showing)
-            return _return_close_window()
+            return _return_to_editindex(request)
         else:
             context = { 'form' : form }
             return render_to_response('form_new_event_and_showing.html', RequestContext(request, context))
@@ -307,7 +322,7 @@ def edit_showing(request, showing_id=None):
             # Now remove any roles that we haven't seen:
             modified_showing.rotaentry_set.filter(role__in = initial_set).delete()
 
-            return _return_close_window()
+            return _return_to_editindex(request)
     else:
         form = toolkit.diary.forms.ShowingForm(instance=showing)
     # Also create a form for "cloning" the showing (ie. adding another one),
@@ -381,7 +396,15 @@ def _edit_event_handle_post(request, event_id):
                 #if media_item.event_set.count() == 0:
                 #    media_item.delete()
 
-        return _return_close_window()
+        return _return_to_editindex(request)
+    # Got here if there's a form validation error:
+    context = {
+            'event' : event,
+            'form' : form,
+            'media_form' : media_form,
+            }
+    return render_to_response('form_event.html', RequestContext(request, context))
+
 
 # @require_write_auth
 def edit_event(request, event_id=None):
@@ -422,7 +445,7 @@ def edit_ideas(request, year=None, month=None):
         form = toolkit.diary.forms.DiaryIdeaForm(request.POST, instance=instance)
         if form.is_valid():
             form.save()
-            return _return_close_window()
+            return _return_to_editindex(request)
     else:
         form = toolkit.diary.forms.DiaryIdeaForm(instance=instance)
 
@@ -459,7 +482,7 @@ def delete_showing(request, showing_id):
         showing = Showing.objects.get(pk=showing_id)
         showing.delete()
 
-    return _return_close_window()
+    return _return_to_editindex(request)
 
 @require_read_auth
 def view_event_field(request, field, year, month, day):
