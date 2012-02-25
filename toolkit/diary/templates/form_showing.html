@@ -3,9 +3,9 @@
 Details for: {{ event.name }}
 {% endblock %}
 {% block script %}
-<script type="text/javascript" src="/static/js/jquery.min.js"></script>
-<script type="text/javascript" src="/static/js/jquery-ui.min.js"></script>
-<script type="text/javascript" src="/static/js/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="/static/js/lib/jquery.min.js"></script>
+<script type="text/javascript" src="/static/js/lib/jquery-ui.min.js"></script>
+<script type="text/javascript" src="/static/js/lib/jquery-ui-timepicker-addon.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
         $('#id_start').datetimepicker({ dateFormat : 'yy-mm-dd', timeFormat : 'hh:mm:ss', minDate : 0});
@@ -17,8 +17,8 @@ $(document).ready(function() {
 {% endblock %}
 {% block css %}
 <style>
-    @import url('/static/css/smoothness/jquery-ui.css');
-    @import url('/static/css/timepicker.css');
+    @import url('/static/css/lib/smoothness/jquery-ui.css');
+    @import url('/static/css/lib/timepicker.css');
     form label {
         font-weight: bold;
         vertical-align: top;
