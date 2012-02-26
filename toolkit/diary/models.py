@@ -10,9 +10,9 @@ import django.conf
 logger = logging.getLogger(__name__)
 
 class Role(models.Model):
-    name = models.CharField(max_length=64, blank=False)
+    name = models.CharField(max_length=64, blank=False, unique=True)
     description = models.CharField(max_length=64, null=True)
-    shortcode = models.CharField(max_length=8, null=True)
+    shortcode = models.CharField(max_length=8, null=True, unique=True)
 
     # Can this role be added to the rota?
     rota = models.BooleanField(default=False)
@@ -47,7 +47,7 @@ class MediaItem(models.Model):
     def autoset_mimetype(self):
         # See lib/python2.7/site-packages/django/forms/fields.py for how to do
         # basic validation of PNGs / JPEGs
-        logging.info("set mimetpye: '{0}'".format(self.media_file))
+#        logging.info("set mimetype: '{0}'".format(self.media_file))
         if self.media_file and self.media_file != '':
             m = magic.Magic(mime=True)
             try:
@@ -166,13 +166,13 @@ class Showing(models.Model):
     def start_date(self):
         return self.start.date()
 
-    extra_copy = models.TextField(max_length=4096, null=True)
-    extra_copy_summary = models.TextField(max_length=4096, null=True)
+    extra_copy = models.TextField(max_length=4096, null=True, blank=True)
+    extra_copy_summary = models.TextField(max_length=4096, null=True, blank=True)
 
-    confirmed = models.BooleanField(default=False)
-    hide_in_programme = models.BooleanField(default=False)
-    cancelled = models.BooleanField(default=False)
-    discounted = models.BooleanField(default=False)
+    confirmed = models.BooleanField(default=False, null=False)
+    hide_in_programme = models.BooleanField(default=False, null=False)
+    cancelled = models.BooleanField(default=False, null=False)
+    discounted = models.BooleanField(default=False, null=False)
 
     # sales tables?
 

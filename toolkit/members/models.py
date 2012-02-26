@@ -28,6 +28,12 @@ class Member(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
+    class Meta:
+        db_table = 'Members'
+
+    def __unicode__(self):
+        return self.name
+
 class Volunteer(models.Model):
 
     member = models.OneToOneField('Member', related_name='volunteer')
@@ -43,3 +49,6 @@ class Volunteer(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'Volunteers'

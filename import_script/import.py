@@ -31,7 +31,7 @@ logger.addHandler(consoleHandler)
 def titlecase(string):
 #   return string.title() # Really doesn't cope with apostrophes.
 #   return " ".join([ word.capitalize() for word in  "This is the voice".split() ])
-    if string is str:
+    if isinstance(string, basestring):
         return re.sub("(^|\s)(\S)", lambda match : match.group(1) + match.group(2).upper(), string)
     else:
         return string
@@ -47,6 +47,7 @@ def connect():
 
 def decode(string):
     if string is str:
+        string = string.strip()
         return string.decode('utf-8')
     else:
         return string
@@ -263,7 +264,7 @@ def create_roles(connection):
 
     for column in cursor.description[1:]:
         role = toolkit.diary.models.Role()
-        role.name = titlecase(column[0]).replace("_", " ")
+        role.name = titlecase(column[0].replace("_", " ").strip())
         role.save()
         logger.info("%s: %d" % (role.name, role.id))
         roles.append(role.id)
@@ -313,14 +314,25 @@ def create_default_tags():
 ###############################################################################
 # Members + Volunteers...
 
-def import_volunteer_roles(volunteer):
-    pass
+def import_volunteer_roles(volunteer, role_map, roles):
+    for role_description, active in roles:
+        if active == 1L:
+            description = role_description[0].lower().strip()
+            # print "'%s'i (%s)" % (description, type(description))
+            if description in role_map:
+                volunteer.roles.add(role_map[description])
+            else:
+                role = toolkit.members.models.Role(name=titlecase(description.replace("_"," ")))
+                role.save()
+                logger.info("Creating role %s: %d" % (role.name, role.id))
+                role_map[description] = role
 
-def import_volunteer(member, active, notes):
+def import_volunteer(member, active, notes, role_map, roles):
     v = toolkit.members.models.Volunteer()
     v.member = member
     v.active = active
-    v.notes = notes
+    if isinstance(notes, basestring):
+        v.notes = notes.strip()
 
     # Image
     image_name = member.legacy_id + ".jpg"
@@ -337,12 +349,18 @@ def import_volunteer(member, active, notes):
         v.portrait_thumb = image_thumbnail_path
 
     v.full_clean()
-    import_volunteer_roles(v)
+    # Need to save volunteer before adding roles (so many-many refernces to
+    # primary key can be created)
+    v.save()
+    import_volunteer_roles(v, role_map, roles)
     v.save()
 
 def import_members(connection):
+
+    role_map = dict( (role.name.replace(" ","_").lower(), role) for role in toolkit.diary.models.Role.objects.all())
+
     cursor = connection.cursor()
-    results = cursor.execute("SELECT members.member_id, name, email, homepage, address, city, postcode, country, landline, mobile, last_updated, refuse_mailshot, status, notes FROM members LEFT JOIN notes ON members.member_id = notes.member_id WHERE members.name != '' ORDER BY member_id")
+    results = cursor.execute("SELECT members.member_id, name, email, homepage, address, city, postcode, country, landline, mobile, last_updated, refuse_mailshot, status, notes, vol_roles_merged.* FROM members LEFT JOIN notes ON members.member_id = notes.member_id LEFT JOIN vol_roles_merged ON members.member_id = vol_roles_merged.member_id WHERE members.name != '' ORDER BY members.member_id")
     # Don't even try to import members with blank names
 
     count = 0
@@ -362,9 +380,15 @@ def import_members(connection):
         m.country = r[7]
         m.phone = r[8]
         m.altphone = r[9]
-        if r[10] == 'member removed self':
+        last_updated = r[10].split('/')
+        if len(last_updated) == 3:
+            try:
+                m.last_updated = datetime.datetime(day=int(last_updated[0]), month=int(last_updated[1]), year=int(last_updated[2]))
+            except ValueError:
+                pass
+        if r[11] == 'member removed self':
             m.mailout = False
-        elif r[10] != None and r[10] != '':
+        elif r[11] != None and r[10] != '':
             m.mailout = False
             m.mailout_failed = True
         try:
@@ -382,13 +406,15 @@ def import_members(connection):
         # SELECT members.member_id, name, email, homepage, address, city, postcode, country, landline, mobile, last_updated, refuse_mailshot, status, notes, vol_roles_merged.* FROM members LEFT JOIN notes on members.member_id = notes.member_id LEFT JOIN vol_roles_merged on vol_roles_merged.member_id = members.member_id ORDER BY members.member_id LIMIT 1000
 
         # From which we conclude:
-        status = r[11]
+        status = r[12]
         if 'retired' in status or 'disgraced' in status or 'ex-voluneer' in status:
             # they're an ex-volunteer:
-            import_volunteer(m, False, r[12])
+            role_tuples = zip(cursor.description[15:], r[15:])
+            import_volunteer(m, False, r[13], role_map, role_tuples)
         elif 'volunteer' in status:
             # they're a current volunteer:
-            import_volunteer(m, True, r[12])
+            role_tuples = zip(cursor.description[15:], r[15:])
+            import_volunteer(m, True, r[13], role_map, role_tuples)
         else:
             pass
 
@@ -425,7 +451,7 @@ def main():
     if role_map is None:
         return
 
-    import_events(conn, role_map)
+#    import_events(conn, role_map)
     import_ideas(conn)
     import_members(conn)
     conn.close ()

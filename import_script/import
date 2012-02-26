@@ -18,7 +18,7 @@ if [ "" != "$2" ] ; then
 	IMAGE_PATH=$2
 fi
 
-svn export --force svn+ssh://cube@sparror.cubecinema.com/home/cube/svn-repo/TRUNK/cgi-bin/events/data/formats
+# svn export --force svn+ssh://cube@sparror.cubecinema.com/home/cube/svn-repo/TRUNK/cgi-bin/events/data/formats
 
 TOOLKIT_PATH=$1
 
