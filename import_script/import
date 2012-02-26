@@ -26,11 +26,14 @@ echo "Rsyncing images from $IMAGE_PATH"
 rsync -av --no-r $IMAGE_PATH/events/* $TOOLKIT_PATH/media/diary/
 rsync -av --no-r $IMAGE_PATH/events/thumb/* $TOOLKIT_PATH/media/diary_thumbnails/
 
+rsync -av --no-r $IMAGE_PATH/portraits/* $TOOLKIT_PATH/media/volunteers/
+rsync -av --no-r $IMAGE_PATH/portraits/thumb/* $TOOLKIT_PATH/media/volunteers_thumbnails/
+
 source $TOOLKIT_PATH/venv/bin/activate
 
 export PYTHONPATH=$PYTHONPATH:$TOOLKIT_PATH
 export DJANGO_SETTINGS_MODULE=settings
 
-python $TOOLKIT_PATH/manage.py reset diary --noinput
+python $TOOLKIT_PATH/manage.py reset members diary --noinput
 python $TOOLKIT_PATH/import_script/import.py $TOOLKIT_PATH
 

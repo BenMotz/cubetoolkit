@@ -148,6 +148,7 @@ ROOT_URLCONF = 'toolkit.urls'
 
 INSTALLED_APPS = (
     'toolkit.diary',
+    'toolkit.members',
     'toolkit.auth',
     # disabled for now;
     #'django.contrib.auth',
