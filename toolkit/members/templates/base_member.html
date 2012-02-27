@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<p><img src="/static/members/cube_microplex_logo.gif" width="400"></p>
+<h3>Cube member's database.</h3>
+{% endblock %}
+
+{% block footer %}
+<p>
+<a href="{% url search-members %}">Search</a> |
+<a href="{% url add-member %}">Add</a> |
+<a href="{% url search-members %}">Edit</a> |
+<a href="{% url search-members %}">Delete</a> |
+<a href="{% url member-statistics %}">Statistics</a> |
+<a href="{% url add-member %}">Home</a>
+</p>
+{% endblock %}

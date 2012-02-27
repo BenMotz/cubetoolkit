@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}
+Cube Member: {{ member.name }}
+{% endblock %}
+
+{% block body %}
+<div class="member">
+    <h2>{{ member.name }}</h2>
+    <p><a href="mailto:{{member.email}}">{{ member.email }}</a></p>
+    <p>{{ member.address }}</p>
+    <p>{{ member.posttown }}</p>
+    <p>{{ member.country }}</p>
+    <p>{{ member.postcode }}</p>
+    <p>{{ member.phone }}</p>
+    <p>{{ member.altphone }}</p>
+    <p>{{ member.website }}</p>
+    <p>{{ member.mailout }}</p>
+    <p>{{ member.mailout_failed }}</p>
+    
+    <p>({{ member.legacy_id }})</p>
+
+</div>
+
+{% endblock %}
+

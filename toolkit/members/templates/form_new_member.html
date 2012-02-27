@@ -1,0 +1,31 @@
+{% extends 'base_member.html' %}
+{% block title %}Add member{% endblock %}
+
+{% block css %}
+<style>
+    th {
+        font-weight: normal;
+        text-align: right;
+    }
+    input {
+        width: 200px;
+    }
+    input[type="submit"] {
+        width: auto;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<h3>Add a Member.</h3>
+{% if message %}<h3>{{ message }}</h3>{% endif %}
+<form action="" method="POST">
+{% csrf_token %}
+<table>
+{{ form.as_table }}
+<tr><td colspan = "2">&nbsp;</td></tr>
+<tr><td colspan = "2"><input type="submit" value="Add Member"></input></td></tr>
+</table>
+</form>
+
+{% endblock %}
