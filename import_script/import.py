@@ -360,7 +360,7 @@ def import_members(connection):
     role_map = dict( (role.name.replace(" ","_").lower(), role) for role in toolkit.diary.models.Role.objects.all())
 
     cursor = connection.cursor()
-    results = cursor.execute("SELECT members.member_id, name, email, homepage, address, city, postcode, country, landline, mobile, last_updated, refuse_mailshot, status, notes, vol_roles_merged.* FROM members LEFT JOIN notes ON members.member_id = notes.member_id LEFT JOIN vol_roles_merged ON members.member_id = vol_roles_merged.member_id WHERE members.name != '' ORDER BY members.member_id")
+    results = cursor.execute("SELECT members.member_id, name, email, homepage, address, city, postcode, country, landline, mobile, last_updated, refuse_mailshot, status, notes, vol_roles_merged.* FROM members LEFT JOIN notes ON members.member_id = notes.member_id LEFT JOIN vol_roles_merged ON members.member_id = vol_roles_merged.member_id WHERE members.name != ''") #  ORDER BY members.member_id")
     # Don't even try to import members with blank names
 
     count = 0
@@ -371,13 +371,13 @@ def import_members(connection):
         r = [ decode(item) for item in r ]
         m = toolkit.members.models.Member()
         m.legacy_id = r[0][:10]
-        m.name = r[1]
+        m.name = titlecase(r[1])
         m.email = r[2]
         m.website = r[3]
-        m.address = r[4]
-        m.posttown = r[5]
-        m.postcode = r[6]
-        m.country = r[7]
+        m.address = titlecase(r[4])
+        m.posttown = titlecase(r[5])
+        m.postcode = r[6].upper() if isinstance(r[6], basestring) else None
+        m.country = titlecase(r[7])
         m.phone = r[8]
         m.altphone = r[9]
         last_updated = r[10].split('/')
@@ -451,7 +451,7 @@ def main():
     if role_map is None:
         return
 
-#    import_events(conn, role_map)
+    import_events(conn, role_map)
     import_ideas(conn)
     import_members(conn)
     conn.close ()
