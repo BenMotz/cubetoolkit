@@ -1,5 +1,6 @@
-import magic
-import PIL.Image
+# import re
+# import magic
+# import PIL.Image
 
 from django.db import models
 
@@ -16,7 +17,7 @@ class Member(models.Model):
     postcode = models.CharField(max_length=16, blank=True, null=True)
     country = models.CharField(max_length=32, blank=True, null=True)
 
-    email = models.CharField(max_length=64, blank=True, null=True)
+    email = models.CharField(max_length=64, blank=True, null=True, unique=True)
     website = models.CharField(max_length=128, blank=True, null=True)
     phone = models.CharField(max_length=64, blank=True, null=True)
     altphone = models.CharField(max_length=64, blank=True, null=True)
@@ -33,6 +34,12 @@ class Member(models.Model):
 
     def __unicode__(self):
         return self.name
+
+
+#    weak_email_validator = re.compile("""\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b""")
+#    def weak_validate_email(self):
+#        pass
+
 
 class Volunteer(models.Model):
 
