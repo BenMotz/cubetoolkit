@@ -1,0 +1,46 @@
+{% extends 'base_member.html' %}
+{% block title %}Search members{% endblock %}
+
+{% block css %}
+<style>
+    th {
+        text-align: left;
+    }
+    input {
+        width: 200px;
+    }
+    input[type="submit"] {
+        width: auto;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<p>Search results for "{{ search_terms }}"<p>
+
+<table>
+<tr>
+{% if show_edit_link %}<th>Select</th>{% endif %}
+{% if show_delete_link %}<th>Delete</th>{% endif %}
+<th>Member</th><th>Name</th><th>Email</th><th>Homepage</th><th>Postal address</th><th>Settlement</th><th>Postcode</th><th>Country</th><th>Telephone</th><th>Mobile telephone</th><th>Last updated</th><th>Refuse mailshot</th><th>Status</th></tr>
+{% for member in members %}
+<tr>
+{% if show_edit_link %}<td><form method="get" action="{% url edit-member member.pk %}"><input type="submit" value="Edit"></form></td>{% endif %}
+{% if show_delete_link %}<td><form method="post" action="{% url delete-member member.pk %}">{% csrf_token %}<input type="submit" value="Delete"></form></td>{% endif %}
+<td>{{ member.pk }}</td>
+<td>{{ member.name|default_if_none:"-" }}</td>
+<td>{% if member.email %}{{ member.email|urlize }}{% else %} - {% endif %}</td>
+<td>{% if member.website %}{{ member.website|urlize }}{% else %} - {% endif %}</td>
+<td>{{ member.address|default_if_none:"-" }}</td>
+<td>{{ member.posttown|default_if_none:"-" }}</td>
+<td>{{ member.postcode|default_if_none:"-" }}</td>
+<td>{{ member.country|default_if_none:"-" }}</td>
+<td>{{ member.phone|default_if_none:"-" }}</td>
+<td>{{ member.altphone|default_if_none:"-" }}</td>
+<td>{{ member.updated_at|date:"d/m/Y" }}</td>
+<td>{{ member.mailout|yesno:"member removed self,,-"}}</td>
+<td>{# there is no status! #}</td>
+{% endfor %}
+</table>
+
+{% endblock %}

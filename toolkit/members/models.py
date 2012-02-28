@@ -17,7 +17,7 @@ class Member(models.Model):
     postcode = models.CharField(max_length=16, blank=True, null=True)
     country = models.CharField(max_length=32, blank=True, null=True)
 
-    email = models.CharField(max_length=64, blank=True, null=True, unique=True)
+    email = models.CharField(max_length=64, blank=True, null=True) # , unique=True)
     website = models.CharField(max_length=128, blank=True, null=True)
     phone = models.CharField(max_length=64, blank=True, null=True)
     altphone = models.CharField(max_length=64, blank=True, null=True)

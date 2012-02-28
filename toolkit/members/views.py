@@ -3,10 +3,11 @@ import logging
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
 from django.template import RequestContext
-from django.core.urlresolvers import reverse
-from django.conf import settings
-from django.forms.models import modelformset_factory
-import django.db
+from django.db.models import Q
+import django.db # Used for raw query for stats
+# from django.core.urlresolvers import reverse
+# from django.conf import settings
+# import django.db
 
 from toolkit.auth.decorators import require_read_auth, require_write_auth
 
@@ -36,14 +37,30 @@ def add_member(request):
     }
     return render_to_response('form_new_member.html', RequestContext(request, context))
 
-def add_volunteer(request):
-    rsp = "add_vol"
-    return HttpResponse(rsp)
-
 @require_read_auth
 def search(request, volunteers=False):
-    rsp = "search {0}".format(volunteers)
-    return HttpResponse(rsp)
+    search_terms = request.GET.get('q', None)
+    show_edit_link = bool(request.GET.get('show_edit_link', None))
+    show_delete_link = bool(request.GET.get('show_delete_link', None))
+    results = None
+    print show_edit_link, show_delete_link
+
+    if search_terms:
+        results = Member.objects.filter(Q(name__icontains = search_terms) | Q(email__icontains = search_terms)).order_by('name')
+        context = {
+                'search_terms' : search_terms,
+                'members' : results,
+                'show_edit_link' : show_edit_link,
+                'show_delete_link' : show_delete_link,
+                }
+        return render_to_response('search_members_results.html', RequestContext(request, context))
+
+    context = {
+            'show_edit_link' : show_edit_link,
+            'show_delete_link' : show_delete_link,
+            }
+    return render_to_response('search_members.html', context)
+
 
 @require_read_auth
 def view_list(request, volunteers=False):
@@ -64,6 +81,16 @@ def view(request, member_id, volunteers=False):
     return render_to_response('view_member.html', context)
 
 @require_write_auth
+def delete_member(request, member_id):
+    rsp = "del_vol"
+    return HttpResponse(rsp)
+
+@require_write_auth
+def delete_volunteer(request, member_id):
+    rsp = "del_vol"
+    return HttpResponse(rsp)
+
+@require_write_auth
 def edit_member(request, member_id):
     context = {}
     member = get_object_or_404(Member, id=member_id)
@@ -73,6 +100,10 @@ def edit_member(request, member_id):
             }
     return render_to_response('view_member.html', context)
 
+def add_volunteer(request):
+    rsp = "add_vol"
+    return HttpResponse(rsp)
+
 @require_write_auth
 def edit_volunteer(request, member_id):
     rsp = "editvol"
@@ -80,5 +111,24 @@ def edit_volunteer(request, member_id):
 
 @require_read_auth
 def member_statistics(request):
-    rsp = "stats"
-    return HttpResponse(rsp)
+    cursor = django.db.connection.cursor()
+    cursor.execute("""SELECT SUBSTRING_INDEX(`email`, '@', -1) as domain, COUNT(1) as num  FROM Members WHERE email != '' GROUP BY domain  ORDER BY num DESC LIMIT 10""")
+    email_stats = [ row for row in cursor.fetchall() ]
+    cursor.close()
+    cursor = django.db.connection.cursor()
+    cursor.execute("""SELECT SUBSTRING_INDEX(`postcode`, ' ', 1) as firstbit, COUNT(1) as num FROM Members WHERE postcode != '' GROUP BY firstbit ORDER BY num DESC LIMIT 10""")
+    postcode_stats = [ row for row in cursor.fetchall() ]
+    cursor.close()
+
+    context = {
+            'email_stats' : email_stats,
+            'postcode_stats' : postcode_stats,
+            'm_count' : Member.objects.count(),
+            'm_email_count' : Member.objects.filter(email__isnull = False).exclude(email = '').count(),
+            'm_email_viable' : Member.objects.filter(email__isnull = False).exclude(email = '').exclude(mailout_failed=True).count(),
+            'm_email_unsub' : Member.objects.exclude(mailout = False).count(),
+            'm_postcode' : Member.objects.filter(postcode__isnull = False).exclude(postcode = '').count(),
+    }
+
+
+    return render_to_response('stats.html', context)
