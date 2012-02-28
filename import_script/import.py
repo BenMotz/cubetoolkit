@@ -388,7 +388,7 @@ def import_members(connection):
                 pass
         if r[11] == 'member removed self':
             m.mailout = False
-        elif r[11] != None and r[10] != '':
+        elif r[11] != None and r[11] != '':
             m.mailout = False
             m.mailout_failed = True
         try:
@@ -396,6 +396,7 @@ def import_members(connection):
             m.save()
         except ValidationError as ve:
             logging.error("Failed saving member %s: %s", m.legacy_id, str(ve))
+            continue
 
         #   Get everyone who's plausibly a volunteer:
         #        SELECT members.name, members.status, notes.* FROM notes JOIN members on notes.member_id = members.member_id ORDER BY status, name;
