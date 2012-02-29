@@ -1,24 +1,38 @@
-{% extends "base.html" %}
+{% extends 'base_member.html' %}
 {% block title %}
 Cube Member: {{ member.name }}
 {% endblock %}
 
+{% block css %}
+<style>
+    .member {
+        padding-left: 50px;
+    }
+    .member form {
+      display: inline;
+    }
+</style>
+{% endblock %}
 {% block body %}
 <div class="member">
     <h2>{{ member.name }}</h2>
+    <p>Number: {{ member.number }}</p>
     <p><a href="mailto:{{member.email}}">{{ member.email }}</a></p>
+    <p>{{ member.website }}</p>
+    <h3>Address</h3>
     <p>{{ member.address }}</p>
     <p>{{ member.posttown }}</p>
     <p>{{ member.country }}</p>
     <p>{{ member.postcode }}</p>
+    <h3>Phone</h3>
     <p>{{ member.phone }}</p>
     <p>{{ member.altphone }}</p>
-    <p>{{ member.website }}</p>
-    <p>{{ member.mailout }}</p>
-    <p>{{ member.mailout_failed }}</p>
-    
-    <p>({{ member.legacy_id }})</p>
-
+    <p>Receives mailout? {{ member.mailout|yesno }}</p>
+    <p>Mailout failed? {{ member.mailout_failed|yesno }}</p>
+    <p>
+<form method="get" action="{% url edit-member member.pk %}"><input type="submit" value="Edit"></form> 
+<form method="post" action="{% url delete-member member.pk %}">{% csrf_token %}<input type="submit" value="Delete"></form>
+</p>
 </div>
 
 {% endblock %}

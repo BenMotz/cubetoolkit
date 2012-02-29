@@ -78,7 +78,7 @@ def view(request, member_id, volunteers=False):
             'show_volunteer' : volunteers,
             'member' : member,
             }
-    return render_to_response('view_member.html', context)
+    return render_to_response('view_member.html', RequestContext(request, context))
 
 @require_write_auth
 def delete_member(request, member_id):
