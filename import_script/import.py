@@ -306,9 +306,13 @@ def load_event_templates(path_to_formats):
     return type_index
 
 def create_default_tags():
-    tags = ('film', 'music', 'party', 'cabaret', 'indymedia', 'talk', 'nanoplex', 'hkkp', 'bluescreen', 'meeting', 'cubeorchestra', 'babycinema')
-    for tag in tags:
+    ro_tags = ('film', 'music', 'party', 'cabaret', 'indymedia', 'talk', 'nanoplex', 'hkkp', 'bluescreen', 'meeting', 'cubeorchestra', 'babycinema')
+    rw_tags = ('35mm','dvd',)
+    for tag in ro_tags:
         t = toolkit.diary.models.EventTag(name=tag, read_only=True)
+        t.save()
+    for tag in rw_tags:
+        t = toolkit.diary.models.EventTag(name=tag, read_only=False)
         t.save()
 
 ###############################################################################
