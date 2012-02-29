@@ -1,0 +1,31 @@
+{% extends 'base_member.html' %}
+{% block title %}Edit member{% endblock %}
+
+{% block css %}
+<style>
+    th {
+        font-weight: normal;
+        text-align: left;
+    }
+    input[type="text"] {
+        width: 50ex;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<h3>Edit a Member.</h3>
+{% if message %}<h3>{{ message }}</h3>{% endif %}
+<form action="" method="POST">
+{% csrf_token %}
+<table>
+<tr><th>Member:</th><td>{{ member.number }}</td>
+{{ form.as_table }}
+<tr><th>Last updated:</th><td>{{ member.updated_at|date:"d/m/Y" }}</td>
+<tr><th>Added:</th><td>{{ member.created_at|date:"d/m/Y" }}</td>
+<tr><td colspan = "2">&nbsp;</td></tr>
+<tr><td colspan = "2"><input type="submit" value="Update"></input></td></tr>
+</table>
+</form>
+
+{% endblock %}

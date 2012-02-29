@@ -335,7 +335,7 @@ def import_volunteer(member, active, notes, role_map, roles):
         v.notes = notes.strip()
 
     # Image
-    image_name = member.legacy_id + ".jpg"
+    image_name = member.number + ".jpg"
     image_path = os.path.join(SITE_ROOT, MEDIA_PATH, VOLUNTEER_IMAGE_PATH, image_name)
     if os.path.exists(image_path):
         # File exists, change path to relative to media root, as django expects
@@ -370,7 +370,7 @@ def import_members(connection):
     for r in cursor.fetchall():
         r = [ decode(item) for item in r ]
         m = toolkit.members.models.Member()
-        m.legacy_id = r[0][:10]
+        m.number = r[0][:10]
         m.name = titlecase(r[1])
         m.email = r[2]
         m.website = r[3]
@@ -391,11 +391,14 @@ def import_members(connection):
         elif r[11] != None and r[11] != '':
             m.mailout = False
             m.mailout_failed = True
+
+        m.notes = r[12] # status
+
         try:
             m.full_clean()
             m.save()
         except ValidationError as ve:
-            logging.error("Failed saving member %s: %s", m.legacy_id, str(ve))
+            logging.error("Failed saving member %s: %s", m.number, str(ve))
             continue
 
         #   Get everyone who's plausibly a volunteer:
@@ -433,7 +436,7 @@ def import_members(connection):
 def main():
     global SITE_ROOT
     if len(sys.argv) == 1:
-        print "Usage: {0} [Path to site root]".format(sys.argv[0])
+        print "Usage:{0} [Path to site root]".format(sys.argv[0])
         sys.exit(1)
     SITE_ROOT = sys.argv[1]
     if not os.path.isdir(SITE_ROOT):
