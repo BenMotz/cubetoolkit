@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Edit volunteer {{ volunteer.member.name }}{% endblock %}
+
+{% block css %}
+<style>
+th {
+    vertical-align: top;
+}
+#roles li {
+    list-style-type: none;
+    display: inline-block;
+    background: lightblue;
+    margin: 5px;
+}
+#roles label {
+    font-weight: bold;
+}
+#vol_form, #mem_form {
+    display: inline-block;
+    width: 400px;
+    vertical-align: top;
+}
+</style>
+{% endblock %}
+
+{% block body %}
+<h3>Edit volunteer {{ volunteer.member.name }}</h3>
+{% if message %}<h3>{{ message }}</h3>{% endif %}
+<form action="" method="POST">
+{% csrf_token %}
+
+<p><input type="submit" value="Save changes"></input></p>
+<div id="mem_form">
+<table>
+{{ mem_form.as_table }}
+<tr><td colspan = "2">&nbsp;</td></tr>
+</table>
+</div>
+
+<div id="vol_form">
+<table>
+    <tr><th><label for="id_vol-portrait">{{ vol_form.portrait.label }}:</label> </th><td> {{ vol_form.portrait.errors }}{{ vol_form.portrait }}</td></tr>
+    <tr><th><label for="id_vol-notes">{{ vol_form.notes.label }}:</label> </th><td> {{ vol_form.notes.errors }}{{ vol_form.notes }}</td></tr>
+</table>
+</div>
+<div id="roles">
+<label for="id_vol-roles">{{ vol_form.roles.label }}:</label> </th><td> {{ vol_form.roles.errors }}{{ vol_form.roles }}</td></tr>
+
+</div>
+
+<p><input type="submit" value="Save changes"></input></p>
+</form>
+
+
+{% endblock %}

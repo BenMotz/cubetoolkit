@@ -13,3 +13,8 @@ class MemberForm(forms.ModelForm):
 class VolunteerForm(forms.ModelForm):
     class Meta(object):
         model = toolkit.members.models.Volunteer
+        fields = ( 'portrait', 'notes', 'roles')
+        widgets = {
+                'notes' : forms.Textarea(attrs={'wrap':'soft'}),
+                'roles' : forms.CheckboxSelectMultiple(),
+            }

@@ -1,5 +1,13 @@
 {% extends 'base.html' %}
 {% load hash_filter %}
+{% block css %}
+<style>
+    em {
+        font-style: normal;
+        color: red;
+    }
+</style>
+{% endblock %}
 
 {% block title %}Cube volunteers{% endblock %}
 
@@ -14,6 +22,7 @@ Report generated: {% now "d/m/Y" %}<p>
 <h3>Contact details:</h3>
 <table>
 {% for volunteer in volunteers %}
+{% with volunteer.member as member %}
 <div style="page-break-inside: avoid">
 {% cycle '<tr>' '' %}
 <td valign="top" align="right">
@@ -23,28 +32,30 @@ Report generated: {% now "d/m/Y" %}<p>
 {% else %}
 <img src="{{ default_mugshot }}" border="0" width="75"><br>
 {% endif %}
-<a href="">[update]</a></td>
+<a href="{% url edit-volunteer volunteer.pk %}">[update]</a></td>
 <td>&nbsp;&nbsp;</td>
 <td valign="top">
-<b><font size="4">{{ volunteer.member.name }}</font></b><p>
+<b><font size="4">{{ member.name }}</font></b><p>
 <b>notes:</b> {{ volunteer.notes|default:"" }}
-<a href="">[update]</a><p>
-<b>roles:</b>{{ roles|lookup:volunteer.id|join:", "|lower }}
-<a href="">[update]</a><p>
-{{ volunteer.member.email|urlize }}</a><br>
-{{ volunteer.member.phone|default:"no main phone number" }}<br>
-{{ volunteer.member.altphone }}<br>
-<a href="">[update]</a><br>
+<a href="{% url edit-volunteer volunteer.pk %}">[update]</a><p>
+<b>roles:</b>{{ vol_role_map|lookup:volunteer.id|join:", "|lower|default:"<em>Request role information</em>" }} <a href="{% url edit-volunteer volunteer.pk %}">[update]</a><p>
+{{ member.email|urlize|default:"<em>Request email address</em>" }}</a><br>
+{{ member.address }}{% if member.address %}<br>{% endif %}
+{{ member.postcode }}{% if member.postcode %}<br>{% endif %}
+{{ member.phone|default:"<em>Request landline number</em>" }}<br>
+{{ member.altphone|default:"<em>Request mobile number</em>" }}<br>
+<a href="{% url edit-volunteer member.pk %}">[update]</a><br>
 <br>
 </td>
 {% cycle '' '</tr>' %}
 </div>
+{% endwith %}
 {% endfor %}
 </table>
 
 <h3>Role summary:</h3>
 <table>
-{% for role, names in role_vol_map.iteritems %}
+{% for role, names in role_vol_map %}
 {% cycle '<tr>' '' '' ''%}
 <td valign="top"><h5>{{ role }}</h5>
 {% for name in names %}

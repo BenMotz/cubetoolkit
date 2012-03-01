@@ -14,6 +14,7 @@ from toolkit.auth.decorators import require_read_auth, require_write_auth
 import toolkit.members.forms
 from toolkit.members.models import Member, Volunteer
 from toolkit.diary.models import Role
+from toolkit.ordereddict import OrderedDict
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -113,19 +114,23 @@ def edit_member(request, member_id):
 @require_read_auth
 def view_volunteer_list(request):
     volunteers = Volunteer.objects.filter(active = True).order_by('member__name').select_related()
-    # Build dict of volunteer pk -> list of role names (avoid lots of queries during template render)
-    roles = {}
-    for vol, role in volunteers.filter(active = True).order_by('roles__name').values_list('id', 'roles__name'):
-        roles.setdefault(vol, []).append(role)
-
+    # Build dict of volunteer pk -> list of role names
+    # and dict of role names -> volunteer names
+    # (avoid lots of queries during template render)
+    vol_role_map = {}
     role_vol_map = {}
-    for role, vol in Role.objects.filter(volunteer__active = True).values_list('name', 'volunteer__member__name').order_by('volunteer__member__name'):
-        role_vol_map.setdefault(role, []).append(vol)
+    for role, vol_id, vol_name in Role.objects.filter(volunteer__active = True).values_list('name', 'volunteer__id', 'volunteer__member__name').order_by('volunteer__member__name', 'name'):
+        role_vol_map.setdefault(role, []).append(vol_name)
+        vol_role_map.setdefault(vol_id, []).append(role)
 
+    # Now sort role_vol_map by role name:
+    role_vol_map = sorted(role_vol_map.iteritems(), lambda a,b: cmp(a[0], b[0]))
+    # (now got a list  of (role, (name1, name2, ...)) tuples, rather than a dict,
+    # but that's fine)
 
     context = {
             'volunteers' : volunteers,
-            'roles' : roles,
+            'vol_role_map' : vol_role_map,
             'role_vol_map' : role_vol_map,
             'default_mugshot' : settings.DEFAULT_MUGSHOT,
     }
@@ -145,8 +150,28 @@ def activate_volunteer(request):
 
 @require_write_auth
 def edit_volunteer(request, member_id):
-    rsp = "editvol"
-    return HttpResponse(rsp)
+    context = {}
+    volunteer = get_object_or_404(Volunteer, id=member_id)
+
+    if request.method == 'POST':
+        vol_form = toolkit.members.forms.VolunteerForm(request.POST, prefix="vol", instance=volunteer)
+        mem_form = toolkit.members.forms.MemberForm(request.POST, prefix="mem", instance=volunteer.member)
+        if vol_form.is_valid() and mem_form.is_valid():
+            logger.info("Saving changes to volunteer '%s' (id: %d)", volunteer.member.name, volunteer.pk)
+            vol_form.save()
+            mem_form.save()
+            return HttpResponseRedirect(reverse("view-volunteer-list"))
+    else:
+        vol_form = toolkit.members.forms.VolunteerForm(prefix="vol", instance=volunteer)
+        mem_form = toolkit.members.forms.MemberForm(prefix="mem", instance=volunteer.member)
+
+
+    context = {
+            'volunteer' : volunteer,
+            'vol_form' : vol_form,
+            'mem_form' : mem_form,
+            }
+    return render_to_response('form_volunteer.html', RequestContext(request, context))
 
 @require_read_auth
 def member_statistics(request):
