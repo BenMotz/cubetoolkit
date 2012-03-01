@@ -27,6 +27,8 @@ Special Terms -
 Tech needed -
 Additonal Info -"""
 
+DEFAULT_MUGSHOT = "/static/members/default_mugshot.gif"
+
 ###############################################################################
 #
 # Below here are Django settings
