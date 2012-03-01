@@ -6,13 +6,14 @@ from django.template import RequestContext
 from django.db.models import Q
 import django.db # Used for raw query for stats
 from django.core.urlresolvers import reverse
-# from django.conf import settings
+from django.conf import settings
 # import django.db
 
 from toolkit.auth.decorators import require_read_auth, require_write_auth
 
 import toolkit.members.forms
-from toolkit.members.models import Member
+from toolkit.members.models import Member, Volunteer
+from toolkit.diary.models import Role
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -63,11 +64,6 @@ def search(request, volunteers=False):
 
 
 @require_read_auth
-def view_list(request, volunteers=False):
-    rsp = "viewlist {0}".format(volunteers)
-    return HttpResponse(rsp)
-
-@require_read_auth
 def view(request, member_id, volunteers=False):
     context = {}
     member = get_object_or_404(Member, id=member_id)
@@ -114,8 +110,37 @@ def edit_member(request, member_id):
             }
     return render_to_response('form_member.html', RequestContext(request, context))
 
+@require_read_auth
+def view_volunteer_list(request):
+    volunteers = Volunteer.objects.filter(active = True).order_by('member__name').select_related()
+    # Build dict of volunteer pk -> list of role names (avoid lots of queries during template render)
+    roles = {}
+    for vol, role in volunteers.filter(active = True).order_by('roles__name').values_list('id', 'roles__name'):
+        roles.setdefault(vol, []).append(role)
+
+    role_vol_map = {}
+    for role, vol in Role.objects.filter(volunteer__active = True).values_list('name', 'volunteer__member__name').order_by('volunteer__member__name'):
+        role_vol_map.setdefault(role, []).append(vol)
+
+
+    context = {
+            'volunteers' : volunteers,
+            'roles' : roles,
+            'role_vol_map' : role_vol_map,
+            'default_mugshot' : settings.DEFAULT_MUGSHOT,
+    }
+    return render_to_response('volunteer_list.html', context)
+
 def add_volunteer(request):
     rsp = "add_vol"
+    return HttpResponse(rsp)
+
+def select_volunteer(request, inactive=False):
+    rsp = "sel_vol %s" % str(inactive)
+    return HttpResponse(rsp)
+
+def activate_volunteer(request):
+    rsp = "activate_vol"
     return HttpResponse(rsp)
 
 @require_write_auth

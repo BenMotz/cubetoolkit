@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load hash_filter %}
+
+{% block title %}Cube volunteers{% endblock %}
+
+{% block body %}
+{# {% for v, n in roles.iteritems %} <p><b>{{ v }}</b><br> {{ n }} </p> {% endfor %} #}
+<img src="/static/members/cube_microplex_logo.gif" width="200"><p><h2>Cube volunteers report.</h2>
+Total cube volunteers: {{ volunteers|length }}<p>
+Report generated: {% now "d/m/Y" %}<p>
+<a href="{% url add-volunteer %}"title="add new volunteer">[add volunteer]</a>
+<a href="{% url select-volunteer %}?action=retire" title="retire volunteer">[retire volunteer]</a>
+<a href="{% url select-volunteer-inactive %}?action=unretire" title="unretire volunteer">[unretire volunteer]</a><br>
+<h3>Contact details:</h3>
+<table>
+{% for volunteer in volunteers %}
+<div style="page-break-inside: avoid">
+{% cycle '<tr>' '' %}
+<td valign="top" align="right">
+{% if volunteer.portrait %}
+<a href="{{ volunteer.portrait.url }}">
+    {% if volunteer.portrait_thumb %}<img src="{{ volunteer.portrait_thumb.url }}" border="0" width="75">{% else %}(missing preview){% endif %}</a><br>
+{% else %}
+<img src="{{ default_mugshot }}" border="0" width="75"><br>
+{% endif %}
+<a href="">[update]</a></td>
+<td>&nbsp;&nbsp;</td>
+<td valign="top">
+<b><font size="4">{{ volunteer.member.name }}</font></b><p>
+<b>notes:</b> {{ volunteer.notes|default:"" }}
+<a href="">[update]</a><p>
+<b>roles:</b>{{ roles|lookup:volunteer.id|join:", "|lower }}
+<a href="">[update]</a><p>
+{{ volunteer.member.email|urlize }}</a><br>
+{{ volunteer.member.phone|default:"no main phone number" }}<br>
+{{ volunteer.member.altphone }}<br>
+<a href="">[update]</a><br>
+<br>
+</td>
+{% cycle '' '</tr>' %}
+</div>
+{% endfor %}
+</table>
+
+<h3>Role summary:</h3>
+<table>
+{% for role, names in role_vol_map.iteritems %}
+{% cycle '<tr>' '' '' ''%}
+<td valign="top"><h5>{{ role }}</h5>
+{% for name in names %}
+{{ name }}<br>
+{% endfor %}
+<br>
+</td>
+{% cycle '' '' '' '</tr>' %}
+{% endfor %}
+</table>
+
+{% endblock %}
