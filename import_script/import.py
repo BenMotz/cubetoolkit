@@ -5,6 +5,7 @@ import datetime
 import MySQLdb
 import re
 import logging
+import shutil
 
 import toolkit.diary.models
 import toolkit.members.models
@@ -347,10 +348,18 @@ def import_volunteer(member, active, notes, role_map, roles):
         v.portrait = image_path
     # Thumbnail
     image_thumbnail_path = os.path.join(SITE_ROOT, MEDIA_PATH, VOLUNTEER_IMAGE_THUMB_PATH, image_name)
-    if image_path and os.path.exists(image_thumbnail_path):
+    if os.path.exists(image_thumbnail_path):
         # As above, change path to relative to media root, as django expects
         image_thumbnail_path = os.path.join(VOLUNTEER_IMAGE_THUMB_PATH, image_name)
         v.portrait_thumb = image_thumbnail_path
+
+    # Got a thumbnail, but no image?
+    if v.portrait is None and v.portrait_thumb is not None:
+        shutil.copy(v.portrait_thumb, os.path.join(SITE_ROOT, MEDIA_PATH, VOLUNTEER_IMAGE_PATH, image_name))
+
+    # Image but no thumbnail?
+    if v.portrait and v.portrait_thumb is None:
+        v.update_portrait_thumb()
 
     v.full_clean()
     # Need to save volunteer before adding roles (so many-many refernces to
