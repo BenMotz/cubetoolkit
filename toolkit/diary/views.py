@@ -4,7 +4,7 @@ import json
 import datetime
 import calendar
 import logging
-from toolkit.ordereddict import OrderedDict
+from toolkit.util.ordereddict import OrderedDict
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404
