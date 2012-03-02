@@ -1,10 +1,15 @@
+import os.path
 # import re
 # import magic
-# import PIL.Image
+import PIL.Image
+import logging
 
+from django.conf import settings
 from django.db import models
 
 from toolkit.diary.models import Role
+
+logger = logging.getLogger(__name__)
 
 class Member(models.Model):
 
@@ -61,6 +66,10 @@ class Member(models.Model):
 
 class Volunteer(models.Model):
 
+    def __init__(self, *args, **kwargs):
+        super(Volunteer, self).__init__(*args, **kwargs)
+        self.original_portrait = self.portrait.file.name if self.portrait else None
+
     member = models.OneToOneField('Member', related_name='volunteer')
 
     notes = models.CharField(max_length=4096, blank=True, null=True)
@@ -70,10 +79,83 @@ class Volunteer(models.Model):
     portrait_thumb = models.ImageField(upload_to="volunteers_thumbnails", max_length=256, null=True, blank=True, editable=False)
 
     # Roles
-    roles = models.ManyToManyField(Role, db_table='Volunteer_Roles')
+    roles = models.ManyToManyField(Role, db_table='Volunteer_Roles', blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'Volunteers'
+
+    def save(self, *args, **kwargs):
+        # Before saving, if portrait has changed:
+        update_thumbnail = kwargs.pop('update_portrait_thumbnail', True)
+
+        result = super(Volunteer, self).save(*args, **kwargs)
+
+        logging.info(self.original_portrait)
+        if self.original_portrait or (self.portrait and self.portrait.file.name != self.original_portrait):
+            # Delete old image:
+            if self.original_portrait:
+                logging.info("Deleting old volunteer portrait '%s'", self.original_portrait)
+                try:
+                    os.unlink(self.original_portrait)
+                except (IOError, OSError) as err:
+                    logging.error("Failed deleting old volunteer portrait '%s': %s", self.original_portrait, err)
+                self.original_portrait = None
+            # update thumbnail (after save, to ensure image has been written to disk)
+            if update_thumbnail:
+                self.update_portrait_thumbnail()
+        return result
+
+    def update_portrait_thumbnail(self):
+        # Delete old thumbnail, if any:
+        if self.portrait_thumb and self.portrait_thumb != '':
+            logger.info("Deleting old portrait thumbnail for {0}, file {1}".format(self.pk, self.portrait_thumb))
+            try:
+                self.portrait_thumb.delete(save=False)
+            except (IOError, OSError) as ose:
+                logger.exception("Failed deleting old thumbnail: {0}".format(ose))
+
+        # If there's not actually a new image to thumbnail, give up:
+        if self.portrait is None or self.portrait == '':
+            return
+
+        try:
+            if not os.path.isfile(self.portrait.file.name):
+                return
+        except (OSError, IOError) as err:
+            logger.error("Failed detecting if portrait exists and is a file (%s): %s", self.portrait.file.name, err)
+            return
+
+        try:
+            im = PIL.Image.open(self.portrait.file.name)
+        except (IOError, OSError) as ioe:
+            logger.error("Failed to read image file {0}: {1}".format(self.portrait.file.name, ioe))
+            return
+        try:
+            im.thumbnail(settings.THUMBNAIL_SIZE, PIL.Image.ANTIALIAS)
+        except MemoryError :
+            logger.error("Out of memory trying to create thumbnail for {0}".format(self.portrait))
+
+        thumb_file = os.path.join(settings.MEDIA_ROOT, "volunteers_thumbnails", os.path.basename(str(self.portrait)))
+
+        # Make sure thumbnail file ends in jpg, to avoid confusion:
+        if os.path.splitext(thumb_file.lower())[1] not in (u'.jpg',u'.jpeg'):
+            thumb_file += ".jpg"
+        try:
+            # Convert image to RGB (can't save Paletted images as jpgs) and 
+            # save thumbnail as JPEG:
+            im.convert("RGB").save(thumb_file, "JPEG")
+            logger.info("Generated thumbnail portrait for volunteer '%s' in file '%s'", self.pk, thumb_file)
+        except (IOError, OSError) as ioe:
+            logger.error("Failed saving thumbnail: {0}".format(ioe))
+            if os.path.exists(thumb_file):
+                try:
+                    os.unlink(thumb_file)
+                except (IOError, OSError) as ioe:
+                    pass
+            return
+        self.portrait_thumb = os.path.relpath(thumb_file, settings.MEDIA_ROOT)
+        self.save(update_portrait_thumbnail=False)
+

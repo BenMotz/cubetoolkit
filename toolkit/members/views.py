@@ -14,7 +14,6 @@ from toolkit.auth.decorators import require_read_auth, require_write_auth
 import toolkit.members.forms
 from toolkit.members.models import Member, Volunteer
 from toolkit.diary.models import Role
-from toolkit.ordereddict import OrderedDict
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -154,7 +153,7 @@ def edit_volunteer(request, member_id):
     volunteer = get_object_or_404(Volunteer, id=member_id)
 
     if request.method == 'POST':
-        vol_form = toolkit.members.forms.VolunteerForm(request.POST, prefix="vol", instance=volunteer)
+        vol_form = toolkit.members.forms.VolunteerForm(request.POST, request.FILES, prefix="vol", instance=volunteer)
         mem_form = toolkit.members.forms.MemberForm(request.POST, prefix="mem", instance=volunteer.member)
         if vol_form.is_valid() and mem_form.is_valid():
             logger.info("Saving changes to volunteer '%s' (id: %d)", volunteer.member.name, volunteer.pk)
