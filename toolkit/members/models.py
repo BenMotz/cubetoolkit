@@ -93,7 +93,6 @@ class Volunteer(models.Model):
 
         result = super(Volunteer, self).save(*args, **kwargs)
 
-        logging.info(self.original_portrait)
         if self.original_portrait or (self.portrait and self.portrait.file.name != self.original_portrait):
             # Delete old image:
             if self.original_portrait:
