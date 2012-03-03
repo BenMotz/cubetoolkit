@@ -148,17 +148,23 @@ def activate_volunteer(request):
     return HttpResponse(rsp)
 
 @require_write_auth
-def edit_volunteer(request, member_id):
-    context = {}
-    volunteer = get_object_or_404(Volunteer, id=member_id)
+def edit_volunteer(request, member_id, create_new=False):
+    if not create_new:
+        volunteer = get_object_or_404(Volunteer, id=member_id)
+        member = volunteer.member
+    else:
+        volunteer = Volunteer()
+        member = Member()
+        volunteer.member = Member()
 
     if request.method == 'POST':
         vol_form = toolkit.members.forms.VolunteerForm(request.POST, request.FILES, prefix="vol", instance=volunteer)
-        mem_form = toolkit.members.forms.MemberForm(request.POST, prefix="mem", instance=volunteer.member)
+        mem_form = toolkit.members.forms.MemberForm(request.POST, prefix="mem", instance=member)
         if vol_form.is_valid() and mem_form.is_valid():
-            logger.info("Saving changes to volunteer '%s' (id: %d)", volunteer.member.name, volunteer.pk)
-            vol_form.save()
+            logger.info("Saving changes to volunteer '%s' (id: %s)", volunteer.member.name, str(volunteer.pk))
             mem_form.save()
+            volunteer.member = member
+            vol_form.save()
             return HttpResponseRedirect(reverse("view-volunteer-list"))
     else:
         vol_form = toolkit.members.forms.VolunteerForm(prefix="vol", instance=volunteer)
@@ -166,6 +172,7 @@ def edit_volunteer(request, member_id):
 
 
     context = {
+            'pagetitle' : 'Add Volunteer' if create_new else 'Edit Volunteer',
             'volunteer' : volunteer,
             'vol_form' : vol_form,
             'mem_form' : mem_form,

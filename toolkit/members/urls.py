@@ -3,7 +3,8 @@ from django.conf.urls.defaults import patterns, url
 # Volunteers:
 volunteer_urls = patterns('toolkit.members.views',
     url('^$', 'view_volunteer_list'),
-    url('^add$', 'add_volunteer', name='add-volunteer'),
+    url('^add$', 'edit_volunteer', name='add-volunteer', kwargs={ 'member_id' : None, 'create_new' : True}),
+#    url('^add$', 'add_volunteer', name='add-volunteer'),
 #    url('^search$', 'search', name='search-volunteers', kwargs={ 'volunteers' : True } ),
     url('^view$', 'view_volunteer_list', name='view-volunteer-list'),
     url('^select$', 'select_volunteer', name='select-volunteer'),

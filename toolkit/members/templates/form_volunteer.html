@@ -1,5 +1,5 @@
 {% extends 'base.html' %}
-{% block title %}Edit volunteer {{ volunteer.member.name }}{% endblock %}
+{% block title %}{{ pagetitle }} {{ volunteer.member.name }}{% endblock %}
 
 {% block css %}
 <style>
@@ -24,12 +24,12 @@ th {
 {% endblock %}
 
 {% block body %}
-<h3>Edit volunteer {{ volunteer.member.name }}</h3>
+<h3>{{ pagetitle }} {{ volunteer.member.name }}</h3>
 {% if message %}<h3>{{ message }}</h3>{% endif %}
 <form action="" method="POST" enctype="multipart/form-data">
 {% csrf_token %}
 
-<p><input type="submit" value="Save changes"></input></p>
+<p><input type="submit" value="Save changes"></input> <a href="{% url view-volunteer-list %}">Cancel</a></p>
 <div id="mem_form">
 <table>
 {{ mem_form.as_table }}
@@ -48,7 +48,7 @@ th {
 
 </div>
 
-<p><input type="submit" value="Save changes"></input></p>
+<p><input type="submit" value="Save changes"></input> <a href="{% url view-volunteer-list %}">Cancel</a></p>
 </form>
 
 
