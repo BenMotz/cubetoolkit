@@ -1,5 +1,6 @@
 """Decorators that can be applied to view methods to restrict access"""
 import logging
+import functools
 
 from django.http import HttpResponseRedirect
 from django.core.urlresolvers import reverse
@@ -14,6 +15,7 @@ logger = logging.getLogger(__name__)
 def require_read_auth(function):
     """Decorator to apply to views that require the user to have provided the
     "read" (or write) password"""
+    @functools.wraps(function)
     def req_read_auth_wrapper(request, *args, **kwargs):
         # Read *or* write auth:
         auth = request.session.get('read_auth', False) or request.session.get('write_auth', False)
@@ -29,6 +31,7 @@ def require_read_auth(function):
 def require_write_auth(function):
     """Decorator to apply to views that require the user to have provided the
     "write" password"""
+    @functools.wraps(function)
     def req_write_auth_wrapper(request, *args, **kwargs):
         auth = request.session.get('write_auth', False)
         if auth:
