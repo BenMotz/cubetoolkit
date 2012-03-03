@@ -139,13 +139,42 @@ def add_volunteer(request):
     rsp = "add_vol"
     return HttpResponse(rsp)
 
-def select_volunteer(request, inactive=False):
-    rsp = "sel_vol %s" % str(inactive)
-    return HttpResponse(rsp)
+def select_volunteer(request, active=True):
+    action_urls = { 'retire' : reverse('inactivate-volunteer'),
+                    'unretire' : reverse('activate-volunteer'),
+                  }
 
-def activate_volunteer(request):
-    rsp = "activate_vol"
-    return HttpResponse(rsp)
+    action = request.GET.get('action', None)
+    if action not in action_urls:
+        logging.error("Select volunteer called with unknown action: %s", action)
+        raise Http404('Invalid action')
+
+    active = bool(active)
+    volunteers = Volunteer.objects.filter(active = active).order_by('member__name').select_related()
+
+    context = {
+            'volunteers' : volunteers,
+            'action' : action,
+            'action_url' : action_urls[action],
+            }
+
+    return render_to_response('select_volunteer.html', RequestContext(request, context))
+
+def activate_volunteer(request, active=True):
+    if request.method != 'POST':
+        return HttpResponse("Not allowed", status=405, mimetype="text/plain")
+
+    vol_pk = request.POST.get('volunteer', None)
+
+    logging.info("Set volunteer.active to %s for volunteer %s", str(active), vol_pk)
+
+    vol = get_object_or_404(Volunteer, id=vol_pk)
+
+    assert type(active) is bool
+    vol.active = active
+    vol.save()
+
+    return HttpResponseRedirect(reverse("view-volunteer-list"))
 
 @require_write_auth
 def edit_volunteer(request, member_id, create_new=False):
@@ -164,7 +193,10 @@ def edit_volunteer(request, member_id, create_new=False):
             logger.info("Saving changes to volunteer '%s' (id: %s)", volunteer.member.name, str(volunteer.pk))
             mem_form.save()
             volunteer.member = member
-            vol_form.save()
+            # Call save with commit=False so that it returns the vol object,
+            # which can then have save called on it, so that
+            # update_portrait_thumbnail parameter can be passed.
+            vol_form.save(commit=False).save(update_portrait_thumbnail=True)
             return HttpResponseRedirect(reverse("view-volunteer-list"))
     else:
         vol_form = toolkit.members.forms.VolunteerForm(prefix="vol", instance=volunteer)

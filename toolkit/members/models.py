@@ -68,7 +68,10 @@ class Volunteer(models.Model):
 
     def __init__(self, *args, **kwargs):
         super(Volunteer, self).__init__(*args, **kwargs)
-        self.original_portrait = self.portrait.file.name if self.portrait else None
+        try:
+            self.original_portrait = self.portrait.file.name if self.portrait else None
+        except (IOError, OSError, ValueError):
+            self.original_portrait = None
 
     member = models.OneToOneField('Member', related_name='volunteer')
 
@@ -89,11 +92,16 @@ class Volunteer(models.Model):
 
     def save(self, *args, **kwargs):
         # Before saving, if portrait has changed:
-        update_thumbnail = kwargs.pop('update_portrait_thumbnail', True)
+        update_thumbnail = kwargs.pop('update_portrait_thumbnail', False)
 
         result = super(Volunteer, self).save(*args, **kwargs)
 
-        if self.original_portrait or (self.portrait and self.portrait.file.name != self.original_portrait):
+        try:
+            current_portrait_file = self.portrait.file.name
+        except (IOError, OSError, ValueError):
+            current_portrait_file = None
+
+        if current_portrait_file != self.original_portrait:
             # Delete old image:
             if self.original_portrait:
                 logging.info("Deleting old volunteer portrait '%s'", self.original_portrait)
