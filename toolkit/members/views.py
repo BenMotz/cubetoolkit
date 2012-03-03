@@ -225,3 +225,7 @@ def member_statistics(request):
 
 
     return render_to_response('stats.html', context)
+
+def member_homepages(request):
+    members = Member.objects.filter(website__isnull = False).exclude(website = '').order_by('number').values('name', 'website')
+    return render_to_response('homepages.html', { 'members' : members })

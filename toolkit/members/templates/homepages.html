@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+{% block title %}
+Cube members' homepages
+{% endblock %}
+
+{% block body %}
+<img src="/static/members/cube_microplex_logo.gif" width="200">
+<p>
+<h2>Cube members' homepages</h2>
+<table>
+{% for member in members %}
+<tr><td>{{ member.name }}</td><td>{{ member.website|urlize }}</td></tr>
+{% endfor %}
+</table>
+{% endblock %}
+

@@ -10,7 +10,6 @@ volunteer_urls = patterns('toolkit.members.views',
 
     url('^(?P<member_id>\d+)$', 'view', name='view-volunteer', kwargs={ 'volunteers' : True } ),
     url('^(?P<member_id>\d+)/edit$', 'edit_volunteer', name='edit-volunteer'),
-    url('^(?P<member_id>\d+)/delete$', 'delete_volunteer', name='delete-volunteer'),
 
     url('^active/set$', 'activate_volunteer', name='activate-volunteer'),
     url('^active/unset$', 'activate_volunteer', name='inactivate-volunteer', kwargs={'active' : False}),
@@ -25,4 +24,7 @@ member_urls = patterns('toolkit.members.views',
     url('^(?P<member_id>\d+)/edit$', 'edit_member', name='edit-member'),
     url('^(?P<member_id>\d+)/delete$', 'delete_member', name='delete-member'),
     url('^statistics$', 'member_statistics', name='member-statistics'),
+
+    # External:
+    url('^homepages$', 'member_homepages', name='member-homepages'),
 )
