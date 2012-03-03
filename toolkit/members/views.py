@@ -85,11 +85,6 @@ def delete_member(request, member_id):
     return HttpResponseRedirect(reverse("search-members"))
 
 @require_write_auth
-def delete_volunteer(request, member_id):
-    rsp = "del_vol"
-    return HttpResponse(rsp)
-
-@require_write_auth
 def edit_member(request, member_id):
     context = {}
     member = get_object_or_404(Member, id=member_id)
@@ -134,10 +129,6 @@ def view_volunteer_list(request):
             'default_mugshot' : settings.DEFAULT_MUGSHOT,
     }
     return render_to_response('volunteer_list.html', context)
-
-def add_volunteer(request):
-    rsp = "add_vol"
-    return HttpResponse(rsp)
 
 def select_volunteer(request, active=True):
     action_urls = { 'retire' : reverse('inactivate-volunteer'),
