@@ -44,7 +44,7 @@ Report generated: {% now "d/m/Y" %}<p>
 {{ member.postcode }}{% if member.postcode %}<br>{% endif %}
 {{ member.phone|default:"<em>Request landline number</em>" }}<br>
 {{ member.altphone|default:"<em>Request mobile number</em>" }}<br>
-<a href="{% url edit-volunteer member.pk %}">[update]</a><br>
+<a href="{% url edit-volunteer volunteer.pk %}">[update]</a><br>
 <br>
 </td>
 {% cycle '' '</tr>' %}
