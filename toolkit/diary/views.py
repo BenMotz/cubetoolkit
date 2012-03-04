@@ -28,7 +28,7 @@ def _return_to_editindex(request):
     # Really, really dirty way to emulate the original functionality and
     # close the popped up window
     prefs = toolkit.diary.edit_prefs.get_preferences(request.session)
-    if prefs['popups'] == 'true':
+    if prefs['popups'] == True:
         return HttpResponse("<!DOCTYPE html><html><head><title>-</title></head><body onload='self.close(); opener.location.reload(true);'>Ok</body></html>")
     else:
         return HttpResponseRedirect(reverse("default-edit"))
