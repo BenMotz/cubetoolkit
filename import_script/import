@@ -37,3 +37,7 @@ export DJANGO_SETTINGS_MODULE=settings
 python $TOOLKIT_PATH/manage.py reset members diary --noinput
 python $TOOLKIT_PATH/import_script/import.py $TOOLKIT_PATH
 
+echo "Done. Guessing event tags..."
+
+python $TOOLKIT_PATH/import_script/auto_tag.py
+
