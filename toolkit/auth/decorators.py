@@ -38,15 +38,15 @@ def require_auth_any(*auth_types):
 def require_read_auth(function):
     """Decorator to apply to views that require the user to have provided the
     "read" password"""
-    return require_auth_any('read')
+    return require_auth_any('read')(function)
 
 def require_write_auth(function):
     """Decorator to apply to views that require the user to have provided the
     "write" password"""
-    return require_auth_any('write')
+    return require_auth_any('write')(function)
 
 def require_read_or_write_auth(function):
     """Decorator to apply to views that require the user to have provided
     either the "read" or "write" password"""
-    return require_auth_any('read', 'write')
+    return require_auth_any('read', 'write')(function)
 

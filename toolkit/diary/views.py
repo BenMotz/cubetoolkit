@@ -17,7 +17,7 @@ import django.db
 from toolkit.diary.models import Showing, Event, DiaryIdea, RotaEntry, MediaItem, EventTemplate, EventTag
 import toolkit.diary.forms
 
-from toolkit.auth.decorators import require_read_auth, require_write_auth
+from toolkit.auth.decorators import require_write_auth, require_read_or_write_auth
 
 import toolkit.diary.edit_prefs
 
@@ -131,7 +131,7 @@ def view_diary(request, year=None, month=None, day=None, event_type=None):
 
     return render_to_response('view_showing_index.html', context)
 
-@require_read_auth
+@require_read_or_write_auth
 def edit_diary_list(request, year=None, day=None, month=None):
     context = { }
     # Sort out date range to display
@@ -206,7 +206,7 @@ def set_edit_preferences(request):
     prefs = toolkit.diary.edit_prefs.get_preferences(request.session)
     return HttpResponse(json.dumps(prefs), mimetype="application/json")
 
-@require_read_auth
+@require_read_or_write_auth
 def add_showing(request, event_id):
     if request.method != 'POST':
         return HttpResponse('Invalid request!', 405) # 405 = Method not allowed
@@ -406,7 +406,7 @@ def _edit_event_handle_post(request, event_id):
     return render_to_response('form_event.html', RequestContext(request, context))
 
 
-# @require_write_auth
+@require_read_or_write_auth
 def edit_event(request, event_id=None):
 
     # Handling of POST (ie updates) is factored out into a separate function
@@ -484,7 +484,7 @@ def delete_showing(request, showing_id):
 
     return _return_to_editindex(request)
 
-@require_read_auth
+@require_read_or_write_auth
 def view_event_field(request, field, year, month, day):
     logger.debug("view_event_field: field {0}".format(field))
     assert field in ('copy','terms', 'rota')
