@@ -261,6 +261,8 @@ def add_event(request):
                               duration=form.cleaned_data['duration'],
                               outside_hire=form.cleaned_data['external'],
                               private=form.cleaned_data['private'])
+            # Set event tags to those from its template:
+            new_event.reset_tags_to_default()
             new_event.save()
             showings = []
             start = form.cleaned_data['start']
@@ -273,6 +275,7 @@ def add_event(request):
                                       booked_by=form.cleaned_data['booked_by'],
                                       )
                 new_showing.save()
+                # Set showing roles to those from its template:
                 new_showing.reset_rota_to_default()
                 showings.append(new_showing)
             return _return_to_editindex(request)

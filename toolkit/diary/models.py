@@ -130,7 +130,7 @@ class Event(models.Model):
     legacy_id = models.CharField(max_length=256, null=True, editable=False)
 
     template = models.ForeignKey('EventTemplate', verbose_name='Event Type', related_name='template', null=True, blank=True)
-    tags = models.ManyToManyField(EventTag, db_table='Event_Tags')
+    tags = models.ManyToManyField(EventTag, db_table='Event_Tags', blank=True)
 
     duration = models.TimeField(null=True)
 
@@ -151,8 +151,14 @@ class Event(models.Model):
 
     class Meta:
         db_table = 'Events'
+
     def __unicode__(self):
         return "%s (%d)" % (self.name, self.id)
+
+    def reset_tags_to_default(self):
+        if self.template:
+            for tag in self.template.tags.all():
+                self.tags.add(tag)
 
 class Showing(models.Model):
 
