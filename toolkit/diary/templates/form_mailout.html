@@ -15,7 +15,7 @@
 {% block body %}
 <p><img src="/static/members/cube_microplex_logo.gif" width="200"></p>
 <h3>Cube member's mailout.</h3>
-<p>Total of <b>{{ num_members}}</b> member emails to send from cube microplex</p>
+<p>Total of <b>{{ email_count }}</b> member emails to send from cube microplex</p>
 <form method="POST">
     {% csrf_token %}
     <p><label for="id_subject">{{ form.subject.label }}</label> {{ form.subject.errors }} {{ form.subject }}</p>

@@ -592,9 +592,10 @@ def _render_mailout_body(days_ahead=7):
 
 def _render_mailout_form(request, body_text, subject_text):
     form = toolkit.diary.forms.MailoutForm(initial={'subject' : subject_text, 'body' : body_text})
-
+    email_count = toolkit.members.models.Member.objects.filter(email__isnull=False).exclude(email = '').exclude(mailout_failed=True).filter(mailout=True).count()
     context = {
             'form' : form,
+            'email_count' : email_count,
             }
 
     return render(request, 'form_mailout.html', context)
