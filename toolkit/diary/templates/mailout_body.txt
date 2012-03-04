@@ -1,0 +1,16 @@
+CUBE PROGRAMME OF EVENTS {# This is all a bit gnarly, because newlines are significant... #}
+
+http://www.cubecinema.com{% url default-view %}
+{% for showing in showings %}
+{% ifchanged %}{{ showing.start|date:"Y" }}
+{% endifchanged %}{% ifchanged %} {{ showing.start|date:"F"|upper }}
+{% endifchanged %}{% ifchanged %}  {{ showing.start|date:"D"}} {{ showing.start|date:"d" }}{% else %}        {% endifchanged %} {{showing.start|date:"H:i"}} ........ {% if showing.hide_in_programme or showing.event.private %}Closed for private event.{% else %}{{ showing.event.name|capfirst }}{% if showing.cancelled %} (CANCELLED){% endif %}{% if showing.discounted %} (TTT){% endif %}{% endif %}{% endfor %}
+{% for showing in showings %}{% if not showing.event.private and not showing.hide_in_programme %}
+{% ifchanged %}------------------------------------------------------------------------------
+
+{{ showing.event.name|upper }}
+
+{% for showing in showing.event.showings.all %}{{ showing.start|date:"H:m d/m/Y" }}
+{% endfor %}
+{{ showing.event.copy }}
+{% endifchanged %}{% endif %}{% endfor %}

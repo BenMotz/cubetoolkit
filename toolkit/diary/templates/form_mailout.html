@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block css %}
+<style type="text/css">
+    textarea {
+        height: 120ex;
+    }
+    form input[type=text] {
+        width: 90ex;
+        display: block;
+    }
+
+</style>
+{% endblock %}
+
+{% block body %}
+<p><img src="/static/members/cube_microplex_logo.gif" width="200"></p>
+<h3>Cube member's mailout.</h3>
+<p>Total of <b>{{ num_members}}</b> member emails to send from cube microplex</p>
+<form method="POST">
+    {% csrf_token %}
+    <p><label for="id_subject">{{ form.subject.label }}</label> {{ form.subject.errors }} {{ form.subject }}</p>
+    <h3><label for="id_body">Body of email</label></h3>
+    {{ form.body.errors }}
+    {{ form.body }}
+    <p><input type="submit" value="Send Mailout"></p>
+</form>
+{% endblock %}
+

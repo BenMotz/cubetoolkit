@@ -7,11 +7,11 @@ import logging
 from toolkit.util.ordereddict import OrderedDict
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
-from django.shortcuts import render_to_response, get_object_or_404
-from django.template import RequestContext
+from django.shortcuts import render_to_response, get_object_or_404, render
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.forms.models import modelformset_factory
+import django.template
 import django.db
 
 from toolkit.diary.models import Showing, Event, DiaryIdea, RotaEntry, MediaItem, EventTemplate, EventTag
@@ -247,7 +247,7 @@ def add_showing(request, event_id):
                     'form' : showing_form,
                     'new_showing_form' : form,
                     }
-            return render_to_response('form_showing.html', RequestContext(request, context))
+            return render(request, 'form_showing.html', context)
         else:
             return HttpResponse("Failed adding showing", status=400)
 
@@ -281,7 +281,7 @@ def add_event(request):
             return _return_to_editindex(request)
         else:
             context = { 'form' : form }
-            return render_to_response('form_new_event_and_showing.html', RequestContext(request, context))
+            return render(request, 'form_new_event_and_showing.html', context)
     elif request.method == 'GET':
         # Marshal date out of the GET request:
         date = request.GET.get('date', datetime.date.today().strftime("%d-%m-%Y"))
@@ -297,7 +297,7 @@ def add_event(request):
         # Creat form, render template:
         form = toolkit.diary.forms.NewEventForm(initial={'start' : event_start})
         context = { 'form' : form }
-        return render_to_response('form_new_event_and_showing.html', RequestContext(request, context))
+        return render(request, 'form_new_event_and_showing.html', context)
     else:
         return HttpResponse("Illegal method", status=405)
 
@@ -341,7 +341,7 @@ def edit_showing(request, showing_id=None):
             'new_showing_form' : new_showing_form,
             }
 
-    return render_to_response('form_showing.html', RequestContext(request, context))
+    return render(request, 'form_showing.html', context)
 
 def _edit_event_handle_post(request, event_id):
     event = get_object_or_404(Event, pk=event_id)
@@ -406,7 +406,7 @@ def _edit_event_handle_post(request, event_id):
             'form' : form,
             'media_form' : media_form,
             }
-    return render_to_response('form_event.html', RequestContext(request, context))
+    return render(request, 'form_event.html', context)
 
 
 @require_read_or_write_auth
@@ -433,7 +433,7 @@ def edit_event(request, event_id=None):
             'media_form' : media_form,
             }
 
-    return render_to_response('form_event.html', RequestContext(request, context))
+    return render(request, 'form_event.html', context)
 
 @require_write_auth
 def edit_ideas(request, year=None, month=None):
@@ -455,7 +455,7 @@ def edit_ideas(request, year=None, month=None):
     context['form'] = form
     context['month'] = instance.month
 
-    return render_to_response('form_idea.html', RequestContext(request, context))
+    return render(request, 'form_idea.html', context)
 
 def view_showing(request, showing_id=None):
     context = {}
@@ -531,14 +531,14 @@ def edit_event_templates(request):
         formset = event_template_formset()
     context = { 'formset' : formset }
 
-    return render_to_response('edit_event_templates.html', RequestContext(request, context))
+    return render(request, 'edit_event_templates.html', context)
 
 def edit_event_tags(request):
     tags = EventTag.objects.all()
 
     if request.method != 'POST':
         context = { 'tags' : tags}
-        return render_to_response('edit_event_tags.html', RequestContext(request, context))
+        return render(request, 'edit_event_tags.html', context)
     # Data was posted
 
     # First, pull out mapping of tag key : name
@@ -573,4 +573,41 @@ def edit_event_tags(request):
             tag.delete()
 
     return HttpResponse("OK")
+
+def _render_mailout_body(days_ahead=7):
+    # Render default mail contents;
+    start_date = datetime.datetime.now()
+    end_date = start_date + datetime.timedelta(days=days_ahead)
+    showings = Showing.objects.filter(hide_in_programme=False).filter(cancelled=False).filter(event__cancelled=False).filter(confirmed=True).filter(start__range=[start_date, end_date]).order_by('start').select_related()
+
+    mail_template = django.template.loader.get_template("mailout_body.txt")
+
+    context = {
+            'start_date' : start_date,
+            'end_date' : end_date,
+            'showings': showings,
+            }
+
+    return mail_template.render(django.template.Context(context))
+
+def _render_mailout_form(request, body_text, subject_text):
+    form = toolkit.diary.forms.MailoutForm(initial={'subject' : subject_text, 'body' : body_text})
+
+    context = {
+            'form' : form,
+            }
+
+    return render(request, 'form_mailout.html', context)
+
+def mailout(request):
+    if request.method == 'GET':
+        query_days_ahead = request.GET.get('daysahead', 9)
+        body_text = _render_mailout_body(query_days_ahead)
+        subject_text = "CUBE Microplex forthcoming events"
+        return _render_mailout_form(request, body_text, subject_text)
+    elif request.method == 'POST':
+        form = toolkit.diary.forms.MailoutForm(request.POST)
+        if not form.is_valid():
+            return render(request, 'form_mailout.html', { 'form' : form})
+        return HttpResponse("Todo!", mimetype="text/plain")
 

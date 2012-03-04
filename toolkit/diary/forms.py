@@ -55,5 +55,7 @@ class NewEventForm(forms.Form):
     confirmed = forms.BooleanField(required=False)
     discounted = forms.BooleanField(required=False)
 
-
+class MailoutForm(forms.Form):
+    subject = forms.CharField(max_length=128, required=True)
+    body = forms.CharField(required=True, widget=forms.Textarea(attrs={'wrap' : 'soft', 'cols' : 80}))
 
