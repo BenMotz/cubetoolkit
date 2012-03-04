@@ -1,7 +1,5 @@
 import logging
 
-import bcrypt
-
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response
 from django.core.urlresolvers import reverse
@@ -10,48 +8,40 @@ import django.conf
 
 from django import forms
 
+import toolkit.auth.check as check
+
 class AuthForm(forms.Form):
     username = forms.CharField(required=True)
     password = forms.CharField(required=True, widget=forms.PasswordInput)
 
-def _check_credentials(user, password, authtype):
-    if authtype not in django.conf.settings.CUBE_AUTH:
-        logging.error("Illegal authtype %s", authtype)
-        return False
-    logging.info("Credential check for %s with username %s", authtype, user)
-
-    u_hash, p_hash = django.conf.settings.CUBE_AUTH[authtype]
-
-    if p_hash == bcrypt.hashpw(password, p_hash) and u_hash == bcrypt.hashpw(user, u_hash):
-        logging.info("Login sucess")
-        return True
-    else:
-        logging.info("Login failed")
-        return False
-
 def auth(request, atype):
-
-    if atype not in ('read', 'write'):
-        raise Http404('Invalid auth requested')
-    session_key = atype + '_auth'
-
-    context = { 'atype' : atype, }
-    # Already authorised?
-    auth = request.session.get(session_key, False)
-
+    auth_types = atype.split(',')
     form = None
-    if request.method == 'POST':
-        # Try to become authorised
+    context = { 'atype' : atype, }
+    logging.info("Auth: %s", str(atype))
+
+    # Valid request?
+    for auth_type in auth_types:
+        if auth_type not in django.conf.settings.CUBE_AUTH:
+            raise Http404('Invalid auth requested')
+
+    # Already authorised?
+    auth = check._has_auth_any(request, auth_types)
+    if auth:
+        print "alread authorised"
+
+    # Not authorised, and credentials have been submitted:
+    if request.method == 'POST' and auth == False:
         form = AuthForm(request.POST)
         if form.is_valid():
-            if _check_credentials(form.cleaned_data['username'], form.cleaned_data['password'], atype):
-                request.session[session_key] = True
-                auth = True
-            else:
-                context['message'] = "Unrecognised username/password for %s access" % (atype,)
+            check._set_auth_from_credentials(request, form.cleaned_data['username'], form.cleaned_data['password'])
+            auth = check._has_auth_any(request, auth_types)
+            if not auth:
+                context['message'] = "Unrecognised username/password for %s access" % (" or ".join(auth_types),)
 
     if auth:
         next = request.session.pop('next', None) or reverse("default-view")
+        print "Redirecting to '%s'" % (next,)
         return HttpResponseRedirect(next)
     else:
         # Always use a new form:

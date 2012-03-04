@@ -5,7 +5,7 @@ Login required
 
 {% block body %}
 
-<h1>Login required for {{ atype }} access</h1>
+<h1>Login required</h1>
 {{ form.name_of_field.errors }}
 {% if message %} <p id="message">{{ message }}</p>{% endif %}
 <form action="{% url auth atype=atype %}" method="post">
