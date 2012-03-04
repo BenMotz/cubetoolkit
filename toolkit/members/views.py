@@ -1,8 +1,7 @@
 import logging
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
-from django.shortcuts import render_to_response, get_object_or_404
-from django.template import RequestContext
+from django.shortcuts import render_to_response, get_object_or_404, render
 from django.db.models import Q
 import django.db # Used for raw query for stats
 from django.core.urlresolvers import reverse
@@ -36,7 +35,7 @@ def add_member(request):
         'form' : form,
         'message' : message,
     }
-    return render_to_response('form_new_member.html', RequestContext(request, context))
+    return render(request, 'form_new_member.html', context)
 
 @require_read_auth
 def search(request, volunteers=False):
@@ -54,7 +53,7 @@ def search(request, volunteers=False):
                 'show_edit_link' : show_edit_link,
                 'show_delete_link' : show_delete_link,
                 }
-        return render_to_response('search_members_results.html', RequestContext(request, context))
+        return render(request, 'search_members_results.html', context)
 
     context = {
             'show_edit_link' : show_edit_link,
@@ -74,7 +73,7 @@ def view(request, member_id, volunteers=False):
             'show_volunteer' : volunteers,
             'member' : member,
             }
-    return render_to_response('view_member.html', RequestContext(request, context))
+    return render(request, 'view_member.html', context)
 
 @require_write_auth
 def delete_member(request, member_id):
@@ -103,7 +102,7 @@ def edit_member(request, member_id):
             'member' : member,
             'form' : form,
             }
-    return render_to_response('form_member.html', RequestContext(request, context))
+    return render(request, 'form_member.html', context)
 
 @require_read_auth
 def view_volunteer_list(request):
@@ -149,7 +148,7 @@ def select_volunteer(request, active=True):
             'action_url' : action_urls[action],
             }
 
-    return render_to_response('select_volunteer.html', RequestContext(request, context))
+    return render(request, 'select_volunteer.html', context)
 
 def activate_volunteer(request, active=True):
     if request.method != 'POST':
@@ -200,7 +199,7 @@ def edit_volunteer(request, member_id, create_new=False):
             'vol_form' : vol_form,
             'mem_form' : mem_form,
             }
-    return render_to_response('form_volunteer.html', RequestContext(request, context))
+    return render(request, 'form_volunteer.html', context)
 
 @require_read_auth
 def member_statistics(request):
@@ -217,9 +216,9 @@ def member_statistics(request):
             'email_stats' : email_stats,
             'postcode_stats' : postcode_stats,
             'm_count' : Member.objects.count(),
-            'm_email_count' : Member.objects.filter(email__isnull = False).exclude(email = '').count(),
-            'm_email_viable' : Member.objects.filter(email__isnull = False).exclude(email = '').exclude(mailout_failed=True).count(),
-            'm_email_unsub' : Member.objects.exclude(mailout = False).count(),
+            'm_email_count' : Member.objects.filter(email__isnull=False).exclude(email = '').count(),
+            'm_email_viable' : Member.objects.filter(email__isnull=False).exclude(email = '').exclude(mailout_failed=True).filter(mailout=True).count(),
+            'm_email_unsub' : Member.objects.filter(email__isnull=False).exclude(email = '').exclude(mailout_failed=True).exclude(mailout=True).count(),
             'm_postcode' : Member.objects.filter(postcode__isnull = False).exclude(postcode = '').count(),
     }
 
