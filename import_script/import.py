@@ -10,7 +10,7 @@ import shutil
 import toolkit.diary.models
 import toolkit.members.models
 import settings
-from django.core.exceptions import ValidationError
+from django.core.exceptions import ValidationError, ObjectDoesNotExist
 
 FORMATS_PATH="./formats"
 
@@ -307,14 +307,38 @@ def load_event_templates(path_to_formats):
     return type_index
 
 def create_default_tags():
-    ro_tags = ('film', 'music', 'party', 'cabaret', 'indymedia', 'talk', 'nanoplex', 'hkkp', 'bluescreen', 'meeting', 'cubeorchestra', 'babycinema')
-    rw_tags = ('35mm','dvd',)
+    ro_tags = ('film', 'music', 'party', 'cabaret', 'indymedia', 'talk', 'nanoplex', 'hkkp', 'bluescreen', 'meeting', 'cubeorchestra', 'babycinema', 'workshop',)
+    rw_tags = ('35mm','dvd','outdoors',)
     for tag in ro_tags:
         t = toolkit.diary.models.EventTag(name=tag, read_only=True)
         t.save()
     for tag in rw_tags:
         t = toolkit.diary.models.EventTag(name=tag, read_only=False)
         t.save()
+
+def add_tags_to_templates():
+    tagmap = {
+            'film 35mm' : ('film', '35mm',),
+            '0 film DVD' : ('film', 'dvd',),
+            'film DVD' : ('film', 'dvd',),
+            'film video' :  ('film', 'dvd',),
+            'video' :  ('film', 'dvd',),
+            'outdoor' : ('outdoors',),
+            'live music' : ('music',),
+            'rehearsal' : (),
+            'workshop' : ('workshop',),
+            'party' : ('party',),
+            'meeting' : ('meeting',),
+        }
+    for template, tags in tagmap.iteritems():
+        try:
+            template = toolkit.diary.models.EventTemplate.objects.get(name=template)
+        except ObjectDoesNotExist:
+            continue
+
+        for tag in tags:
+            tag = toolkit.diary.models.EventTag.objects.get(name=tag)
+            template.tags.add(tag)
 
 ###############################################################################
 # Members + Volunteers...
@@ -464,6 +488,8 @@ def main():
     create_event_types(event_templates)
     # Create default tags
     create_default_tags()
+    # Default template/tag config
+    add_tags_to_templates()
 
     if role_map is None:
         return
