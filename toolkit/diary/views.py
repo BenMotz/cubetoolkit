@@ -409,7 +409,7 @@ def _edit_event_handle_post(request, event_id):
     return render(request, 'form_event.html', context)
 
 
-@require_read_or_write_auth
+@require_write_auth
 def edit_event(request, event_id=None):
 
     # Handling of POST (ie updates) is factored out into a separate function
