@@ -2,7 +2,6 @@ import os
 import re
 import json
 import datetime
-import calendar
 import logging
 from toolkit.util.ordereddict import OrderedDict
 
@@ -14,12 +13,11 @@ from django.forms.models import modelformset_factory
 import django.template
 import django.db
 
+from toolkit.auth.decorators import require_write_auth, require_read_or_write_auth
 from toolkit.diary.models import Showing, Event, DiaryIdea, RotaEntry, MediaItem, EventTemplate, EventTag
 import toolkit.diary.forms
-
-from toolkit.auth.decorators import require_write_auth, require_read_or_write_auth
-
 import toolkit.diary.edit_prefs
+from toolkit.diary.daterange import get_date_range
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -34,57 +32,12 @@ def _return_to_editindex(request):
         return HttpResponseRedirect(reverse("default-edit"))
 
 
-def _get_date_range(year, month, day, user_days_ahead):
-    """Support method to take fields read from HTTP request and return a tuple
-    (datetime, number_of_days)
-    If month or day are blank, they default to 1. If all three are blank it 
-    defaults to today"""
-    if day is not None and month is None:
-        logger.error("Invalid request; can't specify day and no month")
-        raise Http404("Invalid request; can't specify day and no month")
-
-    try:
-        year = int(year) if year else None
-        month = int(month) if month else None
-        day = int(day) if day else None
-    except ValueError:
-        logger.error("Invalid value requested in date range, one of day {0}, month {1}, year {2}".format(day, month, year))
-        raise Http404("Invalid values")
-
-    logger.debug("Range: day %s, month %s, year %s, span %s days", str(day), str(month), str(year), str(user_days_ahead))
-
-    try:
-        if day:
-            startdate = datetime.date(year, month, day)
-            days_ahead = 1
-        elif month:
-            startdate = datetime.date(year, month, 1)
-            days_ahead = calendar.monthrange(year, month)[1]
-        elif year:
-            startdate = datetime.date(year, 1, 1)
-            days_ahead = 365
-            if calendar.isleap(year):
-                days_ahead += 1
-        else:
-            startdate = datetime.date.today()
-            days_ahead = 30 # default
-    except ValueError as vale:
-        logger.error("Invalid something requested in date range: {0}".format(vale))
-        raise Http404("Invalid date")
-
-    if user_days_ahead:
-        try:
-            days_ahead = int(user_days_ahead)
-        except (ValueError, TypeError):
-            pass
-
-
-    return startdate, days_ahead
-
 def view_diary(request, year=None, month=None, day=None, event_type=None):
     context = { }
     query_days_ahead = request.GET.get('daysahead', None)
-    startdate, days_ahead = _get_date_range(year, month, day, query_days_ahead)
+    startdate, days_ahead = get_date_range(year, month, day, query_days_ahead)
+    if startdate is None:
+        raise Http404(days_ahead)
     enddate = startdate + datetime.timedelta(days=days_ahead)
 
     context['today'] = datetime.date.today()
@@ -136,7 +89,9 @@ def edit_diary_list(request, year=None, day=None, month=None):
     context = { }
     # Sort out date range to display
     query_days_ahead = request.GET.get('daysahead', None)
-    startdate, days_ahead = _get_date_range(year, month, day, query_days_ahead)
+    startdate, days_ahead = get_date_range(year, month, day, query_days_ahead)
+    if startdate is None:
+        raise Http404(days_ahead)
     # Don't allow viewing of dates before today, to avoid editing of the past:
     if startdate < datetime.date.today():
         # Change startdate to today:
@@ -493,7 +448,9 @@ def view_event_field(request, field, year, month, day):
     assert field in ('copy','terms', 'rota')
 
     query_days_ahead = request.GET.get('daysahead', None)
-    start_date, days_ahead = _get_date_range(year, month, day, query_days_ahead)
+    start_date, days_ahead = get_date_range(year, month, day, query_days_ahead)
+    if start_date is None:
+        raise Http404(days_ahead)
     end_date = start_date + datetime.timedelta(days=days_ahead)
     showings = Showing.objects.filter(cancelled=False).filter(confirmed=True).filter(start__range=[start_date, end_date]).order_by('start').select_related()
 
