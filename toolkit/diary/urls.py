@@ -1,6 +1,7 @@
 from django.conf.urls.defaults import patterns, include, url
 from django.views.generic import DetailView
 from toolkit.diary.models import Event
+import toolkit.diary.feeds
 
 
 urlpatterns = patterns( 'toolkit.diary.views',
@@ -10,6 +11,9 @@ urlpatterns = patterns( 'toolkit.diary.views',
     url('^(?P<year>\d{4})/?$', 'view_diary', name="year-view"),
     url('^(?P<year>\d{4})/(?P<month>\d{1,2})/?$', 'view_diary', name="month-view"),
     url('^(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})', 'view_diary', name="day-view"),
+
+    # RSS feed
+    url('^rss$', toolkit.diary.feeds.BasicWhatsOnFeed(), name="view-diary-rss", ),
 
     # View lists of events for editing:
     url('^edit/?$', 'edit_diary_list', name="default-edit", ),
