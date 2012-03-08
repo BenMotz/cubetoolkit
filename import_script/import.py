@@ -29,15 +29,12 @@ consoleHandler = logging.StreamHandler()
 consoleHandler.setLevel(logging.DEBUG)
 logger.addHandler(consoleHandler)
 
-def titlecase(string):
-#   return string.title() # Really doesn't cope with apostrophes.
-#   return " ".join([ word.capitalize() for word in  "This is the voice".split() ])
-    if isinstance(string, basestring):
-        return re.sub("(^|\s)(\S)", lambda match : match.group(1) + match.group(2).upper(), string)
-    else:
-        return string
+
+##############################################################################
+# Some utility functions
 
 def connect():
+    # Open database connection
     conn = MySQLdb.connect (host = "localhost",
                             user = settings.IMPORT_SCRIPT_USER,
                            passwd = "spanner",
@@ -45,6 +42,14 @@ def connect():
 #                           use_unicode = True,
                            )
     return conn
+
+def titlecase(string):
+#   return string.title() # Really doesn't cope with apostrophes.
+#   return " ".join([ word.capitalize() for word in  "This is the voice".split() ])
+    if isinstance(string, basestring):
+        return re.sub("(^|\s)(\S)", lambda match : match.group(1) + match.group(2).upper(), string)
+    else:
+        return string
 
 def decode(string):
     if string is str:
@@ -67,6 +72,38 @@ def html_ify(string):
 
 def markdown_ify(string):
     return string
+
+wrap_re = re.compile(r'(.{70,})\n')
+lotsofnewlines_re = re.compile(r'\n\n+')
+# Catch well-formatted links (ie. beginning http://)
+link_re_1 = re.compile(r'(http:\/\/\S{4,})')
+# Optimistic stab at spotting other things that are probably links, based on
+# a smattering of TLDs:
+link_re_2 = re.compile(r'(\s)(www\.[\w.]+\.(com|org|net|uk|de|ly|us|tk)[^\t\n\r\f\v\. ]*)')
+
+def convert_copy_to_markdown(string):
+    if isinstance(string, basestring):
+        # remove all whitespace from start and end of line:
+        result = string.strip()
+        # Strip out carriage returns:
+        result = result.strip().replace('\r','')
+        # Strip out new lines when they occur after 70 other characters (try to fix wrapping)
+        result = wrap_re.sub(r'\1 ', result)
+        # Replace a sequence of 1+ new lines with a single line break;
+        result = lotsofnewlines_re.sub('\n', result)
+        # Now replace all single line breaks with double line breaks (which
+        # markdown will actually show as line breaks)
+        result = result.replace('\n','\n\n')
+
+        # Attempt to magically convert any links to markdown:
+        result = link_re_1.sub(r'[\1](\1)', result)
+        result = link_re_2.sub(r'\1[\2](http://\2)', result)
+        return result
+    else:
+        return string
+
+##############################################################################
+# Diary import
 
 event_tot = 0
 
@@ -184,18 +221,23 @@ def import_events(connection, role_map):
 
         # Name
         e.name = titlecase(r[1])
-        if e.name in (None, u''):
+
+        if e.name in (None, u'', ''):
             # Looking at the db, it's safe to skip all of these
             logging.error("Skipping event with no/missing name id %s", e.legacy_id)
             continue
+        else:
+            # Special fix for the omnipresent Djs:
+            e.name = e.name.replace("Djs", "DJs")
+
         # Copy
         if r[2] is not None:
-            e.copy = markdown_ify(r[2])
+            e.copy = convert_copy_to_markdown(r[2])
         else:
             logger.error("Missing copy for event [%s] %s", r[0], e.name)
             e.copy = ''
         # Copy summary
-        e.copy_summary = r[3]
+        e.copy_summary = convert_copy_to_markdown(r[3])
 
         # Duration:
         if r[4] is not None and r[4] != '':
