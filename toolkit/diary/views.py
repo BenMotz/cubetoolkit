@@ -3,7 +3,11 @@ import re
 import json
 import datetime
 import logging
+
+import markdown
+
 from toolkit.util.ordereddict import OrderedDict
+
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404, render
@@ -75,14 +79,47 @@ def view_diary(request, year=None, month=None, day=None, event_type=None):
     for showing in showings:
         events.setdefault(showing.event, set()).add(showing)
 
-    context['showings'] = showings
-    context['media'] = media
-    context['events'] = events
+    context['showings'] = showings # Set of Showing objects for date range
+    context['media'] = media # Dict of event_id -> (event_id, media_file, thumbnail, credit)
+    context['events'] = events # Ordered dict event -> set(showings)
     # This is prepended to filepaths from the MediaPaths table to use
     # as a location for images:
     context['media_url'] = settings.MEDIA_URL
 
     return render_to_response('view_showing_index.html', context)
+
+def view_diary_json(request, year, month, day):
+    context = { }
+    try:
+        year = int(year) if year else None
+        month = int(month) if month else None
+        day = int(day) if day else None
+    except ValueError:
+        logger.error("Invalid value requested in date range, one of day {0}, month {1}, year {2}".format(day, month, year))
+        raise Http404("Invalid values")
+
+    startdate = datetime.date(year, month, day)
+    enddate = startdate + datetime.timedelta(days=1)
+
+    context['start'] = startdate
+
+    # Do query. select_related() on the end encourages it to get the
+    # associated showing/event data, to reduce the number of SQL queries
+    showings = Showing.objects.filter(confirmed=True).filter(hide_in_programme=False).filter(start__range=[startdate, enddate]).filter(event__private=False).order_by('start').select_related()
+    results = []
+    for showing in showings:
+        event = showing.event
+
+        results.append( {
+                'start' : showing.start.strftime('%d/%m/%Y %H:%M'),
+                'name' : event.name,
+                'copy' : markdown.markdown(event.copy),
+                'link' : reverse("single-event-view", kwargs = { 'event_id' : showing.event_id }),
+                'image' : event.media.get().thumbnail.url if event.media.count() >= 1 else None,
+                'tags' : ", ".join(n[0] for n in event.tags.values_list('name')),
+            })
+
+    return HttpResponse(json.dumps(results), mimetype="application/json")
 
 @require_read_or_write_auth
 def edit_diary_list(request, year=None, day=None, month=None):

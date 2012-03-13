@@ -10,7 +10,7 @@ urlpatterns = patterns( 'toolkit.diary.views',
     url('^(?P<event_type>[\w-]{4,})/$', 'view_diary', name="type-view"),
     url('^(?P<year>\d{4})/?$', 'view_diary', name="year-view"),
     url('^(?P<year>\d{4})/(?P<month>\d{1,2})/?$', 'view_diary', name="month-view"),
-    url('^(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})', 'view_diary', name="day-view"),
+    url('^(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/?$', 'view_diary', name="day-view"),
 
     # RSS feed
     url('^rss$', toolkit.diary.feeds.BasicWhatsOnFeed(), name="view-diary-rss", ),
@@ -59,6 +59,8 @@ urlpatterns = patterns( 'toolkit.diary.views',
     url("^mailout$", 'mailout', name="members-mailout"),
 
     # Ajax calls:
-    url("""^edit/setprefs$""", 'set_edit_preferences', name="set_edit_preferences"),
+    url("^edit/setprefs$", 'set_edit_preferences', name="set_edit_preferences"),
+    url('^(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/json$', 'view_diary_json', name="day-view-json"),
+
 )
 
