@@ -2,10 +2,8 @@
 
 set -e # Abort on errors
 
-IMAGE_PATH=./media/
-
 if [ $# -eq 0 ] ; then
-	echo "Usage: $0 [Path to site root] [Path to images, defaults to $IMAGE_PATH]"
+	echo "Usage: $0 [Path to site root]"
 	exit 1
 fi
 
@@ -14,20 +12,9 @@ if [ ! -d $1 ] ; then
 	exit 1
 fi
 
-if [ "" != "$2" ] ; then
-	IMAGE_PATH=$2
-fi
-
 # svn export --force svn+ssh://cube@sparror.cubecinema.com/home/cube/svn-repo/TRUNK/cgi-bin/events/data/formats
 
 TOOLKIT_PATH=$1
-
-echo "Rsyncing images from $IMAGE_PATH"
-rsync -av --no-r $IMAGE_PATH/events/* $TOOLKIT_PATH/media/diary/
-rsync -av --no-r $IMAGE_PATH/events/thumb/* $TOOLKIT_PATH/media/diary_thumbnails/
-
-rsync -av --no-r $IMAGE_PATH/portraits/* $TOOLKIT_PATH/media/volunteers/
-rsync -av --no-r $IMAGE_PATH/portraits/thumb/* $TOOLKIT_PATH/media/volunteers_thumbnails/
 
 echo "Activate virtualenv"
 
