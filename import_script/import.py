@@ -11,6 +11,7 @@ import toolkit.diary.models
 import toolkit.members.models
 import settings
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from django.db import transaction
 
 FORMATS_PATH="./formats"
 
@@ -206,6 +207,7 @@ def import_ideas(connection):
 
     cursor.close()
 
+@transaction.commit_on_success
 def import_events(connection, role_map):
     cursor = connection.cursor()
     results = cursor.execute("SELECT event_id, event_name, copy, copy_summary, duration, image_credits, terms FROM events ORDER BY event_id")
@@ -434,6 +436,7 @@ def import_volunteer(member, active, notes, role_map, roles):
     import_volunteer_roles(v, role_map, roles)
     v.save()
 
+@transaction.commit_on_success
 def import_members(connection):
 
     role_map = dict( (role.name.replace(" ","_").lower(), role) for role in toolkit.diary.models.Role.objects.all())
