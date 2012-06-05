@@ -12,8 +12,6 @@ if [ ! -d $1 ] ; then
 	exit 1
 fi
 
-# svn export --force svn+ssh://cube@sparror.cubecinema.com/home/cube/svn-repo/TRUNK/cgi-bin/events/data/formats
-
 TOOLKIT_PATH=$1
 
 echo "Activate virtualenv"

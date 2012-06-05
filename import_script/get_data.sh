@@ -26,6 +26,9 @@ VOLUNTEERS_LOCAL_PATH="$LOCAL_PATH/"
 ROLES_SERVER_PATH="/home/cube/cgi-bin/volunteers/roles/"
 ROLES_LOCAL_PATH="$LOCAL_PATH/roles/"
 
+FORMATS_SERVER_PATH="/home/cube/cgi-bin/events/data/formats"
+FORMATS_LOCAL_PATH="$LOCAL_PATH/formats"
+
 EVENT_PHOTO_SERVER_PATH="/home/cube/htdocs/events/images/"
 EVENT_PHOTO_LOCAL_PATH="$MEDIA_PATH/diary/"
 
@@ -51,6 +54,8 @@ echo "Getting Volunteer notes"
 $RSYNC -av --exclude='.svn' $USER@$SERVER:$VOLUNTEERS_SERVER_FILE $VOLUNTEERS_LOCAL_PATH
 echo "Getting Volunteer roles"
 $RSYNC -av --exclude='.svn' $USER@$SERVER:$ROLES_SERVER_PATH/ $ROLES_LOCAL_PATH/
+echo "Getting Event formats"
+$RSYNC -av --exclude='.svn' $USER@$SERVER:$FORMATS_SERVER_PATH/ $FORMATS_LOCAL_PATH/
 echo "Getting Volunteer photos"
 $RSYNC -av --exclude='.svn' --exclude='thumb' --progress $USER@$SERVER:$VOL_PHOTO_SERVER_PATH $VOL_PHOTO_LOCAL_PATH
 echo "Getting Event photos"

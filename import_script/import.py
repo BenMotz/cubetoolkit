@@ -13,7 +13,7 @@ import settings
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import transaction
 
-FORMATS_PATH="./formats"
+FORMATS_PATH="./source_data/formats"
 
 SITE_ROOT = ".."
 MEDIA_PATH = "media"
