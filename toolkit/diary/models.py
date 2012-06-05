@@ -31,8 +31,8 @@ class MediaItem(models.Model):
     mimetype = models.CharField(max_length=64, null=True, blank=True, editable=False)
 
     thumbnail = models.ImageField(upload_to="diary_thumbnails", max_length=256, null=True, blank=True, editable=False)
-    credit = models.CharField(max_length=64, null=True, blank=True, default="Internet scavenged", verbose_name='Image credit')
-    caption = models.CharField(max_length=128, null=True, blank=True)
+    credit = models.CharField(max_length=256, null=True, blank=True, default="Internet scavenged", verbose_name='Image credit')
+    caption = models.CharField(max_length=256, null=True, blank=True)
 
     def save(self, *args, **kwargs):
         # Before saving, update thumbnail and mimetype
