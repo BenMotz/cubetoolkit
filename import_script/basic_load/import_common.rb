@@ -14,6 +14,7 @@ require 'iconv'
 # Reads the file at path/table_name.dat and calls the block
 # with each key/value pair.
 def import_from_db(path, table_name, file_extension = ".dat")
+  @dbh.query("START TRANSACTION")
   db = BDB::Hash.open path+table_name+file_extension,nil, BDB::RDONLY
   db.each_pair do |key,value|
     #   key_coded =  Iconv.iconv("Windows-1252","utf8",key)
@@ -33,6 +34,7 @@ def import_from_db(path, table_name, file_extension = ".dat")
     yield key_coded, value_coded
   end
   db.close
+  @dbh.query("COMMIT")
 end
 
 # General purpose method to read boolean data from berkeley file
