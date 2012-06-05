@@ -44,11 +44,6 @@ MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')
 INSTALLED_APPS = list(INSTALLED_APPS)
 INSTALLED_APPS.append('debug_toolbar')
 
-# Following settings are used by the import script, can be discarded when
-# switch-over is finalised.
-IMPORT_SCRIPT_USER='cube-import'
-IMPORT_SCRIPT_DATABASE='toolkit'
-
 # Enable logging to the console:
 logging.basicConfig(
 #    level = logging.DEBUG,

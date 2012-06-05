@@ -29,6 +29,11 @@ Additonal Info -"""
 
 DEFAULT_MUGSHOT = "/static/members/default_mugshot.gif"
 
+# Following settings are used by the import script, can be discarded when
+# switch-over is finalised.
+IMPORT_SCRIPT_USER='toolkitimport'
+IMPORT_SCRIPT_DATABASE='toolkitimport'
+
 ###############################################################################
 #
 # Below here are Django settings
@@ -164,7 +169,7 @@ INSTALLED_APPS = (
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
-    'south',
+#    'south',
     'django.contrib.markup',
 )
 
