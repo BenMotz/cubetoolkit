@@ -41,8 +41,8 @@ def deploy_code():
         target = os.path.join(env.site_root, CODE_DIR)
         run("rm -rf {0}".format(target))
         run("tar -xzf {0}".format(archive))
-        run("rm -f settings.py")
-        run("ln -s {0} settings.py".format(env.settings))
+        run("rm -f toolkit/settings.py")
+        run("ln -s {0} toolkit/settings.py".format(env.settings))
 
 def deploy_static():
     """Rsync all static content onto target"""

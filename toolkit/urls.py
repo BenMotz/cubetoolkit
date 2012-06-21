@@ -1,7 +1,7 @@
 from django.conf.urls.defaults import patterns, include, url
 import django.conf
 
-import members.urls
+import toolkit.members.urls
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
@@ -11,8 +11,8 @@ urlpatterns = patterns('',
     url(r'^programme/', include('toolkit.diary.urls')),
     url(r'^whatson/', include('toolkit.diary.urls')),
     url(r'^diary/', include('toolkit.diary.urls')),
-    url(r'^members/', include(members.urls.member_urls)),
-    url(r'^volunteers/', include(members.urls.volunteer_urls)),
+    url(r'^members/', include(toolkit.members.urls.member_urls)),
+    url(r'^volunteers/', include(toolkit.members.urls.volunteer_urls)),
     url(r'^auth/', include('toolkit.auth.urls')),
     # Examples:
     # url(r'^$', 'toolkit.views.home', name='home'),

@@ -2,9 +2,9 @@ import os.path
 import logging
 import logging.config
 
-from settings_common import *
+from toolkit.settings_common import *
 
-APP_ROOT = '/var/www_toolkit/site'
+APP_ROOT = '/home/users/cubetoolkit/site'
 LOGGING_CONFIG_FILE = 'logging.conf'
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
@@ -30,3 +30,15 @@ TEMPLATE_DIRS = (
 )
 
 logging.config.fileConfig(os.path.join(APP_ROOT,LOGGING_CONFIG_FILE))
+
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'cubetoolkit',
+        'USER': 'cubetoolkit',
+        'PASSWORD': 'hialpabg',
+        'HOST': '',
+        'PORT': '',
+    }
+}
+

@@ -1,4 +1,4 @@
-from devserver_settings import *
+from toolkit.devserver_settings import *
 
 DATABASES = {
     'default': {

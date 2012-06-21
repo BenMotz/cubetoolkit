@@ -2,7 +2,7 @@ import os.path
 import logging
 import logging.config
 
-from settings_common import *
+from toolkit.settings_common import *
 
 APP_ROOT = '/home/ben/data/python/cube'
 
