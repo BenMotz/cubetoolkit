@@ -46,6 +46,7 @@ def view_diary(request, year=None, month=None, day=None, event_type=None):
 
     context['today'] = datetime.date.today()
     context['start'] = startdate
+
     # Set page title
     if year:
         # If some specific dates were provided, use those
@@ -54,33 +55,25 @@ def view_diary(request, year=None, month=None, day=None, event_type=None):
         # Default title
         context['event_list_name'] = "Cube Programme"
 
-    # Following is a bit more complex than it needs to be, but this is the
-    # highest traffic bit of the site, so this faffing cuts it down to 2
-    # queries...
-    # (Django's ORM is horribly limited)
-
-    # Do query. select_related() on the end encourages it to get the
-    # associated showing/event data, to reduce the number of SQL queries
-    showings = Showing.objects.filter(confirmed=True).filter(hide_in_programme=False).filter(start__range=[startdate, enddate]).filter(event__private=False).order_by('start').select_related()
+    # Do query. The select_related() and prefetch_related on the end encourages
+    # it to get the associated showing/event data, to reduce the number of SQL
+    # queries
+    showings = (Showing.objects.filter(confirmed=True)
+                               .filter(hide_in_programme=False)
+                               .filter(start__range=[startdate, enddate])
+                               .filter(event__private=False)
+                               .order_by('start')
+                               .select_related()
+                               .prefetch_related('event__media'))
     if event_type:
         showings = showings.filter(event__tags__name = event_type)
-    # But that doesn't work for Many-Many relationships. To avoid a separate
-    # query for every single image, get all the image data here.
-    # First, build set of event ids:
-    event_ids = set(showing.event_id for showing in showings)
-    # Now build map of event_id -> mediaitems.
-    # This gets all the data into a simple dict, rather than into model objects
-    # as (because of limitations of Djangos ORM) you can't query for the MediaItems
-    # and also get the event_id that they correspond to returned. So instead do a 
-    # query that gets a dict of values from more than one table, and use that to
-    # build a dictionary mapping event.id to a few fields from MediaItems:
-    media = dict([ (m['event__id'], m) for m in MediaItem.objects.filter(event__id__in = event_ids).values('event__id','media_file','thumbnail','credit') ])
+
+    # Build a list of events for that list of showings:
     events = OrderedDict()
     for showing in showings:
         events.setdefault(showing.event, set()).add(showing)
 
     context['showings'] = showings # Set of Showing objects for date range
-    context['media'] = media # Dict of event_id -> (event_id, media_file, thumbnail, credit)
     context['events'] = events # Ordered dict event -> set(showings)
     # This is prepended to filepaths from the MediaPaths table to use
     # as a location for images:
@@ -105,7 +98,13 @@ def view_diary_json(request, year, month, day):
 
     # Do query. select_related() on the end encourages it to get the
     # associated showing/event data, to reduce the number of SQL queries
-    showings = Showing.objects.filter(confirmed=True).filter(hide_in_programme=False).filter(start__range=[startdate, enddate]).filter(event__private=False).order_by('start').select_related()
+    showings = (Showing.objects.filter(confirmed=True)
+                               .filter(hide_in_programme=False)
+                               .filter(start__range=[startdate, enddate])
+                               .filter(event__private=False)
+                               .order_by('start')
+                               .select_related()
+                               .prefetch_related('event__media'))
     results = []
     for showing in showings:
         event = showing.event
