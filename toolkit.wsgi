@@ -15,7 +15,7 @@ site.addsitedir(os.path.join(SITE_ROOT, VIRTUALENV, "lib/python2.6/site-packages
 sys.path.insert(0, SITE_ROOT)
 
 # Point Django to settings file:
-os.environ['DJANGO_SETTINGS_MODULE'] = 'settings'
+os.environ['DJANGO_SETTINGS_MODULE'] = 'toolkit.settings'
 
 import django.core.handlers.wsgi
 application = django.core.handlers.wsgi.WSGIHandler()
