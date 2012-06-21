@@ -1,8 +1,4 @@
-#!/usr/bin/python
-import os
-import sys
-import datetime
-import re
+#!/usr/bin/env python
 import logging
 
 from toolkit.diary.models import Event, EventTag

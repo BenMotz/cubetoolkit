@@ -9,7 +9,7 @@ import shutil
 
 import toolkit.diary.models
 import toolkit.members.models
-import settings
+import toolkit.settings as settings
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 from django.db import transaction
 
