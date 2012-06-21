@@ -26,7 +26,7 @@ pushd $IMPORT_ROOT/basic_load/
 popd
 
 echo "Loading into django"
-$IMPORT_ROOT/import . $IMPORT_ROOT/source_data/media
+$IMPORT_ROOT/import .
 echo
 
 echo "Done!"
