@@ -1,4 +1,4 @@
-from django.conf.urls.defaults import patterns, url
+from django.conf.urls import patterns, url
 
 urlpatterns = patterns( 'toolkit.auth.views',
     url('^login/(?P<atype>[a-z,]+)$', 'auth', name="auth"),
