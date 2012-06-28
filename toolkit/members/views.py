@@ -18,17 +18,26 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 def add_member(request):
+    # If this view is called with GET then display the form to enter a new
+    # member. If called with POST then take parameters out of the body of 
+    # the request and create a new member
     message = None
     if request.method == 'POST':
+        # Create new member object
         instance = toolkit.members.models.Member()
+        # Create form object to process the submitted data (data is pulled
+        # out of the request.POST automatically)
         form = toolkit.members.forms.NewMemberForm(request.POST, instance=instance)
+        # Validate form fields
         if form.is_valid():
+            # Form is valid, save data:
             logger.info("Adding member '%s'".format(instance.name))
             form.save()
             # Member added ok, new blank form:
             form = toolkit.members.forms.NewMemberForm()
             message = "Added member: {0}".format(instance.number)
     else:
+        # GET request; create form object with default values
         form = toolkit.members.forms.NewMemberForm()
 
     context = {
@@ -46,7 +55,10 @@ def search(request, volunteers=False):
     print show_edit_link, show_delete_link
 
     if search_terms:
-        results = Member.objects.filter(Q(name__icontains = search_terms) | Q(email__icontains = search_terms) | Q(number = search_terms)).order_by('name')
+        results = Member.objects.filter(  Q(name__icontains = search_terms)
+                                        | Q(email__icontains = search_terms)
+                                        | Q(number = search_terms)
+                                       ).order_by('name')
         context = {
                 'search_terms' : search_terms,
                 'members' : results,
@@ -106,13 +118,20 @@ def edit_member(request, member_id):
 
 @require_read_auth
 def view_volunteer_list(request):
+    # Get all volunteers, sorted by name:
     volunteers = Volunteer.objects.filter(active = True).order_by('member__name').select_related()
+
     # Build dict of volunteer pk -> list of role names
     # and dict of role names -> volunteer names
     # (avoid lots of queries during template render)
     vol_role_map = {}
     role_vol_map = {}
-    for role, vol_id, vol_name in Role.objects.filter(volunteer__active = True).values_list('name', 'volunteer__id', 'volunteer__member__name').order_by('volunteer__member__name', 'name'):
+    # Query for active volunteers, sorted by name
+    volunteer_query = (Role.objects.filter(volunteer__active = True)
+                                   .values_list('name', 'volunteer__id', 'volunteer__member__name')
+                                   .order_by('volunteer__member__name', 'name'))
+
+    for role, vol_id, vol_name in volunteer_query:
         role_vol_map.setdefault(role, []).append(vol_name)
         vol_role_map.setdefault(vol_id, []).append(role)
 
@@ -130,6 +149,14 @@ def view_volunteer_list(request):
     return render_to_response('volunteer_list.html', context)
 
 def select_volunteer(request, active=True):
+    # This view is called to retire / unretire a volunteer. It presents a list
+    # of all volunteer names and a button. If the view is called with "action=retire"
+    # in the query then it shows a "retire" button linked to the# retire url, and 
+    # if it's called with "action=unretire" it shows  a link to the unretire url.
+    #
+    # The selection of volunteers (retired vs unretired) is decided by the "active"
+    # parameter to this method, which is set by the url route, depending on which
+    # view was used. This is probably not the simplest way to do this...
     action_urls = { 'retire' : reverse('inactivate-volunteer'),
                     'unretire' : reverse('activate-volunteer'),
                   }
@@ -151,6 +178,8 @@ def select_volunteer(request, active=True):
     return render(request, 'select_volunteer.html', context)
 
 def activate_volunteer(request, active=True):
+    # Sets the 'active' value for the volunteer with the id passed  in the
+    # 'volunteer' parameter of the POST request
     if request.method != 'POST':
         return HttpResponse("Not allowed", status=405, mimetype="text/plain")
 
@@ -168,14 +197,25 @@ def activate_volunteer(request, active=True):
 
 @require_write_auth
 def edit_volunteer(request, member_id, create_new=False):
+    # If called from the "add" url, then create_new will be True. If called from
+    # the edit url then it'll be False
+
+    # Depending on which way this method was called, either create a totally
+    # new volunteer object with default values (add) or load the volunteer
+    # object with the given member_id from the database:
     if not create_new:
+        # Called from "edit" url
         volunteer = get_object_or_404(Volunteer, id=member_id)
         member = volunteer.member
     else:
+        # Called from "add" url
         volunteer = Volunteer()
         member = Member()
         volunteer.member = Member()
 
+    # Now, if the view was loaded with "GET" then display the edit form, and
+    # if it was called with POST then read the updated volunteer data from the
+    # form data and update and save the volunteer object:
     if request.method == 'POST':
         vol_form = toolkit.members.forms.VolunteerForm(request.POST, request.FILES, prefix="vol", instance=volunteer)
         mem_form = toolkit.members.forms.MemberForm(request.POST, prefix="mem", instance=member)
@@ -186,7 +226,11 @@ def edit_volunteer(request, member_id, create_new=False):
             # Call save with commit=False so that it returns the vol object,
             # which can then have save called on it, so that
             # update_portrait_thumbnail parameter can be passed.
+            # (So, to be clear, the first "save" is on the form object, and that
+            # returns a volunteer object, and then "save" is called on the 
+            # volunteer object)
             vol_form.save(commit=False).save(update_portrait_thumbnail=True)
+            # Go to the volunteer list view:
             return HttpResponseRedirect(reverse("view-volunteer-list"))
     else:
         vol_form = toolkit.members.forms.VolunteerForm(prefix="vol", instance=volunteer)
@@ -203,22 +247,34 @@ def edit_volunteer(request, member_id, create_new=False):
 
 @require_read_auth
 def member_statistics(request):
+    # View for the 'statistics' page of the 'membership database'
+
+    # A few hard-coded SQL queries to get some of the more complex numbers
     cursor = django.db.connection.cursor()
+    # Get 10 most popular email domains:
     cursor.execute("""SELECT SUBSTRING_INDEX(`email`, '@', -1) as domain, COUNT(1) as num  FROM Members WHERE email != '' GROUP BY domain  ORDER BY num DESC LIMIT 10""")
     email_stats = [ row for row in cursor.fetchall() ]
     cursor.close()
     cursor = django.db.connection.cursor()
+    # Get 10 most popular postcode prefixes:
     cursor.execute("""SELECT SUBSTRING_INDEX(`postcode`, ' ', 1) as firstbit, COUNT(1) as num FROM Members WHERE postcode != '' GROUP BY firstbit ORDER BY num DESC LIMIT 10""")
     postcode_stats = [ row for row in cursor.fetchall() ]
     cursor.close()
 
+    # Some of the simpler stats are done using the django ORM
     context = {
+            # Results of complex queries:
             'email_stats' : email_stats,
             'postcode_stats' : postcode_stats,
+            # Total number of members:
             'm_count' : Member.objects.count(),
+            # Members with an email address that isn't null/blank:
             'm_email_count' : Member.objects.filter(email__isnull=False).exclude(email = '').count(),
+            # Members with an email address that isn't null/blank, where mailout hasn't failed and they haven't unsubscribed:
             'm_email_viable' : Member.objects.filter(email__isnull=False).exclude(email = '').exclude(mailout_failed=True).filter(mailout=True).count(),
+            # Members with an email address that isn't null/blank, where mailout hasn't failed and they have unsubscribed:
             'm_email_unsub' : Member.objects.filter(email__isnull=False).exclude(email = '').exclude(mailout_failed=True).exclude(mailout=True).count(),
+            # Members with a postcode that isn't null / blank
             'm_postcode' : Member.objects.filter(postcode__isnull = False).exclude(postcode = '').count(),
     }
 
