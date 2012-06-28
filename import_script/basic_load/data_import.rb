@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/usr/bin/env ruby1.8
 
 # Very hacky Ruby script to suck the data out of
 # the various Berkelely db tables that held all the 
