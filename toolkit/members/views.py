@@ -223,13 +223,27 @@ def edit_volunteer(request, member_id, create_new=False):
             logger.info("Saving changes to volunteer '%s' (id: %s)", volunteer.member.name, str(volunteer.pk))
             mem_form.save()
             volunteer.member = member
-            # Call save with commit=False so that it returns the vol object,
-            # which can then have save called on it, so that
-            # update_portrait_thumbnail parameter can be passed.
+            # Call form save with commit=False so that it returns the vol object,
+            updated_volunteer = vol_form.save(commit=False)
+            # Form doesn't automatically handle role mapping, so do it manually. First get
+            # list of volunteer roles from post:
+            roles_from_form = set( int(role, 10) for role in request.POST.getlist('vol-roles') )
+            # Now get list of roles volunteer already has:
+            existing_roles = set( r[0] for r in updated_volunteer.roles.all().values_list('id') )
+            # Ensure all roles listed on form are added
+            updated_volunteer.roles.add(*roles_from_form)
+            # Any roles in existing_roles but not in list from form should be removed:
+            roles_to_remove = existing_roles.difference(roles_from_form)
+            updated_volunteer.roles.remove(*roles_to_remove)
+
+            # Now save updated volunteer object, and set update_portrait_thumbnail
+            # parameter can be passed.
             # (So, to be clear, the first "save" is on the form object, and that
-            # returns a volunteer object, and then "save" is called on the 
-            # volunteer object)
-            vol_form.save(commit=False).save(update_portrait_thumbnail=True)
+            # doesn't write to the database, but returns a volunteer object, and
+            # then "save" is called on the volunteer object, which does write to
+            # the db)
+            updated_volunteer.save(update_portrait_thumbnail=True)
+            #return render(request, 'form_volunteer.html', {})
             # Go to the volunteer list view:
             return HttpResponseRedirect(reverse("view-volunteer-list"))
     else:
@@ -252,12 +266,12 @@ def member_statistics(request):
     # A few hard-coded SQL queries to get some of the more complex numbers
     cursor = django.db.connection.cursor()
     # Get 10 most popular email domains:
-    cursor.execute("""SELECT SUBSTRING_INDEX(`email`, '@', -1) as domain, COUNT(1) as num  FROM Members WHERE email != '' GROUP BY domain  ORDER BY num DESC LIMIT 10""")
+    cursor.execute("""SELECT SUBSTRING_INDEX(`email`, '@', -1) AS domain, COUNT(1) AS num FROM Members WHERE email != '' GROUP BY domain ORDER BY num DESC LIMIT 10""")
     email_stats = [ row for row in cursor.fetchall() ]
     cursor.close()
     cursor = django.db.connection.cursor()
     # Get 10 most popular postcode prefixes:
-    cursor.execute("""SELECT SUBSTRING_INDEX(`postcode`, ' ', 1) as firstbit, COUNT(1) as num FROM Members WHERE postcode != '' GROUP BY firstbit ORDER BY num DESC LIMIT 10""")
+    cursor.execute("""SELECT SUBSTRING_INDEX(`postcode`, ' ', 1) AS firstbit, COUNT(1) AS num FROM Members WHERE postcode != '' GROUP BY firstbit ORDER BY num DESC LIMIT 10""")
     postcode_stats = [ row for row in cursor.fetchall() ]
     cursor.close()
 
