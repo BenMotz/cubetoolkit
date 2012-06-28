@@ -26,7 +26,10 @@ pushd $IMPORT_ROOT/basic_load/
 popd
 
 echo "Loading into django"
+cp logging.conf logging.normal.conf
+cp logging.import.conf logging.conf
 $IMPORT_ROOT/import .
+cp logging.normal.conf logging.conf
 echo
 
 echo "Done!"
