@@ -594,11 +594,17 @@ def view_event_field(request, field, year, month, day):
     if start_date is None:
         raise Http404(days_ahead)
     end_date = start_date + datetime.timedelta(days=days_ahead)
-    showings = Showing.objects.filter(cancelled=False).filter(confirmed=True).filter(start__range=[start_date, end_date]).order_by('start').select_related()
+    showings = (Showing.objects.filter(cancelled=False)
+                               .filter(confirmed=True)
+                               .filter(start__range=[start_date, end_date])
+                               .order_by('start')
+                               .select_related())
 
     if 'search' in request.GET:
         search = request.GET['search']
         logging.info("Search term: {0}".format(search))
+        # Note slightly sneaky use of **; this effectively results in a method
+        # call like: showings.filter(event__copy__icontaings=search)
         showings = showings.filter(**{ 'event__' + field + '__icontains' : search })
     context = {
             'start_date' : start_date,
@@ -677,7 +683,13 @@ def _render_mailout_body(days_ahead=7):
     # Render default mail contents;
     start_date = datetime.datetime.now()
     end_date = start_date + datetime.timedelta(days=days_ahead)
-    showings = Showing.objects.filter(hide_in_programme=False).filter(cancelled=False).filter(event__cancelled=False).filter(confirmed=True).filter(start__range=[start_date, end_date]).order_by('start').select_related()
+    showings = (Showing.objects.filter(hide_in_programme=False)
+                               .filter(cancelled=False)
+                               .filter(event__cancelled=False)
+                               .filter(confirmed=True)
+                               .filter(start__range=[start_date, end_date])
+                               .order_by('start')
+                               .select_related())
 
     mail_template = django.template.loader.get_template("mailout_body.txt")
 
@@ -691,7 +703,11 @@ def _render_mailout_body(days_ahead=7):
 
 def _render_mailout_form(request, body_text, subject_text):
     form = toolkit.diary.forms.MailoutForm(initial={'subject' : subject_text, 'body' : body_text})
-    email_count = toolkit.members.models.Member.objects.filter(email__isnull=False).exclude(email = '').exclude(mailout_failed=True).filter(mailout=True).count()
+    email_count = (toolkit.members.models.Member.objects.filter(email__isnull=False)
+                                                        .exclude(email = '')
+                                                        .exclude(mailout_failed=True)
+                                                        .filter(mailout=True)
+                                                        .count())
     context = {
             'form' : form,
             'email_count' : email_count,
