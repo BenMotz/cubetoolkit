@@ -27,22 +27,44 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 def _return_to_editindex(request):
-    # Really, really dirty way to emulate the original functionality and
-    # close the popped up window
+    # If the user has set the 'popup' preference, then close the popup
+    # and reload the page that opened the popup. Otherwise just redirect to
+    # the index.
+    #
     prefs = toolkit.diary.edit_prefs.get_preferences(request.session)
     if prefs['popups'] == True:
+        # Use a really, really dirty way to emulate the original functionality and
+        # close the popped up window: return a hard-coded page that contains
+        # javacsript to close the open window and reload the source page.
         return HttpResponse("<!DOCTYPE html><html><head><title>-</title></head><body onload='self.close(); opener.location.reload(true);'>Ok</body></html>")
     else:
+        # Redirect to edit index
         return HttpResponseRedirect(reverse("default-edit"))
 
 
 def view_diary(request, year=None, month=None, day=None, event_type=None):
+    # Returns public diary view, starting at specified year/month/day, filtered by
+    # event type.
+    #
+    # Returns different things depending on the supplied parameters;
+    # - if only year is passed, and no daysahead parameter,listings for the
+    #   whole of that year
+    # - if only year & month passed, and no daysahead parameter, listings for
+    #   the whole of that month
+    # - if year, month & day, and no daysahead parameter, listings for that day
+    #   only
+    # - if dayssahead parameter is passed, that many days from the specified
+    #   year/month/date
     context = { }
     query_days_ahead = request.GET.get('daysahead', None)
+
+    # Shared utility method to parse HTTP parameters and return a date range
     startdate, days_ahead = get_date_range(year, month, day, query_days_ahead)
     if startdate is None:
         raise Http404(days_ahead)
     enddate = startdate + datetime.timedelta(days=days_ahead)
+
+    # Start getting together data to send to the template...
 
     context['today'] = datetime.date.today()
     context['start'] = startdate
@@ -55,7 +77,7 @@ def view_diary(request, year=None, month=None, day=None, event_type=None):
         # Default title
         context['event_list_name'] = "Cube Programme"
 
-    # Do query. The select_related() and prefetch_related on the end encourages
+    # Build query. The select_related() and prefetch_related on the end encourages
     # it to get the associated showing/event data, to reduce the number of SQL
     # queries
     showings = (Showing.objects.filter(confirmed=True)
@@ -82,7 +104,12 @@ def view_diary(request, year=None, month=None, day=None, event_type=None):
     return render_to_response('view_showing_index.html', context)
 
 def view_diary_json(request, year, month, day):
+    # Used by the experimental new index; returns a JSON object containing
+    # various bits of data about the events on the given year/month/day
+
     context = { }
+
+    # Parse parameters:
     try:
         year = int(year) if year else None
         month = int(month) if month else None
@@ -106,6 +133,7 @@ def view_diary_json(request, year, month, day):
                                .select_related()
                                .prefetch_related('event__media'))
     results = []
+    # Build list of factoids to send back
     for showing in showings:
         event = showing.event
 
@@ -122,12 +150,21 @@ def view_diary_json(request, year, month, day):
 
 @require_read_or_write_auth
 def edit_diary_list(request, year=None, day=None, month=None):
+    # Basic "edit" list view. Logic about processing of year/month/day
+    # parameters is basically the same as for the public diary view.
+    #
+    # The logic is a bit twisty, from the requirement to show list all dates
+    # and 'ideas' fields in the range, even if they don't have any events in
+    # them, yet.
+
     context = { }
     # Sort out date range to display
     query_days_ahead = request.GET.get('daysahead', None)
+    # utility function, shared with public diary view
     startdate, days_ahead = get_date_range(year, month, day, query_days_ahead)
     if startdate is None:
         raise Http404(days_ahead)
+
     # Don't allow viewing of dates before today, to avoid editing of the past:
     if startdate < datetime.date.today():
         # Change startdate to today:
@@ -140,6 +177,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
                                'day' : startdate.day}),
                      days_ahead))
         return HttpResponseRedirect(new_url)
+
     enddate = startdate + datetime.timedelta(days=days_ahead)
 
 
@@ -172,7 +210,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
     # start of the month in startdate, so the idea for that month gets included:
     idea_startdate = datetime.date(day=1, month=startdate.month, year=startdate.year)
     idea_list = DiaryIdea.objects.filter(month__range=[idea_startdate, enddate]).order_by('month').select_related()
-    # Assemble into the idea dict, with keys that will match the keys in the 
+    # Assemble into the idea dict, with keys that will match the keys in the
     # showings dict
     for idea in idea_list:
         ideas[idea.month] = idea.ideas
@@ -183,6 +221,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
 
     context['ideas'] = ideas
     context['dates'] = dates
+    # Page title:
     context['event_list_name'] = "Diary for %s to %s" % (str(startdate), str(enddate))
     context['start'] = startdate
     context['end'] = enddate
@@ -190,17 +229,29 @@ def edit_diary_list(request, year=None, day=None, month=None):
     return render_to_response('edit_event_index.html', context)
 
 def set_edit_preferences(request):
-    print request.GET
+    # Store user preferences as specified in the request's GET variables,
+    # and return a JSON object containing all current user preferences
+
     # Store updated prefs
     toolkit.diary.edit_prefs.set_preferences(request.session, request.GET)
-    # Retrieve prefs:
+    # Retrieve and return prefs:
     prefs = toolkit.diary.edit_prefs.get_preferences(request.session)
     return HttpResponse(json.dumps(prefs), mimetype="application/json")
 
 @require_read_or_write_auth
 def add_showing(request, event_id):
+    # Add a showing to an existing event. Must be called via POST. Uses POSTed
+    # data to create a new showing.
+    # May optionally be called with a "copy_from" GET parameter, in which case
+    # rota entries (and nothing else, currently) are copied from the showing
+    # with the given ID.
+    #
+    # If add was successful, calls return_to_editindex. On error goes to
+    # form_showing.html
+
     if request.method != 'POST':
         return HttpResponse('Invalid request!', 405) # 405 = Method not allowed
+
     copy_from = request.GET.get('copy_from', None)
     try:
         copy_from = int(copy_from, 10)
@@ -244,7 +295,15 @@ def add_showing(request, event_id):
 
 @require_write_auth
 def add_event(request):
+    # Called GET, with a "date" parameter of the form day-month-year:
+    #     returns 'form_new_event_and_showing' with given date filled in.
+    # Called POST, with various data in request:
+    #     creates new event, and number_of_showings, calls return_to_editindex
+    #
+
     if request.method == 'POST':
+        # Get event data, plus template and showing time and number of showing
+        # days from form. Uses template to set rota roles and tags.
         form = toolkit.diary.forms.NewEventForm(request.POST)
         if form.is_valid():
             new_event = Event(name=form.cleaned_data['event_name'],
@@ -257,6 +316,8 @@ def add_event(request):
             new_event.save()
             showings = []
             start = form.cleaned_data['start']
+            # create number_of_days showings, each at date/time given in start
+            # parameter, and each with rota roles from the template
             for n in range(0, form.cleaned_data['number_of_days']):
                 day_offset = datetime.timedelta(days=n)
                 new_showing = Showing(event=new_event,
@@ -271,9 +332,13 @@ def add_event(request):
                 showings.append(new_showing)
             return _return_to_editindex(request)
         else:
+            # If form was not valid, re-render the form (which will highlight
+            # errors)
             context = { 'form' : form }
             return render(request, 'form_new_event_and_showing.html', context)
+
     elif request.method == 'GET':
+        # GET: Show form blank, with date filled in from GET date parameter:
         # Marshal date out of the GET request:
         date = request.GET.get('date', datetime.date.today().strftime("%d-%m-%Y"))
         date = date.split("-")
@@ -285,7 +350,7 @@ def add_event(request):
             event_start = datetime.datetime(hour=20, minute=0, day=date[0], month=date[1], year=date[2])
         except (ValueError, TypeError):
             return HttpResponse("Illegal date", status=400)
-        # Creat form, render template:
+        # Create form, render template:
         form = toolkit.diary.forms.NewEventForm(initial={'start' : event_start})
         context = { 'form' : form }
         return render(request, 'form_new_event_and_showing.html', context)
@@ -335,17 +400,40 @@ def edit_showing(request, showing_id=None):
     return render(request, 'form_showing.html', context)
 
 def _edit_event_handle_post(request, event_id):
+    # Handle POSTing of the "edit event" form. The surprising level of
+    # complexity here is because of the media item editing, because there
+    # can be many media items for an event (even though this isn't currently
+    # reflected in the UI).
+    #
+    # This means that there are two forms: one for the event, and one for the
+    # media item. The extra logic is to cover the fact that both records need
+    # to be updated, and because at the moment only one media item is handled
+    # the old one will need to be deleted.
+    #
+    # In addition to basic validation of the submitted form, there are five (!)
+    # cases:
+    #  - no media item to begin with, not adding one
+    #  - no media item to begin with, adding a new one
+    #  - existing media item being cleared (and not replaced)
+    #  - existing media item being cleared and replaced
+    #  - existing media item, no change
+
+    # Event object
     event = get_object_or_404(Event, pk=event_id)
+    # Get the event's media item, if any
     if event.media.count() > 0:
         media_item = event.media.all()[0]
         initial_file = media_item.media_file
     else:
         media_item = MediaItem()
         initial_file = None
+
     logger.info("Updating event {0}".format(event_id))
+    # Create and populate forms:
     form = toolkit.diary.forms.EventForm(request.POST, instance=event)
     media_form = toolkit.diary.forms.MediaItemForm(request.POST, request.FILES, instance=media_item)
 
+    # Validate
     if form.is_valid() and media_form.is_valid():
         # First, save the form:
         form.save()
@@ -402,12 +490,14 @@ def _edit_event_handle_post(request, event_id):
 
 @require_write_auth
 def edit_event(request, event_id=None):
+    # Event edit form. The 'POST' case, for submitting edits, is a bit of a
+    # monster, and is a separate method
 
     # Handling of POST (ie updates) is factored out into a separate function
     if request.method == 'POST':
         return _edit_event_handle_post(request, event_id)
-    # So now just dealing with a GET:
 
+    # So now just dealing with a GET:
     event = get_object_or_404(Event, pk=event_id)
     # For now only support a single media item:
     if event.media.count() > 0:
@@ -428,6 +518,9 @@ def edit_event(request, event_id=None):
 
 @require_write_auth
 def edit_ideas(request, year=None, month=None):
+    # GET: return form for editing event for given month/year
+    # POST: store editied idea, go back to edit list
+
     context = {}
     year = int(year)
     month = int(month)
@@ -449,12 +542,15 @@ def edit_ideas(request, year=None, month=None):
     return render(request, 'form_idea.html', context)
 
 def view_showing(request, showing_id=None):
+    # Show details of an individual showing, with given showing_id
     context = {}
     context['showing'] = get_object_or_404(Showing, id=showing_id)
     context['event'] = context['showing'].event
     return render_to_response('view_showing.html', context)
 
 def view_event(request, event_id=None, legacy_id=None):
+    # Show details of an individual event, with given event_id. Also allows
+    # lookup by 'legacy_id', the non-primary key id used in the old toolkit.
     context = {}
     if event_id:
         event = get_object_or_404(Event, id=event_id)
@@ -472,14 +568,24 @@ def view_event(request, event_id=None, legacy_id=None):
 
 @require_write_auth
 def delete_showing(request, showing_id):
+    # Delete the given showing
+
     if request.method == 'POST':
         showing = Showing.objects.get(pk=showing_id)
+        logging.info("Deleting showing id {0} (for event id {1})".format(showing_id, showing.event_id))
         showing.delete()
 
     return _return_to_editindex(request)
 
 @require_read_or_write_auth
 def view_event_field(request, field, year, month, day):
+    # Method shared across various (slightly primitive) views into event data;
+    # the copy, terms and rota reports.
+    #
+    # This method gets the list of events for the given date range (using the
+    # same shared logic for parsing the parameters as the public list / edit
+    # list) and then uses the appropriate template to render the results.
+
     logger.debug("view_event_field: field {0}".format(field))
     assert field in ('copy','terms', 'rota')
 
