@@ -312,8 +312,8 @@ def add_event(request):
                               outside_hire=form.cleaned_data['external'],
                               private=form.cleaned_data['private'])
             # Set event tags to those from its template:
-            new_event.reset_tags_to_default()
             new_event.save()
+            new_event.reset_tags_to_default()
             showings = []
             start = form.cleaned_data['start']
             # create number_of_days showings, each at date/time given in start
@@ -615,6 +615,7 @@ def view_event_field(request, field, year, month, day):
 
     return render_to_response('view_{0}.html'.format(field), context)
 
+@require_write_auth
 def edit_event_templates(request):
     # Get data
     # templates = EventTemplate.objects.all()
@@ -638,6 +639,7 @@ def edit_event_templates(request):
 
     return render(request, 'edit_event_templates.html', context)
 
+@require_write_auth
 def edit_event_tags(request):
     tags = EventTag.objects.all()
 
