@@ -83,7 +83,7 @@ function delete_tag(e) {
         deletions = true;
     }
     $('#tag_' + key).remove();
-    delete tags[key];
+    tags[key] = '';
 }
 
 $(document).ready(function() {

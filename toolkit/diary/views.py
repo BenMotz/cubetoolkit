@@ -274,7 +274,6 @@ def add_showing(request, event_id):
             source_showing = Showing.objects.get(pk=copy_from)
             for rota_entry in source_showing.rotaentry_set.all():
                 r = RotaEntry(showing=new_showing, template=rota_entry)
-                print "role_id:", r.role_id
                 r.save()
 
         return _return_to_editindex(request)
@@ -372,7 +371,6 @@ def edit_showing(request, showing_id=None):
             # Now get list of selected roles;
             selected_roles = dict(request.POST)['roles']
             initial_set = set( r.values()[0] for r in showing.rotaentry_set.values('role_id'))
-            print initial_set
             # For each id, this will get the entry or create it:
             for role_id in selected_roles:
                 role_id = int(role_id)
@@ -617,16 +615,14 @@ def view_event_field(request, field, year, month, day):
 
 @require_write_auth
 def edit_event_templates(request):
-    # Get data
-    # templates = EventTemplate.objects.all()
-    # context = { 'templates' : templates }
-    # Create formset
+    # View for editing event templates.
+    # GET: Render multiple forms (using a formset)
+    # POST: Update formset
+
     event_template_formset = modelformset_factory(EventTemplate, can_delete=True)
 
     if request.method == 'POST':
         formset = event_template_formset(request.POST)
-        print "FORM: ", formset.is_valid()
-        print formset.errors
         if formset.is_valid():
             logger.info("Event templates updated")
             formset.save()
@@ -641,6 +637,10 @@ def edit_event_templates(request):
 
 @require_write_auth
 def edit_event_tags(request):
+    # View for editing event tags.
+    # GET: Reads tags and renders the (JavaScript heavy) template
+    # POST: Process list of tags. Expected to be submitted via AJAX, so doesn't
+    #       return much.
     tags = EventTag.objects.all()
 
     if request.method != 'POST':
@@ -649,7 +649,12 @@ def edit_event_tags(request):
     # Data was posted
 
     # First, pull out mapping of tag key : name
+    # The form returns the data as a set of key/values where the keys are;
+    # "tags[x]" where x is either a positive integer which is the key of an
+    # existing tag, or a negative integer indicating that this is a new tag.
+    # Tags to be deleted have their value set to '' (the empty string)
     tags_submitted = {}
+    # regex to recognise the "tags[x]" format:
     tag_re = re.compile("^tags\[([-\d]+)\]$")
     for key, val in request.POST.iteritems():
         m = tag_re.match(key)
@@ -658,31 +663,36 @@ def edit_event_tags(request):
 
     # Build dict of existing tags:
     tags_by_pk = dict( (tag.pk, tag) for tag in tags )
-    # Now update / add as appropriate
+    # Now update / add as appropriate. Any tag keys that aren't included in
+    # the update are deleted.
     for pk, name in tags_submitted.iteritems():
         extant_tag = tags_by_pk.pop(pk, None)
         if extant_tag:
-            if extant_tag.name != name:
+            if name == '':
+                logger.info("Deleting tag {0} (key {1})".format(extant_tag.name, extant_tag.pk))
+                extant_tag.delete()
+            elif extant_tag.name != name:
                 logger.info("Changing name of tag id {0} from {1} to {2}".format(extant_tag.pk, extant_tag.name, name))
                 extant_tag.name = name
                 extant_tag.save()
         elif extant_tag is None:
             new_tag = EventTag(name=name)
             logger.info("Creating new tag {0}".format(name))
+            # database constraints will enforce uniqueness of tag name
             try:
                 new_tag.save()
             except django.db.IntegrityError as ie:
                 logger.error("Failed adding tag {0}: {1}".format(name, ie))
-    # Any tags still in extant_tag should be deleted:
-    for tag in tags_by_pk.itervalues():
-        if not tag.read_only:
-            logger.info("Deleting tag {0} (key {1})".format(tag.name, tag.pk))
-            tag.delete()
+    # There shouldn't be any tags left in tags_by_pk:
+    if len(tags_by_pk) != 0:
+        logger.error("Tag(s) {0} not included in update".format(",".join(tags_by_pk.values())))
 
     return HttpResponse("OK")
 
 def _render_mailout_body(days_ahead=7):
     # Render default mail contents;
+
+    # Read data
     start_date = datetime.datetime.now()
     end_date = start_date + datetime.timedelta(days=days_ahead)
     showings = (Showing.objects.filter(hide_in_programme=False)
@@ -693,6 +703,7 @@ def _render_mailout_body(days_ahead=7):
                                .order_by('start')
                                .select_related())
 
+    # Render into mail template
     mail_template = django.template.loader.get_template("mailout_body.txt")
 
     context = {
