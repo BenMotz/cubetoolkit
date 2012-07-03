@@ -68,7 +68,7 @@ class MediaItem(models.Model):
             try:
                 self.thumbnail.delete(save=False)
             except (IOError, OSError) as ose:
-                logging.exception("Failed deleting old thumbnail: {0}".format(ose))
+                logging.error("Failed deleting old thumbnail: {0}".format(ose))
         try:
             im = PIL.Image.open(self.media_file.file.name)
         except (IOError, OSError) as ioe:
