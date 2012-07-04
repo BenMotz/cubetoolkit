@@ -6,7 +6,7 @@ import toolkit.diary.feeds
 
 urlpatterns = patterns( 'toolkit.diary.public_views',
     # View lists of event for various time/dates
-    url('^(?:view|)$', 'view_diary', name="default-view"),
+    url('^(?:view/|)$', 'view_diary', name="default-view"),
     url('^view/(?P<event_type>[\w-]{4,})/$', 'view_diary', name="type-view"),
     url('^view/(?P<year>\d{4})/?$', 'view_diary', name="year-view"),
     url('^view/(?P<year>\d{4})/(?P<month>\d{1,2})/?$', 'view_diary', name="month-view"),
@@ -23,7 +23,7 @@ urlpatterns = patterns( 'toolkit.diary.public_views',
     url('^view/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/json$', 'view_diary_json', name="day-view-json"),
 
     # RSS feed
-    url('^rss$', toolkit.diary.feeds.BasicWhatsOnFeed(), name="view-diary-rss", ),
+    url('^rss/$', toolkit.diary.feeds.BasicWhatsOnFeed(), name="view-diary-rss", ),
 )
 
 urlpatterns += patterns( 'toolkit.diary.edit_views',
@@ -34,22 +34,22 @@ urlpatterns += patterns( 'toolkit.diary.edit_views',
     url('^edit/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})', 'edit_diary_list', name="day-edit", ),
 
     # Edit an event: view event before editing
-    url('^edit/event/id/(?P<pk>\d+)/view$',
+    url('^edit/event/id/(?P<pk>\d+)/view/$',
             DetailView.as_view(
                 model=Event,
                 template_name='view_event_privatedetails.html'), name="edit-event-details-view"),
     # Edit an event
-    url('^edit/event/id/(?P<event_id>\d+)$', 'edit_event', name="edit-event-details"),
+    url('^edit/event/id/(?P<event_id>\d+)/$', 'edit_event', name="edit-event-details"),
     # Edit a showing (includes delete / add a new showing)
-    url('^edit/showing/id/(?P<showing_id>\d+)$', 'edit_showing', name="edit-showing"),
+    url('^edit/showing/id/(?P<showing_id>\d+)/$', 'edit_showing', name="edit-showing"),
     # Edit ideas
-    url('^edit/ideas/(?P<year>\d{4})/(?P<month>\d{1,2})$', 'edit_ideas', name="edit-ideas"),
+    url('^edit/ideas/(?P<year>\d{4})/(?P<month>\d{1,2})/$', 'edit_ideas', name="edit-ideas"),
     # Add a new showing (to an existing event) - submission URL for edit-showing
     url('^add/event/id/(?P<event_id>\d+)/showing$', 'add_showing', name="add-showing"),
     # Delete a showing
     url('^edit/showing/id/(?P<showing_id>\d+)/delete$', 'delete_showing', name="delete-showing"),
     # Add a new event + showing
-    url('^add/event$', 'add_event', name="add-event"),
+    url('^add/event/$', 'add_event', name="add-event"),
 
     # Edit event types
     url('^edit/eventtemplates/', 'edit_event_templates', name='edit_event_templates'),
@@ -61,7 +61,7 @@ urlpatterns += patterns( 'toolkit.diary.edit_views',
     # View rota
     url("""^(?P<field>rota|copy|terms)(/|/(?P<year>\d{4})/(?P<month>\d{1,2})/?(?P<day>(?<=/)\d{0,2})?/?)?$""", 'view_event_field', name="view_event_field"),
 
-    url("^mailout$", 'mailout', name="members-mailout"),
+    url("^mailout/$", 'mailout', name="members-mailout"),
 
     # Ajax calls:
     url("^edit/setprefs$", 'set_edit_preferences', name="set_edit_preferences"),

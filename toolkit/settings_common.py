@@ -42,6 +42,8 @@ IMPORT_SCRIPT_DATABASE='toolkitimport'
 # Custom:
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 
+APPEND_SLASH = True
+
 # Django settings for cube project.
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
