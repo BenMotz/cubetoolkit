@@ -4,7 +4,7 @@ from toolkit.diary.models import Event
 import toolkit.diary.feeds
 
 
-urlpatterns = patterns( 'toolkit.diary.views',
+urlpatterns = patterns( 'toolkit.diary.public_views',
     # View lists of event for various time/dates
     url('^(?:view|)$', 'view_diary', name="default-view"),
     url('^view/(?P<event_type>[\w-]{4,})/$', 'view_diary', name="type-view"),
@@ -12,21 +12,26 @@ urlpatterns = patterns( 'toolkit.diary.views',
     url('^view/(?P<year>\d{4})/(?P<month>\d{1,2})/?$', 'view_diary', name="month-view"),
     url('^view/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/?$', 'view_diary', name="day-view"),
 
+    # View individual showing
+    url('^showing/id/(?P<showing_id>\d+)/$', 'view_showing', name="single-showing-view"),
+    # All showings for a given event
+    url('^event/id/(?P<event_id>\d+)/$', 'view_event', name="single-event-view"),
+    # As above, for legacy event ID:
+    url('^event/oldid/(?P<legacy_id>\d+)/$', 'view_event', name="single-event-view-legacyid"),
+
+    # Get JSON describing events on a given (single) date:
+    url('^view/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/json$', 'view_diary_json', name="day-view-json"),
+
     # RSS feed
     url('^rss$', toolkit.diary.feeds.BasicWhatsOnFeed(), name="view-diary-rss", ),
+)
 
+urlpatterns += patterns( 'toolkit.diary.edit_views',
     # View lists of events for editing:
     url('^edit/?$', 'edit_diary_list', name="default-edit", ),
     url('^edit/(?P<year>\d{4})/?$', 'edit_diary_list', name="year-edit", ),
     url('^edit/(?P<year>\d{4})/(?P<month>\d{1,2})/?$', 'edit_diary_list', name="month-edit", ),
     url('^edit/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})', 'edit_diary_list', name="day-edit", ),
-
-    # View individual showing
-    url('^showing/id/(?P<showing_id>\d+)$', 'view_showing', name="single-showing-view"),
-    # All showings for a given event
-    url('^event/id/(?P<event_id>\d+)/$', 'view_event', name="single-event-view"),
-    # As above, for legacy event ID:
-    url('^event/oldid/(?P<legacy_id>\d+)/$', 'view_event', name="single-event-view-legacyid"),
 
     # Edit an event: view event before editing
     url('^edit/event/id/(?P<pk>\d+)/view$',
@@ -60,7 +65,5 @@ urlpatterns = patterns( 'toolkit.diary.views',
 
     # Ajax calls:
     url("^edit/setprefs$", 'set_edit_preferences', name="set_edit_preferences"),
-    url('^view/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/json$', 'view_diary_json', name="day-view-json"),
-
 )
 
