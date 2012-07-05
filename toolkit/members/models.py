@@ -11,15 +11,16 @@ from toolkit.diary.models import Role
 
 logger = logging.getLogger(__name__)
 
+
 class Member(models.Model):
 
     # This is the primary key used in the old perl/bdb system, used as the
-    # user-facing membership number (rather than using the private key). 
+    # user-facing membership number (rather than using the private key).
     # Defaults to = pk. Note; not actually a number!
     number = models.CharField(max_length=10, editable=False)
 
     name = models.CharField(max_length=64)
-    email = models.CharField(max_length=64, blank=True, null=True) # , unique=True)
+    email = models.CharField(max_length=64, blank=True, null=True)  # , unique=True)
 
     address = models.CharField(max_length=128, blank=True, null=True)
     posttown = models.CharField(max_length=64, blank=True, null=True)
@@ -73,7 +74,7 @@ class Volunteer(models.Model):
 
     portrait = models.ImageField(upload_to="volunteers", max_length=256, null=True, blank=True)
     portrait_thumb = models.ImageField(upload_to="volunteers_thumbnails", max_length=256,
-                                                         null=True, blank=True, editable=False)
+                                       null=True, blank=True, editable=False)
 
     # Roles
     roles = models.ManyToManyField(Role, db_table='Volunteer_Roles', blank=True)
@@ -143,7 +144,7 @@ class Volunteer(models.Model):
             return
         try:
             image.thumbnail(settings.THUMBNAIL_SIZE, PIL.Image.ANTIALIAS)
-        except MemoryError :
+        except MemoryError:
             logger.error("Out of memory trying to create thumbnail for {0}".format(self.portrait))
 
         thumb_file = os.path.join(settings.MEDIA_ROOT, "volunteers_thumbnails", os.path.basename(str(self.portrait)))
@@ -152,7 +153,7 @@ class Volunteer(models.Model):
         if os.path.splitext(thumb_file.lower())[1] not in (u'.jpg', u'.jpeg'):
             thumb_file += ".jpg"
         try:
-            # Convert image to RGB (can't save Paletted images as jpgs) and 
+            # Convert image to RGB (can't save Paletted images as jpgs) and
             # save thumbnail as JPEG:
             image.convert("RGB").save(thumb_file, "JPEG")
             logger.info("Generated thumbnail portrait for volunteer '%s' in file '%s'", self.pk, thumb_file)
@@ -166,4 +167,3 @@ class Volunteer(models.Model):
             return
         self.portrait_thumb = os.path.relpath(thumb_file, settings.MEDIA_ROOT)
         self.save(update_portrait_thumbnail=False)
-

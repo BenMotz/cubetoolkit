@@ -7,6 +7,7 @@ from django.core.urlresolvers import reverse
 
 from toolkit.diary.models import Showing
 
+
 class BasicWhatsOnFeed(Feed):
     # Generate a, err, basic "What's on" feed. Defines various methods that hook
     # into the django magic...
@@ -16,7 +17,7 @@ class BasicWhatsOnFeed(Feed):
     link = "/diary"
 
     def items(self):
-        startdate = datetime.date.today() #datetime.datetime.now()
+        startdate = datetime.date.today()  # datetime.datetime.now()
         enddate = startdate + datetime.timedelta(days=self.DAYS_AHEAD)
         showings = (Showing.objects.filter(confirmed=True)
                                    .filter(hide_in_programme=False)
@@ -35,4 +36,4 @@ class BasicWhatsOnFeed(Feed):
 
     def item_link(self, showing):
         # Add the showing ID at the end to ensure that this link is unique (cf. RSS spec)
-        return reverse("single-event-view", kwargs={ 'event_id' : showing.event_id }) + "#" + str(showing.pk)
+        return reverse("single-event-view", kwargs={'event_id': showing.event_id}) + "#" + str(showing.pk)

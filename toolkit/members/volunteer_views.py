@@ -18,7 +18,7 @@ logger.setLevel(logging.DEBUG)
 @require_read_auth
 def view_volunteer_list(request):
     # Get all volunteers, sorted by name:
-    volunteers = Volunteer.objects.filter(active = True).order_by('member__name').select_related()
+    volunteers = Volunteer.objects.filter(active=True).order_by('member__name').select_related()
 
     # Build dict of volunteer pk -> list of role names
     # and dict of role names -> volunteer names
@@ -26,7 +26,7 @@ def view_volunteer_list(request):
     vol_role_map = {}
     role_vol_map = {}
     # Query for active volunteers, sorted by name
-    volunteer_query = (Role.objects.filter(volunteer__active = True)
+    volunteer_query = (Role.objects.filter(volunteer__active=True)
                                    .values_list('name', 'volunteer__id', 'volunteer__member__name')
                                    .order_by('volunteer__member__name', 'name'))
 
@@ -40,25 +40,27 @@ def view_volunteer_list(request):
     # but that's fine)
 
     context = {
-            'volunteers' : volunteers,
-            'vol_role_map' : vol_role_map,
-            'role_vol_map' : role_vol_map,
-            'default_mugshot' : settings.DEFAULT_MUGSHOT,
+        'volunteers': volunteers,
+        'vol_role_map': vol_role_map,
+        'role_vol_map': role_vol_map,
+        'default_mugshot': settings.DEFAULT_MUGSHOT,
     }
     return render_to_response('volunteer_list.html', context)
+
 
 def select_volunteer(request, active=True):
     # This view is called to retire / unretire a volunteer. It presents a list
     # of all volunteer names and a button. If the view is called with "action=retire"
-    # in the query then it shows a "retire" button linked to the# retire url, and 
+    # in the query then it shows a "retire" button linked to the# retire url, and
     # if it's called with "action=unretire" it shows  a link to the unretire url.
     #
     # The selection of volunteers (retired vs unretired) is decided by the "active"
     # parameter to this method, which is set by the url route, depending on which
     # view was used. This is probably not the simplest way to do this...
-    action_urls = { 'retire' : reverse('inactivate-volunteer'),
-                    'unretire' : reverse('activate-volunteer'),
-                  }
+    action_urls = {
+        'retire': reverse('inactivate-volunteer'),
+        'unretire': reverse('activate-volunteer'),
+    }
 
     action = request.GET.get('action', None)
     if action not in action_urls:
@@ -66,15 +68,16 @@ def select_volunteer(request, active=True):
         raise Http404('Invalid action')
 
     active = bool(active)
-    volunteers = Volunteer.objects.filter(active = active).order_by('member__name').select_related()
+    volunteers = Volunteer.objects.filter(active=active).order_by('member__name').select_related()
 
     context = {
-            'volunteers' : volunteers,
-            'action' : action,
-            'action_url' : action_urls[action],
-            }
+        'volunteers': volunteers,
+        'action': action,
+        'action_url': action_urls[action],
+    }
 
     return render(request, 'select_volunteer.html', context)
+
 
 def activate_volunteer(request, active=True):
     # Sets the 'active' value for the volunteer with the id passed  in the
@@ -93,6 +96,7 @@ def activate_volunteer(request, active=True):
     vol.save()
 
     return HttpResponseRedirect(reverse("view-volunteer-list"))
+
 
 @require_write_auth
 def edit_volunteer(request, member_id, create_new=False):
@@ -126,9 +130,9 @@ def edit_volunteer(request, member_id, create_new=False):
             updated_volunteer = vol_form.save(commit=False)
             # Form doesn't automatically handle role mapping, so do it manually. First get
             # list of volunteer roles from post:
-            roles_from_form = set( int(role, 10) for role in request.POST.getlist('vol-roles') )
+            roles_from_form = set(int(role, 10) for role in request.POST.getlist('vol-roles'))
             # Now get list of roles volunteer already has:
-            existing_roles = set( r[0] for r in updated_volunteer.roles.all().values_list('id') )
+            existing_roles = set(r[0] for r in updated_volunteer.roles.all().values_list('id'))
             # Ensure all roles listed on form are added
             updated_volunteer.roles.add(*roles_from_form)
             # Any roles in existing_roles but not in list from form should be removed:
@@ -149,12 +153,10 @@ def edit_volunteer(request, member_id, create_new=False):
         vol_form = toolkit.members.forms.VolunteerForm(prefix="vol", instance=volunteer)
         mem_form = toolkit.members.forms.MemberForm(prefix="mem", instance=volunteer.member)
 
-
     context = {
-            'pagetitle' : 'Add Volunteer' if create_new else 'Edit Volunteer',
-            'volunteer' : volunteer,
-            'vol_form' : vol_form,
-            'mem_form' : mem_form,
-            }
+        'pagetitle': 'Add Volunteer' if create_new else 'Edit Volunteer',
+        'volunteer': volunteer,
+        'vol_form': vol_form,
+        'mem_form': mem_form,
+    }
     return render(request, 'form_volunteer.html', context)
-

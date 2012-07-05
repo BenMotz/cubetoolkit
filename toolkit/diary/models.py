@@ -9,6 +9,7 @@ import django.conf
 
 logger = logging.getLogger(__name__)
 
+
 class Role(models.Model):
     name = models.CharField(max_length=64, unique=True)
     description = models.CharField(max_length=64, null=True, blank=True)
@@ -23,6 +24,7 @@ class Role(models.Model):
     def __unicode__(self):
         return self.name
 
+
 class MediaItem(models.Model):
     """Media (eg. video, audio, html fragment?). Currently to be assoicated
     with events, in future with other things?"""
@@ -32,7 +34,7 @@ class MediaItem(models.Model):
 
     thumbnail = models.ImageField(upload_to="diary_thumbnails", max_length=256, null=True, blank=True, editable=False)
     credit = models.CharField(max_length=256, null=True, blank=True,
-                                                            default="Internet scavenged", verbose_name='Image credit')
+                              default="Internet scavenged", verbose_name='Image credit')
     caption = models.CharField(max_length=256, null=True, blank=True)
 
     class Meta:
@@ -55,7 +57,7 @@ class MediaItem(models.Model):
     def autoset_mimetype(self):
         # See lib/python2.7/site-packages/django/forms/fields.py for how to do
         # basic validation of PNGs / JPEGs
-#        logging.info("set mimetype: '{0}'".format(self.media_file))
+        # logging.info("set mimetype: '{0}'".format(self.media_file))
         if self.media_file and self.media_file != '':
             magic_wrapper = magic.Magic(mime=True)
             try:
@@ -84,14 +86,14 @@ class MediaItem(models.Model):
             return
         try:
             image.thumbnail(django.conf.settings.THUMBNAIL_SIZE, PIL.Image.ANTIALIAS)
-        except MemoryError :
+        except MemoryError:
             logging.error("Out of memory trying to create thumbnail for {0}".format(self.media_file))
 
         thumb_file = os.path.join(
-                                  django.conf.settings.MEDIA_ROOT,
-                                  "diary_thumbnails",
-                                  os.path.basename(str(self.media_file))
-                                  )
+            django.conf.settings.MEDIA_ROOT,
+            "diary_thumbnails",
+            os.path.basename(str(self.media_file))
+        )
         # Make sure thumbnail file ends in jpg, to avoid confusion:
         if os.path.splitext(thumb_file.lower())[1] not in (u'.jpg', u'.jpeg'):
             thumb_file += ".jpg"
@@ -109,6 +111,7 @@ class MediaItem(models.Model):
             return
         self.thumbnail = os.path.relpath(thumb_file, django.conf.settings.MEDIA_ROOT)
         self.save(update_thumbnail=False)
+
 
 class EventTag(models.Model):
     name = models.CharField(max_length=32, unique=True)
@@ -144,8 +147,8 @@ class Event(models.Model):
     # This is the primary key used in the old perl/bdb system
     legacy_id = models.CharField(max_length=256, null=True, editable=False)
 
-    template = models.ForeignKey('EventTemplate', verbose_name='Event Type', 
-                                                                    related_name='template', null=True, blank=True)
+    template = models.ForeignKey('EventTemplate', verbose_name='Event Type',
+                                 related_name='template', null=True, blank=True)
     tags = models.ManyToManyField(EventTag, db_table='Event_Tags', blank=True)
 
     duration = models.TimeField(null=True)
@@ -176,6 +179,7 @@ class Event(models.Model):
             for tag in self.template.tags.all():
                 self.tags.add(tag)
 
+
 class Showing(models.Model):
 
     event = models.ForeignKey('Event', related_name='showings')
@@ -205,7 +209,7 @@ class Showing(models.Model):
 
     def __unicode__(self):
         if self.start is not None and self.id is not None and self.event is not None:
-            return "%s - %s (%d)" % (self.start.strftime("%H:%M %d/%m/%y"), self.event.name, self.id) 
+            return "%s - %s (%d)" % (self.start.strftime("%H:%M %d/%m/%y"), self.event.name, self.id)
         else:
             return "[uninitialised]"
 
@@ -237,8 +241,10 @@ class DiaryIdea(models.Model):
 
     class Meta:
         db_table = 'DiaryIdeas'
+
     def __unicode__(self):
         return "%d/%d" % (self.month.month, self.month.year)
+
 
 class EventTemplate(models.Model):
 
@@ -257,6 +263,7 @@ class EventTemplate(models.Model):
 
     def __unicode__(self):
         return self.name
+
 
 class RotaEntry(models.Model):
 
@@ -293,4 +300,3 @@ class RotaEntry(models.Model):
             self.required = template.required
             self.rank = template.rank
             logger.info("Cloning rota entry from existing rota entry with role_id %d", template.role.pk)
-

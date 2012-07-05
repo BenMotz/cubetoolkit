@@ -25,13 +25,14 @@ from toolkit.diary.daterange import get_date_range
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
+
 def _return_to_editindex(request):
     # If the user has set the 'popup' preference, then close the popup
     # and reload the page that opened the popup. Otherwise just redirect to
     # the index.
     #
     prefs = toolkit.diary.edit_prefs.get_preferences(request.session)
-    if prefs['popups'] == True:
+    if prefs['popups'] is True:
         # Use a really, really dirty way to emulate the original functionality and
         # close the popped up window: return a hard-coded page that contains
         # javacsript to close the open window and reload the source page.
@@ -43,6 +44,7 @@ def _return_to_editindex(request):
         # Redirect to edit index
         return HttpResponseRedirect(reverse("default-edit"))
 
+
 @require_read_or_write_auth
 def edit_diary_list(request, year=None, day=None, month=None):
     # Basic "edit" list view. Logic about processing of year/month/day
@@ -52,7 +54,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
     # and 'ideas' fields in the range, even if they don't have any events in
     # them, yet.
 
-    context = { }
+    context = {}
     # Sort out date range to display
     query_days_ahead = request.GET.get('daysahead', None)
     # utility function, shared with public diary view
@@ -65,16 +67,17 @@ def edit_diary_list(request, year=None, day=None, month=None):
         # Change startdate to today:
         startdate = datetime.date.today()
         # Redirect to the correct page:
-        new_url = ("%s?daysahead=%d" %
-                    (reverse('day-edit', kwargs={
-                               'year' : startdate.year,
-                               'month' : startdate.month,
-                               'day' : startdate.day}),
-                     days_ahead))
+        new_url = "{0}?daysahead={1}".format(
+            reverse('day-edit', kwargs={
+                'year': startdate.year,
+                'month': startdate.month,
+                'day': startdate.day
+            }),
+            days_ahead
+        )
         return HttpResponseRedirect(new_url)
 
     enddate = startdate + datetime.timedelta(days=days_ahead)
-
 
     # Get all showings in the date range
     showings = Showing.objects.filter(start__range=[startdate, enddate]).order_by('start').select_related()
@@ -84,7 +87,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
     # This is done so that if dates don't have ideas/showings they still get
     # shown in the list
     dates = OrderedDict()
-    ideas = {startdate : ''} # Actually, I lied: start of visible list is not
+    ideas = {startdate: ''}  # Actually, I lied: start of visible list is not
                              # neccesarily the 1st of the month, so make sure
                              # that it gets an 'IDEAS' link shown
     for days in xrange(days_ahead):
@@ -123,6 +126,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
     context['edit_prefs'] = toolkit.diary.edit_prefs.get_preferences(request.session)
     return render_to_response('edit_event_index.html', context)
 
+
 def set_edit_preferences(request):
     # Store user preferences as specified in the request's GET variables,
     # and return a JSON object containing all current user preferences
@@ -132,6 +136,7 @@ def set_edit_preferences(request):
     # Retrieve and return prefs:
     prefs = toolkit.diary.edit_prefs.get_preferences(request.session)
     return HttpResponse(json.dumps(prefs), mimetype="application/json")
+
 
 @require_read_or_write_auth
 def add_showing(request, event_id):
@@ -145,7 +150,7 @@ def add_showing(request, event_id):
     # form_showing.html
 
     if request.method != 'POST':
-        return HttpResponse('Invalid request!', 405) # 405 = Method not allowed
+        return HttpResponse('Invalid request!', 405)  # 405 = Method not allowed
 
     copy_from = request.GET.get('copy_from', None)
     try:
@@ -179,13 +184,14 @@ def add_showing(request, event_id):
             showing = get_object_or_404(Showing, pk=copy_from)
             showing_form = toolkit.diary.forms.ShowingForm(instance=showing)
             context = {
-                    'showing' : showing,
-                    'form' : showing_form,
-                    'new_showing_form' : form,
-                    }
+                'showing': showing,
+                'form': showing_form,
+                'new_showing_form': form,
+            }
             return render(request, 'form_showing.html', context)
         else:
             return HttpResponse("Failed adding showing", status=400)
+
 
 @require_write_auth
 def add_event(request):
@@ -228,7 +234,7 @@ def add_event(request):
         else:
             # If form was not valid, re-render the form (which will highlight
             # errors)
-            context = { 'form' : form }
+            context = {'form': form}
             return render(request, 'form_new_event_and_showing.html', context)
 
     elif request.method == 'GET':
@@ -236,7 +242,7 @@ def add_event(request):
         # Marshal date out of the GET request:
         date = request.GET.get('date', datetime.date.today().strftime("%d-%m-%Y"))
         date = date.split("-")
-        assert(len(date) == 3) # Should probably do this better
+        assert(len(date) == 3)  # Should probably do this better
         try:
             date[0] = int(date[0], 10)
             date[1] = int(date[1], 10)
@@ -245,11 +251,12 @@ def add_event(request):
         except (ValueError, TypeError):
             return HttpResponse("Illegal date", status=400)
         # Create form, render template:
-        form = toolkit.diary.forms.NewEventForm(initial={'start' : event_start})
-        context = { 'form' : form }
+        form = toolkit.diary.forms.NewEventForm(initial={'start': event_start})
+        context = {'form': form}
         return render(request, 'form_new_event_and_showing.html', context)
     else:
         return HttpResponse("Illegal method", status=405)
+
 
 @require_write_auth
 def edit_showing(request, showing_id=None):
@@ -265,14 +272,14 @@ def edit_showing(request, showing_id=None):
             modified_showing.save()
             # Now get list of selected roles;
             selected_roles = dict(request.POST)['roles']
-            initial_set = set( r.values()[0] for r in showing.rotaentry_set.values('role_id'))
+            initial_set = set(r.values()[0] for r in showing.rotaentry_set.values('role_id'))
             # For each id, this will get the entry or create it:
             for role_id in selected_roles:
                 role_id = int(role_id)
-                modified_showing.rotaentry_set.get_or_create(role_id = role_id)
+                modified_showing.rotaentry_set.get_or_create(role_id=role_id)
                 initial_set.discard(role_id)
             # Now remove any roles that we haven't seen:
-            modified_showing.rotaentry_set.filter(role__in = initial_set).delete()
+            modified_showing.rotaentry_set.filter(role__in=initial_set).delete()
 
             return _return_to_editindex(request)
     else:
@@ -285,12 +292,13 @@ def edit_showing(request, showing_id=None):
     new_showing_form = toolkit.diary.forms.NewShowingForm(instance=new_showing_template)
 
     context = {
-            'showing' : showing,
-            'form' : form,
-            'new_showing_form' : new_showing_form,
-            }
+        'showing': showing,
+        'form': form,
+        'new_showing_form': new_showing_form,
+    }
 
     return render(request, 'form_showing.html', context)
+
 
 def _edit_event_handle_post(request, event_id):
     # Handle POSTing of the "edit event" form. The surprising level of
@@ -381,10 +389,10 @@ def _edit_event_handle_post(request, event_id):
         return _return_to_editindex(request)
     # Got here if there's a form validation error:
     context = {
-            'event' : event,
-            'form' : form,
-            'media_form' : media_form,
-            }
+        'event': event,
+        'form': form,
+        'media_form': media_form,
+    }
     return render(request, 'form_event.html', context)
 
 
@@ -409,12 +417,13 @@ def edit_event(request, event_id=None):
     media_form = toolkit.diary.forms.MediaItemForm(instance=media_item)
 
     context = {
-            'event' : event,
-            'form' : form,
-            'media_form' : media_form,
-            }
+        'event': event,
+        'form': form,
+        'media_form': media_form,
+    }
 
     return render(request, 'form_event.html', context)
+
 
 @require_write_auth
 def edit_ideas(request, year=None, month=None):
@@ -453,6 +462,7 @@ def delete_showing(request, showing_id):
 
     return _return_to_editindex(request)
 
+
 @require_read_or_write_auth
 def view_event_field(request, field, year, month, day):
     # Method shared across various (slightly primitive) views into event data;
@@ -481,15 +491,16 @@ def view_event_field(request, field, year, month, day):
         logging.info("Search term: {0}".format(search))
         # Note slightly sneaky use of **; this effectively results in a method
         # call like: showings.filter(event__copy__icontaings=search)
-        showings = showings.filter(**{ 'event__' + field + '__icontains' : search })
+        showings = showings.filter(**{'event__' + field + '__icontains': search})
     context = {
-            'start_date' : start_date,
-            'end_date' : end_date,
-            'showings': showings,
-            'event_field' : field,
-            }
+        'start_date': start_date,
+        'end_date': end_date,
+        'showings': showings,
+        'event_field': field,
+    }
 
     return render_to_response('view_{0}.html'.format(field), context)
+
 
 @require_write_auth
 def edit_event_templates(request):
@@ -509,9 +520,10 @@ def edit_event_templates(request):
             formset = event_template_formset()
     else:
         formset = event_template_formset()
-    context = { 'formset' : formset }
+    context = {'formset': formset}
 
     return render(request, 'edit_event_templates.html', context)
+
 
 @require_write_auth
 def edit_event_tags(request):
@@ -522,7 +534,7 @@ def edit_event_tags(request):
     tags = EventTag.objects.all()
 
     if request.method != 'POST':
-        context = { 'tags' : tags}
+        context = {'tags': tags}
         return render(request, 'edit_event_tags.html', context)
     # Data was posted
 
@@ -540,7 +552,7 @@ def edit_event_tags(request):
             tags_submitted[int(m.group(1), 10)] = val.strip().lower()
 
     # Build dict of existing tags:
-    tags_by_pk = dict( (tag.pk, tag) for tag in tags )
+    tags_by_pk = dict((tag.pk, tag) for tag in tags)
     # Now update / add as appropriate. Any tag keys that aren't included in
     # the update are deleted.
     for submitted_pk, submitted_name in tags_submitted.iteritems():
@@ -551,7 +563,7 @@ def edit_event_tags(request):
                 extant_tag.delete()
             elif extant_tag.name != submitted_name:
                 logger.info("Changing name of tag id {0} from {1} to {2}"
-                                        .format(extant_tag.pk, extant_tag.name, submitted_name))
+                            .format(extant_tag.pk, extant_tag.name, submitted_name))
                 extant_tag.name = submitted_name
                 extant_tag.save()
         elif extant_tag is None:
@@ -567,6 +579,7 @@ def edit_event_tags(request):
         logger.error("Tag(s) {0} not included in update".format(",".join(tags_by_pk.values())))
 
     return HttpResponse("OK")
+
 
 def _render_mailout_body(days_ahead=7):
     # Render default mail contents;
@@ -586,26 +599,28 @@ def _render_mailout_body(days_ahead=7):
     mail_template = django.template.loader.get_template("mailout_body.txt")
 
     context = {
-            'start_date' : start_date,
-            'end_date' : end_date,
-            'showings': showings,
-            }
+        'start_date': start_date,
+        'end_date': end_date,
+        'showings': showings,
+    }
 
     return mail_template.render(django.template.Context(context))
 
+
 def _render_mailout_form(request, body_text, subject_text):
-    form = toolkit.diary.forms.MailoutForm(initial={'subject' : subject_text, 'body' : body_text})
+    form = toolkit.diary.forms.MailoutForm(initial={'subject': subject_text, 'body': body_text})
     email_count = (toolkit.members.models.Member.objects.filter(email__isnull=False)
-                                                        .exclude(email = '')
+                                                        .exclude(email='')
                                                         .exclude(mailout_failed=True)
                                                         .filter(mailout=True)
                                                         .count())
     context = {
-            'form' : form,
-            'email_count' : email_count,
-            }
+        'form': form,
+        'email_count': email_count,
+    }
 
     return render(request, 'form_mailout.html', context)
+
 
 def mailout(request):
     if request.method == 'GET':
@@ -616,6 +631,5 @@ def mailout(request):
     elif request.method == 'POST':
         form = toolkit.diary.forms.MailoutForm(request.POST)
         if not form.is_valid():
-            return render(request, 'form_mailout.html', { 'form' : form})
+            return render(request, 'form_mailout.html', {'form': form})
         return HttpResponse("Todo!", mimetype="text/plain")
-

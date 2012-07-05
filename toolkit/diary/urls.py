@@ -4,7 +4,9 @@ from toolkit.diary.models import Event
 import toolkit.diary.feeds
 
 
-urlpatterns = patterns( 'toolkit.diary.public_views',
+urlpatterns = patterns(
+    'toolkit.diary.public_views',
+
     # View lists of event for various time/dates
     url('^(?:view/|)$', 'view_diary', name="default-view"),
     url('^view/(?P<event_type>[\w-]{4,})/$', 'view_diary', name="type-view"),
@@ -26,7 +28,9 @@ urlpatterns = patterns( 'toolkit.diary.public_views',
     url('^rss/$', toolkit.diary.feeds.BasicWhatsOnFeed(), name="view-diary-rss", ),
 )
 
-urlpatterns += patterns( 'toolkit.diary.edit_views',
+urlpatterns += patterns(
+    'toolkit.diary.edit_views',
+
     # View lists of events for editing:
     url('^edit/?$', 'edit_diary_list', name="default-edit", ),
     url('^edit/(?P<year>\d{4})/?$', 'edit_diary_list', name="year-edit", ),
@@ -35,9 +39,10 @@ urlpatterns += patterns( 'toolkit.diary.edit_views',
 
     # Edit an event: view event before editing
     url('^edit/event/id/(?P<pk>\d+)/view/$',
-            DetailView.as_view(
-                model=Event,
-                template_name='view_event_privatedetails.html'), name="edit-event-details-view"),
+        DetailView.as_view(
+            model=Event,
+            template_name='view_event_privatedetails.html'), name="edit-event-details-view"
+        ),
     # Edit an event
     url('^edit/event/id/(?P<event_id>\d+)/$', 'edit_event', name="edit-event-details"),
     # Edit a showing (includes delete / add a new showing)
@@ -60,11 +65,10 @@ urlpatterns += patterns( 'toolkit.diary.edit_views',
     # (ie needs at least year/month, not just a year)
     # View rota
     url("""^(?P<field>rota|copy|terms)(/|/(?P<year>\d{4})/(?P<month>\d{1,2})/?(?P<day>(?<=/)\d{0,2})?/?)?$""",
-                                                                    'view_event_field', name="view_event_field"),
+        'view_event_field', name="view_event_field"),
 
     url("^mailout/$", 'mailout', name="members-mailout"),
 
     # Ajax calls:
     url("^edit/setprefs$", 'set_edit_preferences', name="set_edit_preferences"),
 )
-

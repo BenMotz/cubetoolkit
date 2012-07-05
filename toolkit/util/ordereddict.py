@@ -238,7 +238,7 @@ class OrderedDict(dict):
 
         '''
         if isinstance(other, OrderedDict):
-            return len(self)==len(other) and self.items() == other.items()
+            return len(self) == len(other) and self.items() == other.items()
         return dict.__eq__(self, other)
 
     def __ne__(self, other):
@@ -258,4 +258,3 @@ class OrderedDict(dict):
         "od.viewitems() -> a set-like object providing a view on od's items"
         return ItemsView(self)
 ## end of http://code.activestate.com/recipes/576693/ }}}
-

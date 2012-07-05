@@ -12,14 +12,16 @@ import toolkit.auth.check as check
 
 logger = logging.getLogger(__name__)
 
+
 class AuthForm(forms.Form):
     username = forms.CharField(required=True)
     password = forms.CharField(required=True, widget=forms.PasswordInput)
 
+
 def auth(request, atype):
     auth_types = atype.split(',')
     form = None
-    context = { 'atype' : atype, }
+    context = {'atype': atype}
     logger.debug("Requesting authorisation type: %s", str(atype))
 
     # Valid request?
@@ -32,7 +34,7 @@ def auth(request, atype):
     authorised = check._has_auth_any(request, auth_types)
 
     # Not authorised, and credentials have been submitted:
-    if request.method == 'POST' and authorised == False:
+    if request.method == 'POST' and authorised is False:
         form = AuthForm(request.POST)
         if form.is_valid():
             check._set_auth_from_credentials(request, form.cleaned_data['username'], form.cleaned_data['password'])
@@ -51,6 +53,7 @@ def auth(request, atype):
         context['form'] = form or AuthForm()
         return render_to_response('form_auth.html', RequestContext(request, context))
 
+
 def clear_auth(request):
     logger.info("Logging out")
     request.session.pop('write_auth', None)
@@ -63,4 +66,3 @@ def clear_auth(request):
     else:
         # If not, very bare confirmation:
         return HttpResponse("<html><head><title>Logged out</title></head><body><h1>Logged out</h1></body></html>")
-

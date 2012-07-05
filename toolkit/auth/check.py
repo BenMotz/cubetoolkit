@@ -5,6 +5,7 @@ import django.conf
 
 logger = logging.getLogger(__name__)
 
+
 def _check_credentials(user, password, authtype):
     """Check the username and password against the supplied authtype.
     authtype is expected to be a tuple:
@@ -26,6 +27,7 @@ def _check_credentials(user, password, authtype):
         logger.info("Login failed")
         return False
 
+
 def _set_auth_from_credentials(request, user, password):
     """For the given user/password, set session variables
     for all auth types that match
@@ -34,6 +36,7 @@ def _set_auth_from_credentials(request, user, password):
         if _check_credentials(user, password, credentials):
             session_key = credentials + '_auth'
             request.session[session_key] = True
+
 
 def _has_auth_any(request, auth_types):
     """Accepts string list/tuple 'auth_types', and checks if the user session
@@ -45,6 +48,7 @@ def _has_auth_any(request, auth_types):
         session_key = auth_type + '_auth'
         auth = auth or request.session.get(session_key, False)
     return auth
+
 
 def _has_auth_all(request, auth_types):
     """Accepts string list/tuple 'auth_types', and checks if the user session

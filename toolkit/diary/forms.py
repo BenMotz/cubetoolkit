@@ -2,31 +2,33 @@ import datetime
 from django import forms
 import toolkit.diary.models
 
+
 class DiaryIdeaForm(forms.ModelForm):
     class Meta(object):
         model = toolkit.diary.models.DiaryIdea
+
 
 class EventForm(forms.ModelForm):
     class Meta(object):
         model = toolkit.diary.models.Event
         # Ensure soft wrapping is set for textareas:
         widgets = {
-                'copy': forms.Textarea(attrs={'wrap':'soft'}),
-                'copy_summary': forms.Textarea(attrs={'wrap':'soft'}),
-                'terms': forms.Textarea(attrs={'wrap':'soft'}),
-                'notes': forms.Textarea(attrs={'wrap':'soft'}),
-                  }
-        order = ( 'tags', )
-        fields = ( 'name', 'tags', 'duration', 'cancelled', 'outside_hire',
-                   'private', 'copy', 'copy_summary', 'terms', 'notes')
+            'copy': forms.Textarea(attrs={'wrap': 'soft'}),
+            'copy_summary': forms.Textarea(attrs={'wrap': 'soft'}),
+            'terms': forms.Textarea(attrs={'wrap': 'soft'}),
+            'notes': forms.Textarea(attrs={'wrap': 'soft'}),
+        }
+        order = ('tags', )
+        fields = ('name', 'tags', 'duration', 'cancelled', 'outside_hire',
+                  'private', 'copy', 'copy_summary', 'terms', 'notes')
 
 
 class MediaItemForm(forms.ModelForm):
     class Meta(object):
         model = toolkit.diary.models.MediaItem
         widgets = {
-                'media_file' : forms.ClearableFileInput(attrs={'accept':'image/jpeg,image/gif,image/png'}),
-                  }
+            'media_file': forms.ClearableFileInput(attrs={'accept': 'image/jpeg,image/gif,image/png'}),
+        }
         exclude = ('thumbnail', 'mimetype', 'caption')
 
 
@@ -44,6 +46,7 @@ class NewShowingForm(forms.ModelForm):
         # Exclude these for now:
         exclude = ('event', 'extra_copy', 'extra_copy_summary', 'roles')
 
+
 class NewEventForm(forms.Form):
     start = forms.DateTimeField(required=True)
     duration = forms.TimeField(required=True, initial=datetime.time(hour=1))
@@ -56,7 +59,7 @@ class NewEventForm(forms.Form):
     confirmed = forms.BooleanField(required=False)
     discounted = forms.BooleanField(required=False)
 
+
 class MailoutForm(forms.Form):
     subject = forms.CharField(max_length=128, required=True)
-    body = forms.CharField(required=True, widget=forms.Textarea(attrs={'wrap' : 'soft', 'cols' : 80}))
-
+    body = forms.CharField(required=True, widget=forms.Textarea(attrs={'wrap': 'soft', 'cols': 80}))

@@ -3,7 +3,7 @@ import logging
 from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404, render
 from django.db.models import Q
-import django.db # Used for raw query for stats
+import django.db  # Used for raw query for stats
 from django.core.urlresolvers import reverse
 
 from toolkit.auth.decorators import require_read_auth, require_write_auth
@@ -14,9 +14,10 @@ from toolkit.members.models import Member
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
+
 def add_member(request):
     # If this view is called with GET then display the form to enter a new
-    # member. If called with POST then take parameters out of the body of 
+    # member. If called with POST then take parameters out of the body of
     # the request and create a new member
     message = None
     if request.method == 'POST':
@@ -38,10 +39,11 @@ def add_member(request):
         form = toolkit.members.forms.NewMemberForm()
 
     context = {
-        'form' : form,
-        'message' : message,
+        'form': form,
+        'message': message,
     }
     return render(request, 'form_new_member.html', context)
+
 
 @require_read_auth
 def search(request):
@@ -52,22 +54,22 @@ def search(request):
     print show_edit_link, show_delete_link
 
     if search_terms:
-        results = Member.objects.filter(  Q(name__icontains = search_terms)
-                                        | Q(email__icontains = search_terms)
-                                        | Q(number = search_terms)
+        results = Member.objects.filter(  Q(name__icontains=search_terms)
+                                        | Q(email__icontains=search_terms)
+                                        | Q(number=search_terms)
                                        ).order_by('name')
         context = {
-                'search_terms' : search_terms,
-                'members' : results,
-                'show_edit_link' : show_edit_link,
-                'show_delete_link' : show_delete_link,
-                }
+            'search_terms': search_terms,
+            'members': results,
+            'show_edit_link': show_edit_link,
+            'show_delete_link': show_delete_link,
+        }
         return render(request, 'search_members_results.html', context)
 
     context = {
-            'show_edit_link' : show_edit_link,
-            'show_delete_link' : show_delete_link,
-            }
+        'show_edit_link': show_edit_link,
+        'show_delete_link': show_delete_link,
+    }
     return render_to_response('search_members.html', context)
 
 
@@ -75,15 +77,17 @@ def search(request):
 def view(request, member_id):
     # Is this view actually used?
     member = get_object_or_404(Member, id=member_id)
-    return render(request, 'view_member.html', { 'member' : member })
+    return render(request, 'view_member.html', {'member': member})
+
 
 @require_write_auth
 def delete_member(request, member_id):
     member = get_object_or_404(Member, id=member_id)
     if request.method == 'POST':
-        member.delete() # This will delete associated volunteer record, if any
+        member.delete()  # This will delete associated volunteer record, if any
 
     return HttpResponseRedirect(reverse("search-members"))
+
 
 @require_write_auth
 def edit_member(request, member_id):
@@ -99,12 +103,12 @@ def edit_member(request, member_id):
     else:
         form = toolkit.members.forms.MemberForm(instance=member)
 
-
     context = {
-            'member' : member,
-            'form' : form,
-            }
+        'member': member,
+        'form': form,
+    }
     return render(request, 'form_member.html', context)
+
 
 @require_read_auth
 def member_statistics(request):
@@ -114,64 +118,63 @@ def member_statistics(request):
     cursor = django.db.connection.cursor()
     # Get 10 most popular email domains:
     cursor.execute("SELECT "
-                      "SUBSTRING_INDEX(`email`, '@', -1) AS domain, "
-                      "COUNT(1) AS num "
+                   "   SUBSTRING_INDEX(`email`, '@', -1) AS domain, "
+                   "   COUNT(1) AS num "
                    "FROM Members "
                    "WHERE email != '' "
                    "GROUP BY domain "
                    "ORDER BY num DESC "
                    "LIMIT 10")
-    email_stats = [ row for row in cursor.fetchall() ]
+    email_stats = [row for row in cursor.fetchall()]
     cursor.close()
     cursor = django.db.connection.cursor()
     # Get 10 most popular postcode prefixes:
     cursor.execute("SELECT "
-                        "SUBSTRING_INDEX(`postcode`, ' ', 1) AS firstbit, "
-                        "COUNT(1) AS num "
+                   "    SUBSTRING_INDEX(`postcode`, ' ', 1) AS firstbit, "
+                   "     COUNT(1) AS num "
                    "FROM Members "
                    "WHERE postcode != '' "
                    "GROUP BY firstbit "
                    "ORDER BY num DESC "
                    "LIMIT 10")
-    postcode_stats = [ row for row in cursor.fetchall() ]
+    postcode_stats = [row for row in cursor.fetchall()]
     cursor.close()
 
     # Some of the simpler stats are done using the django ORM
     context = {
-            # Results of complex queries:
-            'email_stats' : email_stats,
-            'postcode_stats' : postcode_stats,
-            # Total number of members:
-            'm_count' : Member.objects.count(),
-            # Members with an email address that isn't null/blank:
-            'm_email_count' : Member.objects.filter(email__isnull=False)
-                                            .exclude(email = '')
-                                            .count(),
-            # Members with an email address that isn't null/blank, where mailout hasn't failed and they haven't unsubscribed:
-            'm_email_viable' : Member.objects.filter(email__isnull=False)
-                                              .exclude(email = '')
-                                              .exclude(mailout_failed=True)
-                                              .filter(mailout=True)
-                                              .count(),
-            # Members with an email address that isn't null/blank, where mailout hasn't failed and they have unsubscribed:
-            'm_email_unsub' : Member.objects.filter(email__isnull=False)
-                                            .exclude(email = '')
-                                            .exclude(mailout_failed=True)
-                                            .exclude(mailout=True)
-                                            .count(),
-            # Members with a postcode that isn't null / blank
-            'm_postcode' : Member.objects.filter(postcode__isnull = False)
-                                         .exclude(postcode = '')
-                                         .count(),
+        # Results of complex queries:
+        'email_stats': email_stats,
+        'postcode_stats': postcode_stats,
+        # Total number of members:
+        'm_count': Member.objects.count(),
+        # Members with an email address that isn't null/blank:
+        'm_email_count': Member.objects.filter(email__isnull=False)
+                                       .exclude(email='')
+                                       .count(),
+        # Members with an email address that isn't null/blank, where mailout hasn't failed & they haven't unsubscribed:
+        'm_email_viable': Member.objects.filter(email__isnull=False)
+                                        .exclude(email='')
+                                        .exclude(mailout_failed=True)
+                                        .filter(mailout=True)
+                                        .count(),
+        # Members with an email address that isn't null/blank, where mailout hasn't failed & they have unsubscribed:
+        'm_email_unsub': Member.objects.filter(email__isnull=False)
+                                       .exclude(email='')
+                                       .exclude(mailout_failed=True)
+                                       .exclude(mailout=True)
+                                       .count(),
+        # Members with a postcode that isn't null / blank
+        'm_postcode': Member.objects.filter(postcode__isnull=False)
+                                    .exclude(postcode='')
+                                    .count(),
     }
-
 
     return render_to_response('stats.html', context)
 
-def member_homepages(request):
-    members = (Member.objects.filter(website__isnull = False)
-                            .exclude(website = '')
-                            .order_by('number')
-                            .values('name', 'website'))
-    return render_to_response('homepages.html', { 'members' : members })
 
+def member_homepages(request):
+    members = (Member.objects.filter(website__isnull=False)
+                             .exclude(website='')
+                             .order_by('number')
+                             .values('name', 'website'))
+    return render_to_response('homepages.html', {'members': members})

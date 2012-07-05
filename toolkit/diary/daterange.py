@@ -5,6 +5,7 @@ import datetime
 
 logger = logging.getLogger(__name__)
 
+
 def get_date_range(year, month, day, user_days_ahead):
     """Support method to take fields read from HTTP request and return a tuple
     (datetime, number_of_days)
@@ -25,7 +26,7 @@ def get_date_range(year, month, day, user_days_ahead):
         return (None, "Invalid values")
 
     logger.debug("Range: day %s, month %s, year %s, span %s days",
-                                            str(day), str(month), str(year), str(user_days_ahead))
+                 str(day), str(month), str(year), str(user_days_ahead))
 
     try:
         if day:
@@ -41,7 +42,7 @@ def get_date_range(year, month, day, user_days_ahead):
                 days_ahead += 1
         else:
             startdate = datetime.date.today()
-            days_ahead = 30 # default
+            days_ahead = 30  # default
     except ValueError as vale:
         logger.error("Invalid something requested in date range: {0}".format(vale))
         return (None, "Invalid date")
@@ -53,4 +54,3 @@ def get_date_range(year, month, day, user_days_ahead):
             pass
 
     return startdate, days_ahead
-

@@ -6,15 +6,15 @@
 # hashed = bcrypt.hashpw('password', bcrypt.gensalt(12))
 # # -- adjust value in gensalt for available CPU power...)
 CUBE_AUTH = {
-        'read' : (
-            '$2a$12$2xv8/PUuYW6yQGjPOQN7l./gbny1MskLYQnlrbvZNSr1el9NprJqa', # Username
-            '$2a$12$p1Y1/08tElCxmUDSUasAAeTKzcpWhICQf8gcEdkIAL4rjUyKCWMz6'  # Password
-        ),
-        'write' : (
-            '$2a$12$re7bQximlvz0hcJCHnS.nOd11jIq.XsK8aSXTIQGFiXnIQ0WvIw5m', # Username
-            '$2a$12$kj2ftlD4U/m0z333dFixPuyvoyIohXy8hIbZDRk3TixYRtt7x/vlO'  # Password
-        ),
-        }
+    'read': (
+        '$2a$12$2xv8/PUuYW6yQGjPOQN7l./gbny1MskLYQnlrbvZNSr1el9NprJqa',  # Username
+        '$2a$12$p1Y1/08tElCxmUDSUasAAeTKzcpWhICQf8gcEdkIAL4rjUyKCWMz6'   # Password
+    ),
+    'write': (
+        '$2a$12$re7bQximlvz0hcJCHnS.nOd11jIq.XsK8aSXTIQGFiXnIQ0WvIw5m',  # Username
+        '$2a$12$kj2ftlD4U/m0z333dFixPuyvoyIohXy8hIbZDRk3TixYRtt7x/vlO'   # Password
+    ),
+}
 
 # Slightly arbitrary (inherited) bounding box for thumbnails
 THUMBNAIL_SIZE = (250, 187)
@@ -61,7 +61,7 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.db.backends.mysql',  # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'
         'NAME': 'cube',                      # Or path to database file if using sqlite3.
         'USER': 'cube',                      # Not used with sqlite3.
         'PASSWORD': 'hialpabg',                  # Not used with sqlite3.
@@ -87,7 +87,7 @@ SITE_ID = 1
 
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
-USE_I18N = False #True
+USE_I18N = False  # True
 
 # If you set this to False, Django will not format dates, numbers and
 # calendars according to the current locale
@@ -130,7 +130,7 @@ STATICFILES_DIRS = (
 STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.FileSystemFinder',
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
-#    'django.contrib.staticfiles.finders.DefaultStorageFinder',
+    # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
 # Make this unique, and don't share it with anybody.
@@ -140,7 +140,7 @@ SECRET_KEY = 's62e_vyvEh+asx_v!85p&r*9n$46_8w3q%51*ceg=-zcnd9mhu'
 TEMPLATE_LOADERS = (
     'django.template.loaders.filesystem.Loader',
     'django.template.loaders.app_directories.Loader',
-#     'django.template.loaders.eggs.Loader',
+    # 'django.template.loaders.eggs.Loader',
 )
 
 MIDDLEWARE_CLASSES = (
@@ -176,7 +176,6 @@ INSTALLED_APPS = (
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
-#    'south',
+    # 'south',
     'django.contrib.markup',
 )
-
