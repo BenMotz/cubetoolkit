@@ -10,9 +10,9 @@ import django.conf
 logger = logging.getLogger(__name__)
 
 class Role(models.Model):
-    name = models.CharField(max_length=64, blank=False, unique=True)
-    description = models.CharField(max_length=64, null=True)
-    shortcode = models.CharField(max_length=8, null=True, unique=True)
+    name = models.CharField(max_length=64, unique=True)
+    description = models.CharField(max_length=64, null=True, blank=True)
+    shortcode = models.CharField(max_length=8, null=True, blank=True, unique=True)
 
     # Can this role be added to the rota?
     rota = models.BooleanField(default=False)
@@ -28,11 +28,16 @@ class MediaItem(models.Model):
     with events, in future with other things?"""
 
     media_file = models.FileField(upload_to="diary", max_length=256, null=True, blank=True, verbose_name='Image file')
-    mimetype = models.CharField(max_length=64, null=True, blank=True, editable=False)
+    mimetype = models.CharField(max_length=64, editable=False)
 
     thumbnail = models.ImageField(upload_to="diary_thumbnails", max_length=256, null=True, blank=True, editable=False)
     credit = models.CharField(max_length=256, null=True, blank=True, default="Internet scavenged", verbose_name='Image credit')
     caption = models.CharField(max_length=256, null=True, blank=True)
+
+    class Meta:
+        db_table = 'MediaItems'
+
+    # Overloaded Django ORM method:
 
     def save(self, *args, **kwargs):
         # Before saving, update thumbnail and mimetype
@@ -43,6 +48,8 @@ class MediaItem(models.Model):
         if update_thumbnail:
             self.update_thumbnail()
         return result
+
+    # Extra, custom methods:
 
     def autoset_mimetype(self):
         # See lib/python2.7/site-packages/django/forms/fields.py for how to do
@@ -97,15 +104,17 @@ class MediaItem(models.Model):
         self.thumbnail = os.path.relpath(thumb_file, django.conf.settings.MEDIA_ROOT)
         self.save(update_thumbnail=False)
 
-    class Meta:
-        db_table = 'MediaItems'
-
 class EventTag(models.Model):
-    name = models.CharField(max_length=32, blank=False, null=False, unique=True)
-    read_only = models.BooleanField(default=False, null=False, editable=False)
+    name = models.CharField(max_length=32, unique=True)
+    read_only = models.BooleanField(default=False, editable=False)
 
     class Meta:
         db_table = 'EventTags'
+
+    def __unicode__(self):
+        return self.name
+
+    # Overloaded Django ORM method:
 
     def save(self, *args, **kwargs):
         if self.pk and self.read_only:
@@ -113,14 +122,14 @@ class EventTag(models.Model):
         else:
             return super(EventTag, self).save(*args, **kwargs)
 
+    # Extra, custom methods:
+
     def delete(self, *args, **kwargs):
         if self.pk and self.read_only:
             return False
         else:
             return super(EventTag, self).delete(*args, **kwargs)
 
-    def __unicode__(self):
-        return self.name
 
 class Event(models.Model):
 
@@ -166,19 +175,15 @@ class Showing(models.Model):
 
     start = models.DateTimeField()
 
-    booked_by = models.CharField(max_length=64, blank=False)
-
-    @property
-    def start_date(self):
-        return self.start.date()
+    booked_by = models.CharField(max_length=64)
 
     extra_copy = models.TextField(max_length=4096, null=True, blank=True)
     extra_copy_summary = models.TextField(max_length=4096, null=True, blank=True)
 
-    confirmed = models.BooleanField(default=False, null=False)
-    hide_in_programme = models.BooleanField(default=False, null=False)
-    cancelled = models.BooleanField(default=False, null=False)
-    discounted = models.BooleanField(default=False, null=False)
+    confirmed = models.BooleanField(default=False)
+    hide_in_programme = models.BooleanField(default=False)
+    cancelled = models.BooleanField(default=False)
+    discounted = models.BooleanField(default=False)
 
     # sales tables?
 
@@ -196,6 +201,12 @@ class Showing(models.Model):
             return "%s - %s (%d)" % (self.start.strftime("%H:%M %d/%m/%y"), self.event.name, self.id) 
         else:
             return "[uninitialised]"
+
+    # Extra, custom methods:
+
+    @property
+    def start_date(self):
+        return self.start.date()
 
     def reset_rota_to_default(self):
         """Clear any existing rota entries. If the associated event has an event
@@ -224,7 +235,7 @@ class DiaryIdea(models.Model):
 
 class EventTemplate(models.Model):
 
-    name = models.CharField(max_length=32, blank=False, null=False)
+    name = models.CharField(max_length=32)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -232,7 +243,7 @@ class EventTemplate(models.Model):
     # Default roles for this event
     roles = models.ManyToManyField(Role, db_table='EventTemplates_Roles')
     # Default tags for this event
-    tags = models.ManyToManyField(EventTag, db_table='EventTemplate_Tags', null=True, blank=True)
+    tags = models.ManyToManyField(EventTag, db_table='EventTemplate_Tags', blank=True)
 
     class Meta:
         db_table = 'EventTemplates'
@@ -241,6 +252,21 @@ class EventTemplate(models.Model):
         return self.name
 
 class RotaEntry(models.Model):
+
+    role = models.ForeignKey(Role)
+    showing = models.ForeignKey(Showing)
+
+    required = models.BooleanField(default=True)
+    rank = models.IntegerField(default=1)
+
+    #created_at = models.DateTimeField(auto_now_add=True)
+    #updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'RotaEntries'
+
+    def __unicode__(self):
+        return "%s %d" % (unicode(self.role), self.rank)
 
     def __init__(self, *args, **kwargs):
         # Allow a template keyword arg to be supplied. If it is, copy rota
@@ -261,17 +287,3 @@ class RotaEntry(models.Model):
             self.rank = template.rank
             logger.info("Cloning rota entry from existing rota entry with role_id %d", template.role.pk)
 
-    role = models.ForeignKey(Role)
-    showing = models.ForeignKey(Showing)
-
-    required = models.BooleanField(default=True)
-    rank = models.IntegerField(default=1)
-
-    #created_at = models.DateTimeField(auto_now_add=True)
-    #updated_at = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        db_table = 'RotaEntries'
-
-    def __unicode__(self):
-        return "%s %d" % (unicode(self.role), self.rank)

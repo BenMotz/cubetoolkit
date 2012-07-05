@@ -16,9 +16,9 @@ class Member(models.Model):
     # This is the primary key used in the old perl/bdb system, used as the
     # user-facing membership number (rather than using the private key). 
     # Defaults to = pk. Note; not actually a number!
-    number = models.CharField(max_length=10, null=False, blank=False, editable=False)
+    number = models.CharField(max_length=10, editable=False)
 
-    name = models.CharField(max_length=64, blank=False, null=False)
+    name = models.CharField(max_length=64)
     email = models.CharField(max_length=64, blank=True, null=True) # , unique=True)
 
     address = models.CharField(max_length=128, blank=True, null=True)
@@ -29,10 +29,10 @@ class Member(models.Model):
     website = models.CharField(max_length=128, blank=True, null=True)
     phone = models.CharField(max_length=64, blank=True, null=True)
     altphone = models.CharField(max_length=64, blank=True, null=True)
-    notes = models.CharField(max_length=1024, blank=True, null=True)
+    notes = models.TextField(blank=True, null=True)
 
-    mailout = models.BooleanField(default=True, blank=False, null=False)
-    mailout_failed = models.BooleanField(default=False, blank=False, null=False)
+    mailout = models.BooleanField(default=True)
+    mailout_failed = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -66,17 +66,10 @@ class Member(models.Model):
 
 class Volunteer(models.Model):
 
-    def __init__(self, *args, **kwargs):
-        super(Volunteer, self).__init__(*args, **kwargs)
-        try:
-            self.original_portrait = self.portrait.file.name if self.portrait else None
-        except (IOError, OSError, ValueError):
-            self.original_portrait = None
-
     member = models.OneToOneField('Member', related_name='volunteer')
 
-    notes = models.CharField(max_length=4096, blank=True, null=True)
-    active = models.BooleanField(default=True, blank=False, null=False)
+    notes = models.TextField(blank=True, null=True)
+    active = models.BooleanField(default=True)
 
     portrait = models.ImageField(upload_to="volunteers", max_length=256, null=True, blank=True)
     portrait_thumb = models.ImageField(upload_to="volunteers_thumbnails", max_length=256, null=True, blank=True, editable=False)
@@ -114,6 +107,13 @@ class Volunteer(models.Model):
             if update_thumbnail:
                 self.update_portrait_thumbnail()
         return result
+
+    def __init__(self, *args, **kwargs):
+        super(Volunteer, self).__init__(*args, **kwargs)
+        try:
+            self.original_portrait = self.portrait.file.name if self.portrait else None
+        except (IOError, OSError, ValueError):
+            self.original_portrait = None
 
     def update_portrait_thumbnail(self):
         # Delete old thumbnail, if any:
