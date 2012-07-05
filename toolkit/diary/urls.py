@@ -59,7 +59,8 @@ urlpatterns += patterns( 'toolkit.diary.edit_views',
     # "rota" "rota/" "rota/2001/01" "rota/2001/01/" "rota/2001/1/02" "rota/2001/1/2/"
     # (ie needs at least year/month, not just a year)
     # View rota
-    url("""^(?P<field>rota|copy|terms)(/|/(?P<year>\d{4})/(?P<month>\d{1,2})/?(?P<day>(?<=/)\d{0,2})?/?)?$""", 'view_event_field', name="view_event_field"),
+    url("""^(?P<field>rota|copy|terms)(/|/(?P<year>\d{4})/(?P<month>\d{1,2})/?(?P<day>(?<=/)\d{0,2})?/?)?$""",
+                                                                    'view_event_field', name="view_event_field"),
 
     url("^mailout/$", 'mailout', name="members-mailout"),
 

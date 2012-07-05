@@ -32,10 +32,10 @@ class UrlTests(TestCase):
                 '/diary/2012/12/30' : {'year' : '2012', 'month' : '12', 'day' : '30'},
                 '/diary/2012/12/30/' : {'year' : '2012', 'month' : '12', 'day' : '30'},
                 }
-        for query,response in calls_to_test.iteritems():
+        for query, response in calls_to_test.iteritems():
             self.client.get(query)
             self.assertTrue(view_mock.called)
-            for k,v in response.iteritems():
+            for k, v in response.iteritems():
                 self.assertEqual(view_mock.call_args[1][k], v)
             view_mock.reset_mock()
 
@@ -68,10 +68,10 @@ class UrlTests(TestCase):
                 '/diary/edit/2012/12/30' : {'year' : '2012', 'month' : '12', 'day' : '30'},
                 '/diary/edit/2012/12/30/' : {'year' : '2012', 'month' : '12', 'day' : '30'},
                 }
-        for query,response in calls_to_test.iteritems():
+        for query, response in calls_to_test.iteritems():
             self.client.get(query)
             self.assertTrue(view_mock.called)
-            for k,v in response.iteritems():
+            for k, v in response.iteritems():
                 self.assertEqual(view_mock.call_args[1][k], v)
             view_mock.reset_mock()
 
@@ -89,7 +89,7 @@ class UrlTests(TestCase):
                 '/diary/rota/2012/12//' : {'field' : 'rota', 'year' : '2012', 'month' : '12', 'day' : ''},
                 }
         # (rota URLS must have at least year/month, not just a year!)
-        for query,response in calls_to_test.iteritems():
+        for query, response in calls_to_test.iteritems():
             self.client.get(query)
             self.assertTrue(view_mock.called)
             for k,v in response.iteritems():

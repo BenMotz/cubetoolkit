@@ -17,7 +17,8 @@ class EventForm(forms.ModelForm):
                 'notes': forms.Textarea(attrs={'wrap':'soft'}),
                   }
         order = ( 'tags', )
-        fields = ( 'name', 'tags', 'duration', 'cancelled', 'outside_hire', 'private', 'copy', 'copy_summary', 'terms', 'notes')
+        fields = ( 'name', 'tags', 'duration', 'cancelled', 'outside_hire',
+                   'private', 'copy', 'copy_summary', 'terms', 'notes')
 
 
 class MediaItemForm(forms.ModelForm):

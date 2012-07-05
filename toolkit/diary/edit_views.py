@@ -537,7 +537,7 @@ def edit_event_tags(request):
     for key, val in request.POST.iteritems():
         m = tag_re.match(key)
         if m:
-            tags_submitted[int(m.group(1),10)] = val.strip().lower()
+            tags_submitted[int(m.group(1), 10)] = val.strip().lower()
 
     # Build dict of existing tags:
     tags_by_pk = dict( (tag.pk, tag) for tag in tags )
@@ -550,7 +550,8 @@ def edit_event_tags(request):
                 logger.info("Deleting tag {0} (key {1})".format(extant_tag.name, extant_tag.pk))
                 extant_tag.delete()
             elif extant_tag.name != submitted_name:
-                logger.info("Changing name of tag id {0} from {1} to {2}".format(extant_tag.pk, extant_tag.name, submitted_name))
+                logger.info("Changing name of tag id {0} from {1} to {2}"
+                                        .format(extant_tag.pk, extant_tag.name, submitted_name))
                 extant_tag.name = submitted_name
                 extant_tag.save()
         elif extant_tag is None:
