@@ -1,6 +1,6 @@
 import logging
 
-from django.http import Http404, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import render_to_response, get_object_or_404, render
 from django.db.models import Q
 import django.db # Used for raw query for stats
@@ -44,7 +44,7 @@ def add_member(request):
     return render(request, 'form_new_member.html', context)
 
 @require_read_auth
-def search(request, volunteers=False):
+def search(request):
     search_terms = request.GET.get('q', None)
     show_edit_link = bool(request.GET.get('show_edit_link', None))
     show_delete_link = bool(request.GET.get('show_delete_link', None))
@@ -113,12 +113,26 @@ def member_statistics(request):
     # A few hard-coded SQL queries to get some of the more complex numbers
     cursor = django.db.connection.cursor()
     # Get 10 most popular email domains:
-    cursor.execute("""SELECT SUBSTRING_INDEX(`email`, '@', -1) AS domain, COUNT(1) AS num FROM Members WHERE email != '' GROUP BY domain ORDER BY num DESC LIMIT 10""")
+    cursor.execute("SELECT "
+                      "SUBSTRING_INDEX(`email`, '@', -1) AS domain, "
+                      "COUNT(1) AS num "
+                   "FROM Members "
+                   "WHERE email != '' "
+                   "GROUP BY domain "
+                   "ORDER BY num DESC "
+                   "LIMIT 10")
     email_stats = [ row for row in cursor.fetchall() ]
     cursor.close()
     cursor = django.db.connection.cursor()
     # Get 10 most popular postcode prefixes:
-    cursor.execute("""SELECT SUBSTRING_INDEX(`postcode`, ' ', 1) AS firstbit, COUNT(1) AS num FROM Members WHERE postcode != '' GROUP BY firstbit ORDER BY num DESC LIMIT 10""")
+    cursor.execute("SELECT "
+                        "SUBSTRING_INDEX(`postcode`, ' ', 1) AS firstbit, "
+                        "COUNT(1) AS num "
+                   "FROM Members "
+                   "WHERE postcode != '' "
+                   "GROUP BY firstbit "
+                   "ORDER BY num DESC "
+                   "LIMIT 10")
     postcode_stats = [ row for row in cursor.fetchall() ]
     cursor.close()
 
@@ -130,18 +144,34 @@ def member_statistics(request):
             # Total number of members:
             'm_count' : Member.objects.count(),
             # Members with an email address that isn't null/blank:
-            'm_email_count' : Member.objects.filter(email__isnull=False).exclude(email = '').count(),
+            'm_email_count' : Member.objects.filter(email__isnull=False)
+                                            .exclude(email = '')
+                                            .count(),
             # Members with an email address that isn't null/blank, where mailout hasn't failed and they haven't unsubscribed:
-            'm_email_viable' : Member.objects.filter(email__isnull=False).exclude(email = '').exclude(mailout_failed=True).filter(mailout=True).count(),
+            'm_email_viable' : Member.objects.filter(email__isnull=False)
+                                              .exclude(email = '')
+                                              .exclude(mailout_failed=True)
+                                              .filter(mailout=True)
+                                              .count(),
             # Members with an email address that isn't null/blank, where mailout hasn't failed and they have unsubscribed:
-            'm_email_unsub' : Member.objects.filter(email__isnull=False).exclude(email = '').exclude(mailout_failed=True).exclude(mailout=True).count(),
+            'm_email_unsub' : Member.objects.filter(email__isnull=False)
+                                            .exclude(email = '')
+                                            .exclude(mailout_failed=True)
+                                            .exclude(mailout=True)
+                                            .count(),
             # Members with a postcode that isn't null / blank
-            'm_postcode' : Member.objects.filter(postcode__isnull = False).exclude(postcode = '').count(),
+            'm_postcode' : Member.objects.filter(postcode__isnull = False)
+                                         .exclude(postcode = '')
+                                         .count(),
     }
 
 
     return render_to_response('stats.html', context)
 
 def member_homepages(request):
-    members = Member.objects.filter(website__isnull = False).exclude(website = '').order_by('number').values('name', 'website')
+    members = (Member.objects.filter(website__isnull = False)
+                            .exclude(website = '')
+                            .order_by('number')
+                            .values('name', 'website'))
     return render_to_response('homepages.html', { 'members' : members })
+

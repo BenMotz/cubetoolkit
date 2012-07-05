@@ -31,7 +31,8 @@ class MediaItem(models.Model):
     mimetype = models.CharField(max_length=64, editable=False)
 
     thumbnail = models.ImageField(upload_to="diary_thumbnails", max_length=256, null=True, blank=True, editable=False)
-    credit = models.CharField(max_length=256, null=True, blank=True, default="Internet scavenged", verbose_name='Image credit')
+    credit = models.CharField(max_length=256, null=True, blank=True,
+                                                            default="Internet scavenged", verbose_name='Image credit')
     caption = models.CharField(max_length=256, null=True, blank=True)
 
     class Meta:
@@ -56,9 +57,9 @@ class MediaItem(models.Model):
         # basic validation of PNGs / JPEGs
 #        logging.info("set mimetype: '{0}'".format(self.media_file))
         if self.media_file and self.media_file != '':
-            m = magic.Magic(mime=True)
+            magic_wrapper = magic.Magic(mime=True)
             try:
-                self.mimetype = m.from_buffer(self.media_file.file.read(4096))
+                self.mimetype = magic_wrapper.from_buffer(self.media_file.file.read(4096))
             except IOError:
                 logging.error("Failed to determine mimetype of file {0}".format(self.media_file.file.name))
                 self.mimetype = "application/octet-stream"
@@ -77,22 +78,27 @@ class MediaItem(models.Model):
             except (IOError, OSError) as ose:
                 logging.error("Failed deleting old thumbnail: {0}".format(ose))
         try:
-            im = PIL.Image.open(self.media_file.file.name)
+            image = PIL.Image.open(self.media_file.file.name)
         except (IOError, OSError) as ioe:
             logging.error("Failed to read image file: {0}".format(ioe))
             return
         try:
-            im.thumbnail(django.conf.settings.THUMBNAIL_SIZE, PIL.Image.ANTIALIAS)
+            image.thumbnail(django.conf.settings.THUMBNAIL_SIZE, PIL.Image.ANTIALIAS)
         except MemoryError :
             logging.error("Out of memory trying to create thumbnail for {0}".format(self.media_file))
-        thumb_file = os.path.join(django.conf.settings.MEDIA_ROOT, "diary_thumbnails", os.path.basename(str(self.media_file)))
+
+        thumb_file = os.path.join(
+                                  django.conf.settings.MEDIA_ROOT,
+                                  "diary_thumbnails",
+                                  os.path.basename(str(self.media_file))
+                                  )
         # Make sure thumbnail file ends in jpg, to avoid confusion:
-        if os.path.splitext(thumb_file.lower())[1] not in (u'.jpg',u'.jpeg'):
+        if os.path.splitext(thumb_file.lower())[1] not in (u'.jpg', u'.jpeg'):
             thumb_file += ".jpg"
         try:
-            # Convert image to RGB (can't save Paletted images as jpgs) and 
+            # Convert image to RGB (can't save Paletted images as jpgs) and
             # save thumbnail as JPEG:
-            im.convert("RGB").save(thumb_file, "JPEG")
+            image.convert("RGB").save(thumb_file, "JPEG")
         except (IOError, OSError) as ioe:
             logging.error("Failed saving thumbnail: {0}".format(ioe))
             if os.path.exists(thumb_file):
@@ -138,7 +144,8 @@ class Event(models.Model):
     # This is the primary key used in the old perl/bdb system
     legacy_id = models.CharField(max_length=256, null=True, editable=False)
 
-    template = models.ForeignKey('EventTemplate', verbose_name='Event Type', related_name='template', null=True, blank=True)
+    template = models.ForeignKey('EventTemplate', verbose_name='Event Type', 
+                                                                    related_name='template', null=True, blank=True)
     tags = models.ManyToManyField(EventTag, db_table='Event_Tags', blank=True)
 
     duration = models.TimeField(null=True)

@@ -65,8 +65,8 @@ def update_requirements():
     # Update the packages installed in the environment:
     venv_path = os.path.join(env.site_root, VIRTUALENV)
     req_file = os.path.join(env.site_root, REQUIREMENTS)
-    with cd(env.site_root):
-        run("{venv_path}/bin/pip install --requirement {req_file}".format(venv_path=venv_path, req_file=req_file))
+#    with cd(env.site_root):
+#        run("{venv_path}/bin/pip install --requirement {req_file}".format(venv_path=venv_path, req_file=req_file))
 
 def restart_server():
     # ??

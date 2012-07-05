@@ -1,3 +1,4 @@
+"""Code shared between both public and editing sets of diary views"""
 import calendar
 import logging
 import datetime
@@ -7,7 +8,7 @@ logger = logging.getLogger(__name__)
 def get_date_range(year, month, day, user_days_ahead):
     """Support method to take fields read from HTTP request and return a tuple
     (datetime, number_of_days)
-    If month or day are blank, they default to 1. If all three are blank it 
+    If month or day are blank, they default to 1. If all three are blank it
     defaults to today.
     If there is an error in the parameters, returns (None, "Error mesage)"""
     if day is not None and month is None:
@@ -19,10 +20,12 @@ def get_date_range(year, month, day, user_days_ahead):
         month = int(month) if month else None
         day = int(day) if day else None
     except ValueError:
-        logger.error("Invalid value requested in date range, one of day {0}, month {1}, year {2}".format(day, month, year))
+        logger.error("Invalid value requested in date range, one of day {0}, month {1}, year {2}"
+                     .format(day, month, year))
         return (None, "Invalid values")
 
-    logger.debug("Range: day %s, month %s, year %s, span %s days", str(day), str(month), str(year), str(user_days_ahead))
+    logger.debug("Range: day %s, month %s, year %s, span %s days",
+                                            str(day), str(month), str(year), str(user_days_ahead))
 
     try:
         if day:

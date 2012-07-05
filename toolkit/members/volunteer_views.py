@@ -35,7 +35,7 @@ def view_volunteer_list(request):
         vol_role_map.setdefault(vol_id, []).append(role)
 
     # Now sort role_vol_map by role name:
-    role_vol_map = sorted(role_vol_map.iteritems(), lambda a,b: cmp(a[0], b[0]))
+    role_vol_map = sorted(role_vol_map.iteritems(), lambda a, b: cmp(a[0], b[0]))
     # (now got a list  of (role, (name1, name2, ...)) tuples, rather than a dict,
     # but that's fine)
 

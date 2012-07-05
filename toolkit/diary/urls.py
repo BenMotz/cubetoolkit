@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import patterns, url
 from django.views.generic import DetailView
 from toolkit.diary.models import Event
 import toolkit.diary.feeds

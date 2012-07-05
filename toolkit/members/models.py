@@ -72,7 +72,8 @@ class Volunteer(models.Model):
     active = models.BooleanField(default=True)
 
     portrait = models.ImageField(upload_to="volunteers", max_length=256, null=True, blank=True)
-    portrait_thumb = models.ImageField(upload_to="volunteers_thumbnails", max_length=256, null=True, blank=True, editable=False)
+    portrait_thumb = models.ImageField(upload_to="volunteers_thumbnails", max_length=256,
+                                                         null=True, blank=True, editable=False)
 
     # Roles
     roles = models.ManyToManyField(Role, db_table='Volunteer_Roles', blank=True)
@@ -136,24 +137,24 @@ class Volunteer(models.Model):
             return
 
         try:
-            im = PIL.Image.open(self.portrait.file.name)
+            image = PIL.Image.open(self.portrait.file.name)
         except (IOError, OSError) as ioe:
             logger.error("Failed to read image file {0}: {1}".format(self.portrait.file.name, ioe))
             return
         try:
-            im.thumbnail(settings.THUMBNAIL_SIZE, PIL.Image.ANTIALIAS)
+            image.thumbnail(settings.THUMBNAIL_SIZE, PIL.Image.ANTIALIAS)
         except MemoryError :
             logger.error("Out of memory trying to create thumbnail for {0}".format(self.portrait))
 
         thumb_file = os.path.join(settings.MEDIA_ROOT, "volunteers_thumbnails", os.path.basename(str(self.portrait)))
 
         # Make sure thumbnail file ends in jpg, to avoid confusion:
-        if os.path.splitext(thumb_file.lower())[1] not in (u'.jpg',u'.jpeg'):
+        if os.path.splitext(thumb_file.lower())[1] not in (u'.jpg', u'.jpeg'):
             thumb_file += ".jpg"
         try:
             # Convert image to RGB (can't save Paletted images as jpgs) and 
             # save thumbnail as JPEG:
-            im.convert("RGB").save(thumb_file, "JPEG")
+            image.convert("RGB").save(thumb_file, "JPEG")
             logger.info("Generated thumbnail portrait for volunteer '%s' in file '%s'", self.pk, thumb_file)
         except (IOError, OSError) as ioe:
             logger.error("Failed saving thumbnail: {0}".format(ioe))

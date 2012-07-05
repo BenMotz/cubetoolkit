@@ -35,7 +35,10 @@ def _return_to_editindex(request):
         # Use a really, really dirty way to emulate the original functionality and
         # close the popped up window: return a hard-coded page that contains
         # javacsript to close the open window and reload the source page.
-        return HttpResponse("<!DOCTYPE html><html><head><title>-</title></head><body onload='self.close(); opener.location.reload(true);'>Ok</body></html>")
+        return HttpResponse("<!DOCTYPE html><html>"
+                            "<head><title>-</title></head>"
+                            "<body onload='self.close(); opener.location.reload(true);'>Ok</body>"
+                            "</html>")
     else:
         # Redirect to edit index
         return HttpResponseRedirect(reverse("default-edit"))
@@ -87,11 +90,11 @@ def edit_diary_list(request, year=None, day=None, month=None):
     for days in xrange(days_ahead):
         # Iterate through every date in the visible range, creating a dict
         # entry for each
-        d = startdate + datetime.timedelta(days=days)
-        dates[d] = []
+        day_in_range = startdate + datetime.timedelta(days=days)
+        dates[day_in_range] = []
         # If it's the 1st of the month, make sure there's an ideas entry
-        if d.day == 1:
-            ideas[d] = ''
+        if day_in_range.day == 1:
+            ideas[day_in_range] = ''
     # Now insert all the showings into the 'dates' dict
     for showing in showings:
         dates[showing.start.date()].append(showing)
@@ -165,8 +168,8 @@ def add_showing(request, event_id):
         if copy_from:
             source_showing = Showing.objects.get(pk=copy_from)
             for rota_entry in source_showing.rotaentry_set.all():
-                r = RotaEntry(showing=new_showing, template=rota_entry)
-                r.save()
+                new_entry = RotaEntry(showing=new_showing, template=rota_entry)
+                new_entry.save()
 
         return _return_to_editindex(request)
     else:
@@ -209,8 +212,8 @@ def add_event(request):
             start = form.cleaned_data['start']
             # create number_of_days showings, each at date/time given in start
             # parameter, and each with rota roles from the template
-            for n in range(0, form.cleaned_data['number_of_days']):
-                day_offset = datetime.timedelta(days=n)
+            for day_count in range(0, form.cleaned_data['number_of_days']):
+                day_offset = datetime.timedelta(days=day_count)
                 new_showing = Showing(event=new_event,
                                       start=(start + day_offset),
                                       discounted=form.cleaned_data['discounted'],
@@ -331,7 +334,8 @@ def _edit_event_handle_post(request, event_id):
         if initial_file is None:
             if media_form.cleaned_data['media_file']:
                 # New item has been uploaded
-                logger.info("Creating new MediaItem for file {0}, linked to event {1}".format(media_form.cleaned_data['media_file'], event.name))
+                logger.info("Creating new MediaItem for file {0}, linked to event {1}"
+                            .format(media_form.cleaned_data['media_file'], event.name))
                 # New image uploaded. Save it:
                 media_form.save()
                 # Add to event
@@ -345,11 +349,17 @@ def _edit_event_handle_post(request, event_id):
             # File uploaded to replace existing:
             if media_form.cleaned_data['media_file']:
                 if 'media_file' in request.FILES:
-                    logger.info("New media uploaded for MediaItem {0}: {1}".format(media_item.pk, media_form.cleaned_data['media_file']))
+                    logger.info("New media uploaded for MediaItem {0}: {1}"
+                                .format(media_item.pk, media_form.cleaned_data['media_file']))
                     try:
-                        logger.info("Deleting old media file: {0} [new file {1}]".format(initial_file.file, media_item.media_file))
-                        if os.path.isfile(initial_file.file.name) and initial_file.file.name.startswith(settings.MEDIA_ROOT):
-                            os.unlink(initial_file.file.name)
+                        logger.info("Deleting old media file: {0} [new file {1}]"
+                                    .format(initial_file.file, media_item.media_file))
+
+                        initial_filename = initial_file.file.name
+
+                        if os.path.isfile(initial_filename) and initial_filename.startswith(settings.MEDIA_ROOT):
+                            os.unlink(initial_filename)
+
                     except (ValueError, OSError, IOError) as error:
                         logger.error("Couldn't delete existing media file: {0}".format(error))
                 else:
@@ -453,7 +463,7 @@ def view_event_field(request, field, year, month, day):
     # list) and then uses the appropriate template to render the results.
 
     logger.debug("view_event_field: field {0}".format(field))
-    assert field in ('copy','terms', 'rota')
+    assert field in ('copy', 'terms', 'rota')
 
     query_days_ahead = request.GET.get('daysahead', None)
     start_date, days_ahead = get_date_range(year, month, day, query_days_ahead)
@@ -533,24 +543,24 @@ def edit_event_tags(request):
     tags_by_pk = dict( (tag.pk, tag) for tag in tags )
     # Now update / add as appropriate. Any tag keys that aren't included in
     # the update are deleted.
-    for pk, name in tags_submitted.iteritems():
-        extant_tag = tags_by_pk.pop(pk, None)
+    for submitted_pk, submitted_name in tags_submitted.iteritems():
+        extant_tag = tags_by_pk.pop(submitted_pk, None)
         if extant_tag:
-            if name == '':
+            if submitted_name == '':
                 logger.info("Deleting tag {0} (key {1})".format(extant_tag.name, extant_tag.pk))
                 extant_tag.delete()
-            elif extant_tag.name != name:
-                logger.info("Changing name of tag id {0} from {1} to {2}".format(extant_tag.pk, extant_tag.name, name))
-                extant_tag.name = name
+            elif extant_tag.name != submitted_name:
+                logger.info("Changing name of tag id {0} from {1} to {2}".format(extant_tag.pk, extant_tag.name, submitted_name))
+                extant_tag.name = submitted_name
                 extant_tag.save()
         elif extant_tag is None:
-            new_tag = EventTag(name=name)
-            logger.info("Creating new tag {0}".format(name))
+            new_tag = EventTag(name=submitted_name)
+            logger.info("Creating new tag {0}".format(submitted_name))
             # database constraints will enforce uniqueness of tag name
             try:
                 new_tag.save()
-            except django.db.IntegrityError as ie:
-                logger.error("Failed adding tag {0}: {1}".format(name, ie))
+            except django.db.IntegrityError as interr:
+                logger.error("Failed adding tag {0}: {1}".format(submitted_name, interr))
     # There shouldn't be any tags left in tags_by_pk:
     if len(tags_by_pk) != 0:
         logger.error("Tag(s) {0} not included in update".format(",".join(tags_by_pk.values())))
