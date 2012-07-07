@@ -389,7 +389,8 @@ def _edit_event_handle_post(request, event_id):
                 # Image cleared. Remove it from the event:
                 event.media.remove(media_item)
                 event.save()
-                # If the media item isn't associated with any events, delete it:
+                ## If the media item isn't associated with any events, delete it:
+                ## ACTUALLY: let's keep it. Disk space is cheap, etc.
                 #if media_item.event_set.count() == 0:
                 #    media_item.delete()
 
