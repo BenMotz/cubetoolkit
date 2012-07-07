@@ -5,6 +5,20 @@ Details for: {{ event.name }}
 {% endblock %}
 {% block css %}
 <style type="text/css">
+    h3 { font-family: Arial; }
+
+    div#booking h1 {
+        font-family: Arial;
+        font-size: 18pt;
+        margin: 0 16px;
+        padding: 5px;
+        background-color: #c0c0c0;
+    }
+    div#booking p {
+        margin: 0 16px 0 16px;
+        padding: 16px;
+        background-color: #c0c0c0;
+    }
     div#detail p {
         margin: 0 16px 0 16px;
         padding: 16px;
@@ -24,11 +38,17 @@ Details for: {{ event.name }}
 {% endblock %}
 
 {% block body %}
-<h1>Details for {{ event.name }}</h1>
+<img src="/static/diary/diary_edit_list_header.gif" alt="Cube Microplex" width="150px">
+<h3>CUBE events diary</h3>
 
+<div id="booking">
+<h1>Details for {{ event.name }}</h1>
+<p>
 {% for showing in event.showings.all %}
-<p>Booked for: <a href="{% url edit-showing showing.pk %}">{{ showing.start|date:"H:i d/m/Y"  }}</a></p>
+Booked for: <a href="{% url edit-showing showing.pk %}">{{ showing.start|date:"H:i d/m/Y"  }}</a><br>
 {% endfor %}
+</p>
+</div>
 
 <div id="detail">
     <p class="d"><b>Name:</b>{{ event.name }} <a href="{% url edit-event-details event.pk %}">[edit]</a></p>
@@ -43,14 +63,16 @@ Details for: {{ event.name }}
 {% if event.media.all.0 %}
 <a href="{{ event.media.all.0.media_file.url }}"><img src="{{ event.media.all.0.thumbnail.url }}" alt="Picture for event {{ event.name }}"></a>
 <p class="image_caption">Image by: {{ event.media.all.0.credit }}</p>
+{% else %}
+<i>no image yet</i>
 {% endif %}
 </p>
 
-<p class="d"><b>Copy for "{{ event.name }}"</b></p>
+<p class="d"><b>Copy for "{{ event.name }}" (for web page)</b></p>
 {{event.copy|markdown}}
 <p><a href="{% url edit-event-details event.pk %}">[edit]</a></p>
 
-<p class="d"><b>Copy summary for "{{ event.name }}"</b></p>
+<p class="d"><b>Copy summary for "{{ event.name }}" (for printed programme)</b></p>
 {{event.copy_summary|markdown}}
 <p><a href="{% url edit-event-details event.pk %}">[edit]</a></p>
 
