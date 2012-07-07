@@ -4,9 +4,36 @@ Details for: {{ event.name }}
 {% endblock %}
 {% block css %}
 <style>
-    form p {
-        display: block;
+    h3 { font-family: Arial; }
+
+    div#title {
+        margin: 0 16px ;
         width: 95%;
+        background-color: #d0d0d0;
+    }
+    div#title h1 {
+        font-family: Arial;
+        font-size: 18pt;
+        margin: 0;
+        padding: 5px;
+    }
+    div#title p {
+        margin: 0;
+        padding: 5px;
+    }
+    div#forms {
+        margin: 0 16px;
+        width: 95%;
+    }
+    div#forms p {
+        margin: 0;
+        padding: 5px;
+    }
+    div#forms p:nth-child(odd) {
+        background-color: #d0d0d0;
+    }
+    div#forms p:nth-child(even) {
+        background-color: #c0c0c0;
     }
     form label {
         font-weight: bold;
@@ -17,7 +44,7 @@ Details for: {{ event.name }}
         float: left;
         width: 15%;
     }
-    form textarea, form input[type=text] {
+    div#forms textarea, form input[type=text] {
         width: 75%;
         display: block;
     }
@@ -25,7 +52,6 @@ Details for: {{ event.name }}
         width: 75%;
         display: block;
         padding-left: 15.5%;
-
     }
     #image_edit label {
         display: inline;
@@ -36,22 +62,31 @@ Details for: {{ event.name }}
 {% endblock %}
 
 {% block body %}
-<h1>Details for {{ event.name }}</h1>
-{% for showing in event.showings.all %}
-<p>Booked for: {{ showing.start|date:"H:i d/m/Y"  }} </p>
-{% endfor %}
+<img src="/static/diary/diary_edit_list_header.gif" alt="Cube Microplex" width="150px">
+<h3>CUBE events diary</h3>
 
+<div id="title">
+<h1>Edit details for "{{ event.name }}"</h1>
+<p>
+{% for showing in event.showings.all %}
+Booked for: {{ showing.start|date:"H:i d/m/Y"  }} <br>
+{% endfor %}
+</p>
+</div>
+<div id="forms">
 <form action="{% url edit-event-details event_id=event.id %}" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form.as_p }}
-
     <p>
         {{ media_form.media_file.label_tag }}
         <span id="image_edit">{{ media_form.media_file.errors }} {{ media_form.media_file }}</span>
     </p>
     <p>{{media_form.credit.errors }} {{ media_form.credit.label_tag }} {{ media_form.credit }}</p>
-    <input type="submit" value="Update" />
+    <p>
+        <input type="submit" value="Update" />
+    </p>
 </form>
+</div>
 
 {% endblock %}
 
