@@ -63,10 +63,11 @@ def deploy_media():
 def update_requirements():
     """ Update installed packages in remote virtualenv """
     # Update the packages installed in the environment:
-    venv_path = os.path.join(env.site_root, VIRTUALENV)
-    req_file = os.path.join(env.site_root, REQUIREMENTS)
-#    with cd(env.site_root):
-#        run("{venv_path}/bin/pip install --requirement {req_file}".format(venv_path=venv_path, req_file=req_file))
+    #venv_path = os.path.join(env.site_root, VIRTUALENV)
+    #req_file = os.path.join(env.site_root, REQUIREMENTS)
+    #with cd(env.site_root):
+    #    run("{venv_path}/bin/pip install --requirement {req_file}".format(venv_path=venv_path, req_file=req_file))
+    pass
 
 def restart_server():
     # ??
