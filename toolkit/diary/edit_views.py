@@ -143,8 +143,8 @@ def add_showing(request, event_id):
     # Add a showing to an existing event. Must be called via POST. Uses POSTed
     # data to create a new showing.
     # May optionally be called with a "copy_from" GET parameter, in which case
-    # rota entries (and nothing else, currently) are copied from the showing
-    # with the given ID.
+    # showing options that have not been specified on the form (rota entries,
+    # confirmed/cancelled/etc) are copied from the showing with the given ID.
     #
     # If add was successful, calls return_to_editindex. On error goes to
     # form_showing.html
@@ -169,12 +169,18 @@ def add_showing(request, event_id):
         new_showing.event_id = event_id
         # Create showing
         new_showing.save()
-        # If a showing_id was supplied, clone the rota from that:
+        # If a showing_id was supplied, clone things from that:
         if copy_from:
             source_showing = Showing.objects.get(pk=copy_from)
+            # clone rota
             for rota_entry in source_showing.rotaentry_set.all():
                 new_entry = RotaEntry(showing=new_showing, template=rota_entry)
                 new_entry.save()
+            # Clone other fields
+            attrs = ('confirmed', 'hide_in_programme', 'cancelled', 'discounted')
+            for attribute in attrs:
+                setattr(new_showing, attribute, getattr(source_showing, attribute))
+            new_showing.save()
 
         return _return_to_editindex(request)
     else:
@@ -289,6 +295,7 @@ def edit_showing(request, showing_id=None):
     new_showing_template = Showing.objects.get(pk=showing.pk)
     new_showing_template.pk = None
     new_showing_template.start += datetime.timedelta(days=1)
+    new_showing_template.booked_by = None  # Clear booked_by, so person cloning will have to fill this in
     new_showing_form = toolkit.diary.forms.NewShowingForm(instance=new_showing_template)
 
     context = {

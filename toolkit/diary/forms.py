@@ -44,7 +44,7 @@ class NewShowingForm(forms.ModelForm):
     class Meta(object):
         model = toolkit.diary.models.Showing
         # Exclude these for now:
-        exclude = ('event', 'extra_copy', 'extra_copy_summary', 'roles')
+        exclude = ('event', 'extra_copy', 'extra_copy_summary', 'roles', 'cancelled', 'confirmed', 'hide_in_programme', 'discounted')
 
 
 class NewEventForm(forms.Form):

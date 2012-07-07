@@ -19,50 +19,87 @@ $(document).ready(function() {
 <style>
     @import url('/static/css/lib/smoothness/jquery-ui.css');
     @import url('/static/css/lib/timepicker.css');
-    form label {
-        font-weight: bold;
-        vertical-align: top;
-        text-align: right;
-        padding-right: 5pt;
-        float: left;
-        width: 15%;
-    }
     form textarea, form input[type=text] {
         width: 80%;
     }
-    form p {
-        margin-top: 3px;
-        margin-bottom: 3px;
+
+    table {
+        width: 500px;
+        border-spacing: 0;
+        border-collapse: collapse; /* IE<7 */
+    }
+
+    h3 { font-family: Arial; }
+    h2, h5 {
+        margin: 2px 0 22px 0;
+    }
+
+    tr:nth-child(odd) td, th {
+        background-color: #d0d0d0;
+    }
+    tr:nth-child(even) td, tr:nth-child(even) th {
+        background-color: #c0c0c0;
+    }
+    form textarea, form input[type=text] {
+        width: 90%;
+    }
+    th {
+        font-weight: normal;
+        text-align: left;
+        padding: 5px 5px 5px 127px;
+        width: 25%;
+    }
+    td {
+        padding: 5px;
+    }
+    td.spacer {
+       height: 20px;
     }
 </style>
 {% endblock %}
 
 {% block body %}
-<h1>Booking</h1>
-<h2>Edit</h2>
+<img src="/static/diary/diary_edit_list_header.gif" alt="Cube Microplex" width="150px">
+<h3>CUBE events diary</h3>
 
-<form action="{% url edit-showing showing_id=showing.id %}" method="post">
+<table>
+    <tr><td colspan="2" /></tr>
+    <tr><td colspan="2" /><h2>BOOKING</h2></tr>
+    <tr><td colspan="2" /></tr>
+
+    <tr><th colspan="2"><h5>Clone booking.</h5></td></tr>
+    <tr><td colspan="2" /></tr>
+
+    <form action="{% url add-showing event_id=showing.event.id %}?copy_from={{showing.id}}" method="post">
     {% csrf_token %}
-    {{ form.as_p }}
-    <input type="submit" value="Update" />
-</form>
+    <tr><th>Event:</th><td>{{ showing.event.name }}</td>
+    {{ new_showing_form.as_table }}
+    <tr><th colspan="2">
+        <input type="submit" value="Clone" />
+    </td></tr>
+    </form>
+    <tr><td colspan="2" class="spacer"/></tr>
+    <tr><th colspan="2"><h5>Delete booking.</h5></td></tr>
+    <tr><th>Date:</th><td>{{ showing.start|date:"d F Y" }}</td></tr>
+    <tr><th>Time:</th><td>{{ showing.start|date:"H:i" }}</td></tr>
+    <tr><th>Event:</th><td>{{ showing.event.name }}</td></tr>
+    <tr><th colspan="2" />
+        <form id="delete_form" action="{% url delete-showing showing_id=showing.id %}" method="post">
+            {% csrf_token %}
+            <input type="submit" value="Delete" />
+        </form>
+    </td></tr>
+    <tr><td colspan="2" class="spacer"/></tr>
 
-<h2>Delete</h2>
-
-<form id="delete_form" action="{% url delete-showing showing_id=showing.id %}" method="post">
+    <tr><th colspan="2"><h5>Edit booking.</h5></td></tr>
+    <tr><th>Event:</th><td>{{ showing.event.name }}</td>
+    <form action="{% url edit-showing showing_id=showing.id %}" method="post">
     {% csrf_token %}
-    <input type="submit" value="Delete" />
-</form>
-
-
-<h2>Clone (add) Booking</h2>
-
-<form action="{% url add-showing event_id=showing.event.id %}?copy_from={{showing.id}}" method="post">
-    {% csrf_token %}
-    {{ new_showing_form.as_p }}
-    <input type="submit" value="Add" />
-</form>
-
-
+    {{ form.as_table }}
+    <tr><th colspan="2">
+        <input type="submit" value="Update" />
+    </td></tr>
+    </form>
+</table>
 {% endblock %}
 
