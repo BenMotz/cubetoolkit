@@ -7,8 +7,19 @@ import PIL.Image
 
 from django.db import models
 import django.conf
+import django.core.exceptions
 
 logger = logging.getLogger(__name__)
+
+from toolkit.diary.validators import validate_in_future
+
+class FutureDateTimeField(models.DateTimeField):
+    """DateTime field that can only be set to times in the future.
+    Used for Showing start times"""
+    default_error_messages = {
+            'invalid': 'Date may not be in the past',
+    }
+    default_validators = [ validate_in_future ]
 
 
 class Role(models.Model):
@@ -189,7 +200,7 @@ class Showing(models.Model):
 
     event = models.ForeignKey('Event', related_name='showings')
 
-    start = models.DateTimeField()
+    start = FutureDateTimeField()
 
     booked_by = models.CharField(max_length=64)
 
@@ -252,7 +263,8 @@ class Showing(models.Model):
         # Don't allow showings to be edited if they're finished. This isn't a
         # complete fix, as operations on querysets (or just SQL) will bypass
         # this, but this will stop the forms deleting records. (Stored procedures,
-        # anyone?)
+        # anyone?). This also doesn't stop showings having their start date
+        # moved from the past to the future!
         if self.start is not None:
             if self.in_past():
                 logger.error("Tried to update showing {0} with start time {1} in the past".format(self.pk, self.start))
@@ -273,6 +285,7 @@ class Showing(models.Model):
 
     @property
     def start_date(self):
+        # Used by templates
         return self.start.date()
 
     def in_past(self):

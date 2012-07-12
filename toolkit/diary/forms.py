@@ -4,9 +4,7 @@ from django.core.exceptions import ValidationError
 import toolkit.diary.models
 
 
-def _in_past(time):
-    # XXX: Should probably be working in UTC?
-    return time < datetime.datetime.now()
+from toolkit.diary.validators import validate_in_future
 
 
 class DiaryIdeaForm(forms.ModelForm):
@@ -44,28 +42,16 @@ class ShowingForm(forms.ModelForm):
         # Exclude these for now:
         exclude = ('event', 'extra_copy', 'extra_copy_summary')
 
-    def clean_start(self):
-        start = self.cleaned_data['start']
-        if _in_past(start):
-            raise ValidationError("May not be in the past")
-        else:
-            return start
-
 
 class CloneShowingForm(forms.Form):
     # For cloning a showing, so only need very minimal extra details
-    start = forms.DateTimeField(required=True)
-    booked_by = forms.CharField(min_length=1, max_length=128, required=True)
 
-    def clean_start(self):
-        start = self.cleaned_data['start']
-        if _in_past(start):
-            raise ValidationError("May not be in the past")
-        else:
-            return start
+    start = forms.DateTimeField(required=True, validators=[validate_in_future])
+    booked_by = forms.CharField(min_length=1, max_length=128, required=True)
 
 
 class NewEventForm(forms.Form):
+    start = forms.DateTimeField(required=True, validators=[validate_in_future])
     start = forms.DateTimeField(required=True)
     duration = forms.TimeField(required=True, initial=datetime.time(hour=1))
     number_of_days = forms.IntegerField(min_value=1, max_value=31, required=True, initial=1)
@@ -77,12 +63,6 @@ class NewEventForm(forms.Form):
     confirmed = forms.BooleanField(required=False)
     discounted = forms.BooleanField(required=False)
 
-    def clean_start(self):
-        start = self.cleaned_data['start']
-        if _in_past(start):
-            raise ValidationError("May not be in the past")
-        else:
-            return start
 
 class MailoutForm(forms.Form):
     subject = forms.CharField(max_length=128, required=True)
