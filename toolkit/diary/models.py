@@ -1,5 +1,6 @@
 import logging
 import os.path
+import datetime
 
 import magic
 import PIL.Image
@@ -179,6 +180,10 @@ class Event(models.Model):
             for tag in self.template.tags.all():
                 self.tags.add(tag)
 
+    def delete(self, *args, **kwargs):
+        # Don't allow Events to be deleted. This doesn't block deletes on
+        # querysets, SQL, etc.
+        raise django.db.IntegrityError("Event deletion not allowed")
 
 class Showing(models.Model):
 
@@ -241,11 +246,37 @@ class Showing(models.Model):
         else:
             return "[uninitialised]"
 
+    # Overload django model methods:
+
+    def save(self, *args, **kwargs):
+        # Don't allow showings to be edited if they're finished. This isn't a
+        # complete fix, as operations on querysets (or just SQL) will bypass
+        # this, but this will stop the forms deleting records. (Stored procedures,
+        # anyone?)
+        if self.start is not None:
+            if self.in_past():
+                logger.error("Tried to update showing {0} with start time {1} in the past".format(self.pk, self.start))
+                raise django.db.IntegrityError("Can't update showings that start in the past")
+        return super(Showing, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        # Don't allow showings to be deleted if they're finished. This isn't a
+        # complete fix, as operations on querysets (or just SQL) will bypass
+        # this, but this will stop the forms deleting records.
+        if self.start is not None:
+            if self.in_past():
+                logger.error("Tried to delete showing {0} with start time {1} in the past".format(self.pk, self.start))
+                raise django.db.IntegrityError("Can't delete showings that start in the past")
+        return super(Showing, self).delete(*args, **kwargs)
+
     # Extra, custom methods:
 
     @property
     def start_date(self):
         return self.start.date()
+
+    def in_past(self):
+        return self.start < datetime.datetime.now()
 
     def reset_rota_to_default(self):
         """Clear any existing rota entries. If the associated event has an event

@@ -45,8 +45,11 @@ class ShowingForm(forms.ModelForm):
         exclude = ('event', 'extra_copy', 'extra_copy_summary')
 
     def clean_start(self):
-        if _in_past(self.cleaned_data['start']):
+        start = self.cleaned_data['start']
+        if _in_past(start):
             raise ValidationError("May not be in the past")
+        else:
+            return start
 
 
 class CloneShowingForm(forms.Form):

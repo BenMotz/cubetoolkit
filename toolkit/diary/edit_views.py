@@ -150,7 +150,7 @@ def add_showing(request, event_id):
     # form_showing.html
 
     if request.method != 'POST':
-        return HttpResponse('Invalid request!', 405)  # 405 = Method not allowed
+        return HttpResponse('Invalid request!', status=405)  # 405 = Method not allowed
 
     copy_from = request.GET.get('copy_from', None)
 
@@ -273,6 +273,8 @@ def edit_showing(request, showing_id=None):
             # For each id, this will get the entry or create it:
             for role_id in selected_roles:
                 role_id = int(role_id)
+                # XXX: For now, only handle one rota entry of each type:
+                # modified_showing.rotaentry_set.get_or_create(role_id=role_id, rank=1)
                 modified_showing.rotaentry_set.get_or_create(role_id=role_id)
                 initial_set.discard(role_id)
             # Now remove any roles that we haven't seen:
@@ -456,8 +458,12 @@ def delete_showing(request, showing_id):
 
     if request.method == 'POST':
         showing = Showing.objects.get(pk=showing_id)
-        logging.info("Deleting showing id {0} (for event id {1})".format(showing_id, showing.event_id))
-        showing.delete()
+        if showing.in_past():
+            logger.error("Attempted to delete showing id {0} that has already started/finished".format(showing_id))
+            return HttpResponse("Error: Attempted to delete completed showing", status=403, mimetype="text/plain")
+        else:
+            logging.info("Deleting showing id {0} (for event id {1})".format(showing_id, showing.event_id))
+            showing.delete()
 
     return _return_to_editindex(request)
 
