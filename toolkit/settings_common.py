@@ -125,6 +125,9 @@ STATICFILES_DIRS = (
     # Don't forget to use absolute paths, not relative paths.
 )
 
+# Where to store messages:
+MESSAGE_STORAGE = 'django.contrib.messages.storage.fallback.FallbackStorage'
+
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
@@ -147,8 +150,12 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
+#    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
+)
+
+TEMPLATE_CONTEXT_PROCESSORS = (
+    'django.contrib.messages.context_processors.messages',
 )
 
 ROOT_URLCONF = 'toolkit.urls'
@@ -169,7 +176,7 @@ INSTALLED_APPS = (
     #'django.contrib.contenttypes',
     'django.contrib.sessions',
     #'django.contrib.sites',
-    #'django.contrib.messages',
+    'django.contrib.messages',
     #'django.contrib.staticfiles',
 
     # Uncomment the next line to enable the admin:

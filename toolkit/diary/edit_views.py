@@ -11,6 +11,7 @@ from django.shortcuts import render_to_response, get_object_or_404, render
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.forms.models import modelformset_factory
+from django.contrib import messages
 import django.template
 import django.db
 
@@ -261,7 +262,9 @@ def edit_showing(request, showing_id=None):
 
     if request.method == 'POST':
         form = toolkit.diary.forms.ShowingForm(request.POST, instance=showing)
-        if form.is_valid():
+        if showing.in_past():
+            messages.add_message(request, messages.ERROR, "Can't edit showings that are in the past")
+        elif form.is_valid():
             # Because Django can't cope with updating the rota automatically
             # do this two-step commit=False / save thing, then manually wrangle
             # the rota:
@@ -460,7 +463,8 @@ def delete_showing(request, showing_id):
         showing = Showing.objects.get(pk=showing_id)
         if showing.in_past():
             logger.error("Attempted to delete showing id {0} that has already started/finished".format(showing_id))
-            return HttpResponse("Error: Attempted to delete completed showing", status=403, mimetype="text/plain")
+            messages.add_message(request, messages.ERROR, "Can't delete showings that are in the past")
+            return HttpResponseRedirect(reverse("edit-showing", kwargs={'showing_id': showing_id}))
         else:
             logging.info("Deleting showing id {0} (for event id {1})".format(showing_id, showing.event_id))
             showing.delete()

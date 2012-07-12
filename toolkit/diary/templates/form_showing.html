@@ -61,6 +61,13 @@ $(document).ready(function() {
 {% block body %}
 <img src="/static/diary/diary_edit_list_header.gif" alt="Cube Microplex" width="150px">
 <h3>CUBE events diary</h3>
+{% if messages %}
+<ul class="messages">
+    {% for message in messages %}
+    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+    {% endfor %}
+</ul>
+{% endif %}
 
 <table>
     <tr><td colspan="2" /></tr>
