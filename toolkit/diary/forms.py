@@ -58,8 +58,12 @@ class CloneShowingForm(forms.Form):
     booked_by = forms.CharField(min_length=1, max_length=128, required=True)
 
     def clean_start(self):
-        if _in_past(self.cleaned_data['start']):
+        start = self.cleaned_data['start']
+        if _in_past(start):
             raise ValidationError("May not be in the past")
+        else:
+            return start
+
 
 class NewEventForm(forms.Form):
     start = forms.DateTimeField(required=True)
@@ -74,8 +78,11 @@ class NewEventForm(forms.Form):
     discounted = forms.BooleanField(required=False)
 
     def clean_start(self):
-        if _in_past(self.cleaned_data['start']):
+        start = self.cleaned_data['start']
+        if _in_past(start):
             raise ValidationError("May not be in the past")
+        else:
+            return start
 
 class MailoutForm(forms.Form):
     subject = forms.CharField(max_length=128, required=True)
