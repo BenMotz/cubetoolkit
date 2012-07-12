@@ -73,7 +73,7 @@ $(document).ready(function() {
     <form action="{% url add-showing event_id=showing.event.id %}?copy_from={{showing.id}}" method="post">
     {% csrf_token %}
     <tr><th>Event:</th><td>{{ showing.event.name }}</td>
-    {{ new_showing_form.as_table }}
+    {{ clone_showing_form.as_table }}
     <tr><th colspan="2">
         <input type="submit" value="Clone" />
     </td></tr>

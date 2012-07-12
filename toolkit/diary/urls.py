@@ -50,11 +50,11 @@ urlpatterns += patterns(
     # Edit ideas
     url('^edit/ideas/(?P<year>\d{4})/(?P<month>\d{1,2})/$', 'edit_ideas', name="edit-ideas"),
     # Add a new showing (to an existing event) - submission URL for edit-showing
-    url('^add/event/id/(?P<event_id>\d+)/showing$', 'add_showing', name="add-showing"),
+    url('^edit/event/id/(?P<event_id>\d+)/addshowing$', 'add_showing', name="add-showing"),
     # Delete a showing
     url('^edit/showing/id/(?P<showing_id>\d+)/delete$', 'delete_showing', name="delete-showing"),
     # Add a new event + showing
-    url('^add/event/$', 'add_event', name="add-event"),
+    url('^edit/event/add$', 'add_event', name="add-event"),
 
     # Edit event types
     url('^edit/eventtemplates/', 'edit_event_templates', name='edit_event_templates'),

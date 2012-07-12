@@ -207,6 +207,34 @@ class Showing(models.Model):
     class Meta:
         db_table = 'Showings'
 
+    def __init__(self, *args, **kwargs):
+        # Allow "copy_from" and "start_offset" keyword args to be supplied.
+        # If "copy_from" is supplied, all showing details except for rota
+        # items (which require DB writes) aare copied from the supplied Showing
+        # object.
+        # If "start_offset" is passed and "copy_from" is also passed, then the
+        # given TimeDelta is added to copy_from.start
+        # (If start_offset is defined by copy_from is not then a ValueError is
+        # raised)
+
+        copy_from = kwargs.pop('copy_from', None)
+        start_offset = kwargs.pop('start_offset', None)
+        if start_offset and copy_from is None:
+            raise ValueError("start_offset supplied with no copy_from")
+
+        super(Showing, self).__init__(*args, **kwargs)
+
+        if copy_from:
+            logger.info("Cloning showing from existing showing (id %d)", copy_from.pk)
+            # Manually copy fields, rather than using things from copy library,
+            # as don't want to copy the rota (as that would make db writes)
+            attributes_to_copy = ('event', 'start', 'booked_by', 'extra_copy',
+                    'confirmed', 'hide_in_programme', 'cancelled', 'discounted')
+            for attribute in attributes_to_copy:
+                setattr(self, attribute, getattr(copy_from, attribute))
+            if start_offset:
+                self.start += start_offset
+
     def __unicode__(self):
         if self.start is not None and self.id is not None and self.event is not None:
             return "%s - %s (%d)" % (self.start.strftime("%H:%M %d/%m/%y"), self.event.name, self.id)
@@ -230,6 +258,12 @@ class Showing(models.Model):
             # Add a rota entry for each role in the event type:
             for role in self.event.template.roles.all():
                 RotaEntry(role=role, showing=self).save()
+
+    def clone_rota_from_showing(self, source_showing):
+        assert(self.pk is not None)
+        for rota_entry in source_showing.rotaentry_set.all():
+            new_entry = RotaEntry(showing=self, template=rota_entry)
+            new_entry.save()
 
 
 class DiaryIdea(models.Model):

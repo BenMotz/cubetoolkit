@@ -39,13 +39,10 @@ class ShowingForm(forms.ModelForm):
         exclude = ('event', 'extra_copy', 'extra_copy_summary')
 
 
-class NewShowingForm(forms.ModelForm):
-    # Same as Showing, but without the role field
-    class Meta(object):
-        model = toolkit.diary.models.Showing
-        # Exclude these for now:
-        exclude = ('event', 'extra_copy', 'extra_copy_summary', 'roles', 'cancelled', 'confirmed', 'hide_in_programme', 'discounted')
-
+class CloneShowingForm(forms.Form):
+    # For cloning a showing, so only need very minimal extra details
+    start = forms.DateTimeField(required=True)
+    booked_by = forms.CharField(min_length=1, max_length=128, required=True)
 
 class NewEventForm(forms.Form):
     start = forms.DateTimeField(required=True)

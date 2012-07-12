@@ -142,61 +142,52 @@ def set_edit_preferences(request):
 def add_showing(request, event_id):
     # Add a showing to an existing event. Must be called via POST. Uses POSTed
     # data to create a new showing.
-    # May optionally be called with a "copy_from" GET parameter, in which case
-    # showing options that have not been specified on the form (rota entries,
-    # confirmed/cancelled/etc) are copied from the showing with the given ID.
+    # Must be called with a "copy_from" GET parameter. Showing options that
+    # are not specified on the form (rota entries, confirmed/cancelled/etc) are
+    # copied from the showing with the given ID.
     #
-    # If add was successful, calls return_to_editindex. On error goes to
+    # If add was successful, calls _return_to_editindex. On error goes to
     # form_showing.html
 
     if request.method != 'POST':
         return HttpResponse('Invalid request!', 405)  # 405 = Method not allowed
 
     copy_from = request.GET.get('copy_from', None)
+
     try:
-        copy_from = int(copy_from, 10)
-    except (TypeError, ValueError):
-        copy_from = None
+        copy_from_pk = int(copy_from, 10)
+        source_showing = Showing.objects.get(pk=copy_from_pk)
+    except (TypeError, ValueError, django.core.exceptions.DoesNotExist) as err:
+        logger.error("Failed getting object for showing clone operation: {0}".format(err))
+        raise Http404("Requested source showing for clone not found")
 
     # Create form using submitted data:
-    form = toolkit.diary.forms.NewShowingForm(request.POST)
-    if form.is_valid():
+    clone_showing_form = toolkit.diary.forms.CloneShowingForm(request.POST)
+    if clone_showing_form.is_valid():
         # Submitted data will have basic time & canceled/private info, but need
         # to set the event id and rota information manually, so don't commit
         # the new object immediately:
-        new_showing = form.save(commit=False)
-        # Set event ID:
-        new_showing.event_id = event_id
-        # Create showing
+        new_showing = toolkit.diary.models.Showing(copy_from=source_showing)
+        new_showing.start = clone_showing_form.cleaned_data['start']
+        new_showing.booked_by = clone_showing_form.cleaned_data['booked_by']
+        # Need to save showing before cloning the rota, as the rota entries
+        # need the key of the Showing, and that won't get created until the
+        # Showing is saved...
         new_showing.save()
-        # If a showing_id was supplied, clone things from that:
-        if copy_from:
-            source_showing = Showing.objects.get(pk=copy_from)
-            # clone rota
-            for rota_entry in source_showing.rotaentry_set.all():
-                new_entry = RotaEntry(showing=new_showing, template=rota_entry)
-                new_entry.save()
-            # Clone other fields
-            attrs = ('confirmed', 'hide_in_programme', 'cancelled', 'discounted')
-            for attribute in attrs:
-                setattr(new_showing, attribute, getattr(source_showing, attribute))
-            new_showing.save()
+        new_showing.clone_rota_from_showing(source_showing)
 
         return _return_to_editindex(request)
     else:
-        # If copy_from was supplied, assume being called from "edit showing"
+        # For now, aassume this is being called from "edit showing"
         # form, and return that
-        if copy_from:
-            showing = get_object_or_404(Showing, pk=copy_from)
-            showing_form = toolkit.diary.forms.ShowingForm(instance=showing)
-            context = {
-                'showing': showing,
-                'form': showing_form,
-                'new_showing_form': form,
-            }
-            return render(request, 'form_showing.html', context)
-        else:
-            return HttpResponse("Failed adding showing", status=400)
+        showing = get_object_or_404(Showing, pk=copy_from)
+        showing_form = toolkit.diary.forms.ShowingForm(instance=showing)
+        context = {
+            'showing': showing,
+            'form': showing_form,
+            'clone_showing_form': clone_showing_form,
+        }
+        return render(request, 'form_showing.html', context)
 
 
 @require_write_auth
@@ -292,16 +283,16 @@ def edit_showing(request, showing_id=None):
         form = toolkit.diary.forms.ShowingForm(instance=showing)
     # Also create a form for "cloning" the showing (ie. adding another one),
     # but initialise it with values from existing event, but a day later...
-    new_showing_template = Showing.objects.get(pk=showing.pk)
-    new_showing_template.pk = None
-    new_showing_template.start += datetime.timedelta(days=1)
-    new_showing_template.booked_by = None  # Clear booked_by, so person cloning will have to fill this in
-    new_showing_form = toolkit.diary.forms.NewShowingForm(instance=new_showing_template)
+    clone_showing_form = toolkit.diary.forms.CloneShowingForm(
+            initial={
+                'start': showing.start + datetime.timedelta(days=1)
+            }
+    )
 
     context = {
         'showing': showing,
         'form': form,
-        'new_showing_form': new_showing_form,
+        'clone_showing_form': clone_showing_form,
     }
 
     return render(request, 'form_showing.html', context)
