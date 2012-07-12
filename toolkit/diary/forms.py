@@ -1,6 +1,12 @@
 import datetime
 from django import forms
+from django.core.exceptions import ValidationError
 import toolkit.diary.models
+
+
+def _in_past(time):
+    # XXX: Should probably be working in UTC?
+    return time < datetime.datetime.now()
 
 
 class DiaryIdeaForm(forms.ModelForm):
@@ -38,11 +44,19 @@ class ShowingForm(forms.ModelForm):
         # Exclude these for now:
         exclude = ('event', 'extra_copy', 'extra_copy_summary')
 
+    def clean_start(self):
+        if _in_past(self.cleaned_data['start']):
+            raise ValidationError("May not be in the past")
+
 
 class CloneShowingForm(forms.Form):
     # For cloning a showing, so only need very minimal extra details
     start = forms.DateTimeField(required=True)
     booked_by = forms.CharField(min_length=1, max_length=128, required=True)
+
+    def clean_start(self):
+        if _in_past(self.cleaned_data['start']):
+            raise ValidationError("May not be in the past")
 
 class NewEventForm(forms.Form):
     start = forms.DateTimeField(required=True)
@@ -56,6 +70,9 @@ class NewEventForm(forms.Form):
     confirmed = forms.BooleanField(required=False)
     discounted = forms.BooleanField(required=False)
 
+    def clean_start(self):
+        if _in_past(self.cleaned_data['start']):
+            raise ValidationError("May not be in the past")
 
 class MailoutForm(forms.Form):
     subject = forms.CharField(max_length=128, required=True)
