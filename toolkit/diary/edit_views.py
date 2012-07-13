@@ -277,8 +277,7 @@ def edit_showing(request, showing_id=None):
             for role_id in selected_roles:
                 role_id = int(role_id)
                 # XXX: For now, only handle one rota entry of each type:
-                # modified_showing.rotaentry_set.get_or_create(role_id=role_id, rank=1)
-                modified_showing.rotaentry_set.get_or_create(role_id=role_id)
+                modified_showing.rotaentry_set.get_or_create(role_id=role_id, rank=1)
                 initial_set.discard(role_id)
             # Now remove any roles that we haven't seen:
             modified_showing.rotaentry_set.filter(role__in=initial_set).delete()
