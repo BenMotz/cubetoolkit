@@ -1,7 +1,7 @@
 import logging
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
-from django.shortcuts import render_to_response, get_object_or_404, render
+from django.shortcuts import get_object_or_404, render
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
@@ -45,7 +45,7 @@ def view_volunteer_list(request):
         'role_vol_map': role_vol_map,
         'default_mugshot': settings.DEFAULT_MUGSHOT,
     }
-    return render_to_response('volunteer_list.html', context)
+    return render(request, 'volunteer_list.html', context)
 
 
 def select_volunteer(request, active=True):

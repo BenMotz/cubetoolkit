@@ -7,7 +7,7 @@ import logging
 from toolkit.util.ordereddict import OrderedDict
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
-from django.shortcuts import render_to_response, get_object_or_404, render
+from django.shortcuts import get_object_or_404, render
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.forms.models import modelformset_factory
@@ -125,7 +125,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
     context['start'] = startdate
     context['end'] = enddate
     context['edit_prefs'] = toolkit.diary.edit_prefs.get_preferences(request.session)
-    return render_to_response('edit_event_index.html', context)
+    return render(request, 'edit_event_index.html', context)
 
 
 def set_edit_preferences(request):
@@ -508,7 +508,7 @@ def view_event_field(request, field, year, month, day):
         'event_field': field,
     }
 
-    return render_to_response('view_{0}.html'.format(field), context)
+    return render(request, 'view_{0}.html'.format(field), context)
 
 
 @require_write_auth

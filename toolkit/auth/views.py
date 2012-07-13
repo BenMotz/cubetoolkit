@@ -1,7 +1,7 @@
 import logging
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
-from django.shortcuts import render_to_response
+from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.template import RequestContext
 import django.conf
@@ -51,7 +51,7 @@ def auth(request, atype):
     else:
         # Always use a new form:
         context['form'] = form or AuthForm()
-        return render_to_response('form_auth.html', RequestContext(request, context))
+        return render(request, 'form_auth.html', RequestContext(request, context))
 
 
 def clear_auth(request):

@@ -1,7 +1,7 @@
 import logging
 
 from django.http import HttpResponseRedirect
-from django.shortcuts import render_to_response, get_object_or_404, render
+from django.shortcuts import get_object_or_404, render
 from django.db.models import Q
 import django.db  # Used for raw query for stats
 from django.core.urlresolvers import reverse
@@ -70,7 +70,7 @@ def search(request):
         'show_edit_link': show_edit_link,
         'show_delete_link': show_delete_link,
     }
-    return render_to_response('search_members.html', context)
+    return render(request, 'search_members.html', context)
 
 
 @require_read_auth
@@ -169,7 +169,7 @@ def member_statistics(request):
                                     .count(),
     }
 
-    return render_to_response('stats.html', context)
+    return render(request, 'stats.html', context)
 
 
 def member_homepages(request):
@@ -177,4 +177,4 @@ def member_homepages(request):
                              .exclude(website='')
                              .order_by('number')
                              .values('name', 'website'))
-    return render_to_response('homepages.html', {'members': members})
+    return render(request, 'homepages.html', {'members': members})

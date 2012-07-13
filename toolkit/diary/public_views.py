@@ -7,7 +7,7 @@ import markdown
 from toolkit.util.ordereddict import OrderedDict
 
 from django.http import HttpResponse, Http404
-from django.shortcuts import render_to_response, get_object_or_404
+from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
@@ -77,7 +77,7 @@ def view_diary(request, year=None, month=None, day=None, event_type=None):
     # as a location for images:
     context['media_url'] = settings.MEDIA_URL
 
-    return render_to_response('view_showing_index.html', context)
+    return render(request, 'view_showing_index.html', context)
 
 
 def view_diary_json(request, year, month, day):
@@ -131,7 +131,7 @@ def view_showing(request, showing_id=None):
     context = {}
     context['showing'] = get_object_or_404(Showing, id=showing_id)
     context['event'] = context['showing'].event
-    return render_to_response('view_showing.html', context)
+    return render(request, 'view_showing.html', context)
 
 
 def view_event(request, event_id=None, legacy_id=None):
@@ -150,4 +150,4 @@ def view_event(request, event_id=None, legacy_id=None):
         'media': {event.id: media},
         'media_url': settings.MEDIA_URL
     }
-    return render_to_response('view_event.html', context)
+    return render(request, 'view_event.html', context)
