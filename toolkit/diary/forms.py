@@ -46,7 +46,7 @@ class ShowingForm(forms.ModelForm):
 class CloneShowingForm(forms.Form):
     # For cloning a showing, so only need very minimal extra details
 
-    start = forms.DateTimeField(required=True, validators=[validate_in_future])
+    clone_start = forms.DateTimeField(required=True, validators=[validate_in_future])
     booked_by = forms.CharField(min_length=1, max_length=128, required=True)
 
 

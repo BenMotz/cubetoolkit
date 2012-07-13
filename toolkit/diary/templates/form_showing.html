@@ -9,6 +9,7 @@ Details for: {{ event.name }}
 <script type="text/javascript">
 $(document).ready(function() {
         $('#id_start').datetimepicker({ dateFormat : 'yy-mm-dd', timeFormat : 'hh:mm:ss', minDate : 0});
+        $('#id_clone_start').datetimepicker({ dateFormat : 'yy-mm-dd', timeFormat : 'hh:mm:ss', minDate : 0});
         $('#delete_form').bind("submit", function() {
             return confirm("Delete event: are you sure?");
         });

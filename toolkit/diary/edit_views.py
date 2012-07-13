@@ -169,7 +169,7 @@ def add_showing(request, event_id):
         # to set the event id and rota information manually, so don't commit
         # the new object immediately:
         new_showing = toolkit.diary.models.Showing(copy_from=source_showing)
-        new_showing.start = clone_showing_form.cleaned_data['start']
+        new_showing.start = clone_showing_form.cleaned_data['clone_start']
         new_showing.booked_by = clone_showing_form.cleaned_data['booked_by']
         # Need to save showing before cloning the rota, as the rota entries
         # need the key of the Showing, and that won't get created until the
@@ -288,7 +288,7 @@ def edit_showing(request, showing_id=None):
     # but initialise it with values from existing event, but a day later...
     clone_showing_form = toolkit.diary.forms.CloneShowingForm(
             initial={
-                'start': showing.start + datetime.timedelta(days=1)
+                'clone_start': showing.start + datetime.timedelta(days=1)
             }
     )
 
