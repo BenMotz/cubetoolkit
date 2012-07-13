@@ -1,6 +1,4 @@
 import os.path
-# import re
-# import magic
 import PIL.Image
 import logging
 
@@ -147,8 +145,11 @@ class Volunteer(models.Model):
         except MemoryError:
             logger.error("Out of memory trying to create thumbnail for {0}".format(self.portrait))
 
-        thumb_file = os.path.join(settings.MEDIA_ROOT, "volunteers_thumbnails", os.path.basename(str(self.portrait)))
-
+        thumb_file = os.path.join(
+            settings.MEDIA_ROOT,
+            "volunteers_thumbnails",
+            os.path.basename(str(self.portrait))
+        )
         # Make sure thumbnail file ends in jpg, to avoid confusion:
         if os.path.splitext(thumb_file.lower())[1] not in (u'.jpg', u'.jpeg'):
             thumb_file += ".jpg"

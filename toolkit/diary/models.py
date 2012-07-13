@@ -6,7 +6,7 @@ import magic
 import PIL.Image
 
 from django.db import models
-import django.conf
+from django.conf import settings
 import django.core.exceptions
 
 logger = logging.getLogger(__name__)
@@ -69,40 +69,40 @@ class MediaItem(models.Model):
     def autoset_mimetype(self):
         # See lib/python2.7/site-packages/django/forms/fields.py for how to do
         # basic validation of PNGs / JPEGs
-        # logging.info("set mimetype: '{0}'".format(self.media_file))
+        # logger.info("set mimetype: '{0}'".format(self.media_file))
         if self.media_file and self.media_file != '':
             magic_wrapper = magic.Magic(mime=True)
             try:
                 self.mimetype = magic_wrapper.from_buffer(self.media_file.file.read(4096))
             except IOError:
-                logging.error("Failed to determine mimetype of file {0}".format(self.media_file.file.name))
+                logger.error("Failed to determine mimetype of file {0}".format(self.media_file.file.name))
                 self.mimetype = "application/octet-stream"
-            logging.debug("Mime type for {0} detected as {1}".format(self.media_file.file.name, self.mimetype))
+            logger.debug("Mime type for {0} detected as {1}".format(self.media_file.file.name, self.mimetype))
 
     def update_thumbnail(self):
         if not self.mimetype.startswith("image"):
-            logging.error("Creating thumbnails for non-image files not supported at this time")
+            logger.error("Creating thumbnails for non-image files not supported at this time")
             # Maybe have some default image for audio/video?
             return
         # Delete old thumbnail, if any:
         if self.thumbnail and self.thumbnail != '':
-            logging.info("Updating thumbnail for media item {0}, file {1}".format(self.pk, self.media_file))
+            logger.info("Updating thumbnail for media item {0}, file {1}".format(self.pk, self.media_file))
             try:
                 self.thumbnail.delete(save=False)
             except (IOError, OSError) as ose:
-                logging.error("Failed deleting old thumbnail: {0}".format(ose))
+                logger.error("Failed deleting old thumbnail: {0}".format(ose))
         try:
             image = PIL.Image.open(self.media_file.file.name)
         except (IOError, OSError) as ioe:
-            logging.error("Failed to read image file: {0}".format(ioe))
+            logger.error("Failed to read image file: {0}".format(ioe))
             return
         try:
-            image.thumbnail(django.conf.settings.THUMBNAIL_SIZE, PIL.Image.ANTIALIAS)
+            image.thumbnail(settings.THUMBNAIL_SIZE, PIL.Image.ANTIALIAS)
         except MemoryError:
-            logging.error("Out of memory trying to create thumbnail for {0}".format(self.media_file))
+            logger.error("Out of memory trying to create thumbnail for {0}".format(self.media_file))
 
         thumb_file = os.path.join(
-            django.conf.settings.MEDIA_ROOT,
+            settings.MEDIA_ROOT,
             "diary_thumbnails",
             os.path.basename(str(self.media_file))
         )
@@ -113,15 +113,16 @@ class MediaItem(models.Model):
             # Convert image to RGB (can't save Paletted images as jpgs) and
             # save thumbnail as JPEG:
             image.convert("RGB").save(thumb_file, "JPEG")
+            logger.info("Generated thumbnail for event '%s' in file '%s'", self.pk, thumb_file)
         except (IOError, OSError) as ioe:
-            logging.error("Failed saving thumbnail: {0}".format(ioe))
+            logger.error("Failed saving thumbnail: {0}".format(ioe))
             if os.path.exists(thumb_file):
                 try:
                     os.unlink(thumb_file)
                 except (IOError, OSError) as ioe:
                     pass
             return
-        self.thumbnail = os.path.relpath(thumb_file, django.conf.settings.MEDIA_ROOT)
+        self.thumbnail = os.path.relpath(thumb_file, settings.MEDIA_ROOT)
         self.save(update_thumbnail=False)
 
 
@@ -174,7 +175,7 @@ class Event(models.Model):
     copy = models.TextField(max_length=8192, null=True, blank=True)
     copy_summary = models.TextField(max_length=4096, null=True, blank=True)
 
-    terms = models.TextField(max_length=4096, default=django.conf.settings.DEFAULT_TERMS_TEXT, null=True, blank=True)
+    terms = models.TextField(max_length=4096, default=settings.DEFAULT_TERMS_TEXT, null=True, blank=True)
     notes = models.TextField(max_length=4096, null=True, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
