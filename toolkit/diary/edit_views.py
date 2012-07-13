@@ -212,10 +212,10 @@ def add_event(request):
             # Set event tags to those from its template:
             new_event.save()
             new_event.reset_tags_to_default()
-            showings = []
+            # create number_of_days showings, each offset by one more from the
+            # date/time given in start parameter, and each with rota roles from
+            # the template
             start = form.cleaned_data['start']
-            # create number_of_days showings, each at date/time given in start
-            # parameter, and each with rota roles from the template
             for day_count in range(0, form.cleaned_data['number_of_days']):
                 day_offset = datetime.timedelta(days=day_count)
                 new_showing = Showing(event=new_event,
@@ -227,7 +227,6 @@ def add_event(request):
                 new_showing.save()
                 # Set showing roles to those from its template:
                 new_showing.reset_rota_to_default()
-                showings.append(new_showing)
             return _return_to_editindex(request)
         else:
             # If form was not valid, re-render the form (which will highlight

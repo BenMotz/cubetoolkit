@@ -71,7 +71,7 @@ $(document).ready(function() {
 
 <table>
     <tr><td colspan="2" /></tr>
-    <tr><td colspan="2" /><h2>BOOKING</h2></tr>
+        <tr><td colspan="2" /><h2>BOOKING: <a href="{% url edit-event-details-view pk=showing.event_id %}">{{ showing.event.name }}</a></h2></tr>
     <tr><td colspan="2" /></tr>
 
     <tr><th colspan="2"><h5>Clone booking.</h5></td></tr>
