@@ -16,7 +16,7 @@ import django.template
 import django.db
 
 from toolkit.auth.decorators import require_write_auth, require_read_or_write_auth
-from toolkit.diary.models import Showing, Event, DiaryIdea, RotaEntry, MediaItem, EventTemplate, EventTag
+from toolkit.diary.models import Showing, Event, DiaryIdea, MediaItem, EventTemplate, EventTag
 import toolkit.diary.forms
 import toolkit.diary.edit_prefs
 
@@ -493,6 +493,8 @@ def view_event_field(request, field, year, month, day):
                                .filter(confirmed=True)
                                .filter(start__range=[start_date, end_date])
                                .order_by('start')
+                               # Very mildly hacky optimisation for fetching the rota:
+                               .prefetch_related('rotaentry_set__role')
                                .select_related())
 
     if 'search' in request.GET:
