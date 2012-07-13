@@ -265,8 +265,12 @@ class Showing(models.Model):
         # this, but this will stop the forms deleting records. (Stored procedures,
         # anyone?). This also doesn't stop showings having their start date
         # moved from the past to the future!
+        #
+        # (For the purposes of the import script, if force=True is passed then
+        # this check is bypassed)
+        force = kwargs.pop('force', False)
         if self.start is not None:
-            if self.in_past():
+            if self.in_past() and not force:
                 logger.error("Tried to update showing {0} with start time {1} in the past".format(self.pk, self.start))
                 raise django.db.IntegrityError("Can't update showings that start in the past")
         return super(Showing, self).save(*args, **kwargs)

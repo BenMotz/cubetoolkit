@@ -141,6 +141,7 @@ def import_event_showings(connection, event, legacy_event_id):
 
     all_showings = []
 
+    fake_start = datetime.datetime.now() + datetime.timedelta(days=1)
 
     cursor = connection.cursor()
     showing_count = cursor.execute("SELECT datetime, event_id, booked_by, confirmed, cancelled, discounted, outside_hire, private_event FROM diary WHERE event_id = '%s' ORDER BY datetime" % legacy_event_id)
@@ -153,7 +154,9 @@ def import_event_showings(connection, event, legacy_event_id):
         s = toolkit.diary.models.Showing()
         all_showings.append(s)
         s.event = event
-        s.start = r[0]
+        s.start = fake_start  # The full_clean checks that start is in the future
+                              # so set a valid start date now, and after the call to 
+                              # full_clean change it to the actual value before saving
         if r[2] is not None and r[2].strip() != '':
             s.booked_by = titlecase(decode(r[2]))
         else:
@@ -170,21 +173,23 @@ def import_event_showings(connection, event, legacy_event_id):
             private_list.append(s)
 
         s.full_clean()
-        s.save()
+        # See comment above:
+        s.start = r[0]
+        s.save(force=True)  # Force, to allow saving of showing with start in past
 
     if len(cancelled_list) == showing_count:
         event.cancelled = True
     else:
         for cancelled_showing in cancelled_list:
             cancelled_showing.cancelled = True
-            cancelled_showing.save()
+            cancelled_showing.save(force=True)  # Force, to allow saving of showing with start in past
 
     if len(private_list) == showing_count:
         event.private = True
     else:
         for hidden_showing in private_list:
             hidden_showing.hide_in_programme = True
-            hidden_showing.save()
+            hidden_showing.save(force=True)  # Force, to allow saving of showing with start in past
 
     event.outside_hire = aggregate_hire
 
