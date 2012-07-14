@@ -83,7 +83,7 @@ td.table_gap {
 .discounted { color: green; }
 
 .event {
-	background-image: url(../diary/line.jpg);
+	background-image: url(../line.jpg);
 	background-repeat: repeat-x;
 	background-color: white;
 	margin-left: 10%;

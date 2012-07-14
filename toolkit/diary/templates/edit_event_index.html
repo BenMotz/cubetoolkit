@@ -8,7 +8,7 @@ Editing {{ event_list_name }}
 
 {% block css %}
 <style type="text/css">
-  @import url('{{ STATIC_URL }}/css/lib/smoothness/jquery-ui.css');
+  @import url('{{ STATIC_URL }}css/lib/smoothness/jquery-ui.css');
   .private {
   font-style: italic;
   }
@@ -47,8 +47,8 @@ Editing {{ event_list_name }}
 {% endblock %}
 
 {% block script %}
-<script type="text/javascript" src="{{ STATIC_URL }}/js/lib/jquery.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}/js/lib/jquery-ui.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
 <script type="text/javascript">
 var edit_prefs = { {% for p,v in edit_prefs.iteritems %}
     '{{ p }}' : '{{ v }}',
@@ -102,7 +102,7 @@ function prefs_updated(data) {
 {% endblock %}
 
 {% block body %}
-<img src="{{ STATIC_URL }}/diary/diary_edit_list_header.gif" alt="Cube Microplex" width="150px">
+<img src="{{ STATIC_URL }}diary/diary_edit_list_header.gif" alt="Cube Microplex" width="150px">
 <h3>CUBE events diary</h3>
 <p id="controls"><a href="{% url logout %}">Log out</a><br>
 Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">this window</a></p>

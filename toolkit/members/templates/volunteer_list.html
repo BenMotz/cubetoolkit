@@ -13,7 +13,7 @@
 
 {% block body %}
 {# {% for v, n in roles.iteritems %} <p><b>{{ v }}</b><br> {{ n }} </p> {% endfor %} #}
-<img src="{{ STATIC_URL }}/members/cube_microplex_logo.gif" width="200"><p><h2>Cube volunteers report.</h2>
+<img src="{{ STATIC_URL }}members/cube_microplex_logo.gif" width="200"><p><h2>Cube volunteers report.</h2>
 Total cube volunteers: {{ volunteers|length }}<p>
 Report generated: {% now "d/m/Y" %}<p>
 <a href="{% url add-volunteer %}"title="add new volunteer">[add volunteer]</a>

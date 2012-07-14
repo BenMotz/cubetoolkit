@@ -6,7 +6,7 @@ Editing Event types
 
 {% block css %}
 <style type="text/css">
-  @import url('{{ STATIC_URL }}/css/lib/smoothness/jquery-ui.css');
+  @import url('{{ STATIC_URL }}css/lib/smoothness/jquery-ui.css');
   body {
       font-family: sans-serif;
       font-size: 9pt;
@@ -38,8 +38,8 @@ Editing Event types
 
 {% block script %}
 <!-- Screw progressive enhancement -->
-<script type="text/javascript" src="{{ STATIC_URL }}/js/lib/jquery.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}/js/lib/jquery-ui.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
 <script type="text/javascript">
 var tags = { {% for tag in tags %}
     '{{ tag.pk }}' : '{{ tag.name }}', {% endfor %}
