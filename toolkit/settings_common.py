@@ -1,4 +1,4 @@
-
+import os.path
 # Usernames / passwords::
 #
 # (To generate a new password hash:
@@ -46,6 +46,7 @@ IMPORT_SCRIPT_DATABASE = 'toolkitimport'
 
 # Custom:
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+APP_ROOT_DETECTED = os.path.dirname(os.path.realpath(__file__))
 
 APPEND_SLASH = True
 
@@ -96,7 +97,7 @@ USE_L10N = True
 # Following are defined in settings_*.py
 ## Absolute filesystem path to the directory that will hold user-uploaded files.
 ## Example: "/home/media/media.lawrence.com/media/"
-#MEDIA_ROOT = os.path.join(APP_ROOT,'media')
+MEDIA_ROOT = os.path.join(APP_ROOT_DETECTED,'../media')
 #
 ## URL that handles the media served from MEDIA_ROOT. Make sure to use a
 ## trailing slash.
@@ -107,7 +108,7 @@ USE_L10N = True
 ## Don't put anything in this directory yourself; store your static files
 ## in apps' "static/" subdirectories and in STATICFILES_DIRS.
 ## Example: "/home/media/media.lawrence.com/static/"
-#STATIC_ROOT = os.path.join(APP_ROOT,'static')
+STATIC_ROOT = os.path.join(APP_ROOT_DETECTED,'../static')
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -118,12 +119,12 @@ STATIC_URL = '/static/'
 # Examples: "http://foo.com/static/admin/", "/static/admin/".
 ADMIN_MEDIA_PREFIX = '/static/admin/'
 
-# Additional locations of static files
-STATICFILES_DIRS = (
-    # Put strings here, like "/home/html/static" or "C:/www/django/static".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-)
+# # Additional locations of static files
+# STATICFILES_DIRS = (
+#     # Put strings here, like "/home/html/static" or "C:/www/django/static".
+#     # Always use forward slashes, even on Windows.
+#     # Don't forget to use absolute paths, not relative paths.
+# )
 
 # Where to store messages:
 MESSAGE_STORAGE = 'django.contrib.messages.storage.fallback.FallbackStorage'
@@ -161,12 +162,12 @@ TEMPLATE_CONTEXT_PROCESSORS = (
 
 ROOT_URLCONF = 'toolkit.urls'
 
-#TEMPLATE_DIRS = (
-#    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-#    # Always use forward slashes, even on Windows.
-#    # Don't forget to use absolute paths, not relative paths.
-#    os.path.join(APP_ROOT, 'templates'),
-#)
+TEMPLATE_DIRS = (
+    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
+    # Always use forward slashes, even on Windows.
+    # Don't forget to use absolute paths, not relative paths.
+    os.path.join(APP_ROOT_DETECTED, '../templates'),
+)
 
 INSTALLED_APPS = (
     'toolkit.diary',
