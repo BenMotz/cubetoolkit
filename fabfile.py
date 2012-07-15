@@ -41,7 +41,7 @@ def deploy_code():
         target = os.path.join(env.site_root, CODE_DIR)
         run("rm -rf {0}".format(target))
         run("tar -xzf {0}".format(archive))
-        run("rm -f toolkit/settings.py")
+        run("rm -f toolkit/settings.py?")
         run("ln -s {0} toolkit/settings.py".format(env.settings))
 
 def deploy_static():
@@ -52,6 +52,12 @@ def deploy_static():
     # This isn't so much to put content there, but to delete anything that
     # isn't needed or shouldn't be there.
     local('rsync -av --delete static/ {0}@{1}:{2}/static'.format(env.user, env.hosts[0], env.site_root))
+
+    with cd(env.site_root):
+        run("cp logging.import.conf logging.conf")
+        run("venv/bin/python manage.py collectstatic --noinput")
+        run("cp logging.normal.conf logging.conf")
+
 
 def deploy_media():
     """Rsync all media content onto target"""
