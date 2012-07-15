@@ -287,9 +287,9 @@ def edit_showing(request, showing_id=None):
     # Also create a form for "cloning" the showing (ie. adding another one),
     # but initialise it with values from existing event, but a day later...
     clone_showing_form = toolkit.diary.forms.CloneShowingForm(
-            initial={
-                'clone_start': showing.start + datetime.timedelta(days=1)
-            }
+        initial={
+            'clone_start': showing.start + datetime.timedelta(days=1)
+        }
     )
 
     context = {
@@ -491,8 +491,7 @@ def view_event_field(request, field, year, month, day):
                                .filter(confirmed=True)
                                .filter(start__range=[start_date, end_date])
                                .order_by('start')
-                               # Very mildly hacky optimisation for fetching the rota:
-                               .prefetch_related('rotaentry_set__role')
+                               .prefetch_related('rotaentry_set__role')  # mildly hacky optimisation for rota view
                                .select_related())
 
     if 'search' in request.GET:

@@ -97,7 +97,7 @@ USE_L10N = True
 # Following are defined in settings_*.py
 ## Absolute filesystem path to the directory that will hold user-uploaded files.
 ## Example: "/home/media/media.lawrence.com/media/"
-MEDIA_ROOT = os.path.join(APP_ROOT_DETECTED,'media')
+MEDIA_ROOT = os.path.join(APP_ROOT_DETECTED, 'media')
 #
 ## URL that handles the media served from MEDIA_ROOT. Make sure to use a
 ## trailing slash.
@@ -108,7 +108,7 @@ MEDIA_ROOT = os.path.join(APP_ROOT_DETECTED,'media')
 ## Don't put anything in this directory yourself; store your static files
 ## in apps' "static/" subdirectories and in STATICFILES_DIRS.
 ## Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = os.path.join(APP_ROOT_DETECTED,'static')
+STATIC_ROOT = os.path.join(APP_ROOT_DETECTED, 'static')
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -124,8 +124,8 @@ STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-    os.path.join(APP_ROOT_DETECTED,'toolkit','static_common'),
- )
+    os.path.join(APP_ROOT_DETECTED, 'toolkit', 'static_common'),
+)
 
 # Where to store messages:
 MESSAGE_STORAGE = 'django.contrib.messages.storage.fallback.FallbackStorage'
@@ -152,7 +152,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-#    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    # 'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
 )
 

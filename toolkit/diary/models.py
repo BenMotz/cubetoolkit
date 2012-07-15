@@ -13,13 +13,14 @@ logger = logging.getLogger(__name__)
 
 from toolkit.diary.validators import validate_in_future
 
+
 class FutureDateTimeField(models.DateTimeField):
     """DateTime field that can only be set to times in the future.
     Used for Showing start times"""
     default_error_messages = {
-            'invalid': 'Date may not be in the past',
+        'invalid': 'Date may not be in the past',
     }
-    default_validators = [ validate_in_future ]
+    default_validators = [validate_in_future]
 
 
 class Role(models.Model):
@@ -197,6 +198,7 @@ class Event(models.Model):
         # querysets, SQL, etc.
         raise django.db.IntegrityError("Event deletion not allowed")
 
+
 class Showing(models.Model):
 
     event = models.ForeignKey('Event', related_name='showings')
@@ -246,7 +248,7 @@ class Showing(models.Model):
             # Manually copy fields, rather than using things from copy library,
             # as don't want to copy the rota (as that would make db writes)
             attributes_to_copy = ('event', 'start', 'booked_by', 'extra_copy',
-                    'confirmed', 'hide_in_programme', 'cancelled', 'discounted')
+                'confirmed', 'hide_in_programme', 'cancelled', 'discounted')
             for attribute in attributes_to_copy:
                 setattr(self, attribute, getattr(copy_from, attribute))
             if start_offset:
