@@ -11,7 +11,7 @@ import toolkit.diary.models
 import toolkit.members.models
 import toolkit.settings as settings
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
-from django.db import transaction
+import django.db
 
 FORMATS_PATH=os.path.join(os.path.dirname(__file__), "./source_data/formats")
 
@@ -212,7 +212,7 @@ def import_ideas(connection):
 
     cursor.close()
 
-@transaction.commit_on_success
+@django.db.transaction.commit_on_success
 def import_events(connection, role_map):
     cursor = connection.cursor()
     results = cursor.execute("SELECT event_id, event_name, copy, copy_summary, duration, image_credits, terms FROM events ORDER BY event_id")
@@ -322,6 +322,46 @@ def create_roles(connection):
     cursor.close()
 
     return roles
+
+
+def mark_standard_roles():
+    # For eff's sake;
+    try:
+        dj_role = toolkit.diary.models.Role.objects.get(name="Dj")
+        dj_role.name = "DJ"
+        dj_role.save()
+    except django.core.exceptions.ObjectDoesNotExist:
+        pass
+
+    # Mark all roles that are featured in > 35 events (arbitrary threshold)
+    # as "standard" event roles (and read_only) and mark all those in more
+    # then 3 events as read_only
+    read_only_roles = []
+    standard_roles = []
+    cursor = django.db.connection.cursor()
+    try:
+        cursor.execute("SELECT "
+                       "role_id, name, count(*) AS 'count' "
+                       "FROM RotaEntries "
+                       "JOIN `Roles` "
+                       "ON `RotaEntries`.`role_id` = `Roles`.`id` "
+                       "GROUP BY role_id")
+        for row in cursor.fetchall():
+            if row[2] > 3:
+                read_only_roles.append(row[0])
+            if row[2] > 35:
+                standard_roles.append(row[0])
+    finally:
+        cursor.close()
+
+    for r_id in read_only_roles:
+        role = toolkit.diary.models.Role.objects.get(id=r_id)
+        role.read_only = True
+        if r_id in standard_roles:
+            role.standard = True
+        role.save()
+
+
 
 ###############################################################################
 # Create event templates using dict { event_template_name : [ list of role names] }
@@ -441,7 +481,7 @@ def import_volunteer(member, active, notes, role_map, roles):
     import_volunteer_roles(v, role_map, roles)
     v.save()
 
-@transaction.commit_on_success
+@django.db.transaction.commit_on_success
 def import_members(connection):
 
     role_map = dict( (role.name.replace(" ","_").lower(), role) for role in toolkit.diary.models.Role.objects.all())
@@ -547,6 +587,9 @@ def main():
     import_events(conn, role_map)
     import_ideas(conn)
     import_members(conn)
+
+    mark_standard_roles()
+
     conn.close ()
 
 if __name__ == "__main__":

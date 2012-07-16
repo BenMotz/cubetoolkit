@@ -60,6 +60,9 @@ urlpatterns += patterns(
     url('^edit/eventtemplates/', 'edit_event_templates', name='edit_event_templates'),
     url('^edit/eventtags/', 'edit_event_tags', name='edit_event_tags'),
 
+    # Edit event roles
+    url('^edit/roles/', 'edit_roles', name='edit_roles'),
+
     # The slightly OTT regex in the following will match:
     # "rota" "rota/" "rota/2001/01" "rota/2001/01/" "rota/2001/1/02" "rota/2001/1/2/"
     # (ie needs at least year/month, not just a year)

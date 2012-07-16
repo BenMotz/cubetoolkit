@@ -16,7 +16,7 @@ import django.template
 import django.db
 
 from toolkit.auth.decorators import require_write_auth, require_read_or_write_auth
-from toolkit.diary.models import Showing, Event, DiaryIdea, MediaItem, EventTemplate, EventTag
+from toolkit.diary.models import Showing, Event, DiaryIdea, MediaItem, EventTemplate, EventTag, Role
 import toolkit.diary.forms
 import toolkit.diary.edit_prefs
 
@@ -587,6 +587,28 @@ def edit_event_tags(request):
         logger.error("Tag(s) {0} not included in update".format(",".join(tags_by_pk.values())))
 
     return HttpResponse("OK")
+
+
+@require_write_auth
+def edit_roles(request):
+    # This is pretty slow,but it's not a commonly used bit of the UI...
+    # (To be precise, save involves >120 queries. TThis is because I've been lazy
+    # and used the formset save method)
+
+    role_formset = modelformset_factory(Role, toolkit.diary.forms.RoleForm, can_delete=True)
+
+    if request.method == 'POST':
+        formset = role_formset(request.POST)
+        if formset.is_valid():
+            logger.info("Roles updated")
+            formset.save()
+            # Reset formset, so get another blank one at the
+            # end, deleted ones disappear, etc.
+            formset = role_formset()
+    else:
+        formset = role_formset()
+
+    return render(request, 'form_edit_roles.html', {'formset': formset})
 
 
 def _render_mailout_body(days_ahead=7):

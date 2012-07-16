@@ -1,10 +1,15 @@
 import datetime
 from django import forms
-from django.core.exceptions import ValidationError
 import toolkit.diary.models
 
 
 from toolkit.diary.validators import validate_in_future
+
+
+class RoleForm(forms.ModelForm):
+    class Meta(object):
+        model = toolkit.diary.models.Role
+        fields = ('name', 'standard')
 
 
 class DiaryIdeaForm(forms.ModelForm):

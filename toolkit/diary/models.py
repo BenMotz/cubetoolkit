@@ -25,17 +25,40 @@ class FutureDateTimeField(models.DateTimeField):
 
 class Role(models.Model):
     name = models.CharField(max_length=64, unique=True)
-    description = models.CharField(max_length=64, null=True, blank=True)
-    shortcode = models.CharField(max_length=8, null=True, blank=True, unique=True)
 
-    # Can this role be added to the rota?
-    rota = models.BooleanField(default=False)
+    standard = models.BooleanField(default=False,
+                                   help_text="Should this role be presented in the main list of roles for events")
+
+    # Allow role to be edited/deleted
+    read_only = models.BooleanField(default=False)
 
     class Meta:
         db_table = 'Roles'
 
     def __unicode__(self):
         return self.name
+
+    def __init__(self, *args, **kwargs):
+        result = super(Role, self).__init__(*args, **kwargs)
+        # Store original value of name, so it can't be edited for
+        # read only roles
+        self._original_name = self.name
+        return result
+
+    def save(self, *args, **kwargs):
+        if self.read_only and self._original_name != self.name:
+            logger.error("Tried to edit read-only role {0}".format(self.name))
+            return
+        else:
+            return super(Role, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        # Don't allow read_only roles to be deleted
+        if self.pk and self.read_only:
+            logger.error("Tried to delete read-only role {0}".format(self.name))
+            return False
+        else:
+            return super(Role, self).delete(*args, **kwargs)
 
 
 class MediaItem(models.Model):
@@ -247,8 +270,8 @@ class Showing(models.Model):
             logger.info("Cloning showing from existing showing (id %d)", copy_from.pk)
             # Manually copy fields, rather than using things from copy library,
             # as don't want to copy the rota (as that would make db writes)
-            attributes_to_copy = ('event', 'start', 'booked_by', 'extra_copy',
-                'confirmed', 'hide_in_programme', 'cancelled', 'discounted')
+            attributes_to_copy = ('event', 'start', 'booked_by', 'extra_copy', 'confirmed',
+                                  'hide_in_programme', 'cancelled', 'discounted')
             for attribute in attributes_to_copy:
                 setattr(self, attribute, getattr(copy_from, attribute))
             if start_offset:
