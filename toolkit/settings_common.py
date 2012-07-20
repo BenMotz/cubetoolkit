@@ -34,6 +34,10 @@ Additonal Info -"""
 
 DEFAULT_MUGSHOT = "/static/members/default_mugshot.gif"
 
+# The maximum number of each type of role that can be assigned to a showing
+# (so, for example, can't have more than this number of bar staff)
+MAX_COUNT_PER_ROLE = 6
+
 # Following settings are used by the import script, can be discarded when
 # switch-over is finalised.
 IMPORT_SCRIPT_USER = 'toolkitimport'

@@ -291,6 +291,7 @@ def edit_showing(request, showing_id=None):
         'form': form,
         'clone_showing_form': clone_showing_form,
         'rota_form': rota_form,
+        'max_role_assignment_count': settings.MAX_COUNT_PER_ROLE,
     }
 
     return render(request, 'form_showing.html', context)

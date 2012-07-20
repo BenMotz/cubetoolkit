@@ -1,11 +1,12 @@
 {% extends "base.html" %}
 {% block title %}
-Details for: {{ event.name }}
+Details for: {{ showing.event.name }}
 {% endblock %}
 {% block script %}
 <script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/ui.spinner.min.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
         $('#id_start').datetimepicker({ dateFormat : 'yy-mm-dd', timeFormat : 'hh:mm:ss', minDate : 0});
@@ -13,6 +14,7 @@ $(document).ready(function() {
         $('#delete_form').bind("submit", function() {
             return confirm("Delete event: are you sure?");
         });
+        $('input.rota_count').spinner({ min: 0, max: {{ max_role_assignment_count }}});
 });
 </script>
 {% endblock %}
@@ -20,9 +22,7 @@ $(document).ready(function() {
 <style>
     @import url('{{ STATIC_URL }}css/lib/smoothness/jquery-ui.css');
     @import url('{{ STATIC_URL }}css/lib/timepicker.css');
-    form textarea, form input[type=text] {
-        width: 80%;
-    }
+    @import url('{{ STATIC_URL }}css/lib/ui.spinner.css');
 
     table {
         width: 500px;
@@ -56,8 +56,24 @@ $(document).ready(function() {
     td.spacer {
        height: 20px;
     }
-    input.spinner {
-        width: 20px;
+    input.rota_count {
+        width: 40px;
+    }
+    #rota_form_cell p {
+        text-align: right;
+        padding: 0 20% 0 0;
+        margin: 2px 0;
+    }
+    #rota_form_cell select {
+        display: block;
+        float: right;
+        height: 120pt;
+        width: 70%
+    }
+    #rota_form_cell span.helptext {
+        display: block;
+        float: right;
+        width: 70%;
     }
 </style>
 {% endblock %}
@@ -110,9 +126,11 @@ $(document).ready(function() {
     {% csrf_token %}
     {{ form.as_table }}
     <tr>
-        <th colspan="2">Main roles</th></tr>
+        <th colspan="2">Rota:</th></tr>
     </tr>
-        {{ rota_form }}
+    <tr><td colspan="2" id="rota_form_cell">
+        {{ rota_form.as_p }}
+    </td></tr>
     <tr><th colspan="2">
         <input type="submit" value="Update" />
     </th></tr>

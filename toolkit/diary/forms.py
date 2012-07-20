@@ -1,6 +1,8 @@
 import datetime
 from django import forms
 import django.db.models
+from django.conf import settings
+
 import toolkit.diary.models
 from toolkit.util.ordereddict import OrderedDict
 
@@ -77,8 +79,9 @@ def rota_form_factory(showing):
         if role.standard:
             # For each "standard" role, add an Integer field;
             members["role_{0}".format(role.pk)] = (
-                forms.IntegerField(min_value=0, max_value=6, required=True, label=role.name,
-                                   initial=rota_entry_count_by_role.get(role.pk, 0))
+                forms.IntegerField(min_value=0, max_value=settings.MAX_COUNT_PER_ROLE , required=True, label=role.name,
+                                   initial=rota_entry_count_by_role.get(role.pk, 0),
+                                   widget=forms.TextInput(attrs={'class': 'rota_count'}))
             )
 
     # Add a MultipleChoiceField for all roles that aren't "standard"
