@@ -56,6 +56,9 @@ $(document).ready(function() {
     td.spacer {
        height: 20px;
     }
+    input.spinner {
+        width: 20px;
+    }
 </style>
 {% endblock %}
 
@@ -69,13 +72,15 @@ $(document).ready(function() {
     {% endfor %}
 </ul>
 {% endif %}
+<pre>
+</pre>
 
 <table>
     <tr><td colspan="2" /></tr>
         <tr><td colspan="2" /><h2>BOOKING: <a href="{% url edit-event-details-view pk=showing.event_id %}">{{ showing.event.name }}</a></h2></tr>
     <tr><td colspan="2" /></tr>
 
-    <tr><th colspan="2"><h5>Clone booking.</h5></td></tr>
+    <tr><th colspan="2"><h5>Clone booking.</h5></th></tr>
     <tr><td colspan="2" /></tr>
 
     <form action="{% url add-showing event_id=showing.event.id %}?copy_from={{showing.id}}" method="post">
@@ -84,10 +89,10 @@ $(document).ready(function() {
     {{ clone_showing_form.as_table }}
     <tr><th colspan="2">
         <input type="submit" value="Clone" />
-    </td></tr>
+    </th></tr>
     </form>
     <tr><td colspan="2" class="spacer"/></tr>
-    <tr><th colspan="2"><h5>Delete booking.</h5></td></tr>
+    <tr><th colspan="2"><h5>Delete booking.</h5></th></tr>
     <tr><th>Date:</th><td>{{ showing.start|date:"d F Y" }}</td></tr>
     <tr><th>Time:</th><td>{{ showing.start|date:"H:i" }}</td></tr>
     <tr><th>Event:</th><td>{{ showing.event.name }}</td></tr>
@@ -96,17 +101,21 @@ $(document).ready(function() {
             {% csrf_token %}
             <input type="submit" value="Delete" />
         </form>
-    </td></tr>
+    </th></tr>
     <tr><td colspan="2" class="spacer"/></tr>
 
-    <tr><th colspan="2"><h5>Edit booking.</h5></td></tr>
+    <tr><th colspan="2"><h5>Edit booking.</h5></th></tr>
     <tr><th>Event:</th><td>{{ showing.event.name }}</td>
     <form action="{% url edit-showing showing_id=showing.id %}" method="post">
     {% csrf_token %}
     {{ form.as_table }}
+    <tr>
+        <th colspan="2">Main roles</th></tr>
+    </tr>
+        {{ rota_form }}
     <tr><th colspan="2">
         <input type="submit" value="Update" />
-    </td></tr>
+    </th></tr>
     </form>
 </table>
 {% endblock %}

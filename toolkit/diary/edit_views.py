@@ -259,31 +259,25 @@ def add_event(request):
 def edit_showing(request, showing_id=None):
     showing = get_object_or_404(Showing, pk=showing_id)
 
+    RotaForm = toolkit.diary.forms.rota_form_factory(showing)
+
     if request.method == 'POST':
         form = toolkit.diary.forms.ShowingForm(request.POST, instance=showing)
+        rota_form = RotaForm(request.POST)
         if showing.in_past():
             messages.add_message(request, messages.ERROR, "Can't edit showings that are in the past")
-        elif form.is_valid():
-            # Because Django can't cope with updating the rota automatically
-            # do this two-step commit=False / save thing, then manually wrangle
-            # the rota:
-            modified_showing = form.save(commit=False)
-            modified_showing.save()
-            # Now get list of selected roles;
-            selected_roles = dict(request.POST)['roles']
-            initial_set = set(r.values()[0] for r in showing.rotaentry_set.values('role_id'))
-            # For each id, this will get the entry or create it:
-            for role_id in selected_roles:
-                role_id = int(role_id)
-                # XXX: For now, only handle one rota entry of each type:
-                modified_showing.rotaentry_set.get_or_create(role_id=role_id, rank=1)
-                initial_set.discard(role_id)
-            # Now remove any roles that we haven't seen:
-            modified_showing.rotaentry_set.filter(role__in=initial_set).delete()
+        elif form.is_valid() and rota_form.is_valid():
+            # The rota form is separate; first save the updated showing
+            modified_showing = form.save()
+            # Then update the rota with the returned data:
+            rota = rota_form.get_rota()
+            modified_showing.update_rota(rota)
 
             return _return_to_editindex(request)
     else:
         form = toolkit.diary.forms.ShowingForm(instance=showing)
+        rota_form = RotaForm()
+
     # Also create a form for "cloning" the showing (ie. adding another one),
     # but initialise it with values from existing event, but a day later...
     clone_showing_form = toolkit.diary.forms.CloneShowingForm(
@@ -296,6 +290,7 @@ def edit_showing(request, showing_id=None):
         'showing': showing,
         'form': form,
         'clone_showing_form': clone_showing_form,
+        'rota_form': rota_form,
     }
 
     return render(request, 'form_showing.html', context)

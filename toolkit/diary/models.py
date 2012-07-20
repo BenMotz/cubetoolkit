@@ -339,6 +339,42 @@ class Showing(models.Model):
             new_entry = RotaEntry(showing=self, template=rota_entry)
             new_entry.save()
 
+    def update_rota(self, _rota):
+        """Update rota from supplied dict. Dict should be a map of
+        role_id: no. entries
+        If no. entries is 0, any existing RotaEntries are deleted. If it's greater
+        than the number of RotaEntries, they'r added as required. If a role_id is
+        not in the dict, then any RotaEntries aren't affected"""
+
+        # copy rota:
+        rota = dict(_rota)
+
+        # Build map of rota entries by role id
+        rota_entries_by_id = {}
+        for re in self.rotaentry_set.select_related():
+            rota_entries_by_id.setdefault(re.role.pk, []).append(re)
+
+        for role_id, count in rota.iteritems():
+            # Number of existing rota entries for this role_id.
+            # Remove from dict, so anything left in the dict at the end
+            # is an error...
+            existing_entries = rota_entries_by_id.pop(role_id, [])
+            # delete highest ranked instances
+            while count < len(existing_entries):
+                logger.info("Removing role {0} from showing {1}".format(role_id, self.pk))
+                highest_ranked = max(existing_entries, key=lambda re: re.rank)
+                highest_ranked.delete()
+                existing_entries.remove(highest_ranked)
+            # add required entries
+            while count > len(existing_entries):
+                logger.info("Adding role {0} to showing {1}".format(role_id, self.pk))
+                # add rotaentries
+                new_re = RotaEntry(role_id=role_id, showing=self)
+                if len(existing_entries) > 0:
+                    new_re.rank = 1 + max(existing_entries, key=lambda re: re.rank).rank
+                new_re.save()
+                existing_entries.append(new_re)
+
 
 class DiaryIdea(models.Model):
     month = models.DateField(editable=False)
