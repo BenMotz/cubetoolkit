@@ -591,18 +591,19 @@ def edit_roles(request):
     # (To be precise, save involves >120 queries. TThis is because I've been lazy
     # and used the formset save method)
 
-    role_formset = modelformset_factory(Role, toolkit.diary.forms.RoleForm, can_delete=True)
+    RoleFormset = modelformset_factory(Role, toolkit.diary.forms.RoleForm, can_delete=True)
+    queryset = Role.objects.order_by('name')
 
     if request.method == 'POST':
-        formset = role_formset(request.POST)
+        formset = RoleFormset(request.POST)
         if formset.is_valid():
             logger.info("Roles updated")
             formset.save()
             # Reset formset, so get another blank one at the
             # end, deleted ones disappear, etc.
-            formset = role_formset()
+            formset = RoleFormset(queryset=queryset)
     else:
-        formset = role_formset()
+        formset = RoleFormset(queryset=queryset)
 
     return render(request, 'form_edit_roles.html', {'formset': formset})
 
