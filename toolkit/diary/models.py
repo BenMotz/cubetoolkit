@@ -34,6 +34,7 @@ class Role(models.Model):
 
     class Meta:
         db_table = 'Roles'
+        ordering = ['name']
 
     def __unicode__(self):
         return self.name
