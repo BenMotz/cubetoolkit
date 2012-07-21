@@ -13,6 +13,12 @@ class MemberForm(forms.ModelForm):
         model = toolkit.members.models.Member
 
 
+class MemberFormWithoutNotes(forms.ModelForm):
+    class Meta(object):
+        model = toolkit.members.models.Member
+        exclude = ('notes',)
+
+
 class VolunteerForm(forms.ModelForm):
     class Meta(object):
         model = toolkit.members.models.Volunteer

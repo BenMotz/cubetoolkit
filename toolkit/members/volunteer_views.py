@@ -121,7 +121,7 @@ def edit_volunteer(request, member_id, create_new=False):
     # form data and update and save the volunteer object:
     if request.method == 'POST':
         vol_form = toolkit.members.forms.VolunteerForm(request.POST, request.FILES, prefix="vol", instance=volunteer)
-        mem_form = toolkit.members.forms.MemberForm(request.POST, prefix="mem", instance=member)
+        mem_form = toolkit.members.forms.MemberFormWithoutNotes(request.POST, prefix="mem", instance=member)
         if vol_form.is_valid() and mem_form.is_valid():
             logger.info("Saving changes to volunteer '%s' (id: %s)", volunteer.member.name, str(volunteer.pk))
             mem_form.save()
@@ -151,10 +151,11 @@ def edit_volunteer(request, member_id, create_new=False):
             return HttpResponseRedirect(reverse("view-volunteer-list"))
     else:
         vol_form = toolkit.members.forms.VolunteerForm(prefix="vol", instance=volunteer)
-        mem_form = toolkit.members.forms.MemberForm(prefix="mem", instance=volunteer.member)
+        mem_form = toolkit.members.forms.MemberFormWithoutNotes(prefix="mem", instance=volunteer.member)
 
     context = {
         'pagetitle': 'Add Volunteer' if create_new else 'Edit Volunteer',
+        'default_mugshot': settings.DEFAULT_MUGSHOT,
         'volunteer': volunteer,
         'vol_form': vol_form,
         'mem_form': mem_form,

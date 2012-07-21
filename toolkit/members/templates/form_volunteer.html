@@ -20,6 +20,9 @@ th {
     width: 400px;
     vertical-align: top;
 }
+input[type="text"], textarea {
+    width: 290px;
+}
 </style>
 {% endblock %}
 
@@ -39,6 +42,14 @@ th {
 
 <div id="vol_form">
 <table>
+    <tr><td /><td>
+        {% if volunteer.portrait %}
+        <a href="{{ volunteer.portrait.url }}">
+            {% if volunteer.portrait_thumb %}<img src="{{ volunteer.portrait_thumb.url }}" border="0" width="75">{% else %}(missing preview){% endif %}</a><br>
+        {% else %}
+        <img src="{{ default_mugshot }}" border="0" width="75"><br>
+        {% endif %}
+    </td></tr>
     <tr><th><label for="id_vol-portrait">{{ vol_form.portrait.label }}:</label> </th><td> {{ vol_form.portrait.errors }}{{ vol_form.portrait }}</td></tr>
     <tr><th><label for="id_vol-notes">{{ vol_form.notes.label }}:</label> </th><td> {{ vol_form.notes.errors }}{{ vol_form.notes }}</td></tr>
 </table>
