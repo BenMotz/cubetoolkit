@@ -35,7 +35,7 @@ def view_volunteer_list(request):
         vol_role_map.setdefault(vol_id, []).append(role)
 
     # Now sort role_vol_map by role name:
-    role_vol_map = sorted(role_vol_map.iteritems(), lambda a, b: cmp(a[0], b[0]))
+    role_vol_map = sorted(role_vol_map.iteritems(), key=lambda role_name_tuple: role_name_tuple[0])
     # (now got a list  of (role, (name1, name2, ...)) tuples, rather than a dict,
     # but that's fine)
 
@@ -128,16 +128,9 @@ def edit_volunteer(request, member_id, create_new=False):
             volunteer.member = member
             # Call form save with commit=False so that it returns the vol object,
             updated_volunteer = vol_form.save(commit=False)
-            # Form doesn't automatically handle role mapping, so do it manually. First get
-            # list of volunteer roles from post:
-            roles_from_form = set(int(role, 10) for role in request.POST.getlist('vol-roles'))
-            # Now get list of roles volunteer already has:
-            existing_roles = set(r[0] for r in updated_volunteer.roles.all().values_list('id'))
-            # Ensure all roles listed on form are added
-            updated_volunteer.roles.add(*roles_from_form)
-            # Any roles in existing_roles but not in list from form should be removed:
-            roles_to_remove = existing_roles.difference(roles_from_form)
-            updated_volunteer.roles.remove(*roles_to_remove)
+            # When called with commit=False, the Form doesn't automatically update
+            # role mapping, so do it manually:
+            updated_volunteer.roles = vol_form.cleaned_data['roles']
 
             # Now save updated volunteer object, and set update_portrait_thumbnail
             # parameter can be passed.
@@ -145,7 +138,7 @@ def edit_volunteer(request, member_id, create_new=False):
             # doesn't write to the database, but returns a volunteer object, and
             # then "save" is called on the volunteer object, which does write to
             # the db)
-            updated_volunteer.save(update_portrait_thumbnail=True)
+            updated_volunteer.save_m2m(update_portrait_thumbnail=True)
             #return render(request, 'form_volunteer.html', {})
             # Go to the volunteer list view:
             return HttpResponseRedirect(reverse("view-volunteer-list"))
