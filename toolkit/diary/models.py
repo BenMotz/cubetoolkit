@@ -77,17 +77,23 @@ class MediaItem(models.Model):
     class Meta:
         db_table = 'MediaItems'
 
+    def __unicode__(self):
+        return u"{0}: {1}".format(self.pk, self.media_file)
+
     # Overloaded Django ORM method:
 
     def save(self, *args, **kwargs):
-        # Before saving, update thumbnail and mimetype
-        self.autoset_mimetype()
         update_thumbnail = kwargs.pop('update_thumbnail', True)
-        result = super(MediaItem, self).save(*args, **kwargs)
-        # Update thumbnail after save, to ensure image has been written to disk
+
+        # Before saving, update mimetype field:
+        # (do this even if file name has stayed the same, as file may have been
+        # overwritten)
+        self.autoset_mimetype()
+
         if update_thumbnail:
-            self.update_thumbnail()
-        return result
+            self._update_thumbnail()
+
+        return super(MediaItem, self).save(*args, **kwargs)
 
     # Extra, custom methods:
 
@@ -98,13 +104,22 @@ class MediaItem(models.Model):
         if self.media_file and self.media_file != '':
             magic_wrapper = magic.Magic(mime=True)
             try:
-                self.mimetype = magic_wrapper.from_buffer(self.media_file.file.read(4096))
+                self.mimetype = magic_wrapper.from_buffer(self.media_file.file.read(0xFFF))
             except IOError:
                 logger.error("Failed to determine mimetype of file {0}".format(self.media_file.file.name))
                 self.mimetype = "application/octet-stream"
+            finally:
+                try:
+                    self.media_file.file.seek(0)
+                except IOError:
+                    pass
             logger.debug("Mime type for {0} detected as {1}".format(self.media_file.file.name, self.mimetype))
 
-    def update_thumbnail(self):
+    def _update_thumbnail(self):
+        if not self.media_file:
+            logger.debug("Not updating thumbnail: media_file.file is None")
+            return
+
         if not self.mimetype.startswith("image"):
             logger.error("Creating thumbnails for non-image files not supported at this time")
             # Maybe have some default image for audio/video?
@@ -117,7 +132,7 @@ class MediaItem(models.Model):
             except (IOError, OSError) as ose:
                 logger.error("Failed deleting old thumbnail: {0}".format(ose))
         try:
-            image = PIL.Image.open(self.media_file.file.name)
+            image = PIL.Image.open(self.media_file.file)
         except (IOError, OSError) as ioe:
             logger.error("Failed to read image file: {0}".format(ioe))
             return
@@ -125,6 +140,11 @@ class MediaItem(models.Model):
             image.thumbnail(settings.THUMBNAIL_SIZE, PIL.Image.ANTIALIAS)
         except MemoryError:
             logger.error("Out of memory trying to create thumbnail for {0}".format(self.media_file))
+        finally:
+            try:
+                self.media_file.file.seek(0)
+            except IOError:
+                pass
 
         thumb_file = os.path.join(
             settings.MEDIA_ROOT,
@@ -148,7 +168,6 @@ class MediaItem(models.Model):
                     pass
             return
         self.thumbnail = os.path.relpath(thumb_file, settings.MEDIA_ROOT)
-        self.save(update_thumbnail=False)
 
 
 class EventTag(models.Model):
@@ -168,8 +187,6 @@ class EventTag(models.Model):
             return False
         else:
             return super(EventTag, self).save(*args, **kwargs)
-
-    # Extra, custom methods:
 
     def delete(self, *args, **kwargs):
         if self.pk and self.read_only:
@@ -221,6 +238,27 @@ class Event(models.Model):
         # Don't allow Events to be deleted. This doesn't block deletes on
         # querysets, SQL, etc.
         raise django.db.IntegrityError("Event deletion not allowed")
+
+    # Extra, custom methods:
+    def clear_main_mediaitem(self):
+        if self.media.count() == 0:
+            return
+        media_item = self.media.all()[0]
+        logger.info("Removing media file {0} from event {1}".format(media_item, self.pk))
+        self.media.remove(media_item)
+        ## If the media item isn't associated with any events, delete it:
+        ## ACTUALLY: let's keep it. Disk space is cheap, etc.
+        #if media_item.event_set.count() == 0:
+        #    media_item.delete()
+
+    def set_main_mediaitem(self, media_file):
+        self.clear_main_mediaitem()
+        self.media.add(media_file)
+
+    def get_main_mediaitem(self):
+        if self.media.count() == 0:
+            return None
+        return self.media.all()[0]
 
 
 class Showing(models.Model):

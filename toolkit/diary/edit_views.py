@@ -298,33 +298,19 @@ def edit_showing(request, showing_id=None):
 
 
 def _edit_event_handle_post(request, event_id):
-    # Handle POSTing of the "edit event" form. The surprising level of
-    # complexity here is because of the media item editing, because there
-    # can be many media items for an event (even though this isn't currently
-    # reflected in the UI).
+    # Handle POSTing of the "edit event" form. The slightly higher than expected
+    # complexity is because there can be more than one media items for an event
+    # (even though this isn't currently reflected in the UI).
     #
     # This means that there are two forms: one for the event, and one for the
     # media item. The extra logic is to cover the fact that both records need
-    # to be updated, and because at the moment only one media item is handled
-    # the old one will need to be deleted.
-    #
-    # In addition to basic validation of the submitted form, there are five (!)
-    # cases:
-    #  - no media item to begin with, not adding one
-    #  - no media item to begin with, adding a new one
-    #  - existing media item being cleared (and not replaced)
-    #  - existing media item being cleared and replaced
-    #  - existing media item, no change
+    # to be updated.
 
     # Event object
     event = get_object_or_404(Event, pk=event_id)
-    # Get the event's media item, if any
-    if event.media.count() > 0:
-        media_item = event.media.all()[0]
-        initial_file = media_item.media_file
-    else:
-        media_item = MediaItem()
-        initial_file = None
+
+    # Get the event's media item, or start a new one:
+    media_item = event.get_main_mediaitem() or MediaItem()
 
     logger.info("Updating event {0}".format(event_id))
     # Create and populate forms:
@@ -333,58 +319,30 @@ def _edit_event_handle_post(request, event_id):
 
     # Validate
     if form.is_valid() and media_form.is_valid():
-        # First, save the form:
+        # First, save the main form:
         form.save()
-        # Event didn't have a MediaItem associated...
-        if initial_file is None:
-            if media_form.cleaned_data['media_file']:
-                # New item has been uploaded
-                logger.info("Creating new MediaItem for file {0}, linked to event {1}"
-                            .format(media_form.cleaned_data['media_file'], event.name))
-                # New image uploaded. Save it:
-                media_form.save()
-                # Add to event
-                event.media.add(media_item)
-                event.save()
-            else:
-                # No file was uploaded, no initial media item, do nothing
-                logger.debug("No existing media file, no file uploaded")
-        # Event had a MediaItem associated initially:
-        else:
-            # File uploaded to replace existing:
-            if media_form.cleaned_data['media_file']:
-                if 'media_file' in request.FILES:
-                    logger.info("New media uploaded for MediaItem {0}: {1}"
-                                .format(media_item.pk, media_form.cleaned_data['media_file']))
-                    try:
-                        logger.info("Deleting old media file: {0} [new file {1}]"
-                                    .format(initial_file.file, media_item.media_file))
-
-                        initial_filename = initial_file.file.name
-
-                        if os.path.isfile(initial_filename) and initial_filename.startswith(settings.MEDIA_ROOT):
-                            os.unlink(initial_filename)
-
-                    except (ValueError, OSError, IOError) as error:
-                        logger.error("Couldn't delete existing media file: {0}".format(error))
-                else:
-                    logger.info("Updating MediaItem {0}, media content unchanged".format(media_item.pk))
-                media_form.save()
-            # if cleaned_data['media_file'] is False then the 'clear'
-            # checkbox was used:
-            else:
-                # Clear the MediaItem from the event
-                logger.info("Removing media file {0} from event {1}".format(initial_file, event.pk))
-                # No file name provided and MediaItem already existed:
-                # Image cleared. Remove it from the event:
-                event.media.remove(media_item)
-                event.save()
-                ## If the media item isn't associated with any events, delete it:
-                ## ACTUALLY: let's keep it. Disk space is cheap, etc.
-                #if media_item.event_set.count() == 0:
-                #    media_item.delete()
-
+        # Handle the media item form:
+        if media_form.cleaned_data['media_file'] is False:
+            # We get here if the "clear" checkbox was ticked.
+            #
+            # If we just call media_form.save then the MediaItem will have the
+            # image removed - we're slightly repurposing the "clear" checkbox
+            # to mean "remove the MediaItem from the event", NOT "remove the
+            # image from the MediaItem":
+            event.clear_main_mediaitem()
+        elif media_form.cleaned_data['media_file'] is not None:
+            # Get here if the form was submitted with the 'file' field not
+            # blank
+            #
+            # Note that if the image is changed the old image is not deleted
+            # from disk. This is Django's default behaviour, and matches what
+            # the old toolkit used to do. No image thrown away!
+            media_form.save()
+            event.set_main_mediaitem(media_item)
+        # If the media_form was submitted with blank file name/no data then
+        # don't save it (caption is ignored)
         return _return_to_editindex(request)
+
     # Got here if there's a form validation error:
     context = {
         'event': event,
