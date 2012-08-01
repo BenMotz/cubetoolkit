@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404, render
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
-from toolkit.auth.decorators import require_read_auth, require_write_auth
+from toolkit.auth.decorators import require_write_auth, require_read_or_write_auth
 
 import toolkit.members.forms
 from toolkit.members.models import Member, Volunteer
@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-@require_read_auth
+@require_read_or_write_auth
 def view_volunteer_list(request):
     # Get all volunteers, sorted by name:
     volunteers = Volunteer.objects.filter(active=True).order_by('member__name').select_related()
@@ -48,6 +48,7 @@ def view_volunteer_list(request):
     return render(request, 'volunteer_list.html', context)
 
 
+@require_read_or_write_auth
 def select_volunteer(request, active=True):
     # This view is called to retire / unretire a volunteer. It presents a list
     # of all volunteer names and a button. If the view is called with "action=retire"
@@ -64,7 +65,7 @@ def select_volunteer(request, active=True):
 
     action = request.GET.get('action', None)
     if action not in action_urls:
-        logging.error("Select volunteer called with unknown action: %s", action)
+        logger.error("Select volunteer called with unknown action: %s", action)
         raise Http404('Invalid action')
 
     active = bool(active)
@@ -79,6 +80,7 @@ def select_volunteer(request, active=True):
     return render(request, 'select_volunteer.html', context)
 
 
+@require_write_auth
 def activate_volunteer(request, active=True):
     # Sets the 'active' value for the volunteer with the id passed  in the
     # 'volunteer' parameter of the POST request
@@ -87,7 +89,7 @@ def activate_volunteer(request, active=True):
 
     vol_pk = request.POST.get('volunteer', None)
 
-    logging.info("Set volunteer.active to %s for volunteer %s", str(active), vol_pk)
+    logger.info("Set volunteer.active to %s for volunteer %s", str(active), vol_pk)
 
     vol = get_object_or_404(Volunteer, id=vol_pk)
 
@@ -126,20 +128,7 @@ def edit_volunteer(request, member_id, create_new=False):
             logger.info("Saving changes to volunteer '%s' (id: %s)", volunteer.member.name, str(volunteer.pk))
             mem_form.save()
             volunteer.member = member
-            # Call form save with commit=False so that it returns the vol object,
-            updated_volunteer = vol_form.save(commit=False)
-            # When called with commit=False, the Form doesn't automatically update
-            # role mapping, so do it manually:
-            updated_volunteer.roles = vol_form.cleaned_data['roles']
-
-            # Now save updated volunteer object, and set update_portrait_thumbnail
-            # parameter can be passed.
-            # (So, to be clear, the first "save" is on the form object, and that
-            # doesn't write to the database, but returns a volunteer object, and
-            # then "save" is called on the volunteer object, which does write to
-            # the db)
-            updated_volunteer.save_m2m(update_portrait_thumbnail=True)
-            #return render(request, 'form_volunteer.html', {})
+            vol_form.save()
             # Go to the volunteer list view:
             return HttpResponseRedirect(reverse("view-volunteer-list"))
     else:

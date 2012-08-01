@@ -84,9 +84,11 @@ class Volunteer(models.Model):
         db_table = 'Volunteers'
 
     def save(self, *args, **kwargs):
-        # Before saving, if portrait has changed:
-        update_thumbnail = kwargs.pop('update_portrait_thumbnail', False)
-
+        # Save the model.
+        # If the filename of the 'portrait' has changed then regenerate the
+        # thumbnail. (This means the thumbnail won't get updated if the filename
+        # hasn't changed, but that shouldn't be the end of the world?)
+        update_thumbnail = kwargs.pop('update_portrait_thumbnail', True)
 
         try:
             current_portrait_file = self.portrait.file.name
@@ -110,6 +112,8 @@ class Volunteer(models.Model):
 
     def __init__(self, *args, **kwargs):
         super(Volunteer, self).__init__(*args, **kwargs)
+        # Store current filename of portrait (if any) so that, at save, changes
+        # can be detected and the thumbnail updated:
         try:
             self.__original_portrait = self.portrait.file.name if self.portrait else None
         except (IOError, OSError, ValueError):
