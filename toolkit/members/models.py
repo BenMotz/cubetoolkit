@@ -87,35 +87,35 @@ class Volunteer(models.Model):
         # Before saving, if portrait has changed:
         update_thumbnail = kwargs.pop('update_portrait_thumbnail', False)
 
-        result = super(Volunteer, self).save(*args, **kwargs)
 
         try:
             current_portrait_file = self.portrait.file.name
         except (IOError, OSError, ValueError):
             current_portrait_file = None
 
-        if current_portrait_file != self.original_portrait:
+        if current_portrait_file != self.__original_portrait:
             # Delete old image:
-            if self.original_portrait:
-                logging.info("Deleting old volunteer portrait '%s'", self.original_portrait)
+            if self.__original_portrait:
+                logging.info("Deleting old volunteer portrait '%s'", self.__original_portrait)
                 try:
-                    os.unlink(self.original_portrait)
+                    os.unlink(self.__original_portrait)
                 except (IOError, OSError) as err:
-                    logging.error("Failed deleting old volunteer portrait '%s': %s", self.original_portrait, err)
-                self.original_portrait = None
-            # update thumbnail (after save, to ensure image has been written to disk)
+                    logging.error("Failed deleting old volunteer portrait '%s': %s", self.__original_portrait, err)
+                self.__original_portrait = None
+            # update thumbnail
             if update_thumbnail:
-                self.update_portrait_thumbnail()
-        return result
+                self._update_portrait_thumbnail()
+
+        return super(Volunteer, self).save(*args, **kwargs)
 
     def __init__(self, *args, **kwargs):
         super(Volunteer, self).__init__(*args, **kwargs)
         try:
-            self.original_portrait = self.portrait.file.name if self.portrait else None
+            self.__original_portrait = self.portrait.file.name if self.portrait else None
         except (IOError, OSError, ValueError):
-            self.original_portrait = None
+            self.__original_portrait = None
 
-    def update_portrait_thumbnail(self):
+    def _update_portrait_thumbnail(self):
         # Delete old thumbnail, if any:
         if self.portrait_thumb and self.portrait_thumb != '':
             logger.info("Deleting old portrait thumbnail for {0}, file {1}".format(self.pk, self.portrait_thumb))
@@ -126,17 +126,11 @@ class Volunteer(models.Model):
 
         # If there's not actually a new image to thumbnail, give up:
         if self.portrait is None or self.portrait == '':
+            self.portrait_thumb = ''
             return
 
         try:
-            if not os.path.isfile(self.portrait.file.name):
-                return
-        except (OSError, IOError) as err:
-            logger.error("Failed detecting if portrait exists and is a file (%s): %s", self.portrait.file.name, err)
-            return
-
-        try:
-            image = PIL.Image.open(self.portrait.file.name)
+            image = PIL.Image.open(self.portrait.file)
         except (IOError, OSError) as ioe:
             logger.error("Failed to read image file {0}: {1}".format(self.portrait.file.name, ioe))
             return
@@ -167,4 +161,3 @@ class Volunteer(models.Model):
                     pass
             return
         self.portrait_thumb = os.path.relpath(thumb_file, settings.MEDIA_ROOT)
-        self.save(update_portrait_thumbnail=False)
