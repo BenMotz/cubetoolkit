@@ -121,7 +121,10 @@ def edit_diary_list(request, year=None, day=None, month=None):
     context['ideas'] = ideas
     context['dates'] = dates
     # Page title:
-    context['event_list_name'] = "Diary for %s to %s" % (startdatetime.strftime("%d-%m-%Y"), enddatetime.strftime("%d-%m-%Y"))
+    context['event_list_name'] = "Diary for {0} to {1}".format(
+        startdatetime.strftime("%d-%m-%Y"),
+        enddatetime.strftime("%d-%m-%Y")
+    )
     context['start'] = startdatetime
     context['end'] = enddatetime
     context['edit_prefs'] = toolkit.diary.edit_prefs.get_preferences(request.session)

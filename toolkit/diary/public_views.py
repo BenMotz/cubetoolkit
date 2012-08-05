@@ -122,7 +122,7 @@ def view_diary_json(request, year, month, day):
             'name': event.name,
             'copy': markdown.markdown(event.copy),
             'link': reverse("single-event-view", kwargs={'event_id': showing.event_id}),
-            'image': event.media.get().thumbnail.url if event.media.count() >= 1 else None,
+            'image': event.media.all()[0].thumbnail.url if event.media.count() >= 1 else None,
             'tags': ", ".join(n[0] for n in event.tags.values_list('name')),
         })
 
