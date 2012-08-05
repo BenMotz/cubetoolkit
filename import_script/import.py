@@ -16,7 +16,7 @@ from django.core.exceptions import ValidationError, ObjectDoesNotExist
 import django.db
 import django.utils.timezone
 
-FORMATS_PATH=os.path.join(os.path.dirname(__file__), "./source_data/formats")
+FORMATS_PATH = os.path.join(os.path.dirname(__file__), "./source_data/formats")
 
 SITE_ROOT = ".."
 MEDIA_PATH = "media"
@@ -39,21 +39,23 @@ logger.addHandler(consoleHandler)
 
 def connect():
     # Open database connection
-    conn = MySQLdb.connect (host = "localhost",
-                            user = settings.IMPORT_SCRIPT_USER,
-                           passwd = "spanner",
-                           db = settings.IMPORT_SCRIPT_DATABASE,
-#                           use_unicode = True,
+    conn = MySQLdb.connect(host="localhost",
+                           user=settings.IMPORT_SCRIPT_USER,
+                           passwd="spanner",
+                           db=settings.IMPORT_SCRIPT_DATABASE,
+                           # use_unicode = True,
                            )
     return conn
+
 
 def titlecase(string):
 #   return string.title() # Really doesn't cope with apostrophes.
 #   return " ".join([ word.capitalize() for word in  "This is the voice".split() ])
     if isinstance(string, basestring):
-        return re.sub("(^|\s)(\S)", lambda match : match.group(1) + match.group(2).upper(), string)
+        return re.sub("(^|\s)(\S)", lambda match: match.group(1) + match.group(2).upper(), string)
     else:
         return string
+
 
 def decode(string):
     if string is str:
@@ -62,20 +64,24 @@ def decode(string):
     else:
         return string
 
+
 def int_def(string, default):
     try:
         return int(string)
     except ValueError:
         return default
 
+
 def html_ify(string):
     result = None
     if string is not None:
-        result = "<p>" + string.strip().replace("\r\n","<br>") + "</p>"
+        result = "<p>" + string.strip().replace("\r\n", "<br>") + "</p>"
     return result
+
 
 def markdown_ify(string):
     return string
+
 
 wrap_re = re.compile(r'(.{70,})\n')
 lotsofnewlines_re = re.compile(r'\n\n+')
@@ -85,19 +91,20 @@ link_re_1 = re.compile(r'(http:\/\/\S{4,})')
 # a smattering of TLDs:
 link_re_2 = re.compile(r'(\s)(www\.[\w.]+\.(com|org|net|uk|de|ly|us|tk)[^\t\n\r\f\v\. ]*)')
 
+
 def convert_copy_to_markdown(string):
     if isinstance(string, basestring):
         # remove all whitespace from start and end of line:
         result = string.strip()
         # Strip out carriage returns:
-        result = result.strip().replace('\r','')
+        result = result.strip().replace('\r', '')
         # Strip out new lines when they occur after 70 other characters (try to fix wrapping)
         result = wrap_re.sub(r'\1 ', result)
         # Replace a sequence of 1+ new lines with a single line break;
         result = lotsofnewlines_re.sub('\n', result)
         # Now replace all single line breaks with double line breaks (which
         # markdown will actually show as line breaks)
-        result = result.replace('\n','\n\n')
+        result = result.replace('\n', '\n\n')
 
         # Attempt to magically convert any links to markdown:
         result = link_re_1.sub(r'[\1](\1)', result)
@@ -106,10 +113,12 @@ def convert_copy_to_markdown(string):
     else:
         return string
 
+
 ##############################################################################
 # Diary import
 
 event_tot = 0
+
 
 def import_event_roles(connection, showings, legacy_event_id, role_map):
     cursor = connection.cursor()
@@ -122,7 +131,7 @@ def import_event_roles(connection, showings, legacy_event_id, role_map):
         col_no = 0
         for role_col in ev[1:]:
             if role_col is not None:
-                for rank in range(0,role_col):
+                for rank in range(0, role_col):
                     for s in showings:
                         rota_entry = toolkit.diary.models.RotaEntry()
                         rota_entry.role_id = role_map[col_no]
@@ -133,6 +142,7 @@ def import_event_roles(connection, showings, legacy_event_id, role_map):
             col_no += 1
 
     cursor.close()
+
 
 def import_event_showings(connection, event, legacy_event_id):
     global event_tot
@@ -160,7 +170,7 @@ def import_event_showings(connection, event, legacy_event_id):
         all_showings.append(s)
         s.event = event
         s.start = fake_start  # The full_clean checks that start is in the future
-                              # so set a valid start date now, and after the call to 
+                              # so set a valid start date now, and after the call to
                               # full_clean change it to the actual value before saving
         if r[2] is not None and r[2].strip() != '':
             s.booked_by = titlecase(decode(r[2]))
@@ -205,6 +215,7 @@ def import_event_showings(connection, event, legacy_event_id):
 
     return all_showings
 
+
 def import_ideas(connection):
     cursor = connection.cursor()
     results = cursor.execute("SELECT date, ideas FROM ideas ORDER BY date")
@@ -217,6 +228,7 @@ def import_ideas(connection):
 
     cursor.close()
 
+
 @django.db.transaction.commit_on_success
 def import_events(connection, role_map):
     cursor = connection.cursor()
@@ -227,7 +239,7 @@ def import_events(connection, role_map):
     pc = 1
     logger.info("%d events" % (results))
     for r in cursor.fetchall():
-        r = [ decode(item) for item in r ]
+        r = [decode(item) for item in r]
         e = toolkit.diary.models.Event()
         e.legacy_id = r[0]
 
@@ -253,12 +265,12 @@ def import_events(connection, role_map):
 
         # Duration:
         if r[4] is not None and r[4] != '':
-            durn_hour, durn_min  = r[4].split('/')
-            durn_hour = int_def(durn_hour,0)
-            durn_min = int_def(durn_min,0)
+            durn_hour, durn_min = r[4].split('/')
+            durn_hour = int_def(durn_hour, 0)
+            durn_min = int_def(durn_min, 0)
             e.duration = datetime.time(durn_hour, durn_min)
         else:
-            e.duration = datetime.time(0,0)
+            e.duration = datetime.time(0, 0)
 
         # Terms
         e.terms = r[6]
@@ -270,7 +282,7 @@ def import_events(connection, role_map):
             continue
 
         # Image
-        image_name = r[0].replace(" ","_") + ".jpg"
+        image_name = r[0].replace(" ", "_") + ".jpg"
         image_path = os.path.join(SITE_ROOT, MEDIA_PATH, EVENT_IMAGES_PATH, image_name)
         if os.path.exists(image_path):
             # File exists, change path to relative to media root, as django expects
@@ -306,6 +318,7 @@ def import_events(connection, role_map):
     cursor.close()
 
     logger.info("%d events" % event_tot)
+
 
 def create_roles(connection):
     roles = []
@@ -367,7 +380,6 @@ def mark_standard_roles():
         role.save()
 
 
-
 ###############################################################################
 # Create event templates using dict { event_template_name : [ list of role names] }
 def create_event_types(event_types):
@@ -383,6 +395,7 @@ def create_event_types(event_types):
             if role.pk not in assigned_roles_keys:
                 logger.info("Adding role %s to %s", role, e_type)
                 e_type_o.roles.add(role)
+
 
 # Read event templates from given path
 def load_event_templates(path_to_formats):
@@ -400,9 +413,10 @@ def load_event_templates(path_to_formats):
     logger.info("Loaded %d event types: %s", len(type_index), ",".join(type_index.keys()))
     return type_index
 
+
 def create_default_tags():
     ro_tags = ('film', 'music', 'party', 'cabaret', 'indymedia', 'talk', 'nanoplex', 'hkkp', 'bluescreen', 'meeting', 'cubeorchestra', 'babycinema', 'workshop',)
-    rw_tags = ('35mm','dvd','outdoors',)
+    rw_tags = ('35mm', 'dvd', 'outdoors',)
     for tag in ro_tags:
         t = toolkit.diary.models.EventTag(name=tag, read_only=True)
         t.save()
@@ -410,20 +424,21 @@ def create_default_tags():
         t = toolkit.diary.models.EventTag(name=tag, read_only=False)
         t.save()
 
+
 def add_tags_to_templates():
     tagmap = {
-            'film 35mm' : ('film', '35mm',),
-            '0 film DVD' : ('film', 'dvd',),
-            'film DVD' : ('film', 'dvd',),
-            'film video' :  ('film', 'dvd',),
-            'video' :  ('film', 'dvd',),
-            'outdoor' : ('outdoors',),
-            'live music' : ('music',),
-            'rehearsal' : (),
-            'workshop' : ('workshop',),
-            'party' : ('party',),
-            'meeting' : ('meeting',),
-        }
+        'film 35mm': ('film', '35mm',),
+        '0 film DVD': ('film', 'dvd',),
+        'film DVD': ('film', 'dvd',),
+        'film video':  ('film', 'dvd',),
+        'video': ('film', 'dvd',),
+        'outdoor': ('outdoors',),
+        'live music': ('music',),
+        'rehearsal': (),
+        'workshop': ('workshop',),
+        'party': ('party',),
+        'meeting': ('meeting',),
+    }
     for template, tags in tagmap.iteritems():
         try:
             template = toolkit.diary.models.EventTemplate.objects.get(name=template)
@@ -434,9 +449,9 @@ def add_tags_to_templates():
             tag = toolkit.diary.models.EventTag.objects.get(name=tag)
             template.tags.add(tag)
 
+
 ###############################################################################
 # Members + Volunteers...
-
 def import_volunteer_roles(volunteer, role_map, roles):
     for role_description, active in roles:
         if active == 1L:
@@ -445,10 +460,11 @@ def import_volunteer_roles(volunteer, role_map, roles):
             if description in role_map:
                 volunteer.roles.add(role_map[description])
             else:
-                role = toolkit.members.models.Role(name=titlecase(description.replace("_"," ")))
+                role = toolkit.members.models.Role(name=titlecase(description.replace("_", " ")))
                 role.save()
                 logger.info("Creating role %s: %d" % (role.name, role.id))
                 role_map[description] = role
+
 
 def import_volunteer(member, active, notes, role_map, roles):
     v = toolkit.members.models.Volunteer()
@@ -486,14 +502,15 @@ def import_volunteer(member, active, notes, role_map, roles):
     import_volunteer_roles(v, role_map, roles)
     v.save(update_portrait_thumbnail=False)
 
+
 @django.db.transaction.commit_on_success
 def import_members(connection):
     timezone = pytz.timezone("Europe/London")
 
-    role_map = dict( (role.name.replace(" ","_").lower(), role) for role in toolkit.diary.models.Role.objects.all())
+    role_map = dict((role.name.replace(" ", "_").lower(), role) for role in toolkit.diary.models.Role.objects.all())
 
     cursor = connection.cursor()
-    results = cursor.execute("SELECT members.member_id, name, email, homepage, address, city, postcode, country, landline, mobile, last_updated, refuse_mailshot, status, notes, vol_roles_merged.* FROM members LEFT JOIN notes ON members.member_id = notes.member_id LEFT JOIN vol_roles_merged ON members.member_id = vol_roles_merged.member_id WHERE members.name != ''") #  ORDER BY members.member_id")
+    results = cursor.execute("SELECT members.member_id, name, email, homepage, address, city, postcode, country, landline, mobile, last_updated, refuse_mailshot, status, notes, vol_roles_merged.* FROM members LEFT JOIN notes ON members.member_id = notes.member_id LEFT JOIN vol_roles_merged ON members.member_id = vol_roles_merged.member_id WHERE members.name != ''")  # ORDER BY members.member_id")
     # Don't even try to import members with blank names
 
     count = 0
@@ -501,7 +518,7 @@ def import_members(connection):
     pc = 1
     logger.info("%d members" % (results))
     for r in cursor.fetchall():
-        r = [ decode(item) for item in r ]
+        r = [decode(item) for item in r]
         m = toolkit.members.models.Member()
         m.number = r[0][:10]
         m.name = titlecase(r[1])
@@ -522,11 +539,11 @@ def import_members(connection):
                 pass
         if r[11] == 'member removed self':
             m.mailout = False
-        elif r[11] != None and r[11] != '':
+        elif r[11] is not None and r[11] != '':
             m.mailout = False
             m.mailout_failed = True
 
-        m.notes = r[12] # status
+        m.notes = r[12]  # status
 
         try:
             m.full_clean()
@@ -567,6 +584,7 @@ def import_members(connection):
 
     logger.info("%d members" % count)
 
+
 def main():
     global SITE_ROOT
     if len(sys.argv) == 1:
@@ -597,7 +615,7 @@ def main():
 
     mark_standard_roles()
 
-    conn.close ()
+    conn.close()
 
 if __name__ == "__main__":
     main()
