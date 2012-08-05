@@ -8,5 +8,4 @@ south
 python-magic>=0.4.0
 mock
 PIL
-fabric
 pytz
