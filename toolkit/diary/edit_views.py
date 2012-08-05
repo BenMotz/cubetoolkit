@@ -582,7 +582,8 @@ def _render_mailout_body(days_ahead=7):
                                .filter(confirmed=True)
                                .filter(start__range=[start_date, end_date])
                                .order_by('start')
-                               .select_related())
+                               .select_related()
+                               .prefetch_related('event__showings'))
 
     # Render into mail template
     mail_template = django.template.loader.get_template("mailout_body.txt")
