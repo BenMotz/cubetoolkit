@@ -7,11 +7,14 @@ import re
 import logging
 import shutil
 
+import pytz
+
 import toolkit.diary.models
 import toolkit.members.models
 import toolkit.settings as settings
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 import django.db
+import django.utils.timezone
 
 FORMATS_PATH=os.path.join(os.path.dirname(__file__), "./source_data/formats")
 
@@ -141,7 +144,9 @@ def import_event_showings(connection, event, legacy_event_id):
 
     all_showings = []
 
-    fake_start = datetime.datetime.now() + datetime.timedelta(days=1)
+    timezone = pytz.timezone("Europe/London")
+
+    fake_start = django.utils.timezone.now() + datetime.timedelta(days=1)
 
     cursor = connection.cursor()
     showing_count = cursor.execute("SELECT datetime, event_id, booked_by, confirmed, cancelled, discounted, outside_hire, private_event FROM diary WHERE event_id = '%s' ORDER BY datetime" % legacy_event_id)
@@ -174,7 +179,7 @@ def import_event_showings(connection, event, legacy_event_id):
 
         s.full_clean()
         # See comment above:
-        s.start = r[0]
+        s.start = timezone.localize(r[0])  # Store datetime with timezone information
         s.save(force=True)  # Force, to allow saving of showing with start in past
 
     if len(cancelled_list) == showing_count:
@@ -231,7 +236,7 @@ def import_events(connection, role_map):
 
         if e.name in (None, u'', ''):
             # Looking at the db, it's safe to skip all of these
-            logging.error("Skipping event with no/missing name id %s", e.legacy_id)
+            logging.warning("Event with no/missing name: id %s (copy: %s)", e.legacy_id, r[2])
             continue
         else:
             # Special fix for the omnipresent Djs:
@@ -241,7 +246,7 @@ def import_events(connection, role_map):
         if r[2] is not None:
             e.copy = convert_copy_to_markdown(r[2])
         else:
-            logger.error("Missing copy for event [%s] %s", r[0], e.name)
+            # logger.warning("No copy for event [%s] %s", r[0], e.name)
             e.copy = ''
         # Copy summary
         e.copy_summary = convert_copy_to_markdown(r[3])
@@ -477,12 +482,13 @@ def import_volunteer(member, active, notes, role_map, roles):
     v.full_clean()
     # Need to save volunteer before adding roles (so many-many refernces to
     # primary key can be created)
-    v.save()
+    v.save(update_portrait_thumbnail=False)
     import_volunteer_roles(v, role_map, roles)
-    v.save()
+    v.save(update_portrait_thumbnail=False)
 
 @django.db.transaction.commit_on_success
 def import_members(connection):
+    timezone = pytz.timezone("Europe/London")
 
     role_map = dict( (role.name.replace(" ","_").lower(), role) for role in toolkit.diary.models.Role.objects.all())
 
@@ -510,7 +516,8 @@ def import_members(connection):
         last_updated = r[10].split('/')
         if len(last_updated) == 3:
             try:
-                m.last_updated = datetime.datetime(day=int(last_updated[0]), month=int(last_updated[1]), year=int(last_updated[2]))
+                last_updated_local = datetime.datetime(day=int(last_updated[0]), month=int(last_updated[1]), year=int(last_updated[2]))
+                m.last_updated = timezone.localize(last_updated_local)  # Store datetime with timezone information
             except ValueError:
                 pass
         if r[11] == 'member removed self':

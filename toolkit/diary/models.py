@@ -1,12 +1,12 @@
 import logging
 import os.path
-import datetime
 
 import magic
 import PIL.Image
 
 from django.db import models
 from django.conf import settings
+import django.utils.timezone
 import django.core.exceptions
 
 logger = logging.getLogger(__name__)
@@ -358,7 +358,7 @@ class Showing(models.Model):
         return self.start.date()
 
     def in_past(self):
-        return self.start < datetime.datetime.now()
+        return self.start < django.utils.timezone.now()
 
     def reset_rota_to_default(self):
         """Clear any existing rota entries. If the associated event has an event

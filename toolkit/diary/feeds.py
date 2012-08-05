@@ -4,6 +4,7 @@ import markdown
 
 from django.contrib.syndication.views import Feed
 from django.core.urlresolvers import reverse
+import django.utils.timezone as timezone
 
 from toolkit.diary.models import Showing
 
@@ -17,7 +18,7 @@ class BasicWhatsOnFeed(Feed):
     link = "/diary"
 
     def items(self):
-        startdate = datetime.date.today()  # datetime.datetime.now()
+        startdate = timezone.now()
         enddate = startdate + datetime.timedelta(days=self.DAYS_AHEAD)
         showings = (Showing.objects.filter(confirmed=True)
                                    .filter(hide_in_programme=False)

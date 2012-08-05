@@ -1,4 +1,3 @@
-import os
 import re
 import json
 import datetime
@@ -14,6 +13,7 @@ from django.forms.models import modelformset_factory
 from django.contrib import messages
 import django.template
 import django.db
+import django.utils.timezone as timezone
 
 from toolkit.auth.decorators import require_write_auth, require_read_or_write_auth
 from toolkit.diary.models import Showing, Event, DiaryIdea, MediaItem, EventTemplate, EventTag, Role
@@ -59,29 +59,29 @@ def edit_diary_list(request, year=None, day=None, month=None):
     # Sort out date range to display
     query_days_ahead = request.GET.get('daysahead', None)
     # utility function, shared with public diary view
-    startdate, days_ahead = get_date_range(year, month, day, query_days_ahead)
-    if startdate is None:
+    startdatetime, days_ahead = get_date_range(year, month, day, query_days_ahead)
+    startdate = startdatetime.date()
+    if startdatetime is None:
         raise Http404(days_ahead)
 
     # Don't allow viewing of dates before today, to avoid editing of the past:
-    if startdate < datetime.date.today():
-        # Change startdate to today:
-        startdate = datetime.date.today()
-        # Redirect to the correct page:
+    local_now = timezone.localtime(timezone.now())
+    if startdate < local_now.date():
+        # Redirect to page with today as the start date:
         new_url = "{0}?daysahead={1}".format(
             reverse('day-edit', kwargs={
-                'year': startdate.year,
-                'month': startdate.month,
-                'day': startdate.day
+                'year': local_now.year,
+                'month': local_now.month,
+                'day': local_now.day
             }),
             days_ahead
         )
         return HttpResponseRedirect(new_url)
 
-    enddate = startdate + datetime.timedelta(days=days_ahead)
+    enddatetime = startdatetime + datetime.timedelta(days=days_ahead)
 
     # Get all showings in the date range
-    showings = Showing.objects.filter(start__range=[startdate, enddate]).order_by('start').select_related()
+    showings = Showing.objects.filter(start__range=[startdatetime, enddatetime]).order_by('start').select_related()
     # Build two dicts, to hold the showings and the ideas. These dicts are
     # initially empty, and get filled in if there are actually showings or
     # ideas for those dates.
@@ -94,11 +94,11 @@ def edit_diary_list(request, year=None, day=None, month=None):
     for days in xrange(days_ahead):
         # Iterate through every date in the visible range, creating a dict
         # entry for each
-        day_in_range = startdate + datetime.timedelta(days=days)
-        dates[day_in_range] = []
+        day_in_range = startdatetime + datetime.timedelta(days=days)
+        dates[day_in_range.date()] = []
         # If it's the 1st of the month, make sure there's an ideas entry
         if day_in_range.day == 1:
-            ideas[day_in_range] = ''
+            ideas[day_in_range.date()] = ''
     # Now insert all the showings into the 'dates' dict
     for showing in showings:
         dates[showing.start.date()].append(showing)
@@ -108,7 +108,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
     # Now get all 'ideas' in date range. Fiddle the date range to be from the
     # start of the month in startdate, so the idea for that month gets included:
     idea_startdate = datetime.date(day=1, month=startdate.month, year=startdate.year)
-    idea_list = DiaryIdea.objects.filter(month__range=[idea_startdate, enddate]).order_by('month').select_related()
+    idea_list = DiaryIdea.objects.filter(month__range=[idea_startdate, enddatetime]).order_by('month').select_related()
     # Assemble into the idea dict, with keys that will match the keys in the
     # showings dict
     for idea in idea_list:
@@ -121,9 +121,9 @@ def edit_diary_list(request, year=None, day=None, month=None):
     context['ideas'] = ideas
     context['dates'] = dates
     # Page title:
-    context['event_list_name'] = "Diary for %s to %s" % (str(startdate), str(enddate))
-    context['start'] = startdate
-    context['end'] = enddate
+    context['event_list_name'] = "Diary for %s to %s" % (startdatetime.strftime("%d-%m-%Y"), enddatetime.strftime("%d-%m-%Y"))
+    context['start'] = startdatetime
+    context['end'] = enddatetime
     context['edit_prefs'] = toolkit.diary.edit_prefs.get_preferences(request.session)
     return render(request, 'edit_event_index.html', context)
 
@@ -244,7 +244,9 @@ def add_event(request):
             date[0] = int(date[0], 10)
             date[1] = int(date[1], 10)
             date[2] = int(date[2], 10)
-            event_start = datetime.datetime(hour=20, minute=0, day=date[0], month=date[1], year=date[2])
+            event_start = timezone.get_current_timezone().localize(
+                datetime.datetime(hour=20, minute=0, day=date[0], month=date[1], year=date[2])
+            )
         except (ValueError, TypeError):
             return HttpResponse("Illegal date", status=400)
         # Create form, render template:
@@ -569,7 +571,7 @@ def _render_mailout_body(days_ahead=7):
     # Render default mail contents;
 
     # Read data
-    start_date = datetime.datetime.now()
+    start_date = timezone.now()
     end_date = start_date + datetime.timedelta(days=days_ahead)
     showings = (Showing.objects.filter(hide_in_programme=False)
                                .filter(cancelled=False)
@@ -608,7 +610,10 @@ def _render_mailout_form(request, body_text, subject_text):
 
 def mailout(request):
     if request.method == 'GET':
-        query_days_ahead = request.GET.get('daysahead', 9)
+        try:
+            query_days_ahead = int(request.GET.get('daysahead', 9))
+        except ValueError:
+            query_days_ahead = 9
         body_text = _render_mailout_body(query_days_ahead)
         subject_text = "CUBE Microplex forthcoming events"
         return _render_mailout_form(request, body_text, subject_text)
