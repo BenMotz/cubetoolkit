@@ -10,6 +10,7 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.conf import settings
+import django.utils.timezone as timezone
 
 from toolkit.diary.models import Showing, Event
 from toolkit.diary.daterange import get_date_range
@@ -48,7 +49,7 @@ def view_diary(request, year=None, month=None, day=None, event_type=None):
     # Set page title
     if year:
         # If some specific dates were provided, use those
-        context['event_list_name'] = "Events for %s" % "/".join([str(s) for s in (day, month, year) if s])
+        context['event_list_name'] = "Cube Programme for %s" % "/".join([str(s) for s in (day, month, year) if s])
     else:
         # Default title
         context['event_list_name'] = "Cube Programme"
@@ -95,16 +96,18 @@ def view_diary_json(request, year, month, day):
         logger.error("Invalid value in date range, one of day {0}, month {1}, year {2}".format(day, month, year))
         raise Http404("Invalid values")
 
-    startdate = datetime.date(year, month, day)
-    enddate = startdate + datetime.timedelta(days=1)
+    startdatetime = timezone.get_current_timezone().localize(
+        datetime.datetime(year, month, day)
+    )
+    enddatetime = startdatetime + datetime.timedelta(days=1)
 
-    context['start'] = startdate
+    context['start'] = startdatetime
 
     # Do query. select_related() on the end encourages it to get the
     # associated showing/event data, to reduce the number of SQL queries
     showings = (Showing.objects.filter(confirmed=True)
                                .filter(hide_in_programme=False)
-                               .filter(start__range=[startdate, enddate])
+                               .filter(start__range=[startdatetime, enddatetime])
                                .filter(event__private=False)
                                .order_by('start')
                                .select_related()
