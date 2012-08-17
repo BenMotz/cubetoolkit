@@ -179,6 +179,7 @@ def add_showing(request, event_id):
         # Showing is saved...
         new_showing.save()
         new_showing.clone_rota_from_showing(source_showing)
+        messages.add_message(request, messages.SUCCESS, "Added showing on {0} for event '{1}'".format(new_showing.start.strftime("%d/%m/%y at %H:%M"), new_showing.event.name))
 
         return _return_to_editindex(request)
     else:
@@ -230,6 +231,7 @@ def add_event(request):
                 new_showing.save()
                 # Set showing roles to those from its template:
                 new_showing.reset_rota_to_default()
+            messages.add_message(request, messages.SUCCESS, "Added event '{0}' with showing on {1}".format(new_event.name, new_showing.start.strftime("%d/%m/%y at %H:%M")))
             return _return_to_editindex(request)
         else:
             # If form was not valid, re-render the form (which will highlight
@@ -277,6 +279,10 @@ def edit_showing(request, showing_id=None):
             # Then update the rota with the returned data:
             rota = rota_form.get_rota()
             modified_showing.update_rota(rota)
+
+            messages.add_message(request, messages.SUCCESS,
+                                 "Updated showing for '{0}' at {1}".format(showing.event.name, showing.start.strftime("%H:%M on %d/%m/%y"))
+            )
 
             return _return_to_editindex(request)
     else:
@@ -344,6 +350,7 @@ def _edit_event_handle_post(request, event_id):
             # the old toolkit used to do. No image thrown away!
             media_form.save()
             event.set_main_mediaitem(media_item)
+        messages.add_message(request, messages.SUCCESS, "Updated details for event '{0}'".format(event.name))
         # If the media_form was submitted with blank file name/no data then
         # don't save it (caption is ignored)
         return _return_to_editindex(request)
@@ -402,6 +409,7 @@ def edit_ideas(request, year=None, month=None):
         form = toolkit.diary.forms.DiaryIdeaForm(request.POST, instance=instance)
         if form.is_valid():
             form.save()
+            messages.add_message(request, messages.SUCCESS, "Updated ideas for {0}/{1}".format(month, year))
             return _return_to_editindex(request)
     else:
         form = toolkit.diary.forms.DiaryIdeaForm(instance=instance)
@@ -424,6 +432,7 @@ def delete_showing(request, showing_id):
             return HttpResponseRedirect(reverse("edit-showing", kwargs={'showing_id': showing_id}))
         else:
             logging.info("Deleting showing id {0} (for event id {1})".format(showing_id, showing.event_id))
+            messages.add_message(request, messages.SUCCESS, "Deleted showing for '{0}' on {1}".format(showing.event.name, showing.start.strftime("%d/%m/%y")))
             showing.delete()
 
     return _return_to_editindex(request)
@@ -485,6 +494,7 @@ def edit_event_templates(request):
             # Reset formset, so get another blank one at the
             # end, deleted ones disappera, etc.
             formset = event_template_formset()
+            messages.add_message(request, messages.SUCCESS, "Event templates updated")
     else:
         formset = event_template_formset()
     context = {'formset': formset}
@@ -564,6 +574,7 @@ def edit_roles(request):
             # Reset formset, so get another blank one at the
             # end, deleted ones disappear, etc.
             formset = RoleFormset()
+            messages.add_message(request, messages.SUCCESS, "Roles updated")
     else:
         formset = RoleFormset()
 

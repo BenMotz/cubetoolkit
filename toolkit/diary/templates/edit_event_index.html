@@ -43,6 +43,27 @@ Editing {{ event_list_name }}
       top: 0;
       right: 10px;
   }
+  .messages li {
+      text-align: center;
+      font-size: 16pt;
+      font-weight: bold;
+      list-style-position: outside;
+      list-style-type: none;
+  }
+  li.success {
+      list-style-image: url("{{ STATIC_URL }}img/message_success.png");
+      color: green;
+  }
+  li.error {
+      list-style-image: url("{{ STATIC_URL }}img/message_error.png");
+      color: red;
+  }
+  li.warning {
+      color: #FF7E00;
+  }
+  li.info {
+      color: #00308F;
+  }
 </style>
 {% endblock %}
 
@@ -118,6 +139,9 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
 <a href="{% url day-edit year=start.year day=start.day month=start.month %}?daysahead=60">See 2 months</a> | 
 <a href="{% url day-edit year=start.year day=start.day month=start.month %}?daysahead=90">See 3 months</a></p>
 <p align='center'><label for="id_start">See from now until:</label> <input type="text" name="lookahead_to" value="{{ end|date:'j-m-Y'}}" id="id_lookahead_to" /></p>
+
+{% include "messages.html" %}
+
 <table class="summary">
     <tr><td></td><td colspan="3"><a href="{% url add-event %}?date={{start|date:"j-m-Y"}}">New event</a></td></tr>
 
