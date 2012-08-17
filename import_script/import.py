@@ -246,7 +246,7 @@ def import_events(connection, role_map):
         # Name
         e.name = titlecase(r[1])
 
-        if e.name in (None, u'', ''):
+        if e.name is None or e.name == '':
             # Looking at the db, it's safe to skip all of these
             logging.warning("Event with no/missing name: id %s (copy: %s)", e.legacy_id, r[2])
             continue
