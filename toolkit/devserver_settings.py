@@ -10,6 +10,7 @@ APP_ROOT = '/home/ben/data/python/cube'
 # trailing slash.
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
 MEDIA_URL = 'http://toolkit/media/'
+# MEDIA_ROOT = '/var/www_toolkit/site/media'
 
 # Enable Debug mode, add in Django toolbar:
 DEBUG = True
@@ -29,3 +30,7 @@ logging.basicConfig(
     level=logging.INFO,
     format='%(asctime)s %(levelname)s %(message)s',
 )
+
+import warnings
+warnings.filterwarnings('error', r"DateTimeField received a naive datetime",
+                        RuntimeWarning, r'django\.db\.models\.fields')
