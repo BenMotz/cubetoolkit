@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load url from future %}
 {% block title %}
 Login required
 {% endblock %}
@@ -8,10 +9,11 @@ Login required
 <h1>Login required</h1>
 {{ form.name_of_field.errors }}
 {% if message %} <p id="message">{{ message }}</p>{% endif %}
-<form action="{% url auth atype=atype %}" method="post">
+<form action="{% url 'login' %}" method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="Continue" />
+    <input type="hidden" name="next" value="{{ next }}" />
 </form>
 {% endblock %}
 

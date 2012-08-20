@@ -14,8 +14,8 @@ from django.contrib import messages
 import django.template
 import django.db
 import django.utils.timezone as timezone
+from django.contrib.auth.decorators import permission_required, login_required
 
-from toolkit.auth.decorators import require_write_auth, require_read_or_write_auth
 from toolkit.diary.models import Showing, Event, DiaryIdea, MediaItem, EventTemplate, EventTag, Role
 import toolkit.diary.forms
 import toolkit.diary.edit_prefs
@@ -46,7 +46,7 @@ def _return_to_editindex(request):
         return HttpResponseRedirect(reverse("default-edit"))
 
 
-@require_read_or_write_auth
+@login_required
 def edit_diary_list(request, year=None, day=None, month=None):
     # Basic "edit" list view. Logic about processing of year/month/day
     # parameters is basically the same as for the public diary view.
@@ -142,7 +142,7 @@ def set_edit_preferences(request):
     return HttpResponse(json.dumps(prefs), mimetype="application/json")
 
 
-@require_read_or_write_auth
+@login_required
 def add_showing(request, event_id):
     # Add a showing to an existing event. Must be called via POST. Uses POSTed
     # data to create a new showing.
@@ -195,7 +195,7 @@ def add_showing(request, event_id):
         return render(request, 'form_showing.html', context)
 
 
-@require_write_auth
+@permission_required('toolkit.write')
 def add_event(request):
     # Called GET, with a "date" parameter of the form day-month-year:
     #     returns 'form_new_event_and_showing' with given date filled in.
@@ -262,7 +262,7 @@ def add_event(request):
         return HttpResponse("Illegal method", status=405)
 
 
-@require_write_auth
+@permission_required('toolkit.write')
 def edit_showing(request, showing_id=None):
     showing = get_object_or_404(Showing, pk=showing_id)
 
@@ -364,7 +364,7 @@ def _edit_event_handle_post(request, event_id):
     return render(request, 'form_event.html', context)
 
 
-@require_write_auth
+@permission_required('toolkit.write')
 def edit_event(request, event_id=None):
     # Event edit form. The 'POST' case, for submitting edits, is a bit of a
     # monster, and is a separate method
@@ -393,7 +393,7 @@ def edit_event(request, event_id=None):
     return render(request, 'form_event.html', context)
 
 
-@require_write_auth
+@permission_required('toolkit.write')
 def edit_ideas(request, year=None, month=None):
     # GET: return form for editing event for given month/year
     # POST: store editied idea, go back to edit list
@@ -420,7 +420,7 @@ def edit_ideas(request, year=None, month=None):
     return render(request, 'form_idea.html', context)
 
 
-@require_write_auth
+@permission_required('toolkit.write')
 def delete_showing(request, showing_id):
     # Delete the given showing
 
@@ -438,7 +438,7 @@ def delete_showing(request, showing_id):
     return _return_to_editindex(request)
 
 
-@require_read_or_write_auth
+@login_required
 def view_event_field(request, field, year, month, day):
     # Method shared across various (slightly primitive) views into event data;
     # the copy, terms and rota reports.
@@ -478,7 +478,7 @@ def view_event_field(request, field, year, month, day):
     return render(request, 'view_{0}.html'.format(field), context)
 
 
-@require_write_auth
+@permission_required('toolkit.write')
 def edit_event_templates(request):
     # View for editing event templates.
     # GET: Render multiple forms (using a formset)
@@ -502,7 +502,7 @@ def edit_event_templates(request):
     return render(request, 'edit_event_templates.html', context)
 
 
-@require_write_auth
+@permission_required('toolkit.write')
 def edit_event_tags(request):
     # View for editing event tags.
     # GET: Reads tags and renders the (JavaScript heavy) template
@@ -558,7 +558,7 @@ def edit_event_tags(request):
     return HttpResponse("OK")
 
 
-@require_write_auth
+@permission_required('toolkit.write')
 def edit_roles(request):
     # This is pretty slow,but it's not a commonly used bit of the UI...
     # (To be precise, save involves >120 queries. TThis is because I've been lazy

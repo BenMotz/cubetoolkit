@@ -14,7 +14,8 @@ urlpatterns = patterns(
     url(r'^diary/', include('toolkit.diary.urls')),
     url(r'^members/', include(toolkit.members.urls.member_urls)),
     url(r'^volunteers/', include(toolkit.members.urls.volunteer_urls)),
-    url(r'^auth/', include('toolkit.auth.urls')),
+    url(r'^login/', 'django.contrib.auth.views.login', {'template_name': 'login.html'}, name='login'),
+    url(r'^logout/', 'django.contrib.auth.views.logout', {'template_name': 'logout.html'}, name='logout'),
     # Examples:
     # url(r'^$', 'toolkit.views.home', name='home'),
     # url(r'^cube/', include('toolkit.foo.urls')),

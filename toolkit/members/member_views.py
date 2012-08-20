@@ -5,8 +5,8 @@ from django.shortcuts import get_object_or_404, render
 from django.db.models import Q
 import django.db  # Used for raw query for stats
 from django.core.urlresolvers import reverse
+from django.contrib.auth.decorators import permission_required, login_required
 
-from toolkit.auth.decorators import require_read_auth, require_write_auth
 
 import toolkit.members.forms
 from toolkit.members.models import Member
@@ -45,7 +45,7 @@ def add_member(request):
     return render(request, 'form_new_member.html', context)
 
 
-@require_read_auth
+@login_required
 def search(request):
     search_terms = request.GET.get('q', None)
     show_edit_link = bool(request.GET.get('show_edit_link', None))
@@ -73,14 +73,14 @@ def search(request):
     return render(request, 'search_members.html', context)
 
 
-@require_read_auth
+@login_required
 def view(request, member_id):
     # Is this view actually used?
     member = get_object_or_404(Member, id=member_id)
     return render(request, 'view_member.html', {'member': member})
 
 
-@require_write_auth
+@permission_required('toolkit.write')
 def delete_member(request, member_id):
     member = get_object_or_404(Member, id=member_id)
     if request.method == 'POST':
@@ -89,7 +89,7 @@ def delete_member(request, member_id):
     return HttpResponseRedirect(reverse("search-members"))
 
 
-@require_write_auth
+@permission_required('toolkit.write')
 def edit_member(request, member_id):
     context = {}
     member = get_object_or_404(Member, id=member_id)
@@ -110,7 +110,7 @@ def edit_member(request, member_id):
     return render(request, 'form_member.html', context)
 
 
-@require_read_auth
+@login_required
 def member_statistics(request):
     # View for the 'statistics' page of the 'membership database'
 

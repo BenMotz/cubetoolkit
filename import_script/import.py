@@ -15,6 +15,8 @@ import toolkit.settings as settings
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 import django.db
 import django.utils.timezone
+import django.contrib.auth as auth
+import django.contrib.contenttypes as contenttypes
 
 FORMATS_PATH = os.path.join(os.path.dirname(__file__), "./source_data/formats")
 
@@ -585,6 +587,17 @@ def import_members(connection):
     logger.info("%d members" % count)
 
 
+def create_users():
+    auth.models.User.objects.create_user('admin', 'toolkit_admin_readonly@localhost', '***REMOVED***')
+    user_rw = auth.models.User.objects.create_user('admin_readwrite', 'toolkit_admin_readwrite@localhost', '***REMOVED***')
+    # Create dummy ContentType:
+    ct = contenttypes.models.ContentType.objects.get_or_create(model='', app_label='toolkit')[0]
+    # Create 'write' permission:
+    write_permission = auth.models.Permission.objects.get_or_create(name='Write access to all toolkit content', content_type=ct, codename='write')[0]
+    # Give admin_readwrite the write permission:
+    user_rw.user_permissions.add(write_permission)
+
+
 def main():
     global SITE_ROOT
     if len(sys.argv) == 1:
@@ -616,6 +629,8 @@ def main():
     mark_standard_roles()
 
     conn.close()
+
+    create_users()
 
 if __name__ == "__main__":
     main()

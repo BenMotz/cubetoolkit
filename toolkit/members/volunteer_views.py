@@ -4,8 +4,7 @@ from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.core.urlresolvers import reverse
 from django.conf import settings
-
-from toolkit.auth.decorators import require_write_auth, require_read_or_write_auth
+from django.contrib.auth.decorators import permission_required, login_required
 
 import toolkit.members.forms
 from toolkit.members.models import Member, Volunteer
@@ -15,7 +14,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-@require_read_or_write_auth
+@login_required
 def view_volunteer_list(request):
     # Get all volunteers, sorted by name:
     volunteers = Volunteer.objects.filter(active=True).order_by('member__name').select_related()
@@ -48,7 +47,7 @@ def view_volunteer_list(request):
     return render(request, 'volunteer_list.html', context)
 
 
-@require_read_or_write_auth
+@login_required
 def select_volunteer(request, active=True):
     # This view is called to retire / unretire a volunteer. It presents a list
     # of all volunteer names and a button. If the view is called with "action=retire"
@@ -80,7 +79,7 @@ def select_volunteer(request, active=True):
     return render(request, 'select_volunteer.html', context)
 
 
-@require_write_auth
+@permission_required('toolkit.write')
 def activate_volunteer(request, active=True):
     # Sets the 'active' value for the volunteer with the id passed  in the
     # 'volunteer' parameter of the POST request
@@ -100,7 +99,7 @@ def activate_volunteer(request, active=True):
     return HttpResponseRedirect(reverse("view-volunteer-list"))
 
 
-@require_write_auth
+@permission_required('toolkit.write')
 def edit_volunteer(request, member_id, create_new=False):
     # If called from the "add" url, then create_new will be True. If called from
     # the edit url then it'll be False

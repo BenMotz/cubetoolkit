@@ -1,20 +1,5 @@
 import os.path
-# Usernames / passwords::
-#
-# (To generate a new password hash:
-# import bcrypt
-# hashed = bcrypt.hashpw('password', bcrypt.gensalt(12))
-# # -- adjust value in gensalt for available CPU power...)
-CUBE_AUTH = {
-    'read': (
-        '$2a$12$2xv8/PUuYW6yQGjPOQN7l./gbny1MskLYQnlrbvZNSr1el9NprJqa',  # Username
-        '$2a$12$p1Y1/08tElCxmUDSUasAAeTKzcpWhICQf8gcEdkIAL4rjUyKCWMz6'   # Password
-    ),
-    'write': (
-        '$2a$12$re7bQximlvz0hcJCHnS.nOd11jIq.XsK8aSXTIQGFiXnIQ0WvIw5m',  # Username
-        '$2a$12$kj2ftlD4U/m0z333dFixPuyvoyIohXy8hIbZDRk3TixYRtt7x/vlO'   # Password
-    ),
-}
+import django.core.urlresolvers
 
 # Slightly arbitrary (inherited) bounding box for thumbnails
 THUMBNAIL_SIZE = (250, 187)
@@ -74,6 +59,14 @@ DATABASES = {
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
+
+## Authorisation related settings:
+LOGIN_URL = django.core.urlresolvers.reverse_lazy('login')
+
+# Configure django to only use (more secure) bcrypt password hashing
+PASSWORD_HASHERS = (
+    'django.contrib.auth.hashers.BCryptPasswordHasher',
+)
 
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -159,7 +152,7 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.common.CommonMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    # 'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
 )
 
@@ -180,12 +173,13 @@ TEMPLATE_DIRS = (
 INSTALLED_APPS = (
     'toolkit.diary',
     'toolkit.members',
-    'toolkit.auth',
-    # disabled for now;
-    #'django.contrib.auth',
-    #'django.contrib.contenttypes',
+#    'toolkit.auth',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',  # Needed by auth framework
+    # Sessions framework: used to store preferences and login details
     'django.contrib.sessions',
-    #'django.contrib.sites',
+    #'django.contrib.sites',  # Not used
+    # Messages: Used to transfer informative text and notifications between pages
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
@@ -196,3 +190,4 @@ INSTALLED_APPS = (
     # 'south',
     'django.contrib.markup',
 )
+
