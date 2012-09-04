@@ -173,7 +173,7 @@ TEMPLATE_DIRS = (
 INSTALLED_APPS = (
     'toolkit.diary',
     'toolkit.members',
-#    'toolkit.auth',
+    'toolkit.auth',
     'django.contrib.auth',
     'django.contrib.contenttypes',  # Needed by auth framework
     # Sessions framework: used to store preferences and login details
