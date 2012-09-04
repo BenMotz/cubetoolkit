@@ -28,7 +28,7 @@ python $TOOLKIT_PATH/manage.py flush --noinput
 
 echo "Importing into django"
 
-python $TOOLKIT_PATH/import_script/import.py $TOOLKIT_PATH
+python $TOOLKIT_PATH/import_script/import_database.py $TOOLKIT_PATH
 
 echo "Done. Guessing event tags..."
 
