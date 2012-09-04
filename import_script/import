@@ -34,3 +34,6 @@ echo "Done. Guessing event tags..."
 
 python $TOOLKIT_PATH/import_script/auto_tag.py
 
+echo "Creating users"
+
+python $TOOLKIT_PATH/import_script/create_users.py
