@@ -45,8 +45,28 @@ It'll ask for a password, which begins with an "m"... (ask if needed)<br>
 <p>You should now have a directory called "repo". You can rename that to anything you like (eg "cubesite" or whatever):<br>
 <code>mv repo cube_site<br>
 cd cube_site<br>
-ls</code><br>
-You should see a bunch of files.</p>
+ls -l</code></p>
+<p>
+You should see a bunch of files, something like;<br>
+<code>total 72<br>
+-rw-r--r-- 1 test test   66 Sep  4 23:17 activate<br>
+-rwxr-xr-x 1 test test  303 Sep  4 23:50 bootstrap.sh<br>
+-rw-r--r-- 1 test test 3997 Sep  4 23:17 fabfile.py<br>
+drwxr-xr-x 4 test test 4096 Sep  4 23:55 import_script<br>
+-rw-r--r-- 1 test test  787 Sep  4 23:17 logging.conf<br>
+-rw-r--r-- 1 test test  780 Sep  4 23:17 logging.import.conf<br>
+-rw-r--r-- 1 test test  787 Sep  4 23:17 logging.normal.conf<br>
+-rwxr-xr-x 1 test test  250 Sep  4 23:17 manage.py<br>
+drwxr-xr-x 6 test test 4096 Sep  4 23:17 media<br>
+-rw-r--r-- 1 test test  123 Sep  4 23:17 requirements.txt<br>
+-rwxr-xr-x 1 test test  554 Sep  4 23:17 run_import.sh<br>
+-rwxr-xr-x 1 test test  137 Sep  4 23:17 runserver<br>
+-rwxr-xr-x 1 test test   93 Sep  4 23:17 runtests<br>
+-rw-r--r-- 1 test test   64 Sep  4 23:17 set_env<br>
+drwxr-xr-x 2 test test 4096 Sep  4 23:17 templates<br>
+drwxr-xr-x 7 test test 4096 Sep  4 23:51 toolkit<br>
+-rw-r--r-- 1 test test  623 Sep  4 23:17 toolkit.wsgi<br>
+</code></p>
 
 <h1>Setting up the python environment</h1>
 <p>To create the python virtual environment I've written a tiny script (feel free to have a look at the contents - it's short) which you can run as:<br>
