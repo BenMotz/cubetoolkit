@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html><head><title>Getting started</title><style>
+            code { background-color: #bbbbbb;
+            padding: 2px;}
+</style></head>
+<body>
+<h1>Installing dependencies</h1>
+<p>Packages you'll need installed. These are the Debian names, but hopefully they'll have similar names in other distributions:</p>
+
+<p><b>The essentials:</b>
+<ul>
+<li>python [I'm using 2.7, but 2.6 *might* work]</li>
+<li>git-core</li>
+<li>python-bcrypt</li>
+<li>python-mysqldb</li>
+<li>python-virtualenv</li>
+<li>python-pip</li>
+<li>mysql-server</li>
+</ul>
+</p>
+<p><b>Things needed for the import script:</b>
+<ul>
+<li>ruby1.8</li>
+<li>ruby-mysql</li>
+<li>ruby-bdb</li>
+<li>libdb-ruby1.8</li>
+<li>libdbi-ruby1.8</li>
+<li>libdb4.4-ruby1.8</li>
+<li>libmysql-ruby1.8</li>
+</ul>
+</p>
+<p>(You'll notice a lot of similarly named packages... I'm not entirely sure which ones are actually critical. It's a long time since I installed all these bits and bobs :) The ulitmate aim is to have Ruby 1.8 installed with the right libraries to let it open mysql databases and Berkeley DB 4.4 files)</p>
+
+<p><b> Things you almost certainly want:</b>
+<ul>
+<li>mysql-client</li>
+</ul>
+
+<h1>Getting the code</h1>
+<p>Assuming you've got all that installed, go to some directory and run:<br>
+<code>git clone cubetoolkit@toolkit.cubecinema.com:repo/</code><br>
+It'll ask for a password, which is: <code>m4n4g3m3nt</code><br>
+(If you use this regularly then you can set it up not to need a password, but I'll come back to that some other time)</p>
+
+<p>You should now have a directory called "repo". Yoy can rename that to anything you like (eg "cubesite" or whatever):<br>
+<code>mv repo cube_site<br>
+cd cube_site<br>
+ls</code><br>
+You should see a bunch of files.</p>
+
+<h1>Setting up the python environment</h1>
+<p>To create the python virtual environment I've written a tiny script (feel free to have a look at the contents - it's short) which you can run as:<br>
+<code>./bootstrap.sh</code><br>
+That should download and install a whole bunch of python packages.</p>
+<p>Now you should be able to activate the python environment, with the Django packages installed. Run:<br>
+<code>source venv/bin/activate</code></p>
+<p>Your command prompt should now say <code>(venv)</code> in front of it.</p>
+
+<h1>Configuring the database</h1>
+
+<p>Now you need to configure the MySQL accounts and database. You'll need to know the username and password for your mysql install. If you don't there's some way to reset them (google!) Then run:<br>
+<code>mysql -u[username] -p[password] < import_script/reset_django_database.sql</code></p>
+
+<p>Now you can initialise the database with the tables for the django app. Run:<br>
+<code>source venv/bin/activate<br>
+python manage.py syncdb</code><br>
+That will probably ask if you want to create a superuser. The answer is "no".
+</p>
+
+<h1>Starting the site</h1>
+<p>Start django's built-in development webserver. Run:<br>
+<code>source venv/bin/activate<br>
+python manage.py runserver</code></p>
+<p>It should say something like:</p>
+<p><code>
+Validating models...<br>
+<br>
+0 errors found<br>
+Django version 1.4.1, using settings 'toolkit.settings'<br>
+Development server is running at http://127.0.0.1:8000/<br>
+Quit the server with CONTROL-C.</code></p>
+<p>Now if you use a (this?) browser to go to: <a href="http://localhost:8000/diary/">http://localhost:8000/diary/</a><br>
+Then you should see an empty diary.</p>
+<p>You can also try going to the various other pages linked below, but as the cube user hasn't been added yet you won't be able to get very far.</p>
+
+<p>When you're happy, either press Ctrl+C, or close the terminal window to kill the server</p>
+
+<h1>Importing data</h1>
+<p>This is a bit complicated; there are a set of scripts that:
+<ol>
+<li>Copy all the diary data from sparror onto your local computer</li>
+<li>Use a ruby script to import all that data into an interm database ('cubetoolkit')</li>
+<li>Use a python script to move all the data from the interim database into the django database</li>
+</ol>
+<p>There's a high chance it'll blow up for some reason, but to give it a go change to the main toolkit directory, and run:<br>
+<code>./run_import.sh</code><br>
+...and let me know where it fouls up :-)<br>
+If you haven't set up SSH certificates then it'll repeatedly (11 times?) ask for the password for the "cube" user on sparror.  That's <code>***REMOVED***</code>. (It's an incentive to go and find out how to configure ssh-agent :-) It'll also all take a while if it works, and print a lot of gumph to your screen</p>
+<p>If it all works correctly, then run the test server again, and when you go the diary page it should have some content</p>
+
+<h1>Links to pages</h1>
+<p>There's no built-in central page linking things together (yet?) so in the meantime, here are some relevant links;</p>
+<ul>
+<li><a href="http://localhost:8000/diary/view">Diary for the public</a></li>
+<li><a href="http://localhost:8000/diary/edit">Edit the Diary</a></li>
+<li><a href="http://localhost:8000/diary/rota">Print the Rota</a></li>
+<li><a href="http://localhost:8000/diary/copy">Copy report</a></li>
+<li><a href="http://localhost:8000/diary/terms">Terms report</a></li>
+<li><a href="http://localhost:8000/diary/edit/eventtags">Edit available event tags</a></li>
+<li><a href="http://localhost:8000/diary/edit/eventtemplates">Edit available event templates</a></li>
+<li><a href="http://localhost:8000/diary/edit/roles">Edit available volunteer/event roles</a></li>
+<li><a href="http://localhost:8000/diary/rss">Basic diary RSS feed</a> (RSS feeds for events with given tag todo)</li>
+<li><a href="http://localhost:8000/volunteers/">Volunteers profiles</a></li>
+<li><a href="http://localhost:8000/members/add">Members database</a></li>
+<li><a href="http://localhost:8000/members/homepages">Members homepages</a></li>
+<li><a href="http://localhost:8000/diary/mailout">Members mailout</a> (Definitely won't actually send email if you click send)</li>
+</ul>
+</body>
+</html>
