@@ -7,7 +7,7 @@
 <h1>Installing dependencies</h1>
 <p>Packages you'll need installed. These are the Debian names, but hopefully they'll have similar names in other distributions:</p>
 
-<p><b>The essentials:</b>
+<p><b>The essentials:</b></p>
 <ul>
 <li>python [I'm using 2.7, but 2.6 *might* work]</li>
 <li>git-core</li>
@@ -16,9 +16,9 @@
 <li>python-virtualenv</li>
 <li>python-pip</li>
 <li>mysql-server</li>
+<li>mysql-client</li>
 </ul>
-</p>
-<p><b>Things needed for the import script:</b>
+<p><b>Things needed for the import script:</b></p>
 <ul>
 <li>ruby1.8</li>
 <li>ruby-mysql</li>
@@ -28,13 +28,7 @@
 <li>libdb4.4-ruby1.8</li>
 <li>libmysql-ruby1.8</li>
 </ul>
-</p>
 <p>(You'll notice a lot of similarly named packages... I'm not entirely sure which ones are actually critical. It's a long time since I installed all these bits and bobs :) The ultimate aim is to have Ruby 1.8 installed with the right libraries to let it open mysql databases and Berkeley DB 4.4 files)</p>
-
-<p><b> Things you almost certainly want:</b>
-<ul>
-<li>mysql-client</li>
-</ul>
 
 <h1>Getting the code</h1>
 <p>Assuming you've got all that installed, go to some directory and run:<br>
@@ -79,7 +73,7 @@ That should download and install a whole bunch of python packages.</p>
 <h1>Configuring the database</h1>
 
 <p>Now you need to configure the MySQL accounts and database. You'll need to know the username and password for your mysql install. If you don't there's some way to reset them (google!) Then run:<br>
-<code>mysql -u[username] -p[password] < import_script/reset_django_database.sql</code></p>
+<code>mysql -u[username] -p[password] &lt; import_script/reset_django_database.sql</code></p>
 
 <p>Now you can initialise the database with the tables for the django app. Run:<br>
 <code>source venv/bin/activate<br>
