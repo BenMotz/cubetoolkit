@@ -118,6 +118,17 @@ Then you should see an empty diary.</p>
 If you haven't set up SSH certificates then it'll repeatedly (11 times?) ask for the password for the "cube" user on sparror. That's the one beginning 6. (It's an incentive to go and find out how to configure ssh-agent :-) It'll also all take a while if it works, and print a lot of gumph to your screen</p>
 <p>If it all works correctly, then run the test server again, and when you go the diary page it should have some content</p>
 
+<p>Re-running the run_import.sh script will delete <b>everything</b> and re-import it all.</p>
+
+<p>Once it's running, the users created by the import process are:<br>
+<table>
+    <tr><th>username</th><th>password</th><th>note</th></tr>
+    <tr><td>cube</td><td>i*******</td><td>Read-only access to volunteer list and diary, write access to membership db</td></tr>
+    <tr><td>admin</td><td>6*****</td><td>Read-write access to everything</td></tr>
+</table>
+(this is all configurable, btw. The file import_script/create_users.py initialises this))</p>
+
+
 <h1>Links to pages</h1>
 <p>There's no built-in central page linking things together (yet?) so in the meantime, here are some relevant links;</p>
 <ul>
