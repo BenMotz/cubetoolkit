@@ -9,6 +9,8 @@ from django.conf import settings
 import django.utils.timezone
 import django.core.exceptions
 
+from south.modelsinspector import add_introspection_rules
+
 logger = logging.getLogger(__name__)
 
 from toolkit.diary.validators import validate_in_future
@@ -22,6 +24,9 @@ class FutureDateTimeField(models.DateTimeField):
     }
     default_validators = [validate_in_future]
 
+# Having defined a custom field, need to tell South that it doesn't need to do
+# anything special when creating/applying database migrations:
+add_introspection_rules([], [r"^toolkit\.diary\.models\.FutureDateTimeField"])
 
 class Role(models.Model):
     name = models.CharField(max_length=64, unique=True)

@@ -37,3 +37,8 @@ python $TOOLKIT_PATH/import_script/auto_tag.py
 echo "Creating users"
 
 python $TOOLKIT_PATH/import_script/create_users.py
+
+echo "Converting app to use south migrations"
+
+python $TOOLKIT_PATH/manage.py convert_to_south diary
+python $TOOLKIT_PATH/manage.py convert_to_south members
