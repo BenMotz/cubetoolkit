@@ -15,8 +15,6 @@ import toolkit.settings as settings
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 import django.db
 import django.utils.timezone
-import django.contrib.auth as auth
-import django.contrib.contenttypes as contenttypes
 
 FORMATS_PATH = os.path.join(os.path.dirname(__file__), "./source_data/formats")
 
@@ -161,7 +159,7 @@ def import_event_showings(connection, event, legacy_event_id):
     fake_start = django.utils.timezone.now() + datetime.timedelta(days=1)
 
     cursor = connection.cursor()
-    showing_count = cursor.execute("SELECT datetime, event_id, booked_by, confirmed, cancelled, discounted, outside_hire, private_event FROM diary WHERE event_id = '%s' ORDER BY datetime" % legacy_event_id)
+    showing_count = cursor.execute("SELECT datetime, event_id, booked_by, confirmed, cancelled, discounted, outside_hire, private_event FROM diary WHERE event_id = %s ORDER BY datetime", legacy_event_id)
     event_tot += showing_count
 
     results = cursor.fetchall()

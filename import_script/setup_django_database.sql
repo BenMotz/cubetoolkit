@@ -15,7 +15,7 @@ DROP DATABASE IF EXISTS toolkitimport;
 CREATE DATABASE `cube` CHARACTER SET 'utf8';
 CREATE DATABASE `toolkitimport` CHARACTER SET 'utf8';
 
-# Give the general user permissions on the djanog db:
+# Give the general user permissions on the django db:
 GRANT ALTER,CREATE,DELETE,DROP,INDEX,INSERT,SELECT,SHOW VIEW,UPDATE ON `cube`.* to `cube`@`localhost`;
 
 # Give the import script user quite a lot of power...
