@@ -1,5 +1,4 @@
 *.pyc
 venv
 site_transfer.tgz
-toolkit.log
-settings.py
+toolkit/settings.py
