@@ -7,6 +7,7 @@ Editing {{ event_list_name }}
 {% endblock %}
 
 {% block css %}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
 <style type="text/css">
   @import url('{{ STATIC_URL }}css/lib/smoothness/jquery-ui.css');
   .private {
@@ -42,27 +43,6 @@ Editing {{ event_list_name }}
       position: absolute;
       top: 0;
       right: 10px;
-  }
-  .messages li {
-      text-align: center;
-      font-size: 16pt;
-      font-weight: bold;
-      list-style-position: outside;
-      list-style-type: none;
-  }
-  li.success {
-      list-style-image: url("{{ STATIC_URL }}img/message_success.png");
-      color: green;
-  }
-  li.error {
-      list-style-image: url("{{ STATIC_URL }}img/message_error.png");
-      color: red;
-  }
-  li.warning {
-      color: #FF7E00;
-  }
-  li.info {
-      color: #00308F;
   }
 </style>
 {% endblock %}
