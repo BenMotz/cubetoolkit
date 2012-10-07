@@ -6,9 +6,9 @@ from django.conf import settings
 from django.db import models
 
 from toolkit.diary.models import Role
+from toolkit.util import generate_random_string
 
 logger = logging.getLogger(__name__)
-
 
 class Member(models.Model):
 
@@ -32,6 +32,8 @@ class Member(models.Model):
 
     mailout = models.BooleanField(default=True)
     mailout_failed = models.BooleanField(default=False)
+    # Used for "click to unsubscribe"/"edit details" etc:
+    mailout_key = models.CharField(max_length=32, blank=False, null=False, editable=False, default=generate_random_string)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

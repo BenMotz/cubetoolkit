@@ -28,4 +28,8 @@ member_urls = patterns(
 
     # External:
     url('^homepages/$', 'member_homepages', name='member-homepages'),
+
+    # Semi-external (see member_views.py for details)
+    url('^(?P<member_id>\d+)/edit/$', 'edit_member', name='edit-member'),
+    url('^(?P<member_id>\d+)/unsubscribe/$', 'unsubscribe_member', name='unsubscribe-member'),
 )
