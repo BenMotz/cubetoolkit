@@ -19,6 +19,10 @@ Additonal Info -"""
 
 DEFAULT_MUGSHOT = "/static/members/default_mugshot.gif"
 
+# This is used as the hostname for unsubscribe links in emails (i.e. emails
+# will have links added to http://[this]/members/100/unsubscribe)
+EMAIL_UNSUBSCRIBE_HOST = "cubecinema.com"
+
 # The maximum number of each type of role that can be assigned to a showing
 # (so, for example, can't have more than this number of bar staff)
 MAX_COUNT_PER_ROLE = 6

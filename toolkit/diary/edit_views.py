@@ -2,6 +2,7 @@ import re
 import json
 import datetime
 import logging
+import time
 
 from toolkit.util.ordereddict import OrderedDict
 
@@ -11,6 +12,7 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.forms.models import modelformset_factory
 from django.contrib import messages
+from django.views.decorators.http import condition
 import django.template
 import django.db
 import django.utils.timezone as timezone
@@ -636,4 +638,56 @@ def mailout(request):
         form = toolkit.diary.forms.MailoutForm(request.POST)
         if not form.is_valid():
             return render(request, 'form_mailout.html', {'form': form})
-        return HttpResponse("Todo!", mimetype="text/plain")
+        return render(request, 'mailout_send.html', form.cleaned_data)
+
+def send_mail(subject, body):
+    """recipients should be a list of (name, email address"""
+
+    signature_template = (
+u"""
+
+If you wish to be removed from our mailing list please use this link:
+http://{0}{{0}}?k={{2}}
+To edit details of your membership, please use this link:
+http://{0}{{1}}?k={{2}}
+""").format(settings.EMAIL_UNSUBSCRIBE_HOST, settings.EMAIL_UNSUBSCRIBE_HOST)
+
+    recipients = (toolkit.members.models.Member.objects.filter(email__isnull=False)
+                                                        .exclude(email='')
+                                                        .exclude(mailout_failed=True)
+                                                        .filter(mailout=True))
+    count = recipients.count()
+    sent = 0
+    one_percent = count // 100
+    yield "0\n"
+
+    for recipient in recipients:
+        signature = signature_template.format(
+            reverse("edit-member", args=(recipient.pk,)),
+            reverse("unsubscribe-member", args=(recipient.pk,)),
+            recipient.mailout_key,
+        )
+
+        sent += 1
+        if sent % one_percent == 0:
+            progress =  int((100.0 * sent) / count) + 1
+            yield "{0}\n".format(progress)
+        # Send the frigging mail...
+        # bork(body + signature)
+
+
+# @condition(etag_func=None, last_modified_func=None)
+def exec_mailout(request):
+    form = toolkit.diary.forms.MailoutForm(request.POST) # ???
+    if not form.is_valid():
+        print form.errors
+        return HttpResponse(json.dumps({'status': 'error'}), mimetype="application/json")
+
+    response =  HttpResponse(
+            send_mail(form.cleaned_data['subject'], form.cleaned_data['body']),
+            content_type='text/plain; charset=UTF-8'
+    )
+
+    return response
+
+

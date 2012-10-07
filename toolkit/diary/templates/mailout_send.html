@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+
+{% block title %}
+Mailout dispatch
+{% endblock %}
+
+{% block css %}
+<style type="text/css">
+    @import url('{{ STATIC_URL }}css/lib/smoothness/jquery-ui.css');
+    p.mail {
+        border: thin solid black;
+        background: #cccccc;
+        padding: 2px;
+        margin: 0 20px;
+    }
+    p#subject {
+        font-family: monospace;
+        white-space: nowrap;
+    }
+    p#body {
+        font-family: monospace;
+        white-space: pre-wrap;
+    }
+    body {
+        font-family: sans-serif;
+    }
+    p.label {
+        font-size: 8pt;
+        margin: 15px 5px 0 5px;
+    }
+</style>
+{% endblock %}
+
+{% block script %}
+<!-- Screw progressive enhancement -->
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
+<script type="text/javascript">
+
+var progress = 0;
+var progressBar;
+var csrftoken;
+var send_xhr;
+
+function getCookie(name) {
+    var cookieValue = null;
+    if (document.cookie && document.cookie != '') {
+        var cookies = document.cookie.split(';');
+        for (var i = 0; i < cookies.length; i++) {
+            var cookie = jQuery.trim(cookies[i]);
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) == (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function progress_poll() {
+    console.log("Ping!");
+
+    if(send_xhr == undefined)
+        return;
+
+    var fullResponse = send_xhr.responseText;
+
+    console.log(fullResponse);
+
+    window.setTimeout(progress_poll, 100);
+/*
+    if(progress < 100) {
+        // progress++;
+        update_progress(progress);
+    } else if(progress === 100) {
+        // set_state(S_COMPLETE);
+    }
+    */
+}
+
+
+function update_progress(percentage) {
+    progressBar.progressbar('value', percentage);
+}
+
+function mail_send_complete() {
+    alert("Complete!");
+}
+
+function mail_send_error(jqXHR, textStatus, errorThrown) {
+    alert("Error: " + textStatus + " " + errorThrown);
+}
+
+function start_send() {
+    set_state(S_SENDING);
+
+    progress = 0;
+    update_progress(progress);
+    data = 'csrfmiddlewaretoken=' + encodeURIComponent(csrftoken) +
+           '&subject=' +  encodeURIComponent($('p#subject').html()) +
+           '&body=' + encodeURIComponent($('p#body').html());
+/*
+    send_xhr = $.ajax('{% url exec-mailout %}', {
+            'cache': false,
+            'complete': mail_send_complete,
+            'data': data,
+            'dataType': 'text',
+            'error': mail_send_error,
+            'type': 'POST'
+            });
+            */
+    send_xhr = new XMLHttpRequest();
+    send_xhr.open('POST', '{% url exec-mailout %}', true);
+    send_xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded; charset=UTF-8");
+    send_xhr.setRequestHeader("Content-length", data.length);
+    send_xhr.setRequestHeader("Connection", "keep-alive");
+    send_xhr.send(data)
+
+    window.setTimeout(progress_poll, 100);
+}
+
+function cancel_send() {
+    set_state(S_ABORTED);
+
+    progress = 1000;
+}
+
+var S_READY=0;
+var S_SENDING=1;
+var S_COMPLETE=2;
+var S_ABORTED=3;
+
+function set_state(state) {
+    switch(state) {
+        case S_READY:
+            $('#status').html('Please read through and check the text below, then click <span id="send">Send</span> when you\'re sure...');
+            $('#send').button().click(start_send);
+            break;
+        case S_SENDING:
+            $('#status').html('Sending. If you change your mind then <span id="cancel">Cancel</span>');
+            $('#cancel').button().click(cancel_send);
+            break;
+        case S_ABORTED:
+            $('#status').html('Sending aborted');
+            break;
+        case S_COMPLETE:
+            $('#status').html('Sent');
+            break;
+    }
+}
+
+$(document).ready(function() {
+    csrftoken = getCookie('csrftoken');
+    set_state(S_READY);
+    progressBar = $('#progress').progressbar(0);
+});
+
+
+</script>
+{% endblock %}
+
+{% block body %}
+<h1>Mailout: confirm</h1>
+<p id="status">Please wait, page loading...</p>
+<p id="progress"></p>
+<p class="label">Subject:</p>
+<p class="mail" id="subject">{{ subject }}</p>
+<p class="label">Body:</p>
+<p class="mail" id="body">{{body}}</p>
+
+{% endblock %}
+

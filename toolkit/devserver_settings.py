@@ -6,6 +6,8 @@ from toolkit.settings_common import *
 
 APP_ROOT = '/home/ben/data/python/cube'
 
+EMAIL_UNSUBSCRIBE_HOST = "localhost:8000"
+
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
