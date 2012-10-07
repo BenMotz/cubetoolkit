@@ -14,3 +14,21 @@ http://www.cubecinema.com{% url default-view %}
 {% endfor %}
 {{ showing.event.copy }}
 {% endifchanged %}{% endif %}{% endfor %}
+
+--
+
+Cube Cinema Microplex
+is located at:
+Dove Street South
+Bristol
+BS2 8JD
+
+postal:
+4 Princess Row
+Bristol
+BS2 8NQ
+
+http://www.cubecinema.com
+
+tel: 0117 907 4190
+
