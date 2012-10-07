@@ -1,6 +1,7 @@
 {% extends 'base.html' %}
 {% load hash_filter %}
 {% block css %}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
 <style>
     em {
         font-style: normal;
@@ -14,6 +15,7 @@
 {% block body %}
 {# {% for v, n in roles.iteritems %} <p><b>{{ v }}</b><br> {{ n }} </p> {% endfor %} #}
 <img src="{{ STATIC_URL }}members/cube_microplex_logo.gif" width="200"><p><h2>Cube volunteers report.</h2>
+{% include "messages.html" %}
 Total cube volunteers: {{ volunteers|length }}<p>
 Report generated: {% now "d/m/Y" %}<p>
 <a href="{% url add-volunteer %}"title="add new volunteer">[add volunteer]</a>

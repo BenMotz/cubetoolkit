@@ -5,6 +5,7 @@ from django.shortcuts import get_object_or_404, render
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.auth.decorators import permission_required, login_required
+from django.contrib import messages
 
 import toolkit.members.forms
 from toolkit.members.models import Member, Volunteer
@@ -88,13 +89,16 @@ def activate_volunteer(request, active=True):
 
     vol_pk = request.POST.get('volunteer', None)
 
-    logger.info("Set volunteer.active to %s for volunteer %s", str(active), vol_pk)
-
     vol = get_object_or_404(Volunteer, id=vol_pk)
 
     assert type(active) is bool
     vol.active = active
     vol.save()
+
+    logger.info("Set volunteer.active to %s for volunteer %s", str(active), vol_pk)
+    messages.add_message(request, messages.SUCCESS, "{0} volunteer {1}".format(
+        "Unretired" if active else "Retired",
+        vol.member.name))
 
     return HttpResponseRedirect(reverse("view-volunteer-list"))
 
@@ -128,6 +132,9 @@ def edit_volunteer(request, member_id, create_new=False):
             mem_form.save()
             volunteer.member = member
             vol_form.save()
+            messages.add_message(request, messages.SUCCESS, "{0} volunteer '{1}'".format(
+                "Created" if create_new else "Updated", member.name
+            ))
             # Go to the volunteer list view:
             return HttpResponseRedirect(reverse("view-volunteer-list"))
     else:

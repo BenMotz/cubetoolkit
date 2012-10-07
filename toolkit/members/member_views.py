@@ -6,6 +6,7 @@ from django.db.models import Q
 import django.db  # Used for raw query for stats
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import permission_required, login_required
+from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 
 
@@ -21,7 +22,6 @@ def add_member(request):
     # If this view is called with GET then display the form to enter a new
     # member. If called with POST then take parameters out of the body of
     # the request and create a new member
-    message = None
     if request.method == 'POST':
         # Create new member object
         instance = toolkit.members.models.Member()
@@ -35,14 +35,13 @@ def add_member(request):
             form.save()
             # Member added ok, new blank form:
             form = toolkit.members.forms.NewMemberForm()
-            message = "Added member: {0}".format(instance.number)
+            messages.add_message(request, messages.SUCCESS, "Added member: {0}".format(instance.number))
     else:
         # GET request; create form object with default values
         form = toolkit.members.forms.NewMemberForm()
 
     context = {
         'form': form,
-        'message': message,
     }
     return render(request, 'form_new_member.html', context)
 
@@ -87,6 +86,7 @@ def delete_member(request, member_id):
     member = get_object_or_404(Member, id=member_id)
     if request.method == 'POST':
         member.delete()  # This will delete associated volunteer record, if any
+        messages.add_message(request, messages.SUCCESS, "Deleted member: {0} ({1})".format(member.number, member.name))
 
     return HttpResponseRedirect(reverse("search-members"))
 
@@ -142,9 +142,11 @@ def edit_member(request, member_id):
     if request.method == 'POST':
         form = toolkit.members.forms.MemberForm(request.POST, instance=member)
         if form.is_valid():
-            logger.info("Saving changes to member id '%s' (id: %d)", member.name, member.pk)
+            logger.info("Saving changes to member '%s' (id: %d)", member.name, member.pk)
             form.save()
-            return HttpResponseRedirect(reverse("search-members"))
+            messages.add_message(request, messages.SUCCESS, "Member {0} updated".format(member.number))
+            if request.user.has_perm('toolkit.write'):
+                return HttpResponseRedirect(reverse("search-members"))
     else:
         form = toolkit.members.forms.MemberForm(instance=member)
 
@@ -171,9 +173,10 @@ def unsubscribe_member(request, member_id):
         action  = request.POST.get('action', 'unsubscribe')
         confirm = request.POST.get('confirm', False)
         if confirm == "yes" and action in ('unsubscribe', 'subscribe'):
-            logger.info("%s member id '%s' (id: %d) from mailing list", action, member.name, member.pk)
             member.mailout = (action == 'subscribe')
             member.save()
+            logger.info("%s member '%s' (id: %d) from mailing list", action, member.name, member.pk)
+            messages.add_message(request, messages.SUCCESS, "Member {0} {1}d".format(member.number, action))
 
     action = 'unsubscribe' if member.mailout else 'subscribe'
 

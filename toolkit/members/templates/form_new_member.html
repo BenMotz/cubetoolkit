@@ -2,6 +2,7 @@
 {% block title %}Add member{% endblock %}
 
 {% block css %}
+{{ block.super }}
 <style>
     th {
         font-weight: normal;
@@ -18,7 +19,6 @@
 
 {% block body %}
 <h3>Add a Member.</h3>
-{% if message %}<h3>{{ message }}</h3>{% endif %}
 <form action="" method="POST">
 {% csrf_token %}
 <table>

@@ -1,8 +1,15 @@
 {% extends 'base.html' %}
 
+{% block css %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
+{% endblock %}
+
 {% block header %}
 <p><img src="{{ STATIC_URL }}members/cube_microplex_logo.gif" width="400"></p>
 <h3>Cube member's database.</h3>
+{% include "messages.html" %}
+
 {% endblock %}
 
 {% block footer %}

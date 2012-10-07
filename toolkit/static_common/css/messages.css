@@ -1,0 +1,21 @@
+  .messages li {
+      text-align: center;
+      font-size: 16pt;
+      font-weight: bold;
+      list-style-position: outside;
+      list-style-type: none;
+  }
+  li.success {
+      list-style-image: url("../img/message_success.png");
+      color: green;
+  }
+  li.error {
+      list-style-image: url("../img/message_error.png");
+      color: red;
+  }
+  li.warning {
+      color: #FF7E00;
+  }
+  li.info {
+      color: #00308F;
+  }

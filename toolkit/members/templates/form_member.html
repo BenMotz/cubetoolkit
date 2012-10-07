@@ -2,6 +2,7 @@
 {% block title %}Edit member{% endblock %}
 
 {% block css %}
+{{ block.super }}
 <style>
     th {
         font-weight: normal;
@@ -18,6 +19,7 @@
 {% if message %}<h3>{{ message }}</h3>{% endif %}
 <form action="" method="POST">
 {% csrf_token %}
+<div style='display:none'><input type="hidden" name="k" value="{{ member.mailout_key }}" /></div>
 <table>
 <tr><th>Member:</th><td>{{ member.number }}</td>
 {{ form.as_table }}
