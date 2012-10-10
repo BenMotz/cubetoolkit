@@ -15,6 +15,7 @@ from django.forms.models import modelformset_factory
 from django.contrib import messages
 import django.template
 import django.db
+from django.db.models import Q
 import django.utils.timezone as timezone
 from django.contrib.auth.decorators import permission_required, login_required
 
@@ -471,7 +472,10 @@ def view_event_field(request, field, year, month, day):
         logging.info("Search term: {0}".format(search))
         # Note slightly sneaky use of **; this effectively results in a method
         # call like: showings.filter(event__copy__icontaings=search)
-        showings = showings.filter(**{'event__' + field + '__icontains': search})
+        showings = showings.filter(
+            Q(**{'event__' + field + '__icontains': search})
+            | Q(event__name__icontains=search)
+        )
     context = {
         'start_date': start_date,
         'end_date': end_date,
