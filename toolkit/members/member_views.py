@@ -31,11 +31,11 @@ def add_member(request):
         # Validate form fields
         if form.is_valid():
             # Form is valid, save data:
-            logger.info("Adding member '%s'".format(instance.name))
+            logger.info(u"Adding member '{0}'".format(instance.name))
             form.save()
             # Member added ok, new blank form:
             form = toolkit.members.forms.NewMemberForm()
-            messages.add_message(request, messages.SUCCESS, "Added member: {0}".format(instance.number))
+            messages.add_message(request, messages.SUCCESS, u"Added member: {0}".format(instance.number))
     else:
         # GET request; create form object with default values
         form = toolkit.members.forms.NewMemberForm()
@@ -86,7 +86,7 @@ def delete_member(request, member_id):
     member = get_object_or_404(Member, id=member_id)
     if request.method == 'POST':
         member.delete()  # This will delete associated volunteer record, if any
-        messages.add_message(request, messages.SUCCESS, "Deleted member: {0} ({1})".format(member.number, member.name))
+        messages.add_message(request, messages.SUCCESS, u"Deleted member: {0} ({1})".format(member.number, member.name))
 
     return HttpResponseRedirect(reverse("search-members"))
 
@@ -142,9 +142,9 @@ def edit_member(request, member_id):
     if request.method == 'POST':
         form = toolkit.members.forms.MemberForm(request.POST, instance=member)
         if form.is_valid():
-            logger.info("Saving changes to member '%s' (id: %d)", member.name, member.pk)
+            logger.info(u"Saving changes to member '{0}' (id: {1})".format(member.name, member.pk))
             form.save()
-            messages.add_message(request, messages.SUCCESS, "Member {0} updated".format(member.number))
+            messages.add_message(request, messages.SUCCESS, u"Member {0} updated".format(member.number))
             if request.user.has_perm('toolkit.write'):
                 return HttpResponseRedirect(reverse("search-members"))
     else:
@@ -175,8 +175,8 @@ def unsubscribe_member(request, member_id):
         if confirm == "yes" and action in ('unsubscribe', 'subscribe'):
             member.mailout = (action == 'subscribe')
             member.save()
-            logger.info("%s member '%s' (id: %d) from mailing list", action, member.name, member.pk)
-            messages.add_message(request, messages.SUCCESS, "Member {0} {1}d".format(member.number, action))
+            logger.info(u"{0} member '{1}' (id: {2}) from mailing list".format(action, member.name, member.pk))
+            messages.add_message(request, messages.SUCCESS, u"Member {0} {1}d".format(member.number, action))
 
     action = 'unsubscribe' if member.mailout else 'subscribe'
 

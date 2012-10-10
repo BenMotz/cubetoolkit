@@ -72,7 +72,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
     local_now = timezone.localtime(timezone.now())
     if startdate < local_now.date():
         # Redirect to page with today as the start date:
-        new_url = "{0}?daysahead={1}".format(
+        new_url = u"{0}?daysahead={1}".format(
             reverse('day-edit', kwargs={
                 'year': local_now.year,
                 'month': local_now.month,
@@ -125,7 +125,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
     context['ideas'] = ideas
     context['dates'] = dates
     # Page title:
-    context['event_list_name'] = "Diary for {0} to {1}".format(
+    context['event_list_name'] = u"Diary for {0} to {1}".format(
         startdatetime.strftime("%d-%m-%Y"),
         enddatetime.strftime("%d-%m-%Y")
     )
@@ -166,7 +166,7 @@ def add_showing(request, event_id):
         copy_from_pk = int(copy_from, 10)
         source_showing = Showing.objects.get(pk=copy_from_pk)
     except (TypeError, ValueError, django.core.exceptions.DoesNotExist) as err:
-        logger.error("Failed getting object for showing clone operation: {0}".format(err))
+        logger.error(u"Failed getting object for showing clone operation: {0}".format(err))
         raise Http404("Requested source showing for clone not found")
 
     # Create form using submitted data:
@@ -184,7 +184,7 @@ def add_showing(request, event_id):
         new_showing.save()
         new_showing.clone_rota_from_showing(source_showing)
         messages.add_message(
-            request, messages.SUCCESS, "Added showing on {0} for event '{1}'".format(
+            request, messages.SUCCESS, u"Added showing on {0} for event '{1}'".format(
                 new_showing.start.strftime("%d/%m/%y at %H:%M"),
                 new_showing.event.name
             )
@@ -242,7 +242,7 @@ def add_event(request):
                 new_showing.reset_rota_to_default()
 
             messages.add_message(
-                request, messages.SUCCESS, "Added event '{0}' with showing on {1}".format(
+                request, messages.SUCCESS, u"Added event '{0}' with showing on {1}".format(
                     new_event.name, new_showing.start.strftime("%d/%m/%y at %H:%M")
                 )
             )
@@ -296,7 +296,7 @@ def edit_showing(request, showing_id=None):
             modified_showing.update_rota(rota)
 
             messages.add_message(
-                request, messages.SUCCESS, "Updated showing for '{0}' at {1}".format(
+                request, messages.SUCCESS, u"Updated showing for '{0}' at {1}".format(
                     showing.event.name, showing.start.strftime("%H:%M on %d/%m/%y")
                 )
             )
@@ -340,7 +340,7 @@ def _edit_event_handle_post(request, event_id):
     # Get the event's media item, or start a new one:
     media_item = event.get_main_mediaitem() or MediaItem()
 
-    logger.info("Updating event {0}".format(event_id))
+    logger.info(u"Updating event {0}".format(event_id))
     # Create and populate forms:
     form = toolkit.diary.forms.EventForm(request.POST, instance=event)
     media_form = toolkit.diary.forms.MediaItemForm(request.POST, request.FILES, instance=media_item)
@@ -367,7 +367,7 @@ def _edit_event_handle_post(request, event_id):
             # the old toolkit used to do. No image thrown away!
             media_form.save()
             event.set_main_mediaitem(media_item)
-        messages.add_message(request, messages.SUCCESS, "Updated details for event '{0}'".format(event.name))
+        messages.add_message(request, messages.SUCCESS, u"Updated details for event '{0}'".format(event.name))
         # If the media_form was submitted with blank file name/no data then
         # don't save it (caption is ignored)
         return _return_to_editindex(request)
@@ -426,7 +426,7 @@ def edit_ideas(request, year=None, month=None):
         form = toolkit.diary.forms.DiaryIdeaForm(request.POST, instance=instance)
         if form.is_valid():
             form.save()
-            messages.add_message(request, messages.SUCCESS, "Updated ideas for {0}/{1}".format(month, year))
+            messages.add_message(request, messages.SUCCESS, u"Updated ideas for {0}/{1}".format(month, year))
             return _return_to_editindex(request)
     else:
         form = toolkit.diary.forms.DiaryIdeaForm(instance=instance)
@@ -444,13 +444,13 @@ def delete_showing(request, showing_id):
     if request.method == 'POST':
         showing = Showing.objects.get(pk=showing_id)
         if showing.in_past():
-            logger.error("Attempted to delete showing id {0} that has already started/finished".format(showing_id))
+            logger.error(u"Attempted to delete showing id {0} that has already started/finished".format(showing_id))
             messages.add_message(request, messages.ERROR, "Can't delete showings that are in the past")
             return HttpResponseRedirect(reverse("edit-showing", kwargs={'showing_id': showing_id}))
         else:
-            logging.info("Deleting showing id {0} (for event id {1})".format(showing_id, showing.event_id))
+            logging.info(u"Deleting showing id {0} (for event id {1})".format(showing_id, showing.event_id))
             messages.add_message(
-                request, messages.SUCCESS, "Deleted showing for '{0}' on {1}".format(
+                request, messages.SUCCESS, u"Deleted showing for '{0}' on {1}".format(
                     showing.event.name, showing.start.strftime("%d/%m/%y")
                 )
             )
@@ -468,7 +468,7 @@ def view_event_field(request, field, year, month, day):
     # same shared logic for parsing the parameters as the public list / edit
     # list) and then uses the appropriate template to render the results.
 
-    logger.debug("view_event_field: field {0}".format(field))
+    logger.debug(u"view_event_field: field {0}".format(field))
     assert field in ('copy', 'terms', 'rota')
 
     query_days_ahead = request.GET.get('daysahead', None)
@@ -485,7 +485,7 @@ def view_event_field(request, field, year, month, day):
 
     if 'search' in request.GET:
         search = request.GET['search']
-        logging.info("Search term: {0}".format(search))
+        logging.info(u"Search term: {0}".format(search))
         # Note slightly sneaky use of **; this effectively results in a method
         # call like: showings.filter(event__copy__icontaings=search)
         showings = showings.filter(
@@ -499,7 +499,7 @@ def view_event_field(request, field, year, month, day):
         'event_field': field,
     }
 
-    return render(request, 'view_{0}.html'.format(field), context)
+    return render(request, u'view_{0}.html'.format(field), context)
 
 
 @permission_required('toolkit.write')
@@ -560,24 +560,24 @@ def edit_event_tags(request):
         extant_tag = tags_by_pk.pop(submitted_pk, None)
         if extant_tag:
             if submitted_name == '':
-                logger.info("Deleting tag {0} (key {1})".format(extant_tag.name, extant_tag.pk))
+                logger.info(u"Deleting tag {0} (key {1})".format(extant_tag.name, extant_tag.pk))
                 extant_tag.delete()
             elif extant_tag.name != submitted_name:
-                logger.info("Changing name of tag id {0} from {1} to {2}"
+                logger.info(u"Changing name of tag id {0} from {1} to {2}"
                             .format(extant_tag.pk, extant_tag.name, submitted_name))
                 extant_tag.name = submitted_name
                 extant_tag.save()
         elif extant_tag is None:
             new_tag = EventTag(name=submitted_name)
-            logger.info("Creating new tag {0}".format(submitted_name))
+            logger.info(u"Creating new tag {0}".format(submitted_name))
             # database constraints will enforce uniqueness of tag name
             try:
                 new_tag.save()
             except django.db.IntegrityError as interr:
-                logger.error("Failed adding tag {0}: {1}".format(submitted_name, interr))
+                logger.error(u"Failed adding tag {0}: {1}".format(submitted_name, interr))
     # There shouldn't be any tags left in tags_by_pk:
     if len(tags_by_pk) != 0:
-        logger.error("Tag(s) {0} not included in update".format(",".join(tags_by_pk.values())))
+        logger.error(u"Tag(s) {0} not included in update".format(",".join(tags_by_pk.values())))
 
     return HttpResponse("OK")
 

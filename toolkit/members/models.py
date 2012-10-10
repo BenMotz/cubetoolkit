@@ -102,11 +102,11 @@ class Volunteer(models.Model):
         if current_portrait_file != self.__original_portrait:
             # Delete old image:
             if self.__original_portrait:
-                logging.info("Deleting old volunteer portrait '%s'", self.__original_portrait)
+                logging.info(u"Deleting old volunteer portrait '{0}'".format(self.__original_portrait))
                 try:
                     os.unlink(self.__original_portrait)
                 except (IOError, OSError) as err:
-                    logging.error("Failed deleting old volunteer portrait '%s': %s", self.__original_portrait, err)
+                    logging.error(u"Failed deleting old volunteer portrait '{0}': {1}".format(self.__original_portrait, err))
                 self.__original_portrait = None
             # update thumbnail
             if update_thumbnail:
@@ -126,11 +126,11 @@ class Volunteer(models.Model):
     def _update_portrait_thumbnail(self):
         # Delete old thumbnail, if any:
         if self.portrait_thumb and self.portrait_thumb != '':
-            logger.info("Deleting old portrait thumbnail for {0}, file {1}".format(self.pk, self.portrait_thumb))
+            logger.info(u"Deleting old portrait thumbnail for {0}, file {1}".format(self.pk, self.portrait_thumb))
             try:
                 self.portrait_thumb.delete(save=False)
             except (IOError, OSError) as ose:
-                logger.exception("Failed deleting old thumbnail: {0}".format(ose))
+                logger.exception(u"Failed deleting old thumbnail: {0}".format(ose))
 
         # If there's not actually a new image to thumbnail, give up:
         if self.portrait is None or self.portrait == '':
@@ -140,12 +140,12 @@ class Volunteer(models.Model):
         try:
             image = PIL.Image.open(self.portrait.file)
         except (IOError, OSError) as ioe:
-            logger.error("Failed to read image file {0}: {1}".format(self.portrait.file.name, ioe))
+            logger.error(u"Failed to read image file {0}: {1}".format(self.portrait.file.name, ioe))
             return
         try:
             image.thumbnail(settings.THUMBNAIL_SIZE, PIL.Image.ANTIALIAS)
         except MemoryError:
-            logger.error("Out of memory trying to create thumbnail for {0}".format(self.portrait))
+            logger.error(u"Out of memory trying to create thumbnail for {0}".format(self.portrait))
 
         thumb_file = os.path.join(
             settings.MEDIA_ROOT,
@@ -159,9 +159,9 @@ class Volunteer(models.Model):
             # Convert image to RGB (can't save Paletted images as jpgs) and
             # save thumbnail as JPEG:
             image.convert("RGB").save(thumb_file, "JPEG")
-            logger.info("Generated thumbnail portrait for volunteer '%s' in file '%s'", self.pk, thumb_file)
+            logger.info(u"Generated thumbnail portrait for volunteer '{0}' in file '{1}'".format(self.pk, thumb_file))
         except (IOError, OSError) as ioe:
-            logger.error("Failed saving thumbnail: {0}".format(ioe))
+            logger.error(u"Failed saving thumbnail: {0}".format(ioe))
             if os.path.exists(thumb_file):
                 try:
                     os.unlink(thumb_file)

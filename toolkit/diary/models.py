@@ -54,7 +54,7 @@ class Role(models.Model):
 
     def save(self, *args, **kwargs):
         if self.read_only and self._original_name != self.name:
-            logger.error("Tried to edit read-only role {0}".format(self.name))
+            logger.error(u"Tried to edit read-only role {0}".format(self.name))
             return
         else:
             return super(Role, self).save(*args, **kwargs)
@@ -62,7 +62,7 @@ class Role(models.Model):
     def delete(self, *args, **kwargs):
         # Don't allow read_only roles to be deleted
         if self.pk and self.read_only:
-            logger.error("Tried to delete read-only role {0}".format(self.name))
+            logger.error(u"Tried to delete read-only role {0}".format(self.name))
             return False
         else:
             return super(Role, self).delete(*args, **kwargs)
@@ -112,14 +112,14 @@ class MediaItem(models.Model):
             try:
                 self.mimetype = magic_wrapper.from_buffer(self.media_file.file.read(0xFFF))
             except IOError:
-                logger.error("Failed to determine mimetype of file {0}".format(self.media_file.file.name))
+                logger.error(u"Failed to determine mimetype of file {0}".format(self.media_file.file.name))
                 self.mimetype = "application/octet-stream"
             finally:
                 try:
                     self.media_file.file.seek(0)
                 except IOError:
                     pass
-            logger.debug("Mime type for {0} detected as {1}".format(self.media_file.file.name, self.mimetype))
+            logger.debug(u"Mime type for {0} detected as {1}".format(self.media_file.file.name, self.mimetype))
 
     def _update_thumbnail(self):
         if not self.media_file:
@@ -132,20 +132,20 @@ class MediaItem(models.Model):
             return
         # Delete old thumbnail, if any:
         if self.thumbnail and self.thumbnail != '':
-            logger.info("Updating thumbnail for media item {0}, file {1}".format(self.pk, self.media_file))
+            logger.info(u"Updating thumbnail for media item {0}, file {1}".format(self.pk, self.media_file))
             try:
                 self.thumbnail.delete(save=False)
             except (IOError, OSError) as ose:
-                logger.error("Failed deleting old thumbnail: {0}".format(ose))
+                logger.error(u"Failed deleting old thumbnail: {0}".format(ose))
         try:
             image = PIL.Image.open(self.media_file.file)
         except (IOError, OSError) as ioe:
-            logger.error("Failed to read image file: {0}".format(ioe))
+            logger.error(u"Failed to read image file: {0}".format(ioe))
             return
         try:
             image.thumbnail(settings.THUMBNAIL_SIZE, PIL.Image.ANTIALIAS)
         except MemoryError:
-            logger.error("Out of memory trying to create thumbnail for {0}".format(self.media_file))
+            logger.error(u"Out of memory trying to create thumbnail for {0}".format(self.media_file))
         finally:
             try:
                 self.media_file.file.seek(0)
@@ -164,9 +164,9 @@ class MediaItem(models.Model):
             # Convert image to RGB (can't save Paletted images as jpgs) and
             # save thumbnail as JPEG:
             image.convert("RGB").save(thumb_file, "JPEG")
-            logger.info("Generated thumbnail for event '%s' in file '%s'", self.pk, thumb_file)
+            logger.info(u"Generated thumbnail for event '{0}' in file '{1}'".format(self.pk, thumb_file))
         except (IOError, OSError) as ioe:
-            logger.error("Failed saving thumbnail: {0}".format(ioe))
+            logger.error(u"Failed saving thumbnail: {0}".format(ioe))
             if os.path.exists(thumb_file):
                 try:
                     os.unlink(thumb_file)
@@ -233,7 +233,7 @@ class Event(models.Model):
         db_table = 'Events'
 
     def __unicode__(self):
-        return "%s (%d)" % (self.name, self.id)
+        return u"{0} ({1})".format(self.name, self.id)
 
     def reset_tags_to_default(self):
         if self.template:
@@ -250,7 +250,7 @@ class Event(models.Model):
         if self.media.count() == 0:
             return
         media_item = self.media.all()[0]
-        logger.info("Removing media file {0} from event {1}".format(media_item, self.pk))
+        logger.info(u"Removing media file {0} from event {1}".format(media_item, self.pk))
         self.media.remove(media_item)
         ## If the media item isn't associated with any events, delete it:
         ## ACTUALLY: let's keep it. Disk space is cheap, etc.
@@ -312,7 +312,7 @@ class Showing(models.Model):
         super(Showing, self).__init__(*args, **kwargs)
 
         if copy_from:
-            logger.info("Cloning showing from existing showing (id %d)", copy_from.pk)
+            logger.info(u"Cloning showing from existing showing (id {0})".format(copy_from.pk))
             # Manually copy fields, rather than using things from copy library,
             # as don't want to copy the rota (as that would make db writes)
             attributes_to_copy = ('event', 'start', 'booked_by', 'extra_copy', 'confirmed',
@@ -324,7 +324,7 @@ class Showing(models.Model):
 
     def __unicode__(self):
         if self.start is not None and self.id is not None and self.event is not None:
-            return "%s - %s (%d)" % (self.start.strftime("%H:%M %d/%m/%y"), self.event.name, self.id)
+            return u"{0} - {1} ({2})".format(self.start.strftime("%H:%M %d/%m/%y"), self.event.name, self.id)
         else:
             return "[uninitialised]"
 
@@ -342,7 +342,7 @@ class Showing(models.Model):
         force = kwargs.pop('force', False)
         if self.start is not None:
             if self.in_past() and not force:
-                logger.error("Tried to update showing {0} with start time {1} in the past".format(self.pk, self.start))
+                logger.error(u"Tried to update showing {0} with start time {1} in the past".format(self.pk, self.start))
                 raise django.db.IntegrityError("Can't update showings that start in the past")
         return super(Showing, self).save(*args, **kwargs)
 
@@ -352,7 +352,7 @@ class Showing(models.Model):
         # this, but this will stop the forms deleting records.
         if self.start is not None:
             if self.in_past():
-                logger.error("Tried to delete showing {0} with start time {1} in the past".format(self.pk, self.start))
+                logger.error(u"Tried to delete showing {0} with start time {1} in the past".format(self.pk, self.start))
                 raise django.db.IntegrityError("Can't delete showings that start in the past")
         return super(Showing, self).delete(*args, **kwargs)
 
@@ -406,13 +406,13 @@ class Showing(models.Model):
             existing_entries = rota_entries_by_id.pop(role_id, [])
             # delete highest ranked instances
             while count < len(existing_entries):
-                logger.info("Removing role {0} from showing {1}".format(role_id, self.pk))
+                logger.info(u"Removing role {0} from showing {1}".format(role_id, self.pk))
                 highest_ranked = max(existing_entries, key=lambda re: re.rank)
                 highest_ranked.delete()
                 existing_entries.remove(highest_ranked)
             # add required entries
             while count > len(existing_entries):
-                logger.info("Adding role {0} to showing {1}".format(role_id, self.pk))
+                logger.info(u"Adding role {0} to showing {1}".format(role_id, self.pk))
                 # add rotaentries
                 new_re = RotaEntry(role_id=role_id, showing=self)
                 if len(existing_entries) > 0:
@@ -432,7 +432,7 @@ class DiaryIdea(models.Model):
         db_table = 'DiaryIdeas'
 
     def __unicode__(self):
-        return "%d/%d" % (self.month.month, self.month.year)
+        return u"{0}/{1}".format(self.month.month, self.month.year)
 
 
 class EventTemplate(models.Model):
@@ -469,7 +469,7 @@ class RotaEntry(models.Model):
         db_table = 'RotaEntries'
 
     def __unicode__(self):
-        return "%s %d" % (unicode(self.role), self.rank)
+        return u"{0} {1}".format(unicode(self.role), self.rank)
 
     def __init__(self, *args, **kwargs):
         # Allow a template keyword arg to be supplied. If it is, copy rota
@@ -488,4 +488,4 @@ class RotaEntry(models.Model):
             self.role = template.role
             self.required = template.required
             self.rank = template.rank
-            logger.info("Cloning rota entry from existing rota entry with role_id %d", template.role.pk)
+            logger.info(u"Cloning rota entry from existing rota entry with role_id {0}".format(template.role.pk))

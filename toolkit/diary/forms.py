@@ -78,7 +78,7 @@ def rota_form_factory(showing):
         _role_ids.append(role.pk)
         if role.standard:
             # For each "standard" role, add an Integer field;
-            members["role_{0}".format(role.pk)] = (
+            members[u"role_{0}".format(role.pk)] = (
                 forms.IntegerField(min_value=0, max_value=settings.MAX_COUNT_PER_ROLE, required=True, label=role.name,
                                    initial=rota_entry_count_by_role.get(role.pk, 0),
                                    widget=forms.TextInput(attrs={'class': 'rota_count'}))

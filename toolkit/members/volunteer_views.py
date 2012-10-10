@@ -65,7 +65,7 @@ def select_volunteer(request, active=True):
 
     action = request.GET.get('action', None)
     if action not in action_urls:
-        logger.error("Select volunteer called with unknown action: %s", action)
+        logger.error(u"Select volunteer called with unknown action: {0}".format(action))
         raise Http404('Invalid action')
 
     active = bool(active)
@@ -95,9 +95,9 @@ def activate_volunteer(request, active=True):
     vol.active = active
     vol.save()
 
-    logger.info("Set volunteer.active to %s for volunteer %s", str(active), vol_pk)
-    messages.add_message(request, messages.SUCCESS, "{0} volunteer {1}".format(
-        "Unretired" if active else "Retired",
+    logger.info(u"Set volunteer.active to {0} for volunteer {1}".format(str(active), vol_pk))
+    messages.add_message(request, messages.SUCCESS, u"{0} volunteer {1}".format(
+        u"Unretired" if active else u"Retired",
         vol.member.name))
 
     return HttpResponseRedirect(reverse("view-volunteer-list"))
@@ -128,12 +128,12 @@ def edit_volunteer(request, member_id, create_new=False):
         vol_form = toolkit.members.forms.VolunteerForm(request.POST, request.FILES, prefix="vol", instance=volunteer)
         mem_form = toolkit.members.forms.MemberFormWithoutNotes(request.POST, prefix="mem", instance=member)
         if vol_form.is_valid() and mem_form.is_valid():
-            logger.info("Saving changes to volunteer '%s' (id: %s)", volunteer.member.name, str(volunteer.pk))
+            logger.info(u"Saving changes to volunteer '{0}' (id: {1})".format(volunteer.member.name, str(volunteer.pk)))
             mem_form.save()
             volunteer.member = member
             vol_form.save()
-            messages.add_message(request, messages.SUCCESS, "{0} volunteer '{1}'".format(
-                "Created" if create_new else "Updated", member.name
+            messages.add_message(request, messages.SUCCESS, u"{0} volunteer '{1}'".format(
+                u"Created" if create_new else u"Updated", member.name
             ))
             # Go to the volunteer list view:
             return HttpResponseRedirect(reverse("view-volunteer-list"))

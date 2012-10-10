@@ -49,7 +49,9 @@ def view_diary(request, year=None, month=None, day=None, event_type=None):
     # Set page title
     if year:
         # If some specific dates were provided, use those
-        context['event_list_name'] = "Cube Programme for %s" % "/".join([str(s) for s in (day, month, year) if s])
+        context['event_list_name'] = u"Cube Programme for {0}".format(
+            u"/".join([str(s) for s in (day, month, year) if s])
+        )
     else:
         # Default title
         context['event_list_name'] = "Cube Programme"
@@ -93,7 +95,7 @@ def view_diary_json(request, year, month, day):
         month = int(month) if month else None
         day = int(day) if day else None
     except ValueError:
-        logger.error("Invalid value in date range, one of day {0}, month {1}, year {2}".format(day, month, year))
+        logger.error(u"Invalid value in date range, one of day {0}, month {1}, year {2}".format(day, month, year))
         raise Http404("Invalid values")
 
     startdatetime = timezone.get_current_timezone().localize(
