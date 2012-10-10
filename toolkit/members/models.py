@@ -146,6 +146,11 @@ class Volunteer(models.Model):
             image.thumbnail(settings.THUMBNAIL_SIZE, PIL.Image.ANTIALIAS)
         except MemoryError:
             logger.error(u"Out of memory trying to create thumbnail for {0}".format(self.portrait))
+        except (IOError, OSError) as ioe:
+            # Emperically, if this happens the thumbnail still gets generated,
+            # albeit with some junk at the end. So just log the error and plow
+            # on regardless...
+            logger.error(u"Error creating thumbnail: {0}".format(ioe))
 
         thumb_file = os.path.join(
             settings.MEDIA_ROOT,
