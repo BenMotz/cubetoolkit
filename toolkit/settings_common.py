@@ -1,5 +1,6 @@
 import os.path
 import django.core.urlresolvers
+import djcelery
 
 # Slightly arbitrary (inherited) bounding box for thumbnails
 THUMBNAIL_SIZE = (250, 187)
@@ -42,6 +43,13 @@ SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 APP_ROOT_DETECTED = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), ".."))
 
 APPEND_SLASH = True
+
+# Celery
+djcelery.setup_loader()
+BROKER_URL = 'django://'
+CELERY_RESULT_BACKEND = 'database'
+CELERY_RESULT_DBURI = "django://"
+
 
 # Django settings for cube project.
 DEBUG = False
@@ -195,5 +203,10 @@ INSTALLED_APPS = (
     # Django databaes migration tool:
     'south',
     'django.contrib.markup',
+
+    # Enabled use of database as 'message bus' to celery:
+    'kombu.transport.django',
+    # Django-celery
+    'djcelery',
 )
 

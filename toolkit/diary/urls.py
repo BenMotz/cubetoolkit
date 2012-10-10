@@ -72,6 +72,7 @@ urlpatterns += patterns(
 
     url("^mailout/$", 'mailout', name="members-mailout"),
     url("^mailout/send$", 'exec_mailout', name="exec-mailout"),
+    url("^mailout/send/progress$", 'mailout_progress', name="mailout-progress"),
 
     # Ajax calls:
     url("^edit/setprefs$", 'set_edit_preferences', name="set_edit_preferences"),

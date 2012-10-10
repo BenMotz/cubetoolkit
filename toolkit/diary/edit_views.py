@@ -2,9 +2,10 @@ import re
 import json
 import datetime
 import logging
-import time
 
 from toolkit.util.ordereddict import OrderedDict
+
+import celery.result
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
@@ -12,7 +13,6 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.forms.models import modelformset_factory
 from django.contrib import messages
-from django.views.decorators.http import condition
 import django.template
 import django.db
 import django.utils.timezone as timezone
@@ -21,6 +21,7 @@ from django.contrib.auth.decorators import permission_required, login_required
 from toolkit.diary.models import Showing, Event, DiaryIdea, MediaItem, EventTemplate, EventTag, Role
 import toolkit.diary.forms
 import toolkit.diary.edit_prefs
+import toolkit.members.tasks
 
 # Shared utility method:
 from toolkit.diary.daterange import get_date_range
@@ -625,6 +626,7 @@ def _render_mailout_form(request, body_text, subject_text):
     return render(request, 'form_mailout.html', context)
 
 
+@permission_required('toolkit.write')
 def mailout(request):
     if request.method == 'GET':
         try:
@@ -640,54 +642,41 @@ def mailout(request):
             return render(request, 'form_mailout.html', {'form': form})
         return render(request, 'mailout_send.html', form.cleaned_data)
 
-def send_mail(subject, body):
-    """recipients should be a list of (name, email address"""
-
-    signature_template = (
-u"""
-
-If you wish to be removed from our mailing list please use this link:
-http://{0}{{0}}?k={{2}}
-To edit details of your membership, please use this link:
-http://{0}{{1}}?k={{2}}
-""").format(settings.EMAIL_UNSUBSCRIBE_HOST, settings.EMAIL_UNSUBSCRIBE_HOST)
-
-    recipients = (toolkit.members.models.Member.objects.filter(email__isnull=False)
-                                                        .exclude(email='')
-                                                        .exclude(mailout_failed=True)
-                                                        .filter(mailout=True))
-    count = recipients.count()
-    sent = 0
-    one_percent = count // 100
-    yield "0\n"
-
-    for recipient in recipients:
-        signature = signature_template.format(
-            reverse("edit-member", args=(recipient.pk,)),
-            reverse("unsubscribe-member", args=(recipient.pk,)),
-            recipient.mailout_key,
-        )
-
-        sent += 1
-        if sent % one_percent == 0:
-            progress =  int((100.0 * sent) / count) + 1
-            yield "{0}\n".format(progress)
-        # Send the frigging mail...
-        # bork(body + signature)
-
 
 # @condition(etag_func=None, last_modified_func=None)
+@permission_required('toolkit.write')
 def exec_mailout(request):
     form = toolkit.diary.forms.MailoutForm(request.POST) # ???
     if not form.is_valid():
         print form.errors
         return HttpResponse(json.dumps({'status': 'error'}), mimetype="application/json")
 
+    result = toolkit.members.tasks.send_mailout.delay(form.cleaned_data['subject'], form.cleaned_data['body'])
+
     response =  HttpResponse(
-            send_mail(form.cleaned_data['subject'], form.cleaned_data['body']),
-            content_type='text/plain; charset=UTF-8'
+            json.dumps({'task_id': result.task_id, 'progress': 0}),
+            mimetype="application/json"
     )
 
     return response
 
+@permission_required('toolkit.write')
+def mailout_progress(request):
+    result = celery.result.AsyncResult(id=request.GET['task_id'])
+    state = result.state
+    progress = 0
 
+    if state is not None:
+        progress_parts = state.split("PROGRESS")
+        if len(progress_parts) > 1:
+            try:
+                progress = int(progress_parts[1])
+            except ValueError:
+                pass
+        elif state == "SUCCESS":
+            progress = 100
+
+    return HttpResponse(
+            json.dumps({'task_id': result.task_id, 'progress': progress}),
+            mimetype="application/json"
+    )
