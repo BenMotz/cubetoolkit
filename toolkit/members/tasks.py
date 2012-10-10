@@ -7,13 +7,12 @@ from celery import task, current_task
 
 from toolkit.members.models import Member
 
+
 @task()
 def send_mailout(subject, body):
-
-
     header_template = u"Dear {0},\n\n"
     signature_template = (
-u"""
+        u"""
 
 If you wish to be removed from our mailing list please use this link:
 http://{0}{{0}}?k={{2}}
@@ -43,9 +42,9 @@ http://{0}{{1}}?k={{2}}
 
             sent += 1
             if sent % one_percent == 0:
-                progress =  int((100.0 * sent) / count) + 1
+                progress = int((100.0 * sent) / count) + 1
                 current_task.update_state(state='PROGRESS{0:03}'.format(progress),
-                        meta={'sent': sent, 'total': count})
+                                          meta={'sent': sent, 'total': count})
                 # yield "{0}\n".format(progress)
             # Send the frigging mail...
             # bork(body + signature)

@@ -183,7 +183,12 @@ def add_showing(request, event_id):
         # Showing is saved...
         new_showing.save()
         new_showing.clone_rota_from_showing(source_showing)
-        messages.add_message(request, messages.SUCCESS, "Added showing on {0} for event '{1}'".format(new_showing.start.strftime("%d/%m/%y at %H:%M"), new_showing.event.name))
+        messages.add_message(
+            request, messages.SUCCESS, "Added showing on {0} for event '{1}'".format(
+                new_showing.start.strftime("%d/%m/%y at %H:%M"),
+                new_showing.event.name
+            )
+        )
 
         return _return_to_editindex(request)
     else:
@@ -235,7 +240,12 @@ def add_event(request):
                 new_showing.save()
                 # Set showing roles to those from its template:
                 new_showing.reset_rota_to_default()
-            messages.add_message(request, messages.SUCCESS, "Added event '{0}' with showing on {1}".format(new_event.name, new_showing.start.strftime("%d/%m/%y at %H:%M")))
+
+            messages.add_message(
+                request, messages.SUCCESS, "Added event '{0}' with showing on {1}".format(
+                    new_event.name, new_showing.start.strftime("%d/%m/%y at %H:%M")
+                )
+            )
             return _return_to_editindex(request)
         else:
             # If form was not valid, re-render the form (which will highlight
@@ -285,8 +295,10 @@ def edit_showing(request, showing_id=None):
             rota = rota_form.get_rota()
             modified_showing.update_rota(rota)
 
-            messages.add_message(request, messages.SUCCESS,
-                                 "Updated showing for '{0}' at {1}".format(showing.event.name, showing.start.strftime("%H:%M on %d/%m/%y"))
+            messages.add_message(
+                request, messages.SUCCESS, "Updated showing for '{0}' at {1}".format(
+                    showing.event.name, showing.start.strftime("%H:%M on %d/%m/%y")
+                )
             )
 
             return _return_to_editindex(request)
@@ -437,7 +449,11 @@ def delete_showing(request, showing_id):
             return HttpResponseRedirect(reverse("edit-showing", kwargs={'showing_id': showing_id}))
         else:
             logging.info("Deleting showing id {0} (for event id {1})".format(showing_id, showing.event_id))
-            messages.add_message(request, messages.SUCCESS, "Deleted showing for '{0}' on {1}".format(showing.event.name, showing.start.strftime("%d/%m/%y")))
+            messages.add_message(
+                request, messages.SUCCESS, "Deleted showing for '{0}' on {1}".format(
+                    showing.event.name, showing.start.strftime("%d/%m/%y")
+                )
+            )
             showing.delete()
 
     return _return_to_editindex(request)
@@ -651,19 +667,20 @@ def mailout(request):
 # @condition(etag_func=None, last_modified_func=None)
 @permission_required('toolkit.write')
 def exec_mailout(request):
-    form = toolkit.diary.forms.MailoutForm(request.POST) # ???
+    form = toolkit.diary.forms.MailoutForm(request.POST)
     if not form.is_valid():
         print form.errors
         return HttpResponse(json.dumps({'status': 'error'}), mimetype="application/json")
 
     result = toolkit.members.tasks.send_mailout.delay(form.cleaned_data['subject'], form.cleaned_data['body'])
 
-    response =  HttpResponse(
-            json.dumps({'task_id': result.task_id, 'progress': 0}),
-            mimetype="application/json"
+    response = HttpResponse(
+        json.dumps({'task_id': result.task_id, 'progress': 0}),
+        mimetype="application/json"
     )
 
     return response
+
 
 @permission_required('toolkit.write')
 def mailout_progress(request):
@@ -682,6 +699,6 @@ def mailout_progress(request):
             progress = 100
 
     return HttpResponse(
-            json.dumps({'task_id': result.task_id, 'progress': progress}),
-            mimetype="application/json"
+        json.dumps({'task_id': result.task_id, 'progress': progress}),
+        mimetype="application/json"
     )

@@ -28,6 +28,7 @@ class FutureDateTimeField(models.DateTimeField):
 # anything special when creating/applying database migrations:
 add_introspection_rules([], [r"^toolkit\.diary\.models\.FutureDateTimeField"])
 
+
 class Role(models.Model):
     name = models.CharField(max_length=64, unique=True)
 

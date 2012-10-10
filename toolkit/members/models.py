@@ -10,6 +10,7 @@ from toolkit.util import generate_random_string
 
 logger = logging.getLogger(__name__)
 
+
 class Member(models.Model):
 
     # This is the primary key used in the old perl/bdb system, used as the
@@ -33,7 +34,8 @@ class Member(models.Model):
     mailout = models.BooleanField(default=True)
     mailout_failed = models.BooleanField(default=False)
     # Used for "click to unsubscribe"/"edit details" etc:
-    mailout_key = models.CharField(max_length=32, blank=False, null=False, editable=False, default=generate_random_string)
+    mailout_key = models.CharField(max_length=32, blank=False, null=False, editable=False,
+                                   default=generate_random_string)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

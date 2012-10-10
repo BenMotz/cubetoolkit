@@ -170,7 +170,7 @@ def unsubscribe_member(request, member_id):
 
     if request.method == 'POST':
         # Default to unsubscribe
-        action  = request.POST.get('action', 'unsubscribe')
+        action = request.POST.get('action', 'unsubscribe')
         confirm = request.POST.get('confirm', False)
         if confirm == "yes" and action in ('unsubscribe', 'subscribe'):
             member.mailout = (action == 'subscribe')
@@ -180,7 +180,8 @@ def unsubscribe_member(request, member_id):
 
     action = 'unsubscribe' if member.mailout else 'subscribe'
 
-    return render(request, 'form_member_edit_subs.html', { 'member': member, 'action': action })
+    return render(request, 'form_member_edit_subs.html', {'member': member, 'action': action})
+
 
 @login_required
 def member_statistics(request):
