@@ -5,6 +5,7 @@ Editing Event types
 {% endblock %}
 
 {% block css %}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
 <style type="text/css">
   body {
       font-family: sans-serif;
@@ -46,6 +47,7 @@ Editing Event types
 <p>These templates are applied when an event is created: editing them will <b>not</b> affect existing events</p>
 <p>To add a new template, edit the blank template at the bottom of the page</p>
 <p class="warn">Changes cannot be automatically undone, please take care</p>
+{% include "messages.html" %}
 </div>
 
 <form method="post">

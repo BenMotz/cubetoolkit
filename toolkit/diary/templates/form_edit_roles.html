@@ -5,6 +5,7 @@ Editing Event roles
 {% endblock %}
 
 {% block css %}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
 <style type="text/css">
   body {
       font-family: sans-serif;
@@ -55,6 +56,7 @@ Editing Event roles
 <p class="warn">Deleting roles cannot be undone, please take care</p>
 <p>(Events marked as "Standard Event Roles" will be shown at the top of the role selection list for events.)</p>
 <p>Add new roles at the end of the list</p>
+{% include "messages.html" %}
 </div>
 
 <form method="post">
