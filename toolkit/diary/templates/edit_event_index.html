@@ -123,7 +123,7 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
 {% include "messages.html" %}
 
 <table class="summary">
-    <tr><td></td><td colspan="3"><a href="{% url add-event %}?date={{start|date:"j-m-Y"}}">New event</a></td></tr>
+    <tr><td></td><td colspan="3"><a href="{% url add-event %}">New event</a></td></tr>
 
 {% for day, showings in dates.items %}
     {% ifchanged %}<tr class="row_year"><td><h1>{{ day|date:"Y" }} </h1></td><td colspan="3"></td></tr>{% endifchanged %}

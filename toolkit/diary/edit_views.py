@@ -245,7 +245,8 @@ def add_event(request):
     elif request.method == 'GET':
         # GET: Show form blank, with date filled in from GET date parameter:
         # Marshal date out of the GET request:
-        date = request.GET.get('date', datetime.date.today().strftime("%d-%m-%Y"))
+        default_date = datetime.date.today() + datetime.timedelta(1)
+        date = request.GET.get('date', default_date.strftime("%d-%m-%Y"))
         date = date.split("-")
         assert(len(date) == 3)  # Should probably do this better
         try:
