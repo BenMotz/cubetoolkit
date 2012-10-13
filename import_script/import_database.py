@@ -49,8 +49,10 @@ def connect():
 
 
 def titlecase(string):
+    """Titlecase string. Eg;
+    'this isn't real' => 'This Isn't Real'
+    """
 #   return string.title() # Really doesn't cope with apostrophes.
-#   return " ".join([ word.capitalize() for word in  "This is the voice".split() ])
     if isinstance(string, basestring):
         return re.sub("(^|\s)(\S)", lambda match: match.group(1) + match.group(2).upper(), string)
     else:
@@ -58,6 +60,7 @@ def titlecase(string):
 
 
 def decode(string):
+    """If string is not unicode convert it, assuming utf-8"""
     if string is str:
         string = string.strip()
         return string.decode('utf-8')
@@ -66,6 +69,7 @@ def decode(string):
 
 
 def int_def(string, default):
+    """Returns integer value of string, or default if cast fails"""
     try:
         return int(string)
     except ValueError:
@@ -77,10 +81,6 @@ def html_ify(string):
     if string is not None:
         result = "<p>" + string.strip().replace("\r\n", "<br>") + "</p>"
     return result
-
-
-def markdown_ify(string):
-    return string
 
 
 wrap_re = re.compile(r'(.{70,})\n')
@@ -159,7 +159,14 @@ def import_event_showings(connection, event, legacy_event_id):
     fake_start = django.utils.timezone.now() + datetime.timedelta(days=1)
 
     cursor = connection.cursor()
-    showing_count = cursor.execute("SELECT datetime, event_id, booked_by, confirmed, cancelled, discounted, outside_hire, private_event FROM diary WHERE event_id = %s ORDER BY datetime", legacy_event_id)
+    showing_count = cursor.execute(
+        "SELECT "
+        "datetime, event_id, booked_by, confirmed, cancelled, discounted, outside_hire, private_event "
+        "FROM diary "
+        "WHERE "
+        "event_id = %s "
+        "ORDER BY datetime", legacy_event_id
+    )
     event_tot += showing_count
 
     results = cursor.fetchall()
@@ -232,7 +239,13 @@ def import_ideas(connection):
 @django.db.transaction.commit_on_success
 def import_events(connection, role_map):
     cursor = connection.cursor()
-    results = cursor.execute("SELECT event_id, event_name, copy, copy_summary, duration, image_credits, terms FROM events ORDER BY event_id")
+    results = cursor.execute(
+        "SELECT "
+        "event_id, event_name, copy, copy_summary, duration, image_credits, terms "
+        "FROM "
+        "events "
+        "ORDER BY event_id"
+    )
 
     count = 0
     tenpc = results / 100
@@ -300,7 +313,11 @@ def import_events(connection, role_map):
         if image_path or image_thumbnail_path:
             # Image credits
             image_credit = titlecase(r[5])
-            media_item = toolkit.diary.models.MediaItem(media_file=image_path, thumbnail=image_thumbnail_path, credit=image_credit)
+            media_item = toolkit.diary.models.MediaItem(
+                media_file=image_path,
+                thumbnail=image_thumbnail_path,
+                credit=image_credit
+            )
             media_item.full_clean()
             media_item.save(update_thumbnail=False)
             e.media.add(media_item)
@@ -415,7 +432,20 @@ def load_event_templates(path_to_formats):
 
 
 def create_default_tags():
-    ro_tags = ('film', 'music', 'party', 'cabaret', 'indymedia', 'talk', 'nanoplex', 'hkkp', 'bluescreen', 'meeting', 'cubeorchestra', 'babycinema', 'workshop',)
+    ro_tags = (
+        'film',
+        'music',
+        'party',
+        'cabaret',
+        'indymedia',
+        'talk',
+        'nanoplex',
+        'hkkp',
+        'bluescreen',
+        'meeting',
+        'cubeorchestra',
+        'babycinema',
+        'workshop',)
     rw_tags = ('35mm', 'dvd', 'outdoors',)
     for tag in ro_tags:
         t = toolkit.diary.models.EventTag(name=tag, read_only=True)
@@ -510,7 +540,15 @@ def import_members(connection):
     role_map = dict((role.name.replace(" ", "_").lower(), role) for role in toolkit.diary.models.Role.objects.all())
 
     cursor = connection.cursor()
-    results = cursor.execute("SELECT members.member_id, name, email, homepage, address, city, postcode, country, landline, mobile, last_updated, refuse_mailshot, status, notes, vol_roles_merged.* FROM members LEFT JOIN notes ON members.member_id = notes.member_id LEFT JOIN vol_roles_merged ON members.member_id = vol_roles_merged.member_id WHERE members.name != ''")  # ORDER BY members.member_id")
+    results = cursor.execute(
+        "SELECT "
+        "members.member_id, name, email, homepage, address, city, postcode, country,"
+        "landline, mobile, last_updated, refuse_mailshot, status, notes, vol_roles_merged.* "
+        "FROM "
+        "members "
+        "LEFT JOIN notes ON members.member_id = notes.member_id "
+        "LEFT JOIN vol_roles_merged ON members.member_id = vol_roles_merged.member_id "
+        "WHERE members.name != ''")  # ORDER BY members.member_id")
     # Don't even try to import members with blank names
 
     count = 0
@@ -533,7 +571,11 @@ def import_members(connection):
         last_updated = r[10].split('/')
         if len(last_updated) == 3:
             try:
-                last_updated_local = datetime.datetime(day=int(last_updated[0]), month=int(last_updated[1]), year=int(last_updated[2]))
+                last_updated_local = datetime.datetime(
+                    day=int(last_updated[0]),
+                    month=int(last_updated[1]),
+                    year=int(last_updated[2])
+                )
                 m.last_updated = timezone.localize(last_updated_local)  # Store datetime with timezone information
             except ValueError:
                 pass
