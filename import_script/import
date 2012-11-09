@@ -1,4 +1,10 @@
 #!/bin/bash
+#
+# Reset the django database, and run python scripts to:
+#   1. Import all data from the generic toolkit_import database into the django
+#      database
+#   2. Assign some event tags based on semi-educated guesswork
+#   3. Create default cube/admin users
 
 set -e # Abort on errors
 
@@ -23,8 +29,16 @@ export DJANGO_SETTINGS_MODULE=toolkit.settings
 
 echo "Resetting database"
 
-python $TOOLKIT_PATH/manage.py syncdb
+# First syncdb, to make sure all tables that aren't managed by south (including
+# south's tracking table) exist
+python $TOOLKIT_PATH/manage.py syncdb --noinput
+# Run south to make sure all the tables it manages have the latest migrations
+# applied
+python $TOOLKIT_PATH/manage.py migrate
+# Now wipe out all data from the database
 python $TOOLKIT_PATH/manage.py flush --noinput
+# Make south reconstruct it's tracking table
+python $TOOLKIT_PATH/manage.py migrate --fake
 
 echo "Importing into django"
 
@@ -38,7 +52,3 @@ echo "Creating users"
 
 python $TOOLKIT_PATH/import_script/create_users.py
 
-echo "Converting app to use south migrations"
-
-python $TOOLKIT_PATH/manage.py convert_to_south diary
-python $TOOLKIT_PATH/manage.py convert_to_south members

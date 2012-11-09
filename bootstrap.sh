@@ -4,6 +4,8 @@
 VENV_PATH=./venv
 REQUIREMENTS_FILE=requirements.txt
 
+set -e
+
 virtualenv $VENV_PATH --system-site-packages
 source $VENV_PATH/bin/activate
 pip install --requirement $REQUIREMENTS_FILE
