@@ -76,13 +76,6 @@ def int_def(string, default):
         return default
 
 
-def html_ify(string):
-    result = None
-    if string is not None:
-        result = "<p>" + string.strip().replace("\r\n", "<br>") + "</p>"
-    return result
-
-
 wrap_re = re.compile(r'(.{70,})\n')
 lotsofnewlines_re = re.compile(r'\n\n+')
 # Catch well-formatted links (ie. beginning http://)
@@ -268,13 +261,9 @@ def import_events(connection, role_map):
             e.name = e.name.replace("Djs", "DJs")
 
         # Copy
-        if r[2] is not None:
-            e.copy = convert_copy_to_markdown(r[2])
-        else:
-            # logger.warning("No copy for event [%s] %s", r[0], e.name)
-            e.copy = ''
-        # Copy summary
-        e.copy_summary = convert_copy_to_markdown(r[3])
+        e.copy = r[2] or ''
+        e.copy_summary = r[3] or ''
+        e.legacy_copy = True
 
         # Duration:
         if r[4] is not None and r[4] != '':
@@ -286,7 +275,7 @@ def import_events(connection, role_map):
             e.duration = datetime.time(0, 0)
 
         # Terms
-        e.terms = r[6]
+        e.terms = r[6] or ''
         try:
             e.full_clean()
             e.save()

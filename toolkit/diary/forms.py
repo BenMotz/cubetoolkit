@@ -2,12 +2,69 @@ import datetime
 from django import forms
 import django.db.models
 from django.conf import settings
+# Widgety:
+from django.utils.safestring import mark_safe
+from django.utils.html import conditional_escape
+from django.forms.util import flatatt
+from django.utils.encoding import force_unicode
 
 import toolkit.diary.models
 from toolkit.util.ordereddict import OrderedDict
 
 
 from toolkit.diary.validators import validate_in_future
+
+class HtmlTextarea(forms.Textarea):
+    class Media(object):
+        css = {
+            'all': ('css/lib/wysihtml5.css',),
+        }
+        js = (
+            'js/lib/wysihtml5/parser_rules/simple.js',
+            'js/lib/wysihtml5/wysihtml5-0.3.0.min.js',
+        )
+
+    toolbar_commands = (
+            # Pair of editor command / toolbar html
+            ('bold', 'Bold'),
+            ('italic', 'Italic'),
+            ('strikethrough', 'Strikethrough'),
+            ('superscript', 'Superscript'),
+            ('subscript', 'Subscript'),
+            ('createLink', 'Insert link'),
+            ('insertUnorderedList', 'insertUnorderedList'),
+            ('insertOrderedList', 'insertOrderedList'),
+    )
+
+    def render(self, name, value, attrs=None):
+        if value is None: value = ''
+        final_attrs = self.build_attrs(attrs, name=name)
+
+        output = [u"<div id='toolbar-{0}' style='display:none;'>".format(final_attrs['id']),]
+        output.extend(
+            u"<a data-wysihtml5-command='{0}'>{1}</a> | ".format(cmd, cmdhtml) for (cmd, cmdhtml) in self.toolbar_commands
+        )
+        output.append("<a data-wysihtml5-action='change_view'>View HTML</a>"
+            "<div data-wysihtml5-dialog='createLink' style='display: none;'>"
+            "  <label>Link: <input data-wysihtml5-dialog-field='href' value='http://'></label>"
+            "  <a data-wysihtml5-dialog-action='save'>OK</a>&nbsp;<a data-wysihtml5-dialog-action='cancel'>Cancel</a>"
+            "</div>"
+            "</div>"
+        )
+        output.append(u'<textarea{0}>{1}</textarea>'.format(
+            flatatt(final_attrs),
+            conditional_escape(force_unicode(value))
+        ))
+        output.append(
+            u"<script type='text/javascript'>"
+            " var editor = new wysihtml5.Editor('{0}', {{"
+            "   toolbar:      'toolbar-{0}',"
+            "   parserRules:  wysihtml5ParserRules"
+            " }});"
+            "</script>".format(final_attrs['id'])
+        )
+
+        return mark_safe(u'\n'.join(output))
 
 
 class RoleForm(forms.ModelForm):
@@ -26,7 +83,7 @@ class EventForm(forms.ModelForm):
         model = toolkit.diary.models.Event
         # Ensure soft wrapping is set for textareas:
         widgets = {
-            'copy': forms.Textarea(attrs={'wrap': 'soft'}),
+            'copy': HtmlTextarea(attrs={'wrap': 'soft'}),
             'copy_summary': forms.Textarea(attrs={'wrap': 'soft'}),
             'terms': forms.Textarea(attrs={'wrap': 'soft'}),
             'notes': forms.Textarea(attrs={'wrap': 'soft'}),

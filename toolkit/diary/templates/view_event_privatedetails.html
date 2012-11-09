@@ -1,5 +1,4 @@
 {% extends "base.html" %}
-{% load markup %}
 {% block title %}
 Details for: {{ event.name }}
 {% endblock %}
@@ -69,11 +68,11 @@ Booked for: <a href="{% url edit-showing showing.pk %}">{{ showing.start|date:"H
 </p>
 
 <p class="d"><b>Copy for "{{ event.name }}" (for web page)</b></p>
-{{event.copy|markdown}}
+<p>{{event.copy_html}}</p>
 <p><a href="{% url edit-event-details event.pk %}">[edit]</a></p>
 
 <p class="d"><b>Copy summary for "{{ event.name }}" (for printed programme)</b></p>
-{{event.copy_summary|markdown}}
+<p class="pre">{{event.copy_summary}}</p>
 <p><a href="{% url edit-event-details event.pk %}">[edit]</a></p>
 
 <p class="d"><b>Terms for "{{ event.name }}"</b></p>

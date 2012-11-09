@@ -1,4 +1,3 @@
-{% load markup %}
 {% load hash_filter %}
 <span id="event_{{ event.id }}">
 <h2>{{ event.name|capfirst}}</h2>
@@ -15,10 +14,10 @@
 <p>
 {% for showing in showings %}
 {% include "showing_time_fragment.html" %}<br>
-{% endfor %} 
+{% endfor %}
 </p>
 
-<p>{{event.copy|markdown}}</p>
+<p>{{ event.copy_html }}</p>
 {# <p>{% for tag in event.tags.all %}{{tag.name}} {% endfor %}</p> #}
 
 </span>

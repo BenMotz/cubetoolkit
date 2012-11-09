@@ -347,7 +347,10 @@ def _edit_event_handle_post(request, event_id):
 
     # Validate
     if form.is_valid() and media_form.is_valid():
-        # First, save the main form:
+        # When the form was created the copy was converted to HTML, so when
+        # saved always clear the "legacy" flag:
+        event.legacy_copy = False
+        # Then save the main form:
         form.save()
         # Handle the media item form:
         if media_form.cleaned_data['media_file'] is False:
@@ -397,6 +400,10 @@ def edit_event(request, event_id=None):
         media_item = event.media.all()[0]
     else:
         media_item = MediaItem()
+
+    # If the event has "legacy" (ie. non-html) copy then convert it to HTML;
+    if event.legacy_copy:
+        event.copy = event.copy_html
 
     form = toolkit.diary.forms.EventForm(instance=event)
     media_form = toolkit.diary.forms.MediaItemForm(instance=media_item)

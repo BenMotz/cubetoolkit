@@ -2,6 +2,9 @@
 {% block title %}
 Details for: {{ event.name }}
 {% endblock %}
+{% block script %}
+{{ form.media }}
+{% endblock %}
 {% block css %}
 <style>
     h3 { font-family: Arial; }

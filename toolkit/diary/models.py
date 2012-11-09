@@ -1,3 +1,4 @@
+import re
 import logging
 import os.path
 
@@ -8,6 +9,7 @@ from django.db import models
 from django.conf import settings
 import django.utils.timezone
 import django.core.exceptions
+from django.utils.safestring import mark_safe
 
 from south.modelsinspector import add_introspection_rules
 
@@ -228,6 +230,11 @@ class Event(models.Model):
     copy = models.TextField(max_length=8192, null=True, blank=True)
     copy_summary = models.TextField(max_length=4096, null=True, blank=True)
 
+    # Following flag is True when the event copy has been imported from the
+    # "legacy" toolkit; the bizarre text wrapping will be fixed up before
+    # display, regex will be applied to turn http://.* into links, etc.
+    legacy_copy = models.BooleanField(default=False, null=False, editable=False)
+
     terms = models.TextField(max_length=4096, default=settings.DEFAULT_TERMS_TEXT, null=True, blank=True)
     notes = models.TextField(max_length=4096, null=True, blank=True)
 
@@ -270,6 +277,45 @@ class Event(models.Model):
         if self.media.count() == 0:
             return None
         return self.media.all()[0]
+
+    # Regular expressions for mangling legacy copy:
+    _wrap_re = re.compile(r'(.{70,})\n')
+    _lotsofnewlines_re = re.compile(r'\n\n+')
+    # Catch well-formatted links (ie. beginning http://)
+    _link_re_1 = re.compile(r'(http:\/\/\S{4,})')
+    # Optimistic stab at spotting other things that are probably links, based on
+    # a smattering of TLDs:
+    _link_re_2 = re.compile(r'(\s)(www\.[\w.]+\.(com|org|net|uk|de|ly|us|tk)[^\t\n\r\f\v\. ]*)')
+
+    @property
+    def copy_html(self):
+        """If self.legacy_copy == True, then try to mangle self.copy into
+        sane HTML fragment. Otherwise return self.copy
+        (Legacy cube copy has line breaks around the 70-80 character mark, and no
+        hyperlinks)"""
+
+        if not self.legacy_copy:
+            return mark_safe(self.copy)
+        else:
+            # remove all whitespace from start and end of line:
+            result = self.copy.strip()
+            # Strip out carriage returns:
+
+            result = result.strip().replace('\r', '')
+            # Strip out new lines when they occur after 70 other characters (try to fix wrapping)
+            result = self._wrap_re.sub(r'\1 ', result)
+            # Replace a sequence of 2+ new lines with a double line break;
+            result = self._lotsofnewlines_re.sub(' <br><br>', result)
+
+            # Now replace all new lines with a single line break;
+            result = result.replace('\n', ' <br>\n')
+
+            # Attempt to magically convert any links to markdown:
+            result = self._link_re_1.sub(r'<a href="\1">\1</a>', result)
+            result = self._link_re_2.sub(r'\1<a href="http://\2">\2</a>', result)
+
+            return mark_safe(result)
+
 
 
 class Showing(models.Model):

@@ -1,4 +1,3 @@
-{% load markup %}
 {% load hash_filter %}
 <div class="event">
 <span id="showing_{{ showing.id }}">
@@ -15,8 +14,7 @@
 <p>
 {% include "showing_time_fragment.html" %}
 </p>
-
-<p>{{showing.event.copy|markdown}}</p>
+<p>{{showing.event.copy_html}}</p>
 <p>[<a href="#top">top of page</a>]</p>
 </span> 
 </div>

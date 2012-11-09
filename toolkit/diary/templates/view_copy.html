@@ -1,5 +1,4 @@
 {% extends "base_view_eventfield.html" %}
-{% load markup %}
 
 {% block title %}
 CUBE programme of events - copy report
@@ -65,7 +64,7 @@ $(document).ready(function() {
 {% ifchanged %}
 <p class="divider">------------------------------------------------------------------------------</p>
 <p>{{ showing.event.name|upper }}</p>
-<p>{{ showing.event.copy|markdown }}</p>
+<p>{{ showing.event.copy_html }}</p>
 <p><a href="{% url edit-event-details showing.event.id %}">[edit]</a></p>
 {% endifchanged %}
 {% endif %}
