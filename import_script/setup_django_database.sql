@@ -1,3 +1,7 @@
+# Script to drop and recreate all databases and users, including those only
+# used for importing of legacy data
+#
+
 # Do some dummy grants, which will create the users if they didn't already
 # exist, so that the following DROP USER won't give an error:
 GRANT USAGE ON *.* TO 'cube'@'localhost';

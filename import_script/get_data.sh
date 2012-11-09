@@ -1,7 +1,10 @@
 #!/bin/bash
+# Fetch all legacy diary data from the master server
+# Works much better if ssh is configured with certificates.
+#
 # Not very profound, this one.
 
-SERVER="sparror.cubecinema.com"
+SERVER="www.cubecinema.com"
 USER="cube"
 RSYNC="/usr/bin/rsync"
 

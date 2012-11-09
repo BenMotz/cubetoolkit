@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 import os
 import sys
 import datetime
@@ -350,6 +350,7 @@ def create_roles(connection):
 
 def mark_standard_roles():
     # For eff's sake;
+    logger.info("Mangling Dj role -> DJ")
     try:
         dj_role = toolkit.diary.models.Role.objects.get(name="Dj")
         dj_role.name = "DJ"
@@ -360,6 +361,7 @@ def mark_standard_roles():
     # Mark all roles that are featured in > 35 events (arbitrary threshold)
     # as "standard" event roles (and read_only) and mark all those in more
     # then 3 events as read_only
+    logger.info("Mark some roles as read only")
     read_only_roles = []
     standard_roles = []
     cursor = django.db.connection.cursor()
@@ -377,6 +379,7 @@ def mark_standard_roles():
                 standard_roles.append(row[0])
     finally:
         cursor.close()
+    logger.info("({0} will be marked R/O)".format(len(read_only_roles)))
 
     for r_id in read_only_roles:
         role = toolkit.diary.models.Role.objects.get(id=r_id)
@@ -558,6 +561,8 @@ def import_members(connection):
         m.phone = r[8]
         m.altphone = r[9]
         last_updated = r[10].split('/')
+        # Try to turn the last_updated value into an actual datetime. If it
+        # fails (as it often does) then go with the default
         if len(last_updated) == 3:
             try:
                 last_updated_local = datetime.datetime(
@@ -647,6 +652,8 @@ def main():
     mark_standard_roles()
 
     conn.close()
+
+    logger.info("Django import complete")
 
 
 if __name__ == "__main__":
