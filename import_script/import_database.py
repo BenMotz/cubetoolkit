@@ -52,9 +52,10 @@ def titlecase(string):
     """Titlecase string. Eg;
     'this isn't real' => 'This Isn't Real'
     """
-#   return string.title() # Really doesn't cope with apostrophes.
+    # (built-in string.title() method really doesn't cope with apostrophes)
     if isinstance(string, basestring):
-        return re.sub("(^|\s)(\S)", lambda match: match.group(1) + match.group(2).upper(), string)
+        # Match any whitespace or double quote followed by an alphanumeric character:
+        return re.sub('(^|\s|")(\w)', lambda match: match.group(1) + match.group(2).upper(), string)
     else:
         return string
 
