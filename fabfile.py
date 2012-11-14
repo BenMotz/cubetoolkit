@@ -48,11 +48,11 @@ def deploy_static():
     """Rsync all static content onto target"""
     # Check that target is defined:
     require('site_root', provided_by = ('testing', 'production'))
-
-    # This isn't so much to put content there, but to delete anything that
-    # isn't needed or shouldn't be there.
-    local('rsync -av --delete static/ {0}@{1}:{2}/static'.format(env.user, env.hosts[0], env.site_root))
-
+#
+#     # This isn't so much to put content there, but to delete anything that
+#     # isn't needed or shouldn't be there.
+#     local('rsync -av --delete static/ {0}@{1}:{2}/static'.format(env.user, env.hosts[0], env.site_root))
+#
     with cd(env.site_root):
         run("cp logging.import.conf logging.conf")
         run("venv/bin/python manage.py collectstatic --noinput")
@@ -107,7 +107,7 @@ def deploy():
             utils.abort("User aborted")
 
     deploy_code()
-    deploy_static()
     update_requirements()
+    deploy_static()
 #    restart_server()
 
