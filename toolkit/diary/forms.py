@@ -15,7 +15,13 @@ from toolkit.util.ordereddict import OrderedDict
 from toolkit.diary.validators import validate_in_future
 
 class HtmlTextarea(forms.Textarea):
+    """TextArea widget overloaded to provide a wysiwyg HTML editor, using the
+    'wysihtml5' editor
+    """
     class Media(object):
+        # Define media (CSS & JS) used by this control. To include this
+        # automatically the template containing the form must have the
+        # {{ form.media }} tag
         css = {
             'all': ('css/lib/wysihtml5.css',),
         }
@@ -24,6 +30,7 @@ class HtmlTextarea(forms.Textarea):
             'js/lib/wysihtml5/wysihtml5-0.3.0.min.js',
         )
 
+    # Commands available in the editor's toolbar:
     toolbar_commands = (
             # Pair of editor command / toolbar html
             ('bold', 'Bold'),
@@ -36,11 +43,12 @@ class HtmlTextarea(forms.Textarea):
             ('insertOrderedList', 'insertOrderedList'),
     )
 
+    # Generate HTML for the editor control:
     def render(self, name, value, attrs=None):
         if value is None: value = ''
         final_attrs = self.build_attrs(attrs, name=name)
 
-        output = [u"<div id='toolbar-{0}' style='display:none;'>".format(final_attrs['id']),]
+        output = [u"<div class='wysihtml5_django_wrapper'><div id='toolbar-{0}' style='display:none;'>".format(final_attrs['id']),]
         output.extend(
             u"<a data-wysihtml5-command='{0}'>{1}</a> | ".format(cmd, cmdhtml) for (cmd, cmdhtml) in self.toolbar_commands
         )
@@ -56,7 +64,8 @@ class HtmlTextarea(forms.Textarea):
             conditional_escape(force_unicode(value))
         ))
         output.append(
-            u"<script type='text/javascript'>"
+            u"</div>"
+            "<script type='text/javascript'>"
             " var editor = new wysihtml5.Editor('{0}', {{"
             "   toolbar:      'toolbar-{0}',"
             "   parserRules:  wysihtml5ParserRules"
@@ -83,6 +92,7 @@ class EventForm(forms.ModelForm):
         model = toolkit.diary.models.Event
         # Ensure soft wrapping is set for textareas:
         widgets = {
+            # Use the custom WYSIWYG text editor widget:
             'copy': HtmlTextarea(attrs={'wrap': 'soft'}),
             'copy_summary': forms.Textarea(attrs={'wrap': 'soft'}),
             'terms': forms.Textarea(attrs={'wrap': 'soft'}),
