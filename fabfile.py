@@ -17,8 +17,8 @@ def testing():
     env.site_root = "/var/www_toolkit/site"
     env.user = "ben"
     env.hosts = ["localhost"]
-    env.git_source = "ben@phonog.dyndns.org:data/python/cube"
     env.settings = "testing_settings.py"
+    env.logging = "logging.normal.conf"
 
 def production():
     """Configure to deploy live"""
@@ -27,6 +27,7 @@ def production():
     env.user = "cubetoolkit"
     env.hosts = ["toolkit.cubecinema.com"]
     env.settings = "live_settings.py"
+    env.logging = "logging.normal.conf"
 
 def deploy_code():
     """Deploy code from git HEAD onto target"""
@@ -43,6 +44,10 @@ def deploy_code():
         run("tar -xzf {0}".format(archive))
         run("rm -f toolkit/settings.py?")
         run("ln -s {0} toolkit/settings.py".format(env.settings))
+        # Remove link to current logging config (will probably be logging.debug.conf)
+        run("rm logging.conf".format(env.logging))
+        # Configure logging
+        run("ln -s {0} logging.conf".format(env.logging))
 
 def deploy_static():
     """Rsync all static content onto target"""
