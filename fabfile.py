@@ -59,9 +59,12 @@ def deploy_static():
 #     local('rsync -av --delete static/ {0}@{1}:{2}/static'.format(env.user, env.hosts[0], env.site_root))
 #
     with cd(env.site_root):
-        run("cp logging.import.conf logging.conf")
+        run("rm -rf static")
+        run("rm logging.conf")
+        run("ln -s logging.debug.conf logging.conf")
         run("venv/bin/python manage.py collectstatic --noinput")
-        run("cp logging.normal.conf logging.conf")
+        run("rm logging.conf")
+        run("ln -s {0} logging.conf".format(env.logging))
 
 
 def deploy_media():
