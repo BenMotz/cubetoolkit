@@ -6,9 +6,9 @@ import django.contrib.contenttypes as contenttypes
 
 def main():
     # Read only user:
-    auth_models.User.objects.create_user('cube', 'toolkit_admin_readonly@localhost', '***REMOVED***')
+    # auth_models.User.objects.create_user('cube', 'toolkit_admin_readonly@localhost', '***REMOVED***')
     # Read/write user:
-    user_rw = auth_models.User.objects.create_user('admin', 'toolkit_admin_readwrite@localhost', '***REMOVED***')
+    user_rw = auth_models.User.objects.create_user('admin', 'toolkit_admin@localhost', '***REMOVED***')
     # Create dummy ContentType:
     ct = contenttypes.models.ContentType.objects.get_or_create(
         model='',
