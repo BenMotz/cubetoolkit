@@ -18,6 +18,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
+@permission_required('toolkit.write')
 def add_member(request):
     # If this view is called with GET then display the form to enter a new
     # member. If called with POST then take parameters out of the body of
