@@ -74,13 +74,18 @@ def deploy_media():
 
     local('rsync -av --delete media/ {0}@{1}:{2}/media'.format(env.user, env.hosts[0], env.site_root))
 
-def update_requirements():
-    """ Update installed packages in remote virtualenv """
+def install_requirements(upgrade=False):
+    """ Install requirements in remote virtualenv """
     # Update the packages installed in the environment:
     venv_path = os.path.join(env.site_root, VIRTUALENV)
     req_file = os.path.join(env.site_root, REQUIREMENTS)
+    upgrade_flag = "--upgrade" if upgrade else ""
     with cd(env.site_root):
-        run("{venv_path}/bin/pip install --requirement {req_file}".format(venv_path=venv_path, req_file=req_file))
+        run("{venv_path}/bin/pip install {upgrade} --requirement {req_file}".format(venv_path=venv_path, upgrade=upgrade_flag, req_file=req_file))
+
+def upgrade_requirements():
+    """ Upgrade all requirements in remote virtualenv """
+    return install_requirements(True)
 
 def restart_server():
     # ??
@@ -104,7 +109,7 @@ def bootstrap():
     venv_path = os.path.join(env.site_root, VIRTUALENV)
     run("virtualenv --system-site-packages {0}".format(venv_path))
     # Update the packages installed in the environment:
-    update_requirements()
+    install_requirements()
 
 def deploy():
     """Upload code, install any new requirements"""
@@ -115,7 +120,7 @@ def deploy():
             utils.abort("User aborted")
 
     deploy_code()
-    update_requirements()
+    install_requirements()
     deploy_static()
 #    restart_server()
 
