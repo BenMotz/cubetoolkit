@@ -44,13 +44,13 @@ Details for: {{ event.name }}
 <h1>Details for {{ event.name }}</h1>
 <p>
 {% for showing in event.showings.all %}
-Booked for: <a href="{% url edit-showing showing.pk %}">{{ showing.start|date:"H:i d/m/Y"  }}</a><br>
+Booked for: <a href="{% url "edit-showing" showing.pk %}">{{ showing.start|date:"H:i d/m/Y"  }}</a><br>
 {% endfor %}
 </p>
 </div>
 
 <div id="detail">
-    <p class="d"><b>Name:</b>{{ event.name }} <a href="{% url edit-event-details event.pk %}">[edit]</a></p>
+    <p class="d"><b>Name:</b>{{ event.name }} <a href="{% url "edit-event-details" event.pk %}">[edit]</a></p>
     <p class="d"><b>Tags:</b> {{ event.tags.all|join:", " }}</p>
     {% comment %}
     {% if event.template %}
@@ -69,19 +69,19 @@ Booked for: <a href="{% url edit-showing showing.pk %}">{{ showing.start|date:"H
 
 <p class="d"><b>Copy for "{{ event.name }}" (for web page)</b></p>
 <p>{{event.copy_html}}</p>
-<p><a href="{% url edit-event-details event.pk %}">[edit]</a></p>
+<p><a href="{% url "edit-event-details" event.pk %}">[edit]</a></p>
 
 <p class="d"><b>Copy summary for "{{ event.name }}" (for printed programme)</b></p>
 <p class="pre">{{event.copy_summary}}</p>
-<p><a href="{% url edit-event-details event.pk %}">[edit]</a></p>
+<p><a href="{% url "edit-event-details" event.pk %}">[edit]</a></p>
 
 <p class="d"><b>Terms for "{{ event.name }}"</b></p>
 <p class="pre">{{event.terms}}</p>
-<p><a href="{% url edit-event-details event.pk %}">[edit]</a></p>
+<p><a href="{% url "edit-event-details" event.pk %}">[edit]</a></p>
 
 <p class="d"><b>Other notes for "{{ event.name }}"</b></p>
 <p>{{event.notes}}</p>
-<p><a href="{% url edit-event-details event.pk %}">[edit]</a></p>
+<p><a href="{% url "edit-event-details" event.pk %}">[edit]</a></p>
 </div>
 <!-- urgh -->
 <p><a href="#" onclick="self.close(); opener.location.reload(true);">back</a></p>

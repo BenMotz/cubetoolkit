@@ -65,7 +65,7 @@ function mail_send_progress_poll(data, textStatus, jqXHR) {
 
     if(progress < 100) {
         window.setTimeout(function() {
-                $.getJSON('{% url mailout-progress %}?task_id=' + data['task_id'], mail_send_progress_poll);
+                $.getJSON('{% url "mailout-progress" %}?task_id=' + data['task_id'], mail_send_progress_poll);
         }, POLL_PERIOD);
     } else {
         set_state(S_COMPLETE);
@@ -90,7 +90,7 @@ function start_send() {
            '&subject=' +  encodeURIComponent($('p#subject').html()) +
            '&body=' + encodeURIComponent($('p#body').html());
 
-    send_xhr = $.ajax('{% url exec-mailout %}', {
+    send_xhr = $.ajax('{% url "exec-mailout" %}', {
             'type': 'POST',
             'cache': false,
             'data': data,

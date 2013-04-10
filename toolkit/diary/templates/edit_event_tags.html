@@ -58,8 +58,8 @@ function submit() {
         'csrfmiddlewaretoken' : '{{ csrf_token }}',
         'tags' : tags,
     };
-    $.post('{% url edit_event_tags %}', tag_data, function() {
-                window.location.href = '{% url edit_event_tags %}';
+    $.post('{% url "edit_event_tags" %}', tag_data, function() {
+                window.location.href = '{% url "edit_event_tags" %}';
             });
 
 }

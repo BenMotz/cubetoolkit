@@ -8,6 +8,6 @@
 <select name="volunteer">{% for volunteer in volunteers %}
     <option value="{{ volunteer.pk }}">{{ volunteer.member.name }}</option>
 {% endfor %}</select>
-<p><input type="submit" name="submit" value="{{ action|title }}"></input> <a href="{% url view-volunteer-list %}">Cancel</a></p>
+<p><input type="submit" name="submit" value="{{ action|title }}"></input> <a href="{% url "view-volunteer-list" %}">Cancel</a></p>
 </form>
 {% endblock %}

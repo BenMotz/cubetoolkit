@@ -18,9 +18,9 @@
 {% include "messages.html" %}
 Total cube volunteers: {{ volunteers|length }}<p>
 Report generated: {% now "d/m/Y" %}<p>
-<a href="{% url add-volunteer %}"title="add new volunteer">[add volunteer]</a>
-<a href="{% url select-volunteer %}?action=retire" title="retire volunteer">[retire volunteer]</a>
-<a href="{% url select-volunteer-inactive %}?action=unretire" title="unretire volunteer">[unretire volunteer]</a><br>
+<a href="{% url "add-volunteer" %}"title="add new volunteer">[add volunteer]</a>
+<a href="{% url "select-volunteer" %}?action=retire" title="retire volunteer">[retire volunteer]</a>
+<a href="{% url "select-volunteer-inactive" %}?action=unretire" title="unretire volunteer">[unretire volunteer]</a><br>
 <h3>Contact details:</h3>
 <table>
 {% for volunteer in volunteers %}
@@ -34,19 +34,19 @@ Report generated: {% now "d/m/Y" %}<p>
 {% else %}
 <img src="{{ default_mugshot }}" border="0" width="75"><br>
 {% endif %}
-<a href="{% url edit-volunteer volunteer.pk %}">[update]</a></td>
+<a href="{% url "edit-volunteer" volunteer.pk %}">[update]</a></td>
 <td>&nbsp;&nbsp;</td>
 <td valign="top">
 <b><font size="4">{{ member.name }}</font></b><p>
 <b>notes:</b> {{ volunteer.notes|default:"" }}
-<a href="{% url edit-volunteer volunteer.pk %}">[update]</a><p>
-<b>roles:</b>{{ vol_role_map|lookup:volunteer.id|join:", "|lower|default:"<em>Request role information</em>" }} <a href="{% url edit-volunteer volunteer.pk %}">[update]</a><p>
+<a href="{% url "edit-volunteer" volunteer.pk %}">[update]</a><p>
+<b>roles:</b>{{ vol_role_map|lookup:volunteer.id|join:", "|lower|default:"<em>Request role information</em>" }} <a href="{% url "edit-volunteer" volunteer.pk %}">[update]</a><p>
 {{ member.email|urlize|default:"<em>Request email address</em>" }}</a><br>
 {{ member.address }}{% if member.address %}<br>{% endif %}
 {{ member.postcode }}{% if member.postcode %}<br>{% endif %}
 {{ member.phone|default:"<em>Request landline number</em>" }}<br>
 {{ member.altphone|default:"<em>Request mobile number</em>" }}<br>
-<a href="{% url edit-volunteer volunteer.pk %}">[update]</a><br>
+<a href="{% url "edit-volunteer" volunteer.pk %}">[update]</a><br>
 <br>
 </td>
 {% cycle '' '</tr>' %}

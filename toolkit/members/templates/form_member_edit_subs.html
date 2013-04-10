@@ -8,7 +8,7 @@
 
 {% block body %}
 <h3>Edit Cube mailing list subscription</h3>
-<form action="{% url unsubscribe-member member_id=member.id%}" method="POST">
+<form action="{% url "unsubscribe-member" member_id=member.id%}" method="POST">
 {% csrf_token %}
 <input name="confirm" type="hidden" value="yes" />
 <input name="k" type="hidden" value="{{ member.mailout_key }}" />

@@ -12,7 +12,7 @@ Edit ideas for {{ month|date:"F Y"}}
 {% block body %}
 <h1>Programming ideas for {{month|date:"F Y"}}</h1>
 {{ form.name_of_field.errors }}
-<form action="{% url edit-ideas month=month.month year=month.year %}" method="post">
+<form action="{% url "edit-ideas" month=month.month year=month.year %}" method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="Update" />

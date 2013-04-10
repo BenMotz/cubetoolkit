@@ -65,7 +65,7 @@ $(document).ready(function() {
 <p class="divider">------------------------------------------------------------------------------</p>
 <p>{{ showing.event.name|upper }}</p>
 <p>{{ showing.event.copy_html }}</p>
-<p><a href="{% url edit-event-details showing.event.id %}">[edit]</a></p>
+<p><a href="{% url "edit-event-details" showing.event.id %}">[edit]</a></p>
 {% endifchanged %}
 {% endif %}
 {% endfor %}

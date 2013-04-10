@@ -25,8 +25,8 @@
 <th>Member</th><th>Name</th><th>Email</th><th>Homepage</th><th>Postal address</th><th>Settlement</th><th>Postcode</th><th>Country</th><th>Telephone</th><th>Mobile telephone</th><th>Last updated</th><th>Refuse mailshot</th><th>Status</th></tr>
 {% for member in members %}
 <tr>
-{% if show_edit_link %}<td><form method="get" action="{% url edit-member member.pk %}"><input type="submit" value="Edit"></form></td>{% endif %}
-{% if show_delete_link %}<td><form method="post" action="{% url delete-member member.pk %}">{% csrf_token %}<input type="submit" value="Delete"></form></td>{% endif %}
+{% if show_edit_link %}<td><form method="get" action="{% url "edit-member" member.pk %}"><input type="submit" value="Edit"></form></td>{% endif %}
+{% if show_delete_link %}<td><form method="post" action="{% url "delete-member" member.pk %}">{% csrf_token %}<input type="submit" value="Delete"></form></td>{% endif %}
 <td>{{ member.number }}</td>
 <td>{{ member.name|default_if_none:"-" }}</td>
 <td>{% if member.email %}{{ member.email|urlize }}{% else %} - {% endif %}</td>

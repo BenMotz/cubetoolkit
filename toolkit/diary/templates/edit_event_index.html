@@ -72,12 +72,12 @@ function dateRangeSelected(dateText, inst) {
     if(days_ahead <= 0) {
         days_ahead = 0;
     }
-    window.location.href = "{% url day-edit year=start.year day=start.day month=start.month %}?daysahead=" + days_ahead;
+    window.location.href = "{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=" + days_ahead;
 }
 function set_edit_pref(pref, value) {
     if(edit_prefs[pref] !== value) {
         edit_prefs[pref] = value;
-        $.getJSON('{% url set_edit_preferences %}', edit_prefs, prefs_updated);
+        $.getJSON('{% url "set_edit_preferences" %}', edit_prefs, prefs_updated);
     }
 }
 function prefs_updated(data) {
@@ -105,7 +105,7 @@ function prefs_updated(data) {
 {% block body %}
 <img src="{{ STATIC_URL }}diary/diary_edit_list_header.gif" alt="Cube Microplex" width="150px">
 <h3>CUBE events diary</h3>
-<p id="controls"><a href="{% url logout %}">Log out</a><br>
+<p id="controls"><a href="{% url "logout" %}">Log out</a><br>
 Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">this window</a></p>
 
 <p><a name="top"></a></p>
@@ -115,31 +115,31 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
 <span class="discounted">Discounted events (like TTT) are magenta</span><br>
 <span class="cancelled">Cancelled events are red</span></p>
 
-<div class="programme"><p align='center'><a href="{% url day-edit year=start.year day=start.day month=start.month %}?daysahead=30">See 1 month</a> | 
-<a href="{% url day-edit year=start.year day=start.day month=start.month %}?daysahead=60">See 2 months</a> | 
-<a href="{% url day-edit year=start.year day=start.day month=start.month %}?daysahead=90">See 3 months</a></p>
+<div class="programme"><p align='center'><a href="{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=30">See 1 month</a> | 
+<a href="{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=60">See 2 months</a> | 
+<a href="{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=90">See 3 months</a></p>
 <p align='center'><label for="id_start">See from now until:</label> <input type="text" name="lookahead_to" value="{{ end|date:'j-m-Y'}}" id="id_lookahead_to" /></p>
 
 {% include "messages.html" %}
 
 <table class="summary">
-    <tr><td></td><td colspan="3"><a href="{% url add-event %}">New event</a></td></tr>
+    <tr><td></td><td colspan="3"><a href="{% url "add-event" %}">New event</a></td></tr>
 
 {% for day, showings in dates.items %}
     {% ifchanged %}<tr class="row_year"><td><h1>{{ day|date:"Y" }} </h1></td><td colspan="3"></td></tr>{% endifchanged %}
     {% ifchanged %}<tr class="row_month"><td><h2>{{ day|date:"F" }}</h2></td><td colspan="3"></td></tr></tr>
     {% endifchanged %}
     {% if day in ideas %}
-    <tr><td><a href="{% url edit-ideas year=day.year month=day.month %}">IDEAS</a></td><td colspan="3">{{ ideas|lookup:day|markdown }}</td></tr>
+    <tr><td><a href="{% url "edit-ideas" year=day.year month=day.month %}">IDEAS</a></td><td colspan="3">{{ ideas|lookup:day|markdown }}</td></tr>
     {% endif %}
-    <tr class="row_day"><td class="cell_day"><a href="{% url add-event %}?date={{day|date:"j-m-Y"}}">{{ day|date:"D"}}&nbsp;{{ day|date:"j" }}</a></td>
+    <tr class="row_day"><td class="cell_day"><a href="{% url "add-event" %}?date={{day|date:"j-m-Y"}}">{{ day|date:"D"}}&nbsp;{{ day|date:"j" }}</a></td>
 
     {% for showing in showings %}
     <td>
-    <a href="{% url edit-showing showing_id=showing.pk %}">{{ showing.start|date:"H:i" }}</a>
+    <a href="{% url "edit-showing" showing_id=showing.pk %}">{{ showing.start|date:"H:i" }}</a>
     </td>
     <td class="table_gap">&nbsp;</td>
-    <td>{{ showing.booked_by }} <a href="{% url edit-event-details-view pk=showing.event.pk %}">
+    <td>{{ showing.booked_by }} <a href="{% url "edit-event-details-view" pk=showing.event.pk %}">
     <span class="{% if showing.cancelled or showing.event.cancelled %}cancelled{% endif %}{% if showing.discounted %} discounted{% endif %}{% if showing.event.private %} private{% endif %}{% if showing.event.outside_hire %} external{% endif %}">
         {% if showing.confirmed %}
         {{ showing.event.name|upper }}

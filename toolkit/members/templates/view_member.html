@@ -30,8 +30,8 @@ Cube Member: {{ member.name }}
     <p>Receives mailout? {{ member.mailout|yesno }}</p>
     <p>Mailout failed? {{ member.mailout_failed|yesno }}</p>
     <p>
-<form method="get" action="{% url edit-member member.pk %}"><input type="submit" value="Edit"></form> 
-<form method="post" action="{% url delete-member member.pk %}">{% csrf_token %}<input type="submit" value="Delete"></form>
+<form method="get" action="{% url "edit-member" member.pk %}"><input type="submit" value="Edit"></form> 
+<form method="post" action="{% url "delete-member" member.pk %}">{% csrf_token %}<input type="submit" value="Delete"></form>
 </p>
 </div>
 

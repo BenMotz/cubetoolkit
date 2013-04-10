@@ -46,7 +46,7 @@ $(document).ready(function() {
 <h1>NEW</h1>
 <p><b>Add an event</b></p>
 
-<form action="{% url add-event %}" method="post">
+<form action="{% url "add-event" %}" method="post">
     {% csrf_token %}
     <table>
     {{ form.as_table }}
