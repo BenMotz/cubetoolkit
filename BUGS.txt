@@ -1,0 +1,44 @@
+
+
+[BUG] -- Allow shorter event names
+[BUG] Illegal form values should be in *RED* (in showing/booking edit, plus other places?)
+[BUG] html links shouldn't be rel="nofollow"/target blank
+[FIXED] HTML editor looks shonky
+[NOREPRO] Popup date/time picker not working on "Edit booking" form after failed submission
+[FIXED] -- Need to set allowed hosts
+[FIXED] -- Sort out logging configuration to be sane (or at least less insane)
+[FIXED] Creating an event for TODAY (generic "new event" link) defaults to RIGHT NOW if it's after 8pm, complete with whack number of seconds
+[FIXED] Terms report search is wonky (doesn't search event names?)
+[FIXED] Add better help text to top of "Roles" edit
+[FIXED] Add 'messages' display to top of Event templates edit (and Roles/Tags edit?)
+[FIXED] Add 'this cannot be undone' to 'Delete showing' prompt
+[FIXED] Editing event details:
+ 1. Set name to blank, save (fails)
+ 2. Set photo caption blank, save:
+2012-10-10 20:44:47,005 edit_views _edit_event_handle_post INFO : Updating event 5745
+2012-10-10 20:44:47,017 models autoset_mimetype DEBUG : Mime type for /home/users/cubetoolkit/site/media/diary/6787.jpg detected as image/jpeg
+2012-10-10 20:44:47,017 models _update_thumbnail INFO : Updating thumbnail for media item 2037, file diary/6787.jpg
+2012-10-10 20:44:47,027 base handle_uncaught_exception ERROR : Internal Server Error: /toolkit/diary/edit/event/id/5745/
+Traceback (most recent call last):
+  File "/home/users/cubetoolkit/site/venv/lib/python2.6/site-packages/django/core/handlers/base.py", line 111, in get_response
+    response = callback(request, *callback_args, **callback_kwargs)
+  File "/home/users/cubetoolkit/site/venv/lib/python2.6/site-packages/django/contrib/auth/decorators.py", line 20, in _wrapped_view
+    return view_func(request, *args, **kwargs)
+  File "/home/users/cubetoolkit/site/toolkit/diary/edit_views.py", line 376, in edit_event
+    return _edit_event_handle_post(request, event_id)
+  File "/home/users/cubetoolkit/site/toolkit/diary/edit_views.py", line 353, in _edit_event_handle_post
+    media_form.save()
+  File "/home/users/cubetoolkit/site/venv/lib/python2.6/site-packages/django/forms/models.py", line 364, in save
+    fail_message, commit, construct=False)
+  File "/home/users/cubetoolkit/site/venv/lib/python2.6/site-packages/django/forms/models.py", line 86, in save_instance
+    instance.save()
+  File "/home/users/cubetoolkit/site/toolkit/diary/models.py", line 99, in save
+    self._update_thumbnail()
+  File "/home/users/cubetoolkit/site/toolkit/diary/models.py", line 145, in _update_thumbnail
+    image.thumbnail(settings.THUMBNAIL_SIZE, PIL.Image.ANTIALIAS)
+  File "/usr/lib/python2.6/dist-packages/PIL/Image.py", line 1559, in thumbnail
+    self.load()
+  File "/usr/lib/python2.6/dist-packages/PIL/ImageFile.py", line 201, in load
+    raise IOError("image file is truncated (%d bytes not processed)" % len(b))
+IOError: image file is truncated (35 bytes not processed)
+
