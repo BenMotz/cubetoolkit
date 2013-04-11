@@ -29,15 +29,11 @@ EMAIL_UNSUBSCRIBE_HOST = "cubecinema.com"
 # (so, for example, can't have more than this number of bar staff)
 MAX_COUNT_PER_ROLE = 6
 
-# Following settings are used by the import script, can be discarded when
-# switch-over is finalised.
-IMPORT_SCRIPT_USER = 'toolkitimport'
-IMPORT_SCRIPT_DATABASE = 'toolkitimport'
-
 ###############################################################################
 #
 # Below here are Django settings
 #
+
 
 # Custom:
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
@@ -53,6 +49,7 @@ CELERY_RESULT_DBURI = "django://"
 
 
 # Django settings for cube project.
+ALLOWED_HOSTS = ['.cubecinema.com', ]
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 

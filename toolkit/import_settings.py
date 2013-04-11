@@ -1,5 +1,11 @@
 from toolkit.settings import *
 
+# Following settings are used by the import script, can be discarded when
+# switch-over is finalised.
+
+IMPORT_SCRIPT_USER = 'toolkitimport'
+IMPORT_SCRIPT_DATABASE = 'toolkitimport'
+
 # Logging setup for import script:
 LOGGING = {
     'version': 1,
