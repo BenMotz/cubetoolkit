@@ -37,7 +37,7 @@ python $TOOLKIT_PATH/manage.py syncdb --noinput
 python $TOOLKIT_PATH/manage.py migrate
 # Now wipe out all data from the database
 python $TOOLKIT_PATH/manage.py flush --noinput
-# Make south reconstruct it's tracking table
+# Make south reconstruct its tracking table
 python $TOOLKIT_PATH/manage.py migrate --fake
 
 echo "Importing into django"
