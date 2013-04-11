@@ -11,7 +11,7 @@ import pytz
 
 import toolkit.diary.models
 import toolkit.members.models
-import toolkit.settings as settings
+from django.conf import settings
 from django.core.exceptions import ValidationError, ObjectDoesNotExist
 import django.db
 import django.utils.timezone
