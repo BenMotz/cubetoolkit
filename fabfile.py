@@ -54,7 +54,7 @@ def deploy_static():
 #
     with cd(env.site_root):
         run("rm -rf static")
-        run("venv/bin/python manage.py collectstatic --noinput")
+        run("venv/bin/python manage.py collectstatic --noinput --settings=toolkit.import_settings")
 
 
 def deploy_media():
