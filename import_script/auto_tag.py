@@ -5,14 +5,7 @@ from toolkit.diary.models import Event, EventTag
 from django.db.models import Q
 
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-
-# Set up logging:
-consoleHandler = logging.StreamHandler()
-consoleHandler.setLevel(logging.DEBUG)
-logger.addHandler(consoleHandler)
-
+logger = logging.getLogger('toolkit.import')
 
 def tag_events_with_name_containing(text, tags):
     events = Event.objects.filter(name__icontains=text)
@@ -50,7 +43,7 @@ def tag_ttt_as_film():
 
 def tag_certs_as_film():
     # Assume all discounted things are TTT and are film
-    print "Certificate based guessing"
+    logger.info("Running certificate based film tag guessing...")
     certificates = ('PG', 'U', '15', '12', '12A', '18')
     cert_text = []
     cert_text.extend("cert " + c for c in certificates)
@@ -67,7 +60,7 @@ def tag_certs_as_film():
 
     events = Event.objects.filter(query)
     tag = EventTag.objects.get(name="film")
-    print "Certificates lead to %d events being tagged as films" % len(query)
+    logger.info("Certificates lead to %d events being tagged as films" % len(query))
     for e in events:
         tag.event_set.add(e)
     # Belt and braces:
@@ -87,7 +80,7 @@ def main():
         "bluescreen": ('bluescreen',),
     }
     for text, tags in copy_map.iteritems():
-        print text, tags
+        logger.info("Tagging all events containing the text '%s' with tags '%s'" % (text, ", ".join(tags)))
         tag_events_with_terms_containing(text, tags)
         tag_events_with_name_containing(text, tags)
 
