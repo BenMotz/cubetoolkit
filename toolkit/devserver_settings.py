@@ -1,7 +1,3 @@
-import os.path
-import logging
-import logging.config
-
 from toolkit.settings_common import *
 
 APP_ROOT = '/home/ben/data/python/cube'
@@ -26,12 +22,11 @@ MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')
 INSTALLED_APPS = list(INSTALLED_APPS)
 INSTALLED_APPS.append('debug_toolbar')
 
-# Enable logging to the console:
-logging.basicConfig(
-    # level = logging.DEBUG,
-    level=logging.INFO,
-    format='%(asctime)s %(levelname)s %(message)s',
-)
+# Enable logging of *everything* to the console:
+LOGGING['root'] = {
+    'handlers': ['console'],
+    'level': 'DEBUG',
+}
 
 import warnings
 warnings.filterwarnings('error', r"DateTimeField received a naive datetime",

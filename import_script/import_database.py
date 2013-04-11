@@ -25,14 +25,8 @@ EVENT_THUMB_IMAGES_PATH = "diary_thumbnails"
 VOLUNTEER_IMAGE_PATH = "volunteers"
 VOLUNTEER_IMAGE_THUMB_PATH = "volunteers_thumbnails"
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger('toolkit.import')
 logger.setLevel(logging.DEBUG)
-
-# Set up logging:
-consoleHandler = logging.StreamHandler()
-consoleHandler.setLevel(logging.DEBUG)
-logger.addHandler(consoleHandler)
-
 
 ##############################################################################
 # Some utility functions
@@ -255,7 +249,7 @@ def import_events(connection, role_map):
 
         if e.name is None or e.name == '':
             # Looking at the db, it's safe to skip all of these
-            logging.warning("Event with no/missing name: id %s (copy: %s)", e.legacy_id, r[2])
+            logger.warning("Event with no/missing name: id %s (copy: %s)", e.legacy_id, r[2])
             continue
         else:
             # Special fix for the omnipresent Djs:
@@ -586,7 +580,7 @@ def import_members(connection):
             m.full_clean()
             m.save()
         except ValidationError as ve:
-            logging.error("Failed saving member %s: %s", m.number, str(ve))
+            logger.error("Failed saving member %s: %s", m.number, str(ve))
             continue
 
         #   Get everyone who's plausibly a volunteer:

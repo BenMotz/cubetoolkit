@@ -25,7 +25,7 @@ echo "Activate virtualenv"
 source $TOOLKIT_PATH/venv/bin/activate
 
 export PYTHONPATH=$PYTHONPATH:$TOOLKIT_PATH
-export DJANGO_SETTINGS_MODULE=toolkit.settings
+export DJANGO_SETTINGS_MODULE=toolkit.import_settings
 
 echo "Resetting database"
 

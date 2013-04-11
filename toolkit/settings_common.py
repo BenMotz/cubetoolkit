@@ -1,6 +1,7 @@
 import os.path
 import django.core.urlresolvers
 import djcelery
+import sys
 
 # Slightly arbitrary (inherited) bounding box for thumbnails
 THUMBNAIL_SIZE = (250, 187)
@@ -209,4 +210,48 @@ INSTALLED_APPS = (
     # Django-celery
     'djcelery',
 )
+
+# Common logging config. Different settings files can tweak this.
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+
+    'formatters': {
+        'simple': {
+            'format': '%(name)s %(levelname)s %(message)s',
+        },
+        'verbose': {
+            'format': '%(asctime)s %(module)s %(funcName)s %(levelname)s : %(message)s',
+        },
+    },
+
+    'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple',
+            # Args:
+            'stream': sys.stderr,
+        },
+        'file': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',  # really?
+            'formatter': 'verbose',
+            # Args:
+            'filename': '/var/log/cubetoolkit/debug.log',
+            'mode': 'a',
+            'maxBytes': 10485760,
+            'backupCount': 5,
+        },
+    },
+
+    'loggers': {
+        'django': {
+            'propagate': True,
+        },
+    },
+
+    # Don't configure a root logger or any other logging config; each settings
+    # file should do that
+}
 

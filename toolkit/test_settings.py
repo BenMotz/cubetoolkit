@@ -10,3 +10,9 @@ DATABASES = {
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
 }
+
+# Enable logging to the console:
+LOGGING['root'] = {
+    'handlers': ['console'],
+    'level': 'DEBUG',
+}
