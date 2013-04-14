@@ -135,6 +135,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
     return render(request, 'edit_event_index.html', context)
 
 
+@login_required
 def set_edit_preferences(request):
     # Store user preferences as specified in the request's GET variables,
     # and return a JSON object containing all current user preferences

@@ -34,9 +34,16 @@ class PublicDiaryViews(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_view_by_year(self):
-        url = reverse("year-view", kwargs={"year": "2010"})
+        url = reverse("year-view", kwargs={"year": "2013"})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+
+        # Should test the contents better, I suspect...
+        self.assertContains(response, u'Event three title')
+        self.assertContains(response, u'<p>Event three Copy</p>')
+        # Not confirmed / private:
+        self.assertNotContains(response, u'Event one title')
+        self.assertNotContains(response, u'<p>Event one copy</p>')
 
     def test_view_by_month(self):
         url = reverse("month-view", kwargs={"year": "2010", "month": "12"})
@@ -57,7 +64,7 @@ class PublicDiaryViews(TestCase):
         data = json.loads(response.content)
         # Eh (shrug)
         self.assertEqual(data, [{
-                         u"name": u"Event three",
+                         u"name": u"Event three title",
                          u"tags": u"tag two",
                          u"image": None,
                          u"start": u"13/04/2013 18:00",
@@ -69,8 +76,8 @@ class PublicDiaryViews(TestCase):
     def test_view_showing(self):
         url = reverse("single-showing-view", kwargs={"showing_id": "1"})
         response = self.client.get(url)
-        self.assertIn(u'Event two title', response.content)
-        self.assertIn(u'<p>Event two copy</p>', response.content)
+        self.assertContains(response, u'Event two title')
+        self.assertContains(response, u'<p>Event two copy</p>')
         self.assertEqual(response.status_code, 200)
 
     # Event series view:
@@ -78,8 +85,8 @@ class PublicDiaryViews(TestCase):
         url = reverse("single-event-view", kwargs={"event_id": "1"})
         response = self.client.get(url)
         # TODO: test data better, including media!
-        self.assertIn(u'Event one title', response.content)
-        self.assertIn(u'<p>Event one copy</p>', response.content)
+        self.assertContains(response, u'Event one title')
+        self.assertContains(response, u'<p>Event one copy</p>')
         self.assertEqual(response.status_code, 200)
 
     def test_view_event_legacy(self):
@@ -88,6 +95,48 @@ class PublicDiaryViews(TestCase):
         # TODO: test data!
         self.assertEqual(response.status_code, 200)
 
+    # TODO: Cancelled/confirmed/visible/TTT
+
+
+class EditDiaryViewsLoginRequired(TestCase):
+    """Basic test that the private diary pages do not load without a login"""
+
+    fixtures = ['small_data_set.json']
+
+    def test_urls(self):
+        views_to_test = {
+            "default-edit": {},
+            "year-edit": {"year": "2013"},
+            "month-edit": {"year": "2013", "month": "1"},
+            "day-edit": {"year": "2013", "month": "1", "day": "1"},
+            "edit-event-details-view": {"pk": "1"},
+            "edit-event-details": {"event_id": "1"},
+            "edit-showing": {"showing_id": "1"},
+            "edit-ideas": {"year": "2012", "month": "1"},
+            "add-showing": {"event_id": "1"},
+            "delete-showing": {"showing_id": "1"},
+            "add-event": {},
+
+            "edit_event_templates": {},
+            "edit_event_tags": {},
+            "edit_roles": {},
+            "members-mailout": {},
+            "exec-mailout": {},
+            "mailout-progress": {},
+            "set_edit_preferences": {},
+        }
+        for view_name, kwargs in views_to_test.iteritems():
+            url = reverse(view_name, kwargs=kwargs)
+            expected_redirect = "{0}?next={1}".format(reverse("django.contrib.auth.views.login"), url)
+
+            # Test GET:
+            response = self.client.get(url)
+            self.assertRedirects(response, expected_redirect)
+
+            # Test POST:
+            response = self.client.post(url)
+            self.assertRedirects(response, expected_redirect)
+
 
 class EditDiaryViews(TestCase):
     """Basic test that the private diary pages load"""
@@ -95,8 +144,15 @@ class EditDiaryViews(TestCase):
     # Some fixture data, so Showings don't 404
     fixtures = ['small_data_set.json']
 
+    def setUp(self):
+        self.client.login(username="admin", password="***REMOVED***")
+
     def test_view_default(self):
-        pass
+        url = reverse("default-edit")
+        response = self.client.get(url)
+        # self.assertIn(u'Event one title', response.content)
+        # self.assertIn(u'<p>Event one copy</p>', response.content)
+        self.assertEqual(response.status_code, 200)
 
 
 class UrlTests(TestCase):
