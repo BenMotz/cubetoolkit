@@ -10,10 +10,10 @@ import json
 from django.test import TestCase
 from django.core.urlresolvers import reverse, resolve
 import django.http
-from mock import patch
 
 
 class PublicDiaryViews(TestCase):
+    """Basic test that all the public diary pages load"""
 
     # Some fixture data, so Showings don't 404
     fixtures = ['small_data_set.json']
@@ -57,26 +57,29 @@ class PublicDiaryViews(TestCase):
         data = json.loads(response.content)
         # Eh (shrug)
         self.assertEqual(data, [{
-                         u"name": u"Event two",
+                         u"name": u"Event three",
                          u"tags": u"tag two",
                          u"image": None,
                          u"start": u"13/04/2013 18:00",
                          u"link": u"/diary/event/id/3/",
-                         u"copy": u"<p>Copy</p>"
+                         u"copy": u"<p>Event three Copy</p>"
                          }])
 
     # View of individual showing:
     def test_view_showing(self):
         url = reverse("single-showing-view", kwargs={"showing_id": "1"})
         response = self.client.get(url)
-        # TODO: test data!
+        self.assertIn(u'Event two title', response.content)
+        self.assertIn(u'<p>Event two copy</p>', response.content)
         self.assertEqual(response.status_code, 200)
 
     # Event series view:
     def test_view_event(self):
         url = reverse("single-event-view", kwargs={"event_id": "1"})
         response = self.client.get(url)
-        # TODO: test data!
+        # TODO: test data better, including media!
+        self.assertIn(u'Event one title', response.content)
+        self.assertIn(u'<p>Event one copy</p>', response.content)
         self.assertEqual(response.status_code, 200)
 
     def test_view_event_legacy(self):
@@ -86,9 +89,18 @@ class PublicDiaryViews(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-class UrlTests(TestCase):
+class EditDiaryViews(TestCase):
+    """Basic test that the private diary pages load"""
+
     # Some fixture data, so Showings don't 404
     fixtures = ['small_data_set.json']
+
+    def test_view_default(self):
+        pass
+
+
+class UrlTests(TestCase):
+    """Test the regular expressions in urls.py"""
 
     def test_diary_urls(self):
         # Test all basic diary URLs

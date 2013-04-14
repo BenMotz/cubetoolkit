@@ -133,10 +133,11 @@ def view_diary_json(request, year, month, day):
 
 def view_showing(request, showing_id=None):
     # Show details of an individual showing, with given showing_id
-    context = {}
-    context['showing'] = get_object_or_404(Showing, id=showing_id)
-    context['event'] = context['showing'].event
-    return render(request, 'view_showing.html', context)
+
+    # For now, just turn it into a view of the corresponding event:
+    showing = get_object_or_404(Showing, id=showing_id)
+
+    return view_event(request, event_id=showing.event_id)
 
 
 def view_event(request, event_id=None, legacy_id=None):
