@@ -13,6 +13,6 @@ DATABASES = {
 
 # Enable logging to the console:
 LOGGING['root'] = {
-    'handlers': ['console'],
-    'level': 'DEBUG',
+#    'handlers': ['console'],
+#    'level': 'WARNING',
 }

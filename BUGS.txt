@@ -1,10 +1,13 @@
 
+[NEWFEATURE] -- Need a sensible archive view/search
 
+[BUG] -- If diary view-by-tag has nothing then have an informative message! (Likewise by date?)
 [BUG] -- Allow shorter event names
 [BUG] Illegal form values should be in *RED* (in showing/booking edit, plus other places?)
 [BUG] html links shouldn't be rel="nofollow"/target blank
+
 [FIXED] HTML editor looks shonky
-[NOREPRO] Popup date/time picker not working on "Edit booking" form after failed submission
+[CANTREPRODUCE] Popup date/time picker not working on "Edit booking" form after failed submission
 [FIXED] -- Need to set allowed hosts
 [FIXED] -- Sort out logging configuration to be sane (or at least less insane)
 [FIXED] Creating an event for TODAY (generic "new event" link) defaults to RIGHT NOW if it's after 8pm, complete with whack number of seconds

@@ -9,10 +9,12 @@ urlpatterns = patterns(
 
     # View lists of event for various time/dates
     url('^(?:view/|)$', 'view_diary', name="default-view"),
-    url('^view/(?P<event_type>[\w-]{4,})/$', 'view_diary', name="type-view"),
     url('^view/(?P<year>\d{4})/?$', 'view_diary', name="year-view"),
     url('^view/(?P<year>\d{4})/(?P<month>\d{1,2})/?$', 'view_diary', name="month-view"),
     url('^view/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/?$', 'view_diary', name="day-view"),
+    # View for events by tag. This needs to come *after* the year view, to
+    # avoid years being parsed as tags:
+    url('^view/(?P<event_type>[\w-]+)/$', 'view_diary', name="type-view"),
 
     # View individual showing
     url('^showing/id/(?P<showing_id>\d+)/$', 'view_showing', name="single-showing-view"),
