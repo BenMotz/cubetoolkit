@@ -14,6 +14,7 @@ from toolkit.util.ordereddict import OrderedDict
 
 from toolkit.diary.validators import validate_in_future
 
+
 class HtmlTextarea(forms.Textarea):
     """TextArea widget overloaded to provide a wysiwyg HTML editor, using the
     'wysihtml5' editor
@@ -32,27 +33,31 @@ class HtmlTextarea(forms.Textarea):
 
     # Commands available in the editor's toolbar:
     toolbar_commands = (
-            # Pair of editor command / toolbar html
-            ('bold', 'Bold'),
-            ('italic', 'Italic'),
-            ('strikethrough', 'Strikethrough'),
-            ('superscript', 'Superscript'),
-            ('subscript', 'Subscript'),
-            ('createLink', 'Insert link'),
-            ('insertUnorderedList', 'insertUnorderedList'),
-            ('insertOrderedList', 'insertOrderedList'),
+        # Pair of editor command / toolbar html
+        ('bold', 'Bold'),
+        ('italic', 'Italic'),
+        ('strikethrough', 'Strikethrough'),
+        ('superscript', 'Superscript'),
+        ('subscript', 'Subscript'),
+        ('createLink', 'Insert link'),
+        ('insertUnorderedList', 'insertUnorderedList'),
+        ('insertOrderedList', 'insertOrderedList'),
     )
 
     # Generate HTML for the editor control:
     def render(self, name, value, attrs=None):
-        if value is None: value = ''
+        if value is None:
+            value = ''
         final_attrs = self.build_attrs(attrs, name=name)
 
-        output = [u"<div class='wysihtml5_django_wrapper'><div id='toolbar-{0}' style='display:none;'>".format(final_attrs['id']),]
+        output = [u"<div class='wysihtml5_django_wrapper'><div id='toolbar-{0}' style='display:none;'>"
+                  .format(final_attrs['id']), ]
         output.extend(
-            u"<a data-wysihtml5-command='{0}'>{1}</a> | ".format(cmd, cmdhtml) for (cmd, cmdhtml) in self.toolbar_commands
+            u"<a data-wysihtml5-command='{0}'>{1}</a> | "
+            .format(cmd, cmdhtml) for (cmd, cmdhtml) in self.toolbar_commands
         )
-        output.append("<a data-wysihtml5-action='change_view'>View HTML</a>"
+        output.append(
+            "<a data-wysihtml5-action='change_view'>View HTML</a>"
             "<div data-wysihtml5-dialog='createLink' style='display: none;'>"
             "  <label>Link: <input data-wysihtml5-dialog-field='href' value='http://'></label>"
             "  <a data-wysihtml5-dialog-action='save'>OK</a>&nbsp;<a data-wysihtml5-dialog-action='cancel'>Cancel</a>"

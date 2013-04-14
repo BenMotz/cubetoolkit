@@ -266,7 +266,7 @@ class Event(models.Model):
         self.media.remove(media_item)
         ## If the media item isn't associated with any events, delete it:
         ## ACTUALLY: let's keep it. Disk space is cheap, etc.
-        #if media_item.event_set.count() == 0:
+        # if media_item.event_set.count() == 0:
         #    media_item.delete()
 
     def set_main_mediaitem(self, media_file):
@@ -315,7 +315,6 @@ class Event(models.Model):
             result = self._link_re_2.sub(r'\1<a href="http://\2" target="_blank">\2</a>', result)
 
             return mark_safe(result)
-
 
 
 class Showing(models.Model):
@@ -513,8 +512,8 @@ class RotaEntry(models.Model):
     required = models.BooleanField(default=True)
     rank = models.IntegerField(default=1)
 
-    #created_at = models.DateTimeField(auto_now_add=True)
-    #updated_at = models.DateTimeField(auto_now=True)
+    # created_at = models.DateTimeField(auto_now_add=True)
+    # updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'RotaEntries'
