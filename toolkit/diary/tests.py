@@ -140,6 +140,9 @@ class EditDiaryViews(TestCase):
     def setUp(self):
         self.client.login(username="admin", password="T3stPassword!")
 
+    def tearDown(self):
+        self.client.logout()
+
     def test_view_default(self):
         url = reverse("default-edit")
         response = self.client.get(url)
