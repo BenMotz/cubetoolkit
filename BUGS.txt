@@ -6,12 +6,13 @@
 
 [BUG] -- Add anchors to diary view so jumping by legacy id will work
 [BUG] -- If diary view-by-tag has nothing then have an informative message! (Likewise by date?)
-[BUG] -- Allow shorter event names
 [BUG] Illegal form values should be in *RED* (in showing/booking edit, plus other places?)
 [BUG] html links shouldn't be rel="nofollow"/target blank
 [BUG] -- "Ttt" in imported title data
 [BUG] -- auth bug highlighted by tests
+[BUG] -- don't allow all blank event names / booked_by
 
+[FIXED] -- Allow shorter event names
 [FIXED] -- On import of members, detect "not member" in status field and set a boolean to signify the same.
 [FIXED] HTML editor looks shonky
 [CANTREPRODUCE] Popup date/time picker not working on "Edit booking" form after failed submission
