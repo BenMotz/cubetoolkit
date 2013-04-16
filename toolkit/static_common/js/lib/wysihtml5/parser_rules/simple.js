@@ -21,7 +21,7 @@ var wysihtml5ParserRules = {
     li:     {},
     a:      {
       set_attributes: {
-        target: "_blank",
+//        target: "_blank",
 //        rel:    "nofollow"
       },
       check_attributes: {

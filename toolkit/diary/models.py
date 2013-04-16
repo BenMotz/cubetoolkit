@@ -311,8 +311,8 @@ class Event(models.Model):
             result = result.replace('\n', ' <br>\n')
 
             # Attempt to magically convert any links to markdown:
-            result = self._link_re_1.sub(r'<a href="\1" target="_blank">\1</a>', result)
-            result = self._link_re_2.sub(r'\1<a href="http://\2" target="_blank">\2</a>', result)
+            result = self._link_re_1.sub(r'<a href="\1">\1</a>', result)
+            result = self._link_re_2.sub(r'\1<a href="http://\2">\2</a>', result)
 
             return mark_safe(result)
 
