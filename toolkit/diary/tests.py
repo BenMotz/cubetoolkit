@@ -1,10 +1,3 @@
-"""
-This file demonstrates writing tests using the unittest module. These will pass
-when you run "manage.py test".
-
-Replace this with more appropriate tests for your application.
-"""
-
 import json
 
 from django.test import TestCase
@@ -145,7 +138,7 @@ class EditDiaryViews(TestCase):
     fixtures = ['small_data_set.json']
 
     def setUp(self):
-        self.client.login(username="admin", password="***REMOVED***")
+        self.client.login(username="admin", password="T3stPassword!")
 
     def test_view_default(self):
         url = reverse("default-edit")

@@ -1879,7 +1879,7 @@
             "is_superuser": false,
             "last_login": "2013-04-10T22:27:29Z",
             "last_name": "",
-            "password": "bcrypt$$2a$12$skuSJCehlgWhs7.RAidKMeC8KiA93oH68IVKp1CSrv1wm7vqKqIoG",
+            "password": "bcrypt$$2a$12$bDsur/X9D7B5KpAxJRqtMudPnR/2/.PIzxcw9NYu6nkL6HQsQABym",
             "user_permissions": [
                 79
             ],
@@ -1899,7 +1899,7 @@
             "is_superuser": false,
             "last_login": "2013-04-10T22:27:29Z",
             "last_name": "",
-            "password": "bcrypt$$2a$12$skuSJCehlgWhs7.RAidKMeC8KiA93oH68IVKp1CSrv1wm7vqKqIoG",
+            "password": "bcrypt$$2a$12$bDsur/X9D7B5KpAxJRqtMudPnR/2/.PIzxcw9NYu6nkL6HQsQABym",
             "user_permissions": [
                 79
             ],
