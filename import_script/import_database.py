@@ -576,6 +576,9 @@ def import_members(connection):
 
         m.notes = r[12]  # status
 
+        if 'not member' in m.notes:
+            m.is_member = False
+
         try:
             m.full_clean()
             m.save()

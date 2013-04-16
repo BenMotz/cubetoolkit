@@ -4,7 +4,6 @@
 [NEWFEATURE] -- Less busy role selection in new vol screen. Use precendence?
 [TODO] -- Basic member automated tests
 
-[BUG] -- On import of members, detect "not member" in status field and set a boolean to signify the same.
 [BUG] -- Add anchors to diary view so jumping by legacy id will work
 [BUG] -- If diary view-by-tag has nothing then have an informative message! (Likewise by date?)
 [BUG] -- Allow shorter event names
@@ -13,6 +12,7 @@
 [BUG] -- "Ttt" in imported title data
 [BUG] -- auth bug highlighted by tests
 
+[FIXED] -- On import of members, detect "not member" in status field and set a boolean to signify the same.
 [FIXED] HTML editor looks shonky
 [CANTREPRODUCE] Popup date/time picker not working on "Edit booking" form after failed submission
 [FIXED] -- Need to set allowed hosts

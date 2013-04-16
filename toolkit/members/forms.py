@@ -16,7 +16,7 @@ class MemberForm(forms.ModelForm):
 class MemberFormWithoutNotes(forms.ModelForm):
     class Meta(object):
         model = toolkit.members.models.Member
-        exclude = ('notes',)
+        exclude = ('is_member', 'notes',)
 
 
 class VolunteerForm(forms.ModelForm):

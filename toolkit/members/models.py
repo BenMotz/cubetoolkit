@@ -31,6 +31,8 @@ class Member(models.Model):
     altphone = models.CharField(max_length=64, blank=True, null=True)
     notes = models.TextField(blank=True, null=True)
 
+    is_member = models.BooleanField(default=True)
+
     mailout = models.BooleanField(default=True)
     mailout_failed = models.BooleanField(default=False)
     # Used for "click to unsubscribe"/"edit details" etc:
