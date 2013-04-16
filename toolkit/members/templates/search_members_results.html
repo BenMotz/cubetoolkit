@@ -38,7 +38,7 @@
 <td>{{ member.phone|default_if_none:"-" }}</td>
 <td>{{ member.altphone|default_if_none:"-" }}</td>
 <td>{{ member.updated_at|date:"d/m/Y" }}</td>
-<td>{{ member.mailout|yesno:"member removed self,,-"}}</td>
+<td>{{ member.mailout|yesno:",member removed self,-"}}</td>
 <td>{# there is no status! #}</td>
 {% endfor %}
 </table>
