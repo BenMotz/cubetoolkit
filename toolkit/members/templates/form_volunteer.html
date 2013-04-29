@@ -55,8 +55,9 @@ input[type="text"], textarea {
 </table>
 </div>
 <div id="roles">
-<label for="id_vol-roles">{{ vol_form.roles.label }}:</label> </th><td> {{ vol_form.roles.errors }}{{ vol_form.roles }}</td></tr>
-
+    <label for="id_vol-roles">{{ vol_form.roles.label }}:</label>
+    {{ vol_form.roles.errors }}
+    {{ vol_form.roles }}
 </div>
 
 <p><input type="submit" value="Save changes"></input> <a href="{% url "view-volunteer-list" %}">Cancel</a></p>
