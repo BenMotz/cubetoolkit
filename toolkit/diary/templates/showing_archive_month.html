@@ -21,7 +21,7 @@ Cube Programme Archival listings for {{ month|date:"F Y" }}
     <li> {{showing.start|date:"D d N y" }}
       <ul>
     {% endifchanged %}
-    <li>{{ showing.start|date:"H:i" }} <a href="{% url "single-showing-view" showing_id=showing.pk %}">{{ showing.event.name }}</a></li>
+    <li>{{ showing.start|date:"H:i" }} <a href="{% url "single-event-view" event_id=showing.event_id %}">{{ showing.event.name }}</a></li>
     {% endfor %}
 </ul></ul>
     <p>
