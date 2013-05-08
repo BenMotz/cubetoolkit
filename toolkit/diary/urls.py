@@ -2,6 +2,7 @@ from django.conf.urls import patterns, url
 from django.views.generic import DetailView
 from toolkit.diary.models import Event
 import toolkit.diary.feeds
+from django.contrib.auth.decorators import login_required
 
 
 urlpatterns = patterns(
@@ -41,9 +42,9 @@ urlpatterns += patterns(
 
     # Edit an event: view event before editing
     url('^edit/event/id/(?P<pk>\d+)/view/$',
-        DetailView.as_view(
+        login_required(DetailView.as_view(
             model=Event,
-            template_name='view_event_privatedetails.html'), name="edit-event-details-view"
+            template_name='view_event_privatedetails.html')), name="edit-event-details-view"
         ),
     # Edit an event
     url('^edit/event/id/(?P<event_id>\d+)/$', 'edit_event', name="edit-event-details"),
