@@ -11,6 +11,7 @@ from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.conf import settings
 import django.utils.timezone as timezone
+import django.views.generic as generic
 
 from toolkit.diary.models import Showing, Event
 from toolkit.diary.daterange import get_date_range
@@ -157,3 +158,40 @@ def view_event(request, event_id=None, legacy_id=None):
         'media_url': settings.MEDIA_URL
     }
     return render(request, 'view_event.html', context)
+
+class ArchiveIndex(generic.ArchiveIndexView):
+    model = Showing
+    date_field = 'start'
+    template_name = 'showing_archive.html'
+
+class ArchiveYear(generic.YearArchiveView):
+    model = Showing
+    date_field = 'start'
+    template_name = 'showing_archive_year.html'
+
+    def get_queryset(self, *args, **kwargs):
+        qs = super(ArchiveYear, self).get_queryset(*args, **kwargs)
+        return qs.filter(confirmed=True, hide_in_programme=False, event__private=False)
+
+    def get_dated_queryset(self, *args, **kwargs):
+        kwargs['ordering'] = 'start'
+
+        return super(ArchiveYear, self).get_dated_queryset(*args, **kwargs)
+
+class ArchiveMonth(generic.MonthArchiveView):
+    model = Showing
+    date_field = 'start'
+    template_name = 'showing_archive_month.html'
+    month_format='%m'
+
+    def get_queryset(self, *args, **kwargs):
+
+        qs = super(ArchiveMonth, self).get_queryset(*args, **kwargs)
+
+        # Add select_related to keep SQL queries under control:
+        return qs.filter(confirmed=True, hide_in_programme=False, event__private=False).select_related()
+
+    def get_dated_queryset(self, *args, **kwargs):
+        kwargs['ordering'] = 'start'
+
+        return super(ArchiveMonth, self).get_dated_queryset(*args, **kwargs)

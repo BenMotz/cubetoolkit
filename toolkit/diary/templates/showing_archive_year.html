@@ -1,0 +1,24 @@
+{% extends "showing_archive_base.html" %}
+{% block title %}
+Cube Programme Archival listings for {{ year|date:"Y" }}
+{% endblock %}
+
+{% block archive_body %}
+<h1>Cube programme archive: {{ year|date:"Y" }}</h1>
+<ul>
+    <p>
+    {% if previous_year %}
+    <a href="{% url "archive-view-year" year=previous_year.year %}">← {{ previous_year|date:"Y" }}</a>
+    {% endif %}
+
+    <a href="{% url "archive-view-index" %}">↑ Index</a>
+    {% if next_year %}
+    <a href="{% url "archive-view-year" year=next_year.year %}">{{ next_year|date:"Y" }} →</a>
+    {% endif %}
+    </p>
+    {% for date in date_list %}
+    <li><a href="{% url "archive-view-month" year=date.year month=date.month %}">{{ date|date:"F Y" }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock archive_body%}
+

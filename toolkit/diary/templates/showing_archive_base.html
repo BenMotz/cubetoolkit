@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ STATIC_URL }}diary/css/programme.css" type="text/css" title="Preferred" media="screen,projection">
+{% endblock %}
+
+{% block body %}
+<div class="programme">
+
+{% block archive_body %}{% endblock %}
+
+</div>
+<div class="footer">
+<p><a href="http://www.cubecinema.com/">Home</a> | <a href="{% url "default-view" %}">What's on</a></p>
+</div>
+{% endblock body%}

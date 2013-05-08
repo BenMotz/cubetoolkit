@@ -1,8 +1,10 @@
 from django.conf.urls import patterns, url
 from django.views.generic import DetailView
 from toolkit.diary.models import Event
-import toolkit.diary.feeds
 from django.contrib.auth.decorators import login_required
+
+import toolkit.diary.feeds
+from toolkit.diary.public_views import ArchiveIndex, ArchiveYear, ArchiveMonth
 
 
 urlpatterns = patterns(
@@ -23,6 +25,11 @@ urlpatterns = patterns(
     url('^event/id/(?P<event_id>\d+)/$', 'view_event', name="single-event-view"),
     # As above, for legacy event ID:
     url('^event/oldid/(?P<legacy_id>\d+)/$', 'view_event', name="single-event-view-legacyid"),
+
+    # Archive:
+    url('^archive/$', ArchiveIndex.as_view(), name="archive-view-index"),
+    url('^archive/(?P<year>\d{4})/$', ArchiveYear.as_view(), name="archive-view-year"),
+    url('^archive/(?P<year>\d{4})/(?P<month>\d{1,2})/$', ArchiveMonth.as_view(), name="archive-view-month"),
 
     # Get JSON describing events on a given (single) date:
     url('^view/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/json$', 'view_diary_json', name="day-view-json"),

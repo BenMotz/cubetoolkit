@@ -1,0 +1,13 @@
+{% extends "showing_archive_base.html" %}
+{% block title %}
+Cube Programme Archive
+{% endblock %}
+
+{% block archive_body %}
+<h1>Cube programme archive</h1>
+<ul>
+    {% for date in date_list.reverse %}
+    <li><a href="{% url "archive-view-year" year=date.year %}">{{ date|date:"Y" }}</a></li>
+    {% endfor %}
+</ul>
+{% endblock archive_body%}
