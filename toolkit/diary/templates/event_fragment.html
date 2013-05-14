@@ -1,5 +1,6 @@
 {% load hash_filter %}
 <span id="event_{{ event.id }}">
+{# backwards-compatible anchor: #}{% if event.legacy_id %}<a name="{{ event.legacy_id }}"></a>{% endif %}
 <h2>{{ event.name|capfirst}}</h2>
 
 {% with event.media.all.0 as media_item %}
