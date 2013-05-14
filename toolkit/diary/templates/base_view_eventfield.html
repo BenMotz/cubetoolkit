@@ -14,12 +14,10 @@ $(document).ready(function() {
         $('#id_from_date').datepicker({
             dateFormat : 'dd-mm-yy',
             onSelect : dateRangeSelected,
-            minDate : 0,
         });
         $('#id_to_date').datepicker({
             dateFormat : 'dd-mm-yy',
             onSelect : dateRangeSelected,
-            minDate : 0,
         });
         $('#daterange')[0].onsubmit = function() {
             dateRangeSelected();
