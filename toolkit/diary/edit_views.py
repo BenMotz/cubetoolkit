@@ -491,20 +491,23 @@ def view_event_field(request, field, year, month, day):
                                .prefetch_related('rotaentry_set__role')  # mildly hacky optimisation for rota view
                                .select_related())
 
-    if 'search' in request.GET:
-        search = request.GET['search']
+    search = request.GET.get('search')
+    if search:
         logging.info(u"Search term: {0}".format(search))
         # Note slightly sneaky use of **; this effectively results in a method
-        # call like: showings.filter(event__copy__icontaings=search)
+        # call like: showings.filter(event__copy__icontains=search)
         showings = showings.filter(
             Q(**{'event__' + field + '__icontains': search})
             | Q(event__name__icontains=search)
         )
+
     context = {
         'start_date': start_date,
         'end_date': end_date,
+        'days_ahead': days_ahead,
         'showings': showings,
         'event_field': field,
+        'search': search,
     }
 
     return render(request, u'view_{0}.html'.format(field), context)

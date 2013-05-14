@@ -40,7 +40,11 @@ $(document).ready(function() {
 {{ block.super }}
 <img src="{{ STATIC_URL }}diary/diary_edit_list_header.gif" alt="Cube Microplex" width="150px">
 <h3>CUBE programme of events - terms report</h3>
-<form id="form_search"><input type="text" name="search"> <input type="submit" value="Search"></form>
+<form id="form_search">
+    <input type="text" name="search" {% if search %}value="{{ search }}"{% endif %}>
+    <input type="submit" value="Search">
+    <input type="hidden" value="{{ days_ahead }}" name="daysahead">
+</form>
 <div class="terms">
 {% for showing in showings %}
 {% spaceless %}

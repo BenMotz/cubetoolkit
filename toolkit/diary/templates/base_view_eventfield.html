@@ -36,7 +36,10 @@ function dateRangeSelected(dateText, inst) {
     if(days_ahead <= 0) {
         days_ahead = 0;
     }
-    window.location.href = "{% url "view_event_field" event_field %}/" + (from_date.getYear() + 1900) + "/" + (from_date.getMonth() + 1) + "/" + from_date.getDate() +  "?daysahead=" + days_ahead;
+    window.location.href = "{% url "view_event_field" event_field %}/" +
+        (from_date.getYear() + 1900) + "/" + (from_date.getMonth() + 1) + "/" +
+        from_date.getDate() + "?daysahead=" + days_ahead {% if search %} +
+        "&search={{ search|urlencode }}"{% endif %};
 }
 </script>
 {% endblock %}
