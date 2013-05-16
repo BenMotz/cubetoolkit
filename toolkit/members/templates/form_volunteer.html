@@ -6,14 +6,19 @@
 th {
     vertical-align: top;
 }
+#roles ul {
+    -moz-columns: 3;
+    -webkit-columns: 3;
+    columns: 3;
+}
 #roles li {
     list-style-type: none;
-    display: inline-block;
-    background: lightblue;
+    /* display: inline-block; */
     margin: 5px;
 }
-#roles label {
+.standard_role {
     font-weight: bold;
+    /* background: lightgreen; */
 }
 #vol_form, #mem_form {
     display: inline-block;
@@ -55,9 +60,13 @@ input[type="text"], textarea {
 </table>
 </div>
 <div id="roles">
-    <label for="id_vol-roles">{{ vol_form.roles.label }}:</label>
     {{ vol_form.roles.errors }}
-    {{ vol_form.roles }}
+    <ul>
+    {% for c in vol_form.roles.field.queryset %}
+    {% ifchanged %}</ul><h3>{{ c.standard|yesno:"Event roles,Other roles" }}</h3><ul>{% endifchanged %}
+    <li{% if c.standard %} class="standard_role"{% endif %}><label for="{{vol_form.roles.auto_id}}_{{ forloop.counter0 }}"><input id="{{vol_form.roles.auto_id}}_{{ forloop.counter0 }}" type="checkbox"  value={{c.id}} name="{{ vol_form.prefix }}-roles" {% if c.id in vol_form.roles.value %}checked {% endif %}/> {{ c }}</label></li> 
+    {% endfor %}
+    </ul>
 </div>
 
 <p><input type="submit" value="Save changes"></input> <a href="{% url "view-volunteer-list" %}">Cancel</a></p>

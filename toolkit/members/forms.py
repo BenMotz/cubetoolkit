@@ -20,6 +20,12 @@ class MemberFormWithoutNotes(forms.ModelForm):
 
 
 class VolunteerForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super(VolunteerForm, self).__init__(*args, **kwargs)
+
+        # Force ordering of roles list to be by "standard" role type, then name
+        self.fields['roles'].queryset = self.fields['roles'].queryset.order_by("-standard", "name")
+
     class Meta(object):
         model = toolkit.members.models.Volunteer
         fields = ('portrait', 'notes', 'roles')
