@@ -212,3 +212,20 @@ class NewEventForm(forms.Form):
 class MailoutForm(forms.Form):
     subject = forms.CharField(max_length=128, required=True)
     body = forms.CharField(required=True, widget=forms.Textarea(attrs={'wrap': 'soft', 'cols': 80}))
+
+class SearchForm(forms.Form):
+    search_term = forms.CharField(label="Search for", required=False)
+    start_date = forms.DateTimeField(label="Search from", required=False)
+    end_date = forms.DateTimeField(label="Search to", required=False)
+    search_in_descriptions = forms.BooleanField(label="Also search event descriptions", required=False)
+
+    def clean(self):
+        cleaned_data = super(SearchForm, self).clean()
+
+        # Check that either a search term or a searchh start or end date is supplied:
+        if (len(cleaned_data.get('search_term', '').strip()) == 0
+                and not
+                (cleaned_data.get('start_date') or cleaned_data.get('end_date'))):
+            raise forms.ValidationError("Must give either a search term or a date range")
+
+        return cleaned_data

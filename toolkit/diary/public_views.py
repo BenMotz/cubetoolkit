@@ -6,6 +6,7 @@ import markdown
 
 from toolkit.util.ordereddict import OrderedDict
 
+from django.db.models import Q
 from django.http import HttpResponse, Http404
 from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
@@ -15,6 +16,7 @@ import django.views.generic as generic
 
 from toolkit.diary.models import Showing, Event
 from toolkit.diary.daterange import get_date_range
+from toolkit.diary.forms import SearchForm
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -195,3 +197,67 @@ class ArchiveMonth(generic.MonthArchiveView):
         kwargs['ordering'] = 'start'
 
         return super(ArchiveMonth, self).get_dated_queryset(*args, **kwargs)
+
+class ArchiveSearch(generic.list.ListView, generic.edit.FormMixin):
+    model = Showing
+    template_name = 'showing_archive_search.html'
+    form_class = SearchForm
+
+    def get_form_kwargs(self):
+        # Load form data from GET params. If no GET was supplied then pass
+        # None into the form, otherwise it will generate an error to say that
+        # some search parameters are required
+        return {'data': self.request.GET if len(self.request.GET) else None}
+
+    def get_context_data(self, **kwargs):
+        # Put the form in the context data sent to the template
+        context = super(ArchiveSearch, self).get_context_data(**kwargs)
+        context.update({
+            'form': self.form,
+            'search_submitted': len(self.request.GET),
+        })
+        return context
+
+    def get_queryset(self):
+        # Build the queryset using the form data
+
+        # If the form was not valid, return a blank queryset (i.e. don't do a
+        # search)
+        # (is_valid() includes a check that the form wasn't blank)
+        if not self.form.is_valid():
+            return ()
+
+        # Data from the search form:
+        options = self.form.cleaned_data
+
+        # Start with a queryset containing all public showings:
+        queryset = Showing.objects.all().filter(
+            confirmed=True,
+            hide_in_programme=False,
+            event__private=False).select_related()
+
+        if options['search_term']:
+            if options['search_in_descriptions']:
+                # If a search term was provided and "search descriptions"
+                # was checked, filter on the event name and copy:
+                queryset = queryset.filter(
+                    Q(event__name__icontains=options['search_term'])
+                    |
+                    Q(event__copy__icontains=options['search_term'])
+                )
+            else:
+                # Otherwise just the event name
+                queryset = queryset.filter(event__name__icontains=options['search_term'])
+        # Add extra filters if start/end date were specified:
+        if options['start_date']:
+            queryset = queryset.filter(start__gte=options['start_date'])
+        if options['end_date']:
+            queryset = queryset.filter(start__lte=options['end_date'])
+
+        return queryset
+
+    def get(self, request):
+        self.form = self.get_form(self.form_class)
+
+        # Rely on functionality from the generic view...
+        return super(ArchiveSearch, self).get(request)

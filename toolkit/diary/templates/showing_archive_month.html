@@ -5,6 +5,13 @@ Cube Programme Archival listings for {{ month|date:"F Y" }}
 
 {% block archive_body %}
 <h1>Cube programme archive: {{ month|date:"F Y" }}</h1>
+    <form action="{% url "archive-search" %}">
+        <input id="archive_search_input" type="text" name="search_term" placeholder="Search within {{ month|date:"F Y" }}"/>
+        <input type="submit" value="Search" />
+        <input type="hidden" name="search_in_descriptions" value="on">
+        <input type="hidden" name="start_date" value="{{ month|date:"d/m/Y" }}">
+        <input type="hidden" name="end_date" value="{{ next_month|date:"d/m/Y" }}">
+    </form>
     <p>
     {% if previous_month %}
     <a href="{% url "archive-view-month" year=previous_month.year month=previous_month.month %}">← Previous month ({{ previous_month|date:"F" }})</a>
@@ -21,7 +28,9 @@ Cube Programme Archival listings for {{ month|date:"F Y" }}
     <li> {{showing.start|date:"D d N y" }}
       <ul>
     {% endifchanged %}
-    <li>{{ showing.start|date:"H:i" }} <a href="{% url "single-event-view" event_id=showing.event_id %}">{{ showing.event.name }}</a></li>
+    <li>{{ showing.start|date:"H:i" }}
+    <a href="{% url "single-event-view" event_id=showing.event_id %}" {% if showing.cancelled or showing.event.cancelled %}class="cancelled"{% endif %}>{{ showing.event.name }}</a>{% if showing.cancelled or showing.event.cancelled %}{%if not "cancelled" in showing.event.name.lower %} (Cancelled){% endif %}{%endif%}
+    </li>
     {% endfor %}
 </ul></ul>
     <p>

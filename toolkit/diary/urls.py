@@ -4,7 +4,8 @@ from toolkit.diary.models import Event
 from django.contrib.auth.decorators import login_required
 
 import toolkit.diary.feeds
-from toolkit.diary.public_views import ArchiveIndex, ArchiveYear, ArchiveMonth
+from toolkit.diary.public_views import (ArchiveIndex, ArchiveYear,
+                                        ArchiveMonth, ArchiveSearch)
 
 
 urlpatterns = patterns(
@@ -30,6 +31,8 @@ urlpatterns = patterns(
     url('^archive/$', ArchiveIndex.as_view(), name="archive-view-index"),
     url('^archive/(?P<year>\d{4})/$', ArchiveYear.as_view(), name="archive-view-year"),
     url('^archive/(?P<year>\d{4})/(?P<month>\d{1,2})/$', ArchiveMonth.as_view(), name="archive-view-month"),
+    # Search
+    url('^archive/search/$', ArchiveSearch.as_view(), name="archive-search"),
 
     # Get JSON describing events on a given (single) date:
     url('^view/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/json$', 'view_diary_json', name="day-view-json"),

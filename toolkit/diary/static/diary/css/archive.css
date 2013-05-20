@@ -1,0 +1,21 @@
+.resultdate a { text-decoration: none; color:#000080;}
+.resultdate a:visited {color:#000080;}
+
+.search_form li {
+	list-style-type: none;
+}
+.search_form .errorlist {
+	color: red;
+}
+.search_form input[type=text] {
+	width: 300px;
+}
+.search_form ul {
+	width: 400px;
+}
+.search_form li {
+	text-align: right;
+}
+.search_form li li {
+	text-align: center;
+}

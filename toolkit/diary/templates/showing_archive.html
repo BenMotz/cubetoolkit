@@ -5,6 +5,7 @@ Cube Programme Archive
 
 {% block archive_body %}
 <h1>Cube programme archive</h1>
+    <form action="{% url "archive-search" %}"><input id="archive_search_input" type="text" name="search_term" placeholder="Search"/> <input type="submit" value="Search" /></form>
 <ul>
     {% for date in date_list.reverse %}
     <li><a href="{% url "archive-view-year" year=date.year %}">{{ date|date:"Y" }}</a></li>
