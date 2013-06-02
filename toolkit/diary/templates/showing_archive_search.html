@@ -3,6 +3,16 @@
 Cube Programme Archive: Search{% if search_term %} for "{{ search_term }}"{% endif %}
 {% endblock %}
 
+{% block script %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+        $('#id_start_date').datepicker({ dateFormat : 'dd/mm/yy' });
+        $('#id_end_date').datepicker({ dateFormat : 'dd/mm/yy' });
+});
+</script>
+{% endblock %}
 {% block archive_body %}
 <h1>Cube programme archive: Search {% if search_term %}results for "{{ search_term }}"{% endif %}</h1>
 
