@@ -83,6 +83,9 @@ def view_diary(request, year=None, month=None, day=None, event_type=None):
     # as a location for images:
     context['media_url'] = settings.MEDIA_URL
 
+    if request.GET.get('template'):
+        return render(request, 'view_showing_index_oto.html', context)
+
     return render(request, 'view_showing_index.html', context)
 
 
