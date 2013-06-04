@@ -52,7 +52,7 @@ $(document).ready(function() {
 {% ifchanged %}<h2 class="pad">{{ showing.start|date:"F"|upper }}</h2>{% endifchanged %}
 {% ifchanged %}<p class="day">{{ showing.start|date:"D"}} {{ showing.start|date:"d" }}{% else %} <p>      {% endifchanged %} {{showing.start|date:"H:i"}} ......... {{ showing.event.name|capfirst }}</p>
 <p>{{ showing.event.name|upper }}</p>
-<p class="flags">{% if showing.cancelled or showing.event.cancelled %}CANCELLED / {% endif %}{% if showing.event.outside_hire %}External event{% else %}Cube event{% endif %} / {% if showing.event.private or showing.hide_in_programme %}Private event{% else %}Public event{% endif %} / {% if showing.confirmed %}Confirmed{% else %}Unconfirmed{% endif %}{% if showing.discounted %} / Discounted{% endif %}</p>
+<p class="flags">{% if showing.cancelled %}CANCELLED / {% endif %}{% if showing.event.outside_hire %}External event{% else %}Cube event{% endif %} / {% if showing.event.private or showing.hide_in_programme %}Private event{% else %}Public event{% endif %} / {% if showing.confirmed %}Confirmed{% else %}Unconfirmed{% endif %}{% if showing.discounted %} / Discounted{% endif %}</p>
 <p class="terms">{{ showing.event.terms.strip }}</p>
 {% endspaceless %}
 

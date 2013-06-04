@@ -624,7 +624,6 @@ def _render_mailout_body(days_ahead=7):
     end_date = start_date + datetime.timedelta(days=days_ahead)
     showings = (Showing.objects.filter(hide_in_programme=False)
                                .filter(cancelled=False)
-                               .filter(event__cancelled=False)
                                .filter(confirmed=True)
                                .filter(start__range=[start_date, end_date])
                                .order_by('start')

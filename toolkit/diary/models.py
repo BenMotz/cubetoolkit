@@ -221,7 +221,6 @@ class Event(models.Model):
 
     duration = models.TimeField(null=True)
 
-    cancelled = models.BooleanField(default=False)
     outside_hire = models.BooleanField(default=False)
     private = models.BooleanField(default=False)
 

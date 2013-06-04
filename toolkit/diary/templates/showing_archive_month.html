@@ -29,7 +29,7 @@ Cube Programme Archival listings for {{ month|date:"F Y" }}
       <ul>
     {% endifchanged %}
     <li>{{ showing.start|date:"H:i" }}
-    <a href="{% url "single-event-view" event_id=showing.event_id %}" {% if showing.cancelled or showing.event.cancelled %}class="cancelled"{% endif %}>{{ showing.event.name }}</a>{% if showing.cancelled or showing.event.cancelled %}{%if not "cancelled" in showing.event.name.lower %} (Cancelled){% endif %}{%endif%}
+    <a href="{% url "single-event-view" event_id=showing.event_id %}" {% if showing.cancelled %}class="cancelled"{% endif %}>{{ showing.event.name }}</a>{% if showing.cancelled %}{%if not "cancelled" in showing.event.name.lower %} (Cancelled){% endif %}{%endif%}
     </li>
     {% endfor %}
 </ul></ul>

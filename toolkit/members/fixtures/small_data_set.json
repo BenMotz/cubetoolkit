@@ -44,7 +44,6 @@
     },
     {
         "fields": {
-            "cancelled": false,
             "copy": "Event one copy",
             "copy_summary": "Event one copy summary",
             "created_at": "2013-04-10T22:29:42Z",
@@ -66,7 +65,6 @@
     },
     {
         "fields": {
-            "cancelled": false,
             "copy": "Event two copy",
             "copy_summary": "Event two copy summary",
             "created_at": "2013-04-10T22:30:02Z",
@@ -88,7 +86,6 @@
     },
     {
         "fields": {
-            "cancelled": false,
             "copy": "Event three Copy",
             "copy_summary": "Copy three summary",
             "created_at": "2013-04-10T22:30:37Z",

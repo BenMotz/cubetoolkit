@@ -93,6 +93,7 @@ class DiaryIdeaForm(forms.ModelForm):
 
 
 class EventForm(forms.ModelForm):
+
     class Meta(object):
         model = toolkit.diary.models.Event
         # Ensure soft wrapping is set for textareas:
@@ -104,7 +105,7 @@ class EventForm(forms.ModelForm):
             'notes': forms.Textarea(attrs={'wrap': 'soft'}),
         }
         order = ('tags', )
-        fields = ('name', 'tags', 'duration', 'cancelled', 'outside_hire',
+        fields = ('name', 'tags', 'duration', 'outside_hire',
                   'private', 'copy', 'copy_summary', 'terms', 'notes')
 
 

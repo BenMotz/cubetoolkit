@@ -137,7 +137,6 @@ def import_event_showings(connection, event, legacy_event_id):
     # Some slightly funky logic to do the mapping:
     #
     aggregate_hire = False
-    cancelled_list = []
     private_list = []
 
     all_showings = []
@@ -174,8 +173,7 @@ def import_event_showings(connection, event, legacy_event_id):
 
         s.confirmed = bool(r[3])
 
-        if r[4]:
-            cancelled_list.append(s)
+        s.cancelled = bool(r[4])
 
         s.discounted = bool(r[5])
         aggregate_hire |= bool(r[6])
@@ -186,13 +184,6 @@ def import_event_showings(connection, event, legacy_event_id):
         # See comment above:
         s.start = timezone.localize(r[0])  # Store datetime with timezone information
         s.save(force=True)  # Force, to allow saving of showing with start in past
-
-    if len(cancelled_list) == showing_count:
-        event.cancelled = True
-    else:
-        for cancelled_showing in cancelled_list:
-            cancelled_showing.cancelled = True
-            cancelled_showing.save(force=True)  # Force, to allow saving of showing with start in past
 
     if len(private_list) == showing_count:
         event.private = True

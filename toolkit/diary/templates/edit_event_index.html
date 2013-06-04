@@ -140,12 +140,12 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
     </td>
     <td class="table_gap">&nbsp;</td>
     <td>{{ showing.booked_by }} <a href="{% url "edit-event-details-view" pk=showing.event.pk %}">
-    <span class="{% if showing.cancelled or showing.event.cancelled %}cancelled{% endif %}{% if showing.discounted %} discounted{% endif %}{% if showing.event.private %} private{% endif %}{% if showing.event.outside_hire %} external{% endif %}">
+    <span class="{% if showing.cancelled %}cancelled{% endif %}{% if showing.discounted %} discounted{% endif %}{% if showing.event.private %} private{% endif %}{% if showing.event.outside_hire %} external{% endif %}">
         {% if showing.confirmed %}
         {{ showing.event.name|upper }}
         {% else %}
         {{ showing.event.name }}
-        {% endif %}{% if showing.discounted %}(TTT){% endif %}{% if showing.cancelled or showing.event.cancelled %}(CANCELLED){% endif %}
+        {% endif %}{% if showing.discounted %}(TTT){% endif %}{% if showing.cancelled %}(CANCELLED){% endif %}
     </span>
     </a></td></tr>
     <tr><td>&nbsp;</td>
