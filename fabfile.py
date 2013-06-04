@@ -64,6 +64,14 @@ def deploy_media():
 
     local('rsync -av --delete media/ {0}@{1}:{2}/media'.format(env.user, env.hosts[0], env.site_root))
 
+def run_migrations():
+    """Run south to make sure database schema is in sync with the application"""
+    require('site_root', provided_by = ('testing', 'production'))
+
+    with cd(env.site_root):
+        run("venv/bin/python manage.py migrate --noinput --settings=toolkit.import_settings")
+
+
 def install_requirements(upgrade=False):
     """ Install requirements in remote virtualenv """
     # Update the packages installed in the environment:
@@ -110,7 +118,10 @@ def deploy():
             utils.abort("User aborted")
 
     deploy_code()
-    install_requirements()
+    # Following won't work on Sparror, as some reqs need working gcc toolchain
+    # so are installed system-wide:
+    ## install_requirements()
+
     deploy_static()
-#    restart_server()
+    run_migrations()
 
