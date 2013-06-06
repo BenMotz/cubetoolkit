@@ -13,7 +13,7 @@ require 'mysql'
 #@DATABASE_NAME = "toolkit"
 @DATABASE_NAME = "toolkitimport"
 @DB_USERNAME = "toolkitimport"
-@DB_DANGER = "spanner"
+@DB_DANGER = "b9dhgJakpWT77LR"
 
 # Open connection to toolkit_import_db. Username, server and password
 # hardcoded. That should probably change.

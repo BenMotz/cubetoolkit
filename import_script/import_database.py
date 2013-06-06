@@ -35,7 +35,7 @@ def connect():
     # Open database connection
     conn = MySQLdb.connect(host="localhost",
                            user=settings.IMPORT_SCRIPT_USER,
-                           passwd="spanner",
+                           passwd="b9dhgJakpWT77LR",
                            db=settings.IMPORT_SCRIPT_DATABASE,
                            # use_unicode = True,
                            )

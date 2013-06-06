@@ -62,9 +62,9 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',  # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'
-        'NAME': 'cube',                      # Or path to database file if using sqlite3.
-        'USER': 'cube',                      # Not used with sqlite3.
-        'PASSWORD': 'hialpabg',                  # Not used with sqlite3.
+        'NAME': 'toolkit',                      # Or path to database file if using sqlite3.
+        'USER': 'toolkit',                      # Not used with sqlite3.
+        'PASSWORD': 'Kr3QejhDb7amDwf',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
