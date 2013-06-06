@@ -4,13 +4,10 @@ django-debug-toolbar==0.9.4
 django-celery==3.0.11
 # Functionality introduced at these versions is required:
 python-magic>=0.4.0
-py-bcrypt>=0.1
 # These should (!) have stable APIs, so let upgrades happen
 Markdown
-MySQL-python
 python-dateutil
 mock
 pytz
 # Not sure about:
-PIL
 south
