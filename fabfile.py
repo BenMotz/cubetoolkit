@@ -12,13 +12,13 @@ REQUIREMENTS_C_COMPONENT = "requirements_c_components.txt"
 # This is deleted whenever code is deployed
 CODE_DIR = "toolkit"
 
-def testing():
-    """Configure to deploy locally"""
-    env.target = "testing"
+def staging():
+    """Configure to deploy to staging server"""
+    env.target = "staging"
     env.site_root = "/var/www_toolkit/site"
     env.user = "ben"
     env.hosts = ["localhost"]
-    env.settings = "testing_settings.py"
+    env.settings = "staging_settings.py"
 
 def production():
     """Configure to deploy live"""
@@ -31,7 +31,7 @@ def production():
 def deploy_code():
     """Deploy code from git HEAD onto target"""
     # Check that target is defined:
-    require('site_root', provided_by = ('testing', 'production'))
+    require('site_root', provided_by = ('staging', 'production'))
 
     archive = "site_transfer.tgz"
     local("git archive --format=tgz HEAD > {0}".format(archive))
@@ -47,7 +47,7 @@ def deploy_code():
 def deploy_static():
     """Run collectstatic command"""
     # Check that target is defined:
-    require('site_root', provided_by = ('testing', 'production'))
+    require('site_root', provided_by = ('staging', 'production'))
 
     with cd(env.site_root):
         run("pwd")
@@ -58,13 +58,13 @@ def deploy_static():
 def deploy_media():
     """Rsync all media content onto target"""
     # Check that target is defined:
-    require('site_root', provided_by = ('testing', 'production'))
+    require('site_root', provided_by = ('staging', 'production'))
 
     local('rsync -av --delete media/ {0}@{1}:{2}/media'.format(env.user, env.hosts[0], env.site_root))
 
 def run_migrations():
     """Run south to make sure database schema is in sync with the application"""
-    require('site_root', provided_by = ('testing', 'production'))
+    require('site_root', provided_by = ('staging', 'production'))
 
     with cd(env.site_root):
         run("venv/bin/python manage.py migrate --noinput --settings=toolkit.import_settings")
@@ -93,7 +93,7 @@ def bootstrap():
     if not console.confirm("Flatten remote, including media files?", default=False):
         utils.abort("User aborted")
     # Check that target is defined:
-    require('site_root', provided_by = ('testing', 'production'))
+    require('site_root', provided_by = ('staging', 'production'))
     # Scorch the earth
     run("rm -rf %(site_root)s" % env)
     # Recreate the directory
@@ -113,7 +113,7 @@ def bootstrap():
 def deploy():
     """Upload code, install any new requirements"""
     # Check that target is defined:
-    require('site_root', provided_by = ('testing', 'production'))
+    require('site_root', provided_by = ('staging', 'production'))
     if env.target == 'production':
         if not console.confirm("Uploading to live site: sure?", default=False):
             utils.abort("User aborted")
