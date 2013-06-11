@@ -1,12 +1,13 @@
 from django.conf.urls import patterns, include, url
 import django.conf
+import django.views.generic as generic
+from django.contrib.auth.decorators import login_required
 
 import toolkit.members.urls
 import toolkit.auth.urls
+import toolkit.index.urls
 
-# Uncomment the next two lines to enable the admin:
-# from django.contrib import admin
-# admin.autodiscover()
+from toolkit.index.models import IndexLink
 
 urlpatterns = patterns(
     '',
@@ -16,15 +17,18 @@ urlpatterns = patterns(
     url(r'^members/', include(toolkit.members.urls.member_urls)),
     url(r'^volunteers/', include(toolkit.members.urls.volunteer_urls)),
     url(r'^auth/', include(toolkit.auth.urls.urlpatterns)),
+    url(r'^index/', include(toolkit.index.urls.urlpatterns)),
 
-    # Examples:
-    # url(r'^$', 'toolkit.views.home', name='home'),
-    # url(r'^cube/', include('toolkit.foo.urls')),
+    # Main index page: requires logging in, even though some other parts
+    # (eg diary index) don't.
+    url(r'^$', login_required(
+        generic.list.ListView.as_view(
+            model=IndexLink,
+            template_name='toolkit_index.html')
+        ),
+        name="toolkit-index"
+    ),
 
-    # Uncomment the admin/doc line below to enable admin documentation:
-    # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
-
-    # Uncomment the next line to enable the admin:
-    # url(r'^admin/', include(admin.site.urls)),
+    # Static content, only used when running in the development server
     url(r'^static/(.*)$', 'django.views.static.serve', {'document_root': django.conf.settings.STATIC_ROOT}),
 )

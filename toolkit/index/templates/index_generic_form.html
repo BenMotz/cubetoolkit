@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block title %}
+Cube Toolkit: Create/edit item
+{% endblock %}
+
+{% block css %}{% endblock %}
+
+{% block body %}
+<h1>Create/edit item</h1>
+{% if message %}<h3>{{ message }}</h3>{% endif %}
+<form method="POST">
+{% csrf_token %}
+{{ form.as_p }}
+<p><input type="submit" value="Save"> <a href="{% url "toolkit-index" %}">Cancel</a></p>
+</form>
+
+{% endblock %}
+

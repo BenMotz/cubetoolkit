@@ -184,6 +184,7 @@ INSTALLED_APPS = (
     'toolkit.diary',
     'toolkit.members',
     'toolkit.auth',
+    'toolkit.index',
     'django.contrib.auth',
     'django.contrib.contenttypes',  # Needed by auth framework
     # Sessions framework: used to store preferences and login details
