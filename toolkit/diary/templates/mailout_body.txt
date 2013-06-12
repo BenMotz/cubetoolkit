@@ -1,6 +1,6 @@
 CUBE PROGRAMME OF EVENTS {# This is all a bit gnarly, because newlines are significant... #}
 
-http://www.cubecinema.com{% url default-view %}
+http://www.cubecinema.com{% url "default-view" %}
 {% for showing in showings %}
 {% ifchanged %}{{ showing.start|date:"Y" }}
 {% endifchanged %}{% ifchanged %} {{ showing.start|date:"F"|upper }}
