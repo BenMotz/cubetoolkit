@@ -1,6 +1,8 @@
 from django.conf.urls import patterns, url
+import django.utils.functional as functional
 import django.views.generic.edit as generic_edit
 from django.contrib.auth.decorators import permission_required
+from django.core.urlresolvers import reverse
 
 from toolkit.index.models import IndexLink, IndexCategory
 
@@ -13,7 +15,9 @@ urlpatterns = patterns(
         write_decorator(generic_edit.CreateView.as_view(
             model=IndexLink,
             template_name="index_generic_form.html",
-            success_url="/"
+            # Need to use 'lazy', as 'reverse' won't work until urlpatterns
+            # (this data structure) has been defined.
+            success_url=functional.lazy(reverse, str)("toolkit-index"),
         )),
         name='create-index-link'
     ),
@@ -21,7 +25,7 @@ urlpatterns = patterns(
         write_decorator(generic_edit.UpdateView.as_view(
             model=IndexLink,
             template_name="index_generic_form.html",
-            success_url="/"
+            success_url=functional.lazy(reverse, str)("toolkit-index"),
         )),
         name='update-index-link'
     ),
@@ -29,7 +33,7 @@ urlpatterns = patterns(
         write_decorator(generic_edit.DeleteView.as_view(
             model=IndexLink,
             template_name="index_delete_form.html",
-            success_url="/"
+            success_url=functional.lazy(reverse, str)("toolkit-index"),
         )),
         name='delete-index-link'
     ),
@@ -38,7 +42,7 @@ urlpatterns = patterns(
         write_decorator(generic_edit.CreateView.as_view(
             model=IndexCategory,
             template_name="index_generic_form.html",
-            success_url="/"
+            success_url=functional.lazy(reverse, str)("toolkit-index"),
         )),
         name='create-index-category'
     ),
@@ -46,7 +50,7 @@ urlpatterns = patterns(
         write_decorator(generic_edit.UpdateView.as_view(
             model=IndexCategory,
             template_name="index_generic_form.html",
-            success_url="/"
+            success_url=functional.lazy(reverse, str)("toolkit-index"),
         )),
         name='update-index-category'
     ),
