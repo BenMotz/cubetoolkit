@@ -8,7 +8,7 @@ from toolkit.diary.public_views import (ArchiveIndex, ArchiveYear,
                                         ArchiveMonth, ArchiveSearch)
 
 
-urlpatterns = patterns(
+programme_urls = patterns(
     'toolkit.diary.public_views',
 
     # View lists of event for various time/dates
@@ -41,7 +41,7 @@ urlpatterns = patterns(
     url('^rss/$', toolkit.diary.feeds.BasicWhatsOnFeed(), name="view-diary-rss", ),
 )
 
-urlpatterns += patterns(
+diary_urls = patterns(
     'toolkit.diary.edit_views',
 
     # View lists of events for editing:

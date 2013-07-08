@@ -6,14 +6,14 @@ from django.contrib.auth.decorators import login_required
 import toolkit.members.urls
 import toolkit.auth.urls
 import toolkit.index.urls
+import toolkit.diary.urls
 
 from toolkit.index.models import IndexLink
 
 urlpatterns = patterns(
     '',
-    url(r'^programme/', include('toolkit.diary.urls')),
-    url(r'^whatson/', include('toolkit.diary.urls')),
-    url(r'^diary/', include('toolkit.diary.urls')),
+    url(r'^programme/', include(toolkit.diary.urls.programme_urls)),
+    url(r'^diary/', include(toolkit.diary.urls.diary_urls)),
     url(r'^members/', include(toolkit.members.urls.member_urls)),
     url(r'^volunteers/', include(toolkit.members.urls.volunteer_urls)),
     url(r'^auth/', include(toolkit.auth.urls.urlpatterns)),
