@@ -20,8 +20,8 @@ import django.utils.timezone as timezone
 from django.contrib.auth.decorators import permission_required, login_required
 
 from toolkit.diary.models import Showing, Event, DiaryIdea, MediaItem, EventTemplate, EventTag, Role
-import toolkit.diary.forms
-import toolkit.diary.edit_prefs
+import toolkit.diary.forms as diary_forms
+import toolkit.diary.edit_prefs as edit_prefs
 import toolkit.members.tasks
 
 # Shared utility method:
@@ -36,7 +36,7 @@ def _return_to_editindex(request):
     # and reload the page that opened the popup. Otherwise just redirect to
     # the index.
     #
-    prefs = toolkit.diary.edit_prefs.get_preferences(request.session)
+    prefs = edit_prefs.get_preferences(request.session)
     if prefs['popups'] is True:
         # Use a really, really dirty way to emulate the original functionality and
         # close the popped up window: return a hard-coded page that contains
@@ -139,7 +139,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
     )
     context['start'] = startdatetime
     context['end'] = enddatetime
-    context['edit_prefs'] = toolkit.diary.edit_prefs.get_preferences(request.session)
+    context['edit_prefs'] = edit_prefs.get_preferences(request.session)
     return render(request, 'edit_event_index.html', context)
 
 
@@ -149,9 +149,9 @@ def set_edit_preferences(request):
     # and return a JSON object containing all current user preferences
 
     # Store updated prefs
-    toolkit.diary.edit_prefs.set_preferences(request.session, request.GET)
+    edit_prefs.set_preferences(request.session, request.GET)
     # Retrieve and return prefs:
-    prefs = toolkit.diary.edit_prefs.get_preferences(request.session)
+    prefs = edit_prefs.get_preferences(request.session)
     return HttpResponse(json.dumps(prefs), mimetype="application/json")
 
 
@@ -179,7 +179,7 @@ def add_showing(request, event_id):
         raise Http404("Requested source showing for clone not found")
 
     # Create form using submitted data:
-    clone_showing_form = toolkit.diary.forms.CloneShowingForm(request.POST)
+    clone_showing_form = diary_forms.CloneShowingForm(request.POST)
     if clone_showing_form.is_valid():
         # Submitted data will have basic time & canceled/private info, but need
         # to set the event id and rota information manually, so don't commit
@@ -204,7 +204,7 @@ def add_showing(request, event_id):
         # For now, aassume this is being called from "edit showing"
         # form, and return that
         showing = get_object_or_404(Showing, pk=copy_from)
-        showing_form = toolkit.diary.forms.ShowingForm(instance=showing)
+        showing_form = diary_forms.ShowingForm(instance=showing)
         context = {
             'showing': showing,
             'form': showing_form,
@@ -224,7 +224,7 @@ def add_event(request):
     if request.method == 'POST':
         # Get event data, plus template and showing time and number of showing
         # days from form. Uses template to set rota roles and tags.
-        form = toolkit.diary.forms.NewEventForm(request.POST)
+        form = diary_forms.NewEventForm(request.POST)
         if form.is_valid():
             new_event = Event(name=form.cleaned_data['event_name'],
                               template=form.cleaned_data['event_template'],
@@ -279,7 +279,7 @@ def add_event(request):
         except (ValueError, TypeError):
             return HttpResponse("Illegal date", status=400)
         # Create form, render template:
-        form = toolkit.diary.forms.NewEventForm(initial={'start': event_start})
+        form = diary_forms.NewEventForm(initial={'start': event_start})
         context = {'form': form}
         return render(request, 'form_new_event_and_showing.html', context)
     else:
@@ -290,10 +290,10 @@ def add_event(request):
 def edit_showing(request, showing_id=None):
     showing = get_object_or_404(Showing, pk=showing_id)
 
-    RotaForm = toolkit.diary.forms.rota_form_factory(showing)
+    RotaForm = diary_forms.rota_form_factory(showing)
 
     if request.method == 'POST':
-        form = toolkit.diary.forms.ShowingForm(request.POST, instance=showing)
+        form = diary_forms.ShowingForm(request.POST, instance=showing)
         rota_form = RotaForm(request.POST)
         if showing.in_past():
             messages.add_message(request, messages.ERROR, "Can't edit showings that are in the past")
@@ -312,12 +312,12 @@ def edit_showing(request, showing_id=None):
 
             return _return_to_editindex(request)
     else:
-        form = toolkit.diary.forms.ShowingForm(instance=showing)
+        form = diary_forms.ShowingForm(instance=showing)
         rota_form = RotaForm()
 
     # Also create a form for "cloning" the showing (ie. adding another one),
     # but initialise it with values from existing event, but a day later...
-    clone_showing_form = toolkit.diary.forms.CloneShowingForm(
+    clone_showing_form = diary_forms.CloneShowingForm(
         initial={
             'clone_start': showing.start + datetime.timedelta(days=1)
         }
@@ -351,8 +351,8 @@ def _edit_event_handle_post(request, event_id):
 
     logger.info(u"Updating event {0}".format(event_id))
     # Create and populate forms:
-    form = toolkit.diary.forms.EventForm(request.POST, instance=event)
-    media_form = toolkit.diary.forms.MediaItemForm(request.POST, request.FILES, instance=media_item)
+    form = diary_forms.EventForm(request.POST, instance=event)
+    media_form = diary_forms.MediaItemForm(request.POST, request.FILES, instance=media_item)
 
     # Validate
     if form.is_valid() and media_form.is_valid():
@@ -414,8 +414,8 @@ def edit_event(request, event_id=None):
     if event.legacy_copy:
         event.copy = event.copy_html
 
-    form = toolkit.diary.forms.EventForm(instance=event)
-    media_form = toolkit.diary.forms.MediaItemForm(instance=media_item)
+    form = diary_forms.EventForm(instance=event)
+    media_form = diary_forms.MediaItemForm(instance=media_item)
 
     context = {
         'event': event,
@@ -439,13 +439,13 @@ def edit_ideas(request, year=None, month=None):
     # didn't already exist:
     instance, created = DiaryIdea.objects.get_or_create(month=datetime.date(year=year, month=month, day=1))
     if request.method == 'POST':
-        form = toolkit.diary.forms.DiaryIdeaForm(request.POST, instance=instance)
+        form = diary_forms.DiaryIdeaForm(request.POST, instance=instance)
         if form.is_valid():
             form.save()
             messages.add_message(request, messages.SUCCESS, u"Updated ideas for {0}/{1}".format(month, year))
             return _return_to_editindex(request)
     else:
-        form = toolkit.diary.forms.DiaryIdeaForm(instance=instance)
+        form = diary_forms.DiaryIdeaForm(instance=instance)
 
     context['form'] = form
     context['month'] = instance.month
@@ -607,7 +607,7 @@ def edit_roles(request):
     # (To be precise, save involves >120 queries. TThis is because I've been lazy
     # and used the formset save method)
 
-    RoleFormset = modelformset_factory(Role, toolkit.diary.forms.RoleForm, can_delete=True)
+    RoleFormset = modelformset_factory(Role, diary_forms.RoleForm, can_delete=True)
 
     if request.method == 'POST':
         formset = RoleFormset(request.POST)
@@ -651,7 +651,7 @@ def _render_mailout_body(days_ahead=7):
 
 
 def _render_mailout_form(request, body_text, subject_text):
-    form = toolkit.diary.forms.MailoutForm(initial={'subject': subject_text, 'body': body_text})
+    form = diary_forms.MailoutForm(initial={'subject': subject_text, 'body': body_text})
     email_count = (toolkit.members.models.Member.objects.filter(email__isnull=False)
                                                         .exclude(email='')
                                                         .exclude(mailout_failed=True)
@@ -676,7 +676,7 @@ def mailout(request):
         subject_text = "CUBE Microplex forthcoming events"
         return _render_mailout_form(request, body_text, subject_text)
     elif request.method == 'POST':
-        form = toolkit.diary.forms.MailoutForm(request.POST)
+        form = diary_forms.MailoutForm(request.POST)
         if not form.is_valid():
             return render(request, 'form_mailout.html', {'form': form})
         return render(request, 'mailout_send.html', form.cleaned_data)
@@ -685,7 +685,7 @@ def mailout(request):
 # @condition(etag_func=None, last_modified_func=None)
 @permission_required('toolkit.write')
 def exec_mailout(request):
-    form = toolkit.diary.forms.MailoutForm(request.POST)
+    form = diary_forms.MailoutForm(request.POST)
     if not form.is_valid():
         print form.errors
         return HttpResponse(json.dumps({'status': 'error'}), mimetype="application/json")
