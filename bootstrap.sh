@@ -2,7 +2,7 @@
 # Trivial script to create virtualenv and do initial package install
 # (Requires system pip to be available)
 VENV_PATH=./venv
-REQUIREMENTS_FILE=requirements.txt
+REQUIREMENTS_FILE=requirements_python_only.txt
 
 set -e
 
