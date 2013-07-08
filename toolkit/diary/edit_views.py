@@ -35,9 +35,10 @@ def _return_to_editindex(request):
     # If the user has set the 'popup' preference, then close the popup
     # and reload the page that opened the popup. Otherwise just redirect to
     # the index.
-    #
+
     prefs = edit_prefs.get_preferences(request.session)
-    if prefs['popups'] is True:
+    # (nb: the pref is stored as 'true'/'false', not a python bool!)
+    if prefs['popups'] == 'true':
         # Use a really, really dirty way to emulate the original functionality and
         # close the popped up window: return a hard-coded page that contains
         # javacsript to close the open window and reload the source page.
