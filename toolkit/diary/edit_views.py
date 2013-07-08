@@ -50,6 +50,14 @@ def _return_to_editindex(request):
         return HttpResponseRedirect(reverse("default-edit"))
 
 
+@permission_required('toolkit.write')
+def cancel_edit(request):
+    # Again, a dirty hack, used with the above method, used for the "Cancel"
+    # link in forms, to either close the popup or just redirect to the edit
+    # page
+    return _return_to_editindex(request)
+
+
 @login_required
 def edit_diary_list(request, year=None, day=None, month=None):
     # Basic "edit" list view. Logic about processing of year/month/day

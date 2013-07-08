@@ -15,7 +15,7 @@ Edit ideas for {{ month|date:"F Y"}}
 <form action="{% url "edit-ideas" month=month.month year=month.year %}" method="post">
     {% csrf_token %}
     {{ form.as_p }}
-    <input type="submit" value="Update" />
+    <input type="submit" value="Update" /> <a href="{% url "cancel-edit" %}">Cancel</a>
 </form>
 
 <p>To put in links:<code>[link text](web address)</code><br>

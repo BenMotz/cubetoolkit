@@ -132,7 +132,7 @@ Booked for: {{ showing.start|date:"H:i d/m/Y"  }} <br>
     </p>
     <p>{{media_form.credit.errors }} {{ media_form.credit.label_tag }} {{ media_form.credit }}</p>
     <p>
-        <input type="submit" value="Update" />
+        <input type="submit" value="Update" /> <a href="{% url "edit-event-details-view" pk=event.pk %}">Cancel</a>
     </p>
 </form>
 </div>

@@ -44,6 +44,9 @@ programme_urls = patterns(
 diary_urls = patterns(
     'toolkit.diary.edit_views',
 
+    # Used for cancelling an edit action:
+    url('^edit/cancel/?$', 'cancel_edit', name="cancel-edit", ),
+
     # View lists of events for editing:
     url('^edit/?$', 'edit_diary_list', name="default-edit", ),
     url('^edit/(?P<year>\d{4})/?$', 'edit_diary_list', name="year-edit", ),

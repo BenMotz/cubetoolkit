@@ -84,7 +84,7 @@ Booked for: <a href="{% url "edit-showing" showing.pk %}">{{ showing.start|date:
 <p><a href="{% url "edit-event-details" event.pk %}">[edit]</a></p>
 </div>
 <!-- urgh -->
-<p><a href="#" onclick="self.close(); opener.location.reload(true);">back</a></p>
+<p><a href="{% url "cancel-edit" %}">Back</a></p>
 
 {% endblock %}
 
