@@ -2,10 +2,7 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-KNOWN_PREFS = {'popups': True}
-
-PREF_MAP = {'false': False, 'true': True}
-
+KNOWN_PREFS = {'popups': 'true'}
 
 def get_preferences(session):
     edit_prefs = {}
