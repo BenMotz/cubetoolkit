@@ -1,5 +1,4 @@
 
-[TODO] -- internal notes for events - fewer lines, nearer top of form
 [NEWFEATURE] -- Per-tag RSS
 [NEWFEATURE] -- 'subscribe me' UI for members lists
 [NEWFEATURE] --  make old IDs work into the future
@@ -7,11 +6,11 @@
 [TODO] -- 'days ahead' on edit view should be persistent preference
 
 [BUG] -- WYSIWYG HTML editor isn't quite right ...
-[BUG] -- If diary view-by-tag has nothing then have an informative message! (Likewise by date?)
 [BUG] -- Illegal form values should be in *RED* (in showing/booking edit, plus other places?)
-[BUG] -- don't allow all blank event names / booked_by
+[BUG] -- If diary view-by-tag has nothing then have an informative message! (Likewise by date?)
 [BUG] -- handle errors for saving Event details if image and image is missing
 
+[DONE] -- internal notes for events - fewer lines, nearer top of form
 [FIXED] -- "Ttt" in imported title data
 [FIXED] -- closing popups doesn't work before pref is changed?
 [DONE] -- Cancel buttons everywhere
@@ -21,7 +20,8 @@
 [FIXED] -- Add anchors to diary view so jumping by legacy id will work
 [FIXED] -- html links shouldn't be rel="nofollow"/target blank
 [FIXED] -- auth bug highlighted by tests
-[FIXED] -- Allow shorter event names
+[FIXED] -- Allow shorter event names (whoops)
+[FIXED] -- don't allow all blank event names / booked_by
 [FIXED] -- On import of members, detect "not member" in status field and set a boolean to signify the same.
 [FIXED] HTML editor looks shonky
 [CANTREPRODUCE] Popup date/time picker not working on "Edit booking" form after failed submission
