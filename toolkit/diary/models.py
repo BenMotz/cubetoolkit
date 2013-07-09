@@ -235,7 +235,7 @@ class Event(models.Model):
     legacy_copy = models.BooleanField(default=False, null=False, editable=False)
 
     terms = models.TextField(max_length=4096, default=settings.DEFAULT_TERMS_TEXT, null=True, blank=True)
-    notes = models.TextField(max_length=4096, null=True, blank=True)
+    notes = models.TextField(max_length=4096, null=True, blank=True, verbose_name="Programmer's notes")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

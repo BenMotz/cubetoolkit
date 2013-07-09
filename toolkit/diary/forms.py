@@ -102,11 +102,15 @@ class EventForm(forms.ModelForm):
             'copy': HtmlTextarea(attrs={'wrap': 'soft'}),
             'copy_summary': forms.Textarea(attrs={'wrap': 'soft'}),
             'terms': forms.Textarea(attrs={'wrap': 'soft'}),
-            'notes': forms.Textarea(attrs={'wrap': 'soft'}),
+            'notes': forms.Textarea(attrs={
+                'wrap': 'soft',
+                'rows': 5,  # Arbitrary
+                'placeholder': "Programmer's notes - not visible to public",
+                }),
         }
         order = ('tags', )
-        fields = ('name', 'tags', 'duration', 'outside_hire',
-                  'private', 'copy', 'copy_summary', 'terms', 'notes')
+        fields = ('name', 'tags', 'notes', 'duration', 'outside_hire',
+                  'private', 'copy', 'copy_summary', 'terms')
 
 
 class MediaItemForm(forms.ModelForm):
