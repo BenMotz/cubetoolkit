@@ -320,7 +320,7 @@ class Showing(models.Model):
 
     event = models.ForeignKey('Event', related_name='showings')
 
-    start = FutureDateTimeField()
+    start = FutureDateTimeField(db_index=True)
 
     booked_by = models.CharField(max_length=64)
 
