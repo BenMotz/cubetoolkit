@@ -80,6 +80,35 @@ class HtmlTextarea(forms.Textarea):
 
         return mark_safe(u'\n'.join(output))
 
+class JQueryDateTimePicker(forms.DateTimeInput):
+    def __init__(self, *args, **kwargs):
+
+        # Change the default date/time format to match that used by the
+        # jquery widget:
+        if 'format' not in kwargs:
+            kwargs['format'] = "%d/%m/%Y %H:%M"
+
+        super(JQueryDateTimePicker, self).__init__(*args, **kwargs)
+
+    class Media(object):
+        css = {
+            'all': ('css/lib/smoothness/jquery-ui.css', 'css/lib/timepicker.css', ),
+        }
+        js = (
+                'js/lib/jquery.min.js',
+                'js/lib/jquery-ui.min.js',
+                'js/lib/jquery-ui-timepicker-addon.js',
+        )
+
+    def render(self, name, value, attrs=None):
+        output = super(JQueryDateTimePicker, self).render(name, value, attrs=attrs)
+        final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
+
+        output += (u"<script type='text/javascript'>"
+                    "$('#{control_id}').datetimepicker({{ dateFormat : 'dd/mm/yy', timeFormat : 'hh:mm', minDate : 0}});"
+                    "</script>".format(control_id=final_attrs[u'id']))
+        return mark_safe(output)
+
 
 class RoleForm(forms.ModelForm):
     class Meta(object):
@@ -202,7 +231,7 @@ class CloneShowingForm(forms.Form):
 
 class NewEventForm(forms.Form):
     start = forms.DateTimeField(required=True, validators=[validate_in_future])
-    start = forms.DateTimeField(required=True)
+    start = forms.DateTimeField(required=True, widget=JQueryDateTimePicker())
     duration = forms.TimeField(required=True, initial=datetime.time(hour=1))
     number_of_days = forms.IntegerField(min_value=1, max_value=31, required=True, initial=1)
     event_name = forms.CharField(min_length=1, max_length=256, required=True)
