@@ -1,11 +1,11 @@
-{% extends "base.html" %}
+{% extends "form_base.html" %}
 
 {% block title %}
 Editing Event roles
 {% endblock %}
 
 {% block css %}
-<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
+{{ block.super }}
 <style type="text/css">
   body {
       font-family: sans-serif;

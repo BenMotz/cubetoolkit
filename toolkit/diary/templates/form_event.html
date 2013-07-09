@@ -1,11 +1,9 @@
-{% extends "base.html" %}
+{% extends "form_base.html" %}
 {% block title %}
 Details for: {{ event.name }}
 {% endblock %}
-{% block script %}
-{{ form.media }}
-{% endblock %}
 {% block css %}
+{{ block.super }}
 <style>
     h3 { font-family: Arial; }
     div#title {

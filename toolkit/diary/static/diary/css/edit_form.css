@@ -1,0 +1,4 @@
+.errorlist li {
+    color: red;
+    list-style: none url("../../img/message_error.png") inside;
+}
