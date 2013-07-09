@@ -230,6 +230,10 @@ def import_events(connection, role_map):
     tenpc = results / 100
     pc = 1
     logger.info("%d events" % (results))
+
+    # Special case regex for ticket tout tuseday acronym
+    ttt_re = re.compile("[Tt]tt")
+
     for r in cursor.fetchall():
         r = [decode(item) for item in r]
         e = toolkit.diary.models.Event()
@@ -237,6 +241,9 @@ def import_events(connection, role_map):
 
         # Name
         e.name = titlecase(r[1])
+        # Special case regex for ttt or Ttt -> TTT
+        e.name = ttt_re.sub("TTT", e.name)
+
 
         if e.name is None or e.name == '':
             # Looking at the db, it's safe to skip all of these
