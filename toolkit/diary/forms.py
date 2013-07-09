@@ -157,6 +157,10 @@ class ShowingForm(forms.ModelForm):
         # Exclude these for now:
         exclude = ('event', 'extra_copy', 'extra_copy_summary', 'roles')
 
+        widgets = {
+            'start': JQueryDateTimePicker(),
+        }
+
 
 def rota_form_factory(showing):
     # Dynamically generate a form to edit the rota for the given showing
@@ -225,7 +229,8 @@ def rota_form_factory(showing):
 class CloneShowingForm(forms.Form):
     # For cloning a showing, so only need very minimal extra details
 
-    clone_start = forms.DateTimeField(required=True, validators=[validate_in_future])
+    clone_start = forms.DateTimeField(required=True, validators=[validate_in_future],
+                                      widget=JQueryDateTimePicker())
     booked_by = forms.CharField(min_length=1, max_length=128, required=True)
 
 

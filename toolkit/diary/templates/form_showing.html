@@ -4,14 +4,9 @@ Details for: {{ showing.event.name }}
 {% endblock %}
 {% block script %}
 {{ block.super }}
-<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery-ui-timepicker-addon.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/lib/ui.spinner.min.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
-        $('#id_start').datetimepicker({ dateFormat : 'yy-mm-dd', timeFormat : 'hh:mm:ss', minDate : 0});
-        $('#id_clone_start').datetimepicker({ dateFormat : 'yy-mm-dd', timeFormat : 'hh:mm:ss', minDate : 0});
         $('#delete_form').bind("submit", function() {
             return confirm("Delete event: are you sure?\nThis cannot be undone!");
         });
@@ -22,8 +17,6 @@ $(document).ready(function() {
 {% block css %}
 {{ block.super }}
 <style>
-    @import url('{{ STATIC_URL }}css/lib/smoothness/jquery-ui.css');
-    @import url('{{ STATIC_URL }}css/lib/timepicker.css');
     @import url('{{ STATIC_URL }}css/lib/ui.spinner.css');
 
     table {
