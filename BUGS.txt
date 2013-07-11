@@ -5,11 +5,11 @@
 [TODO] -- Basic member automated tests
 [TODO] -- 'days ahead' on edit view should be persistent preference
 
-[BUG] -- WYSIWYG HTML editor isn't quite right ...
-[BUG] -- Illegal form values should be in *RED* (in showing/booking edit, plus other places?)
 [BUG] -- If diary view-by-tag has nothing then have an informative message! (Likewise by date?)
 [BUG] -- handle errors for saving Event details if image and image is missing
 
+[WONTFIX] -- WYSIWYG HTML editor isn't quite right ...
+[DONE] -- Illegal form values should be in *RED* (in showing/booking edit, plus other places?)
 [DONE] -- internal notes for events - fewer lines, nearer top of form
 [FIXED] -- "Ttt" in imported title data
 [FIXED] -- closing popups doesn't work before pref is changed?
