@@ -1,12 +1,79 @@
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 
+import django.contrib.auth.models as auth_models
+import django.contrib.contenttypes as contenttypes
+
 from toolkit.members.models import Member, Volunteer
+from toolkit.diary.models import Role
 
-class SecurityTests(TestCase):
+class MembersTestsMixin(object):
+
+    def setUp(self):
+        self._setup_test_data()
+
+        return super(MembersTestsMixin, self).setUp()
+
+    def _setup_test_data(self):
+        # Roles:
+        r1 = Role(name="Role 1 (standard)", read_only=False, standard=True)
+        r1.save()
+        r2 = Role(name="Role 2 (nonstandard)", read_only=False, standard=False)
+        r2.save()
+        r3 = Role(name="Role 3", read_only=False, standard=False)
+        r3.save()
+
+        # Members:
+        m1 = Member(name="Member One", email="one@example.com", number="1", postcode="BS1 1AA")
+        m1.save()
+        m2 = Member(name="Two Member", email="two@example.com", number="2", postcode="")
+        m2.save()
+        m3 = Member(name="Volunteer One", email="volon@cube.test", number="3",
+                    phone="0800 000 000", address="1 Road", posttown="Town", postcode="BS6 123", country="UK",
+                    website="http://foo.test/")
+        m3.save()
+        m4 = Member(name="Volunteer Two", email="", number="4",
+                    phone="", altphone="", address="", posttown="", postcode="", country="",
+                    website="http://foo.test/")
+        m4.save()
+        m5 = Member(name="Volunteer Three", email="volthree@foo.test", number="4",
+                    phone="", altphone="", address="", posttown="", postcode="", country="",
+                    website="")
+        m5.save()
+
+        # Volunteers:
+        v1 = Volunteer(member=m3)
+        v1.save()
+        v1.roles = [r1, r3]
+        v1.save()
+
+        v2 = Volunteer(member=m4)
+        v2.save()
+
+        v3 = Volunteer(member=m5)
+        v3.save()
+        v3.roles = [r3]
+        v3.save()
+
+        # System user:
+        user_rw = auth_models.User.objects.create_user('admin', 'toolkit_admin@localhost', 'T3stPassword!')
+        # Create dummy ContentType:
+        ct = contenttypes.models.ContentType.objects.get_or_create(
+            model='',
+            app_label='toolkit'
+        )[0]
+        # Create 'write' permission:
+        write_permission = auth_models.Permission.objects.get_or_create(
+            name='Write access to all toolkit content',
+            content_type=ct,
+            codename='write'
+        )[0]
+        # Give "admin" user the write permission:
+        user_rw.user_permissions.add(write_permission)
+
+
+class SecurityTests(MembersTestsMixin, TestCase):
     """Basic test that the private pages do not load without a login"""
-
-    fixtures = ['small_data_set.json']
 
     def test_private_urls(self):
         """All URLs which should 302 redirect to the login page"""
@@ -73,11 +140,11 @@ class SecurityTests(TestCase):
             self.assertContains(response, member.name)
 
 
-class TestVolunteerEditViews(TestCase):
-
-    fixtures = ['small_data_set.json']
+class TestVolunteerEditViews(MembersTestsMixin, TestCase):
 
     def setUp(self):
+        super(TestVolunteerEditViews, self).setUp()
+
         self.assertTrue(self.client.login(username="admin", password="T3stPassword!"))
 
     def tearDown(self):
