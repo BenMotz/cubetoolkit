@@ -1,19 +1,181 @@
 import json
 
+import pytz
+from datetime import datetime, date
+
 from django.test import TestCase
 from django.core.urlresolvers import reverse, resolve
 import django.http
+import django.contrib.auth.models as auth_models
+import django.contrib.contenttypes as contenttypes
+
+from toolkit.diary.models import Showing, Event, Role, EventTag, DiaryIdea, EventTemplate, RotaEntry
+from toolkit.members.models import Member, Volunteer
 
 
-class PublicDiaryViews(TestCase):
+class DiaryTestsMixin(object):
+
+    def setUp(self):
+        self._setup_test_data()
+
+        return super(DiaryTestsMixin, self).setUp()
+
+    def _setup_test_data(self):
+        # Roles:
+        r1 = Role(name="Role 1 (standard)", read_only=False, standard=True)
+        r1.save()
+        r2 = Role(name="Role 2 (nonstandard)", read_only=False, standard=False)
+        r2.save()
+        r3 = Role(name="Role 3", read_only=False, standard=False)
+        r3.save()
+
+        # Tags:
+        t1 = EventTag(name="tag one", read_only=False)
+        t1.save()
+        t2 = EventTag(name="tag two", read_only=False)
+        t2.save()
+
+        # Events:
+        e1 = Event(
+            name="Event one title",
+            copy="Event one copy",
+            copy_summary="Event one copy summary",
+            duration="01:30:00",
+        )
+        e1.save()
+
+        e2 = Event(
+            name="Event two title",
+            copy="Event two copy",
+            copy_summary="Event two copy summary",
+            duration="01:30:00",
+            legacy_id="100",
+        )
+        e2.save()
+
+        e3 = Event(
+            name="Event three title",
+            copy="Event three Copy",
+            copy_summary="Copy three summary",
+            duration="03:00:00",
+            notes="Notes",
+        )
+        e3.save()
+        e3.tags = [t2,]
+        e3.save()
+
+        # Showings:
+        s1 = Showing(
+            start=pytz.timezone("Europe/London").localize(datetime(2013, 4, 1, 19, 00)),
+            event=e2,
+            booked_by="User",
+        )
+        s1.save(force=True)  # Force start date in the past
+
+        s2 = Showing(
+            start=pytz.timezone("Europe/London").localize(datetime(2013, 4, 13, 18, 00)),
+            event=e3,
+            booked_by="User Two",
+            confirmed=True
+        )
+        s2.save(force=True)  # Force start date in the past
+
+
+        # Rota items:
+        RotaEntry(showing=s1, role=r2, rank=1).save()
+        RotaEntry(showing=s1, role=r3, rank=1).save()
+        RotaEntry(showing=s2, role=r1, rank=1).save()
+        RotaEntry(showing=s2, role=r1, rank=2).save()
+        RotaEntry(showing=s2, role=r1, rank=3).save()
+        RotaEntry(showing=s2, role=r1, rank=4).save()
+        RotaEntry(showing=s2, role=r1, rank=5).save()
+        RotaEntry(showing=s2, role=r1, rank=6).save()
+
+        # Ideas:
+        i = DiaryIdea(
+            ideas="April 2013 ideas",
+            month=date(year=2013, month=4, day=1)
+        )
+        i.save()
+        i = DiaryIdea(
+            ideas="May 2013 ideas",
+            month=date(year=2013, month=5, day=1)
+        )
+        i.save()
+
+        # Templates:
+        tmpl = EventTemplate(name="Template 1")
+        tmpl.save()
+        tmpl.roles = [r1]
+        tmpl.tags = [t1]
+        tmpl.save()
+
+        tmpl = EventTemplate(name="Template 2")
+        tmpl.save()
+        tmpl.roles = [r2]
+        tmpl.tags = [t2]
+        tmpl.save()
+
+        tmpl = EventTemplate(name="Template 3")
+        tmpl.save()
+        tmpl.roles = [r1, r2, r3]
+        tmpl.save()
+
+        # Members:
+        m1 = Member(name="Member One", email="one@example.com", number="1", postcode="BS1 1AA")
+        m1.save()
+        m2 = Member(name="Two Member", email="two@example.com", number="2", postcode="")
+        m2.save()
+        m3 = Member(name="Volunteer One", email="volon@cube.test", number="3",
+                    phone="0800 000 000", address="1 Road", posttown="Town", postcode="BS6 123", country="UK",
+                    website="http://foo.test/")
+        m3.save()
+        m4 = Member(name="Volunteer Two", email="", number="4",
+                    phone="", altphone="", address="", posttown="", postcode="", country="",
+                    website="http://foo.test/")
+        m4.save()
+        m5 = Member(name="Volunteer Three", email="volthree@foo.test", number="4",
+                    phone="", altphone="", address="", posttown="", postcode="", country="",
+                    website="")
+        m5.save()
+
+        # Volunteers:
+        v1 = Volunteer(member=m3)
+        v1.save()
+        v1.roles = [r1, r3]
+        v1.save()
+
+        v2 = Volunteer(member=m4)
+        v2.save()
+
+        v3 = Volunteer(member=m5)
+        v3.save()
+        v3.roles = [r3]
+        v3.save()
+
+        # System user:
+        user_rw = auth_models.User.objects.create_user('admin', 'toolkit_admin@localhost', 'T3stPassword!')
+        # Create dummy ContentType:
+        ct = contenttypes.models.ContentType.objects.get_or_create(
+            model='',
+            app_label='toolkit'
+        )[0]
+        # Create 'write' permission:
+        write_permission = auth_models.Permission.objects.get_or_create(
+            name='Write access to all toolkit content',
+            content_type=ct,
+            codename='write'
+        )[0]
+        # Give "admin" user the write permission:
+        user_rw.user_permissions.add(write_permission)
+
+
+class PublicDiaryViews(DiaryTestsMixin, TestCase):
     """Basic test that all the public diary pages load"""
-
-    # Some fixture data, so Showings don't 404
-    fixtures = ['small_data_set.json']
 
     def test_view_default(self):
         # Hard code root URL to assert that it gets something:
-        response = self.client.get('/diary/')
+        response = self.client.get('/programme/')
         self.assertEqual(response.status_code, 200)
 
     def test_view_default_reversed(self):
@@ -61,7 +223,7 @@ class PublicDiaryViews(TestCase):
                          u"tags": u"tag two",
                          u"image": None,
                          u"start": u"13/04/2013 18:00",
-                         u"link": u"/diary/event/id/3/",
+                         u"link": u"/programme/event/id/3/",
                          u"copy": u"<p>Event three Copy</p>"
                          }])
 
@@ -91,10 +253,8 @@ class PublicDiaryViews(TestCase):
     # TODO: Cancelled/confirmed/visible/TTT
 
 
-class EditDiaryViewsLoginRequired(TestCase):
+class EditDiaryViewsLoginRequired(DiaryTestsMixin, TestCase):
     """Basic test that the private diary pages do not load without a login"""
-
-    fixtures = ['small_data_set.json']
 
     def test_urls(self):
         views_to_test = {
@@ -131,13 +291,12 @@ class EditDiaryViewsLoginRequired(TestCase):
             self.assertRedirects(response, expected_redirect)
 
 
-class EditDiaryViews(TestCase):
+class EditDiaryViews(DiaryTestsMixin, TestCase):
     """Basic test that the private diary pages load"""
 
-    # Some fixture data, so Showings don't 404
-    fixtures = ['small_data_set.json']
-
     def setUp(self):
+        super(EditDiaryViews, self).setUp()
+
         self.client.login(username="admin", password="T3stPassword!")
 
     def tearDown(self):
@@ -151,26 +310,26 @@ class EditDiaryViews(TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-class UrlTests(TestCase):
+class UrlTests(DiaryTestsMixin, TestCase):
     """Test the regular expressions in urls.py"""
 
     def test_diary_urls(self):
         # Test all basic diary URLs
         calls_to_test = {
             # '/diary': (), # This is a 302...
-            '/diary/view/': {},
-            '/diary/view/2012': {'year': '2012'},
-            '/diary/view/2012/': {'year': '2012'},
-            '/diary/view/2012/12': {'year': '2012', 'month': '12'},
-            '/diary/view/2012/12/': {'year': '2012', 'month': '12'},
-            '/diary/view/2012/12/30': {'year': '2012', 'month': '12', 'day': '30'},
-            '/diary/view/2012/12/30/': {'year': '2012', 'month': '12', 'day': '30'},
-            '/diary/view/films/': {'event_type': 'films'},
+            '/programme/view/': {},
+            '/programme/view/2012': {'year': '2012'},
+            '/programme/view/2012/': {'year': '2012'},
+            '/programme/view/2012/12': {'year': '2012', 'month': '12'},
+            '/programme/view/2012/12/': {'year': '2012', 'month': '12'},
+            '/programme/view/2012/12/30': {'year': '2012', 'month': '12', 'day': '30'},
+            '/programme/view/2012/12/30/': {'year': '2012', 'month': '12', 'day': '30'},
+            '/programme/view/films/': {'event_type': 'films'},
             # Tags that are similar to, but aren't quite the same as, years:
-            '/diary/view/1/': {'event_type': '1'},
-            '/diary/view/12/': {'event_type': '12'},
-            '/diary/view/123/': {'event_type': '123'},
-            '/diary/view/12345/': {'event_type': '12345'},
+            '/programme/view/1/': {'event_type': '1'},
+            '/programme/view/12/': {'event_type': '12'},
+            '/programme/view/123/': {'event_type': '123'},
+            '/programme/view/12345/': {'event_type': '12345'},
         }
         for query, response in calls_to_test.iteritems():
             match = resolve(query)

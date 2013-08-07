@@ -126,7 +126,7 @@ def view_diary_json(request, year, month, day):
         event = showing.event
 
         results.append({
-            'start': showing.start.strftime('%d/%m/%Y %H:%M'),
+            'start': timezone.localtime(showing.start).strftime('%d/%m/%Y %H:%M'),
             'name': event.name,
             'copy': markdown.markdown(event.copy),
             'link': reverse("single-event-view", kwargs={'event_id': showing.event_id}),
