@@ -1,3 +1,4 @@
+import re
 import json
 
 import pytz
@@ -527,6 +528,72 @@ class DeleteShowing(DiaryTestsMixin, TestCase):
         self.assertFalse(Showing.objects.filter(id=3))
 
         self.assert_return_to_index(response)
+
+
+class PreferencesTests(DiaryTestsMixin, TestCase):
+    def setUp(self):
+        super(PreferencesTests, self).setUp()
+        # Log in:
+        self.client.login(username="admin", password="T3stPassword!")
+
+
+    def _get_edit_prefs(self, response):
+        match = re.search(ur"var\s+edit_prefs\s*=\s*({.*?});", str(response), re.DOTALL)
+        return json.loads(match.group(1))
+
+    def test_set_pref(self):
+        url = reverse("default-edit")
+
+        # Get current prefs:
+        response = self.client.get(url)
+        edit_prefs = self._get_edit_prefs(response)
+        self.assertEqual(edit_prefs["popups"], "true")
+
+        # Set popups false:
+        response = self.client.get(reverse("set_edit_preferences"),
+            data={"popups": "false"})
+        self.assertEqual(response.status_code, 200)
+
+        # Verify change:
+        response = self.client.get(url)
+        edit_prefs = self._get_edit_prefs(response)
+        self.assertEqual(edit_prefs["popups"], "false")
+
+        # Back to true:
+        response = self.client.get(reverse("set_edit_preferences"),
+            data={"popups": "true"})
+        self.assertEqual(response.status_code, 200)
+
+        # Verify change:
+        response = self.client.get(url)
+        edit_prefs = self._get_edit_prefs(response)
+        self.assertEqual(edit_prefs["popups"], "true")
+
+    def test_bad_value(self):
+        url = reverse("default-edit")
+
+        # Set popups something stupid:
+        response = self.client.get(reverse("set_edit_preferences"),
+            data={"popups": "tralala"*100})
+        self.assertEqual(response.status_code, 200)
+
+        # Verify change:
+        response = self.client.get(url)
+        edit_prefs = self._get_edit_prefs(response)
+        self.assertEqual(edit_prefs["popups"], "tralalatra")
+
+    def test_bad_pref(self):
+        url = reverse("default-edit")
+
+        # Set weird value, verify it doesn't come out in the edit page:
+        response = self.client.get(reverse("set_edit_preferences"),
+            data={"nonsense": "tralala"})
+        self.assertEqual(response.status_code, 200)
+
+        response = self.client.get(url)
+        edit_prefs = self._get_edit_prefs(response)
+        self.assertEqual(edit_prefs.keys(), ["popups"])
+
 
 
 class UrlTests(DiaryTestsMixin, TestCase):
