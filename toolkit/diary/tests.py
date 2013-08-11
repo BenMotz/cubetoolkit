@@ -594,6 +594,21 @@ class PreferencesTests(DiaryTestsMixin, TestCase):
         edit_prefs = self._get_edit_prefs(response)
         self.assertEqual(edit_prefs.keys(), ["popups"])
 
+    def test_redirect_change(self):
+        url = reverse("cancel-edit")
+        # default to javscript hackery:
+        response = self.client.get(url)
+        self.assert_return_to_index(response)
+
+        # Set popup preference false:
+        response = self.client.get(reverse("set_edit_preferences"),
+            data={"popups": "false"})
+        self.assertEqual(response.status_code, 200)
+
+        # should now 302 to edit list:
+        response = self.client.get(url)
+        self.assertRedirects(response, reverse("default-edit"))
+
 
 
 class UrlTests(DiaryTestsMixin, TestCase):
