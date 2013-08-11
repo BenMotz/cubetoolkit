@@ -3,6 +3,8 @@ import json
 import pytz
 from datetime import datetime, date
 
+from mock import patch
+
 from django.test import TestCase
 from django.core.urlresolvers import reverse, resolve
 import django.http
@@ -20,7 +22,21 @@ class DiaryTestsMixin(object):
 
         return super(DiaryTestsMixin, self).setUp()
 
+    # Useful method:
+    def assert_return_to_index(self, response):
+        # Check status=200 and expected text included:
+        self.assertContains(response,
+            "<!DOCTYPE html><html>"
+            "<head><title>-</title></head>"
+            "<body onload='self.close(); opener.location.reload(true);'>Ok</body>"
+            "</html>"
+        )
+
+
     def _setup_test_data(self):
+
+        self._fake_now = pytz.timezone("Europe/London").localize(datetime(2013, 6, 1, 11, 00))
+
         # Roles:
         r1 = Role(name="Role 1 (standard)", read_only=False, standard=True)
         r1.save()
@@ -308,6 +324,144 @@ class EditDiaryViews(DiaryTestsMixin, TestCase):
         # self.assertIn(u'Event one title', response.content)
         # self.assertIn(u'<p>Event one copy</p>', response.content)
         self.assertEqual(response.status_code, 200)
+
+
+class EditShowing(DiaryTestsMixin, TestCase):
+
+    def setUp(self):
+        super(EditShowing, self).setUp()
+        # Log in:
+        self.client.login(username="admin", password="T3stPassword!")
+
+    def test_add_showing_must_post(self):
+        # Add a new showing
+        url = reverse("add-showing", kwargs={"event_id": 1})
+        url += "?copy_from=2"
+        # TODO: Add more query data that might work
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 405)
+
+    def test_add_showing_no_copy_from(self):
+        # No copy_from parameter: should return 404
+        url = reverse("add-showing", kwargs={"event_id": 1})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_add_showing_no_start(self):
+        url = reverse("add-showing", kwargs={"event_id": 1})
+        url += "?copy_from=2"
+
+        showing_count_before = Showing.objects.count()
+
+        source = Showing.objects.get(id=2)
+
+        self.assertEqual(source.event.showings.count(), 1)
+
+        response = self.client.post(url, data={
+            "booked_by": "someone",
+        })
+
+        showing_count_after = Showing.objects.count()
+        self.assertEqual(showing_count_after, showing_count_before)
+
+        self.assertFormError(response, 'clone_showing_form', 'clone_start', u'This field is required.')
+
+    def test_add_showing_no_booked_by(self):
+        url = reverse("add-showing", kwargs={"event_id": 1})
+        url += "?copy_from=2"
+
+        showing_count_before = Showing.objects.count()
+
+        source = Showing.objects.get(id=2)
+
+        self.assertEqual(source.event.showings.count(), 1)
+
+        # Start is in past, but should get error about missing booked_by
+        response = self.client.post(url, data={
+            "clone_start": "13/07/2010 20:00"
+        })
+
+        showing_count_after = Showing.objects.count()
+        self.assertEqual(showing_count_after, showing_count_before)
+
+        self.assertFormError(response, 'clone_showing_form', 'booked_by', u'This field is required.')
+
+    @patch('django.utils.timezone.now')
+    def test_add_showing_in_past(self, now_patch):
+        now_patch.return_value = self._fake_now
+
+        url = reverse("add-showing", kwargs={"event_id": 1})
+        url += "?copy_from=2"
+
+        showing_count_before = Showing.objects.count()
+
+        source = Showing.objects.get(id=2)
+
+        self.assertEqual(source.event.showings.count(), 1)
+
+        # do add/clone:
+        response = self.client.post(url, data={
+            "booked_by": u"Someone",
+            "clone_start": u"01/01/2010 20:00"  # The past!
+        })
+
+        showing_count_after = Showing.objects.count()
+        self.assertEqual(showing_count_after, showing_count_before)
+
+        self.assertFormError(response, 'clone_showing_form', 'clone_start', u'Must be in the future')
+
+    @patch('django.utils.timezone.now')
+    def test_add_showing(self, now_patch):
+        now_patch.return_value = self._fake_now
+
+        url = reverse("add-showing", kwargs={"event_id": 1})
+        url += "?copy_from=2"
+
+        showing_count_before = Showing.objects.count()
+
+        source = Showing.objects.get(id=2)
+
+        self.assertEqual(source.event.showings.count(), 1)
+
+        # do add/clone:
+        response = self.client.post(url, data={
+            "booked_by": u"Someone or the other - \u20ac",
+            "clone_start": "13/07/2013 20:00"
+        })
+
+        showing_count_after = Showing.objects.count()
+        self.assertEqual(showing_count_after, showing_count_before + 1)
+
+        # Get clone:
+        dest = list(source.event.showings.all())[-1]
+
+        # Check "booked by":
+        self.assertEqual(dest.booked_by, u"Someone or the other - \u20ac")
+
+        # Check fields were cloned:
+        self.assertEqual(source.event_id, dest.event_id)
+        self.assertEqual(source.extra_copy, dest.extra_copy)
+        self.assertEqual(source.extra_copy_summary, dest.extra_copy_summary)
+        self.assertEqual(source.confirmed, dest.confirmed)
+        self.assertEqual(source.hide_in_programme, dest.hide_in_programme)
+        self.assertEqual(source.cancelled, dest.cancelled)
+        self.assertEqual(source.discounted, dest.discounted)
+
+        # Check rota cloned:
+        src_rota = source.rotaentry_set.all()
+        dst_rota = dest.rotaentry_set.all()
+
+        self.assertEqual(
+            len(src_rota),
+            len(dst_rota)
+        )
+
+        for src_entry, dst_entry in zip(source.rotaentry_set.all(), dest.rotaentry_set.all()):
+            self.assertEqual(src_entry.role, dst_entry.role)
+            self.assertEqual(src_entry.rank, dst_entry.rank)
+
+        self.assert_return_to_index(response)
 
 
 class UrlTests(DiaryTestsMixin, TestCase):

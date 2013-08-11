@@ -175,7 +175,7 @@ def add_showing(request, event_id):
     try:
         copy_from_pk = int(copy_from, 10)
         source_showing = Showing.objects.get(pk=copy_from_pk)
-    except (TypeError, ValueError, django.core.exceptions.DoesNotExist) as err:
+    except (TypeError, ValueError, django.core.exceptions.ObjectDoesNotExist) as err:
         logger.error(u"Failed getting object for showing clone operation: {0}".format(err))
         raise Http404("Requested source showing for clone not found")
 
@@ -202,7 +202,7 @@ def add_showing(request, event_id):
 
         return _return_to_editindex(request)
     else:
-        # For now, aassume this is being called from "edit showing"
+        # For now, assume this is being called from "edit showing"
         # form, and return that
         showing = get_object_or_404(Showing, pk=copy_from)
         showing_form = diary_forms.ShowingForm(instance=showing)
