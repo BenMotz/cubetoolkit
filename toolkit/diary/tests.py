@@ -38,18 +38,20 @@ class DiaryTestsMixin(object):
         self._fake_now = pytz.timezone("Europe/London").localize(datetime(2013, 6, 1, 11, 00))
 
         # Roles:
-        r1 = Role(name="Role 1 (standard)", read_only=False, standard=True)
+        r1 = Role(name=u"Role 1 (standard)", read_only=False, standard=True)
         r1.save()
-        r2 = Role(name="Role 2 (nonstandard)", read_only=False, standard=False)
+        r2 = Role(name=u"Role 2 (nonstandard)", read_only=False, standard=False)
         r2.save()
-        r3 = Role(name="Role 3", read_only=False, standard=False)
+        r3 = Role(name=u"Role 3", read_only=False, standard=False)
         r3.save()
 
         # Tags:
-        t1 = EventTag(name="tag one", read_only=False)
+        t1 = EventTag(name=u"tag one", read_only=False)
         t1.save()
-        t2 = EventTag(name="tag two", read_only=False)
+        t2 = EventTag(name=u"tag two", read_only=False)
         t2.save()
+        t3 = EventTag(name=u"\u0167ag \u0165hre\u0119", read_only=False)
+        t3.save()
 
         # Events:
         e1 = Event(
@@ -80,6 +82,17 @@ class DiaryTestsMixin(object):
         e3.tags = [t2,]
         e3.save()
 
+        e4 = Event(
+            name=u"Event four titl\u0113",
+            copy=u"Event four C\u014dpy",
+            copy_summary=u"\u010copy four summary",
+            duration="01:00:00",
+            notes="\u0147otes on event fou\u0159",
+        )
+        e4.save()
+        e4.tags = [t2,]
+        e4.save()
+
         # Showings:
         s1 = Showing(
             start=pytz.timezone("Europe/London").localize(datetime(2013, 4, 1, 19, 00)),
@@ -95,6 +108,16 @@ class DiaryTestsMixin(object):
             confirmed=True
         )
         s2.save(force=True)  # Force start date in the past
+
+        # When the clock is patched to claim that it's 1/6/2013, this showing
+        # will be in the future:
+        s3 = Showing(
+            start=pytz.timezone("Europe/London").localize(datetime(2013, 8, 13, 18, 00)),
+            event=e4,
+            booked_by=u"\u0102nother \u0170ser",
+            confirmed=True
+        )
+        s3.save(force=True)  # Force start date in the past
 
 
         # Rota items:
@@ -326,10 +349,10 @@ class EditDiaryViews(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-class EditShowing(DiaryTestsMixin, TestCase):
+class AddShowing(DiaryTestsMixin, TestCase):
 
     def setUp(self):
-        super(EditShowing, self).setUp()
+        super(AddShowing, self).setUp()
         # Log in:
         self.client.login(username="admin", password="T3stPassword!")
 
@@ -460,6 +483,48 @@ class EditShowing(DiaryTestsMixin, TestCase):
         for src_entry, dst_entry in zip(source.rotaentry_set.all(), dest.rotaentry_set.all()):
             self.assertEqual(src_entry.role, dst_entry.role)
             self.assertEqual(src_entry.rank, dst_entry.rank)
+
+        self.assert_return_to_index(response)
+
+class DeleteShowing(DiaryTestsMixin, TestCase):
+
+    def setUp(self):
+        super(DeleteShowing, self).setUp()
+        # Log in:
+        self.client.login(username="admin", password="T3stPassword!")
+
+    def test_delete_showing_must_post(self):
+
+        url = reverse("delete-showing", kwargs={"showing_id": 1})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 405)
+
+        Showing.objects.get(id=1)  # Will raise an exception if it doesn't exist
+
+    @patch('django.utils.timezone.now')
+    def test_delete_showing_in_past(self, now_patch):
+        now_patch.return_value = self._fake_now
+
+        url = reverse("delete-showing", kwargs={"showing_id": 1})
+        response = self.client.post(url)
+
+        # Should redirect to edit page:
+        self.assertRedirects(response, reverse("edit-showing", kwargs={"showing_id": 1}))
+
+        # Showing should still exist:
+        Showing.objects.get(id=1)  # Will raise an exception if it doesn't exist
+
+    @patch('django.utils.timezone.now')
+    def test_delete_showing(self, now_patch):
+        now_patch.return_value = self._fake_now
+
+        self.assertTrue(Showing.objects.filter(id=3))
+
+        url = reverse("delete-showing", kwargs={"showing_id": 3})
+        response = self.client.post(url)
+
+        # Showing should have been deleted
+        self.assertFalse(Showing.objects.filter(id=3))
 
         self.assert_return_to_index(response)
 

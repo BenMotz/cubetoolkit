@@ -458,20 +458,22 @@ def edit_ideas(request, year=None, month=None):
 def delete_showing(request, showing_id):
     # Delete the given showing
 
-    if request.method == 'POST':
-        showing = Showing.objects.get(pk=showing_id)
-        if showing.in_past():
-            logger.error(u"Attempted to delete showing id {0} that has already started/finished".format(showing_id))
-            messages.add_message(request, messages.ERROR, "Can't delete showings that are in the past")
-            return HttpResponseRedirect(reverse("edit-showing", kwargs={'showing_id': showing_id}))
-        else:
-            logging.info(u"Deleting showing id {0} (for event id {1})".format(showing_id, showing.event_id))
-            messages.add_message(
-                request, messages.SUCCESS, u"Deleted showing for '{0}' on {1}".format(
-                    showing.event.name, showing.start.strftime("%d/%m/%y")
-                )
+    if request.method != 'POST':
+        return HttpResponse('Invalid request!', status=405)  # 405 = Method not allowed
+
+    showing = Showing.objects.get(pk=showing_id)
+    if showing.in_past():
+        logger.error(u"Attempted to delete showing id {0} that has already started/finished".format(showing_id))
+        messages.add_message(request, messages.ERROR, "Can't delete showings that are in the past")
+        return HttpResponseRedirect(reverse("edit-showing", kwargs={'showing_id': showing_id}))
+    else:
+        logging.info(u"Deleting showing id {0} (for event id {1})".format(showing_id, showing.event_id))
+        messages.add_message(
+            request, messages.SUCCESS, u"Deleted showing for '{0}' on {1}".format(
+                showing.event.name, showing.start.strftime("%d/%m/%y")
             )
-            showing.delete()
+        )
+        showing.delete()
 
     return _return_to_editindex(request)
 
