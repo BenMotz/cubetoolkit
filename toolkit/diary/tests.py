@@ -34,6 +34,12 @@ class DiaryTestsMixin(object):
             "</html>"
         )
 
+    def assert_has_message(self, response, msg, level):
+        self.assertContains(
+            response,
+            u'<li class="{}">{}</li>'.format(level, msg)
+        )
+
     def _setup_test_data(self):
 
         self._fake_now = pytz.timezone("Europe/London").localize(datetime(2013, 6, 1, 11, 00))
@@ -129,6 +135,7 @@ class DiaryTestsMixin(object):
         RotaEntry(showing=s2, role=r1, rank=4).save()
         RotaEntry(showing=s2, role=r1, rank=5).save()
         RotaEntry(showing=s2, role=r1, rank=6).save()
+        RotaEntry(showing=s3, role=r2, rank=1).save()
 
         # Ideas:
         i = DiaryIdea(
@@ -488,6 +495,163 @@ class AddShowingView(DiaryTestsMixin, TestCase):
             self.assertEqual(src_entry.rank, dst_entry.rank)
 
         self.assert_return_to_index(response)
+
+
+class EditShowing(DiaryTestsMixin, TestCase):
+
+    def setUp(self):
+        super(EditShowing, self).setUp()
+        # Log in:
+        self.client.login(username="admin", password="T3stPassword!")
+
+    def tests_edit_showing_get(self):
+        url = reverse("edit-showing", kwargs={"showing_id": 3})
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_showing.html")
+
+        # (In the following, can't use "HTML" matching (which doesn't mind if
+        # the text isn't exact, so long as it's equivalent) as the output isn't
+        # currently valid HTML. Whoops.)
+
+        # "clone" part should have expected start time:
+        self.assertContains(response,
+            u'<input id="id_clone_start" name="clone_start" type="text" value="14/08/2013 18:00" />'
+        )
+        # Edit should have existing values:
+        self.assertContains(response,
+            u'<input id="id_start" name="start" type="text" value="13/08/2013 18:00" />'
+        )
+        self.assertContains(response,
+            u'<input id="id_booked_by" maxlength="64" name="booked_by" type="text" value="\u0102nother \u0170ser" />'
+        )
+        self.assertContains(response,
+            u'<input checked="checked" id="id_confirmed" name="confirmed" type="checkbox" />'
+        )
+        self.assertContains(response,
+            u'<input id="id_hide_in_programme" name="hide_in_programme" type="checkbox" />'
+        )
+        self.assertContains(response,
+            u'<input id="id_cancelled" name="cancelled" type="checkbox" />'
+        )
+        self.assertContains(response,
+            u'<input id="id_discounted" name="discounted" type="checkbox" />'
+        )
+
+        # Rota edit:
+        self.assertContains(response,
+            u'<input class="rota_count" id="id_role_1" name="role_1" type="text" value="0" />'
+        )
+        self.assertContains(response,
+            u'<option value="2" selected="selected">'
+        )
+        self.assertContains(response,
+            u'<option value="3">'
+        )
+
+    @patch('django.utils.timezone.now')
+    def tests_edit_showing(self, now_patch):
+        now_patch.return_value = self._fake_now
+
+        url = reverse("edit-showing", kwargs={"showing_id": 3})
+        response = self.client.post(url, data={
+            u"start": u"15/08/2013 19:30",
+            u"booked_by": u"Yet \u0102nother \u0170ser",
+            u"confirmed": u"on",
+            u"hide_in_programme": u"on",
+            u"cancelled": u"on",
+            u"discounted": u"on",
+            u"role_1": u"3",
+            u"other_roles": u"3",
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.assert_return_to_index(response)
+
+        # Check showing was updated:
+        showing = Showing.objects.get(id=3)
+        self.assertEqual(showing.start, pytz.utc.localize(datetime(2013, 8, 15, 18, 30)))
+        self.assertEqual(showing.booked_by, u"Yet \u0102nother \u0170ser")
+        self.assertEqual(showing.confirmed, True)
+        self.assertEqual(showing.hide_in_programme, True)
+        self.assertEqual(showing.cancelled, True)
+        self.assertEqual(showing.discounted, True)
+        # Check rota is as expected:
+        rota = list(showing.rotaentry_set.all())
+        self.assertEqual(len(rota), 4)
+        self.assertEqual(rota[0].role_id, 1)
+        self.assertEqual(rota[0].rank, 1)
+        self.assertEqual(rota[1].role_id, 1)
+        self.assertEqual(rota[1].rank, 2)
+        self.assertEqual(rota[2].role_id, 1)
+        self.assertEqual(rota[2].rank, 3)
+        self.assertEqual(rota[3].role_id, 3)
+        self.assertEqual(rota[3].rank, 1)
+
+    @patch('django.utils.timezone.now')
+    def tests_edit_showing_in_past(self, now_patch):
+        now_patch.return_value = self._fake_now
+
+        url = reverse("edit-showing", kwargs={"showing_id": 1})
+        response = self.client.post(url, data={
+            u"start": u"15/08/2013 19:30",
+            u"booked_by": u"Valid",
+            u"role_1": u"0",
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_showing.html")
+        self.assert_has_message(response, u"Can&#39;t edit showings that are in the past", "error")
+
+    @patch('django.utils.timezone.now')
+    def tests_edit_showing_missing_data(self, now_patch):
+        now_patch.return_value = self._fake_now
+
+        url = reverse("edit-showing", kwargs={"showing_id": 3})
+        response = self.client.post(url, data={
+            u"start": u"",
+            u"booked_by": u"",
+            u"role_1": u"0",
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_showing.html")
+
+        self.assertFormError(response, 'form', 'start', u'This field is required.')
+        self.assertFormError(response, 'form', 'booked_by', u'This field is required.')
+
+    @patch('django.utils.timezone.now')
+    def tests_edit_showing_invalid_date_past(self, now_patch):
+        now_patch.return_value = self._fake_now
+
+        url = reverse("edit-showing", kwargs={"showing_id": 3})
+        response = self.client.post(url, data={
+            u"start": u"15/01/2013 19:30",
+            u"booked_by": u"Valid",
+            u"role_1": u"0",
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_showing.html")
+
+        self.assertFormError(response, 'form', 'start', u'Must be in the future')
+
+    @patch('django.utils.timezone.now')
+    def tests_edit_showing_invalid_date_malformed(self, now_patch):
+        now_patch.return_value = self._fake_now
+
+        url = reverse("edit-showing", kwargs={"showing_id": 3})
+        response = self.client.post(url, data={
+            u"start": u"Spinach",
+            u"booked_by": u"Valid",
+            u"role_1": u"0",
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_showing.html")
+
+        self.assertFormError(response, 'form', 'start', u'Enter a valid date/time.')
 
 
 class DeleteShowing(DiaryTestsMixin, TestCase):
