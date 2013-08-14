@@ -2,7 +2,7 @@ import re
 import json
 
 import pytz
-from datetime import datetime, date
+from datetime import datetime, date, time
 
 from mock import patch
 
@@ -350,10 +350,10 @@ class EditDiaryViews(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
 
 
-class AddShowing(DiaryTestsMixin, TestCase):
+class AddShowingView(DiaryTestsMixin, TestCase):
 
     def setUp(self):
-        super(AddShowing, self).setUp()
+        super(AddShowingView, self).setUp()
         # Log in:
         self.client.login(username="admin", password="T3stPassword!")
 
@@ -528,6 +528,153 @@ class DeleteShowing(DiaryTestsMixin, TestCase):
         self.assertFalse(Showing.objects.filter(id=3))
 
         self.assert_return_to_index(response)
+
+
+class AddEventView(DiaryTestsMixin, TestCase):
+
+    def setUp(self):
+        super(AddEventView, self).setUp()
+        # Log in:
+        self.client.login(username="admin", password="T3stPassword!")
+
+    @patch('django.utils.timezone.now')
+    def test_get_add_event_form_default_start(self, now_patch):
+        now_patch.return_value = self._fake_now
+
+        url = reverse("add-event")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_new_event_and_showing.html")
+        # Default start should be set one day in the future:
+        self.assertContains(response, ur'<input id="id_start" name="start" value="02/06/2013 20:00" type="text" />', html=True)
+
+    def test_get_add_event_form_specify_start(self):
+        url = reverse("add-event")
+        response = self.client.get(url, data={"date": "01-01-1950"})
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_new_event_and_showing.html")
+        # Default start should be set one day in the future:
+        self.assertContains(response, ur'<input id="id_start" name="start" value="01/01/1950 20:00" type="text" />', html=True)
+
+    def test_get_add_event_form_specify_malformed_start(self):
+        url = reverse("add-event")
+        response = self.client.get(url, data={"date": "crisp packet"})
+        self.assertContains(response, "Invalid start date", status_code=400)
+
+    def test_get_add_event_form_specify_invalid_start(self):
+        url = reverse("add-event")
+        response = self.client.get(url, data={"date": "99-01-1950"})
+        self.assertContains(response, "Illegal date", status_code=400)
+
+    @patch('django.utils.timezone.now')
+    def test_add_event(self, now_patch):
+        now_patch.return_value = self._fake_now
+
+        url = reverse("add-event")
+        response = self.client.post(url, data= {
+            u"start": u"02/06/2013 20:00",
+            u"duration": u"01:30:00",
+            u"number_of_days": u"3",
+            u"event_name": u"Ev\u0119nt of choic\u0119",
+            u"event_template": u"1",
+            u"booked_by": u"\u015Comeb\u014ddy",
+            u"private": u"on",
+            u"external": u"",
+            u"confirmed": u"on",
+            u"discounted": u"on",
+        })
+        # Request succeeded?
+        self.assertEqual(response.status_code, 200)
+        self.assert_return_to_index(response)
+
+        # Event added correctly?
+        event = Event.objects.get(name=u"Ev\u0119nt of choic\u0119")
+        self.assertEqual(event.duration, time(1, 30))
+        self.assertEqual(event.private, True)
+        self.assertEqual(event.outside_hire, False)
+        self.assertEqual(event.template, EventTemplate.objects.get(id=1))
+
+        showings = list(event.showings.all())
+        self.assertEqual(len(showings), 3)
+        # Showings should have been added over 3 days. Time specified was BST,
+        # so should be 7pm in UTC:
+        self.assertEqual(showings[0].start, pytz.utc.localize(datetime(2013, 6, 2, 19, 0)))
+        self.assertEqual(showings[1].start, pytz.utc.localize(datetime(2013, 6, 3, 19, 0)))
+        self.assertEqual(showings[2].start, pytz.utc.localize(datetime(2013, 6, 4, 19, 0)))
+
+        role_1 = Role.objects.get(id=1)
+        for s in showings:
+            self.assertEqual(s.booked_by, u"\u015Comeb\u014ddy")
+            self.assertEqual(s.confirmed, True)
+            self.assertEqual(s.hide_in_programme, False)
+            self.assertEqual(s.cancelled, False)
+            self.assertEqual(s.discounted, True)
+            self.assertEqual(list(s.roles.all()), [role_1, ])
+
+    @patch('django.utils.timezone.now')
+    def test_add_event_in_past(self, now_patch):
+        now_patch.return_value = self._fake_now
+
+        event_count_before = Event.objects.count()
+
+        url = reverse("add-event")
+        response = self.client.post(url, data= {
+            u"start": u"30/05/2013 20:00",
+            u"duration": u"01:30:00",
+            u"number_of_days": u"3",
+            u"event_name": u"Ev\u0119nt of choic\u0119",
+            u"event_template": u"1",
+            u"booked_by": u"\u015Comeb\u014ddy",
+            u"private": u"on",
+            u"external": u"",
+            u"confirmed": u"on",
+            u"discounted": u"on",
+        })
+        # Request succeeded?
+        self.assertEqual(response.status_code, 200)
+
+        # Event shouldn't have been added:
+        self.assertEqual(event_count_before, Event.objects.count())
+
+        self.assertTemplateUsed(response, "form_new_event_and_showing.html")
+
+        # Check error was as expected:
+        self.assertFormError(response, 'form', 'start', u'Must be in the future')
+
+    @patch('django.utils.timezone.now')
+    def test_add_event_missing_fields(self, now_patch):
+        now_patch.return_value = self._fake_now
+
+        event_count_before = Event.objects.count()
+
+        url = reverse("add-event")
+        response = self.client.post(url, data= {
+            u"start": u"",
+            u"duration": u"",
+            u"number_of_days": u"",
+            u"event_name": u"",
+            u"event_template": u"",
+            u"booked_by": u"",
+            u"private": u"",
+            u"external": u"",
+            u"confirmed": u"",
+            u"discounted": u"",
+        })
+        # Request succeeded?
+        self.assertEqual(response.status_code, 200)
+
+        # Event shouldn't have been added:
+        self.assertEqual(event_count_before, Event.objects.count())
+
+        self.assertTemplateUsed(response, "form_new_event_and_showing.html")
+
+        # Check error was as expected:
+        self.assertFormError(response, 'form', 'start', u'This field is required.')
+        self.assertFormError(response, 'form', 'duration', u'This field is required.')
+        self.assertFormError(response, 'form', 'number_of_days', u'This field is required.')
+        self.assertFormError(response, 'form', 'event_name', u'This field is required.')
+        self.assertFormError(response, 'form', 'booked_by', u'This field is required.')
+
 
 
 class PreferencesTests(DiaryTestsMixin, TestCase):

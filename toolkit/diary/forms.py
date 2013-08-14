@@ -137,8 +137,7 @@ class CloneShowingForm(forms.Form):
 
 
 class NewEventForm(forms.Form):
-    start = forms.DateTimeField(required=True, validators=[validate_in_future])
-    start = forms.DateTimeField(required=True, widget=JQueryDateTimePicker())
+    start = forms.DateTimeField(required=True, validators=[validate_in_future], widget=JQueryDateTimePicker())
     duration = forms.TimeField(required=True, initial=datetime.time(hour=1))
     number_of_days = forms.IntegerField(min_value=1, max_value=31, required=True, initial=1)
     event_name = forms.CharField(min_length=1, max_length=256, required=True)

@@ -266,10 +266,11 @@ def add_event(request):
     elif request.method == 'GET':
         # GET: Show form blank, with date filled in from GET date parameter:
         # Marshal date out of the GET request:
-        default_date = datetime.date.today() + datetime.timedelta(1)
+        default_date = django.utils.timezone.now().date() + datetime.timedelta(1)
         date = request.GET.get('date', default_date.strftime("%d-%m-%Y"))
         date = date.split("-")
-        assert(len(date) == 3)  # Should probably do this better
+        if len(date) != 3:
+            return HttpResponse("Invalid start date", status=400, content_type="text/plain")
         try:
             date[0] = int(date[0], 10)
             date[1] = int(date[1], 10)
@@ -278,13 +279,13 @@ def add_event(request):
                 datetime.datetime(hour=20, minute=0, day=date[0], month=date[1], year=date[2])
             )
         except (ValueError, TypeError):
-            return HttpResponse("Illegal date", status=400)
+            return HttpResponse("Illegal date", status=400, content_type="text/plain")
         # Create form, render template:
         form = diary_forms.NewEventForm(initial={'start': event_start})
         context = {'form': form}
         return render(request, 'form_new_event_and_showing.html', context)
     else:
-        return HttpResponse("Illegal method", status=405)
+        return HttpResponse("Illegal method", status=405, content_type="text/plain")
 
 
 @permission_required('toolkit.write')
