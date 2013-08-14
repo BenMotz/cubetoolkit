@@ -4,6 +4,7 @@ logger = logging.getLogger(__name__)
 
 KNOWN_PREFS = {'popups': 'true'}
 
+
 def get_preferences(session):
     edit_prefs = {}
     for pref, default in KNOWN_PREFS.iteritems():

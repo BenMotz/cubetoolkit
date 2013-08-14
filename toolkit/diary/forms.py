@@ -153,6 +153,7 @@ class MailoutForm(forms.Form):
     subject = forms.CharField(max_length=128, required=True)
     body = forms.CharField(required=True, widget=forms.Textarea(attrs={'wrap': 'soft', 'cols': 80}))
 
+
 class SearchForm(forms.Form):
     search_term = forms.CharField(label="Search for", required=False)
     start_date = forms.DateTimeField(label="Search from", required=False)

@@ -26,13 +26,13 @@ class DiaryTestsMixin(object):
     # Useful method:
     def assert_return_to_index(self, response):
         # Check status=200 and expected text included:
-        self.assertContains(response,
+        self.assertContains(
+            response,
             "<!DOCTYPE html><html>"
             "<head><title>-</title></head>"
             "<body onload='self.close(); opener.location.reload(true);'>Ok</body>"
             "</html>"
         )
-
 
     def _setup_test_data(self):
 
@@ -80,7 +80,7 @@ class DiaryTestsMixin(object):
             notes="Notes",
         )
         e3.save()
-        e3.tags = [t2,]
+        e3.tags = [t2, ]
         e3.save()
 
         e4 = Event(
@@ -91,7 +91,7 @@ class DiaryTestsMixin(object):
             notes="\u0147otes on event fou\u0159",
         )
         e4.save()
-        e4.tags = [t2,]
+        e4.tags = [t2, ]
         e4.save()
 
         # Showings:
@@ -119,7 +119,6 @@ class DiaryTestsMixin(object):
             confirmed=True
         )
         s3.save(force=True)  # Force start date in the past
-
 
         # Rota items:
         RotaEntry(showing=s1, role=r2, rank=1).save()
@@ -211,6 +210,7 @@ class DiaryTestsMixin(object):
 
 
 class PublicDiaryViews(DiaryTestsMixin, TestCase):
+
     """Basic test that all the public diary pages load"""
 
     def test_view_default(self):
@@ -294,6 +294,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
 
 
 class EditDiaryViewsLoginRequired(DiaryTestsMixin, TestCase):
+
     """Basic test that the private diary pages do not load without a login"""
 
     def test_urls(self):
@@ -332,6 +333,7 @@ class EditDiaryViewsLoginRequired(DiaryTestsMixin, TestCase):
 
 
 class EditDiaryViews(DiaryTestsMixin, TestCase):
+
     """Basic test that the private diary pages load"""
 
     def setUp(self):
@@ -487,6 +489,7 @@ class AddShowingView(DiaryTestsMixin, TestCase):
 
         self.assert_return_to_index(response)
 
+
 class DeleteShowing(DiaryTestsMixin, TestCase):
 
     def setUp(self):
@@ -546,7 +549,11 @@ class AddEventView(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_new_event_and_showing.html")
         # Default start should be set one day in the future:
-        self.assertContains(response, ur'<input id="id_start" name="start" value="02/06/2013 20:00" type="text" />', html=True)
+        self.assertContains(
+            response,
+            ur'<input id="id_start" name="start" value="02/06/2013 20:00" type="text" />',
+            html=True
+        )
 
     def test_get_add_event_form_specify_start(self):
         url = reverse("add-event")
@@ -554,7 +561,11 @@ class AddEventView(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_new_event_and_showing.html")
         # Default start should be set one day in the future:
-        self.assertContains(response, ur'<input id="id_start" name="start" value="01/01/1950 20:00" type="text" />', html=True)
+        self.assertContains(
+            response,
+            ur'<input id="id_start" name="start" value="01/01/1950 20:00" type="text" />',
+            html=True
+        )
 
     def test_get_add_event_form_specify_malformed_start(self):
         url = reverse("add-event")
@@ -571,7 +582,7 @@ class AddEventView(DiaryTestsMixin, TestCase):
         now_patch.return_value = self._fake_now
 
         url = reverse("add-event")
-        response = self.client.post(url, data= {
+        response = self.client.post(url, data={
             u"start": u"02/06/2013 20:00",
             u"duration": u"01:30:00",
             u"number_of_days": u"3",
@@ -618,7 +629,7 @@ class AddEventView(DiaryTestsMixin, TestCase):
         event_count_before = Event.objects.count()
 
         url = reverse("add-event")
-        response = self.client.post(url, data= {
+        response = self.client.post(url, data={
             u"start": u"30/05/2013 20:00",
             u"duration": u"01:30:00",
             u"number_of_days": u"3",
@@ -648,7 +659,7 @@ class AddEventView(DiaryTestsMixin, TestCase):
         event_count_before = Event.objects.count()
 
         url = reverse("add-event")
-        response = self.client.post(url, data= {
+        response = self.client.post(url, data={
             u"start": u"",
             u"duration": u"",
             u"number_of_days": u"",
@@ -676,13 +687,12 @@ class AddEventView(DiaryTestsMixin, TestCase):
         self.assertFormError(response, 'form', 'booked_by', u'This field is required.')
 
 
-
 class PreferencesTests(DiaryTestsMixin, TestCase):
+
     def setUp(self):
         super(PreferencesTests, self).setUp()
         # Log in:
         self.client.login(username="admin", password="T3stPassword!")
-
 
     def _get_edit_prefs(self, response):
         match = re.search(ur"var\s+edit_prefs\s*=\s*({.*?});", str(response), re.DOTALL)
@@ -698,7 +708,7 @@ class PreferencesTests(DiaryTestsMixin, TestCase):
 
         # Set popups false:
         response = self.client.get(reverse("set_edit_preferences"),
-            data={"popups": "false"})
+                                   data={"popups": "false"})
         self.assertEqual(response.status_code, 200)
 
         # Verify change:
@@ -708,7 +718,7 @@ class PreferencesTests(DiaryTestsMixin, TestCase):
 
         # Back to true:
         response = self.client.get(reverse("set_edit_preferences"),
-            data={"popups": "true"})
+                                   data={"popups": "true"})
         self.assertEqual(response.status_code, 200)
 
         # Verify change:
@@ -721,7 +731,7 @@ class PreferencesTests(DiaryTestsMixin, TestCase):
 
         # Set popups something stupid:
         response = self.client.get(reverse("set_edit_preferences"),
-            data={"popups": "tralala"*100})
+                                   data={"popups": "tralala" * 100})
         self.assertEqual(response.status_code, 200)
 
         # Verify change:
@@ -734,7 +744,7 @@ class PreferencesTests(DiaryTestsMixin, TestCase):
 
         # Set weird value, verify it doesn't come out in the edit page:
         response = self.client.get(reverse("set_edit_preferences"),
-            data={"nonsense": "tralala"})
+                                   data={"nonsense": "tralala"})
         self.assertEqual(response.status_code, 200)
 
         response = self.client.get(url)
@@ -749,7 +759,7 @@ class PreferencesTests(DiaryTestsMixin, TestCase):
 
         # Set popup preference false:
         response = self.client.get(reverse("set_edit_preferences"),
-            data={"popups": "false"})
+                                   data={"popups": "false"})
         self.assertEqual(response.status_code, 200)
 
         # should now 302 to edit list:
@@ -757,8 +767,8 @@ class PreferencesTests(DiaryTestsMixin, TestCase):
         self.assertRedirects(response, reverse("default-edit"))
 
 
-
 class UrlTests(DiaryTestsMixin, TestCase):
+
     """Test the regular expressions in urls.py"""
 
     def test_diary_urls(self):

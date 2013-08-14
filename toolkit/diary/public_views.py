@@ -164,10 +164,12 @@ def view_event(request, event_id=None, legacy_id=None):
     }
     return render(request, 'view_event.html', context)
 
+
 class ArchiveIndex(generic.ArchiveIndexView):
     model = Showing
     date_field = 'start'
     template_name = 'showing_archive.html'
+
 
 class ArchiveYear(generic.YearArchiveView):
     model = Showing
@@ -183,11 +185,12 @@ class ArchiveYear(generic.YearArchiveView):
 
         return super(ArchiveYear, self).get_dated_queryset(*args, **kwargs)
 
+
 class ArchiveMonth(generic.MonthArchiveView):
     model = Showing
     date_field = 'start'
     template_name = 'showing_archive_month.html'
-    month_format='%m'
+    month_format = '%m'
 
     def get_queryset(self, *args, **kwargs):
 
@@ -200,6 +203,7 @@ class ArchiveMonth(generic.MonthArchiveView):
         kwargs['ordering'] = 'start'
 
         return super(ArchiveMonth, self).get_dated_queryset(*args, **kwargs)
+
 
 class ArchiveSearch(generic.list.ListView, generic.edit.FormMixin):
     model = Showing
