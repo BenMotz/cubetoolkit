@@ -3,16 +3,19 @@ import json
 
 import pytz
 from datetime import datetime, date, time
+import tempfile
 
 from mock import patch
 
 from django.test import TestCase
+from django.test.utils import override_settings
 from django.core.urlresolvers import reverse, resolve
 import django.http
 import django.contrib.auth.models as auth_models
 import django.contrib.contenttypes as contenttypes
 
-from toolkit.diary.models import Showing, Event, Role, EventTag, DiaryIdea, EventTemplate, RotaEntry
+from toolkit.diary.models import (Showing, Event, Role, EventTag, DiaryIdea,
+                                 EventTemplate, RotaEntry, MediaItem)
 from toolkit.members.models import Member, Volunteer
 
 
@@ -66,15 +69,17 @@ class DiaryTestsMixin(object):
             copy="Event one copy",
             copy_summary="Event one copy summary",
             duration="01:30:00",
+            outside_hire=True,
         )
         e1.save()
 
         e2 = Event(
             name="Event two title",
-            copy="Event two copy",
-            copy_summary="Event two copy summary",
+            copy="Event\n two\n copy",  # newlines will be stripped at legacy conversion
+            copy_summary="Event two\n copy summary",
             duration="01:30:00",
             legacy_id="100",
+            legacy_copy=True,
         )
         e2.save()
 
@@ -279,7 +284,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         url = reverse("single-showing-view", kwargs={"showing_id": "1"})
         response = self.client.get(url)
         self.assertContains(response, u'Event two title')
-        self.assertContains(response, u'<p>Event two copy</p>')
+        self.assertContains(response, u'<p>Event <br>\n two <br>\n copy</p>')
         self.assertEqual(response.status_code, 200)
 
     # Event series view:
@@ -340,8 +345,7 @@ class EditDiaryViewsLoginRequired(DiaryTestsMixin, TestCase):
 
 
 class EditDiaryViews(DiaryTestsMixin, TestCase):
-
-    """Basic test that the private diary pages load"""
+    """Basic test that various private diary pages load"""
 
     def setUp(self):
         super(EditDiaryViews, self).setUp()
@@ -861,6 +865,224 @@ class AddEventView(DiaryTestsMixin, TestCase):
         self.assertFormError(response, 'form', 'number_of_days', u'This field is required.')
         self.assertFormError(response, 'form', 'event_name', u'This field is required.')
         self.assertFormError(response, 'form', 'booked_by', u'This field is required.')
+
+
+class EditEventView(DiaryTestsMixin, TestCase):
+
+    def setUp(self):
+        super(EditEventView, self).setUp()
+        # Log in:
+        self.client.login(username="admin", password="T3stPassword!")
+
+    def test_get_edit_event_form_no_media_no_legacy_copy(self):
+        url = reverse("edit-event-details", kwargs={"event_id": 1})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_event.html")
+
+        self.assertContains(response, u"Event one title")
+        self.assertContains(response, u"Event one copy")
+        self.assertContains(response, u"Event one copy summary")
+        self.assertContains(response, u"01:30:00")
+        self.assertContains(response, u'<input id="id_outside_hire" checked="checked" name="outside_hire" type="checkbox" />', html=True)
+        self.assertContains(response, u'<input id="id_private" name="private" type="checkbox" />', html=True)
+        # Blah. It's probably fine. Ahem.
+
+    def test_get_edit_event_form_no_media_legacy_copy(self):
+        # Test the transformation of legacy copy properly in a separate set of
+        # tests...
+
+        url = reverse("edit-event-details", kwargs={"event_id": 2})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_event.html")
+
+        self.assertContains(response, u"Event two title")
+        self.assertContains(response, u"Event <br>\n two <br>\n copy")  # newlines -> <br>
+        self.assertContains(response, u"Event two\n copy summary")  # not stripped
+        self.assertContains(response, u"01:30:00")
+        self.assertContains(response, u'<input id="id_outside_hire" name="outside_hire" type="checkbox" />', html=True)
+        self.assertContains(response, u'<input id="id_private" name="private" type="checkbox" />', html=True)
+        # It's probably still fine. Cough.
+
+    @override_settings(MEDIA_ROOT="/tmp")
+    def test_get_edit_event_form_media_item(self):
+        with tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-", suffix=".jpg") as temp_jpg:
+            # Add MediaItem to event 1:
+            media_item = MediaItem(media_file=temp_jpg.name, mimetype="image/jpeg", caption="Image Caption!", credit="Image Credit!")
+            media_item.save()
+            event = Event.objects.get(id=1)
+            event.media.add(media_item)
+            event.save()
+
+            # Get page:
+            url = reverse("edit-event-details", kwargs={"event_id": 1})
+            response = self.client.get(url)
+            self.assertEqual(response.status_code, 200)
+            self.assertTemplateUsed(response, "form_event.html")
+
+            self.assertContains(response, media_item.media_file)
+                    # Submit the minimum amount of data to validate:
+            self.assertContains(response, "Image Credit!")
+            # Caption not currently exposed to user
+
+
+    def test_get_edit_missing_event(self):
+        url = reverse("edit-event-details", kwargs={"event_id": 1000})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_post_edit_missing_event(self):
+        url = reverse("edit-event-details", kwargs={"event_id": 1000})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_post_edit_event_no_media_missing_data(self):
+        url = reverse("edit-event-details", kwargs={"event_id": 1})
+        response = self.client.post(url, data={})
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_event.html")
+
+        self.assertFormError(response, 'form', 'name', u'This field is required.')
+        self.assertFormError(response, 'form', 'duration', u'This field is required.')
+
+    def test_post_edit_event_no_media_minimal_data(self):
+        url = reverse("edit-event-details", kwargs={"event_id": 2})
+
+        # Submit the minimum amount of data to validate:
+        response = self.client.post(url, data={
+            'name': u'New \u20acvent Name',
+            'duration': u'00:10:00',
+        })
+        self.assert_return_to_index(response)
+
+        event = Event.objects.get(id=2)
+        self.assertEqual(event.name, u'New \u20acvent Name')
+        self.assertEqual(event.duration, time(0,10))
+        self.assertEqual(event.copy, u'')
+        self.assertEqual(event.copy_summary, u'')
+        self.assertEqual(event.terms, u'')
+        self.assertEqual(event.notes, u'')
+        self.assertEqual(event.media.count(), 0)
+        self.assertEqual(event.outside_hire, False)
+        self.assertEqual(event.private, False)
+        # Shouldn't have changed:
+        self.assertEqual(event.legacy_id, u'100')
+
+    def test_post_edit_event_no_media_all_fields(self):
+        url = reverse("edit-event-details", kwargs={"event_id": 2})
+
+        # Submit the minimum amount of data to validate:
+        response = self.client.post(url, data={
+            'name': u'New \u20acvent Name!',
+            'duration': u'01:10:09',
+            'copy': u'Some more copy',
+            'copy_summary': u'Copy summary blah',
+            'terms': u'Always term time',
+            'notes': u'This is getting\n boring',
+            'outside_hire': u'on',
+            'private': u'on',
+        })
+        self.assert_return_to_index(response)
+
+        event = Event.objects.get(id=2)
+        self.assertEqual(event.name, u'New \u20acvent Name!')
+        self.assertEqual(event.duration, time(1,10, 9))
+        self.assertEqual(event.copy, u'Some more copy')
+        self.assertEqual(event.copy_summary, u'Copy summary blah')
+        self.assertEqual(event.terms, u'Always term time')
+        self.assertEqual(event.notes, u'This is getting\n boring')
+        self.assertEqual(event.media.count(), 0)
+        self.assertEqual(event.outside_hire, True)
+        self.assertEqual(event.private, True)
+        # Shouldn't have changed:
+        self.assertEqual(event.legacy_id, u'100')
+
+    def test_post_edit_event_add_media_invalid_empty(self):
+        url = reverse("edit-event-details", kwargs={"event_id": 2})
+
+        with tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-", suffix=".jpg") as temp_jpg:
+            response = self.client.post(url, data={
+                'name': u'New \u20acvent Name',
+                'duration': u'00:10:00',
+                'media_file': temp_jpg,
+            })
+            self.assertEqual(response.status_code, 200)
+            self.assertTemplateUsed(response, "form_event.html")
+            self.assertFormError(response, 'media_form', 'media_file', u'The submitted file is empty.')
+
+    def test_post_edit_event_add_media_not_an_image(self):
+        url = reverse("edit-event-details", kwargs={"event_id": 2})
+
+        with tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-", suffix=".jpg") as temp_jpg:
+            temp_jpg.write("Not an empty jpeg")
+            temp_jpg.seek(0)
+            response = self.client.post(url, data={
+                'name': u'New \u20acvent Name',
+                'duration': u'00:10:00',
+                'media_file': temp_jpg,
+                'credit': u'All new image credit!'
+            })
+            self.assert_return_to_index(response)
+
+            event = Event.objects.get(id=2)
+            self.assertEqual(event.media.count(), 1)
+            media_item = event.media.all()[0]
+            self.assertEqual(media_item.mimetype, "text/plain")
+            self.assertEqual(str(media_item.thumbnail), '')
+            self.assertEqual(media_item.credit, u'All new image credit!')
+            self.assertEqual(media_item.caption, None)
+
+    def test_post_edit_event_add_media_jpeg(self):
+        url = reverse("edit-event-details", kwargs={"event_id": 2})
+
+        with tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-", suffix=".jpg") as temp_jpg:
+            # Minimal JPEG file:
+            temp_jpg.write("\xFF\xD8\xFF\xE0\x00\x10\x4A\x46\x49\x46\x00\x01\x01\x01\x00\x48\x00\x48\x00"
+                           "\x00\xFF\xDB\x00\x43\x00" + ("\xFF" * 65) +
+                           "\xC2\x00\x0B\x08\x00\x01\x00\x01\x01\x01\x11\x00\xFF\xC4\x00\x14\x10\x01\x00"
+                           "\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\xFF\xDA\x00\x08"
+                           "\x01\x01\x00\x01\x3F\x10")
+            temp_jpg.seek(0)
+            response = self.client.post(url, data={
+                'name': u'New \u20acvent Name',
+                'duration': u'00:10:00',
+                'media_file': temp_jpg,
+                'credit': u'All new image credit!'
+            })
+            self.assert_return_to_index(response)
+
+            event = Event.objects.get(id=2)
+            self.assertEqual(event.media.count(), 1)
+            media_item = event.media.all()[0]
+            self.assertEqual(media_item.mimetype, "image/jpeg")
+            # self.assertEqual(str(media_item.thumbnail), '')  # Thumbnailing fails, as PIL can't cope
+            self.assertEqual(media_item.credit, u'All new image credit!')
+            self.assertEqual(media_item.caption, None)
+
+    @override_settings(MEDIA_ROOT="/tmp")
+    def test_post_edit_event_clear_media(self):
+        with tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-", suffix=".jpg") as temp_jpg:
+            # Add MediaItem to event 1:
+            media_item = MediaItem(media_file=temp_jpg.name, mimetype="image/jpeg", caption="Image Caption!", credit="Image Credit!")
+            media_item.save()
+            event = Event.objects.get(id=2)
+            event.media.add(media_item)
+            event.save()
+
+            url = reverse("edit-event-details", kwargs={"event_id": 2})
+
+            response = self.client.post(url, data={
+                'name': u'New \u20acvent Name',
+                'duration': u'00:10:00',
+                'media_file': temp_jpg.name,
+                'media_file-clear': 'on',
+            })
+            self.assert_return_to_index(response)
+
+            event = Event.objects.get(id=2)
+            # Media item should be gone:
+            self.assertEqual(event.media.count(), 0)
 
 
 class EditIdeasViewTests(DiaryTestsMixin, TestCase):
