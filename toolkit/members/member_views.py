@@ -8,7 +8,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import permission_required, login_required
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
-from django.views.decorators.http import require_GET, require_POST, require_http_methods
+from django.views.decorators.http import require_POST, require_safe, require_http_methods
 
 
 import toolkit.members.forms
@@ -50,12 +50,12 @@ def add_member(request):
 
 
 @login_required
+@require_safe
 def search(request):
     search_terms = request.GET.get('q', None)
     show_edit_link = bool(request.GET.get('show_edit_link', None))
     show_delete_link = bool(request.GET.get('show_delete_link', None))
     results = None
-    print show_edit_link, show_delete_link
 
     if search_terms:
         results = Member.objects.filter(  Q(name__icontains=search_terms)
@@ -78,6 +78,7 @@ def search(request):
 
 
 @login_required
+@require_safe
 def view(request, member_id):
     # Is this view actually used?
     member = get_object_or_404(Member, id=member_id)
@@ -85,11 +86,11 @@ def view(request, member_id):
 
 
 @permission_required('toolkit.write')
+@require_POST
 def delete_member(request, member_id):
     member = get_object_or_404(Member, id=member_id)
-    if request.method == 'POST':
-        member.delete()  # This will delete associated volunteer record, if any
-        messages.add_message(request, messages.SUCCESS, u"Deleted member: {0} ({1})".format(member.number, member.name))
+    member.delete()  # This will delete associated volunteer record, if any
+    messages.add_message(request, messages.SUCCESS, u"Deleted member: {0} ({1})".format(member.number, member.name))
 
     return HttpResponseRedirect(reverse("search-members"))
 
@@ -123,6 +124,7 @@ def _check_access_permitted_for_member_key(permission, request, member_id):
 
 # This view (and unsubscribe_member below) can be accessed both by logged in users and
 # if the magic key associated with the member record is passed in in the request
+@require_http_methods(["GET", "POST"])
 def edit_member(request, member_id):
 
     if not _check_access_permitted_for_member_key('toolkit.write', request, member_id):
@@ -162,6 +164,7 @@ def edit_member(request, member_id):
 
 # This view (and edit_member above) can be accessed both by logged in users and
 # if the magic key associated with the member record is passed in in the request
+@require_http_methods(["GET", "POST"])
 def unsubscribe_member(request, member_id):
 
     if not _check_access_permitted_for_member_key('toolkit.write', request, member_id):
@@ -187,6 +190,7 @@ def unsubscribe_member(request, member_id):
 
 
 @login_required
+@require_safe
 def member_statistics(request):
     # View for the 'statistics' page of the 'membership database'
 
@@ -248,6 +252,7 @@ def member_statistics(request):
     return render(request, 'stats.html', context)
 
 
+@require_safe
 def member_homepages(request):
     members = (Member.objects.filter(website__isnull=False)
                              .exclude(website='')
