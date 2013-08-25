@@ -8,6 +8,7 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import permission_required, login_required
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
+from django.views.decorators.http import require_GET, require_POST, require_http_methods
 
 
 import toolkit.members.forms
@@ -19,6 +20,7 @@ logger.setLevel(logging.DEBUG)
 
 
 @permission_required('toolkit.write')
+@require_http_methods(["GET", "POST"])
 def add_member(request):
     # If this view is called with GET then display the form to enter a new
     # member. If called with POST then take parameters out of the body of
@@ -37,7 +39,7 @@ def add_member(request):
             # Member added ok, new blank form:
             form = toolkit.members.forms.NewMemberForm()
             messages.add_message(request, messages.SUCCESS, u"Added member: {0}".format(instance.number))
-    else:
+    elif request.method == 'GET':
         # GET request; create form object with default values
         form = toolkit.members.forms.NewMemberForm()
 

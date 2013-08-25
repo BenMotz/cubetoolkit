@@ -179,4 +179,57 @@ class TestVolunteerEditViews(MembersTestsMixin, TestCase):
         # And redirected to volunteer list
         self.assertRedirects(response, reverse("view-volunteer-list"))
 
+class TestAddMemberView(MembersTestsMixin, TestCase):
+    def setUp(self):
+        super(TestAddMemberView, self).setUp()
 
+        self.assertTrue(self.client.login(username="admin", password="T3stPassword!"))
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_get_form(self):
+        url = reverse("add-member")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_new_member.html")
+
+    def test_post_form(self):
+        new_name = u"Some New \u20acejit"
+
+        self.assertEqual(Member.objects.filter(name=new_name).count(), 0)
+
+        url = reverse("add-member")
+        response = self.client.post(url, data={
+            u"name": new_name,
+            u"email": u"blah.blah-blah@hard-to-tell-if-genuine.uk",
+            u"postcode": "SW1A 1AA",
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_new_member.html")
+
+        member = Member.objects.get(name=new_name)
+        self.assertEqual(member.email, u"blah.blah-blah@hard-to-tell-if-genuine.uk")
+        self.assertEqual(member.postcode, u"SW1A 1AA")
+
+        self.assertContains(response, u"Added member: {}".format(member.number))
+
+    def test_post_form_invalid_data_missing(self):
+        url = reverse("add-member")
+        response = self.client.post(url)
+
+        count_before = Member.objects.count()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_new_member.html")
+
+        self.assertFormError(response, 'form', 'name', u'This field is required.')
+
+        self.assertEqual(count_before, Member.objects.count())
+
+    def test_invalid_method(self):
+        url = reverse("add-member")
+        response = self.client.put(url)
+        self.assertEqual(response.status_code, 405)
