@@ -11,6 +11,7 @@ import django.contrib.contenttypes as contenttypes
 from toolkit.members.models import Member, Volunteer
 from toolkit.diary.models import Role
 
+
 class MembersTestsMixin(object):
 
     def setUp(self):
@@ -79,6 +80,7 @@ class MembersTestsMixin(object):
 
 
 class SecurityTests(MembersTestsMixin, TestCase):
+
     """Basic test that the private pages do not load without a login"""
 
     def test_private_urls(self):
@@ -138,8 +140,8 @@ class SecurityTests(MembersTestsMixin, TestCase):
         # Now try with the key:
         for view_name in views_to_test:
             url = "{0}?k={1}".format(
-                    reverse(view_name, kwargs={'member_id': member.id}),
-                    member.mailout_key)
+                reverse(view_name, kwargs={'member_id': member.id}),
+                member.mailout_key)
             # Test GET:
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
@@ -185,7 +187,9 @@ class TestVolunteerEditViews(MembersTestsMixin, TestCase):
         # And redirected to volunteer list
         self.assertRedirects(response, reverse("view-volunteer-list"))
 
+
 class TestAddMemberView(MembersTestsMixin, TestCase):
+
     def setUp(self):
         super(TestAddMemberView, self).setUp()
 
@@ -240,7 +244,9 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
         response = self.client.put(url)
         self.assertEqual(response.status_code, 405)
 
+
 class TestSearchMemberView(MembersTestsMixin, TestCase):
+
     def setUp(self):
         super(TestSearchMemberView, self).setUp()
 
@@ -299,9 +305,11 @@ class TestSearchMemberView(MembersTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "search_members_results.html")
 
-        self.assertContains(response,
+        self.assertContains(
+            response,
             u'<form method="get" action="{}"><input type="submit" value="Edit"></form>'.format(
-                reverse("edit-member", kwargs={"member_id": 3})),
+                reverse("edit-member", kwargs={"member_id": 3})
+            ),
             html=True,
         )
         self.assertNotContains(response, u'<input type="submit" value="Delete">', html=True)
@@ -317,17 +325,18 @@ class TestSearchMemberView(MembersTestsMixin, TestCase):
         self.assertTemplateUsed(response, "search_members_results.html")
 
         self.assertContains(response,
-            u'<input type="submit" value="Delete">',
-            html=True,
-        )
+                            u'<input type="submit" value="Delete">',
+                            html=True,
+                            )
 
         self.assertContains(response,
-                reverse("delete-member", kwargs={"member_id": 3})
-        )
+                            reverse("delete-member", kwargs={"member_id": 3})
+                            )
         self.assertNotContains(response, u'<input type="submit" value="Edit">', html=True)
 
 
 class TestDeleteMemberView(MembersTestsMixin, TestCase):
+
     def setUp(self):
         super(TestDeleteMemberView, self).setUp()
 
@@ -364,12 +373,9 @@ class TestDeleteMemberView(MembersTestsMixin, TestCase):
 
 
 class TestUnsubscribeMemberView(MembersTestsMixin, TestCase):
+
     def setUp(self):
         super(TestUnsubscribeMemberView, self).setUp()
-#        self.assertTrue(self.client.login(username="admin", password="T3stPassword!"))
-#
-#    def tearDown(self):
-#        self.client.logout()
 
     def _assert_redirect_to_login(self, response, url, extra_parameters=""):
         expected_redirect = (
@@ -513,8 +519,12 @@ class TestUnsubscribeMemberView(MembersTestsMixin, TestCase):
         # Still subscribed:
         self._assert_subscribed(2)
 
+    # TODO: Should add further tests for when the user is logged in. But
+    # it's not actually used, so don't bother...
+
 
 class TestMemberMiscViews(MembersTestsMixin, TestCase):
+
     def setUp(self):
         super(TestMemberMiscViews, self).setUp()
 
@@ -523,8 +533,8 @@ class TestMemberMiscViews(MembersTestsMixin, TestCase):
     def tearDown(self):
         self.client.logout()
 
+#    The SQL query used for the stats doesn't work with SQLite!
 #    def test_get_stats(self):
-#        # SQL query for stats doesn't work with SQLite!
 #        url = reverse("member-statistics")
 #        response = self.client.get(url)
 #        self.assertTemplateUsed(response, "stats.html")

@@ -15,7 +15,7 @@ import django.contrib.auth.models as auth_models
 import django.contrib.contenttypes as contenttypes
 
 from toolkit.diary.models import (Showing, Event, Role, EventTag, DiaryIdea,
-                                 EventTemplate, RotaEntry, MediaItem)
+                                  EventTemplate, RotaEntry, MediaItem)
 from toolkit.members.models import Member, Volunteer
 
 
@@ -346,6 +346,7 @@ class EditDiaryViewsLoginRequired(DiaryTestsMixin, TestCase):
 
 
 class EditDiaryViews(DiaryTestsMixin, TestCase):
+
     """Basic test that various private diary pages load"""
 
     def setUp(self):
@@ -933,7 +934,6 @@ class EditEventView(DiaryTestsMixin, TestCase):
             self.assertContains(response, "Image Credit!")
             # Caption not currently exposed to user
 
-
     def test_get_edit_missing_event(self):
         url = reverse("edit-event-details", kwargs={"event_id": 1000})
         response = self.client.get(url)
@@ -965,7 +965,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
 
         event = Event.objects.get(id=2)
         self.assertEqual(event.name, u'New \u20acvent Name')
-        self.assertEqual(event.duration, time(0,10))
+        self.assertEqual(event.duration, time(0, 10))
         self.assertEqual(event.copy, u'')
         self.assertEqual(event.copy_summary, u'')
         self.assertEqual(event.terms, u'')
@@ -994,7 +994,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
 
         event = Event.objects.get(id=2)
         self.assertEqual(event.name, u'New \u20acvent Name!')
-        self.assertEqual(event.duration, time(1,10, 9))
+        self.assertEqual(event.duration, time(1, 10, 9))
         self.assertEqual(event.copy, u'Some more copy')
         self.assertEqual(event.copy_summary, u'Copy summary blah')
         self.assertEqual(event.terms, u'Always term time')
@@ -1071,7 +1071,8 @@ class EditEventView(DiaryTestsMixin, TestCase):
     def test_post_edit_event_clear_media(self):
         with tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-", suffix=".jpg") as temp_jpg:
             # Add MediaItem to event 1:
-            media_item = MediaItem(media_file=temp_jpg.name, mimetype="image/jpeg", caption="Image Caption!", credit="Image Credit!")
+            media_item = MediaItem(
+                media_file=temp_jpg.name, mimetype="image/jpeg", caption="Image Caption!", credit="Image Credit!")
             media_item.save()
             event = Event.objects.get(id=2)
             event.media.add(media_item)
@@ -1216,7 +1217,7 @@ class ViewEventFieldTests(DiaryTestsMixin, TestCase):
     def test_custom_start_date_rota_long_time(self):
         # Reverse doesn't work for full date, as regex is apparently too
         # complicated:
-        url = reverse("view_event_field", kwargs={ "field": "rota" })
+        url = reverse("view_event_field", kwargs={"field": "rota"})
         url += "/2013/01/01?daysahead=365"
 
         response = self.client.get(url)
@@ -1228,7 +1229,7 @@ class ViewEventFieldTests(DiaryTestsMixin, TestCase):
 
     def test_custom_start_date_rota_less_long_time(self):
         # Now shorter date range, should find one fewer event
-        url = reverse("view_event_field", kwargs={ "field": "rota" })
+        url = reverse("view_event_field", kwargs={"field": "rota"})
         url += "/2013/01/01?daysahead=120"
 
         response = self.client.get(url)
@@ -1240,14 +1241,14 @@ class ViewEventFieldTests(DiaryTestsMixin, TestCase):
 
     def test_custom_start_date_rota_invalid_date(self):
         # Now shorter date range, should find one fewer event
-        url = reverse("view_event_field", kwargs={ "field": "rota" })
+        url = reverse("view_event_field", kwargs={"field": "rota"})
         url += "/2013/99/99?daysahead=120"
 
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
     def test_custom_start_date_terms_search_success(self):
-        url = reverse("view_event_field", kwargs={ "field": "terms" })
+        url = reverse("view_event_field", kwargs={"field": "terms"})
         url += "/2013/01/01?daysahead=365&search=Terminal"
 
         response = self.client.get(url)
@@ -1258,7 +1259,7 @@ class ViewEventFieldTests(DiaryTestsMixin, TestCase):
         self.assertContains(response, u"EVENT FOUR TITL\u0112")
 
     def test_custom_start_date_terms_search_no_result(self):
-        url = reverse("view_event_field", kwargs={ "field": "terms" })
+        url = reverse("view_event_field", kwargs={"field": "terms"})
         url += "/2013/01/01?daysahead=365&search=elephant"
 
         response = self.client.get(url)
@@ -1305,7 +1306,6 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             u"\n"
             u"Event four C\u014dpy\n"
         )
-
 
     def tearDown(self):
         self.time_patch.stop()
