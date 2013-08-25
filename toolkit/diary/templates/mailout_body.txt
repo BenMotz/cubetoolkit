@@ -1,4 +1,4 @@
-CUBE PROGRAMME OF EVENTS {# This is all a bit gnarly, because newlines are significant... #}
+CUBE PROGRAMME OF EVENTS{# This is all a bit gnarly, because newlines are significant... #}
 
 http://www.cubecinema.com{% url "default-view" %}
 {% for showing in showings %}

@@ -124,7 +124,7 @@ class DiaryTestsMixin(object):
         # When the clock is patched to claim that it's 1/6/2013, this showing
         # will be in the future:
         s3 = Showing(
-            start=pytz.timezone("Europe/London").localize(datetime(2013, 8, 13, 18, 00)),
+            start=pytz.timezone("Europe/London").localize(datetime(2013, 6, 9, 18, 00)),
             event=e4,
             booked_by=u"\u0102nother \u0170ser",
             confirmed=True
@@ -366,14 +366,36 @@ class EditDiaryViews(DiaryTestsMixin, TestCase):
         url = reverse("view_event_field", kwargs={"field": "rota"})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_rota.html")
 
         url = reverse("view_event_field", kwargs={"field": "copy"})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_copy.html")
 
         url = reverse("view_event_field", kwargs={"field": "terms"})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_terms.html")
+
+    def test_view_tag_editor(self):
+        url = reverse("edit_event_tags")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "edit_event_tags.html")
+
+    def test_view_template_editor(self):
+        url = reverse("edit_event_templates")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "edit_event_templates.html")
+
+    def test_view_role_editor(self):
+        url = reverse("edit_roles")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_edit_roles.html")
+
 
 class AddShowingView(DiaryTestsMixin, TestCase):
 
@@ -533,11 +555,11 @@ class EditShowing(DiaryTestsMixin, TestCase):
 
         # "clone" part should have expected start time:
         self.assertContains(response,
-            u'<input id="id_clone_start" name="clone_start" type="text" value="14/08/2013 18:00" />'
+            u'<input id="id_clone_start" name="clone_start" type="text" value="10/06/2013 18:00" />'
         )
         # Edit should have existing values:
         self.assertContains(response,
-            u'<input id="id_start" name="start" type="text" value="13/08/2013 18:00" />'
+            u'<input id="id_start" name="start" type="text" value="09/06/2013 18:00" />'
         )
         self.assertContains(response,
             u'<input id="id_booked_by" maxlength="64" name="booked_by" type="text" value="\u0102nother \u0170ser" />'
@@ -1158,6 +1180,115 @@ class EditIdeasViewTests(DiaryTestsMixin, TestCase):
         self.assertEqual(idea.ideas, u"An ide\u0113 f\u014d\u0159 some \u20acvent")
 
         self.assert_return_to_index(response)
+
+
+class MailoutTests(DiaryTestsMixin, TestCase):
+
+    def setUp(self):
+        super(MailoutTests, self).setUp()
+        # Log in:
+        self.client.login(username="admin", password="T3stPassword!")
+
+        # Fake "now()" function to return a fixed time:
+        self.time_patch = patch('django.utils.timezone.now')
+        self.time_mock = self.time_patch.start()
+        self.time_mock.return_value = self._fake_now
+
+        self.expected_mailout_header = (
+            u"CUBE PROGRAMME OF EVENTS\n"
+            u"\n"
+            u"http://www.cubecinema.com/programme/\n"
+            u"\n"
+        )
+
+        self.expected_mailout_event = (
+            u"CUBE PROGRAMME OF EVENTS\n"
+            u"\n"
+            u"http://www.cubecinema.com/programme/\n"
+            u"\n"
+            u"2013\n"
+            u" JUNE\n"
+            u"  Sun 09 18:00 ........ Event four titl\u0113\n"
+            u"\n"
+            u"------------------------------------------------------------------------------\n"
+            u"\n"
+            u"EVENT FOUR TITL\u0112\n"
+            u"\n"
+            u"18:06 09/06/2013\n"
+            u"\n"
+            u"Event four C\u014dpy\n"
+        )
+
+
+    def tearDown(self):
+        self.time_patch.stop()
+
+    def test_get_form(self):
+        url = reverse("members-mailout")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_mailout.html")
+
+        self.assertContains(response, self.expected_mailout_header)
+        self.assertContains(response, self.expected_mailout_event)
+
+    def test_get_form_custom_daysahead(self):
+        url = reverse("members-mailout")
+        response = self.client.get(url, data={"daysahead": 15})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_mailout.html")
+
+        self.assertContains(response, self.expected_mailout_header)
+        self.assertContains(response, self.expected_mailout_event)
+
+    def test_get_form_invalid_daysahead(self):
+        url = reverse("members-mailout")
+        response = self.client.get(url, data={"daysahead": "monkey"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_mailout.html")
+
+        self.assertContains(response, self.expected_mailout_header)
+        self.assertContains(response, self.expected_mailout_event)
+
+    def test_get_form_no_events(self):
+        url = reverse("members-mailout")
+        response = self.client.get(url, data={"daysahead": 1})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_mailout.html")
+
+        self.assertContains(response, self.expected_mailout_header)
+        # NOT:
+        self.assertNotContains(response, self.expected_mailout_event)
+
+    def test_post_form(self):
+        url = reverse("members-mailout")
+        response = self.client.post(url, data={
+            'subject': "Yet another member's mailout",
+            'body': u"Let the bodies hit the floor\netc."
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "mailout_send.html")
+
+    def test_post_form_no_data(self):
+        url = reverse("members-mailout")
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_mailout.html")
+
+        self.assertFormError(response, 'form', 'subject', u'This field is required.')
+        self.assertFormError(response, 'form', 'body', u'This field is required.')
+
+
+    def test_invalid_method(self):
+        url = reverse("members-mailout")
+        response = self.client.put(url)
+        self.assertEqual(response.status_code, 405)
 
 
 class PreferencesTests(DiaryTestsMixin, TestCase):

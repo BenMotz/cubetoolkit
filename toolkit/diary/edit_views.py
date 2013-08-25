@@ -628,7 +628,7 @@ def edit_roles(request):
     return render(request, 'form_edit_roles.html', {'formset': formset})
 
 
-def _render_mailout_body(days_ahead=7):
+def _render_mailout_body(days_ahead):
     # Render default mail contents;
 
     # Read data
@@ -684,6 +684,8 @@ def mailout(request):
         if not form.is_valid():
             return render(request, 'form_mailout.html', {'form': form})
         return render(request, 'mailout_send.html', form.cleaned_data)
+    else:
+        return HttpResponse('Invalid request', status=405)
 
 
 # @condition(etag_func=None, last_modified_func=None)
@@ -692,6 +694,7 @@ def exec_mailout(request):
     form = diary_forms.MailoutForm(request.POST)
     if not form.is_valid():
         print form.errors
+        logger.error("Mailout failed: {}".format(repr(form.errors)))
         return HttpResponse(json.dumps({'status': 'error'}), mimetype="application/json")
 
     result = toolkit.members.tasks.send_mailout.delay(form.cleaned_data['subject'], form.cleaned_data['body'])
