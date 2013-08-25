@@ -372,6 +372,246 @@ class TestDeleteMemberView(MembersTestsMixin, TestCase):
         self.assertEqual(Member.objects.filter(id=1).count(), 1)
 
 
+class TestEditMemberViewNotLoggedIn(MembersTestsMixin, TestCase):
+
+    def setUp(self):
+        super(TestEditMemberViewNotLoggedIn, self).setUp()
+
+    def _assert_redirect_to_login(self, response, url, extra_parameters=""):
+        expected_redirect = (
+            reverse("login") +
+            "?next=" +
+            urllib.quote(url + extra_parameters)
+        )
+        self.assertRedirects(response, expected_redirect)
+
+    # GET tests ###########################################
+    def test_edit_get_form(self):
+        member = Member.objects.get(pk=2)
+
+        url = reverse("edit-member", kwargs={"member_id": 2})
+        response = self.client.get(url, data={
+            'k': member.mailout_key,
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_member.html")
+
+    def test_edit_get_form_no_key(self):
+        url = reverse("edit-member", kwargs={"member_id": 2})
+        response = self.client.get(url)
+
+        self._assert_redirect_to_login(response, url)
+
+    def test_edit_get_form_incorrect_key(self):
+        url = reverse("edit-member", kwargs={"member_id": 2})
+        response = self.client.get(url, data={
+            'k': "the WRONG KEY",
+        })
+        self._assert_redirect_to_login(response, url, "?k=the+WRONG+KEY")
+
+    def test_edit_get_form_invalid_memberid(self):
+        url = reverse("edit-member", kwargs={"member_id": 21212})
+        response = self.client.get(url, data={
+            'k': "the WRONG KEY",
+        })
+        # If the member doesn't exist then don't give a specific error to that
+        # effect, just redirect to the login page:
+        self._assert_redirect_to_login(response, url, "?k=the+WRONG+KEY")
+
+    # POST tests ###########################################
+    def test_edit_post_form_minimal_data(self):
+        new_name = u'N\u018EW Name'
+
+        member = Member.objects.get(pk=2)
+        self.assertEqual(member.name, u"Tw\u020d Member")
+        member_mailout_key = member.mailout_key
+        self.assertTrue(member.is_member)
+
+        url = reverse("edit-member", kwargs={"member_id": 2})
+        response = self.client.post(url, data={
+            'name': new_name,
+            'k': member_mailout_key,
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_member.html")
+
+        member = Member.objects.get(pk=2)
+        self.assertEqual(member.name, new_name)
+        self.assertEqual(member.email, "")
+        self.assertEqual(member.address, "")
+        self.assertEqual(member.posttown, "")
+        self.assertEqual(member.postcode, "")
+        self.assertEqual(member.country, "")
+        self.assertEqual(member.website, "")
+        self.assertEqual(member.phone, "")
+        self.assertEqual(member.altphone, "")
+        self.assertEqual(member.notes, "")
+        self.assertFalse(member.mailout)
+        self.assertFalse(member.mailout_failed)
+        self.assertFalse(member.is_member)
+
+        # Shouldn't have been changed:
+        self.assertEqual(member.mailout_key, member_mailout_key)
+
+        self.assertContains(response, new_name)
+        self.assertContains(response, "Member 02 updated")
+
+    def test_edit_post_form_all_data(self):
+        new_name = u'N\u018EW Name'
+
+        member = Member.objects.get(pk=2)
+        self.assertEqual(member.name, u"Tw\u020d Member")
+        member_mailout_key = member.mailout_key
+        self.assertTrue(member.is_member)
+
+        url = reverse("edit-member", kwargs={"member_id": 2})
+        response = self.client.post(url, data={
+            'name': new_name,
+            'email': 'snoo@whatver',
+            'k': member_mailout_key,
+            'address': "somewhere over the rainbow, I guess",
+            'posttown': "Town Town Town!",
+            'postcode': "< Sixteen chars?",
+            'country': "Suriname",
+            'website': "http://don't_care/",
+            'phone': "+44 0000000000000001",
+            'altphone': "-1 3202394 2352 23 234",
+            'notes': "plays the balalaika really badly",
+            'mailout': "t",
+            'mailout_failed': "t",
+            'is_member': "t",
+            "mailout_key": "sinister",
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_member.html")
+
+        member = Member.objects.get(pk=2)
+        self.assertEqual(member.name, new_name)
+        self.assertEqual(member.email, 'snoo@whatver')
+        self.assertEqual(member.address,"somewhere over the rainbow, I guess")
+        self.assertEqual(member.posttown,"Town Town Town!")
+        self.assertEqual(member.postcode, "< Sixteen chars?")
+        self.assertEqual(member.country, "Suriname")
+        self.assertEqual(member.website, "http://don't_care/")
+        self.assertEqual(member.phone, "+44 0000000000000001")
+        self.assertEqual(member.altphone, "-1 3202394 2352 23 234")
+        self.assertEqual(member.notes, "plays the balalaika really badly")
+        self.assertTrue(member.mailout)
+        self.assertTrue(member.mailout_failed)
+        self.assertTrue(member.is_member)
+
+        # Shouldn't have been changed:
+        self.assertEqual(member.mailout_key, member_mailout_key)
+
+        self.assertContains(response, new_name)
+        self.assertContains(response, "Member 02 updated")
+
+    def test_edit_post_form_invalid_data_missing(self):
+        member = Member.objects.get(pk=2)
+        start_name = member.name
+
+        url = reverse("edit-member", kwargs={"member_id": 2})
+        response = self.client.post(url, data={
+            'k': member.mailout_key,
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_member.html")
+
+        # Only mandatory field is "name":
+        self.assertFormError(response, 'form', 'name', u'This field is required.')
+
+        member = Member.objects.get(pk=2)
+        self.assertEqual(start_name, member.name)
+
+    def test_edit_post_form_no_key(self):
+        url = reverse("edit-member", kwargs={"member_id": 2})
+        response = self.client.post(url)
+
+        self._assert_redirect_to_login(response, url)
+
+    def test_edit_post_form_incorrect_key(self):
+        url = reverse("edit-member", kwargs={"member_id": 2})
+        response = self.client.post(url, data={
+            'k': "the WRONG KEY",
+        })
+        self._assert_redirect_to_login(response, url)
+
+    def test_edit_post_form_invalid_memberid(self):
+        url = reverse("edit-member", kwargs={"member_id": 21212})
+        response = self.client.post(url, data={
+            'k': "the WRONG KEY",
+        })
+        # If the member doesn't exist then don't give a specific error to that
+        # effect, just redirect to the login page:
+        self._assert_redirect_to_login(response, url)
+
+
+class TestEditMemberViewLoggedIn(MembersTestsMixin, TestCase):
+
+    def setUp(self):
+        super(TestEditMemberViewLoggedIn, self).setUp()
+        self.assertTrue(self.client.login(username="admin", password="T3stPassword!"))
+
+    def tearDown(self):
+        self.client.logout()
+
+    # GET tests ###########################################
+    def test_edit_get_form(self):
+        url = reverse("edit-member", kwargs={"member_id": 2})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_member.html")
+
+    def test_edit_get_form_invalid_memberid(self):
+        url = reverse("edit-member", kwargs={"member_id": 21212})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    # POST tests ###########################################
+    # Only test differences from not logged in view...
+    def test_edit_post_form_minimal_data(self):
+        new_name = u'N\u018EW Name'
+
+        member = Member.objects.get(pk=2)
+        self.assertEqual(member.name, u"Tw\u020d Member")
+
+        member_mailout_key = member.mailout_key
+
+        url = reverse("edit-member", kwargs={"member_id": 2})
+        response = self.client.post(url, data={'name': new_name,}, follow=True)
+
+        member = Member.objects.get(pk=2)
+        # New name set:
+        self.assertEqual(member.name, new_name)
+
+        # Secret key shouldn't have been changed:
+        self.assertEqual(member.mailout_key, member_mailout_key)
+
+        # Should redirect to search page, with a success message inserted:
+        self.assertRedirects(response, reverse("search-members"))
+        self.assertContains(response, "Member 02 updated")
+
+    def test_edit_post_form_invalid_data_missing(self):
+        member = Member.objects.get(pk=2)
+        start_name = member.name
+
+        url = reverse("edit-member", kwargs={"member_id": 2})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_member.html")
+
+        # Only mandatory field is "name":
+        self.assertFormError(response, 'form', 'name', u'This field is required.')
+
+        member = Member.objects.get(pk=2)
+        self.assertEqual(start_name, member.name)
+
+    def test_edit_post_form_invalid_memberid(self):
+        url = reverse("edit-member", kwargs={"member_id": 21212})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 404)
+
+
 class TestUnsubscribeMemberView(MembersTestsMixin, TestCase):
 
     def setUp(self):
