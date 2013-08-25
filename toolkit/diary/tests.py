@@ -1223,6 +1223,8 @@ class MailoutTests(DiaryTestsMixin, TestCase):
     def tearDown(self):
         self.time_patch.stop()
 
+    # Tests of edit mailout / confirm mailout form ##########################
+
     def test_get_form(self):
         url = reverse("members-mailout")
         response = self.client.get(url)
@@ -1284,11 +1286,119 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         self.assertFormError(response, 'form', 'subject', u'This field is required.')
         self.assertFormError(response, 'form', 'body', u'This field is required.')
 
-
     def test_invalid_method(self):
         url = reverse("members-mailout")
         response = self.client.put(url)
         self.assertEqual(response.status_code, 405)
+
+    # Tests of send mailout / Ajax form ######################################
+    def test_exec_view_invalid_method(self):
+        url = reverse("exec-mailout")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 405)
+
+    def test_exec_view_invalid_content(self):
+        url = reverse("exec-mailout")
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 200)
+
+        response = json.loads(response.content)
+        self.assertEqual(response, {
+            u"status": u"error",
+            u"errors": {
+                u"body": [u"This field is required."],
+                u"subject": [u"This field is required."]
+            }
+        })
+
+    @patch("toolkit.members.tasks.send_mailout")
+    def test_exec_view_good_content(self, send_mailout_patch):
+        send_mailout_patch.delay.return_value.task_id = u'dummy-task-id'
+
+        url = reverse("exec-mailout")
+        response = self.client.post(url, data={
+            u"subject": u"Mailout of the month",
+            u"body": u"Blah\nBlah\nBlah",
+        })
+
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+
+        self.assertEqual(response_data, {
+            u"status": u"ok",
+            u"progress": 0,
+            u"task_id": u"dummy-task-id"
+        })
+
+    def test_exec_view_get_progress_invalid_method(self):
+        url = reverse("mailout-progress")
+        response = self.client.post(url, data={u"task_id": u"dummy-task-id"})
+        self.assertEqual(response.status_code, 405)
+
+    @patch("celery.result.AsyncResult")
+    def test_exec_view_get_progress(self, async_result_patch):
+        async_result_patch.return_value.state = u"PROGRESS10"
+        async_result_patch.return_value.task_id = u"dummy-task-id"
+
+        url = reverse("mailout-progress")
+        response = self.client.get(url, data={u"task_id": u"dummy-task-id"})
+
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data, {
+            u'status': u'ok',
+            u'progress': 10,
+            u'task_id': u'dummy-task-id'
+        })
+
+    @patch("celery.result.AsyncResult")
+    def test_exec_view_get_progress_complete(self, async_result_patch):
+        async_result_patch.return_value.state = u"SUCCESS"
+        async_result_patch.return_value.task_id = u"dummy-task-id"
+
+        url = reverse("mailout-progress")
+        response = self.client.get(url, data={u"task_id": u"dummy-task-id"})
+
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data, {
+            u'status': u'ok',
+            u'progress': 100,
+            u'task_id': u'dummy-task-id'
+        })
+
+    @patch("celery.result.AsyncResult")
+    def test_exec_view_get_bad_celery_progress_data(self, async_result_patch):
+        async_result_patch.return_value.state = u"PROGRESS"
+        async_result_patch.return_value.task_id = u"dummy-task-id"
+
+        url = reverse("mailout-progress")
+        response = self.client.get(url, data={u"task_id": u"dummy-task-id"})
+
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data, {
+            u'status': u'error',
+            u'progress': 0,
+            u'task_id': u'dummy-task-id'
+        })
+
+    @patch("celery.result.AsyncResult")
+    def test_exec_view_get_bad_celery_data(self, async_result_patch):
+        async_result_patch.return_value.state = u"garbage scow"
+        async_result_patch.return_value.task_id = u"dummy-task-id"
+
+        url = reverse("mailout-progress")
+        response = self.client.get(url, data={u"task_id": u"dummy-task-id"})
+
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data, {
+            u'status': u'error',
+            u'progress': 0,
+            u'task_id': u'dummy-task-id'
+        })
 
 
 class PreferencesTests(DiaryTestsMixin, TestCase):

@@ -18,6 +18,7 @@ import django.db
 from django.db.models import Q
 import django.utils.timezone as timezone
 from django.contrib.auth.decorators import permission_required, login_required
+from django.views.decorators.http import require_GET, require_POST
 
 from toolkit.diary.models import Showing, Event, DiaryIdea, MediaItem, EventTemplate, EventTag, Role
 import toolkit.diary.forms as diary_forms
@@ -168,7 +169,8 @@ def add_showing(request, event_id):
     # form_showing.html
 
     if request.method != 'POST':
-        return HttpResponse('Invalid request!', status=405)  # 405 = Method not allowed
+        # 405 = Method not allowed
+        return HttpResponse('Invalid request', status=405, content_type="text/plain")
 
     copy_from = request.GET.get('copy_from', None)
 
@@ -285,7 +287,8 @@ def add_event(request):
         context = {'form': form}
         return render(request, 'form_new_event_and_showing.html', context)
     else:
-        return HttpResponse("Illegal method", status=405, content_type="text/plain")
+        # 405 = Method not allowed
+        return HttpResponse('Invalid request', status=405, content_type="text/plain")
 
 
 @permission_required('toolkit.write')
@@ -460,7 +463,8 @@ def delete_showing(request, showing_id):
     # Delete the given showing
 
     if request.method != 'POST':
-        return HttpResponse('Invalid request!', status=405)  # 405 = Method not allowed
+        # 405 = Method not allowed
+        return HttpResponse('Invalid request', status=405, content_type="text/plain")
 
     showing = Showing.objects.get(pk=showing_id)
     if showing.in_past():
@@ -671,6 +675,12 @@ def _render_mailout_form(request, body_text, subject_text):
 
 @permission_required('toolkit.write')
 def mailout(request):
+    # This view loads a form with a draft mailout subject & body. When the user
+    # is happy, they click "Send", which POSTs the data back to this view. If
+    # the data pases the basic checks then it gets sent back in the
+    # "mailout_send" form. That form has javascript which, if the user
+    # confirms, posts to the "exec-mailout" view
+
     if request.method == 'GET':
         try:
             query_days_ahead = int(request.GET.get('daysahead', 9))
@@ -685,22 +695,28 @@ def mailout(request):
             return render(request, 'form_mailout.html', {'form': form})
         return render(request, 'mailout_send.html', form.cleaned_data)
     else:
-        return HttpResponse('Invalid request', status=405)
+        # 405 = Method not allowed
+        return HttpResponse('Invalid request', status=405, content_type="text/plain")
 
 
 # @condition(etag_func=None, last_modified_func=None)
 @permission_required('toolkit.write')
+@require_POST
 def exec_mailout(request):
+
     form = diary_forms.MailoutForm(request.POST)
     if not form.is_valid():
-        print form.errors
         logger.error("Mailout failed: {}".format(repr(form.errors)))
-        return HttpResponse(json.dumps({'status': 'error'}), mimetype="application/json")
+        response = {
+            'status': 'error',
+            'errors': dict(form.errors),
+        }
+        return HttpResponse(json.dumps(response), mimetype="application/json")
 
     result = toolkit.members.tasks.send_mailout.delay(form.cleaned_data['subject'], form.cleaned_data['body'])
 
     response = HttpResponse(
-        json.dumps({'task_id': result.task_id, 'progress': 0}),
+        json.dumps({'status': 'ok', 'task_id': result.task_id, 'progress': 0}),
         mimetype="application/json"
     )
 
@@ -708,10 +724,12 @@ def exec_mailout(request):
 
 
 @permission_required('toolkit.write')
+@require_GET
 def mailout_progress(request):
     result = celery.result.AsyncResult(id=request.GET['task_id'])
     state = result.state
     progress = 0
+    status = u'ok'
 
     if state is not None:
         progress_parts = state.split("PROGRESS")
@@ -719,11 +737,15 @@ def mailout_progress(request):
             try:
                 progress = int(progress_parts[1])
             except ValueError:
-                pass
+                logger.error("Invalid progress from async mailout task: {}".format(state))
+                status = 'error'
         elif state == "SUCCESS":
             progress = 100
+        else:
+            logger.error("Invalid data from async mailout task: {}".format(state))
+            status = 'error'
 
     return HttpResponse(
-        json.dumps({'task_id': result.task_id, 'progress': progress}),
+        json.dumps({'status': status, 'task_id': result.task_id, 'progress': progress}),
         mimetype="application/json"
     )
