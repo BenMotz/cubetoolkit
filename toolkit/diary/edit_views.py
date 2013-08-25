@@ -18,7 +18,7 @@ import django.db
 from django.db.models import Q
 import django.utils.timezone as timezone
 from django.contrib.auth.decorators import permission_required, login_required
-from django.views.decorators.http import require_GET, require_POST
+from django.views.decorators.http import require_GET, require_POST, require_http_methods
 
 from toolkit.diary.models import Showing, Event, DiaryIdea, MediaItem, EventTemplate, EventTag, Role
 import toolkit.diary.forms as diary_forms
@@ -158,6 +158,7 @@ def set_edit_preferences(request):
 
 
 @login_required
+@require_POST
 def add_showing(request, event_id):
     # Add a showing to an existing event. Must be called via POST. Uses POSTed
     # data to create a new showing.
@@ -168,10 +169,7 @@ def add_showing(request, event_id):
     # If add was successful, calls _return_to_editindex. On error goes to
     # form_showing.html
 
-    if request.method != 'POST':
-        # 405 = Method not allowed
-        return HttpResponse('Invalid request', status=405, content_type="text/plain")
-
+    # Although the data was POSTed, the copy_from is passed in the qyery:
     copy_from = request.GET.get('copy_from', None)
 
     try:
@@ -217,6 +215,7 @@ def add_showing(request, event_id):
 
 
 @permission_required('toolkit.write')
+@require_http_methods(["GET", "POST"])
 def add_event(request):
     # Called GET, with a "date" parameter of the form day-month-year:
     #     returns 'form_new_event_and_showing' with given date filled in.
@@ -286,12 +285,10 @@ def add_event(request):
         form = diary_forms.NewEventForm(initial={'start': event_start})
         context = {'form': form}
         return render(request, 'form_new_event_and_showing.html', context)
-    else:
-        # 405 = Method not allowed
-        return HttpResponse('Invalid request', status=405, content_type="text/plain")
 
 
 @permission_required('toolkit.write')
+@require_http_methods(["GET", "POST"])
 def edit_showing(request, showing_id=None):
     showing = get_object_or_404(Showing, pk=showing_id)
 
@@ -459,12 +456,9 @@ def edit_ideas(request, year=None, month=None):
 
 
 @permission_required('toolkit.write')
+@require_POST
 def delete_showing(request, showing_id):
     # Delete the given showing
-
-    if request.method != 'POST':
-        # 405 = Method not allowed
-        return HttpResponse('Invalid request', status=405, content_type="text/plain")
 
     showing = Showing.objects.get(pk=showing_id)
     if showing.in_past():
@@ -674,6 +668,7 @@ def _render_mailout_form(request, body_text, subject_text):
 
 
 @permission_required('toolkit.write')
+@require_http_methods(["GET", "POST"])
 def mailout(request):
     # This view loads a form with a draft mailout subject & body. When the user
     # is happy, they click "Send", which POSTs the data back to this view. If
@@ -694,9 +689,6 @@ def mailout(request):
         if not form.is_valid():
             return render(request, 'form_mailout.html', {'form': form})
         return render(request, 'mailout_send.html', form.cleaned_data)
-    else:
-        # 405 = Method not allowed
-        return HttpResponse('Invalid request', status=405, content_type="text/plain")
 
 
 # @condition(etag_func=None, last_modified_func=None)
