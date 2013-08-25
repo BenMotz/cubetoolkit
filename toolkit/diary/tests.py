@@ -98,6 +98,7 @@ class DiaryTestsMixin(object):
             name=u"Event four titl\u0113",
             copy=u"Event four C\u014dpy",
             copy_summary=u"\u010copy four summary",
+            terms=u"Terminal price: \u00a31 / \u20ac3",
             duration="01:00:00",
             notes="\u0147otes on event fou\u0159",
         )
@@ -361,22 +362,6 @@ class EditDiaryViews(DiaryTestsMixin, TestCase):
         # self.assertIn(u'Event one title', response.content)
         # self.assertIn(u'<p>Event one copy</p>', response.content)
         self.assertEqual(response.status_code, 200)
-
-    def test_view_event_fields(self):
-        url = reverse("view_event_field", kwargs={"field": "rota"})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "view_rota.html")
-
-        url = reverse("view_event_field", kwargs={"field": "copy"})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "view_copy.html")
-
-        url = reverse("view_event_field", kwargs={"field": "terms"})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "view_terms.html")
 
     def test_view_tag_editor(self):
         url = reverse("edit_event_tags")
@@ -1180,6 +1165,108 @@ class EditIdeasViewTests(DiaryTestsMixin, TestCase):
         self.assertEqual(idea.ideas, u"An ide\u0113 f\u014d\u0159 some \u20acvent")
 
         self.assert_return_to_index(response)
+
+
+class ViewEventFieldTests(DiaryTestsMixin, TestCase):
+
+    def setUp(self):
+        super(ViewEventFieldTests, self).setUp()
+        # Log in:
+        self.client.login(username="admin", password="T3stPassword!")
+
+        # Fake "now()" function to return a fixed time:
+        self.time_patch = patch('django.utils.timezone.now')
+        self.time_mock = self.time_patch.start()
+        self.time_mock.return_value = self._fake_now
+
+    def tearDown(self):
+        self.time_patch.stop()
+
+    def test_view_event_field_rota(self):
+        url = reverse("view_event_field", kwargs={"field": "rota"})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_rota.html")
+
+        self.assertNotContains(response, u"EVENT THREE TITLE")
+        self.assertContains(response, u"EVENT FOUR TITL\u0112")
+        self.assertContains(response, u"Role 2 (nonstandard)-1")
+
+    def test_view_event_field_copy(self):
+        url = reverse("view_event_field", kwargs={"field": "copy"})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_copy.html")
+
+        self.assertNotContains(response, u"EVENT THREE TITLE")
+        self.assertContains(response, u"Sun 09 18:00 ......... Event four titl\u0113")
+        self.assertContains(response, u"<p>EVENT FOUR TITL\u0112</p>", html=True)
+        self.assertContains(response, u"<p>Event four C\u014dpy</p>", html=True)
+
+    def test_view_event_field_terms(self):
+        url = reverse("view_event_field", kwargs={"field": "terms"})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_terms.html")
+
+        self.assertContains(response, u"Sun 09 18:00 ......... Event four titl\u0113")
+        self.assertContains(response, u"Cube event / Public event / Confirmed")
+        self.assertContains(response, u"Terminal price: \u00a31 / \u20ac3")
+
+    def test_custom_start_date_rota_long_time(self):
+        # Reverse doesn't work for full date, as regex is apparently too
+        # complicated:
+        url = reverse("view_event_field", kwargs={ "field": "rota" })
+        url += "/2013/01/01?daysahead=365"
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_rota.html")
+
+        self.assertContains(response, u"EVENT THREE TITLE")
+        self.assertContains(response, u"EVENT FOUR TITL\u0112")
+
+    def test_custom_start_date_rota_less_long_time(self):
+        # Now shorter date range, should find one fewer event
+        url = reverse("view_event_field", kwargs={ "field": "rota" })
+        url += "/2013/01/01?daysahead=120"
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_rota.html")
+
+        self.assertContains(response, u"EVENT THREE TITLE")
+        self.assertNotContains(response, u"EVENT FOUR TITL\u0112")
+
+    def test_custom_start_date_rota_invalid_date(self):
+        # Now shorter date range, should find one fewer event
+        url = reverse("view_event_field", kwargs={ "field": "rota" })
+        url += "/2013/99/99?daysahead=120"
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_custom_start_date_terms_search_success(self):
+        url = reverse("view_event_field", kwargs={ "field": "terms" })
+        url += "/2013/01/01?daysahead=365&search=Terminal"
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_terms.html")
+
+        self.assertNotContains(response, u"EVENT THREE TITLE")
+        self.assertContains(response, u"EVENT FOUR TITL\u0112")
+
+    def test_custom_start_date_terms_search_no_result(self):
+        url = reverse("view_event_field", kwargs={ "field": "terms" })
+        url += "/2013/01/01?daysahead=365&search=elephant"
+
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_terms.html")
+
+        self.assertNotContains(response, u"EVENT THREE TITLE")
+        self.assertNotContains(response, u"EVENT FOUR TITL\u0112")
 
 
 class MailoutTests(DiaryTestsMixin, TestCase):
