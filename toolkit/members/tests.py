@@ -497,8 +497,8 @@ class TestEditMemberViewNotLoggedIn(MembersTestsMixin, TestCase):
         member = Member.objects.get(pk=2)
         self.assertEqual(member.name, new_name)
         self.assertEqual(member.email, 'snoo@whatver')
-        self.assertEqual(member.address,"somewhere over the rainbow, I guess")
-        self.assertEqual(member.posttown,"Town Town Town!")
+        self.assertEqual(member.address, "somewhere over the rainbow, I guess")
+        self.assertEqual(member.posttown, "Town Town Town!")
         self.assertEqual(member.postcode, "< Sixteen chars?")
         self.assertEqual(member.country, "Suriname")
         self.assertEqual(member.website, "http://don't_care/")
@@ -587,7 +587,7 @@ class TestEditMemberViewLoggedIn(MembersTestsMixin, TestCase):
         member_mailout_key = member.mailout_key
 
         url = reverse("edit-member", kwargs={"member_id": 2})
-        response = self.client.post(url, data={'name': new_name,}, follow=True)
+        response = self.client.post(url, data={'name': new_name, }, follow=True)
 
         member = Member.objects.get(pk=2)
         # New name set:
@@ -798,15 +798,21 @@ class TestMemberMiscViews(MembersTestsMixin, TestCase):
         response = self.client.get(url)
         self.assertTemplateUsed(response, "homepages.html")
 
-        self.assertContains(response, u'<a href="http://1.foo.test/" rel="nofollow">http://1.foo.test/</a>', html=True)
-        self.assertContains(response, u'<a href="http://two.foo.test/" rel="nofollow">http://two.foo.test/</a>', html=True)
+        self.assertContains(response,
+                            u'<a href="http://1.foo.test/" rel="nofollow">http://1.foo.test/</a>',
+                            html=True)
+        self.assertContains(response,
+                            u'<a href="http://two.foo.test/" rel="nofollow">http://two.foo.test/</a>',
+                            html=True)
 
     def test_post_homepages(self):
         url = reverse("member-homepages")
         response = self.client.post(url)
         self.assertEqual(response.status_code, 405)
 
+
 class TestActivateDeactivateVolunteer(MembersTestsMixin, TestCase):
+
     def setUp(self):
         super(TestActivateDeactivateVolunteer, self).setUp()
         self.assertTrue(self.client.login(username="admin", password="T3stPassword!"))
