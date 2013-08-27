@@ -4,6 +4,7 @@ from mock import patch
 
 from django.test import TestCase
 from django.core.urlresolvers import reverse
+from django.conf import settings
 
 import django.contrib.auth.models as auth_models
 import django.contrib.contenttypes as contenttypes
@@ -29,44 +30,47 @@ class MembersTestsMixin(object):
         r3.save()
 
         # Members:
-        m1 = Member(name=u"Member On\u0205", email="one@example.com", number="1", postcode="BS1 1AA")
-        m1.save()
-        m2 = Member(name=u"Tw\u020d Member", email="two@example.com", number="02", postcode="")
-        m2.save()
-        m3 = Member(name=u"Some Third Chap", email="two@member.test", number="000", postcode="NORAD")
-        m3.save()
-        m4 = Member(name="Volunteer One", email="volon@cube.test", number="3",
-                    phone="0800 000 000", address="1 Road", posttown="Town", postcode="BS6 123", country="UK",
-                    website="http://1.foo.test/")
-        m4.save()
-        m5 = Member(name="Volunteer Two", email="", number="4",
-                    phone="", altphone="", address="", posttown="", postcode="", country="",
-                    website="http://two.foo.test/")
-        m5.save()
-        m6 = Member(name="Volunteer Three", email="volthree@foo.test", number="4",
-                    phone="", altphone="", address="", posttown="", postcode="", country="",
-                    website="")
-        m6.save()
-        m7 = Member(name="Volunteer Four", email="four4@foo.test", number="o4",
-                    phone="", altphone="", address="", posttown="", postcode="", country="",
-                    website="")
-        m7.save()
+        self.mem_1 = Member(name=u"Member On\u0205", email="one@example.com", number="1", postcode="BS1 1AA")
+        self.mem_1.save()
+        self.mem_2 = Member(name=u"Tw\u020d Member", email="two@example.com", number="02", postcode="")
+        self.mem_2.save()
+        self.mem_3 = Member(name=u"Some Third Chap", email="two@member.test", number="000", postcode="NORAD")
+        self.mem_3.save()
+        self.mem_4 = Member(name="Volunteer One", email="volon@cube.test", number="3",
+                            phone="0800 000 000", address="1 Road", posttown="Town of towns", postcode="BS6 123",
+                            country="UKountry", website="http://1.foo.test/")
+        self.mem_4.save()
+        self.mem_5 = Member(name="Volunteer Two", email="", number="4",
+                            phone="", altphone="", address="", posttown="", postcode="", country="",
+                            website="http://two.foo.test/")
+        self.mem_5.save()
+        self.mem_6 = Member(name="Volunteer Three", email="volthree@foo.test", number="4",
+                            phone="", altphone="", address="", posttown="", postcode="", country="",
+                            website="")
+        self.mem_6.save()
+        self.mem_7 = Member(name="Volunteer Four", email="four4@foo.test", number="o4",
+                            phone="", altphone="", address="", posttown="", postcode="", country="",
+                            website="")
+        self.mem_7.save()
 
         # Volunteers:
-        self.vol_1 = Volunteer(member=m4)
-        self.vol_1.save()
+        self.vol_1 = Volunteer(
+            member=self.mem_4, notes=u'Likes the $, the \u00a3 and the \u20ac',
+            portrait=settings.MEDIA_ROOT + "/path/to/portrait", portrait_thumb=settings.MEDIA_ROOT + "/path/to/thumb"
+        )
+        self.vol_1.save(update_portrait_thumbnail=False)
         self.vol_1.roles = [r1, r3]
         self.vol_1.save()
 
-        self.vol_2 = Volunteer(member=m5)
+        self.vol_2 = Volunteer(member=self.mem_5)
         self.vol_2.save()
 
-        self.vol_3 = Volunteer(member=m6)
+        self.vol_3 = Volunteer(member=self.mem_6)
         self.vol_3.save()
         self.vol_3.roles = [r3]
         self.vol_3.save()
 
-        self.vol_4 = Volunteer(member=m7, active=False, notes=u"Subliminal, superluminous")
+        self.vol_4 = Volunteer(member=self.mem_7, active=False, notes=u"Subliminal, superluminous")
         self.vol_4.save()
         self.vol_4.roles = [r3]
         self.vol_4.save()
@@ -96,11 +100,11 @@ class SecurityTests(MembersTestsMixin, TestCase):
         """All URLs which should 302 redirect to the login page"""
         views_to_test = {
             # Volunteer urls:
-            'add-volunteer': {'member_id': None, 'create_new': True},
+            'add-volunteer': {},
             'view-volunteer-list': {},
             'unretire-select-volunteer': {},
             'retire-select-volunteer': {},
-            'edit-volunteer': {'member_id': 1},
+            'edit-volunteer': {'volunteer_id': 1},
             'activate-volunteer': {},
             'inactivate-volunteer': {},
             # Member urls:
@@ -889,5 +893,263 @@ class TestActivateDeactivateVolunteer(MembersTestsMixin, TestCase):
 
     def test_unretire_no_vol_id(self):
         url = reverse("activate-volunteer")
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 404)
+
+class TestVolunteerEdit(MembersTestsMixin, TestCase):
+    def setUp(self):
+        super(TestVolunteerEdit, self).setUp()
+        self.assertTrue(self.client.login(username="admin", password="T3stPassword!"))
+
+    def test_get_form_edit(self):
+        url = reverse("edit-volunteer", kwargs={"volunteer_id": self.vol_1.id})
+        response = self.client.get(url)
+
+        self.assertTemplateUsed(response, "form_volunteer.html")
+
+        self.assertContains(response, "Volunteer One")
+        self.assertContains(response, "volon@cube.test")
+        self.assertContains(response, "0800 000 000")
+        self.assertContains(response, "1 Road")
+        self.assertContains(response, "Town of towns")
+        self.assertContains(response, "BS6 123")
+        self.assertContains(response, "UKountry")
+        self.assertContains(response, "http://1.foo.test/")
+
+        self.assertContains(response, "<title>Edit Volunteer Volunteer One</title>")
+
+        self.assertContains(response,
+                            '<a href="http://toolkit/tmp/path/to/portrait">'
+                            '<img src="http://toolkit/tmp/path/to/thumb" border="0" width="75"></a>',
+                            html=True)
+
+    def test_get_form_add(self):
+        url = reverse("add-volunteer")
+        response = self.client.get(url)
+
+        self.assertTemplateUsed(response, "form_volunteer.html")
+
+        self.assertContains(response, "<title>Add Volunteer</title>", html=True)
+        # Should have default mugshot:
+        self.assertContains(response,
+                            '<img src="{}" border="0" width="75">'.format(settings.DEFAULT_MUGSHOT),
+                            html=True)
+
+    def test_get_form_edit_invalid_vol(self):
+        url = reverse("edit-volunteer", kwargs={"volunteer_id": 10001})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_post_new_vol_minimal_data(self):
+        init_vol_count = Volunteer.objects.count()
+        init_mem_count = Member.objects.count()
+
+        url = reverse("add-volunteer")
+        response = self.client.post(url, data={
+            u'mem-name': u'New Volunteer, called \u0187hri\u01a8topher'
+        }, follow=True)
+        self.assertRedirects(response, reverse("view-volunteer-list"))
+
+        self.assertContains(
+            response,
+            u'<li class="success">Created volunteer &#39;New Volunteer, called \u0187hri\u01a8topher&#39;</li>',
+            html=True
+        )
+
+        # one more of each:
+        self.assertEqual(Volunteer.objects.count(), init_vol_count + 1)
+        self.assertEqual(Member.objects.count(), init_mem_count + 1)
+
+        # New things:
+        new_member = Member.objects.get(name=u"New Volunteer, called \u0187hri\u01a8topher")
+        # Implicitly check Volunteer record exists:
+        self.assertTrue(new_member.volunteer.active)
+
+    def test_post_new_vol_all_data(self):
+        init_vol_count = Volunteer.objects.count()
+        init_mem_count = Member.objects.count()
+
+        url = reverse("add-volunteer")
+        response = self.client.post(url, data={
+            u'mem-name': u'Another New Volunteer',
+            u'mem-email': 'snoo@whatver.com',
+            u'mem-address': "somewhere over the rainbow, I guess",
+            u'mem-posttown': "Town Town Town!",
+            u'mem-postcode': "< Sixteen chars?",
+            u'mem-country': "Suriname",
+            u'mem-website': "http://still_don't_care/",
+            u'mem-phone': "+44 1000000000000001",
+            u'mem-altphone': "-1 3202394 2352 23 234",
+            u'mem-mailout_failed': "t",
+            u'mem-notes': "member notes shouldn't be on this form!",
+            u'vol-notes': "plays the balalaika really badly",
+            u'vol-roles': [2, 3],
+        }, follow=True)
+
+        self.assertRedirects(response, reverse("view-volunteer-list"))
+
+        self.assertContains(
+            response,
+            u'<li class="success">Created volunteer &#39;Another New Volunteer&#39;</li>',
+            html=True
+        )
+
+        # one more of each:
+        self.assertEqual(Volunteer.objects.count(), init_vol_count + 1)
+        self.assertEqual(Member.objects.count(), init_mem_count + 1)
+
+        # New things:
+        new_member = Member.objects.get(name=u"Another New Volunteer")
+        self.assertEqual(new_member.email, 'snoo@whatver.com')
+        self.assertEqual(new_member.address, "somewhere over the rainbow, I guess")
+        self.assertEqual(new_member.posttown, "Town Town Town!")
+        self.assertEqual(new_member.postcode, "< Sixteen chars?")
+        self.assertEqual(new_member.country, "Suriname")
+        self.assertEqual(new_member.website, "http://still_don't_care/")
+        self.assertEqual(new_member.phone, "+44 1000000000000001")
+        self.assertEqual(new_member.altphone, "-1 3202394 2352 23 234")
+        self.assertFalse(new_member.mailout)
+        self.assertTrue(new_member.mailout_failed)
+        self.assertTrue(new_member.is_member)
+        # Member notes aren't included on the form:
+        self.assertEqual(new_member.notes, None)
+
+        self.assertTrue(new_member.volunteer.active)
+        self.assertEqual(new_member.volunteer.notes, "plays the balalaika really badly")
+
+        roles = new_member.volunteer.roles.all()
+
+        self.assertEqual(len(roles), 2)
+        self.assertEqual(roles[0].id, 2)
+        self.assertEqual(roles[1].id, 3)
+
+
+    def test_post_new_vol_invalid_missing_data(self):
+        url = reverse("add-volunteer")
+        response = self.client.post(url)
+
+        self.assertTemplateUsed(response, "form_volunteer.html")
+
+        # The only mandatory field (!)
+        self.assertFormError(response, 'mem_form', 'name', u'This field is required.')
+
+    def test_post_edit_vol_minimal_data(self):
+        init_vol_count = Volunteer.objects.count()
+        init_mem_count = Member.objects.count()
+
+        url = reverse("edit-volunteer", kwargs={"volunteer_id": 1})
+        response = self.client.post(url, data={
+            u'mem-name': u'Renam\u018fd Vol'
+        }, follow=True)
+        self.assertRedirects(response, reverse("view-volunteer-list"))
+
+        self.assertContains(
+            response,
+            u'<li class="success">Updated volunteer &#39;Renam\u018fd Vol&#39;</li>',
+            html=True
+        )
+
+        # same number of each:
+        self.assertEqual(Volunteer.objects.count(), init_vol_count)
+        self.assertEqual(Member.objects.count(), init_mem_count)
+
+        # extant member
+        volunteer = Volunteer.objects.get(id=1)
+        member = volunteer.member
+        self.assertTrue(member.volunteer.active)
+        # Changed things:
+        self.assertEqual(member.name, u"Renam\u018fd Vol")
+        self.assertEqual(member.email, "")
+        self.assertEqual(member.address, "")
+        self.assertEqual(member.posttown, "")
+        self.assertEqual(member.postcode, "")
+        self.assertEqual(member.country, "")
+        self.assertEqual(member.website, "")
+        self.assertEqual(member.phone, "")
+        self.assertEqual(member.altphone, "")
+        self.assertFalse(member.mailout)
+        self.assertFalse(member.mailout_failed)
+        self.assertTrue(member.is_member)
+        # Member notes aren't included on the form:
+        self.assertEqual(member.notes, None)
+
+        self.assertTrue(member.volunteer.active)
+        self.assertEqual(member.volunteer.notes, "")
+
+        self.assertEqual(member.volunteer.roles.count(), 0)
+
+    def test_post_edit_vol_all_data(self):
+        init_vol_count = Volunteer.objects.count()
+        init_mem_count = Member.objects.count()
+
+        url = reverse("edit-volunteer", kwargs={"volunteer_id": 1})
+
+        response = self.client.post(url, data={
+            u'mem-name': u'Renam\u018fd Vol',
+            u'mem-email': 'snoo@whatver.com',
+            u'mem-address': "somewhere over the rainbow, I guess",
+            u'mem-posttown': "Town Town Town!",
+            u'mem-postcode': "< Sixteen chars?",
+            u'mem-country': "Suriname",
+            u'mem-website': "http://still_don't_care/",
+            u'mem-phone': "+44 1000000000000001",
+            u'mem-altphone': "-1 3202394 2352 23 234",
+            u'mem-mailout_failed': "t",
+            u'mem-notes': "member notes shouldn't be on this form!",
+            u'vol-notes': "plays the balalaika really badly",
+            u'vol-roles': [2, 3],
+        }, follow=True)
+
+        self.assertRedirects(response, reverse("view-volunteer-list"))
+
+        self.assertContains(
+            response,
+            u'<li class="success">Updated volunteer &#39;Renam\u018fd Vol&#39;</li>',
+            html=True
+        )
+
+        # same number of each:
+        self.assertEqual(Volunteer.objects.count(), init_vol_count)
+        self.assertEqual(Member.objects.count(), init_mem_count)
+
+        # extant member
+        volunteer = Volunteer.objects.get(id=1)
+        member = volunteer.member
+        self.assertTrue(member.volunteer.active)
+        self.assertEqual(member.name, u"Renam\u018fd Vol")
+        self.assertEqual(member.email, 'snoo@whatver.com')
+        self.assertEqual(member.address, "somewhere over the rainbow, I guess")
+        self.assertEqual(member.posttown, "Town Town Town!")
+        self.assertEqual(member.postcode, "< Sixteen chars?")
+        self.assertEqual(member.country, "Suriname")
+        self.assertEqual(member.website, "http://still_don't_care/")
+        self.assertEqual(member.phone, "+44 1000000000000001")
+        self.assertEqual(member.altphone, "-1 3202394 2352 23 234")
+        self.assertFalse(member.mailout)
+        self.assertTrue(member.mailout_failed)
+        self.assertTrue(member.is_member)
+        # Member notes aren't included on the form:
+        self.assertEqual(member.notes, None)
+
+        self.assertTrue(member.volunteer.active)
+        self.assertEqual(member.volunteer.notes, "plays the balalaika really badly")
+
+        roles = member.volunteer.roles.all()
+
+        self.assertEqual(len(roles), 2)
+        self.assertEqual(roles[0].id, 2)
+        self.assertEqual(roles[1].id, 3)
+
+    def test_post_update_vol_invalid_missing_data(self):
+        url = reverse("edit-volunteer", kwargs={"volunteer_id": 1})
+        response = self.client.post(url)
+
+        self.assertTemplateUsed(response, "form_volunteer.html")
+
+        # The only mandatory field (!)
+        self.assertFormError(response, 'mem_form', 'name', u'This field is required.')
+
+    def test_post_update_vol_invalid_vol_id(self):
+        url = reverse("edit-volunteer", kwargs={"volunteer_id": 10001})
         response = self.client.post(url)
         self.assertEqual(response.status_code, 404)

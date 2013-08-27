@@ -37,7 +37,7 @@ input[type="text"], textarea {
 <form action="" method="POST" enctype="multipart/form-data">
 {% csrf_token %}
 
-<p><input type="submit" value="Save changes"></input> <a href="{% url "view-volunteer-list" %}">Cancel</a></p>
+<p><input type="submit" value="Save changes"> <a href="{% url "view-volunteer-list" %}">Cancel</a></p>
 <div id="mem_form">
 <table>
 {{ mem_form.as_table }}
@@ -69,7 +69,7 @@ input[type="text"], textarea {
     </ul>
 </div>
 
-<p><input type="submit" value="Save changes"></input> <a href="{% url "view-volunteer-list" %}">Cancel</a></p>
+<p><input type="submit" value="Save changes"> <a href="{% url "view-volunteer-list" %}">Cancel</a></p>
 </form>
 
 

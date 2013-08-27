@@ -4,12 +4,12 @@ from django.conf.urls import patterns, url
 volunteer_urls = patterns(
     'toolkit.members.volunteer_views',
     url('^$', 'view_volunteer_list'),
-    url('^add/$', 'edit_volunteer', name='add-volunteer', kwargs={'member_id': None, 'create_new': True}),
+    url('^add/$', 'edit_volunteer', name='add-volunteer', kwargs={'volunteer_id': None, 'create_new': True}),
     url('^view/$', 'view_volunteer_list', name='view-volunteer-list'),
     url('^retire/select$', 'select_volunteer', name='retire-select-volunteer', kwargs={'action': 'retire'}),
     url('^unretire/select$', 'select_volunteer', name='unretire-select-volunteer', kwargs={'action': 'unretire', 'active': False}),
 
-    url('^(?P<member_id>\d+)/edit$', 'edit_volunteer', name='edit-volunteer'),
+    url('^(?P<volunteer_id>\d+)/edit$', 'edit_volunteer', name='edit-volunteer'),
 
     url('^unretire$', 'activate_volunteer', name='activate-volunteer'),
     url('^retire$', 'activate_volunteer', name='inactivate-volunteer', kwargs={'set_active': False}),

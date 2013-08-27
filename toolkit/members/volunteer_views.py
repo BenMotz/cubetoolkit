@@ -1,12 +1,12 @@
 import logging
 
-from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.auth.decorators import permission_required, login_required
 from django.contrib import messages
-from django.views.decorators.http import require_POST, require_safe, require_http_methods
+from django.views.decorators.http import require_POST, require_safe
 
 import toolkit.members.forms
 from toolkit.members.models import Member, Volunteer
@@ -103,16 +103,16 @@ def activate_volunteer(request, set_active=True):
 
 
 @permission_required('toolkit.write')
-def edit_volunteer(request, member_id, create_new=False):
+def edit_volunteer(request, volunteer_id, create_new=False):
     # If called from the "add" url, then create_new will be True. If called from
     # the edit url then it'll be False
 
     # Depending on which way this method was called, either create a totally
     # new volunteer object with default values (add) or load the volunteer
-    # object with the given member_id from the database:
+    # object with the given volunteer_id from the database:
     if not create_new:
         # Called from "edit" url
-        volunteer = get_object_or_404(Volunteer, id=member_id)
+        volunteer = get_object_or_404(Volunteer, id=volunteer_id)
         member = volunteer.member
     else:
         # Called from "add" url

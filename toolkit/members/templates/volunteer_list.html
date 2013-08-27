@@ -7,6 +7,9 @@
         font-style: normal;
         color: red;
     }
+    tr {
+        page-break-inside: avoid;
+    }
 </style>
 {% endblock %}
 
@@ -25,7 +28,7 @@ Report generated: {% now "d/m/Y" %}<p>
 <table>
 {% for volunteer in volunteers %}
 {% with volunteer.member as member %}
-<div style="page-break-inside: avoid">
+
 {% cycle '<tr>' '' %}
 <td valign="top" align="right">
 {% if volunteer.portrait %}
@@ -41,7 +44,7 @@ Report generated: {% now "d/m/Y" %}<p>
 <b>notes:</b> {{ volunteer.notes|default:"" }}
 <a href="{% url "edit-volunteer" volunteer.pk %}">[update]</a><p>
 <b>roles:</b>{{ vol_role_map|lookup:volunteer.id|join:", "|lower|default:"<em>Request role information</em>" }} <a href="{% url "edit-volunteer" volunteer.pk %}">[update]</a><p>
-{{ member.email|urlize|default:"<em>Request email address</em>" }}</a><br>
+{{ member.email|urlize|default:"<em>Request email address</em>" }}<br>
 {{ member.address }}{% if member.address %}<br>{% endif %}
 {{ member.postcode }}{% if member.postcode %}<br>{% endif %}
 {{ member.phone|default:"<em>Request landline number</em>" }}<br>
@@ -50,7 +53,7 @@ Report generated: {% now "d/m/Y" %}<p>
 <br>
 </td>
 {% cycle '' '</tr>' %}
-</div>
+
 {% endwith %}
 {% endfor %}
 </table>
