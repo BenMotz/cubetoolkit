@@ -6,6 +6,7 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.auth.decorators import permission_required, login_required
 from django.contrib import messages
+from django.views.decorators.http import require_POST, require_safe, require_http_methods
 
 import toolkit.members.forms
 from toolkit.members.models import Member, Volunteer
@@ -16,6 +17,7 @@ logger.setLevel(logging.DEBUG)
 
 
 @login_required
+@require_safe
 def view_volunteer_list(request):
     # Get all volunteers, sorted by name:
     volunteers = Volunteer.objects.filter(active=True).order_by('member__name').select_related()
@@ -49,11 +51,12 @@ def view_volunteer_list(request):
 
 
 @login_required
-def select_volunteer(request, active=True):
+@require_safe
+def select_volunteer(request, action, active=True):
     # This view is called to retire / unretire a volunteer. It presents a list
     # of all volunteer names and a button. If the view is called with "action=retire"
-    # in the query then it shows a "retire" button linked to the# retire url, and
-    # if it's called with "action=unretire" it shows  a link to the unretire url.
+    # in the url then it shows a "retire" button linked to the# retire url, and
+    # if it's called with "action=unretire" it shows a link to the unretire url.
     #
     # The selection of volunteers (retired vs unretired) is decided by the "active"
     # parameter to this method, which is set by the url route, depending on which
@@ -63,12 +66,9 @@ def select_volunteer(request, active=True):
         'unretire': reverse('activate-volunteer'),
     }
 
-    action = request.GET.get('action', None)
-    if action not in action_urls:
-        logger.error(u"Select volunteer called with unknown action: {0}".format(action))
-        raise Http404('Invalid action')
+    assert action in action_urls
+    assert isinstance(active, bool)
 
-    active = bool(active)
     volunteers = Volunteer.objects.filter(active=active).order_by('member__name').select_related()
 
     context = {
@@ -81,23 +81,22 @@ def select_volunteer(request, active=True):
 
 
 @permission_required('toolkit.write')
-def activate_volunteer(request, active=True):
+@require_POST
+def activate_volunteer(request, set_active=True):
     # Sets the 'active' value for the volunteer with the id passed  in the
     # 'volunteer' parameter of the POST request
-    if request.method != 'POST':
-        return HttpResponse("Not allowed", status=405, mimetype="text/plain")
 
     vol_pk = request.POST.get('volunteer', None)
 
     vol = get_object_or_404(Volunteer, id=vol_pk)
 
-    assert type(active) is bool
-    vol.active = active
+    assert isinstance(set_active, bool)
+    vol.active = set_active
     vol.save()
 
-    logger.info(u"Set volunteer.active to {0} for volunteer {1}".format(str(active), vol_pk))
-    messages.add_message(request, messages.SUCCESS, u"{0} volunteer {1}".format(
-        u"Unretired" if active else u"Retired",
+    logger.info(u"Set volunteer.active to {} for volunteer {}".format(str(set_active), vol_pk))
+    messages.add_message(request, messages.SUCCESS, u"{} volunteer {}".format(
+        u"Unretired" if set_active else u"Retired",
         vol.member.name))
 
     return HttpResponseRedirect(reverse("view-volunteer-list"))

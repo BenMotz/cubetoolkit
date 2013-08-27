@@ -47,20 +47,29 @@ class MembersTestsMixin(object):
                     phone="", altphone="", address="", posttown="", postcode="", country="",
                     website="")
         m6.save()
+        m7 = Member(name="Volunteer Four", email="four4@foo.test", number="o4",
+                    phone="", altphone="", address="", posttown="", postcode="", country="",
+                    website="")
+        m7.save()
 
         # Volunteers:
-        v1 = Volunteer(member=m4)
-        v1.save()
-        v1.roles = [r1, r3]
-        v1.save()
+        self.vol_1 = Volunteer(member=m4)
+        self.vol_1.save()
+        self.vol_1.roles = [r1, r3]
+        self.vol_1.save()
 
-        v2 = Volunteer(member=m5)
-        v2.save()
+        self.vol_2 = Volunteer(member=m5)
+        self.vol_2.save()
 
-        v3 = Volunteer(member=m6)
-        v3.save()
-        v3.roles = [r3]
-        v3.save()
+        self.vol_3 = Volunteer(member=m6)
+        self.vol_3.save()
+        self.vol_3.roles = [r3]
+        self.vol_3.save()
+
+        self.vol_4 = Volunteer(member=m7, active=False, notes=u"Subliminal, superluminous")
+        self.vol_4.save()
+        self.vol_4.roles = [r3]
+        self.vol_4.save()
 
         # System user:
         user_rw = auth_models.User.objects.create_user('admin', 'toolkit_admin@localhost', 'T3stPassword!')
@@ -89,11 +98,11 @@ class SecurityTests(MembersTestsMixin, TestCase):
             # Volunteer urls:
             'add-volunteer': {'member_id': None, 'create_new': True},
             'view-volunteer-list': {},
-            'select-volunteer': {},
-            'select-volunteer-inactive': {'active': False},
+            'unretire-select-volunteer': {},
+            'retire-select-volunteer': {},
             'edit-volunteer': {'member_id': 1},
             'activate-volunteer': {},
-            'inactivate-volunteer': {'active': False},
+            'inactivate-volunteer': {},
             # Member urls:
             'add-member': {},
             'search-members': {},
@@ -796,3 +805,83 @@ class TestMemberMiscViews(MembersTestsMixin, TestCase):
         url = reverse("member-homepages")
         response = self.client.post(url)
         self.assertEqual(response.status_code, 405)
+
+class TestActivateDeactivateVolunteer(MembersTestsMixin, TestCase):
+    def setUp(self):
+        super(TestActivateDeactivateVolunteer, self).setUp()
+        self.assertTrue(self.client.login(username="admin", password="T3stPassword!"))
+
+    def test_load_select_form_retire(self):
+        url = reverse("retire-select-volunteer")
+        response = self.client.get(url)
+
+        self.assertTemplateUsed(response, 'select_volunteer.html')
+
+        self.assertContains(response, "Volunteer One")
+        self.assertContains(response, "Volunteer Two")
+        self.assertContains(response, "Volunteer Three")
+        self.assertNotContains(response, "Volunteer Four")
+
+    def test_load_select_form_unretire(self):
+        url = reverse("unretire-select-volunteer")
+        response = self.client.get(url)
+
+        self.assertTemplateUsed(response, 'select_volunteer.html')
+
+        self.assertNotContains(response, "Volunteer One")
+        self.assertNotContains(response, "Volunteer Two")
+        self.assertNotContains(response, "Volunteer Three")
+        self.assertContains(response, "Volunteer Four")
+
+    def test_select_form_post(self):
+        url = reverse("unretire-select-volunteer")
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 405)
+
+    def test_retire(self):
+        vol = Volunteer.objects.get(id=2)
+        self.assertTrue(vol.active)
+
+        url = reverse("inactivate-volunteer")
+        response = self.client.post(url, data={u"volunteer": u"2"}, follow=True)
+
+        self.assertRedirects(response, reverse("view-volunteer-list"))
+
+        vol = Volunteer.objects.get(id=2)
+        self.assertFalse(vol.active)
+
+        self.assertContains(response, u"Retired volunteer Volunteer Two")
+
+    def test_retire_bad_vol_id(self):
+        url = reverse("inactivate-volunteer")
+        response = self.client.post(url, data={u"volunteer": u"2000"})
+        self.assertEqual(response.status_code, 404)
+
+    def test_retire_no_vol_id(self):
+        url = reverse("inactivate-volunteer")
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_unretire(self):
+        vol = Volunteer.objects.get(id=self.vol_4.pk)
+        self.assertFalse(vol.active)
+
+        url = reverse("activate-volunteer")
+        response = self.client.post(url, data={u"volunteer": u"4"}, follow=True)
+
+        self.assertRedirects(response, reverse("view-volunteer-list"))
+
+        vol = Volunteer.objects.get(id=self.vol_4.pk)
+        self.assertTrue(vol.active)
+
+        self.assertContains(response, u"Unretired volunteer Volunteer Four")
+
+    def test_unretire_bad_vol_id(self):
+        url = reverse("activate-volunteer")
+        response = self.client.post(url, data={u"volunteer": u"2000"})
+        self.assertEqual(response.status_code, 404)
+
+    def test_unretire_no_vol_id(self):
+        url = reverse("activate-volunteer")
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 404)

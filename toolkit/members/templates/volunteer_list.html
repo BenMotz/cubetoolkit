@@ -19,8 +19,8 @@
 Total cube volunteers: {{ volunteers|length }}<p>
 Report generated: {% now "d/m/Y" %}<p>
 <a href="{% url "add-volunteer" %}"title="add new volunteer">[add volunteer]</a>
-<a href="{% url "select-volunteer" %}?action=retire" title="retire volunteer">[retire volunteer]</a>
-<a href="{% url "select-volunteer-inactive" %}?action=unretire" title="unretire volunteer">[unretire volunteer]</a><br>
+<a href="{% url "retire-select-volunteer" %}" title="retire volunteer">[retire volunteer]</a>
+<a href="{% url "unretire-select-volunteer" %}" title="unretire volunteer">[unretire volunteer]</a><br>
 <h3>Contact details:</h3>
 <table>
 {% for volunteer in volunteers %}

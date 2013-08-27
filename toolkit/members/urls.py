@@ -6,13 +6,13 @@ volunteer_urls = patterns(
     url('^$', 'view_volunteer_list'),
     url('^add/$', 'edit_volunteer', name='add-volunteer', kwargs={'member_id': None, 'create_new': True}),
     url('^view/$', 'view_volunteer_list', name='view-volunteer-list'),
-    url('^select$', 'select_volunteer', name='select-volunteer'),
-    url('^select/inactive$', 'select_volunteer', name='select-volunteer-inactive', kwargs={'active': False}),
+    url('^retire/select$', 'select_volunteer', name='retire-select-volunteer', kwargs={'action': 'retire'}),
+    url('^unretire/select$', 'select_volunteer', name='unretire-select-volunteer', kwargs={'action': 'unretire', 'active': False}),
 
     url('^(?P<member_id>\d+)/edit$', 'edit_volunteer', name='edit-volunteer'),
 
-    url('^active/set$', 'activate_volunteer', name='activate-volunteer'),
-    url('^active/unset$', 'activate_volunteer', name='inactivate-volunteer', kwargs={'active': False}),
+    url('^unretire$', 'activate_volunteer', name='activate-volunteer'),
+    url('^retire$', 'activate_volunteer', name='inactivate-volunteer', kwargs={'set_active': False}),
 )
 
 # Members:
