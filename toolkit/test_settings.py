@@ -11,6 +11,8 @@ DATABASES = {
     }
 }
 
+MEDIA_ROOT = '/tmp'
+
 # Enable logging to the console:
 LOGGING['root'] = {
 #    'handlers': ['console'],

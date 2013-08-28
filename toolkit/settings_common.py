@@ -29,6 +29,11 @@ EMAIL_UNSUBSCRIBE_HOST = "cubecinema.com"
 # (so, for example, can't have more than this number of bar staff)
 MAX_COUNT_PER_ROLE = 6
 
+# Probably don't want to change these: subdirectories of MEDIA directory where
+# volunteer images get saved:
+VOLUNTEER_PORTRAIT_DIR = 'volunteers'
+VOLUNTEER_PORTRAIT_PREVIEW_DIR = 'volunteers_thumbnails'
+
 ###############################################################################
 #
 # Below here are Django settings

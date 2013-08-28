@@ -4,7 +4,10 @@
 [NEWFEATURE] --  make old IDs work into the future
 [TODO] -- Basic member automated tests
 [TODO] -- 'days ahead' on edit view should be persistent preference
+[TODO] -- result count in member search?
+[TODO] -- do JS close of popup using a redirect?
 
+[BUG] -- make more forms redirect after submit, to avoid reload adding duplicates (eg. new member form)
 [BUG] -- If diary view-by-tag has nothing then have an informative message! (Likewise by date?)
 [BUG] -- handle errors for saving Event details if image and image is missing
 

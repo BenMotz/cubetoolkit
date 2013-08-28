@@ -1066,6 +1066,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
             # self.assertEqual(str(media_item.thumbnail), '')  # Thumbnailing fails, as PIL can't cope
             self.assertEqual(media_item.credit, u'All new image credit!')
             self.assertEqual(media_item.caption, None)
+            # TODO: Check file?
 
     @override_settings(MEDIA_ROOT="/tmp")
     def test_post_edit_event_clear_media(self):

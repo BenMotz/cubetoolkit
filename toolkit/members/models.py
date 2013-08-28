@@ -76,8 +76,8 @@ class Volunteer(models.Model):
     notes = models.TextField(blank=True, null=True)
     active = models.BooleanField(default=True)
 
-    portrait = models.ImageField(upload_to="volunteers", max_length=256, null=True, blank=True)
-    portrait_thumb = models.ImageField(upload_to="volunteers_thumbnails", max_length=256,
+    portrait = models.ImageField(upload_to=settings.VOLUNTEER_PORTRAIT_DIR, max_length=256, null=True, blank=True)
+    portrait_thumb = models.ImageField(upload_to=settings.VOLUNTEER_PORTRAIT_PREVIEW_DIR, max_length=256,
                                        null=True, blank=True, editable=False)
 
     # Roles
@@ -156,7 +156,7 @@ class Volunteer(models.Model):
 
         thumb_file = os.path.join(
             settings.MEDIA_ROOT,
-            "volunteers_thumbnails",
+            settings.VOLUNTEER_PORTRAIT_PREVIEW_DIR,
             os.path.basename(str(self.portrait))
         )
         # Make sure thumbnail file ends in jpg, to avoid confusion:
