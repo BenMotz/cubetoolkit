@@ -1,5 +1,3 @@
-import time
-
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
@@ -27,6 +25,9 @@ http://{0}{{1}}?k={{2}}
     count = recipients.count()
     sent = 0
     one_percent = count // 100
+
+    if count == 0:
+        return (False, 1000, ['blah', 'blah', 'blah'])
 
     with open("/tmp/spool", "w") as spool:
         for recipient in recipients:
