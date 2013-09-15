@@ -1,5 +1,5 @@
 # Fix versions of django and directly related components:
-Django==1.5
+Django==1.5.4
 django-debug-toolbar==0.9.4
 django-celery==3.0.11
 # Functionality introduced at these versions is required:
