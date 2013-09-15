@@ -17,6 +17,16 @@
 <a href="{% url "day-view" year=start.year day=start.day month=start.month %}?daysahead=60">See 2 months</a> |
 <a href="{% url "day-view" year=start.year day=start.day month=start.month %}?daysahead=90">See 3 months</a></p>
 
+{% if showings|length == 0 %}
+<p>
+{% if event_type %}
+Couldn't find anything tagged <strong>{{ event_type }}</strong>
+{% else %}
+Nothing on between {{ start|date:"l j M Y"  }} and {{ end|date:"l j M Y" }}
+{% endif %}
+</p>
+{% endif %}
+
 <table class="summary">
 {% for showing in showings %}
     {% ifchanged %}<tr class="row_year"><td colspan="4"><h1>{{ showing.start|date:"Y" }} </h1></td></tr>{% endifchanged %}

@@ -11,6 +11,7 @@ from django.http import HttpResponse, Http404
 from django.shortcuts import render, get_object_or_404
 from django.core.urlresolvers import reverse
 from django.conf import settings
+from django.utils.safestring import mark_for_escaping
 import django.utils.timezone as timezone
 import django.views.generic as generic
 
@@ -48,6 +49,10 @@ def view_diary(request, year=None, month=None, day=None, event_type=None):
 
     context['today'] = datetime.date.today()
     context['start'] = startdate
+    context['end'] = enddate
+    # Following is user input passed back, so make doubly sure that it gets
+    # escaped in the template:
+    context['event_type'] = mark_for_escaping(event_type) if event_type else None
 
     # Set page title
     if year:

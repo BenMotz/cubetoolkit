@@ -263,6 +263,19 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
+    def test_view_by_tag_nothing_found(self):
+        url = reverse("type-view", kwargs={"event_type": "folm"})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "<p>Couldn't find anything tagged <strong>folm</strong></p>", html=True)
+
+    def test_view_by_date_nothing_found(self):
+        url = reverse("year-view", kwargs={"year": "2093"})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "<p>Nothing on between Thursday 1 Jan 2093 and Friday 1 Jan 2094</p>", html=True)
+
+
     # JSON day data:
     def test_day_json(self):
         url = reverse("day-view-json", kwargs={"year": "2013", "month": "4", "day": "13"})
