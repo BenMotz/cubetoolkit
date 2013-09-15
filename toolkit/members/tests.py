@@ -3,7 +3,7 @@ import urllib
 import os.path
 import tempfile
 
-from mock import patch
+from mock import patch, call
 
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -15,6 +15,7 @@ import django.contrib.contenttypes as contenttypes
 
 from toolkit.members.models import Member, Volunteer
 from toolkit.diary.models import Role
+import toolkit.members.tasks
 
 
 class MembersTestsMixin(object):
@@ -900,6 +901,7 @@ class TestActivateDeactivateVolunteer(MembersTestsMixin, TestCase):
         response = self.client.post(url)
         self.assertEqual(response.status_code, 404)
 
+
 class TestVolunteerEdit(MembersTestsMixin, TestCase):
     def setUp(self):
         super(TestVolunteerEdit, self).setUp()
@@ -1035,7 +1037,6 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertEqual(len(roles), 2)
         self.assertEqual(roles[0].id, 2)
         self.assertEqual(roles[1].id, 3)
-
 
     def test_post_new_vol_invalid_missing_data(self):
         url = reverse("add-volunteer")
@@ -1271,3 +1272,25 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         shutil.rmtree(os.path.join('/tmp', settings.VOLUNTEER_PORTRAIT_DIR))
         shutil.rmtree(os.path.join('/tmp', settings.VOLUNTEER_PORTRAIT_PREVIEW_DIR))
 
+
+class TestMemberMailoutTask(MembersTestsMixin, TestCase):
+    def setUp(self):
+        super(TestMemberMailoutTask, self).setUp()
+        self.assertTrue(self.client.login(username="admin", password="T3stPassword!"))
+
+    @patch("toolkit.members.tasks.current_task")
+    def test_basic(self, current_task_mock):
+        result = toolkit.members.tasks.send_mailout(
+            "The Subject!", u"The Body!\nThat will be \u20ac1, please\nTa!"
+        )
+        current_task_mock.update_state.assert_has_calls([
+            call(state='PROGRESS017', meta={'total': 6, 'sent': 1}),
+            call(state='PROGRESS034', meta={'total': 6, 'sent': 2}),
+            call(state='PROGRESS051', meta={'total': 6, 'sent': 3}),
+            call(state='PROGRESS067', meta={'total': 6, 'sent': 4}),
+            call(state='PROGRESS084', meta={'total': 6, 'sent': 5}),
+            # 101% complete! (ahem)
+            call(state='PROGRESS101', meta={'total': 6, 'sent': 6})
+        ])
+        # Other fields of tuple are meaningless:
+        self.assertEqual(result[0], True)
