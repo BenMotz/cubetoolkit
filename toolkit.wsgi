@@ -1,8 +1,11 @@
 import os
 import sys
 import site
+import djcelery
 
 VIRTUALENV="venv"
+
+djcelery.setup_loader()
 
 # Get site root from this file's location:
 SITE_ROOT=os.path.abspath(os.path.dirname(__file__))

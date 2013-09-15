@@ -1,6 +1,5 @@
 import os.path
 import django.core.urlresolvers
-import djcelery
 import sys
 
 # Slightly arbitrary (inherited) bounding box for thumbnails
@@ -47,7 +46,6 @@ APP_ROOT_DETECTED = os.path.abspath(os.path.join(os.path.dirname(os.path.realpat
 APPEND_SLASH = True
 
 # Celery
-djcelery.setup_loader()
 BROKER_URL = 'django://'
 CELERY_RESULT_BACKEND = 'database'
 CELERY_RESULT_DBURI = "django://"
