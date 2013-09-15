@@ -1,11 +1,8 @@
 import os
 import sys
 import site
-import djcelery
 
 VIRTUALENV="venv"
-
-djcelery.setup_loader()
 
 # Get site root from this file's location:
 SITE_ROOT=os.path.abspath(os.path.dirname(__file__))
@@ -16,6 +13,10 @@ site.addsitedir(os.path.join(SITE_ROOT, VIRTUALENV, "lib/python2.6/site-packages
 
 # Add site package root to start of pythonpath:
 sys.path.insert(0, SITE_ROOT)
+
+# celery should now be available (on the virtualenv path)
+import djcelery
+djcelery.setup_loader()
 
 # Point Django to settings file:
 os.environ['DJANGO_SETTINGS_MODULE'] = 'toolkit.settings'
