@@ -24,7 +24,7 @@ http://{0}{{1}}?k={{2}}
                                 .filter(mailout=True))
     count = recipients.count()
     sent = 0
-    one_percent = count // 100
+    one_percent = count // 100 or 1
 
     if count == 0:
         return (False, 1000, ['blah', 'blah', 'blah'])
