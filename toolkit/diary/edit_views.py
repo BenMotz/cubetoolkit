@@ -734,7 +734,7 @@ def mailout_progress(request):
         elif state == "SUCCESS":
             progress = 100
         else:
-            logger.error("Invalid data from async mailout task: {}".format(state))
+            logger.error("Invalid data from async mailout task: {}".format(repr(state)))
             status = 'error'
 
     return HttpResponse(
