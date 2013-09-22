@@ -76,9 +76,14 @@ DATABASES = {
 ## Authorisation related settings:
 LOGIN_URL = django.core.urlresolvers.reverse_lazy('login')
 
-# Configure django to only use (more secure) bcrypt password hashing
 PASSWORD_HASHERS = (
+    'django.contrib.auth.hashers.PBKDF2PasswordHasher',
+    'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
     'django.contrib.auth.hashers.BCryptPasswordHasher',
+    'django.contrib.auth.hashers.SHA1PasswordHasher',
+#   Don't allow:
+#    'django.contrib.auth.hashers.MD5PasswordHasher',
+#    'django.contrib.auth.hashers.CryptPasswordHasher',
 )
 
 # Local time zone for this installation. Choices can be found here:
