@@ -18,7 +18,7 @@
     {% if showing.discounted %}<span class="discounted">{{ showing.start }} TTT</span>
     {% else %}
     {{ showing.start }} {% endif %}
-{% if showing.cancelled %}</span>{% endif %}
+    {% if showing.cancelled %}</span>{% endif %}<br>
 {% endfor %}
 </p>
 
