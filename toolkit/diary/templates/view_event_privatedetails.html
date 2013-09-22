@@ -63,7 +63,7 @@ Booked for: <a href="{% url "edit-showing" showing.pk %}">{{ showing.start|date:
 
 <p class="d"><b>Event image.</b><br>
 {% if event.media.all.0 %}
-<a href="{{ event.media.all.0.media_file.url }}"><img src="{{ event.media.all.0.thumbnail.url }}" alt="Picture for event {{ event.name }}"></a>
+<a href="{{ event.media.all.0.media_file }}"><img src="{{ event.media.all.0.thumbnail }}" alt="Picture for event {{ event.name }}"></a>
 <p class="image_caption">Image by: {{ event.media.all.0.credit }}</p>
 {% else %}
 <i>no image yet</i>
