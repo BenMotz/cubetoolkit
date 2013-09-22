@@ -1,5 +1,3 @@
-# Fix versions of django and directly related components:
-py-bcrypt>=0.1
 # These should (!) have stable APIs, so let upgrades happen
 MySQL-python
 # Not sure about:
