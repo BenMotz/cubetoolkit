@@ -1,4 +1,4 @@
-from toolkit.settings import *
+from toolkit.settings_common import *
 
 # Following settings are used by the import script, can be discarded when
 # switch-over is finalised.
