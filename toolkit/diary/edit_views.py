@@ -21,7 +21,7 @@ from django.contrib.auth.decorators import permission_required, login_required
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 
 from toolkit.diary.models import (Showing, Event, DiaryIdea, MediaItem,
-                                  EventTemplate, EventTag, Role)
+                                  EventTemplate, EventTag, Role, RotaEntry)
 import toolkit.diary.forms as diary_forms
 import toolkit.diary.edit_prefs as edit_prefs
 import toolkit.members.tasks
@@ -783,3 +783,54 @@ def mailout_progress(request):
         }),
         mimetype="application/json"
     )
+
+
+@permission_required('toolkit.write')
+@require_http_methods(["GET", "POST"])
+def rota_edit(request):
+    if request.method == 'GET':
+        # Fiddly way to set startdate to the start of the local day:
+        # Get current UTC time and convert to local time:
+        now_local = django.utils.timezone.localtime(django.utils.timezone.now())
+        # Create a new local time with hour/min/sec set to zero:
+        current_tz = django.utils.timezone.get_current_timezone()
+        start_date = current_tz.localize(datetime.datetime(now_local.year, now_local.month, now_local.day))
+
+        try:
+            days_ahead = int(request.GET.get('daysahead', 30))
+        except ValueError:
+            days_ahead = 30
+
+        end_date = start_date + datetime.timedelta(days=days_ahead)
+        showings = (Showing.objects.filter(cancelled=False)
+                                   .filter(confirmed=True)
+                                   .filter(start__range=[start_date, end_date])
+                                   .order_by('start')
+                                   .prefetch_related('rotaentry_set__role')  # mildly hacky optimisation for rota view
+                                   .select_related())
+
+        context = {
+            'start_date': start_date,
+            'end_date': end_date,
+            'days_ahead': days_ahead,
+            'showings': showings,
+        }
+
+        return render(request, u'edit_rota.html', context)
+    if request.method == 'POST':
+        logger.debug("POOOOST")
+        try:
+            entry_id = int(request.POST.get('id'))
+        except ValueError:
+            logger.error("Invalid entry_id")
+            return HttpResponse("Invalid entry id", status=400, content_type="text/plain")
+        name = request.POST.get('value')
+        if len(name) > 200:
+            return HttpResponse("Invalid name", status=400, content_type="text/plain")
+
+        rota_entry = get_object_or_404(RotaEntry, pk=entry_id)
+        rota_entry.name = name
+        rota_entry.save()
+
+        return HttpResponse(name)
+

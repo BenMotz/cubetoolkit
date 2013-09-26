@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}
+CUBE role rota
+{% endblock %}
+
+{% block css %}
+<style type="text/css">
+    @import url('{{ STATIC_URL }}css/lib/smoothness/jquery-ui.css');
+    h1, h2 { margin: 1mm; }
+    td.cell_day {
+        font-weight: bold;
+        text-align: right;
+    }
+    td.event_name {
+        font-weight: bold;
+    }
+    td.rl {
+        text-align: right;
+    }
+    td.rer { width: 3.5cm; }
+    td.rel { width: 3.5cm; text-align: right;}
+</style>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.jeditable.mini.js"></script>
+<script>
+ $(document).ready(function() {
+         $('.rota_name').editable('', {
+            submitdata: {
+                csrfmiddlewaretoken: "{{ csrf_token }}"
+            }
+         });
+ });
+</script>
+{% endblock %}
+
+{% block body %}
+<table border="0" cellspacing="0">
+
+{% for showing in showings %}
+    {% ifchanged %}<tr><td><h1>{{ showing.start|date:"Y" }} </h1></td><td colspan="6"></td></tr>{% endifchanged %}
+    {% ifchanged %}<tr><td></td><td><h2>{{ showing.start|date:"F" }}</h2></td><td colspan="5"></td></tr>{% endifchanged %}
+    <tr><td> </td><td class="cell_day">{{ showing.start|date:"D"}}&nbsp;{{ showing.start|date:"j" }}</td><td>{{ showing.start|date:"H:i" }}</td><td class="event_name" colspan="4">{{ showing.event.name.upper }} </td></tr>
+    {% for rota_entry in showing.rotaentry_set.all %}
+        {% if forloop.counter|divisibleby:2 %}
+        <td class="rer">| <span class="rota_name" id="{{ rota_entry.pk }}">{{ rota_entry.name|default:"----" }}</span>   </td><td>&gt; {{ rota_entry.role.name }}-{{ rota_entry.rank }} </td></tr>
+        {% else %}
+        <tr><td colspan="3"></td><td class="rl"> {{ rota_entry.role.name }}-{{ rota_entry.rank }} &lt; </td><td class="rel"><span class="rota_name" id="{{ rota_entry.pk }}">{{ rota_entry.name|default:"----" }}</span> |</td>
+            {% if forloop.last %}
+                <td colspan="2"></td></tr>
+            {% endif %}
+        {% endif %}
+    {% endfor %}
+{% endfor %}
+
+</table>
+
+{% endblock %}
+

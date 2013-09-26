@@ -500,8 +500,10 @@ class RotaEntry(models.Model):
     required = models.BooleanField(default=True)
     rank = models.IntegerField(default=1)
 
+    name = models.TextField(max_length=256, null=True, blank=True)
+
     # created_at = models.DateTimeField(auto_now_add=True)
-    # updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'RotaEntries'

@@ -1,0 +1,119 @@
+# -*- coding: utf-8 -*-
+import datetime
+import pytz
+from south.db import db
+from south.v2 import SchemaMigration
+from django.db import models
+
+
+class Migration(SchemaMigration):
+
+    def forwards(self, orm):
+        # Adding field 'RotaEntry.name'
+        db.add_column('RotaEntries', 'name',
+                      self.gf('django.db.models.fields.TextField')(max_length=256, null=True, blank=True),
+                      keep_default=False)
+
+        updated_at_when = datetime.datetime(2013, 9, 26, 0, 0)
+        updated_at_when = pytz.timezone("UTC").localize(updated_at_when)
+        # Adding field 'RotaEntry.updated_at'
+        db.add_column('RotaEntries', 'updated_at',
+                      self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=updated_at_when, blank=True),
+                      keep_default=False)
+
+
+    def backwards(self, orm):
+        # Deleting field 'RotaEntry.name'
+        db.delete_column('RotaEntries', 'name')
+
+        # Deleting field 'RotaEntry.updated_at'
+        db.delete_column('RotaEntries', 'updated_at')
+
+
+    models = {
+        u'diary.diaryidea': {
+            'Meta': {'object_name': 'DiaryIdea', 'db_table': "'DiaryIdeas'"},
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'ideas': ('django.db.models.fields.TextField', [], {'max_length': '16384', 'null': 'True', 'blank': 'True'}),
+            'month': ('django.db.models.fields.DateField', [], {}),
+            'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
+        },
+        u'diary.event': {
+            'Meta': {'object_name': 'Event', 'db_table': "'Events'"},
+            'copy': ('django.db.models.fields.TextField', [], {'max_length': '8192', 'null': 'True', 'blank': 'True'}),
+            'copy_summary': ('django.db.models.fields.TextField', [], {'max_length': '4096', 'null': 'True', 'blank': 'True'}),
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'duration': ('django.db.models.fields.TimeField', [], {'null': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'legacy_copy': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'legacy_id': ('django.db.models.fields.CharField', [], {'max_length': '256', 'null': 'True'}),
+            'media': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['diary.MediaItem']", 'db_table': "'Event_MediaItems'", 'symmetrical': 'False'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '256'}),
+            'notes': ('django.db.models.fields.TextField', [], {'max_length': '4096', 'null': 'True', 'blank': 'True'}),
+            'outside_hire': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'private': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'tags': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['diary.EventTag']", 'symmetrical': 'False', 'db_table': "'Event_Tags'", 'blank': 'True'}),
+            'template': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'template'", 'null': 'True', 'to': u"orm['diary.EventTemplate']"}),
+            'terms': ('django.db.models.fields.TextField', [], {'default': "'Contacts-\\nCompany-\\nAddress-\\nEmail-\\nPh No-\\nHire Fee (inclusive of VAT, if applicable) -\\nFinancial Deal (%/fee/split etc)-\\nDeposit paid before the night (p/h only) -\\nAmount needed to be collected (p/h only) -\\nSpecial Terms -\\nTech needed -\\nAdditonal Info -'", 'max_length': '4096', 'null': 'True', 'blank': 'True'}),
+            'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
+        },
+        u'diary.eventtag': {
+            'Meta': {'object_name': 'EventTag', 'db_table': "'EventTags'"},
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '32'}),
+            'read_only': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
+        },
+        u'diary.eventtemplate': {
+            'Meta': {'object_name': 'EventTemplate', 'db_table': "'EventTemplates'"},
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'max_length': '32'}),
+            'roles': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['diary.Role']", 'db_table': "'EventTemplates_Roles'", 'symmetrical': 'False'}),
+            'tags': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['diary.EventTag']", 'symmetrical': 'False', 'db_table': "'EventTemplate_Tags'", 'blank': 'True'}),
+            'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
+        },
+        u'diary.mediaitem': {
+            'Meta': {'object_name': 'MediaItem', 'db_table': "'MediaItems'"},
+            'caption': ('django.db.models.fields.CharField', [], {'max_length': '256', 'null': 'True', 'blank': 'True'}),
+            'credit': ('django.db.models.fields.CharField', [], {'default': "'Internet scavenged'", 'max_length': '256', 'null': 'True', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'media_file': ('django.db.models.fields.files.FileField', [], {'max_length': '256', 'null': 'True', 'blank': 'True'}),
+            'mimetype': ('django.db.models.fields.CharField', [], {'max_length': '64'})
+        },
+        u'diary.role': {
+            'Meta': {'ordering': "['name']", 'object_name': 'Role', 'db_table': "'Roles'"},
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '64'}),
+            'read_only': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'standard': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
+        },
+        u'diary.rotaentry': {
+            'Meta': {'object_name': 'RotaEntry', 'db_table': "'RotaEntries'"},
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.TextField', [], {'max_length': '256', 'null': 'True', 'blank': 'True'}),
+            'rank': ('django.db.models.fields.IntegerField', [], {'default': '1'}),
+            'required': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
+            'role': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['diary.Role']"}),
+            'showing': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['diary.Showing']"}),
+            'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
+        },
+        u'diary.showing': {
+            'Meta': {'object_name': 'Showing', 'db_table': "'Showings'"},
+            'booked_by': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
+            'cancelled': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'confirmed': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
+            'discounted': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'event': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'showings'", 'to': u"orm['diary.Event']"}),
+            'extra_copy': ('django.db.models.fields.TextField', [], {'max_length': '4096', 'null': 'True', 'blank': 'True'}),
+            'extra_copy_summary': ('django.db.models.fields.TextField', [], {'max_length': '4096', 'null': 'True', 'blank': 'True'}),
+            'hide_in_programme': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'roles': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['diary.Role']", 'through': u"orm['diary.RotaEntry']", 'symmetrical': 'False'}),
+            'start': ('toolkit.diary.models.FutureDateTimeField', [], {'db_index': 'True'}),
+            'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
+        }
+    }
+
+    complete_apps = ['diary']
