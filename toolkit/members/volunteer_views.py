@@ -94,8 +94,8 @@ def activate_volunteer(request, set_active=True):
     vol.active = set_active
     vol.save()
 
-    logger.info(u"Set volunteer.active to {} for volunteer {}".format(str(set_active), vol_pk))
-    messages.add_message(request, messages.SUCCESS, u"{} volunteer {}".format(
+    logger.info(u"Set volunteer.active to {0} for volunteer {1}".format(str(set_active), vol_pk))
+    messages.add_message(request, messages.SUCCESS, u"{0} volunteer {1}".format(
         u"Unretired" if set_active else u"Retired",
         vol.member.name))
 

@@ -698,7 +698,7 @@ def exec_mailout(request):
 
     form = diary_forms.MailoutForm(request.POST)
     if not form.is_valid():
-        logger.error("Mailout failed: {}".format(repr(form.errors)))
+        logger.error("Mailout failed: {0}".format(repr(form.errors)))
         response = {
             'status': 'error',
             'errors': dict(form.errors),
@@ -729,12 +729,12 @@ def mailout_progress(request):
             try:
                 progress = int(progress_parts[1])
             except ValueError:
-                logger.error("Invalid progress from async mailout task: {}".format(state))
+                logger.error("Invalid progress from async mailout task: {0}".format(state))
                 status = 'error'
         elif state == "SUCCESS":
             progress = 100
         else:
-            logger.error(u"Invalid data from async mailout task: {}".format(state))
+            logger.error(u"Invalid data from async mailout task: {0}".format(state))
             status = 'error'
 
     return HttpResponse(
