@@ -130,12 +130,17 @@ def view_diary_json(request, year, month, day):
     for showing in showings:
         event = showing.event
 
+        thumbnail = None
+        if event.media.count() >= 1:
+            media_item = event.media.all()[0]
+            thumbnail = event.media.all()[0].thumbnail.url if media_item.thumbnail.name else None
+
         results.append({
             'start': timezone.localtime(showing.start).strftime('%d/%m/%Y %H:%M'),
             'name': event.name,
             'copy': markdown.markdown(event.copy),
             'link': reverse("single-event-view", kwargs={'event_id': showing.event_id}),
-            'image': event.media.all()[0].thumbnail.url if event.media.count() >= 1 else None,
+            'image': thumbnail,
             'tags': ", ".join(n[0] for n in event.tags.values_list('name')),
         })
 
