@@ -13,9 +13,9 @@ def send_mailout(subject, body):
         u"""
 
 If you wish to be removed from our mailing list please use this link:
-http://{0}{{0}}?k={{2}}
-To edit details of your membership, please use this link:
 http://{0}{{1}}?k={{2}}
+To edit details of your membership, please use this link:
+http://{0}{{0}}?k={{2}}
 """).format(settings.EMAIL_UNSUBSCRIBE_HOST, settings.EMAIL_UNSUBSCRIBE_HOST)
 
     recipients = (Member.objects.filter(email__isnull=False)
