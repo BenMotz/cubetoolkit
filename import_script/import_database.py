@@ -518,11 +518,42 @@ def import_volunteer(member, active, notes, role_map, roles):
     v.save(update_portrait_thumbnail=False)
 
 
+def parse_imported_date(date_string, timezone):
+    # Try to turn the date_string into an actual datetime. If it
+    # fails (as it often does) then return None. On success returns a datetime
+    # localised to the supplied timezone
+    # (Tries to parse date_string as dd/mm/yy)
+
+    date_localised = None
+    components = date_string.split('/')
+    if len(components) == 3:
+        try:
+            day = int(components[0])
+            month = int(components[1])
+            year = int(components[2])
+            # There are some 2 digit years:
+            if year < 1900:
+                logger.info("Implausible year {0}, guessing it should be {1}"
+                            .format(year, year + 2000))
+                year += 2000
+            date_naive = datetime.datetime(
+                    day=day,
+                    month=month,
+                    year=year
+            )
+            date_localised = timezone.localize(date_naive)
+        except ValueError:
+            logger.info("Couldn't parse date {0}".format(date_string))
+    return date_localised
+
 @django.db.transaction.commit_on_success
 def import_members(connection):
     timezone = pytz.timezone("Europe/London")
 
     role_map = dict((role.name.replace(" ", "_").lower(), role) for role in toolkit.diary.models.Role.objects.all())
+
+    # Cursor used for doing direct updates of records (bypassing Django)
+    update_cursor = django.db.connection.cursor()
 
     cursor = connection.cursor()
     results = cursor.execute(
@@ -553,19 +584,7 @@ def import_members(connection):
         m.country = titlecase(r[7])
         m.phone = r[8]
         m.altphone = r[9]
-        last_updated = r[10].split('/')
-        # Try to turn the last_updated value into an actual datetime. If it
-        # fails (as it often does) then go with the default
-        if len(last_updated) == 3:
-            try:
-                last_updated_local = datetime.datetime(
-                    day=int(last_updated[0]),
-                    month=int(last_updated[1]),
-                    year=int(last_updated[2])
-                )
-                m.last_updated = timezone.localize(last_updated_local)  # Store datetime with timezone information
-            except ValueError:
-                pass
+
         if r[11] == 'member removed self':
             m.mailout = False
         elif r[11] is not None and r[11] != '':
@@ -580,6 +599,13 @@ def import_members(connection):
         try:
             m.full_clean()
             m.save()
+            # Because django automatically sets the updated_at/created_at date,
+            # just do a raw SQL UPDATE to set updated_at/created_at set:
+            updated_at = parse_imported_date(r[10], timezone)
+            if updated_at:
+                update_cursor.execute(
+                    "UPDATE Members SET created_at = %s, updated_at = %s WHERE id = %s",
+                     [updated_at, updated_at, m.pk])
         except ValidationError as ve:
             logger.error("Failed saving member %s: %s", m.number, str(ve))
             continue
@@ -613,6 +639,7 @@ def import_members(connection):
             sys.stdout.flush()
 
     cursor.close()
+    update_cursor.close()
 
     logger.info("%d members" % count)
 
