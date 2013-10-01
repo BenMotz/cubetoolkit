@@ -36,8 +36,8 @@ http://{0}{{1}}?k={{2}}
             )
 
             signature = signature_template.format(
-                reverse("edit-member", args=(recipient.pk,)),
                 reverse("unsubscribe-member", args=(recipient.pk,)),
+                reverse("edit-member", args=(recipient.pk,)),
                 recipient.mailout_key,
             )
 
