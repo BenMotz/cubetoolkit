@@ -61,7 +61,7 @@ http://{0}{{1}}?k={{2}}
     # DELETE THE FOLLOWING LINE IF YOU WANT TO TRY EMAILING FOR REALSIES
     # XXX XXX XXX
 
-    return (True, 0, 'No recipients found')
+    return (True, 0, 'DISABLED UNTIL READY')
 
     try:
         for recipient in recipients:
