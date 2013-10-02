@@ -718,26 +718,42 @@ def exec_mailout(request):
 @permission_required('toolkit.write')
 @require_GET
 def mailout_progress(request):
-    result = celery.result.AsyncResult(id=request.GET['task_id'])
-    state = result.state
+    async_result = celery.result.AsyncResult(id=request.GET['task_id'])
+    state = async_result.state
     progress = 0
-    status = u'ok'
+    complete = False
+    # Following values are set if complete:
+    error = None
+    sent_count = None
+    error_msg = None
 
-    if state is not None:
+    print "Got:", state
+
+    if state:
         progress_parts = state.split("PROGRESS")
         if len(progress_parts) > 1:
             try:
                 progress = int(progress_parts[1])
             except ValueError:
                 logger.error("Invalid progress from async mailout task: {0}".format(state))
-                status = 'error'
         elif state == "SUCCESS":
             progress = 100
+            complete = True
+            if async_result.result and len(async_result.result) == 3:
+                error, sent_count, error_msg = async_result.result
+        elif state == "PENDING":
+            progress = 0
         else:
             logger.error(u"Invalid data from async mailout task: {0}".format(state))
-            status = 'error'
 
     return HttpResponse(
-        json.dumps({'status': status, 'task_id': result.task_id, 'progress': progress}),
+        json.dumps({
+            'task_id': async_result.task_id,
+            'complete': complete,
+            'progress': progress,
+            'error': error,
+            'error_msg': error_msg,
+            'sent_count': sent_count,
+        }),
         mimetype="application/json"
     )

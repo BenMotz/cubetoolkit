@@ -24,6 +24,11 @@ DEFAULT_MUGSHOT = "/static/members/default_mugshot.gif"
 # will have links added to http://[this]/members/100/unsubscribe)
 EMAIL_UNSUBSCRIBE_HOST = "cubecinema.com"
 
+# Default address to which reports of a successful mailout delivery are sent:
+MAILOUT_DELIVERY_REPORT_TO = "cubeadmin@cubecinema.com"
+# "From" address for mailout
+MAILOUT_FROM_ADDRESS = "mailout@cubecinema.com"
+
 # The maximum number of each type of role that can be assigned to a showing
 # (so, for example, can't have more than this number of bar staff)
 MAX_COUNT_PER_ROLE = 6

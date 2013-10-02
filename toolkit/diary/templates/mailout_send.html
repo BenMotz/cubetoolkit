@@ -60,20 +60,32 @@ function getCookie(name) {
 }
 
 function mail_send_progress_poll(data, textStatus, jqXHR) {
-    progress = data['progress'];
-    update_progress(progress);
+    if (!data) {
+        return;
+    }
 
-    if(progress < 100) {
+    complete = data['complete'];
+
+    if (complete !== true) {
+        progress = data['progress'];
+        update_progress(progress);
         window.setTimeout(function() {
                 $.getJSON('{% url "mailout-progress" %}?task_id=' + data['task_id'], mail_send_progress_poll);
         }, POLL_PERIOD);
     } else {
-        set_state(S_COMPLETE);
+        if (data['error'] === true) {
+            set_state(S_ERROR);
+            if (data['error_msg']) {
+                $('#error_msg').html(data['error_msg']);
+            }
+        } else {
+            set_state(S_COMPLETE);
+        }
     }
 }
 
 
-function update_progress(percentage) {
+function update_progress(percentage, error, error_message, count) {
     progressBar.progressbar('value', percentage);
 }
 
@@ -99,7 +111,7 @@ function start_send() {
             'success': mail_send_progress_poll,
             });
 
-    window.setTimeout(progress_poll, 100);
+    window.setTimeout(mail_send_progress_poll, 100);
 }
 
 function cancel_send() {
@@ -108,10 +120,11 @@ function cancel_send() {
     progress = 1000;
 }
 
-var S_READY=0;
-var S_SENDING=1;
-var S_COMPLETE=2;
-var S_ABORTED=3;
+var S_READY = 0;
+var S_SENDING = 1;
+var S_COMPLETE = 2;
+var S_ABORTED = 3;
+var S_ERROR = 4;
 
 function set_state(state) {
     switch(state) {
@@ -124,10 +137,13 @@ function set_state(state) {
             $('#cancel').button().click(cancel_send);
             break;
         case S_ABORTED:
-            $('#status').html('Sending aborted');
+            $('#status').html('Sending aborted not yet implemented!');
             break;
         case S_COMPLETE:
             $('#status').html('Sent');
+            break;
+        case S_ERROR:
+            $('#status').html('An error occurred: <span id="error_msg">(unknown)</span>');
             break;
     }
 }
