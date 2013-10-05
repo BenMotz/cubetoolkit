@@ -52,3 +52,5 @@ echo "Creating users"
 
 python $TOOLKIT_PATH/import_script/create_users.py
 
+echo "Import index"
+python $TOOLKIT_PATH/import_script/import_index.py $TOOLKIT_PATH/import_script/source_data/tools.dat

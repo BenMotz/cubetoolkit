@@ -1,4 +1,3 @@
-[TODO] -- Import index page links
 [TODO] -- New 'import' script to dump and import DB from live for devserver
 [NEWFEATURE] -- Per-tag RSS
 [NEWFEATURE] -- 'subscribe me' UI for members lists
@@ -12,6 +11,7 @@
 [BUG] -- make more forms redirect after submit, to avoid reload adding duplicates (eg. new member form)
 [BUG] -- handle errors for saving Event details if image and image is missing
 
+[DONE] -- Import index page links
 [DONE] -- Logout link on the members database pages
 [FIXED] -- utf-8 in base.html
 [DONE] -- Copy summary report for Nina

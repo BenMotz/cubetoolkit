@@ -54,6 +54,9 @@ EVENT_PHOTO_THUMBS_LOCAL_PATH="$MEDIA_PATH/diary_thumbnails/"
 VOL_PHOTO_THUMBS_SERVER_PATH="/home/cube/htdocs/volunteers/portraits/thumb/"
 VOL_PHOTO_THUMBS_LOCAL_PATH="$MEDIA_PATH/volunteers_thumbnails/"
 
+INDEX_LINKS_SERVER_PATH="/home/cube/cgi-bin/toolkit/tools.dat"
+INDEX_LINKS_LOCAL_PATH="$LOCAL_PATH/tools.dat"
+
 echo "Getting Diary"
 $RSYNC -av --exclude='.svn' ${SRC_ROOT}$DIARY_SERVER_PATH/*.dat $DIARY_LOCAL_PATH/
 echo "Getting Events"
@@ -77,5 +80,7 @@ echo "Getting Volunteer thumbs"
 $RSYNC -av --exclude='.svn' --progress ${SRC_ROOT}$VOL_PHOTO_THUMBS_SERVER_PATH $VOL_PHOTO_THUMBS_LOCAL_PATH
 echo "Getting Event thumbs"
 $RSYNC -av --exclude='.svn' --progress ${SRC_ROOT}$EVENT_PHOTO_THUMBS_SERVER_PATH $EVENT_PHOTO_THUMBS_LOCAL_PATH
+echo "Getting index links"
+$RSYNC -av --exclude='.svn' --progress ${SRC_ROOT}$INDEX_LINKS_SERVER_PATH $INDEX_LINKS_LOCAL_PATH
 
 exit 0
