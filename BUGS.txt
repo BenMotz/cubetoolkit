@@ -1,14 +1,20 @@
-
+[TODO] -- Import index page links
+[TODO] -- New 'import' script to dump and import DB from live for devserver
 [NEWFEATURE] -- Per-tag RSS
 [NEWFEATURE] -- 'subscribe me' UI for members lists
 [NEWFEATURE] --  make old IDs work into the future
+[TODO] -- Make SMTP host configurable via settings.py
 [TODO] -- 'days ahead' on edit view should be persistent preference
 [TODO] -- result count in member search?
 [TODO] -- do JS close of popup using a redirect?
 
+[BUG] -- Sort out email encoding
 [BUG] -- make more forms redirect after submit, to avoid reload adding duplicates (eg. new member form)
 [BUG] -- handle errors for saving Event details if image and image is missing
 
+[DONE] -- Logout link on the members database pages
+[FIXED] -- utf-8 in base.html
+[DONE] -- Copy summary report for Nina
 [FIXED] -- If diary view-by-tag has nothing then have an informative message! (Likewise by date?)
 [DONE] -- Basic member automated tests
 [WONTFIX] -- WYSIWYG HTML editor isn't quite right ...
