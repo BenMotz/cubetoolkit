@@ -487,7 +487,7 @@ def view_event_field(request, field, year, month, day):
     # list) and then uses the appropriate template to render the results.
 
     logger.debug(u"view_event_field: field {0}".format(field))
-    assert field in ('copy', 'terms', 'rota')
+    assert field in ('copy', 'terms', 'rota', 'copy_summary')
 
     query_days_ahead = request.GET.get('daysahead', None)
     start_date, days_ahead = get_date_range(year, month, day, query_days_ahead)
