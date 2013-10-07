@@ -25,6 +25,9 @@ CUBE programme of events - copy summary report
     div.copy p.divider {
         padding: 10pt;
     }
+    p.copy_summary {
+        white-space: pre-line;
+    }
 </style>
 {% endblock %}
 {% block script %}
@@ -72,7 +75,7 @@ $(document).ready(function() {
 {% ifchanged %}
 <p class="divider">------------------------------------------------------------------------------</p>
 <p>{{ showing.event.name|upper }}</p>
-<p>{{ showing.event.copy_summar}}</p>
+<p class="copy_summary">{{ showing.event.copy_summary}}</p>
 <p><a href="{% url "edit-event-details" showing.event.id %}">[edit]</a></p>
 {% endifchanged %}
 {% endif %}
