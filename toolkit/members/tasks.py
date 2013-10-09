@@ -1,5 +1,6 @@
 import smtplib
 from email.mime.text import MIMEText
+from email.Header import Header
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
@@ -11,6 +12,18 @@ from toolkit.members.models import Member
 
 logger = get_task_logger(__name__)
 
+
+def string_is_ascii(string):
+    return all(ord(char) < 0x7F for char in string)
+
+
+def get_ascii_or_encoded_header(string):
+    if string_is_ascii(string):
+        return string.encode("ascii")
+    else:
+        return Header(string.encode("utf-8"), "utf-8")
+
+
 def _send_email(smtp_conn, destination, subject, body):
     error = None
 
@@ -18,9 +31,10 @@ def _send_email(smtp_conn, destination, subject, body):
     # Change the message encoding to match:
     msg.set_charset("utf-7")
 
-    msg['Subject'] = subject.encode("utf-7")
-    msg['From']    = settings.MAILOUT_FROM_ADDRESS
-    msg['To']      = destination
+    # Assume 'From' is always ASCII(!)
+    msg['From'] = settings.MAILOUT_FROM_ADDRESS
+    msg['To'] = get_ascii_or_encoded_header(destination)
+    msg['Subject'] = get_ascii_or_encoded_header(subject)
 
     try:
         smtp_conn.sendmail(settings.MAILOUT_FROM_ADDRESS,
@@ -35,6 +49,7 @@ def _send_email(smtp_conn, destination, subject, body):
         logger.error("Failed sending to {0}: {1}".format(destination, smtpe))
 
     return error
+
 
 @task()
 def send_mailout(subject, body):
