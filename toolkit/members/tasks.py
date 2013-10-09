@@ -11,6 +11,31 @@ from toolkit.members.models import Member
 
 logger = get_task_logger(__name__)
 
+def _send_email(smtp_conn, destination, subject, body):
+    error = None
+
+    msg = MIMEText(body.encode("utf-7"))
+    # Change the message encoding to match:
+    msg.set_charset("utf-7")
+
+    msg['Subject'] = subject.encode("utf-7")
+    msg['From']    = settings.MAILOUT_FROM_ADDRESS
+    msg['To']      = destination
+
+    try:
+        smtp_conn.sendmail(settings.MAILOUT_FROM_ADDRESS,
+                           [destination],
+                           msg.as_string())
+    except smtplib.SMTPServerDisconnected as ssd:
+        logger.error("Failed sending to {0}: {1}".format(destination, ssd))
+        # don't handle this:
+        raise
+    except smtplib.SMTPException as smtpe:
+        error = str(smtpe)
+        logger.error("Failed sending to {0}: {1}".format(destination, smtpe))
+
+    return error
+
 @task()
 def send_mailout(subject, body):
     """
@@ -49,7 +74,7 @@ http://{0}{{1}}?k={{2}}
 
     # Open connection to SMTP server:
     try:
-        smtp_conn = smtplib.SMTP('localhost')
+        smtp_conn = smtplib.SMTP(settings.EMAIL_HOST, settings.EMAIL_PORT)
     except Exception as exc:
         msg = "Failed to connect to SMTP server: {0}".format(exc)
         logger.error(msg)
@@ -60,7 +85,6 @@ http://{0}{{1}}?k={{2}}
     # XXX XXX XXX
     # DELETE THE FOLLOWING LINE IF YOU WANT TO TRY EMAILING FOR REALSIES
     # XXX XXX XXX
-
     return (True, 0, 'DISABLED UNTIL READY')
 
     try:
@@ -77,26 +101,13 @@ http://{0}{{1}}?k={{2}}
                 reverse("edit-member", args=(recipient.pk,)),
                 recipient.mailout_key,
             )
-
-            # Build final email, encoded in UTF-7 (?!)
+            # Build final email, still in unicode:
             email_body = header + body + signature
-            msg = MIMEText(email_body.encode("utf-7"))
-            # Change the message encoding to match:
-            msg.set_charset("utf-7")
 
-            msg['Subject'] = subject.encode("utf-7")
-            msg['From']    = settings.MAILOUT_FROM_ADDRESS
-            msg['To']      = recipient.email
+            error = _send_email(smtp_conn, recipient.email, subject, email_body)
 
-            # Send the message via our own SMTP server, but don't include the
-            # envelope header.
-            try:
-                smtp_conn.sendmail(settings.MAILOUT_FROM_ADDRESS,
-                                   [recipient.email],
-                                   msg.as_string())
-            except smtplib.SMTPException as smtpe:
-                err_list.append(str(smtpe))
-                logger.error("Failed sending to {0}: {1}".format(recipient.email, smtpe))
+            if error:
+                err_list.append(error)
 
             sent += 1
             if sent % one_percent == 0:
@@ -113,19 +124,16 @@ http://{0}{{1}}?k={{2}}
 
         report += "\n"
         report += body
-        msg = MIMEText(report.encode("utf-8"))
-        msg.set_charset("utf-8")
 
-        msg['Subject'] = subject.encode("utf-8")
-        msg['From']    = settings.MAILOUT_FROM_ADDRESS
-        msg['To']      = settings.MAILOUT_DELIVERY_REPORT_TO
-        smtp_conn.sendmail(settings.MAILOUT_FROM_ADDRESS,
-                           [settings.MAILOUT_DELIVERY_REPORT_TO],
-                           msg.as_string())
+        _send_email(smtp_conn, settings.MAILOUT_DELIVERY_REPORT_TO, subject, report)
+
     except Exception as exc:
         logger.exception("Mailout job failed, {0}".format(exc))
-        raise
+        return (True, sent, "Mailout job died: {0}".format(exc))
     finally:
-        smtp_conn.quit()
+        try:
+            smtp_conn.quit()
+        except smtplib.SMTPException as smtpe:
+            logger.error("SMTP Quit failed: {0}".format(smtpe))
 
     return (False, sent, 'Ok')

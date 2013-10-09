@@ -741,6 +741,13 @@ def mailout_progress(request):
             complete = True
             if async_result.result and len(async_result.result) == 3:
                 error, sent_count, error_msg = async_result.result
+        elif state == "FAILURE":
+            complete = True
+            error = True
+            if async_result.result:
+                error_msg = unicode(async_result.result)
+            else:
+                error_msg = "Failed: Unknown error"
         elif state == "PENDING":
             progress = 0
         else:

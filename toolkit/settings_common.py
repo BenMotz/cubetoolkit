@@ -24,6 +24,11 @@ DEFAULT_MUGSHOT = "/static/members/default_mugshot.gif"
 # will have links added to http://[this]/members/100/unsubscribe)
 EMAIL_UNSUBSCRIBE_HOST = "cubecinema.com"
 
+# SMTP host/port settings. For complete list of relevant settings see:
+# https://docs.djangoproject.com/en/1.5/ref/settings/#email-backend
+EMAIL_HOST = 'localhost'
+EMAIL_PORT = 25
+
 # Default address to which reports of a successful mailout delivery are sent:
 MAILOUT_DELIVERY_REPORT_TO = "cubeadmin@cubecinema.com"
 # "From" address for mailout
@@ -259,6 +264,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'propagate': True,
+            'level': 'INFO',
         },
     },
 
