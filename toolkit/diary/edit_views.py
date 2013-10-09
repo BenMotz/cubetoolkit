@@ -727,8 +727,6 @@ def mailout_progress(request):
     sent_count = None
     error_msg = None
 
-    print "Got:", state
-
     if state:
         progress_parts = state.split("PROGRESS")
         if len(progress_parts) > 1:
