@@ -17,29 +17,31 @@ def string_is_ascii(string):
     return all(ord(char) < 0x7F for char in string)
 
 
-def get_ascii_or_encoded_header(string):
-    if string_is_ascii(string):
-        return string.encode("ascii")
-    else:
-        return Header(string.encode("utf-8"), "utf-8")
-
-
-def _send_email(smtp_conn, destination, subject, body):
+def _send_email(smtp_conn, destination, subject, body, mail_is_ascii):
     error = None
 
-    msg = MIMEText(body.encode("utf-7"))
-    # Change the message encoding to match:
-    msg.set_charset("utf-7")
+    # Body, encoded in either ASCII or UTF-8:
+    body_charset = "ascii" if mail_is_ascii else "utf-8"
+    msg = MIMEText(body.encode(body_charset, "replace"), "plain", body_charset)
 
     # Assume 'From' is always ASCII(!)
     msg['From'] = settings.MAILOUT_FROM_ADDRESS
-    msg['To'] = get_ascii_or_encoded_header(destination)
-    msg['Subject'] = get_ascii_or_encoded_header(subject)
+    # This will try encoding in ascii, then iso-8859-1 then fallback to UTF-8
+    # if that fails. (This is desirable as iso-8859-1 is more readable without
+    # decoding, plus more compact)
+    # ('To' can contain non-ascii in name part, i.e. "name <address>")
+    msg['To'] = Header(destination, "iso-8859-1")
+    msg['Subject'] = Header(subject, "iso-8859-1")
 
     try:
+        # Enforce ascii destination email address:
         smtp_conn.sendmail(settings.MAILOUT_FROM_ADDRESS,
-                           [destination],
+                           [destination.encode("ascii")],
                            msg.as_string())
+    except UnicodeError:
+        msg = "Non-ascii email address {0}".format(destination.encode("ascii", "replace"))
+        logger.error(msg)
+        return msg
     except smtplib.SMTPServerDisconnected as ssd:
         logger.error("Failed sending to {0}: {1}".format(destination, ssd))
         # don't handle this:
@@ -57,22 +59,24 @@ def send_mailout(subject, body):
     Sends email with supplied subject/body to all members who have an email
     address, and who have mailout==True and mailout_failed=False.
 
-    Also sends an email to settings.MAILOUT_DELIVERY_REPORT_TO when done
+    Requires subject and body to be unicode.
+
+    Also sends an email to settings.MAILOUT_DELIVERY_REPORT_TO when done.
 
     returns a tuple:
     (error, sent_count, error_message)
-    where error is True if an error occurred
+    where error is True if an error occurred.
     """
 
     header_template = u"Dear {0},\n\n"
     signature_template = (
-        u"""
-
-If you wish to be removed from our mailing list please use this link:
-http://{0}{{0}}?k={{2}}
-To edit details of your membership, please use this link:
-http://{0}{{1}}?k={{2}}
-""").format(settings.EMAIL_UNSUBSCRIBE_HOST, settings.EMAIL_UNSUBSCRIBE_HOST)
+        u"\n" +
+        u"\n" +
+        u"If you wish to be removed from our mailing list please use this link:\n" +
+        u"http://{0}{{0}}?k={{2}}\n" +
+        u"To edit details of your membership, please use this link:\n" +
+        u"http://{0}{{1}}?k={{2}}\n"
+    ).format(settings.EMAIL_UNSUBSCRIBE_HOST)
 
     recipients = (Member.objects.filter(email__isnull=False)
                                 .exclude(email='')
@@ -82,10 +86,11 @@ http://{0}{{1}}?k={{2}}
     sent = 0
     one_percent = count // 100 or 1
 
-    logger.info("Sending mailout to {0} recipients".format(count))
-
     if count == 0:
+        logger.error("No recipients found")
         return (True, 0, 'No recipients found')
+
+    logger.info("Sending mailout to {0} recipients".format(count))
 
     # Open connection to SMTP server:
     try:
@@ -94,6 +99,10 @@ http://{0}{{1}}?k={{2}}
         msg = "Failed to connect to SMTP server: {0}".format(exc)
         logger.error(msg)
         return (True, 0, msg)
+
+    # Cache if body is 7 bit clean (will need to check each sender name, but
+    # save a bit of time by not scanning everything)
+    body_is_ascii = string_is_ascii(body) and string_is_ascii(signature_template)
 
     err_list = []
 
@@ -117,9 +126,10 @@ http://{0}{{1}}?k={{2}}
                 recipient.mailout_key,
             )
             # Build final email, still in unicode:
-            email_body = header + body + signature
+            mail_body = header + body + signature
+            mail_is_ascii = body_is_ascii and string_is_ascii(header)
 
-            error = _send_email(smtp_conn, recipient.email, subject, email_body)
+            error = _send_email(smtp_conn, recipient.email, subject, mail_body, mail_is_ascii)
 
             if error:
                 err_list.append(error)
@@ -140,7 +150,7 @@ http://{0}{{1}}?k={{2}}
         report += "\n"
         report += body
 
-        _send_email(smtp_conn, settings.MAILOUT_DELIVERY_REPORT_TO, subject, report)
+        _send_email(smtp_conn, unicode(settings.MAILOUT_DELIVERY_REPORT_TO), subject, report, body_is_ascii)
 
     except Exception as exc:
         logger.exception("Mailout job failed, {0}".format(exc))
