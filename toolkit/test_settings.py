@@ -15,6 +15,11 @@ MEDIA_ROOT = '/tmp'
 
 # Enable logging to the console:
 LOGGING['root'] = {
-#    'handlers': ['console'],
-#    'level': 'WARNING',
+    # 'handlers': ['console'],
+    # 'level': 'WARNING',
 }
+
+PASSWORD_HASHERS = (
+    # For testing use insecure, but much faster, MD5 password hasher:
+    'django.contrib.auth.hashers.MD5PasswordHasher',
+)
