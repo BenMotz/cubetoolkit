@@ -1447,15 +1447,18 @@ class MailoutTests(DiaryTestsMixin, TestCase):
 
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content)
-        self.assertEqual(response_data, {
-            u'status': u'ok',
+        self.assertEqual({
+            u'complete': False,
+            u'error': None,
+            u'error_msg': None,
+            u'sent_count': None,
             u'progress': 10,
             u'task_id': u'dummy-task-id'
-        })
+        }, response_data)
 
     @patch("celery.result.AsyncResult")
-    def test_exec_view_get_progress_complete(self, async_result_patch):
-        async_result_patch.return_value.state = u"SUCCESS"
+    def test_exec_view_get_progress_pending(self, async_result_patch):
+        async_result_patch.return_value.state = u"PENDING"
         async_result_patch.return_value.task_id = u"dummy-task-id"
 
         url = reverse("mailout-progress")
@@ -1463,11 +1466,114 @@ class MailoutTests(DiaryTestsMixin, TestCase):
 
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content)
-        self.assertEqual(response_data, {
-            u'status': u'ok',
+        self.assertEqual({
+            u'complete': False,
+            u'error': None,
+            u'error_msg': None,
+            u'sent_count': None,
+            u'progress': 0,
+            u'task_id': u'dummy-task-id'
+        }, response_data)
+
+    @patch("celery.result.AsyncResult")
+    def test_exec_view_get_progress_failure(self, async_result_patch):
+        async_result_patch.return_value.state = u"FAILURE"
+        async_result_patch.return_value.task_id = u"dummy-task-id"
+        async_result_patch.return_value.result = IOError("This could happen")
+
+        url = reverse("mailout-progress")
+        response = self.client.get(url, data={u"task_id": u"dummy-task-id"})
+
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual({
+            u'complete': True,
+            u'error': True,
+            u'error_msg': "This could happen",
+            u'sent_count': None,
+            u'progress': 0,
+            u'task_id': u'dummy-task-id'
+        }, response_data)
+
+    @patch("celery.result.AsyncResult")
+    def test_exec_view_get_progress_failure_no_result(self, async_result_patch):
+        async_result_patch.return_value.state = u"FAILURE"
+        async_result_patch.return_value.task_id = u"dummy-task-id"
+        async_result_patch.return_value.result = None
+
+        url = reverse("mailout-progress")
+        response = self.client.get(url, data={u"task_id": u"dummy-task-id"})
+
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual({
+            u'complete': True,
+            u'error': True,
+            u'error_msg': "Failed: Unknown error",
+            u'sent_count': None,
+            u'progress': 0,
+            u'task_id': u'dummy-task-id'
+        }, response_data)
+
+    @patch("celery.result.AsyncResult")
+    def test_exec_view_get_progress_complete(self, async_result_patch):
+        async_result_patch.return_value.state = u"SUCCESS"
+        async_result_patch.return_value.task_id = u"dummy-task-id"
+        async_result_patch.return_value.result = (False, 321, "Ok")
+
+        url = reverse("mailout-progress")
+        response = self.client.get(url, data={u"task_id": u"dummy-task-id"})
+
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual({
+            u'complete': True,
+            u'error': False,
+            u'error_msg': u'Ok',
+            u'sent_count': 321,
             u'progress': 100,
             u'task_id': u'dummy-task-id'
-        })
+        }, response_data)
+
+    @patch("celery.result.AsyncResult")
+    def test_exec_view_get_progress_complete_bad_result(self, async_result_patch):
+        async_result_patch.return_value.state = u"SUCCESS"
+        async_result_patch.return_value.task_id = u"dummy-task-id"
+        async_result_patch.return_value.result = "Nu?"
+
+        url = reverse("mailout-progress")
+        response = self.client.get(url, data={u"task_id": u"dummy-task-id"})
+
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual({
+            u'complete': True,
+            u'error': True,
+            u'error_msg': u"Couldn't retrieve status from completed job",
+            u'sent_count': 0,
+            u'progress': 100,
+            u'task_id': u'dummy-task-id'
+        }, response_data)
+
+    @patch("celery.result.AsyncResult")
+    def test_exec_view_get_progress_complete_error(self, async_result_patch):
+        async_result_patch.return_value.state = u"SUCCESS"
+        async_result_patch.return_value.task_id = u"dummy-task-id"
+        async_result_patch.return_value.result = (True, 322, "Error message")
+
+        url = reverse("mailout-progress")
+        response = self.client.get(url, data={u"task_id": u"dummy-task-id"})
+
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual({
+            u'complete': True,
+            u'error': True,
+            u'error_msg': u'Error message',
+            u'sent_count': 322,
+            u'progress': 100,
+            u'task_id': u'dummy-task-id'
+        }, response_data)
 
     @patch("celery.result.AsyncResult")
     def test_exec_view_get_bad_celery_progress_data(self, async_result_patch):
@@ -1479,11 +1585,14 @@ class MailoutTests(DiaryTestsMixin, TestCase):
 
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content)
-        self.assertEqual(response_data, {
-            u'status': u'error',
+        self.assertEqual({
+            u'complete': False,
+            u'error': None,
+            u'error_msg': None,
+            u'sent_count': None,
             u'progress': 0,
             u'task_id': u'dummy-task-id'
-        })
+        }, response_data)
 
     @patch("celery.result.AsyncResult")
     def test_exec_view_get_bad_celery_data(self, async_result_patch):
@@ -1495,11 +1604,14 @@ class MailoutTests(DiaryTestsMixin, TestCase):
 
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content)
-        self.assertEqual(response_data, {
-            u'status': u'error',
+        self.assertEqual({
+            u'complete': False,
+            u'error': None,
+            u'error_msg': None,
+            u'sent_count': None,
             u'progress': 0,
             u'task_id': u'dummy-task-id'
-        })
+        }, response_data)
 
 
 class PreferencesTests(DiaryTestsMixin, TestCase):

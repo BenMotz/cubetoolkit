@@ -737,8 +737,12 @@ def mailout_progress(request):
         elif state == "SUCCESS":
             progress = 100
             complete = True
-            if async_result.result and len(async_result.result) == 3:
+            if async_result.result and isinstance(async_result.result, tuple) and len(async_result.result) == 3:
                 error, sent_count, error_msg = async_result.result
+            else:
+                error = True
+                sent_count = 0
+                error_msg = u"Couldn't retrieve status from completed job"
         elif state == "FAILURE":
             complete = True
             error = True
