@@ -2,12 +2,12 @@
 [NEWFEATURE] -- Per-tag RSS
 [NEWFEATURE] -- 'subscribe me' UI for members lists
 [NEWFEATURE] --  make old IDs work into the future
-[TODO] -- result count in member search?
 [TODO] -- do JS close of popup using a redirect?
 
 [BUG] -- make more forms redirect after submit, to avoid reload adding duplicates (eg. new member form)
 [BUG] -- handle errors for saving Event details if image and image is missing
 
+[DONE] -- result count in member search?
 [DONE] -- default days ahead for edit view -> 90 days
 [DONE] -- 'days ahead' on edit view should be persistent preference
 [DONE] -- Sort out email encoding
