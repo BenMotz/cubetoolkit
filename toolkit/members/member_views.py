@@ -39,6 +39,7 @@ def add_member(request):
             # Member added ok, new blank form:
             form = toolkit.members.forms.NewMemberForm()
             messages.add_message(request, messages.SUCCESS, u"Added member: {0}".format(instance.number))
+            return HttpResponseRedirect(reverse("add-member"))
     elif request.method == 'GET':
         # GET request; create form object with default values
         form = toolkit.members.forms.NewMemberForm()

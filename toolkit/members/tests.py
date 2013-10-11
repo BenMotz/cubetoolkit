@@ -236,9 +236,9 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
             u"name": new_name,
             u"email": u"blah.blah-blah@hard-to-tell-if-genuine.uk",
             u"postcode": "SW1A 1AA",
-        })
+        }, follow=True)
 
-        self.assertEqual(response.status_code, 200)
+        self.assertRedirects(response, url)
         self.assertTemplateUsed(response, "form_new_member.html")
 
         member = Member.objects.get(name=new_name)

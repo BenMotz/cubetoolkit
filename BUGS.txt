@@ -4,7 +4,7 @@
 [NEWFEATURE] --  make old IDs work into the future
 [TODO] -- do JS close of popup using a redirect?
 
-[BUG] -- make more forms redirect after submit, to avoid reload adding duplicates (eg. new member form)
+[BUG] -- make more forms redirect after submit, to avoid reload adding duplicates (done for members)
 [BUG] -- handle errors for saving Event details if image and image is missing
 
 [DONE] -- result count in member search?
