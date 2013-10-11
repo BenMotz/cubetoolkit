@@ -71,9 +71,20 @@ def edit_diary_list(request, year=None, day=None, month=None):
 
     context = {}
     # Sort out date range to display
+
+    # If the query contained the number of days ahead to show then retrieve it
+    # and store it as the default for this session (so coming back to the page
+    # will look the same)
     query_days_ahead = request.GET.get('daysahead', None)
+
+    if query_days_ahead:
+        edit_prefs.set_preference(request.session, 'daysahead', query_days_ahead)
+        default_days_ahead = query_days_ahead
+    else:
+        default_days_ahead = int(edit_prefs.get_preference(request.session, 'daysahead'))
+
     # utility function, shared with public diary view
-    startdatetime, days_ahead = get_date_range(year, month, day, query_days_ahead)
+    startdatetime, days_ahead = get_date_range(year, month, day, query_days_ahead, default_days_ahead)
     startdate = startdatetime.date()
     if startdatetime is None:
         raise Http404(days_ahead)

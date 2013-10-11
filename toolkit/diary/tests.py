@@ -17,6 +17,7 @@ import django.contrib.contenttypes as contenttypes
 from toolkit.diary.models import (Showing, Event, Role, EventTag, DiaryIdea,
                                   EventTemplate, RotaEntry, MediaItem)
 from toolkit.members.models import Member, Volunteer
+import toolkit.diary.edit_prefs
 
 
 class DiaryTestsMixin(object):
@@ -1653,6 +1654,25 @@ class PreferencesTests(DiaryTestsMixin, TestCase):
         edit_prefs = self._get_edit_prefs(response)
         self.assertEqual(edit_prefs["popups"], "true")
 
+    def test_set_get_single_pref(self):
+        session_mock = {}
+        toolkit.diary.edit_prefs.set_preference(session_mock, 'daysahead', 30)
+
+        retrieved_pref = toolkit.diary.edit_prefs.get_preference(session_mock, 'daysahead')
+        self.assertEqual(retrieved_pref, '30')
+
+    def test_set_get_single_missing_pref(self):
+        session_mock = {}
+        retrieved_pref = toolkit.diary.edit_prefs.get_preference(session_mock, 'daysahead')
+        self.assertEqual(retrieved_pref, '90')
+
+    def test_set_get_single_bad_pref(self):
+        session_mock = {'spangles': 'foo'}
+        # Shouldn't return the value, as it's not a known pref, even tho it's
+        # in the session:
+        retrieved_pref = toolkit.diary.edit_prefs.get_preference(session_mock, 'spangles')
+        self.assertEqual(retrieved_pref, None)
+
     def test_bad_value(self):
         url = reverse("default-edit")
 
@@ -1676,7 +1696,7 @@ class PreferencesTests(DiaryTestsMixin, TestCase):
 
         response = self.client.get(url)
         edit_prefs = self._get_edit_prefs(response)
-        self.assertEqual(edit_prefs.keys(), ["popups"])
+        self.assertEqual(edit_prefs.keys(), ["daysahead", "popups"])
 
     def test_redirect_change(self):
         url = reverse("cancel-edit")

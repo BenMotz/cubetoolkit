@@ -7,7 +7,7 @@ import django.utils.timezone
 logger = logging.getLogger(__name__)
 
 
-def get_date_range(year, month, day, user_days_ahead):
+def get_date_range(year, month, day, user_days_ahead, default_days_ahead=30):
     """Support method to take fields read from HTTP request and return a tuple
     (datetime, number_of_days)
     If month or day are blank, they default to 1. If all three are blank it
@@ -50,7 +50,7 @@ def get_date_range(year, month, day, user_days_ahead):
             # Create a new local time with hour/min/sec set to zero:
             startdate = current_tz.localize(datetime.datetime(now_local.year, now_local.month, now_local.day))
 
-            days_ahead = 30  # default
+            days_ahead = int(default_days_ahead)
     except ValueError as vale:
         logger.error("Invalid something requested in date range: {0}".format(vale))
         return (None, "Invalid date")
