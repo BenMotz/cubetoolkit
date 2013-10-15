@@ -9,10 +9,10 @@ KNOWN_PREFS = {
 }
 
 def get_preferences(session):
-    edit_prefs = {
-        pref: session.get('editpref_' + pref, default)
+    edit_prefs = dict(
+        (pref, session.get('editpref_' + pref, default))
         for pref, default in KNOWN_PREFS.iteritems()
-    }
+    )
     return edit_prefs
 
 def get_preference(session, name):
