@@ -64,6 +64,25 @@ class DiaryTestsMixin(object):
         t3 = EventTag(name=u"\u0167ag \u0165hre\u0119", read_only=False)
         t3.save()
 
+        """
+        Event  outside_hire   private   Tags
+        ---------------------------------------
+        e1     True           False
+        e2     False          False
+        e3     False          False    t2
+        e4     False          False    t2
+        e5     False          True
+        e6     True           True     t3
+
+        Showing  Event  Date    Confirmed  Hidden  Cancelled  Discount
+        ------------------------------------------------------------
+        s1       e2    1/4/13   F          F       F          F
+        s2       e3    13/4/13  T          F       F          F
+        s3       e4    9/6/13   T          F       F          F
+        s4       e4    14/9/13  F          F       F          F
+        s5       e5    14/2/13  T          F       F          F
+        """
+
         # Events:
         e1 = Event(
             name="Event one title",
@@ -117,6 +136,20 @@ class DiaryTestsMixin(object):
             private=True
         )
         e5.save()
+
+        e6 = Event(
+            name=u"PRIVATE OUTSIDE Event (Six)",
+            copy=u"PRIVATE OUTSIDE Event 6ix copy",
+            copy_summary=u"OUTSIDE PRIVATE \u010copy six summary",
+            terms=u"Ever More terms; price: \u00a32 / \u20ac5",
+            duration="4:00:00",
+            notes="\u0147otes on private/outwide event six",
+            outside_hire=True,
+            private=True
+        )
+        e6.save()
+        e6.tags = [t3, ]
+        e6.save()
 
         # Showings:
         s1 = Showing(
