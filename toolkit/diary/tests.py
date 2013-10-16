@@ -107,6 +107,17 @@ class DiaryTestsMixin(object):
         e4.tags = [t2, ]
         e4.save()
 
+        e5 = Event(
+            name=u"PRIVATE Event FIVE titl\u0113!",
+            copy=u"PRIVATE Event 5ive C\u014dpy",
+            copy_summary=u"\u010copy five summary",
+            terms=u"More terms; price: \u00a32 / \u20ac5",
+            duration="10:00:00",
+            notes="\u0147otes on event five",
+            private=True
+        )
+        e5.save()
+
         # Showings:
         s1 = Showing(
             start=pytz.timezone("Europe/London").localize(datetime(2013, 4, 1, 19, 00)),
@@ -132,6 +143,23 @@ class DiaryTestsMixin(object):
             confirmed=True
         )
         s3.save(force=True)  # Force start date in the past
+
+        s4 = Showing(
+            start=pytz.timezone("Europe/London").localize(datetime(2013, 9, 14, 18, 00)),
+            event=e4,
+            booked_by="User Two",
+            hide_in_programme=True,
+            confirmed=True
+        )
+        s4.save(force=True)  # Force start date in the past
+
+        s5 = Showing(
+            start=pytz.timezone("Europe/London").localize(datetime(2013, 2, 14, 18, 00)),
+            event=e5,
+            booked_by="Yet another user",
+            confirmed=True,
+        )
+        s5.save(force=True)
 
         # Rota items:
         RotaEntry(showing=s1, role=r2, rank=1).save()
@@ -1317,7 +1345,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             u"\n"
             u"EVENT FOUR TITL\u0112\n"
             u"\n"
-            u"18:06 09/06/2013\n"
+            u"18:00 09/06/2013\n"
             u"\n"
             u"Event four C\u014dpy\n"
         )
@@ -1333,7 +1361,6 @@ class MailoutTests(DiaryTestsMixin, TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_mailout.html")
-
         self.assertContains(response, self.expected_mailout_header)
         self.assertContains(response, self.expected_mailout_event)
 
@@ -1792,3 +1819,9 @@ class UrlTests(DiaryTestsMixin, TestCase):
             self.assertEqual(match.func.__name__, "view_event_field")
             for k, v in response.iteritems():
                 self.assertEqual(match.kwargs[k], v)
+
+class ShowingModelManager(DiaryTestsMixin, TestCase):
+    def test_all_public(self):
+        records = list(Showing.objects.all_public())
+        self.assertEqual(len(records), 2)
+        # self.assertIn(

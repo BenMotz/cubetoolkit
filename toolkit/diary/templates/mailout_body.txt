@@ -10,7 +10,7 @@ http://www.cubecinema.com{% url "default-view" %}
 
 {{ showing.event.name|upper }}
 
-{% for showing in showing.event.showings.all %}{{ showing.start|date:"H:m d/m/Y" }}
+{% for showing in showing.event.showings.all_public %}{{ showing.start|date:"H:i d/m/Y" }}
 {% endfor %}
 {{ showing.event.copy }}
 {% endifchanged %}{% endif %}{% endfor %}

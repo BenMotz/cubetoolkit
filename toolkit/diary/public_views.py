@@ -67,10 +67,8 @@ def view_diary(request, year=None, month=None, day=None, event_type=None):
     # Build query. The select_related() and prefetch_related on the end encourages
     # it to get the associated showing/event data, to reduce the number of SQL
     # queries
-    showings = (Showing.objects.filter(confirmed=True)
-                               .filter(hide_in_programme=False)
+    showings = (Showing.objects.all_public()
                                .filter(start__range=[startdate, enddate])
-                               .filter(event__private=False)
                                .order_by('start')
                                .select_related()
                                .prefetch_related('event__media'))
@@ -118,10 +116,8 @@ def view_diary_json(request, year, month, day):
 
     # Do query. select_related() on the end encourages it to get the
     # associated showing/event data, to reduce the number of SQL queries
-    showings = (Showing.objects.filter(confirmed=True)
-                               .filter(hide_in_programme=False)
+    showings = (Showing.objects.all_public()
                                .filter(start__range=[startdatetime, enddatetime])
-                               .filter(event__private=False)
                                .order_by('start')
                                .select_related()
                                .prefetch_related('event__media'))
@@ -248,10 +244,7 @@ class ArchiveSearch(generic.list.ListView, generic.edit.FormMixin):
         options = self.form.cleaned_data
 
         # Start with a queryset containing all public showings:
-        queryset = Showing.objects.all().filter(
-            confirmed=True,
-            hide_in_programme=False,
-            event__private=False).select_related()
+        queryset = Showing.objects.all_public().select_related()
 
         if options['search_term']:
             if options['search_in_descriptions']:

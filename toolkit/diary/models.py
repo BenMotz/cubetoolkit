@@ -315,6 +315,16 @@ class Event(models.Model):
 
             return mark_safe(result)
 
+class ShowingManager(models.Manager):
+    def all_public(self):
+        """
+        As all(), with filters pre-applied so only showings that should be
+        visible to the general public are included. (ie. exclude unconfirmed,
+        hidden in programme)
+        """
+        return (self.filter(event__private=False)
+                    .filter(confirmed=True)
+                    .filter(hide_in_programme=False))
 
 class Showing(models.Model):
 
@@ -339,6 +349,9 @@ class Showing(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    # Custom manager, with some extra methods:
+    objects = ShowingManager()
 
     class Meta:
         db_table = 'Showings'
@@ -373,7 +386,7 @@ class Showing(models.Model):
 
     def __unicode__(self):
         if self.start is not None and self.id is not None and self.event is not None:
-            return u"{0} - {1} ({2})".format(self.start.strftime("%H:%M %d/%m/%y"), self.event.name, self.id)
+            return u"{0} - {1} ({2})".format(self.start.strftime("%H:%M %Z%z %d/%m/%y"), self.event.name, self.id)
         else:
             return "[uninitialised]"
 

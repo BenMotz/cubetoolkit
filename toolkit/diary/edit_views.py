@@ -643,9 +643,8 @@ def _render_mailout_body(days_ahead):
     # Read data
     start_date = timezone.now()
     end_date = start_date + datetime.timedelta(days=days_ahead)
-    showings = (Showing.objects.filter(hide_in_programme=False)
+    showings = (Showing.objects.all_public()
                                .filter(cancelled=False)
-                               .filter(confirmed=True)
                                .filter(start__range=[start_date, end_date])
                                .order_by('start')
                                .select_related()
