@@ -76,11 +76,11 @@ class DiaryTestsMixin(object):
 
         Showing  Event  Date    Confirmed  Hidden  Cancelled  Discount|E: outside  private
         --------------------------------------------------------------|-------------------
-        e2s1       e2    1/4/13   F          F       F          F       |   F        F
-        e2s2       e2    2/4/13   T          F       F          F       |   F        F
-        e2s3       e2    3/4/13   T          F       T          F       |   F        F
-        e2s4       e2    4/4/13   T          T       F          F       |   F        F
-        e2s5       e2    5/4/13   T          T       T          F       |   F        F
+        e2s1       e2    1/4/13   F          F       F          F     |   F        F
+        e2s2       e2    2/4/13   T          F       F          F     |   F        F
+        e2s3       e2    3/4/13   T          F       T          F     |   F        F
+        e2s4       e2    4/4/13   T          T       F          F     |   F        F
+        e2s5       e2    5/4/13   T          T       T          F     |   F        F
 
         s2       e3    13/4/13  T          F       F          F       |   F        F
         s3       e4    9/6/13   T          F       F          F       |   F        F
@@ -260,21 +260,23 @@ class DiaryTestsMixin(object):
         tmpl.save()
 
         # Members:
-        m1 = Member(name="Member One", email="one@example.com", number="1", postcode="BS1 1AA")
+        m1 = Member(name="Member One", email="one@example.com", number="1",
+                    postcode="BS1 1AA")
         m1.save()
-        m2 = Member(name="Two Member", email="two@example.com", number="2", postcode="")
+        m2 = Member(name="Two Member", email="two@example.com", number="2",
+                    postcode="")
         m2.save()
         m3 = Member(name="Volunteer One", email="volon@cube.test", number="3",
-                    phone="0800 000 000", address="1 Road", posttown="Town", postcode="BS6 123", country="UK",
-                    website="http://foo.test/")
+                    phone="0800 000 000", address="1 Road", posttown="Town",
+                    postcode="BS6 123", country="UK", website="http://foo.test/")
         m3.save()
         m4 = Member(name="Volunteer Two", email="", number="4",
-                    phone="", altphone="", address="", posttown="", postcode="", country="",
-                    website="http://foo.test/")
+                    phone="", altphone="", address="", posttown="", postcode="",
+                    country="", website="http://foo.test/")
         m4.save()
         m5 = Member(name="Volunteer Three", email="volthree@foo.test", number="4",
-                    phone="", altphone="", address="", posttown="", postcode="", country="",
-                    website="")
+                    phone="", altphone="", address="", posttown="", postcode="",
+                    country="", website="")
         m5.save()
 
         # Volunteers:
@@ -353,14 +355,19 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         url = reverse("type-view", kwargs={"event_type": "folm"})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "<p>Couldn't find anything tagged <strong>folm</strong></p>", html=True)
+        self.assertContains(response,
+                            "<p>Couldn't find anything tagged <strong>folm</strong></p>",
+                            html=True)
 
     def test_view_by_date_nothing_found(self):
         url = reverse("year-view", kwargs={"year": "2093"})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "<p>Nothing on between Thursday 1 Jan 2093 and Friday 1 Jan 2094</p>", html=True)
-
+        self.assertContains(
+            response,
+            "<p>Nothing on between Thursday 1 Jan 2093 and Friday 1 Jan 2094</p>",
+            html=True
+        )
 
     # JSON day data:
     def test_day_json(self):
@@ -433,7 +440,8 @@ class EditDiaryViewsLoginRequired(DiaryTestsMixin, TestCase):
         }
         for view_name, kwargs in views_to_test.iteritems():
             url = reverse(view_name, kwargs=kwargs)
-            expected_redirect = "{0}?next={1}".format(reverse("django.contrib.auth.views.login"), url)
+            expected_redirect = ("{0}?next={1}"
+                                 .format(reverse("django.contrib.auth.views.login"), url))
 
             # Test GET:
             response = self.client.get(url)
@@ -521,7 +529,8 @@ class AddShowingView(DiaryTestsMixin, TestCase):
         showing_count_after = Showing.objects.count()
         self.assertEqual(showing_count_after, showing_count_before)
 
-        self.assertFormError(response, 'clone_showing_form', 'clone_start', u'This field is required.')
+        self.assertFormError(response, 'clone_showing_form', 'clone_start',
+                             u'This field is required.')
 
     def test_add_showing_no_booked_by(self):
         url = reverse("add-showing", kwargs={"event_id": 1})
@@ -541,7 +550,8 @@ class AddShowingView(DiaryTestsMixin, TestCase):
         showing_count_after = Showing.objects.count()
         self.assertEqual(showing_count_after, showing_count_before)
 
-        self.assertFormError(response, 'clone_showing_form', 'booked_by', u'This field is required.')
+        self.assertFormError(response, 'clone_showing_form', 'booked_by',
+                             u'This field is required.')
 
     @patch('django.utils.timezone.now')
     def test_add_showing_in_past(self, now_patch):
@@ -565,7 +575,8 @@ class AddShowingView(DiaryTestsMixin, TestCase):
         showing_count_after = Showing.objects.count()
         self.assertEqual(showing_count_after, showing_count_before)
 
-        self.assertFormError(response, 'clone_showing_form', 'clone_start', u'Must be in the future')
+        self.assertFormError(response, 'clone_showing_form', 'clone_start',
+                             u'Must be in the future')
 
     @patch('django.utils.timezone.now')
     def test_add_showing(self, now_patch):
@@ -639,37 +650,47 @@ class EditShowing(DiaryTestsMixin, TestCase):
         # currently valid HTML. Whoops.)
 
         # "clone" part should have expected start time:
-        self.assertContains(response,
+        self.assertContains(
+            response,
             u'<input id="id_clone_start" name="clone_start" type="text" value="10/06/2013 18:00" />'
         )
         # Edit should have existing values:
-        self.assertContains(response,
+        self.assertContains(
+            response,
             u'<input id="id_start" name="start" type="text" value="09/06/2013 18:00" />'
         )
-        self.assertContains(response,
+        self.assertContains(
+            response,
             u'<input id="id_booked_by" maxlength="64" name="booked_by" type="text" value="\u0102nother \u0170ser" />'
         )
-        self.assertContains(response,
+        self.assertContains(
+            response,
             u'<input checked="checked" id="id_confirmed" name="confirmed" type="checkbox" />'
         )
-        self.assertContains(response,
+        self.assertContains(
+            response,
             u'<input id="id_hide_in_programme" name="hide_in_programme" type="checkbox" />'
         )
-        self.assertContains(response,
+        self.assertContains(
+            response,
             u'<input id="id_cancelled" name="cancelled" type="checkbox" />'
         )
-        self.assertContains(response,
+        self.assertContains(
+            response,
             u'<input id="id_discounted" name="discounted" type="checkbox" />'
         )
 
         # Rota edit:
-        self.assertContains(response,
+        self.assertContains(
+            response,
             u'<input class="rota_count" id="id_role_1" name="role_1" type="text" value="0" />'
         )
-        self.assertContains(response,
+        self.assertContains(
+            response,
             u'<option value="2" selected="selected">'
         )
-        self.assertContains(response,
+        self.assertContains(
+            response,
             u'<option value="3">'
         )
 
@@ -1879,6 +1900,7 @@ class UrlTests(DiaryTestsMixin, TestCase):
 
 
 class ShowingModelManager(DiaryTestsMixin, TestCase):
+
     def test_all_public(self):
         records = list(Showing.objects.all_public())
         # From the fixtures, there are 4 showings that are confirmed and not

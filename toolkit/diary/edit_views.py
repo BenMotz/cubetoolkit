@@ -20,7 +20,8 @@ import django.utils.timezone as timezone
 from django.contrib.auth.decorators import permission_required, login_required
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
 
-from toolkit.diary.models import Showing, Event, DiaryIdea, MediaItem, EventTemplate, EventTag, Role
+from toolkit.diary.models import (Showing, Event, DiaryIdea, MediaItem,
+                                  EventTemplate, EventTag, Role)
 import toolkit.diary.forms as diary_forms
 import toolkit.diary.edit_prefs as edit_prefs
 import toolkit.members.tasks
@@ -106,7 +107,8 @@ def edit_diary_list(request, year=None, day=None, month=None):
     enddatetime = startdatetime + datetime.timedelta(days=days_ahead)
 
     # Get all showings in the date range
-    showings = Showing.objects.filter(start__range=[startdatetime, enddatetime]).order_by('start').select_related()
+    showings = (Showing.objects.filter(start__range=[startdatetime, enddatetime])
+                               .order_by('start').select_related())
     # Build two dicts, to hold the showings and the ideas. These dicts are
     # initially empty, and get filled in if there are actually showings or
     # ideas for those dates.
@@ -133,14 +135,17 @@ def edit_diary_list(request, year=None, day=None, month=None):
     # Now get all 'ideas' in date range. Fiddle the date range to be from the
     # start of the month in startdate, so the idea for that month gets included:
     idea_startdate = datetime.date(day=1, month=startdate.month, year=startdate.year)
-    idea_list = DiaryIdea.objects.filter(month__range=[idea_startdate, enddatetime]).order_by('month').select_related()
+    idea_list = (DiaryIdea.objects.filter(month__range=[idea_startdate, enddatetime])
+                                  .order_by('month').select_related())
     # Assemble into the idea dict, with keys that will match the keys in the
     # showings dict
     for idea in idea_list:
         ideas[idea.month] = idea.ideas
     # Fiddle so that the idea for the first month is displayed, even if
     # startdate is after the first day of the month:
-    if idea_startdate not in showings and len(idea_list) > 0 and idea_list[0].month.month == startdate.month:
+    if (idea_startdate not in showings
+            and len(idea_list) > 0
+            and idea_list[0].month.month == startdate.month):
         ideas[startdate] = idea_list[0].ideas
 
     context['ideas'] = ideas
@@ -450,7 +455,10 @@ def edit_ideas(request, year=None, month=None):
 
     # Use get or create in order to silently create the ideas entry if it
     # didn't already exist:
-    instance, created = DiaryIdea.objects.get_or_create(month=datetime.date(year=year, month=month, day=1))
+    instance, created = DiaryIdea.objects.get_or_create(
+        month=datetime.date(year=year, month=month, day=1)
+    )
+
     if request.method == 'POST':
         form = diary_forms.DiaryIdeaForm(request.POST, instance=instance)
         if form.is_valid():
@@ -475,7 +483,9 @@ def delete_showing(request, showing_id):
     if showing.in_past():
         logger.error(u"Attempted to delete showing id {0} that has already started/finished".format(showing_id))
         messages.add_message(request, messages.ERROR, "Can't delete showings that are in the past")
-        return HttpResponseRedirect(reverse("edit-showing", kwargs={'showing_id': showing_id}))
+        return HttpResponseRedirect(
+            reverse("edit-showing", kwargs={'showing_id': showing_id})
+        )
     else:
         logging.info(u"Deleting showing id {0} (for event id {1})".format(showing_id, showing.event_id))
         messages.add_message(
@@ -715,7 +725,8 @@ def exec_mailout(request):
         }
         return HttpResponse(json.dumps(response), mimetype="application/json")
 
-    result = toolkit.members.tasks.send_mailout.delay(form.cleaned_data['subject'], form.cleaned_data['body'])
+    result = toolkit.members.tasks.send_mailout.delay(form.cleaned_data['subject'],
+                                                      form.cleaned_data['body'])
 
     response = HttpResponse(
         json.dumps({'status': 'ok', 'task_id': result.task_id, 'progress': 0}),
@@ -747,7 +758,9 @@ def mailout_progress(request):
         elif state == "SUCCESS":
             progress = 100
             complete = True
-            if async_result.result and isinstance(async_result.result, tuple) and len(async_result.result) == 3:
+            if (async_result.result
+                    and isinstance(async_result.result, tuple)
+                    and len(async_result.result) == 3):
                 error, sent_count, error_msg = async_result.result
             else:
                 error = True
