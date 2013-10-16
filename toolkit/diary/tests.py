@@ -74,13 +74,18 @@ class DiaryTestsMixin(object):
         e5     False          True
         e6     True           True     t3
 
-        Showing  Event  Date    Confirmed  Hidden  Cancelled  Discount
-        ------------------------------------------------------------
-        s1       e2    1/4/13   F          F       F          F
-        s2       e3    13/4/13  T          F       F          F
-        s3       e4    9/6/13   T          F       F          F
-        s4       e4    14/9/13  F          F       F          F
-        s5       e5    14/2/13  T          F       F          F
+        Showing  Event  Date    Confirmed  Hidden  Cancelled  Discount|E: outside  private
+        --------------------------------------------------------------|-------------------
+        e2s1       e2    1/4/13   F          F       F          F       |   F        F
+        e2s2       e2    2/4/13   T          F       F          F       |   F        F
+        e2s3       e2    3/4/13   T          F       T          F       |   F        F
+        e2s4       e2    4/4/13   T          T       F          F       |   F        F
+        e2s5       e2    5/4/13   T          T       T          F       |   F        F
+
+        s2       e3    13/4/13  T          F       F          F       |   F        F
+        s3       e4    9/6/13   T          F       F          F       |   F        F
+        s4       e4    14/9/13  F          F       F          F       |   F        F
+        s5       e5    14/2/13  T          F       F          F       |   F        T
         """
 
         # Events:
@@ -152,12 +157,31 @@ class DiaryTestsMixin(object):
         e6.save()
 
         # Showings:
-        s1 = Showing(
+        e2s1 = Showing(  # pk :1
             start=pytz.timezone("Europe/London").localize(datetime(2013, 4, 1, 19, 00)),
-            event=e2,
-            booked_by="User",
-        )
-        s1.save(force=True)  # Force start date in the past
+            event=e2, booked_by="User",
+            confirmed=False, hide_in_programme=False, cancelled=False, discounted=False)
+        e2s1.save(force=True)
+        e2s2 = Showing(  # pk :2
+            start=pytz.timezone("Europe/London").localize(datetime(2013, 4, 2, 19, 00)),
+            event=e2, booked_by="User",
+            confirmed=True, hide_in_programme=False, cancelled=False, discounted=False)
+        e2s2.save(force=True)
+        e2s3 = Showing(  # pk :3
+            start=pytz.timezone("Europe/London").localize(datetime(2013, 4, 3, 19, 00)),
+            event=e2, booked_by="User",
+            confirmed=True, hide_in_programme=False, cancelled=True, discounted=False)
+        e2s3.save(force=True)
+        e2s4 = Showing(  # pk :4
+            start=pytz.timezone("Europe/London").localize(datetime(2013, 4, 4, 19, 00)),
+            event=e2, booked_by="User",
+            confirmed=True, hide_in_programme=True, cancelled=False, discounted=False)
+        e2s4.save(force=True)
+        e2s5 = Showing(  # pk :5
+            start=pytz.timezone("Europe/London").localize(datetime(2013, 4, 5, 19, 00)),
+            event=e2, booked_by="User",
+            confirmed=True, hide_in_programme=True, cancelled=True, discounted=False)
+        e2s5.save(force=True)
 
         s2 = Showing(
             start=pytz.timezone("Europe/London").localize(datetime(2013, 4, 13, 18, 00)),
@@ -195,8 +219,8 @@ class DiaryTestsMixin(object):
         s5.save(force=True)
 
         # Rota items:
-        RotaEntry(showing=s1, role=r2, rank=1).save()
-        RotaEntry(showing=s1, role=r3, rank=1).save()
+        RotaEntry(showing=e2s1, role=r2, rank=1).save()
+        RotaEntry(showing=e2s1, role=r3, rank=1).save()
         RotaEntry(showing=s2, role=r1, rank=1).save()
         RotaEntry(showing=s2, role=r1, rank=2).save()
         RotaEntry(showing=s2, role=r1, rank=3).save()
@@ -488,7 +512,7 @@ class AddShowingView(DiaryTestsMixin, TestCase):
 
         source = Showing.objects.get(id=2)
 
-        self.assertEqual(source.event.showings.count(), 1)
+        self.assertEqual(source.event.showings.count(), 5)
 
         response = self.client.post(url, data={
             "booked_by": "someone",
@@ -507,7 +531,7 @@ class AddShowingView(DiaryTestsMixin, TestCase):
 
         source = Showing.objects.get(id=2)
 
-        self.assertEqual(source.event.showings.count(), 1)
+        self.assertEqual(source.event.showings.count(), 5)
 
         # Start is in past, but should get error about missing booked_by
         response = self.client.post(url, data={
@@ -530,7 +554,7 @@ class AddShowingView(DiaryTestsMixin, TestCase):
 
         source = Showing.objects.get(id=2)
 
-        self.assertEqual(source.event.showings.count(), 1)
+        self.assertEqual(source.event.showings.count(), 5)
 
         # do add/clone:
         response = self.client.post(url, data={
@@ -554,7 +578,7 @@ class AddShowingView(DiaryTestsMixin, TestCase):
 
         source = Showing.objects.get(id=2)
 
-        self.assertEqual(source.event.showings.count(), 1)
+        self.assertEqual(source.event.showings.count(), 5)
 
         # do add/clone:
         response = self.client.post(url, data={
@@ -604,7 +628,7 @@ class EditShowing(DiaryTestsMixin, TestCase):
         self.client.login(username="admin", password="T3stPassword!")
 
     def tests_edit_showing_get(self):
-        url = reverse("edit-showing", kwargs={"showing_id": 3})
+        url = reverse("edit-showing", kwargs={"showing_id": 7})
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 200)
@@ -653,7 +677,7 @@ class EditShowing(DiaryTestsMixin, TestCase):
     def tests_edit_showing(self, now_patch):
         now_patch.return_value = self._fake_now
 
-        url = reverse("edit-showing", kwargs={"showing_id": 3})
+        url = reverse("edit-showing", kwargs={"showing_id": 7})
         response = self.client.post(url, data={
             u"start": u"15/08/2013 19:30",
             u"booked_by": u"Yet \u0102nother \u0170ser",
@@ -669,7 +693,7 @@ class EditShowing(DiaryTestsMixin, TestCase):
         self.assert_return_to_index(response)
 
         # Check showing was updated:
-        showing = Showing.objects.get(id=3)
+        showing = Showing.objects.get(id=7)
         self.assertEqual(showing.start, pytz.utc.localize(datetime(2013, 8, 15, 18, 30)))
         self.assertEqual(showing.booked_by, u"Yet \u0102nother \u0170ser")
         self.assertEqual(showing.confirmed, True)
@@ -785,13 +809,13 @@ class DeleteShowing(DiaryTestsMixin, TestCase):
     def test_delete_showing(self, now_patch):
         now_patch.return_value = self._fake_now
 
-        self.assertTrue(Showing.objects.filter(id=3))
+        self.assertTrue(Showing.objects.filter(id=7))
 
-        url = reverse("delete-showing", kwargs={"showing_id": 3})
+        url = reverse("delete-showing", kwargs={"showing_id": 7})
         response = self.client.post(url)
 
         # Showing should have been deleted
-        self.assertFalse(Showing.objects.filter(id=3))
+        self.assertFalse(Showing.objects.filter(id=7))
 
         self.assert_return_to_index(response)
 
@@ -1853,8 +1877,14 @@ class UrlTests(DiaryTestsMixin, TestCase):
             for k, v in response.iteritems():
                 self.assertEqual(match.kwargs[k], v)
 
+
 class ShowingModelManager(DiaryTestsMixin, TestCase):
     def test_all_public(self):
         records = list(Showing.objects.all_public())
-        self.assertEqual(len(records), 2)
-        # self.assertIn(
+        # From the fixtures, there are 4 showings that are confirmed and not
+        # private / hidden
+        self.assertEqual(len(records), 4)
+        for showing in records:
+            self.assertTrue(showing.confirmed)
+            self.assertFalse(showing.hide_in_programme)
+            self.assertFalse(showing.event.private)
