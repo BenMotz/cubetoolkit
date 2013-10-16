@@ -164,7 +164,7 @@ def view_event(request, event_id=None, legacy_id=None):
 
     context = {
         'event': event,
-        'showings': event.showings.all(),
+        'showings': event.showings.all_public(),
         'media': {event.id: media},
         'media_url': settings.MEDIA_URL
     }

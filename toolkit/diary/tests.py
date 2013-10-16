@@ -396,12 +396,23 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
 
     # Event series view:
     def test_view_event(self):
-        url = reverse("single-event-view", kwargs={"event_id": "1"})
+        url = reverse("single-event-view", kwargs={"event_id": "2"})
         response = self.client.get(url)
-        # TODO: test data better, including media!
-        self.assertContains(response, u'Event one title')
-        self.assertContains(response, u'<p>Event one copy</p>')
+
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_event.html")
+
+        # TODO: test data better, including media!
+        self.assertContains(response, u'Event two title')
+        self.assertContains(response, u'<p>Event <br> two <br> copy</p>', html=True)
+        self.assertEqual(response.status_code, 200)
+        # Some showings *should* be listed:
+        self.assertContains(response, "2 Apr 2013")
+        self.assertContains(response, "3 Apr 2013")
+        # Some showings should *not* be listed:
+        self.assertNotContains(response, "1 Apr 2013")
+        self.assertNotContains(response, "4 Apr 2013")
+        self.assertNotContains(response, "5 Apr 2013")
 
     def test_view_event_legacy(self):
         url = reverse("single-event-view-legacyid", kwargs={"legacy_id": "100"})
