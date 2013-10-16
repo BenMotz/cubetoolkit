@@ -172,19 +172,19 @@ def view_event(request, event_id=None, legacy_id=None):
 
 
 class ArchiveIndex(generic.ArchiveIndexView):
-    model = Showing
+    # Limit to public events
+    queryset = Showing.objects.all_public().select_related()
+
     date_field = 'start'
     template_name = 'showing_archive.html'
 
 
 class ArchiveYear(generic.YearArchiveView):
-    model = Showing
+    # Limit to public events (select_related heavily reduces query count)
+    queryset = Showing.objects.all_public().select_related()
+
     date_field = 'start'
     template_name = 'showing_archive_year.html'
-
-    def get_queryset(self, *args, **kwargs):
-        qs = super(ArchiveYear, self).get_queryset(*args, **kwargs)
-        return qs.filter(confirmed=True, hide_in_programme=False, event__private=False)
 
     def get_dated_queryset(self, *args, **kwargs):
         kwargs['ordering'] = 'start'
@@ -193,17 +193,12 @@ class ArchiveYear(generic.YearArchiveView):
 
 
 class ArchiveMonth(generic.MonthArchiveView):
-    model = Showing
+    # Limit to public events (select_related heavily reduces query count)
+    queryset = Showing.objects.all_public().select_related()
+
     date_field = 'start'
     template_name = 'showing_archive_month.html'
     month_format = '%m'
-
-    def get_queryset(self, *args, **kwargs):
-
-        qs = super(ArchiveMonth, self).get_queryset(*args, **kwargs)
-
-        # Add select_related to keep SQL queries under control:
-        return qs.filter(confirmed=True, hide_in_programme=False, event__private=False).select_related()
 
     def get_dated_queryset(self, *args, **kwargs):
         kwargs['ordering'] = 'start'
