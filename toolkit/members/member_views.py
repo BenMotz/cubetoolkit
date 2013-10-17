@@ -233,11 +233,7 @@ def member_statistics(request):
                                        .exclude(email='')
                                        .count(),
         # Members with an email address that isn't null/blank, where mailout hasn't failed & they haven't unsubscribed:
-        'm_email_viable': Member.objects.filter(email__isnull=False)
-                                        .exclude(email='')
-                                        .exclude(mailout_failed=True)
-                                        .filter(mailout=True)
-                                        .count(),
+        'm_email_viable': Member.objects.mailout_recipients().count(),
         # Members with an email address that isn't null/blank, where mailout hasn't failed & they have unsubscribed:
         'm_email_unsub': Member.objects.filter(email__isnull=False)
                                        .exclude(email='')

@@ -78,10 +78,7 @@ def send_mailout(subject, body):
         u"http://{0}{{1}}?k={{2}}\n"
     ).format(settings.EMAIL_UNSUBSCRIBE_HOST)
 
-    recipients = (Member.objects.filter(email__isnull=False)
-                                .exclude(email='')
-                                .exclude(mailout_failed=True)
-                                .filter(mailout=True))
+    recipients = Member.objects.mailout_recipients()
     count = recipients.count()
     sent = 0
     one_percent = count // 100 or 1

@@ -11,6 +11,18 @@ from toolkit.util import generate_random_string
 logger = logging.getLogger(__name__)
 
 
+class MemberManager(models.Manager):
+    # Used with Member class, to encapsulate logic about selecting which
+    # members should get the mailout, and other such things
+
+    def mailout_recipients(self):
+        """Get all members who should be sent the mailout"""
+        return (self.filter(email__isnull=False)
+                    .exclude(email='')
+                    .exclude(mailout_failed=True)
+                    .filter(mailout=True))
+
+
 class Member(models.Model):
 
     # This is the primary key used in the old perl/bdb system, used as the
@@ -41,6 +53,9 @@ class Member(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    # Custom manager, includes helpful methods for selecting members:
+    objects = MemberManager()
 
     class Meta:
         db_table = 'Members'
@@ -108,7 +123,8 @@ class Volunteer(models.Model):
                 try:
                     os.unlink(self.__original_portrait)
                 except (IOError, OSError) as err:
-                    logging.error(u"Failed deleting old volunteer portrait '{0}': {1}".format(self.__original_portrait, err))
+                    logging.error(u"Failed deleting old volunteer portrait '{0}': {1}"
+                                  .format(self.__original_portrait, err))
                 self.__original_portrait = None
             # update thumbnail
             if update_thumbnail:

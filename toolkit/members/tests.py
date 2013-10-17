@@ -60,6 +60,10 @@ class MembersTestsMixin(object):
                             phone="", altphone="", address="", posttown="", postcode="", country="",
                             website="")
         self.mem_7.save()
+        self.mem_8 = Member(name=u"Number Eight, No mailout please", email="bart@bart.test", number="010", mailout=False)
+        self.mem_8.save()
+        self.mem_8 = Member(name=u"Number Nine, mailout failed", email="frobney@squoo.test", number="010", mailout_failed=True)
+        self.mem_8.save()
 
         # Volunteers:
         self.vol_1 = Volunteer(
@@ -168,6 +172,15 @@ class SecurityTests(MembersTestsMixin, TestCase):
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, member.name)
 
+
+class TestMemberModelManager(MembersTestsMixin, TestCase):
+    def test_email_recipients(self):
+        recipients = Member.objects.mailout_recipients()
+        self.assertEqual(recipients.count(), 6)
+        for member in recipients:
+            self.assertTrue(member.mailout)
+            self.assertFalse(member.mailout_failed)
+            self.assertTrue(member.email)
 
 class TestVolunteerEditViews(MembersTestsMixin, TestCase):
 
