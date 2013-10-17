@@ -3,7 +3,6 @@ import logging
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.db.models import Q
-import django.db  # Used for raw query for stats
 from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import permission_required, login_required
 from django.contrib import messages
@@ -195,31 +194,10 @@ def unsubscribe_member(request, member_id):
 def member_statistics(request):
     # View for the 'statistics' page of the 'membership database'
 
-    # A few hard-coded SQL queries to get some of the more complex numbers
-    cursor = django.db.connection.cursor()
     # Get 10 most popular email domains:
-    cursor.execute("SELECT "
-                   "   SUBSTRING_INDEX(`email`, '@', -1) AS domain, "
-                   "   COUNT(1) AS num "
-                   "FROM Members "
-                   "WHERE email != '' "
-                   "GROUP BY domain "
-                   "ORDER BY num DESC "
-                   "LIMIT 10")
-    email_stats = [row for row in cursor.fetchall()]
-    cursor.close()
-    cursor = django.db.connection.cursor()
+    email_stats = Member.objects.get_stat_popular_email_domains()
     # Get 10 most popular postcode prefixes:
-    cursor.execute("SELECT "
-                   "    SUBSTRING_INDEX(`postcode`, ' ', 1) AS firstbit, "
-                   "     COUNT(1) AS num "
-                   "FROM Members "
-                   "WHERE postcode != '' "
-                   "GROUP BY firstbit "
-                   "ORDER BY num DESC "
-                   "LIMIT 10")
-    postcode_stats = [row for row in cursor.fetchall()]
-    cursor.close()
+    postcode_stats = Member.objects.get_stat_popular_postcode_prefixes()
 
     # Some of the simpler stats are done using the django ORM
     context = {
