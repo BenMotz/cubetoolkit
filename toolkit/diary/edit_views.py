@@ -107,7 +107,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
     enddatetime = startdatetime + datetime.timedelta(days=days_ahead)
 
     # Get all showings in the date range
-    showings = (Showing.objects.filter(start__range=[startdatetime, enddatetime])
+    showings = (Showing.objects.start_in_range(startdatetime, enddatetime)
                                .order_by('start').select_related())
     # Build two dicts, to hold the showings and the ideas. These dicts are
     # initially empty, and get filled in if there are actually showings or
@@ -515,9 +515,9 @@ def view_event_field(request, field, year, month, day):
     if start_date is None:
         raise Http404(days_ahead)
     end_date = start_date + datetime.timedelta(days=days_ahead)
-    showings = (Showing.objects.filter(cancelled=False)
-                               .filter(confirmed=True)
-                               .filter(start__range=[start_date, end_date])
+    showings = (Showing.objects.not_cancelled()
+                               .confirmed()
+                               .start_in_range(start_date, end_date)
                                .order_by('start')
                                .prefetch_related('rotaentry_set__role')  # mildly hacky optimisation for rota view
                                .select_related())
@@ -653,9 +653,9 @@ def _render_mailout_body(days_ahead):
     # Read data
     start_date = timezone.now()
     end_date = start_date + datetime.timedelta(days=days_ahead)
-    showings = (Showing.objects.all_public()
-                               .filter(cancelled=False)
-                               .filter(start__range=[start_date, end_date])
+    showings = (Showing.objects.public()
+                               .not_cancelled()
+                               .start_in_range(start_date, end_date)
                                .order_by('start')
                                .select_related()
                                .prefetch_related('event__showings'))

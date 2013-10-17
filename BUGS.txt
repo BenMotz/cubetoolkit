@@ -6,6 +6,7 @@
 
 [BUG] -- make more forms redirect after submit, to avoid reload adding duplicates (done for members)
 [BUG] -- handle errors for saving Event details if image and image is missing
+[QUERY] -- Should cancelled events appear in the mailout by default?
 
 [DONE] -- result count in member search?
 [DONE] -- default days ahead for edit view -> 90 days

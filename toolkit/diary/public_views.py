@@ -67,8 +67,8 @@ def view_diary(request, year=None, month=None, day=None, event_type=None):
     # Build query. The select_related() and prefetch_related on the end encourages
     # it to get the associated showing/event data, to reduce the number of SQL
     # queries
-    showings = (Showing.objects.all_public()
-                               .filter(start__range=[startdate, enddate])
+    showings = (Showing.objects.public()
+                               .start_in_range(startdate, enddate)
                                .order_by('start')
                                .select_related()
                                .prefetch_related('event__media'))
@@ -116,8 +116,8 @@ def view_diary_json(request, year, month, day):
 
     # Do query. select_related() on the end encourages it to get the
     # associated showing/event data, to reduce the number of SQL queries
-    showings = (Showing.objects.all_public()
-                               .filter(start__range=[startdatetime, enddatetime])
+    showings = (Showing.objects.public()
+                               .start_in_range(startdatetime, enddatetime)
                                .order_by('start')
                                .select_related()
                                .prefetch_related('event__media'))
@@ -164,7 +164,7 @@ def view_event(request, event_id=None, legacy_id=None):
 
     context = {
         'event': event,
-        'showings': event.showings.all_public(),
+        'showings': event.showings.public(),
         'media': {event.id: media},
         'media_url': settings.MEDIA_URL
     }
@@ -173,7 +173,7 @@ def view_event(request, event_id=None, legacy_id=None):
 
 class ArchiveIndex(generic.ArchiveIndexView):
     # Limit to public events
-    queryset = Showing.objects.all_public().select_related()
+    queryset = Showing.objects.public().select_related()
 
     date_field = 'start'
     template_name = 'showing_archive.html'
@@ -181,7 +181,7 @@ class ArchiveIndex(generic.ArchiveIndexView):
 
 class ArchiveYear(generic.YearArchiveView):
     # Limit to public events (select_related heavily reduces query count)
-    queryset = Showing.objects.all_public().select_related()
+    queryset = Showing.objects.public().select_related()
 
     date_field = 'start'
     template_name = 'showing_archive_year.html'
@@ -194,7 +194,7 @@ class ArchiveYear(generic.YearArchiveView):
 
 class ArchiveMonth(generic.MonthArchiveView):
     # Limit to public events (select_related heavily reduces query count)
-    queryset = Showing.objects.all_public().select_related()
+    queryset = Showing.objects.public().select_related()
 
     date_field = 'start'
     template_name = 'showing_archive_month.html'
@@ -239,7 +239,7 @@ class ArchiveSearch(generic.list.ListView, generic.edit.FormMixin):
         options = self.form.cleaned_data
 
         # Start with a queryset containing all public showings:
-        queryset = Showing.objects.all_public().select_related()
+        queryset = Showing.objects.public().select_related()
 
         if options['search_term']:
             if options['search_in_descriptions']:

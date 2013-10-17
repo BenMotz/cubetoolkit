@@ -10,6 +10,7 @@ from django.conf import settings
 import django.utils.timezone
 import django.core.exceptions
 from django.utils.safestring import mark_safe
+from django.db.models.query import QuerySet
 
 from south.modelsinspector import add_introspection_rules
 
@@ -315,16 +316,48 @@ class Event(models.Model):
 
             return mark_safe(result)
 
-class ShowingManager(models.Manager):
-    def all_public(self):
+
+class ShowingQuerySet(QuerySet):
+    """
+    This class provides some custom methods to make searching and selecting
+    sets of Showings clearer
+    """
+    def start_in_range(self, startdate, enddate):
+        """Filter showings that have a start date in the given range"""
+        return self.filter(start__range=[startdate, enddate])
+
+    def public(self):
         """
-        As all(), with filters pre-applied so only showings that should be
-        visible to the general public are included. (ie. exclude unconfirmed,
-        hidden in programme)
+        Filters so only showings that should be visible to the general public
+        are included. (ie. exclude unconfirmed, hidden in programme)
         """
         return (self.filter(event__private=False)
                     .filter(confirmed=True)
                     .filter(hide_in_programme=False))
+
+    def not_cancelled(self):
+        """Filter out cancelled showings"""
+        return self.filter(cancelled=False)
+
+    def confirmed(self):
+        """Filter out unconfirmed showings"""
+        return self.filter(confirmed=True)
+
+
+class ShowingManager(models.Manager):
+    """
+    Glue class to allow the ShowingQuerySet to be transparently used with the
+    Showing model
+    """
+    def get_query_set(self):
+        return ShowingQuerySet(self.model, using=self._db)
+
+    def __getattr__(self, name):
+        try:
+            return getattr(self.__class__, name)
+        except AttributeError:
+            return getattr(self.get_query_set(), name)
+
 
 class Showing(models.Model):
 
