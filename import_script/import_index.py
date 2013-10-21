@@ -1,12 +1,7 @@
 #!/usr/bin/env python
 import os
 import sys
-#import datetime
-#import re
 import logging
-#import shutil
-#
-#import pytz
 
 from toolkit.index.models import IndexLink, IndexCategory
 
@@ -14,7 +9,6 @@ logger = logging.getLogger('toolkit.import')
 logger.setLevel(logging.INFO)
 
 def add_link(link, description, category):
-    #category = IndexCategory.objects.get_or_create(name=category)[0]
     cat_obj = IndexCategory.objects.get_or_create(name=category)[0]
     index_obj, created = IndexLink.objects.get_or_create(
         text=description,
@@ -48,7 +42,7 @@ def main():
         sys.exit(1)
     index_file = sys.argv[1]
     if not os.path.isfile(index_file):
-        print "{0} is not a valid path to a directory".format(index_file)
+        print "{0} is not a valid path to a file".format(index_file)
         sys.exit(2)
 
     logger.info("Importing index links from {0}".format(index_file))
