@@ -260,11 +260,11 @@ LOGGING = {
             'maxBytes': 10485760,
             'backupCount': 5,
         },
-        'null': {
-            'level': 'DEBUG',
-            'class': 'logging.NullHandler',
-            'formatter': 'simple',
-        }
+#        'null': {
+#            'level': 'DEBUG',
+#            'class': 'logging.NullHandler',
+#            'formatter': 'simple',
+#        }
     },
 
     'loggers': {

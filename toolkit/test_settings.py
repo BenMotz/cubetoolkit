@@ -15,8 +15,8 @@ MEDIA_ROOT = '/tmp'
 
 # Enable logging to the console:
 LOGGING['root'] = {
-    'handlers': ['null'],
-    'level': 'WARNING',
+#    'handlers': ['null'],
+#    'level': 'WARNING',
 }
 
 PASSWORD_HASHERS = (
