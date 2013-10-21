@@ -1,7 +1,7 @@
 import os
 import os.path
 
-from fabric.api import require, env, run, cd, local, put, sudo, lcd
+from fabric.api import require, env, run, cd, local, put, lcd, get, prompt
 from fabric import utils
 from fabric.contrib import console
 
@@ -11,6 +11,11 @@ REQUIREMENTS_C_COMPONENT = "requirements_c_components.txt"
 
 # This is deleted whenever code is deployed
 CODE_DIR = "toolkit"
+
+
+def _assert_target_set():
+    # utility method to check that target is defined:
+    require('site_root', provided_by=('staging', 'production'))
 
 
 def staging():
@@ -34,8 +39,7 @@ def production():
 def deploy_code():
     """Deploy code from git HEAD onto target"""
 
-    # Check that target is defined:
-    require('site_root', provided_by=('staging', 'production'))
+    _assert_target_set()
 
     # Create tar of (local) git HEAD:
     archive = "site_transfer.tgz"
@@ -67,8 +71,8 @@ def deploy_code():
 
 def deploy_static():
     """Run collectstatic command"""
-    # Check that target is defined:
-    require('site_root', provided_by=('staging', 'production'))
+
+    _assert_target_set()
 
     with cd(env.site_root):
         utils.puts("Running collectstatic (pwd is '{0}')".format(run("pwd")))
@@ -79,15 +83,16 @@ def deploy_static():
 
 def deploy_media():
     """Rsync all media content onto target"""
-    # Check that target is defined:
-    require('site_root', provided_by=('staging', 'production'))
+
+    _assert_target_set()
 
     local('rsync -av --delete media/ {0}@{1}:{2}/media'.format(env.user, env.hosts[0], env.site_root))
 
 
 def run_migrations():
     """Run south to make sure database schema is in sync with the application"""
-    require('site_root', provided_by=('staging', 'production'))
+
+    _assert_target_set()
 
     with cd(env.site_root):
         utils.puts("Running database migrations")
@@ -113,10 +118,12 @@ def upgrade_requirements():
 # Disabled, for destruction avoidance
 def bootstrap():
     """Wipe out what has gone before, build virtual environment, uppload code"""
+
+    _assert_target_set()
+
     if not console.confirm("Flatten remote, including media files?", default=False):
         utils.abort("User aborted")
-    # Check that target is defined:
-    require('site_root', provided_by=('staging', 'production'))
+
     # Scorch the earth
     run("rm -rf %(site_root)s" % env)
     # Recreate the directory
@@ -134,10 +141,56 @@ def bootstrap():
     deploy()
 
 
+def _fetch_database_dump(dump_filename):
+    if os.path.exists(dump_filename):
+        utils.abort("Local file {0} already exists".format(dump_filename))
+
+    utils.puts("Generating remote database dump")
+    with cd(env.site_root):
+        dump_file_path = os.path.join(env.site_root, dump_filename)
+
+        run("venv/bin/python manage.py mysqldump_database {dump_file_path} "
+            "--settings=toolkit.import_settings".format(
+                dump_file_path=dump_file_path
+                ))
+        get(dump_file_path, local_path=dump_filename)
+        run("rm {0}".format(dump_file_path))
+
+
+def _load_database_dump(dump_filename):
+    if not os.path.isfile(dump_filename):
+        utils.abort("Couldn't find {0}".format(dump_filename))
+
+    db_username = prompt("Please enter local database username "
+                         "(must have permission to drop and create database!)",
+                         default="root")
+
+    if not console.confirm("About to do something irreversible to the 'toolkit'"
+                           "database on your local system. Sure? ", default=False):
+        utils.abort("User aborted")
+        local("rm {0}".format(dump_filename))
+
+    local("mysql -u{db_username} -p toolkit < {dump_filename}".format(
+        db_username=db_username, dump_filename=dump_filename))
+
+
+def sync_to_local_database():
+    """Retrieve the remote database and load it into the local database"""
+
+    _assert_target_set()
+
+    dump_filename = "database_dump.sql"
+    _fetch_database_dump(dump_filename)
+    _load_database_dump(dump_filename)
+
+    local("rm {0}".format(dump_filename))
+
+
 def deploy():
     """Upload code, install any new requirements"""
-    # Check that target is defined:
-    require('site_root', provided_by=('staging', 'production'))
+
+    _assert_target_set()
+
     if env.target == 'production':
         if not console.confirm("Uploading to live site: sure?", default=False):
             utils.abort("User aborted")

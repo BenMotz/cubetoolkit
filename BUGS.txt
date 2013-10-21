@@ -1,13 +1,14 @@
-[TODO] -- New 'import' script to dump and import DB from live for devserver
 [NEWFEATURE] -- Per-tag RSS
 [NEWFEATURE] -- 'subscribe me' UI for members lists
 [NEWFEATURE] --  make old IDs work into the future
 [TODO] -- do JS close of popup using a redirect?
+[TODO] -- code to sync remote images/media to local
 
 [BUG] -- make more forms redirect after submit, to avoid reload adding duplicates (done for members)
 [BUG] -- handle errors for saving Event details if image and image is missing
 [QUERY] -- Should cancelled events appear in the mailout by default?
 
+[DONE] -- New 'import' script to dump and import DB from live for devserver
 [DONE] -- result count in member search?
 [DONE] -- default days ahead for edit view -> 90 days
 [DONE] -- 'days ahead' on edit view should be persistent preference
