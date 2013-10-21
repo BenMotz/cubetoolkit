@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 {% block title %}
 Details for: {{ event.name }}
 {% endblock %}
@@ -62,12 +63,17 @@ Booked for: <a href="{% url "edit-showing" showing.pk %}">{{ showing.start|date:
     {% endcomment %}
 
 <p class="d"><b>Event image.</b><br>
-{% if event.media.all.0 %}
-<a href="{{ event.media.all.0.media_file }}"><img src="{{ event.media.all.0.thumbnail }}" alt="Picture for event {{ event.name }}"></a>
-<p class="image_caption">Image by: {{ event.media.all.0.credit }}</p>
+
+{% with event.media.all.0 as media_item %}
+{% if media_item %}
+<a href="{% static media_item.media_file.url %}"><img src="{% static media_item.thumbnail.url %}" alt="Picture for event {{ event.name }}"></a>
+{% if media_item.credit %}
+<p class="image_caption">Image by: {{ media_item.credit }}</p>
+{% endif %}
 {% else %}
 <i>no image yet</i>
 {% endif %}
+{% endwith %}
 </p>
 
 <p class="d"><b>Copy for "{{ event.name }}" (for web page)</b></p>
