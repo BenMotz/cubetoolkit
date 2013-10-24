@@ -2,9 +2,6 @@ import re
 import logging
 import os.path
 
-import magic
-import PIL.Image
-
 from django.db import models
 from django.conf import settings
 import django.utils.timezone
@@ -17,6 +14,7 @@ from south.modelsinspector import add_introspection_rules
 logger = logging.getLogger(__name__)
 
 from toolkit.diary.validators import validate_in_future
+import toolkit.util.image as imagetools
 
 
 class FutureDateTimeField(models.DateTimeField):
@@ -105,23 +103,15 @@ class MediaItem(models.Model):
         return super(MediaItem, self).save(*args, **kwargs)
 
     # Extra, custom methods:
-
     def autoset_mimetype(self):
         # See lib/python2.7/site-packages/django/forms/fields.py for how to do
         # basic validation of PNGs / JPEGs
-        # logger.info("set mimetype: '{0}'".format(self.media_file))
-        if self.media_file and self.media_file != '':
-            magic_wrapper = magic.Magic(mime=True)
+        if self.media_file and self.media_file.name != '':
             try:
-                self.mimetype = magic_wrapper.from_buffer(self.media_file.file.read(0xFFF))
+                self.mimetype = imagetools.get_mimetype(self.media_file.file)
             except IOError:
                 logger.error(u"Failed to determine mimetype of file {0}".format(self.media_file.file.name))
                 self.mimetype = "application/octet-stream"
-            finally:
-                try:
-                    self.media_file.file.seek(0)
-                except IOError:
-                    pass
             logger.debug(u"Mime type for {0} detected as {1}".format(self.media_file.file.name, self.mimetype))
 
     def _update_thumbnail(self):
@@ -129,59 +119,32 @@ class MediaItem(models.Model):
             logger.debug("Not updating thumbnail: media_file.file is None")
             return
 
-        if not self.mimetype.startswith("image"):
-            logger.error("Creating thumbnails for non-image files not supported at this time")
-            # Maybe have some default image for audio/video?
-            return
+        logger.info(u"Updating thumbnail for media item {0}, file {1}".format(self.pk, self.media_file))
+
         # Delete old thumbnail, if any:
         if self.thumbnail and self.thumbnail != '':
-            logger.info(u"Updating thumbnail for media item {0}, file {1}".format(self.pk, self.media_file))
             try:
+                logger.debug(u"Deleting old thumbnail file, {0}".format(self.thumbnail))
                 self.thumbnail.delete(save=False)
             except (IOError, OSError) as ose:
                 logger.error(u"Failed deleting old thumbnail: {0}".format(ose))
-        try:
-            image = PIL.Image.open(self.media_file.file)
-        except (IOError, OSError) as ioe:
-            logger.error(u"Failed to read image file: {0}".format(ioe))
-            return
-        try:
-            image.thumbnail(settings.THUMBNAIL_SIZE, PIL.Image.ANTIALIAS)
-        except MemoryError:
-            logger.error(u"Out of memory trying to create thumbnail for {0}".format(self.media_file))
-        except (IOError, OSError) as ioe:
-            # Emperically, if this happens the thumbnail still gets generated,
-            # albeit with some junk at the end. So just log the error and plow
-            # on regardless...
-            logger.error(u"Error creating thumbnail: {0}".format(ioe))
-        finally:
-            try:
-                self.media_file.file.seek(0)
-            except IOError:
-                pass
 
-        thumb_file = os.path.join(
+        thumb_filename = os.path.join(
             settings.MEDIA_ROOT,
             "diary_thumbnails",
             os.path.basename(str(self.media_file))
         )
-        # Make sure thumbnail file ends in jpg, to avoid confusion:
-        if os.path.splitext(thumb_file.lower())[1] not in (u'.jpg', u'.jpeg'):
-            thumb_file += ".jpg"
+
         try:
-            # Convert image to RGB (can't save Paletted images as jpgs) and
-            # save thumbnail as JPEG:
-            image.convert("RGB").save(thumb_file, "JPEG")
-            logger.info(u"Generated thumbnail for event '{0}' in file '{1}'".format(self.pk, thumb_file))
-        except (IOError, OSError) as ioe:
-            logger.error(u"Failed saving thumbnail: {0}".format(ioe))
-            if os.path.exists(thumb_file):
-                try:
-                    os.unlink(thumb_file)
-                except (IOError, OSError) as ioe:
-                    pass
-            return
-        self.thumbnail = os.path.relpath(thumb_file, settings.MEDIA_ROOT)
+            act_thumb_filename = imagetools.generate_thumbnail(
+                self.media_file.file,
+                thumb_filename,
+                settings.THUMBNAIL_SIZE
+            )
+            self.thumbnail = os.path.relpath(act_thumb_filename, settings.MEDIA_ROOT)
+        except imagetools.ThumbnailError as te:
+            logger.error("Failed generating thumbnail: {0}".format(te))
+            self.thumbnail = None
 
 
 class EventTag(models.Model):
@@ -271,6 +234,7 @@ class Event(models.Model):
 
     def set_main_mediaitem(self, media_file):
         self.clear_main_mediaitem()
+        logger.info(u"Adding media file {0} to event {1}".format(media_file, self.pk))
         self.media.add(media_file)
 
     def get_main_mediaitem(self):
