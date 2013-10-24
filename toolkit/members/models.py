@@ -7,7 +7,7 @@ from django.conf import settings
 from django.db import models
 
 from toolkit.diary.models import Role
-from toolkit.util import generate_random_string
+from toolkit.util import generate_random_string, image
 
 logger = logging.getLogger(__name__)
 
@@ -176,7 +176,8 @@ class Volunteer(models.Model):
     def _update_portrait_thumbnail(self):
         # Delete old thumbnail, if any:
         if self.portrait_thumb and self.portrait_thumb != '':
-            logger.info(u"Deleting old portrait thumbnail for {0}, file {1}".format(self.pk, self.portrait_thumb))
+            logger.info(u"Deleting old portrait thumbnail for {0}, file {1}"
+                        .format(self.pk, self.portrait_thumb))
             try:
                 self.portrait_thumb.delete(save=False)
             except (IOError, OSError) as ose:
@@ -187,40 +188,19 @@ class Volunteer(models.Model):
             self.portrait_thumb = ''
             return
 
-        try:
-            image = PIL.Image.open(self.portrait.file)
-        except (IOError, OSError) as ioe:
-            logger.error(u"Failed to read image file {0}: {1}".format(self.portrait.file.name, ioe))
-            return
-        try:
-            image.thumbnail(settings.THUMBNAIL_SIZE, PIL.Image.ANTIALIAS)
-        except MemoryError:
-            logger.error(u"Out of memory trying to create thumbnail for {0}".format(self.portrait))
-        except (IOError, OSError) as ioe:
-            # Emperically, if this happens the thumbnail still gets generated,
-            # albeit with some junk at the end. So just log the error and plow
-            # on regardless...
-            logger.error(u"Error creating thumbnail: {0}".format(ioe))
-
-        thumb_file = os.path.join(
+        thumb_filename = os.path.join(
             settings.MEDIA_ROOT,
             settings.VOLUNTEER_PORTRAIT_PREVIEW_DIR,
             os.path.basename(str(self.portrait))
         )
-        # Make sure thumbnail file ends in jpg, to avoid confusion:
-        if os.path.splitext(thumb_file.lower())[1] not in (u'.jpg', u'.jpeg'):
-            thumb_file += ".jpg"
+
         try:
-            # Convert image to RGB (can't save Paletted images as jpgs) and
-            # save thumbnail as JPEG:
-            image.convert("RGB").save(thumb_file, "JPEG")
-            logger.info(u"Generated thumbnail portrait for volunteer '{0}' in file '{1}'".format(self.pk, thumb_file))
-        except (IOError, OSError) as ioe:
-            logger.error(u"Failed saving thumbnail: {0}".format(ioe))
-            if os.path.exists(thumb_file):
-                try:
-                    os.unlink(thumb_file)
-                except (IOError, OSError) as ioe:
-                    pass
-            return
-        self.portrait_thumb = os.path.relpath(thumb_file, settings.MEDIA_ROOT)
+            act_thumb_filename = image.generate_thumbnail(
+                self.portrait.file,
+                thumb_filename,
+                settings.THUMBNAIL_SIZE
+            )
+            self.portrait_thumb = os.path.relpath(act_thumb_filename, settings.MEDIA_ROOT)
+        except image.ThumbnailError as te:
+            logger.error("Failed generating thumbnail: {0}".format(te))
+            self.portrait_thumb = None
