@@ -27,6 +27,6 @@ def set_preferences(session, prefs_requested):
 
 def set_preference(session, name, value):
     if name in KNOWN_PREFS:
-        logger.debug("Set pref {} to '{}'".format(name, value))
+        logger.debug("Set pref {0} to '{1}'".format(name, value))
         value = str(value)[:10]  # limit length of stored value
         session['editpref_' + name] = value

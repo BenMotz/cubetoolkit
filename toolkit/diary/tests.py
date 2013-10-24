@@ -42,7 +42,7 @@ class DiaryTestsMixin(object):
     def assert_has_message(self, response, msg, level):
         self.assertContains(
             response,
-            u'<li class="{}">{}</li>'.format(level, msg)
+            u'<li class="{0}">{1}</li>'.format(level, msg)
         )
 
     def _setup_test_data(self):

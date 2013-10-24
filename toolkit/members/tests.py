@@ -258,7 +258,7 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
         self.assertEqual(member.email, u"blah.blah-blah@hard-to-tell-if-genuine.uk")
         self.assertEqual(member.postcode, u"SW1A 1AA")
 
-        self.assertContains(response, u"Added member: {}".format(member.number))
+        self.assertContains(response, u"Added member: {0}".format(member.number))
 
     def test_post_form_invalid_data_missing(self):
         url = reverse("add-member")
@@ -341,7 +341,7 @@ class TestSearchMemberView(MembersTestsMixin, TestCase):
 
         self.assertContains(
             response,
-            u'<form method="get" action="{}"><input type="submit" value="Edit"></form>'.format(
+            u'<form method="get" action="{0}"><input type="submit" value="Edit"></form>'.format(
                 reverse("edit-member", kwargs={"member_id": 3})
             ),
             html=True,
@@ -963,7 +963,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertContains(response, "<title>Add Volunteer</title>", html=True)
         # Should have default mugshot:
         self.assertContains(response,
-                            '<img src="{}" border="0" width="75">'.format(settings.DEFAULT_MUGSHOT),
+                            '<img src="{0}" border="0" width="75">'.format(settings.DEFAULT_MUGSHOT),
                             html=True)
 
     def test_get_form_edit_invalid_vol(self):
