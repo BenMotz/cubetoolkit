@@ -204,6 +204,7 @@ INSTALLED_APPS = (
     'toolkit.auth',
     'toolkit.index',
     'toolkit.util',
+    'easy_thumbnails',
     'django.contrib.auth',
     'django.contrib.contenttypes',  # Needed by auth framework
     # Sessions framework: used to store preferences and login details

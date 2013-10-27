@@ -11,3 +11,6 @@ mock
 pytz
 # Not sure about:
 south
+# for easy_thumbnails:
+six
+
