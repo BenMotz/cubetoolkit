@@ -15,6 +15,8 @@ from django.utils.safestring import mark_for_escaping
 import django.utils.timezone as timezone
 import django.views.generic as generic
 
+from easy_thumbnails.files import get_thumbnailer
+
 from toolkit.diary.models import Showing, Event
 from toolkit.diary.daterange import get_date_range
 from toolkit.diary.forms import SearchForm
@@ -129,7 +131,11 @@ def view_diary_json(request, year, month, day):
         thumbnail = None
         if event.media.count() >= 1:
             media_item = event.media.all()[0]
-            thumbnail = event.media.all()[0].thumbnail.url if media_item.thumbnail.name else None
+            try:
+                thumbnailer = get_thumbnailer(media_item.media_file)
+                thumbnail = thumbnailer.get_thumbnail({'size': (500, 200)}).url
+            except Exception:
+                logger.exception("Failed getting thumbnail for event {0}".format(event))
 
         results.append({
             'start': timezone.localtime(showing.start).strftime('%d/%m/%Y %H:%M'),

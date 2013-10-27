@@ -50,7 +50,7 @@ class MediaItemForm(forms.ModelForm):
         widgets = {
             'media_file': forms.ClearableFileInput(attrs={'accept': 'image/jpeg,image/gif,image/png'}),
         }
-        exclude = ('thumbnail', 'mimetype', 'caption')
+        exclude = ('mimetype', 'caption')
 
 
 class ShowingForm(forms.ModelForm):
