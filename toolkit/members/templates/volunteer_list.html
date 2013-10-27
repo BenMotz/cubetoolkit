@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load thumbnail %}
 {% load hash_filter %}
 {% block css %}
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
@@ -33,7 +34,7 @@ Report generated: {% now "d/m/Y" %}<p>
 <td valign="top" align="right">
 {% if volunteer.portrait %}
 <a href="{{ volunteer.portrait.url }}">
-    {% if volunteer.portrait_thumb %}<img src="{{ volunteer.portrait_thumb.url }}" border="0" width="75">{% else %}(missing preview){% endif %}</a><br>
+    <img src="{{ volunteer.portrait|thumbnail_url:'portrait' }}" border="0" width="75"></a><br>
 {% else %}
 <img src="{{ default_mugshot }}" border="0" width="75"><br>
 {% endif %}

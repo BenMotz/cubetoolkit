@@ -2,8 +2,6 @@ import os.path
 import django.core.urlresolvers
 import sys
 
-# Slightly arbitrary (inherited) bounding box for thumbnails
-THUMBNAIL_SIZE = (250, 187)
 
 DEFAULT_TERMS_TEXT = """Contacts-
 Company-
@@ -41,15 +39,35 @@ MAX_COUNT_PER_ROLE = 6
 # Probably don't want to change these: subdirectories of MEDIA directory where
 # volunteer images get saved:
 VOLUNTEER_PORTRAIT_DIR = 'volunteers'
-VOLUNTEER_PORTRAIT_PREVIEW_DIR = 'volunteers_thumbnails'
 
 ###############################################################################
 #
 # Below here are Django settings
 #
 
+# Thumbnails will be stored in a subdirectory (called "thumbnails") of where
+# the original image is stored:
+THUMBNAIL_SUBDIR = "thumbnails"
 
-# Custom:
+THUMBNAIL_DEBUG = True
+
+# Settings for easy_thumbnails:
+THUMBNAIL_ALIASES = {
+    'members.Volunteer.portrait': {
+        'portrait': {
+            'size': (75, 200),
+        },
+    },
+    'diary.MediaItem': {
+        'std': {
+            # Slightly arbitrary (inherited) bounding box
+            'size': (250, 187),
+        },
+    },
+}
+
+
+# Custom tweaks:
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 APP_ROOT_DETECTED = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), ".."))
 
