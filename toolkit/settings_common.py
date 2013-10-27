@@ -51,7 +51,8 @@ VOLUNTEER_PORTRAIT_PREVIEW_DIR = 'volunteers_thumbnails'
 
 # Custom:
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
-APP_ROOT_DETECTED = os.path.abspath(os.path.join(os.path.dirname(os.path.realpath(__file__)), ".."))
+APP_ROOT_DETECTED = os.path.abspath(os.path.join(os.path.dirname(
+    os.path.realpath(__file__)), ".."))
 
 APPEND_SLASH = True
 
@@ -74,12 +75,12 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',  # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'
-        'NAME': 'toolkit',                      # Or path to database file if using sqlite3.
-        'USER': 'toolkit',                      # Not used with sqlite3.
-        'PASSWORD': 'Kr3QejhDb7amDwf',                  # Not used with sqlite3.
-        'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-        'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'toolkit',
+        'USER': 'toolkit',
+        'PASSWORD': 'Kr3QejhDb7amDwf',
+        'HOST': '',  # Set to empty string for localhost.
+        'PORT': '',  # Set to empty string for default.
     }
 }
 
@@ -91,9 +92,9 @@ PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
     'django.contrib.auth.hashers.BCryptPasswordHasher',
     'django.contrib.auth.hashers.SHA1PasswordHasher',
-#   Don't allow:
-#    'django.contrib.auth.hashers.MD5PasswordHasher',
-#    'django.contrib.auth.hashers.CryptPasswordHasher',
+    #   Don't allow:
+    #    'django.contrib.auth.hashers.MD5PasswordHasher',
+    #    'django.contrib.auth.hashers.CryptPasswordHasher',
 )
 
 # Local time zone for this installation. Choices can be found here:
@@ -260,11 +261,11 @@ LOGGING = {
             'maxBytes': 10485760,
             'backupCount': 5,
         },
-#        'null': {
-#            'level': 'DEBUG',
-#            'class': 'logging.NullHandler',
-#            'formatter': 'simple',
-#        }
+        # 'null': {
+        #     'level': 'DEBUG',
+        #     'class': 'logging.NullHandler',
+        #     'formatter': 'simple',
+        # }
     },
 
     'loggers': {
@@ -277,4 +278,3 @@ LOGGING = {
     # Don't configure a root logger or any other logging config; each settings
     # file should do that
 }
-
