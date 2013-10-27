@@ -10,6 +10,9 @@ from easy_thumbnails.alias import aliases
 from easy_thumbnails.conf import settings
 from easy_thumbnails.files import get_thumbnailer
 
+import logging
+logger = logging.getLogger(__file__)
+
 register = Library()
 
 RE_SIZE = re.compile(r'(\d+)x(\d+)$')
@@ -275,6 +278,7 @@ def thumbnail_url(source, alias):
     try:
         thumb = get_thumbnailer(source)[alias]
     except Exception:
+        logger.exception("Failed generating thumbnail for {0}, {1}".format(source, alias))
         return ''
     return thumb.url
 
