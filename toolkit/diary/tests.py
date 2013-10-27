@@ -1137,9 +1137,8 @@ class EditEventView(DiaryTestsMixin, TestCase):
         # Shouldn't have changed:
         self.assertEqual(event.legacy_id, u'100')
 
-    @patch("toolkit.util.image.generate_thumbnail")
     @patch("toolkit.util.image.get_mimetype")
-    def test_post_edit_event_add_media_invalid_empty(self, get_mimetype_patch, gen_thumbnail_patch):
+    def test_post_edit_event_add_media_invalid_empty(self, get_mimetype_patch):
 
         url = reverse("edit-event-details", kwargs={"event_id": 2})
 
@@ -1155,16 +1154,13 @@ class EditEventView(DiaryTestsMixin, TestCase):
         self.assertFormError(response, 'media_form', 'media_file', u'The submitted file is empty.')
 
         self.assertFalse(get_mimetype_patch.called)
-        self.assertFalse(gen_thumbnail_patch.called)
 
         event = Event.objects.get(id=2)
         self.assertEqual(event.media.count(), 0)
 
-    @patch("toolkit.util.image.generate_thumbnail")
     @patch("toolkit.util.image.get_mimetype")
-    def test_post_edit_event_add_media_not_an_image(self, get_mimetype_patch, gen_thumbnail_patch):
+    def test_post_edit_event_add_media_not_an_image(self, get_mimetype_patch):
         get_mimetype_patch.return_value = "text/plain"
-        gen_thumbnail_patch.side_effect = toolkit.util.image.ThumbnailError(u"Nope")
 
         url = reverse("edit-event-details", kwargs={"event_id": 2})
 
@@ -1181,20 +1177,17 @@ class EditEventView(DiaryTestsMixin, TestCase):
         self.assert_return_to_index(response)
 
         self.assertTrue(get_mimetype_patch.called)
-        self.assertTrue(gen_thumbnail_patch.called)
 
         event = Event.objects.get(id=2)
         self.assertEqual(event.media.count(), 1)
         media_item = event.media.all()[0]
         self.assertEqual(media_item.mimetype, "text/plain")
-        self.assertEqual(str(media_item.thumbnail), '')
         self.assertEqual(media_item.credit, u'All new image credit!')
         self.assertEqual(media_item.caption, None)
 
-    @patch("toolkit.util.image.generate_thumbnail")
     @patch("toolkit.util.image.get_mimetype")
     @override_settings(MEDIA_ROOT="/tmp")
-    def test_post_edit_event_add_media_jpeg(self, get_mimetype_patch, gen_thumbnail_patch):
+    def test_post_edit_event_add_media_jpeg(self, get_mimetype_patch):
         get_mimetype_patch.return_value = "image/jpeg"
 
         url = reverse("edit-event-details", kwargs={"event_id": 2})
@@ -1202,7 +1195,6 @@ class EditEventView(DiaryTestsMixin, TestCase):
         with tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-", suffix=".jpg") as temp_jpg:
             # used for assertion:
             temp_file_name = os.path.basename(temp_jpg.name)
-            gen_thumbnail_patch.side_effect = lambda src, dst, opt: dst
 
             temp_jpg.write("Dummy jpeg")
             temp_jpg.seek(0)
@@ -1216,7 +1208,6 @@ class EditEventView(DiaryTestsMixin, TestCase):
         self.assert_return_to_index(response)
 
         self.assertTrue(get_mimetype_patch.called)
-        self.assertTrue(gen_thumbnail_patch.called)
 
         event = Event.objects.get(id=2)
         self.assertEqual(event.media.count(), 1)
@@ -1226,13 +1217,10 @@ class EditEventView(DiaryTestsMixin, TestCase):
         self.assertEqual(media_item.caption, None)
         self.assertEqual(media_item.media_file.name,
             os.path.join("diary", temp_file_name))
-        self.assertEqual(media_item.thumbnail.name,
-            os.path.join("diary_thumbnails", temp_file_name))
 
     @override_settings(MEDIA_ROOT="/tmp")
-    @patch("toolkit.util.image.generate_thumbnail")
     @patch("toolkit.util.image.get_mimetype")
-    def test_post_edit_event_add_media_png(self, get_mimetype_patch, gen_thumbnail_patch):
+    def test_post_edit_event_add_media_png(self, get_mimetype_patch):
         get_mimetype_patch.return_value = "image/png"
 
         url = reverse("edit-event-details", kwargs={"event_id": 2})
@@ -1240,9 +1228,6 @@ class EditEventView(DiaryTestsMixin, TestCase):
         with tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-", suffix=".png") as temp_png:
             # used for assertion:
             temp_file_name = os.path.basename(temp_png.name)
-
-            # Thumbnailer will change filename to have jpg extension:
-            gen_thumbnail_patch.side_effect = lambda src, dst, opt: dst + ".jpg"
 
             temp_png.write("Dummy png")
             temp_png.seek(0)
@@ -1256,7 +1241,6 @@ class EditEventView(DiaryTestsMixin, TestCase):
         self.assert_return_to_index(response)
 
         self.assertTrue(get_mimetype_patch.called)
-        self.assertTrue(gen_thumbnail_patch.called)
 
         event = Event.objects.get(id=2)
         self.assertEqual(event.media.count(), 1)
@@ -1266,8 +1250,6 @@ class EditEventView(DiaryTestsMixin, TestCase):
         self.assertEqual(media_item.caption, None)
         self.assertEqual(media_item.media_file.name,
             os.path.join("diary", temp_file_name))
-        self.assertEqual(media_item.thumbnail.name,
-            os.path.join("diary_thumbnails", temp_file_name) + ".jpg")
 
     @override_settings(MEDIA_ROOT="/tmp")
     def test_post_edit_event_clear_media(self):

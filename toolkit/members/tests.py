@@ -68,9 +68,9 @@ class MembersTestsMixin(object):
         # Volunteers:
         self.vol_1 = Volunteer(
             member=self.mem_4, notes=u'Likes the $, the \u00a3 and the \u20ac',
-            portrait=settings.MEDIA_ROOT + "/path/to/portrait", portrait_thumb=settings.MEDIA_ROOT + "/path/to/thumb"
+            portrait=settings.MEDIA_ROOT + "/path/to/portrait"
         )
-        self.vol_1.save(update_portrait_thumbnail=False)
+        self.vol_1.save()
         self.vol_1.roles = [r1, r3]
         self.vol_1.save()
 
@@ -1107,7 +1107,6 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertEqual(member.volunteer.notes, "")
         # Won't have changed without "clear" being checked:
         self.assertEqual(member.volunteer.portrait, '/tmp/path/to/portrait')
-        self.assertEqual(member.volunteer.portrait_thumb, '/tmp/path/to/thumb')
 
         self.assertEqual(member.volunteer.roles.count(), 0)
 
@@ -1191,24 +1190,19 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
     def test_post_update_vol_clear_portrait(self):
 
         temp_jpg = tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-", suffix=".jpg", delete=False)
-        temp_thumb_jpg = tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-thumb-", suffix=".jpg", delete=False)
 
         # Ensure files get cleaned up:
         self.files_in_use.append(temp_jpg.name)
-        self.files_in_use.append(temp_thumb_jpg.name)
 
         temp_jpg.close()
-        temp_thumb_jpg.close()
 
         # Add to vol 1:
         vol = Volunteer.objects.get(id=1)
         vol.portrait = temp_jpg.name
-        vol.portrait_thumb = temp_thumb_jpg.name
-        vol.save(update_portrait_thumbnail=False)
+        vol.save()
 
         # No errant code should have deleted the files:
         self.assertTrue(os.path.isfile(temp_jpg.name))
-        self.assertTrue(os.path.isfile(temp_thumb_jpg.name))
 
         # Post an edit to clear the image:
         url = reverse("edit-volunteer", kwargs={"volunteer_id": 1})
@@ -1221,37 +1215,28 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         vol = Volunteer.objects.get(id=1)
         self.assertEqual(vol.member.name, u'Pictureless Person')
         self.assertEqual(vol.portrait, '')
-        self.assertEqual(vol.portrait_thumb, '')
 
         # Should have deleted the old images:
         self.assertFalse(os.path.isfile(temp_jpg.name))
-        self.assertFalse(os.path.isfile(temp_thumb_jpg.name))
 
     @override_settings(MEDIA_ROOT="/tmp")
     def test_post_update_vol_change_portrait_success(self):
         temp_old_jpg = tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-", suffix=".jpg", delete=False)
-        temp_old_thumb_jpg = tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-thumb-", suffix=".jpg", delete=False)
 
         expected_upload_path = os.path.join('/tmp', settings.VOLUNTEER_PORTRAIT_DIR, "image_bluesq.jpg")
-        expected_thumb_path = os.path.join('/tmp', settings.VOLUNTEER_PORTRAIT_PREVIEW_DIR, "image_bluesq.jpg")
 
         # Ensure files get cleaned up:
         self.files_in_use.append(temp_old_jpg.name)
-        self.files_in_use.append(temp_old_thumb_jpg.name)
         self.files_in_use.append(expected_upload_path)
-        self.files_in_use.append(expected_thumb_path)
         temp_old_jpg.close()
-        temp_old_thumb_jpg.close()
 
         # Add to vol 1:
         vol = Volunteer.objects.get(id=1)
         vol.portrait = temp_old_jpg.name
-        vol.portrait_thumb = temp_old_thumb_jpg.name
-        vol.save(update_portrait_thumbnail=False)
+        vol.save()
 
         # No errant code should have deleted the files:
         self.assertTrue(os.path.isfile(temp_old_jpg.name))
-        self.assertTrue(os.path.isfile(temp_old_thumb_jpg.name))
 
         # Get new image to send:
         new_jpg_filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), "test_data", "image_bluesq.jpg")
@@ -1274,15 +1259,11 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
 
         # Portrait path should be:
         self.assertEqual(vol.portrait.name, os.path.join(settings.VOLUNTEER_PORTRAIT_DIR, "image_bluesq.jpg"))
-        self.assertEqual(vol.portrait_thumb.name, os.path.join(settings.VOLUNTEER_PORTRAIT_PREVIEW_DIR, "image_bluesq.jpg"))
         # And should have 'uploaded' file to:
         self.assertTrue(os.path.isfile(expected_upload_path))
-        # And created thumbnail:
-        self.assertTrue(os.path.isfile(expected_thumb_path))
 
         # Should have deleted the old images:
         self.assertFalse(os.path.isfile(temp_old_jpg.name))
-        self.assertFalse(os.path.isfile(temp_old_thumb_jpg.name))
 
         # XXX do this properly:
         shutil.rmtree(os.path.join('/tmp', settings.VOLUNTEER_PORTRAIT_DIR))
