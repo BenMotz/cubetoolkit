@@ -284,24 +284,28 @@ def import_events(connection, role_map):
             image_path = os.path.join(EVENT_IMAGES_PATH, image_name)
         else:
             image_path = None
-        # Thumbnail
+
+        # Existing thumbnail:
         image_thumbnail_path = os.path.join(SITE_ROOT, MEDIA_PATH, EVENT_THUMB_IMAGES_PATH, image_name)
-        if image_path and os.path.exists(image_thumbnail_path):
-            # As above, change path to relative to media root, as django expects
+
+        # If there's a thumbnail, but no original image, then copy the
+        # thumbnail over to be the original image:
+        if os.path.exists(image_thumbnail_path) and not image_path:
+            logger.info("Event {0} has thumb but no image: using thumb for main".format(e.legacy_id))
             image_thumbnail_path = os.path.join(EVENT_THUMB_IMAGES_PATH, image_name)
-        else:
-            image_thumbnail_path = None
+            image_path = os.path.join(EVENT_IMAGES_PATH, image_name)
+            shutil.copyfile(image_thumbnail_path, image_path)
+
         # If either image or thumbnail existed, create media item:
-        if image_path or image_thumbnail_path:
+        if image_path:
             # Image credits
             image_credit = titlecase(r[5])
             media_item = toolkit.diary.models.MediaItem(
                 media_file=image_path,
-                thumbnail=image_thumbnail_path,
                 credit=image_credit
             )
             media_item.full_clean()
-            media_item.save(update_thumbnail=False)
+            media_item.save()
             e.media.add(media_item)
 
         showings = import_event_showings(connection, e, r[0])
@@ -503,19 +507,16 @@ def import_volunteer(member, active, notes, role_map, roles):
         v.portrait_thumb = image_thumbnail_path
 
     # Got a thumbnail, but no image?
-    if v.portrait is None and v.portrait_thumb is not None:
-        shutil.copy(v.portrait_thumb, os.path.join(SITE_ROOT, MEDIA_PATH, VOLUNTEER_IMAGE_PATH, image_name))
-
-    # Image but no thumbnail?
-    if v.portrait and v.portrait_thumb is None:
-        v.update_portrait_thumb()
+    if v.portrait is None and os.path.exists(image_thumbnail_path):
+        logger.info("Volunteer '{0}' has thumbnail but no portrait: using thumb".format(member.name))
+        shutil.copy(image_thumbnail_path, os.path.join(SITE_ROOT, MEDIA_PATH, VOLUNTEER_IMAGE_PATH, image_name))
 
     v.full_clean()
     # Need to save volunteer before adding roles (so many-many refernces to
     # primary key can be created)
-    v.save(update_portrait_thumbnail=False)
+    v.save()
     import_volunteer_roles(v, role_map, roles)
-    v.save(update_portrait_thumbnail=False)
+    v.save()
 
 
 def parse_imported_date(date_string, timezone):
