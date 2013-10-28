@@ -133,7 +133,11 @@ def view_diary_json(request, year, month, day):
             media_item = event.media.all()[0]
             try:
                 thumbnailer = get_thumbnailer(media_item.media_file)
-                thumbnail = thumbnailer.get_thumbnail({'size': (500, 200)}).url
+                thumbnail = thumbnailer.get_thumbnail({
+                    'size': (0, 200),
+                    'crop': 'scale',
+                    'upscale': True,
+                }).url
             except Exception:
                 logger.exception("Failed getting thumbnail for event {0}".format(event))
 
