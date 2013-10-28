@@ -124,8 +124,6 @@ class Volunteer(models.Model):
     active = models.BooleanField(default=True)
 
     portrait = models.ImageField(upload_to=settings.VOLUNTEER_PORTRAIT_DIR, max_length=256, null=True, blank=True)
-    portrait_thumb = models.ImageField(upload_to=settings.VOLUNTEER_PORTRAIT_PREVIEW_DIR, max_length=256,
-                                       null=True, blank=True, editable=False)
 
     # Roles
     roles = models.ManyToManyField(Role, db_table='Volunteer_Roles', blank=True)
@@ -138,11 +136,6 @@ class Volunteer(models.Model):
 
     def save(self, *args, **kwargs):
         # Save the model.
-        # If the filename of the 'portrait' has changed then regenerate the
-        # thumbnail. (This means the thumbnail won't get updated if the filename
-        # hasn't changed, but that shouldn't be the end of the world?)
-        update_thumbnail = kwargs.pop('update_portrait_thumbnail', True)
-
         try:
             current_portrait_file = self.portrait.file.name
         except (IOError, OSError, ValueError):
@@ -158,9 +151,6 @@ class Volunteer(models.Model):
                     logging.error(u"Failed deleting old volunteer portrait '{0}': {1}"
                                   .format(self.__original_portrait, err))
                 self.__original_portrait = None
-            # update thumbnail
-            if update_thumbnail:
-                self._update_portrait_thumbnail()
 
         return super(Volunteer, self).save(*args, **kwargs)
 

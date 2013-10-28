@@ -76,7 +76,6 @@ class MediaItem(models.Model):
     media_file = models.FileField(upload_to="diary", max_length=256, null=True, blank=True, verbose_name='Image file')
     mimetype = models.CharField(max_length=64, editable=False)
 
-    thumbnail = models.ImageField(upload_to="diary_thumbnails", max_length=256, null=True, blank=True, editable=False)
     credit = models.CharField(max_length=256, null=True, blank=True,
                               default="Internet scavenged", verbose_name='Image credit')
     caption = models.CharField(max_length=256, null=True, blank=True)
@@ -90,15 +89,10 @@ class MediaItem(models.Model):
     # Overloaded Django ORM method:
 
     def save(self, *args, **kwargs):
-        update_thumbnail = kwargs.pop('update_thumbnail', True)
-
         # Before saving, update mimetype field:
         # (do this even if file name has stayed the same, as file may have been
         # overwritten)
         self.autoset_mimetype()
-
-        if update_thumbnail:
-            self._update_thumbnail()
 
         return super(MediaItem, self).save(*args, **kwargs)
 
@@ -113,38 +107,6 @@ class MediaItem(models.Model):
                 logger.error(u"Failed to determine mimetype of file {0}".format(self.media_file.file.name))
                 self.mimetype = "application/octet-stream"
             logger.debug(u"Mime type for {0} detected as {1}".format(self.media_file.file.name, self.mimetype))
-
-    def _update_thumbnail(self):
-        if not self.media_file:
-            logger.debug("Not updating thumbnail: media_file.file is None")
-            return
-
-        logger.info(u"Updating thumbnail for media item {0}, file {1}".format(self.pk, self.media_file))
-
-        # Delete old thumbnail, if any:
-        if self.thumbnail and self.thumbnail != '':
-            try:
-                logger.debug(u"Deleting old thumbnail file, {0}".format(self.thumbnail))
-                self.thumbnail.delete(save=False)
-            except (IOError, OSError) as ose:
-                logger.error(u"Failed deleting old thumbnail: {0}".format(ose))
-
-        thumb_filename = os.path.join(
-            settings.MEDIA_ROOT,
-            "diary_thumbnails",
-            os.path.basename(str(self.media_file))
-        )
-
-        try:
-            act_thumb_filename = imagetools.generate_thumbnail(
-                self.media_file.file,
-                thumb_filename,
-                settings.THUMBNAIL_SIZE
-            )
-            self.thumbnail = os.path.relpath(act_thumb_filename, settings.MEDIA_ROOT)
-        except imagetools.ThumbnailError as te:
-            logger.error("Failed generating thumbnail: {0}".format(te))
-            self.thumbnail = None
 
 
 class EventTag(models.Model):

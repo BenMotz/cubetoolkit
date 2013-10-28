@@ -1,4 +1,6 @@
 {% extends 'base.html' %}
+{% load thumbnail %}
+
 {% block title %}{{ pagetitle }} {{ volunteer.member.name }}{% endblock %}
 
 {% block css %}
@@ -50,7 +52,7 @@ input[type="text"], textarea {
     <tr><td /><td>
         {% if volunteer.portrait %}
         <a href="{{ volunteer.portrait.url }}">
-            {% if volunteer.portrait_thumb %}<img src="{{ volunteer.portrait_thumb.url }}" border="0" width="75">{% else %}(missing preview){% endif %}</a><br>
+            <img src="{{ volunteer.portrait|thumbnail_url:'portrait' }}" border="0" width="75"></a><br>
         {% else %}
         <img src="{{ default_mugshot }}" border="0" width="75"><br>
         {% endif %}
