@@ -27,8 +27,9 @@ def gen_catch_exc(field):
 
 def gen_mediaitem_thumbs():
     items = MediaItem.objects.all()
-    total = items.count() / 100.0
+    total = items.count()
     print "Generating thumbnail images for {0} media items".format(total)
+    total = total / 100.0
     for count, media_item in enumerate(MediaItem.objects.all()):
         if media_item.media_file:
             gen_catch_exc(media_item.media_file)
@@ -36,10 +37,12 @@ def gen_mediaitem_thumbs():
             logger.error("Media item without media_file!")
         print_percent(count / total)
 
+
 def gen_vol_thumbs():
     volunteers = Volunteer.objects.all()
     total = volunteers.count()
-    print "Generating thumbnail images for {0} volunteers images".format(total)
+    print ("Generating thumbnail images for {0} volunteer records (not all of "
+           "whom have portraits)".format(total))
     total = total / 100.0
     for count, volunteer in enumerate(volunteers):
         if volunteer.portrait:
