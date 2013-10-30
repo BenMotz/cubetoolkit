@@ -87,6 +87,7 @@ class DiaryTestsMixin(object):
         s3       e4    9/6/13   T          F       F          F       |   F        F
         s4       e4    14/9/13  F          F       F          F       |   F        F
         s5       e5    14/2/13  T          F       F          F       |   F        T
+        s6       e1    15/2/13  T          T       F          F       |   F        F
         """
 
         # Events:
@@ -158,16 +159,16 @@ class DiaryTestsMixin(object):
         e6.save()
 
         # Showings:
-        e2s1 = Showing(  # pk :1
+        self.e2s1 = Showing(  # pk :1
             start=pytz.timezone("Europe/London").localize(datetime(2013, 4, 1, 19, 00)),
             event=e2, booked_by="User",
             confirmed=False, hide_in_programme=False, cancelled=False, discounted=False)
-        e2s1.save(force=True)
-        e2s2 = Showing(  # pk :2
+        self.e2s1.save(force=True)
+        self.e2s2 = Showing(  # pk :2
             start=pytz.timezone("Europe/London").localize(datetime(2013, 4, 2, 19, 00)),
             event=e2, booked_by="User",
             confirmed=True, hide_in_programme=False, cancelled=False, discounted=False)
-        e2s2.save(force=True)
+        self.e2s2.save(force=True)
         e2s3 = Showing(  # pk :3
             start=pytz.timezone("Europe/London").localize(datetime(2013, 4, 3, 19, 00)),
             event=e2, booked_by="User",
@@ -219,9 +220,18 @@ class DiaryTestsMixin(object):
         )
         s5.save(force=True)
 
+        s6 = Showing(
+            start=pytz.timezone("Europe/London").localize(datetime(2013, 2, 15, 18, 00)),
+            event=e1,
+            booked_by="Blah blah",
+            confirmed=True,
+            hide_in_programme=True,
+        )
+        s6.save(force=True)
+
         # Rota items:
-        RotaEntry(showing=e2s1, role=r2, rank=1).save()
-        RotaEntry(showing=e2s1, role=r3, rank=1).save()
+        RotaEntry(showing=self.e2s1, role=r2, rank=1).save()
+        RotaEntry(showing=self.e2s1, role=r3, rank=1).save()
         RotaEntry(showing=s2, role=r1, rank=1).save()
         RotaEntry(showing=s2, role=r1, rank=2).save()
         RotaEntry(showing=s2, role=r1, rank=3).save()
@@ -384,16 +394,21 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
                          u"image": None,
                          u"start": u"13/04/2013 18:00",
                          u"link": u"/programme/event/id/3/",
-                         u"copy": u"<p>Event three Copy</p>"
+                         u"copy": u"Event three Copy"
                          }])
 
     # View of individual showing:
     def test_view_showing(self):
-        url = reverse("single-showing-view", kwargs={"showing_id": "1"})
+        url = reverse("single-showing-view", kwargs={"showing_id": str(self.e2s2.pk)})
         response = self.client.get(url)
         self.assertContains(response, u'Event two title')
         self.assertContains(response, u'<p>Event <br>\n two <br>\n copy</p>')
         self.assertEqual(response.status_code, 200)
+
+    def test_view_hidden_showing(self):
+        url = reverse("single-showing-view", kwargs={"showing_id": str(self.e2s1.pk)})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
 
     # Event series view:
     def test_view_event(self):
@@ -420,6 +435,12 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         response = self.client.get(url)
         # TODO: test data!
         self.assertEqual(response.status_code, 200)
+
+    def test_view_event_no_public_showings(self):
+        # Event 1 has no publicly viewable showings:
+        url = reverse("single-event-view", kwargs={"event_id": "1"})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
 
     # TODO: Cancelled/confirmed/visible/TTT
 
@@ -1990,14 +2011,14 @@ class ShowingModelCustomQueryset(DiaryTestsMixin, TestCase):
     def test_manager_not_cancelled(self):
         records = list(Showing.objects.not_cancelled())
         # From the fixtures, there are 7 showings that aren't cancelled
-        self.assertEqual(len(records), 7)
+        self.assertEqual(len(records), 8)
         for showing in records:
             self.assertFalse(showing.cancelled)
 
     def test_manager_confirmed(self):
         records = list(Showing.objects.confirmed())
         # From the fixtures, there are 7 showings that are confirmed:
-        self.assertEqual(len(records), 7)
+        self.assertEqual(len(records), 8)
         for showing in records:
             self.assertTrue(showing.confirmed)
 

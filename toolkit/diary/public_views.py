@@ -2,8 +2,6 @@ import json
 import datetime
 import logging
 
-import markdown
-
 from toolkit.util.ordereddict import OrderedDict
 
 from django.db.models import Q
@@ -129,8 +127,8 @@ def view_diary_json(request, year, month, day):
         event = showing.event
 
         thumbnail = None
-        if event.media.count() >= 1:
-            media_item = event.media.all()[0]
+        media_item = event.get_main_mediaitem()
+        if media_item:
             try:
                 thumbnailer = get_thumbnailer(media_item.media_file)
                 thumbnail = thumbnailer.get_thumbnail({
@@ -144,7 +142,7 @@ def view_diary_json(request, year, month, day):
         results.append({
             'start': timezone.localtime(showing.start).strftime('%d/%m/%Y %H:%M'),
             'name': event.name,
-            'copy': markdown.markdown(event.copy),
+            'copy': event.copy_html,
             'link': reverse("single-event-view", kwargs={'event_id': showing.event_id}),
             'image': thumbnail,
             'tags': ", ".join(n[0] for n in event.tags.values_list('name')),
@@ -155,11 +153,14 @@ def view_diary_json(request, year, month, day):
 
 def view_showing(request, showing_id=None):
     # Show details of an individual showing, with given showing_id
-
     # For now, just turn it into a view of the corresponding event:
-    showing = get_object_or_404(Showing, id=showing_id)
 
-    return view_event(request, event_id=showing.event_id)
+    # Ensure that showing is only displayed if it's visible to the public:
+    showings = Showing.objects.public().filter(id=showing_id)
+    if len(showings) == 0:
+        raise Http404("Showing not found")
+
+    return view_event(request, event_id=showings[0].event_id)
 
 
 def view_event(request, event_id=None, legacy_id=None):
@@ -170,11 +171,16 @@ def view_event(request, event_id=None, legacy_id=None):
         event = get_object_or_404(Event, id=event_id)
     else:
         event = get_object_or_404(Event, legacy_id=legacy_id)
-    media = event.media.all()[0] if len(event.media.all()) > 0 else None
+
+    media = event.get_main_mediaitem()
+    showings = event.showings.public()
+
+    if event.private or len(showings) == 0:
+        raise Http404("Event not found")
 
     context = {
         'event': event,
-        'showings': event.showings.public(),
+        'showings': showings,
         'media': {event.id: media},
         'media_url': settings.MEDIA_URL
     }

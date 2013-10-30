@@ -423,10 +423,7 @@ def edit_event(request, event_id=None):
     # So now just dealing with a GET:
     event = get_object_or_404(Event, pk=event_id)
     # For now only support a single media item:
-    if event.media.count() > 0:
-        media_item = event.media.all()[0]
-    else:
-        media_item = MediaItem()
+    media_item = event.get_main_mediaitem() or MediaItem()
 
     # If the event has "legacy" (ie. non-html) copy then convert it to HTML;
     if event.legacy_copy:
