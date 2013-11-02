@@ -24,17 +24,23 @@ $(document).ready(function() {
 </form>
 {% if search_submitted %} {# Don't show the 'Results: 0' if no search was performed: #}
     <h3>{{ showing_list|length }} Result{{ showing_list|length|pluralize }}</h3>
-    <ul><ul>
+    <ul>
+        <li style="display: none;">
+        <ul>
         {% for showing in showing_list %}
-        {% ifchanged showing.start.day %}</ul></li>
-    <li> {{showing.start|date:"D d" }} 
-    <span class="resultdate"><a href="{% url "archive-view-month" year=showing.start.year month=showing.start.month %}">{{showing.start|date:"N" }}</a>
-    <a href="{% url "archive-view-year" year=showing.start.year %}">{{showing.start|date:"y"}}</a></span>
-          <ul>
+        {% ifchanged showing.start.day %}
+        </ul>
+        </li>
+        <li> {{showing.start|date:"D d" }}
+            <span class="resultdate">
+                <a href="{% url "archive-view-month" year=showing.start.year month=showing.start.month %}">{{showing.start|date:"N" }}</a>
+                <a href="{% url "archive-view-year" year=showing.start.year %}">{{showing.start|date:"y"}}</a>
+            </span>
+            <ul>
         {% endifchanged %}
         <li>{{ showing.start|date:"H:i" }} 
-        <a href="{% url "single-event-view" event_id=showing.event_id %}" {% if showing.cancelled  %}class="cancelled"{% endif %}>{{ showing.event.name }}</a>
-        {% if showing.cancelled %}{%if not "cancelled" in showing.event.name.lower %}(Cancelled){% endif %}{%endif%}
+            <a href="{% url "single-event-view" event_id=showing.event_id %}" {% if showing.cancelled  %}class="cancelled"{% endif %}>{{ showing.event.name }}</a>
+            {% if showing.cancelled %}{%if not "cancelled" in showing.event.name.lower %}(Cancelled){% endif %}{%endif%}
         </li>
         {% endfor %}
     </ul></ul>
