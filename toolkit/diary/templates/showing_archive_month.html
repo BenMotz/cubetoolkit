@@ -21,23 +21,26 @@ Cube Programme Archival listings for {{ month|date:"F Y" }}
     <a href="{% url "archive-view-month" year=next_month.year month=next_month.month %}">Next month ({{ next_month|date:"F" }}) →</a>
     {% endif %}
     </p>
+    {% spaceless %}
+    {% regroup showing_list by start.day as showing_by_start %}
     <ul>
-        <li style="display: none;">
-        <ul>
-        {% for showing in showing_list %}
-            {% ifchanged showing.start.day %}
-                </ul>
-            </li>
-            <li> {{showing.start|date:"D d N y" }}
-                <ul>
-            {% endifchanged %}
-                    <li>{{ showing.start|date:"H:i" }}
-                        <a href="{% url "single-event-view" event_id=showing.event_id %}" {% if showing.cancelled %}class="cancelled"{% endif %}>{{ showing.event.name }}</a>
-                        {% if showing.cancelled %}{% if not "cancelled" in showing.event.name.lower %}(Cancelled){% endif %}{%endif%}
-                    </li>
+    {% for date_showings in showing_by_start %}
+        {% for showing in date_showings.list %}
+            {% if forloop.first %}
+        <li>{{showing.start|date:"D d N y" }}
+            <ul>
+            {% endif %}
+                <li>{{ showing.start|date:"H:i" }}
+                    <a href="{% url "single-event-view" event_id=showing.event_id %}" {% if showing.cancelled %}class="cancelled"{% endif %} >{{ showing.event.name }}</a>
+                    {% if showing.cancelled and not "cancelled" in showing.event.name.lower %}(Cancelled){% endif %}
+                </li>
         {% endfor %}
-        </ul>
+            </ul>
+        </li>
+    {% endfor %}
     </ul>
+    {% endspaceless %}
+
     <p>
     {% if previous_month %}
     <a href="{% url "archive-view-month" year=previous_month.year month=previous_month.month %}">← Previous month ({{ previous_month|date:"F" }})</a>
