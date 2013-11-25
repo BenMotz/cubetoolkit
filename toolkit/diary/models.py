@@ -104,9 +104,9 @@ class MediaItem(models.Model):
             try:
                 self.mimetype = imagetools.get_mimetype(self.media_file.file)
             except IOError:
-                logger.error(u"Failed to determine mimetype of file {0}".format(self.media_file.file.name))
+                logger.error(u"Failed to determine mimetype of file {0}".format(self.media_file.name))
                 self.mimetype = "application/octet-stream"
-            logger.debug(u"Mime type for {0} detected as {1}".format(self.media_file.file.name, self.mimetype))
+            logger.debug(u"Mime type for {0} detected as {1}".format(self.media_file.name, self.mimetype))
 
 
 class EventTag(models.Model):
