@@ -1,3 +1,10 @@
 #!/usr/bin/env bash
 source ./activate
-./manage.py test --settings=toolkit.test_settings $*
+
+if [ $# -eq 0 ]; then
+	TEST_LIST="diary members index auth util"
+else
+	TEST_LIST=$*
+fi
+
+./manage.py test --settings=toolkit.test_settings ${TEST_LIST}
