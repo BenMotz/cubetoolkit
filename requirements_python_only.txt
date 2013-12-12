@@ -13,4 +13,5 @@ pytz
 south
 # for easy_thumbnails:
 six
-
+# For generating non-html copy for mailout etc:
+html2text

@@ -1,6 +1,8 @@
 import re
 import logging
-import os.path
+
+import html2text
+import HTMLParser
 
 from django.db import models
 from django.conf import settings
@@ -241,6 +243,21 @@ class Event(models.Model):
             result = self._link_re_2.sub(r'\1<a href="http://\2">\2</a>', result)
 
             return mark_safe(result)
+
+    @property
+    def copy_plaintext(self):
+        """Return copy suitable for text only use (i.e. member's mailout)"""
+
+        if self.legacy_copy:
+            # Don't do a general HTML conversion, but convert any entities to
+            # unicode:
+            text = HTMLParser.HTMLParser().unescape(self.copy)
+        else:
+            # Use html2text library to do a quick and happy conversion to
+            # plain text; http://www.aaronsw.com/2002/html2text/
+            text = html2text.html2text(self.copy)
+
+        return mark_safe(text)
 
 
 class ShowingQuerySet(QuerySet):

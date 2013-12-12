@@ -12,7 +12,7 @@ http://www.cubecinema.com{% url "default-view" %}
 
 {% for showing in showing.event.showings.public %}{{ showing.start|date:"H:i d/m/Y" }}
 {% endfor %}
-{{ showing.event.copy }}
+{{ showing.event.copy_plaintext }}
 {% endifchanged %}{% endfor %}--
 
 Cube Cinema Microplex
