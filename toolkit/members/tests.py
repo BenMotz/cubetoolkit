@@ -948,11 +948,9 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertContains(response, "http://1.foo.test/")
 
         self.assertContains(response, "<title>Edit Volunteer Volunteer One</title>")
-        # Actually a bug? Don't think so, but...
         self.assertContains(response,
-                            '<a href="http://toolkit/tmp/path/to/portrait">'
-                            '<img src="http://toolkit/tmp/path/to/thumb" border="0" width="75"></a>',
-                            html=True)
+                            '<a href="/tmp/path/to/portrait">',
+                            html=False)
 
     def test_get_form_add(self):
         url = reverse("add-volunteer")
