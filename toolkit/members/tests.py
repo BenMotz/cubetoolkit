@@ -948,7 +948,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertContains(response, "http://1.foo.test/")
 
         self.assertContains(response, "<title>Edit Volunteer Volunteer One</title>")
-
+        # Actually a bug? Don't think so, but...
         self.assertContains(response,
                             '<a href="http://toolkit/tmp/path/to/portrait">'
                             '<img src="http://toolkit/tmp/path/to/thumb" border="0" width="75"></a>',
@@ -1241,9 +1241,6 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         # Get new image to send:
         new_jpg_filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), "test_data", "image_bluesq.jpg")
 
-        # XXX do this properly:
-        os.mkdir(os.path.join('/tmp', settings.VOLUNTEER_PORTRAIT_PREVIEW_DIR))
-
         with open(new_jpg_filename, "rb") as new_jpg_file:
             # Post an edit to update the image:
             url = reverse("edit-volunteer", kwargs={"volunteer_id": 1})
@@ -1267,7 +1264,6 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
 
         # XXX do this properly:
         shutil.rmtree(os.path.join('/tmp', settings.VOLUNTEER_PORTRAIT_DIR))
-        shutil.rmtree(os.path.join('/tmp', settings.VOLUNTEER_PORTRAIT_PREVIEW_DIR))
 
 
 class TestMemberMailoutTask(MembersTestsMixin, TestCase):
