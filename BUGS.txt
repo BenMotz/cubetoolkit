@@ -4,8 +4,8 @@
 [TODO] -- do JS close of popup using a redirect?
 [TODO] -- code to sync remote images/media to local
 
-[BUG] -- Make sure text wraps properly in mailout, once wrapping on edit page no longer
-         enforces 80 columns...
+[BUG] -- Automatic linkifying of programme copy should detect https as URLs
+[BUG] -- html2text not in the requirements files
 [BUG] -- make more forms redirect after submit, to avoid reload adding duplicates (done for members)
 [BUG] -- handle errors for saving Event details if image and image is missing
 [QUERY] -- Should cancelled events appear in the mailout by default?
