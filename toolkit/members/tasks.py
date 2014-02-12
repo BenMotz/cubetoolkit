@@ -104,9 +104,8 @@ def send_mailout(subject, body):
     err_list = []
 
     # XXX XXX XXX
-    # DELETE THE FOLLOWING LINE IF YOU WANT TO TRY EMAILING FOR REALSIES
-    # XXX XXX XXX
-    return (True, 0, 'DISABLED UNTIL READY')
+    # Uncomment the following line if you want to disable mailout for testing
+    # return (True, 0, 'DISABLED UNTIL READY')
 
     try:
         for recipient in recipients:
