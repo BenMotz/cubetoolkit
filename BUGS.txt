@@ -5,11 +5,11 @@
 [TODO] -- code to sync remote images/media to local
 
 [BUG] -- Automatic linkifying of programme copy should detect https as URLs
-[BUG] -- html2text not in the requirements files
 [BUG] -- make more forms redirect after submit, to avoid reload adding duplicates (done for members)
 [BUG] -- handle errors for saving Event details if image and image is missing
 [QUERY] -- Should cancelled events appear in the mailout by default?
 
+[DONE] -- html2text not in the requirements files
 [DONE] -- New 'import' script to dump and import DB from live for devserver
 [DONE] -- result count in member search?
 [DONE] -- default days ahead for edit view -> 90 days
