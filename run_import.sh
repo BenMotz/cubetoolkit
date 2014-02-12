@@ -15,6 +15,9 @@ IMPORT_ROOT=$SITE_ROOT/import_script
 
 cd $SITE_ROOT
 
+echo "Site is now live! Use the 'sync to live site' script instead!"
+exit 0
+
 pushd $IMPORT_ROOT/
 echo "Rsyncing data off sparror"
 ./get_data.sh
