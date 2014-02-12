@@ -27,6 +27,7 @@ var wysihtml5ParserRules = {
       check_attributes: {
         href:   "url" // important to avoid XSS
       }
-    }
+    },
+    iframe: {}
   }
 };
