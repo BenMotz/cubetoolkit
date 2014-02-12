@@ -3,12 +3,24 @@
 import django.contrib.auth.models as auth_models
 import django.contrib.contenttypes as contenttypes
 
+def get_password():
+    print "*" * 80
+    password = raw_input("Please enter string to use as admin password: ")
+    check_password = None
+
+    while check_password != password:
+        print
+        check_password = raw_input("Please re-enter for confirmation: ")
+
+    return password
+
 
 def main():
     # Read only user:
-    # auth_models.User.objects.create_user('cube', 'toolkit_admin_readonly@localhost', '***REMOVED***')
+    # auth_models.User.objects.create_user('cube', 'toolkit_admin_readonly@localhost', '********')
     # Read/write user:
-    user_rw = auth_models.User.objects.create_user('admin', 'toolkit_admin@localhost', '***REMOVED***')
+    cube_password = get_password()
+    user_rw = auth_models.User.objects.create_user('admin', 'toolkit_admin@localhost', cube_password)
     # Create dummy ContentType:
     ct = contenttypes.models.ContentType.objects.get_or_create(
         model='',
