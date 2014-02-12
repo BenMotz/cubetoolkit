@@ -240,7 +240,6 @@ INSTALLED_APPS = (
 
     # Django databaes migration tool:
     'south',
-    'django.contrib.markup',
 
     # Enabled use of database as 'message bus' to celery:
     'kombu.transport.django',

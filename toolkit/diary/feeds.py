@@ -1,7 +1,5 @@
 import datetime
 
-import markdown
-
 from django.contrib.syndication.views import Feed
 from django.core.urlresolvers import reverse
 import django.utils.timezone as timezone
@@ -32,7 +30,7 @@ class BasicWhatsOnFeed(Feed):
         return showing.event.name
 
     def item_description(self, showing):
-        description = showing.start.strftime("%d/%m/%Y %H:%M<br><br>") + markdown.markdown(showing.event.copy)
+        description = showing.start.strftime("%d/%m/%Y %H:%M<br><br>") + showing.event.copy_html
         return description
 
     def item_link(self, showing):

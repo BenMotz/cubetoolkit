@@ -1,6 +1,5 @@
 {% extends "base.html" %}
 {% load hash_filter %}
-{% load markup %}
 
 {% block title %}
 Editing {{ event_list_name }}
@@ -43,6 +42,9 @@ Editing {{ event_list_name }}
       position: absolute;
       top: 0;
       right: 10px;
+  }
+  .ideas {
+      white-space: pre-line;
   }
 </style>
 {% endblock %}
@@ -130,7 +132,7 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
     {% ifchanged %}<tr class="row_month"><td><h2>{{ day|date:"F" }}</h2></td><td colspan="3"></td></tr></tr>
     {% endifchanged %}
     {% if day in ideas %}
-    <tr><td><a href="{% url "edit-ideas" year=day.year month=day.month %}">IDEAS</a></td><td colspan="3">{{ ideas|lookup:day|markdown }}</td></tr>
+    <tr><td><a href="{% url "edit-ideas" year=day.year month=day.month %}">IDEAS</a></td><td colspan="3" class="ideas">{{ ideas|lookup:day }}</td></tr>
     {% endif %}
     <tr class="row_day"><td class="cell_day"><a href="{% url "add-event" %}?date={{day|date:"j-m-Y"}}">{{ day|date:"D"}}&nbsp;{{ day|date:"j" }}</a></td>
 
