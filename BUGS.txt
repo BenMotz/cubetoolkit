@@ -4,6 +4,7 @@
 [TODO] -- do JS close of popup using a redirect?
 [TODO] -- code to sync remote images/media to local
 
+[BUG] -- iframes / youtube links in wysihtml5 are totes borked
 [BUG] -- Automatic linkifying of programme copy should detect https as URLs
 [BUG] -- make more forms redirect after submit, to avoid reload adding duplicates (done for members)
 [BUG] -- handle errors for saving Event details if image and image is missing
