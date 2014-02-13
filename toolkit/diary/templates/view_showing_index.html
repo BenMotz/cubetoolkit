@@ -41,7 +41,7 @@ Nothing on between {{ start|date:"l j M Y"  }} and {{ end|date:"l j M Y" }}
         <tr><td>&nbsp;</td>
     {% endifchanged %}
     <td class="cell_time">{{showing.start|date:"H:i"}}</td><td class="table_gap">&nbsp;</td>
-    <td class="cell_event"><a href="#event_{{showing.event.id}}">{% if showing.discounted %}<span class="discounted">{% endif %}{% if showing.cancelled %}<span class="cancelled">{% endif %}{{ showing.event.name|capfirst }}{% if showing.cancelled %} (CANCELLED) </span>{% endif %}{% if showing.discounted %} {% if showing.start.weekday == 1 %}(<abbr title="Ticket Tout Tuesday">TTT</abbr>){% else %}(Discount){% endif %}</span>{% endif %}</a></td></tr>
+    <td class="cell_event"><a href="#event_{{showing.event.id}}">{% if showing.discounted %}<span class="discounted">{% endif %}{% if showing.cancelled %}<span class="cancelled">{% endif %}{{ showing.event.name|capfirst }}{% if showing.cancelled  and not "cancelled" in showing.event.name.lower %} (CANCELLED) </span>{% endif %}{% if showing.discounted %} {% if showing.start.weekday == 1 %}(<abbr title="Ticket Tout Tuesday">TTT</abbr>){% else %}(Discount){% endif %}</span>{% endif %}</a></td></tr>
 {% endfor %}
 
 </table>

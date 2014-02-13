@@ -19,7 +19,7 @@
     {% if showing.discounted %}<span class="discounted">{{ showing.start }} <abbr title="Ticket Tout Tuesday">TTT</abbr></span>
     {% else %}
     {{ showing.start }} {% endif %}
-    {% if showing.cancelled %}</span>{% endif %}<br>
+    {% if showing.cancelled %} (cancelled)</span>{% endif %}<br>
 {% endfor %}
 </p>
 
