@@ -26,8 +26,8 @@ def get_date_range(year, month, day, user_days_ahead, default_days_ahead=30):
                      .format(day, month, year))
         return (None, "Invalid values")
 
-    logger.debug("Range: day %s, month %s, year %s, span %s days",
-                 str(day), str(month), str(year), str(user_days_ahead))
+    #logger.debug("Range: day %s, month %s, year %s, span %s days",
+    #             str(day), str(month), str(year), str(user_days_ahead))
 
     current_tz = django.utils.timezone.get_current_timezone()
 
