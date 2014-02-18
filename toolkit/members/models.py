@@ -1,6 +1,7 @@
 import os.path
 import PIL.Image
 import logging
+import binascii
 
 import django.db  # Used for raw query for stats
 from django.conf import settings
@@ -106,10 +107,28 @@ class Member(models.Model):
         result = super(Member, self).save(*args, **kwargs)
 
         if set_number:
-            self.number = str(self.pk)
+            self.number = self._generate_membership_number()
             self.save()
 
         return result
+
+    def _generate_membership_number(self):
+        membership_no = "?"
+
+        if not self.pk:
+            # No private key! Use a hash of the name:
+            logger.error("Trying to generate membership number without a private key."
+                         " Falling back to hash of name.")
+            membership_no = binascii.crc32(self.name) & 0xffffffff
+        else:
+            offset = 0
+            # If private key is already in use as a membership number try multiples of
+            # 100000 higher...
+            while Member.objects.filter(number=str(self.pk + offset)).count():
+                offset += 100000
+            membership_no = str(self.pk + offset)
+
+        return membership_no
 
 #    weak_email_validator = re.compile("""\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b""")
 #    def weak_validate_email(self):

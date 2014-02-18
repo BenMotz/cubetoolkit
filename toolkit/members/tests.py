@@ -182,6 +182,57 @@ class TestMemberModelManager(MembersTestsMixin, TestCase):
             self.assertFalse(member.mailout_failed)
             self.assertTrue(member.email)
 
+
+class TestMemberModel(TestCase):
+    def setUp(self):
+        member_one = Member(name="Member One", number="1", email="one@example.com")
+        member_one.save()
+
+    def test_membership_number_no_existing(self):
+        new_member = Member(name="Member two", email="two@example.com")
+        new_member.save()
+        self.assertEqual(str(new_member.pk), new_member.number)
+
+    def test_membership_number_exists(self):
+        old_member = Member.objects.get(id=1)
+        old_member.number = "2"
+        old_member.save()
+
+        new_member = Member(name="Member two", email="two@example.com")
+        new_member.save()
+        self.assertEqual("100002", new_member.number)
+
+    def test_membership_number_exists_twice(self):
+        old_member = Member.objects.get(id=1)
+        old_member.number = "3"
+        old_member.save()
+
+        new_member_one = Member(name="Member two", email="two@example.com")
+        new_member_one.save()
+        new_member_one.number = "100003"
+        new_member_one.save()
+
+        new_member_two = Member(name="Member two", email="two@example.com")
+        new_member_two.save()
+        self.assertEqual("200003", new_member_two.number)
+
+    def test_membership_number_custom(self):
+        new_member = Member(name="Member two", email="two@example.com")
+        new_member.number = "Orange squash"
+        new_member.save()
+
+        new_member = Member.objects.get(id=new_member.pk)
+        self.assertEqual(new_member.number, "Orange squash")
+
+    def test_membership_number_custom_edit(self):
+        old_member = Member.objects.get(id=1)
+        old_member.number = "Orange squash"
+        old_member.save()
+
+        old_member = Member.objects.get(id=1)
+        self.assertEqual(old_member.number, "Orange squash")
+
+
 class TestVolunteerEditViews(MembersTestsMixin, TestCase):
 
     def setUp(self):
