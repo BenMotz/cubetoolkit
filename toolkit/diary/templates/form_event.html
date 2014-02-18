@@ -59,7 +59,7 @@ Details for: {{ event.name }}
         font-weight: bold;
     }
     /* Collection of hacky CSS for WYSIHTML5 copy editor: */
-    div.wysihtml5_django_wrapper {
+    div.ckeditor_django_wrapper {
         border: thin solid #d0d0d0;
         padding-left: 16%;
         background-color: #d0d0d0;
@@ -71,38 +71,6 @@ Details for: {{ event.name }}
       height: 280px;
       font-family: Verdana;
       font-size: 11px;
-    }
-    #toolbar-id_copy {
-        background-color: #f0f0f0;
-        font-family: Verdana;
-        font-size: 12px;
-        padding: 4px 0;
-        margin: 4px;
-        border: thin solid gray;
-        border-radius: 3px;
-        width: 71%;
-        text-align: center;
-    }
-    #toolbar-id_copy div {
-        width: auto;
-        border: none;
-
-    }
-    /* Clear inherited styles */
-    #toolbar-id_copy div label{
-        display: inline;
-        float: none;
-    }
-    /* OK / Cancel buttons on link edit */
-    #toolbar-id_copy div a {
-        border: thin solid black;
-        border-radius: 3px;
-        padding: 2px 3px;
-        color: black:;
-        background-color: #d0d0d0;
-        font-family: sans;
-        font-size: 12px;
-        cursor: default;
     }
 
 </style>

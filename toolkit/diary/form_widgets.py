@@ -8,66 +8,36 @@ from django.utils.encoding import force_unicode
 
 class HtmlTextarea(forms.Textarea):
     """TextArea widget overloaded to provide a wysiwyg HTML editor, using the
-    'wysihtml5' editor
+    'CKEditor' editor
     """
     class Media(object):
         # Define media (CSS & JS) used by this control. To include this
         # automatically the template containing the form must have the
         # {{ form.media }} tag
-        css = {
-            'all': ('css/lib/wysihtml5.css',),
-        }
         js = (
-            'js/lib/wysihtml5/parser_rules/simple.js',
-            'js/lib/wysihtml5/wysihtml5-0.3.0.min.js',
+            'js/lib/ckeditor/ckeditor.js',
         )
-
-    # Commands available in the editor's toolbar:
-    toolbar_commands = (
-        # Pair of editor command / toolbar html
-        ('bold', 'Bold'),
-        ('italic', 'Italic'),
-        ('strikethrough', 'Strikethrough'),
-        ('superscript', 'Superscript'),
-        ('subscript', 'Subscript'),
-        ('createLink', 'Insert link'),
-        ('insertUnorderedList', 'insertUnorderedList'),
-        ('insertOrderedList', 'insertOrderedList'),
-    )
 
     # Generate HTML for the editor control:
     def render(self, name, value, attrs=None):
         if value is None:
             value = ''
+
         final_attrs = self.build_attrs(attrs, name=name)
 
-        output = [u"<div class='wysihtml5_django_wrapper'><div id='toolbar-{0}' style='display:none;'>"
-                  .format(final_attrs['id']), ]
-        output.extend(
-            u"<a data-wysihtml5-command='{0}'>{1}</a> | "
-            .format(cmd, cmdhtml) for (cmd, cmdhtml) in self.toolbar_commands
-        )
-        output.append(
-            "<a data-wysihtml5-action='change_view'>View HTML</a>"
-            "<div data-wysihtml5-dialog='createLink' style='display: none;'>"
-            "  <label>Link: <input data-wysihtml5-dialog-field='href' value='http://'></label>"
-            "  <a data-wysihtml5-dialog-action='save'>OK</a>&nbsp;<a data-wysihtml5-dialog-action='cancel'>Cancel</a>"
-            "</div>"
-            "</div>"
-        )
-        output.append(u'<textarea{0}>{1}</textarea>'.format(
-            flatatt(final_attrs),
-            conditional_escape(force_unicode(value))
-        ))
-        output.append(
-            u"</div>"
-            "<script type='text/javascript'>"
-            " var editor = new wysihtml5.Editor('{0}', {{"
-            "   toolbar:      'toolbar-{0}',"
-            "   parserRules:  wysihtml5ParserRules"
-            " }});"
-            "</script>".format(final_attrs['id'])
-        )
+        output = [
+            u"<div class='ckeditor_django_wrapper'>",
+            u'<textarea{0}>{1}</textarea>'.format(
+                flatatt(final_attrs),
+                conditional_escape(force_unicode(value))
+            ),
+            u"</div>",
+            u"<script type='text/javascript'>",
+            u" CKEDITOR.replace('{0}');".format(
+                final_attrs['id']
+            ),
+            u"</script>",
+        ]
 
         return mark_safe(u'\n'.join(output))
 
