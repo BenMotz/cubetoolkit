@@ -814,6 +814,7 @@ def rota_edit(request):
             'end_date': end_date,
             'days_ahead': days_ahead,
             'showings': showings,
+            'placeholder_text': 'Click to edit',
         }
 
         return render(request, u'edit_rota.html', context)
