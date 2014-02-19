@@ -10,7 +10,19 @@ REQUIREMENTS_DEV=requirements_development.txt
 
 set -e
 
-virtualenv $VENV_PATH --system-site-packages
+VIRTUALENV_MAJOR_VERSION=$(virtualenv --version | cut --delimiter=. -f 1)
+VIRTUALENV_MINOR_VERSION=$(virtualenv --version | cut --delimiter=. -f 2)
+
+# Virtualenv changed their interface in a breaking way at v1.7: (idiots)
+if [ $VIRTUALENV_MAJOR_VERSION -eq 1 ] && [ $VIRTUALENV_MINOR_VERSION -lt 7 ] ; then
+    VIRTUALENV_OPTIONS=""
+else
+    VIRTUALENV_OPTIONS="--system-site-packages"
+fi
+
+virtualenv $VENV_PATH $VIRTUALENV_OPTIONS
+
 source $VENV_PATH/bin/activate
+
 pip install --requirement $REQUIREMENTS_FILE
 pip install --requirement $REQUIREMENTS_DEV
