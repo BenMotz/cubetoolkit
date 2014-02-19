@@ -423,8 +423,8 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertContains(response, u'<p>Event <br> two <br> copy</p>', html=True)
         self.assertEqual(response.status_code, 200)
         # Some showings *should* be listed:
-        self.assertContains(response, "Tue 2 Apr, 7 p.m.")
-        self.assertContains(response, "Wed 3 Apr, 7 p.m.")
+        self.assertContains(response, "Tue 2nd Apr, 7 p.m.")
+        self.assertContains(response, "Wed 3rd Apr, 7 p.m.")
         # Some showings should *not* be listed:
         self.assertNotContains(response, "1 Apr")
         self.assertNotContains(response, "4 Apr")
