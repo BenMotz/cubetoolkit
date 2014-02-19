@@ -89,6 +89,7 @@ def view(request, member_id):
 @require_POST
 def delete_member(request, member_id):
     member = get_object_or_404(Member, id=member_id)
+    logger.info(u"Deleting member '{0}'".format(member.name))
     member.delete()  # This will delete associated volunteer record, if any
     messages.add_message(request, messages.SUCCESS, u"Deleted member: {0} ({1})".format(member.number, member.name))
 
