@@ -300,6 +300,7 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
             u"name": new_name,
             u"email": u"blah.blah-blah@hard-to-tell-if-genuine.uk",
             u"postcode": "SW1A 1AA",
+            u"mailout": "on",
         }, follow=True)
 
         self.assertRedirects(response, url)
@@ -308,6 +309,27 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
         member = Member.objects.get(name=new_name)
         self.assertEqual(member.email, u"blah.blah-blah@hard-to-tell-if-genuine.uk")
         self.assertEqual(member.postcode, u"SW1A 1AA")
+        self.assertEqual(member.mailout, True)
+
+        self.assertContains(response, u"Added member: {0}".format(member.number))
+
+    def test_post_minimal_submission(self):
+        new_name = u"Another New \u20acejit"
+
+        self.assertEqual(Member.objects.filter(name=new_name).count(), 0)
+
+        url = reverse("add-member")
+        response = self.client.post(url, data={
+            u"name": new_name,
+        }, follow=True)
+
+        self.assertRedirects(response, url)
+        self.assertTemplateUsed(response, "form_new_member.html")
+
+        member = Member.objects.get(name=new_name)
+        self.assertEqual(member.email, u"")
+        self.assertEqual(member.postcode, u"")
+        self.assertEqual(member.mailout, False)
 
         self.assertContains(response, u"Added member: {0}".format(member.number))
 
