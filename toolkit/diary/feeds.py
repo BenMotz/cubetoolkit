@@ -35,4 +35,4 @@ class BasicWhatsOnFeed(Feed):
 
     def item_link(self, showing):
         # Add the showing ID at the end to ensure that this link is unique (cf. RSS spec)
-        return reverse("single-event-view", kwargs={'event_id': showing.event_id}) + "#" + str(showing.pk)
+        return reverse("single-event-view", kwargs={'event_id': showing.event_id})
