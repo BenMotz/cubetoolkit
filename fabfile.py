@@ -21,9 +21,9 @@ def _assert_target_set():
 def staging():
     """Configure to deploy to staging server"""
     env.target = "staging"
-    env.site_root = "/var/www_toolkit/site"
-    env.user = "ben"
-    env.hosts = ["localhost"]
+    env.site_root = "/home/staging/site"
+    env.user = "staging"
+    env.hosts = ["sparror.cubecinema.com"]
     env.settings = "staging_settings.py"
 
 
