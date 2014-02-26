@@ -66,7 +66,8 @@ def deploy_code():
 
             # Configure the correct settings file.
             run("rm -f toolkit/settings.py?")
-            run("ln -s {0} toolkit/settings.py".format(env.settings))
+            run("ln -s {0} toolkit/settings.py"
+                .format(os.path.join(env.site_root, env.settings)))
 
 
 def deploy_static():
@@ -78,7 +79,7 @@ def deploy_static():
         utils.puts("Running collectstatic (pwd is '{0}')".format(run("pwd")))
         static_path = os.path.join(env.site_root, "static")
         run("rm -rf {0}".format(static_path))
-        run("venv/bin/python manage.py collectstatic --noinput --settings=toolkit.import_settings")
+        run("venv/bin/python manage.py collectstatic --noinput")
 
 
 def deploy_media():
@@ -89,6 +90,15 @@ def deploy_media():
     local('rsync -av --delete media/ {0}@{1}:{2}/media'.format(env.user, env.hosts[0], env.site_root))
 
 
+def sync_database():
+    """Run basic database sync - won't touch tables that are being managed by south"""
+    _assert_target_set()
+
+    with cd(env.site_root):
+        utils.puts("Running syncdb")
+        run("venv/bin/python manage.py syncdb --noinput")
+
+
 def run_migrations():
     """Run south to make sure database schema is in sync with the application"""
 
@@ -96,7 +106,7 @@ def run_migrations():
 
     with cd(env.site_root):
         utils.puts("Running database migrations")
-        run("venv/bin/python manage.py migrate --noinput --settings=toolkit.import_settings")
+        run("venv/bin/python manage.py migrate --noinput")
 
 
 def install_requirements(upgrade=False):
@@ -200,4 +210,5 @@ def deploy():
     install_requirements()
 
     deploy_static()
+    sync_database()
     run_migrations()
