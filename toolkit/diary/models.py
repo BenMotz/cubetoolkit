@@ -238,7 +238,7 @@ class Event(models.Model):
             # Now replace all new lines with a single line break;
             result = result.replace('\n', ' <br>\n')
 
-            # Attempt to magically convert any links to markdown:
+            # Attempt to magically convert any links to HTML markup:
             result = self._link_re_1.sub(r'<a href="\1">\1</a>', result)
             result = self._link_re_2.sub(r'\1<a href="http://\2">\2</a>', result)
 
@@ -255,7 +255,12 @@ class Event(models.Model):
         else:
             # Use html2text library to do a quick and happy conversion to
             # plain text; http://www.aaronsw.com/2002/html2text/
+
+            # Don't try to substitute ASCII characters for unicode ones:
+            html2text.UNICODE_SNOB = True
             text = html2text.html2text(self.copy)
+            # Convert links from markdown format to just the URL:
+            text = re.sub(r'\[.*?\]\((https?://.*?)\)', r'\1', text, flags=re.DOTALL)
 
         return mark_safe(text)
 
