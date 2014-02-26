@@ -137,8 +137,9 @@ def bootstrap():
     else:
         run("virtualenv --system-site-packages {0}".format(venv_path))
 
-    # Now run deployment, as normal
-    deploy()
+    utils.puts("\nRemote site is prepared. Now copy the settings file to '{0}/{1}'"
+               " and run the 'deploy' command from this fabric file."
+               .format(env.site_root, env.settings))
 
 
 def _fetch_database_dump(dump_filename):

@@ -91,17 +91,6 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'toolkit',
-        'USER': 'toolkit',
-        'PASSWORD': 'Kr3QejhDb7amDwf',
-        'HOST': '',  # Set to empty string for localhost.
-        'PORT': '',  # Set to empty string for default.
-    }
-}
-
 ## Authorisation related settings:
 LOGIN_URL = django.core.urlresolvers.reverse_lazy('login')
 
@@ -149,7 +138,7 @@ MEDIA_ROOT = os.path.join(APP_ROOT_DETECTED, 'media')
 ## URL that handles the media served from MEDIA_ROOT. Make sure to use a
 ## trailing slash.
 ## Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
-#MEDIA_URL = '/media/'
+MEDIA_URL = '/media/'
 #
 ## Absolute path to the directory static files should be collected to.
 ## Don't put anything in this directory yourself; store your static files
@@ -184,9 +173,6 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
     # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
-
-# Make this unique, and don't share it with anybody.
-SECRET_KEY = 's62e_vyvEh+asx_v!85p&r*9n$46_8w3q%51*ceg=-zcnd9mhu'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -274,7 +260,7 @@ LOGGING = {
             'class': 'logging.handlers.RotatingFileHandler',  # really?
             'formatter': 'verbose',
             # Args:
-            'filename': '/var/log/cubetoolkit/debug.log',
+            'filename': 'debug.log',  # overridden in other settings files
             'mode': 'a',
             'maxBytes': 10485760,
             'backupCount': 5,
