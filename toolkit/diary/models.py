@@ -210,7 +210,7 @@ class Event(models.Model):
     _wrap_re = re.compile(r'(.{70,})\n')
     _lotsofnewlines_re = re.compile(r'\n\n+')
     # Catch well-formatted links (ie. beginning http://)
-    _link_re_1 = re.compile(r'(http:\/\/\S{4,})')
+    _link_re_1 = re.compile(r'(https?:\/\/\S{4,})')
     # Optimistic stab at spotting other things that are probably links, based on
     # a smattering of TLDs:
     _link_re_2 = re.compile(r'(\s)(www\.[\w.]+\.(com|org|net|uk|de|ly|us|tk)[^\t\n\r\f\v\. ]*)')

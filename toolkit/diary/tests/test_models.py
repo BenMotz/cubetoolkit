@@ -5,7 +5,7 @@ from datetime import datetime
 
 from django.test import TestCase
 
-from toolkit.diary.models import Showing
+from toolkit.diary.models import Showing, Event
 
 from .common import DiaryTestsMixin
 
@@ -76,3 +76,72 @@ class ShowingModelCustomQueryset(DiaryTestsMixin, TestCase):
             self.assertTrue(showing.start < end)
             self.assertTrue(showing.start > start)
             self.assertTrue(showing.confirmed)
+
+
+class EventModelNonLegacyCopy(TestCase):
+
+    def setUp(self):
+        self.sample_copy = (
+            u"<p>Simple &amp; tidy HTML/unicode \u00a9\u014dpy\n</p>\n"
+            u"<p>With a <a href='http://example.com/foo/'>link!</a>"
+            u"<p>And another! <a href='https://example.com/bar/'>link!</a>"
+            u" and some equivalent things; &pound; &#163; \u00a3<br></p>"
+        )
+        self.event = Event(name="Test event", legacy_copy=False, copy=self.sample_copy)
+        self.event.save()
+
+    def test_simple(self):
+        # Test copy goes in and out without being mangled
+        reloaded = Event.objects.get(id=self.event.pk)
+        self.assertEqual(reloaded.copy, self.sample_copy)
+
+    def test_html_copy(self):
+        self.assertEqual(self.event.copy_html, self.sample_copy)
+
+    def test_plaintext_copy(self):
+        expected = (
+            u"Simple & tidy HTML/unicode \u00a9\u014dpy\n\n"
+            u"With a http://example.com/foo/\n\n"
+            u"And another! https://example.com/bar/"
+            # The extra \n after the first two \xa3 is from the line wrapping:
+            u" and some equivalent things; \u00a3 \u00a3\n\u00a3\n\n"
+        )
+        self.assertEqual(self.event.copy_plaintext, expected)
+
+class EventModelLegacyCopy(TestCase):
+
+    def setUp(self):
+        self.sample_copy = (
+            u"Simple &amp; tidy legacy \u00a9\u014dpy\n\n"
+            u"With an unardorned link: http://example.com/foo/"
+            u" https://example.com/foo/"
+            u" and some equivalent things; &pound; &#163; \u00a3..."
+            u" and <this> \"'<troublemaker>'\""
+        )
+        self.event = Event(name="Test event", legacy_copy=True, copy=self.sample_copy)
+        self.event.save()
+
+    def test_simple(self):
+        # Test copy goes in and out without being mangled
+        reloaded = Event.objects.get(id=self.event.pk)
+        self.assertEqual(reloaded.copy, self.sample_copy)
+
+    def test_html_copy(self):
+        expected = (
+            u"Simple &amp; tidy legacy \u00a9\u014dpy <br><br>"
+            u'With an unardorned link: <a href="http://example.com/foo/">http://example.com/foo/</a>'
+            u' <a href="https://example.com/foo/">https://example.com/foo/</a>'
+            u" and some equivalent things; &pound; &#163; \u00a3..."
+            u" and <this> \"'<troublemaker>'\""
+        )
+        self.assertEqual(self.event.copy_html, expected)
+
+    def test_plaintext_copy(self):
+        expected = (
+            u"Simple & tidy legacy \u00a9\u014dpy\n\n"
+            u"With an unardorned link: http://example.com/foo/"
+            u" https://example.com/foo/"
+            u" and some equivalent things; \u00a3 \u00a3 \u00a3..."
+            u" and <this> \"'<troublemaker>'\""
+        )
+        self.assertEqual(self.event.copy_plaintext, expected)
