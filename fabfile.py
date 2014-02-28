@@ -176,8 +176,13 @@ def _fetch_database_dump(dump_filename):
                 dump_file_path=dump_file_path,
                 deploy_script_settings=env.deploy_script_settings
                 ))
-        get(dump_file_path, local_path=dump_filename)
-        run("rm {0}".format(dump_file_path))
+        run("gzip {dump_file_path} -c > {dump_file_path}.gz".format(
+            dump_file_path=dump_file_path
+            ))
+        get(dump_file_path + ".gz", local_path=dump_filename + ".gz")
+        run("rm {0} {0}.gz".format(dump_file_path))
+
+        local("gunzip {0}.gz".format(dump_filename))
 
 
 def _load_database_dump(dump_filename):
