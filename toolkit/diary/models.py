@@ -260,7 +260,7 @@ class Event(models.Model):
             html2text.UNICODE_SNOB = True
             text = html2text.html2text(self.copy)
             # Convert links from markdown format to just the URL:
-            text = re.sub(r'\[.*?\]\((https?://.*?)\)', r'\1', text, flags=re.DOTALL)
+            text = re.sub(r'\[(.*?)\]\((https?://.*?)\)', r'\1: \2', text, flags=re.DOTALL)
 
         return mark_safe(text)
 
