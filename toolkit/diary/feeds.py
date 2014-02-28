@@ -13,7 +13,7 @@ class BasicWhatsOnFeed(Feed):
     DAYS_AHEAD = 7
     title = "Cube cinema forthcoming events"
     description = "Events at the cube cinema over the next %d days. E&OE." % (DAYS_AHEAD, )
-    link = "/diary"
+    link = "/programme"
 
     def items(self):
         startdate = timezone.now()
