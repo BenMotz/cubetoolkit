@@ -25,6 +25,10 @@ def staging():
     env.user = "staging"
     env.hosts = ["sparror.cubecinema.com"]
     env.settings = "staging_settings.py"
+    # For running manage.py commands use this settings file; this is mostly
+    # so that a different logfile can be set, as the deploy user may not have
+    # permission to access the normal log file
+    env.deploy_script_settings = "toolkit.deploy_settings"
 
 
 def production():
@@ -34,6 +38,8 @@ def production():
     env.user = "toolkit"
     env.hosts = ["sparror.cubecinema.com"]
     env.settings = "live_settings.py"
+    # See note above:
+    env.deploy_script_settings = "toolkit.deploy_settings"
 
 
 def deploy_code():
@@ -62,7 +68,9 @@ def deploy_code():
             utils.puts("Deleting {0}".format(target))
             run("rm -rf {0}".format(target))
             utils.puts("Extracting {0}".format(archive))
-            run("tar -xzf {0}".format(archive))
+            # Untar with -m to avoid trying to utime /media directories that
+            # may be owned by the webserver (which then fails)
+            run("tar -m -xzf {0}".format(archive))
 
             # Configure the correct settings file.
             run("rm -f toolkit/settings.py?")
@@ -79,7 +87,8 @@ def deploy_static():
         utils.puts("Running collectstatic (pwd is '{0}')".format(run("pwd")))
         static_path = os.path.join(env.site_root, "static")
         run("rm -rf {0}".format(static_path))
-        run("venv/bin/python manage.py collectstatic --noinput")
+        run("venv/bin/python manage.py collectstatic --noinput --settings={0}"
+            .format(env.deploy_script_settings))
 
 
 def deploy_media():
@@ -96,7 +105,8 @@ def sync_database():
 
     with cd(env.site_root):
         utils.puts("Running syncdb")
-        run("venv/bin/python manage.py syncdb --noinput")
+        run("venv/bin/python manage.py syncdb --noinput --settings={0}"
+            .format(env.deploy_script_settings))
 
 
 def run_migrations():
@@ -106,7 +116,8 @@ def run_migrations():
 
     with cd(env.site_root):
         utils.puts("Running database migrations")
-        run("venv/bin/python manage.py migrate --noinput")
+        run("venv/bin/python manage.py migrate --noinput --settings={0}"
+            .format(env.deploy_script_settings))
 
 
 def install_requirements(upgrade=False):
@@ -161,8 +172,9 @@ def _fetch_database_dump(dump_filename):
         dump_file_path = os.path.join(env.site_root, dump_filename)
 
         run("venv/bin/python manage.py mysqldump_database {dump_file_path} "
-            "--settings=toolkit.import_settings".format(
-                dump_file_path=dump_file_path
+            "--settings={deploy_script_settings}".format(
+                dump_file_path=dump_file_path,
+                deploy_script_settings=env.deploy_script_settings
                 ))
         get(dump_file_path, local_path=dump_filename)
         run("rm {0}".format(dump_file_path))
