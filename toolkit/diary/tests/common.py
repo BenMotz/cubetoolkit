@@ -183,13 +183,13 @@ class DiaryTestsMixin(object):
 
         # When the clock is patched to claim that it's 1/6/2013, this showing
         # will be in the future:
-        s3 = Showing(
+        self.e4s3 = Showing(
             start=pytz.timezone("Europe/London").localize(datetime(2013, 6, 9, 18, 00)),
             event=e4,
             booked_by=u"\u0102nother \u0170ser",
             confirmed=True
         )
-        s3.save(force=True)  # Force start date in the past
+        self.e4s3.save(force=True)  # Force start date in the past
 
         s4 = Showing(
             start=pytz.timezone("Europe/London").localize(datetime(2013, 9, 14, 18, 00)),
@@ -226,7 +226,7 @@ class DiaryTestsMixin(object):
         RotaEntry(showing=s2, role=r1, rank=4).save()
         RotaEntry(showing=s2, role=r1, rank=5).save()
         RotaEntry(showing=s2, role=r1, rank=6).save()
-        RotaEntry(showing=s3, role=r2, rank=1).save()
+        RotaEntry(showing=self.e4s3, role=r2, rank=1).save()
 
         # Ideas:
         i = DiaryIdea(

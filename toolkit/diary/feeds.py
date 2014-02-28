@@ -18,12 +18,11 @@ class BasicWhatsOnFeed(Feed):
     def items(self):
         startdate = timezone.now()
         enddate = startdate + datetime.timedelta(days=self.DAYS_AHEAD)
-        showings = (Showing.objects.filter(confirmed=True)
-                                   .filter(hide_in_programme=False)
-                                   .filter(start__range=[startdate, enddate])
-                                   .filter(event__private=False)
-                                   .order_by('start')
-                                   .select_related())
+        showings = (Showing.objects.public()
+                               .start_in_range(startdate, enddate)
+                               .order_by('start')
+                               .select_related()
+                               .select_related())
         return showings.all()
 
     def item_title(self, showing):
