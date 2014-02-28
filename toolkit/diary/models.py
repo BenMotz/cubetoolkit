@@ -244,6 +244,10 @@ class Event(models.Model):
 
             return mark_safe(result)
 
+    # This RE needs to be compiled so that the flags can be specified, as the
+    # flags option to re.sub() wasn't added until python 2.7
+    _plaintext_re = re.compile(ur'\[(.*?)\]\((https?://.*?)\)', flags=re.DOTALL)
+
     @property
     def copy_plaintext(self):
         """Return copy suitable for text only use (i.e. member's mailout)"""
@@ -260,7 +264,7 @@ class Event(models.Model):
             html2text.UNICODE_SNOB = True
             text = html2text.html2text(self.copy)
             # Convert links from markdown format to just the URL:
-            text = re.sub(r'\[(.*?)\]\((https?://.*?)\)', r'\1: \2', text, flags=re.DOTALL)
+            text = self._plaintext_re.sub(ur'\1: \2', text)
 
         return mark_safe(text)
 
