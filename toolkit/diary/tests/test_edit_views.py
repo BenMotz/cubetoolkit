@@ -45,6 +45,9 @@ class EditDiaryViewsLoginRequired(DiaryTestsMixin, TestCase):
             "exec-mailout": {},
             "mailout-progress": {},
             "set_edit_preferences": {},
+
+            "edit-printed-programmes": {},
+            "add-printed-programme": {},
         }
         for view_name, kwargs in views_to_test.iteritems():
             url = reverse(view_name, kwargs=kwargs)

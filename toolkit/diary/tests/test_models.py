@@ -1,11 +1,11 @@
 from __future__ import absolute_import
 
 import pytz
-from datetime import datetime
+from datetime import datetime, date
 
 from django.test import TestCase
 
-from toolkit.diary.models import Showing, Event
+from toolkit.diary.models import Showing, Event, PrintedProgramme
 
 from .common import DiaryTestsMixin
 
@@ -145,3 +145,26 @@ class EventModelLegacyCopy(TestCase):
             u" and <this> \"'<troublemaker>'\""
         )
         self.assertEqual(self.event.copy_plaintext, expected)
+
+class PrintedProgrammeModelTests(TestCase):
+
+    def test_month_ok(self):
+        pp = PrintedProgramme(
+            programme="/foo/bar",
+            month = date(2010, 2, 1)
+        )
+        pp.save()
+
+        pp = PrintedProgramme.objects.get(pk=pp.pk)
+        self.assertEqual(pp.month, date(2010, 2, 1))
+
+    def test_month_normalised(self):
+        pp = PrintedProgramme(
+            programme="/foo/bar",
+            month = date(2010, 2, 2)
+        )
+        pp.save()
+
+        pp = PrintedProgramme.objects.get(pk=pp.pk)
+        self.assertEqual(pp.month, date(2010, 2, 1))
+

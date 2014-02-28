@@ -3,6 +3,7 @@ import logging
 
 import html2text
 import HTMLParser
+import datetime
 
 from django.db import models
 from django.conf import settings
@@ -536,3 +537,25 @@ class RotaEntry(models.Model):
             self.required = template.required
             self.rank = template.rank
             logger.info(u"Cloning rota entry from existing rota entry with role_id {0}".format(template.role.pk))
+
+
+class PrintedProgramme(models.Model):
+    month = models.DateField(editable=False, unique=True)
+    programme = models.FileField(upload_to="printedprogramme", max_length=256,
+                                 null=False, blank=False, verbose_name='Programme PDF')
+    designer = models.CharField(max_length=256, null=True, blank=True)
+    notes = models.TextField(max_length=8192, null=True, blank=True)
+
+    class Meta:
+        db_table = 'PrintedProgrammes'
+
+    def __unicode__(self):
+        return u"Printed programme for {0}/{1}".format(self.month.month, self.month.year)
+
+    def save(self, *args, **kwargs):
+        # Enforce month column always being a date for the first of the month:
+        if self.month.day != 1:
+            logger.error("PrintedProgramme has month value which isn't the 1st"
+                         " of the month")
+            self.month = datetime.date(self.month.year, self.month.month, 1)
+        return super(PrintedProgramme, self).save(*args, **kwargs)

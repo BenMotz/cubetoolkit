@@ -88,6 +88,10 @@ diary_urls = patterns(
 
     # Ajax calls:
     url("^edit/setprefs$", 'set_edit_preferences', name="set_edit_preferences"),
+
+    # Printed programme archive edit/upload:
+    url("^printedprogrammes$", 'printed_programme_edit', name="edit-printed-programmes", kwargs={'operation': 'edit'}),
+    url("^printedprogrammes/add$", 'printed_programme_edit', name="add-printed-programme", kwargs={'operation': 'add'}),
 )
 
 diary_urls += patterns(

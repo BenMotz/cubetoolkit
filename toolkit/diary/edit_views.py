@@ -17,9 +17,11 @@ from django.db.models import Q
 import django.utils.timezone as timezone
 from django.contrib.auth.decorators import permission_required, login_required
 from django.views.decorators.http import require_POST, require_http_methods
+import django.views.generic as generic
 
 from toolkit.diary.models import (Showing, Event, DiaryIdea, MediaItem,
-                                  EventTemplate, EventTag, Role)
+                                  EventTemplate, EventTag, Role,
+                                  PrintedProgramme)
 import toolkit.diary.forms as diary_forms
 import toolkit.diary.edit_prefs as edit_prefs
 import toolkit.members.tasks
@@ -640,3 +642,39 @@ def edit_roles(request):
         formset = RoleFormset()
 
     return render(request, 'form_edit_roles.html', {'formset': formset})
+
+
+@permission_required('toolkit.write')
+def printed_programme_edit(request, operation):
+    assert(operation in ('edit', 'add'))
+
+    programme_queryset = PrintedProgramme.objects.order_by('month')
+    programme_formset = modelformset_factory(PrintedProgramme,
+                                             can_delete=True,
+                                             extra=0)
+
+    # Blank forms, for use in GET or for whichever form hasn't been POSTed
+    formset = programme_formset(queryset=programme_queryset)
+    new_programme_form = diary_forms.NewPrintedProgrammeForm()
+
+    if request.method == 'POST':
+        if operation == "edit":
+            formset = programme_formset(request.POST,
+                                        request.FILES,
+                                        queryset=programme_queryset)
+            edited_form = formset
+        elif operation == "add":
+            new_programme_form = diary_forms.NewPrintedProgrammeForm(request.POST,
+                                                                     request.FILES)
+            edited_form = new_programme_form
+
+        if edited_form.is_valid():
+            edited_form.save()
+            logger.info("Printed programme archive updated")
+            return HttpResponseRedirect(reverse("edit-printed-programmes"))
+
+    context = {
+        'formset': formset,
+        'new_programme_form': new_programme_form,
+    }
+    return render(request, 'form_printedprogramme_archive.html', context)

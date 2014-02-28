@@ -1,0 +1,62 @@
+{% extends "base_public.html" %}
+
+{% block title %}
+Cube Programmes
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
+<style type="text/css">
+  body { font-family: sans-serif;}
+  .errorlist li {
+      color: red;
+      list-style: none url("{{ STATIC_URL }}img/message_error.png") inside;
+  }
+  .editlist li {
+      list-style-type: none;
+      padding-bottom: 2pt;
+      font-weight: bold;
+  }
+  .editlist ul {
+      padding-bottom: 0.5cm;
+  }
+  .editlist ul li {
+      font-weight: normal;
+  }
+  .editlist textarea {
+      height: 12pt;
+  }
+</style>
+{% endblock %}
+
+{% block body %}
+<h1>Printed programme archive</h1>
+
+{% include "messages.html" %}
+
+<form method="POST" enctype="multipart/form-data">
+{% csrf_token %}
+{{ formset.management_form }}
+<h2>Edit existing entries</h2>
+<ul class="editlist">
+{% for form in formset %}
+    <li>{{ form.instance.month|date:"F Y" }}<ul>
+    {{ form.as_ul }}
+    </ul>
+    </li>
+    {% if forloop.last %}
+        <input type="submit" value="Save changes">
+    {% endif %}
+{% endfor %}
+</ul>
+</form>
+
+<form method="POST" action="{% url "add-printed-programme" %}" enctype="multipart/form-data">
+<h2>Add a Month</h2>
+{% csrf_token %}
+{{ new_programme_form.as_p }}
+<input type="submit" value="Add new month">
+</form>
+
+{% endblock %}
+

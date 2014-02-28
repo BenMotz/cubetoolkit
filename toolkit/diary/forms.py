@@ -1,4 +1,6 @@
 import datetime
+import calendar
+
 from django import forms
 import django.db.models
 from django.conf import settings
@@ -168,5 +170,43 @@ class SearchForm(forms.Form):
                 and not
                 (cleaned_data.get('start_date') or cleaned_data.get('end_date'))):
             raise forms.ValidationError("Must give either a search term or a date range")
+
+        return cleaned_data
+
+
+class NewPrintedProgrammeForm(forms.ModelForm):
+    # A custom form, so as to present a month/year choice for the date (if the
+    # normal Date select is used there's no trivial way to hide the choice of
+    # day of month - plus this allows the available range of years to be
+    # limited to Cube founding through next year)
+
+    year = forms.ChoiceField(
+        choices=[
+            (y, y) for y in xrange(settings.DAWN_OF_TIME, datetime.date.today().year + 2)
+        ],
+        initial=datetime.date.today().year
+    )
+    month = forms.ChoiceField(
+        choices=(zip(range(13), calendar.month_name)[1:]),
+        initial=datetime.date.today().month
+    )
+
+    class Meta(object):
+        model = toolkit.diary.models.PrintedProgramme
+
+    def clean(self):
+        cleaned_data = super(NewPrintedProgrammeForm, self).clean()
+
+        # Sets the "month" field on the model from the form data
+        try:
+            programme_month = datetime.date(
+                int(cleaned_data['year']),
+                int(cleaned_data['month']),
+                1
+            )
+        except (KeyError, ValueError, TypeError):
+            raise forms.ValidationError("Invalid/missing value for year and/or month")
+
+        self.instance.month = programme_month
 
         return cleaned_data

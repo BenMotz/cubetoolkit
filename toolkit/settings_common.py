@@ -40,6 +40,10 @@ MAX_COUNT_PER_ROLE = 6
 # volunteer images get saved:
 VOLUNTEER_PORTRAIT_DIR = 'volunteers'
 
+# Currently only used for setting an outer limit on what year printed
+# programmes can be uploaded
+DAWN_OF_TIME = 1998
+
 ###############################################################################
 #
 # Below here are Django settings
