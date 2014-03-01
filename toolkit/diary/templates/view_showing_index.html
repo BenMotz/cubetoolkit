@@ -48,7 +48,7 @@ Nothing on between {{ start|date:"l j M Y"  }} and {{ end|date:"l j M Y" }}
 </div>
 <div class="details">
 {% for event, showings in events.iteritems %}
-<div class="event">
+<div class="event" id="event_{{ event.id }}">
 {% include "event_fragment.html" %}
 <p>[<a href="#top">top of page</a>]</p>
 </div>

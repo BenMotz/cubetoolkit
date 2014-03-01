@@ -34,10 +34,10 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
 
         # Should test the contents better, I suspect...
         self.assertContains(response, u'Event three title')
-        self.assertContains(response, u'<p>Event three Copy</p>')
+        self.assertContains(response, u'Event three Copy')
         # Not confirmed / private:
         self.assertNotContains(response, u'Event one title')
-        self.assertNotContains(response, u'<p>Event one copy</p>')
+        self.assertNotContains(response, u'Event one copy')
 
     def test_view_by_month(self):
         url = reverse("month-view", kwargs={"year": "2010", "month": "12"})
@@ -89,7 +89,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         url = reverse("single-showing-view", kwargs={"showing_id": str(self.e2s2.pk)})
         response = self.client.get(url)
         self.assertContains(response, u'Event two title')
-        self.assertContains(response, u'<p>Event <br>\n two <br>\n copy</p>')
+        self.assertContains(response, u'Event <br>\n two <br>\n copy')
         self.assertEqual(response.status_code, 200)
 
     def test_view_hidden_showing(self):
@@ -107,7 +107,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
 
         # TODO: test data better, including media!
         self.assertContains(response, u'Event two title')
-        self.assertContains(response, u'<p>Event <br> two <br> copy</p>', html=True)
+        self.assertContains(response, u'Event <br>\n two <br>\n copy')
         self.assertEqual(response.status_code, 200)
         # Some showings *should* be listed:
         self.assertContains(response, "Tue 2nd Apr, 7 p.m.")
