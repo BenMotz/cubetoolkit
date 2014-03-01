@@ -33,6 +33,10 @@ CKEDITOR.editorConfig = function( config ) {
 	config.removeDialogTabs = 'link:advanced';
 
 	// Allow iframe with all attributes:
-	config.extraAllowedContent = config.extraAllowedContent || '';
-	config.extraAllowedContent += ' ;iframe[*]';
+	if (config.extraAllowedContent) {
+		config.extraAllowedContent += '; ';
+	} else {
+		config.extraAllowedContent = '';
+	}
+	config.extraAllowedContent += 'iframe[*]';
 };
