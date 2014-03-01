@@ -14,9 +14,6 @@ DATABASES = {
 # Different to the key used in production!
 SECRET_KEY = '*@t04l3a7+uos5*7=c4ph1t#s(l*tlcdx(n(isztw^4w2c&mu-'
 
-LOGGING['handlers']['file']['filename'] = 'django_test.log'
-LOGGING['root'] = {}
-
 MEDIA_ROOT = '/tmp'
 
 PASSWORD_HASHERS = (
@@ -24,4 +21,19 @@ PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.MD5PasswordHasher',
 )
 
-
+# Minimal logging configuration, that should eat almost everything
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'handlers': {
+        # NullHandler would be better, but that requires python 2.7
+        'console': {
+            'level': 'CRITICAL',
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'CRITICAL',
+    }
+}
