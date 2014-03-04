@@ -144,7 +144,7 @@ class NewEventForm(forms.Form):
     event_template = forms.ModelChoiceField(queryset=toolkit.diary.models.EventTemplate.objects.all(), required=False)
     booked_by = forms.CharField(min_length=1, max_length=64, required=True)
     private = forms.BooleanField(required=False)
-    external = forms.BooleanField(required=False)
+    outside_hire = forms.BooleanField(required=False)
     confirmed = forms.BooleanField(required=False)
     discounted = forms.BooleanField(required=False)
 

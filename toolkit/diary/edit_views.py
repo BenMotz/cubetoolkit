@@ -245,7 +245,7 @@ def add_event(request):
             new_event = Event(name=form.cleaned_data['event_name'],
                               template=form.cleaned_data['event_template'],
                               duration=form.cleaned_data['duration'],
-                              outside_hire=form.cleaned_data['external'],
+                              outside_hire=form.cleaned_data['outside_hire'],
                               private=form.cleaned_data['private'])
             # Set event tags to those from its template:
             new_event.save()

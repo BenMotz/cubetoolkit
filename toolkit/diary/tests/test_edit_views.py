@@ -506,7 +506,7 @@ class AddEventView(DiaryTestsMixin, TestCase):
             u"event_template": u"1",
             u"booked_by": u"\u015Comeb\u014ddy",
             u"private": u"on",
-            u"external": u"",
+            u"outside_hire": u"",
             u"confirmed": u"on",
             u"discounted": u"on",
         })
@@ -553,7 +553,7 @@ class AddEventView(DiaryTestsMixin, TestCase):
             u"event_template": u"1",
             u"booked_by": u"\u015Comeb\u014ddy",
             u"private": u"on",
-            u"external": u"",
+            u"outside_hire": u"",
             u"confirmed": u"on",
             u"discounted": u"on",
         })
@@ -583,7 +583,7 @@ class AddEventView(DiaryTestsMixin, TestCase):
             u"event_template": u"",
             u"booked_by": u"",
             u"private": u"",
-            u"external": u"",
+            u"outside_hire": u"",
             u"confirmed": u"",
             u"discounted": u"",
         })
