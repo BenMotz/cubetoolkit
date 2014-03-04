@@ -6,7 +6,7 @@ DATABASES = {
         'NAME': 'toolkit',
         'USER': 'toolkit',
         # Substitute password for your local test database here:
-        'PASSWORD': None,
+        'PASSWORD': 'devserver_db_password',
         'HOST': '',  # Set to empty string for localhost.
         'PORT': '',  # Set to empty string for default.
     }

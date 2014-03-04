@@ -7,7 +7,7 @@ GRANT USAGE ON *.* TO 'toolkit'@'localhost';
 DROP USER 'toolkit'@'localhost';
 
 # And re-create
-CREATE USER 'toolkit'@'localhost' IDENTIFIED BY 'put password for toolkit user here';
+CREATE USER 'toolkit'@'localhost' IDENTIFIED BY 'devserver_db_password';
 
 DROP DATABASE IF EXISTS toolkit;
 CREATE DATABASE `toolkit` CHARACTER SET 'utf8';
