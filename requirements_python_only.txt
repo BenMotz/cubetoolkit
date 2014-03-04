@@ -2,6 +2,7 @@
 Django==1.5.5
 django-debug-toolbar==0.9.4
 django-celery==3.0.11
+celery==3.0.19  # 3.1 has breaking changes
 # Functionality introduced at these versions is required:
 python-magic>=0.4.0
 # These should (!) have stable APIs, so let upgrades happen
