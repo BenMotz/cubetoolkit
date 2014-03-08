@@ -11,7 +11,15 @@
 {% block body %}
 
 <p><a name="top"></a></p>
-<div class="programme"><a href="http://www.cubecinema.com/"><img class="cubelogo" src="{{ STATIC_URL }}diary/prog_logo_captioned.png" alt="Cube Programme"></a>
+<div class="programme"><a href="http://www.cubecinema.com/"><img class="cubelogo" src="{{ STATIC_URL }}diary/prog_logo_captioned.png" alt="Cube Programme"></a><br>
+
+{% if printed_programmes %}
+    <p align='center'>
+    {% for printed_programme in printed_programmes %}
+    <img src="{{ STATIC_URL }}diary/tiny_pdf_file_icon.gif" alt="Link to PDF"><a href="{{ printed_programme.programme.url }}">Printed programme for {{ printed_programme.month|date:"M Y" }}</a><br>
+    {% endfor %}
+    </p>
+{% endif %}
 
 <p align='center'><a href="{% url "day-view" year=start.year day=start.day month=start.month %}?daysahead=30">See 1 month</a> |
 <a href="{% url "day-view" year=start.year day=start.day month=start.month %}?daysahead=60">See 2 months</a> |

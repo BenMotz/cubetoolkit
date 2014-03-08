@@ -15,7 +15,7 @@ import django.views.generic as generic
 
 from easy_thumbnails.files import get_thumbnailer
 
-from toolkit.diary.models import Showing, Event
+from toolkit.diary.models import Showing, Event, PrintedProgramme
 from toolkit.diary.daterange import get_date_range
 from toolkit.diary.forms import SearchForm
 
@@ -85,6 +85,9 @@ def view_diary(request, year=None, month=None, day=None, event_type=None):
     # This is prepended to filepaths from the MediaPaths table to use
     # as a location for images:
     context['media_url'] = settings.MEDIA_URL
+
+    context['printed_programmes'] = PrintedProgramme.objects.month_in_range(
+        startdate, enddate)
 
     if request.GET.get('template'):
         return render(request, 'view_showing_index_oto.html', context)

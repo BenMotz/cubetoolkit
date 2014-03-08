@@ -539,12 +539,23 @@ class RotaEntry(models.Model):
             logger.info(u"Cloning rota entry from existing rota entry with role_id {0}".format(template.role.pk))
 
 
+class PrintedProgrammeManager(models.Manager):
+    def month_in_range(self, start, end):
+        """Select printed programmes for months in given range"""
+        # The idea being that even if 'start' is some day after the first of
+        # the month, the programme for that month is still returned
+        start_date = datetime.date(start.year, start.month, 1)
+
+        return self.filter(month__range=[start_date, end])
+
 class PrintedProgramme(models.Model):
     month = models.DateField(editable=False, unique=True)
     programme = models.FileField(upload_to="printedprogramme", max_length=256,
                                  null=False, blank=False, verbose_name='Programme PDF')
     designer = models.CharField(max_length=256, null=True, blank=True)
     notes = models.TextField(max_length=8192, null=True, blank=True)
+
+    objects = PrintedProgrammeManager()
 
     class Meta:
         db_table = 'PrintedProgrammes'
