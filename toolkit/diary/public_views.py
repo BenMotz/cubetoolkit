@@ -78,10 +78,10 @@ def view_diary(request, year=None, month=None, day=None, event_type=None):
     # Build a list of events for that list of showings:
     events = OrderedDict()
     for showing in showings:
-        events.setdefault(showing.event, set()).add(showing)
+        events.setdefault(showing.event, list()).append(showing)
 
     context['showings'] = showings  # Set of Showing objects for date range
-    context['events'] = events  # Ordered dict event -> set(showings)
+    context['events'] = events  # Ordered dict mapping event -> list of showings
     # This is prepended to filepaths from the MediaPaths table to use
     # as a location for images:
     context['media_url'] = settings.MEDIA_URL

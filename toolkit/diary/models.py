@@ -341,6 +341,7 @@ class Showing(models.Model):
 
     class Meta:
         db_table = 'Showings'
+        ordering = ['start']
 
     def __init__(self, *args, **kwargs):
         # Allow "copy_from" and "start_offset" keyword args to be supplied.
