@@ -34,6 +34,13 @@ Cube Programmes
 
 {% include "messages.html" %}
 
+<form method="POST" action="{% url "add-printed-programme" %}" enctype="multipart/form-data">
+<h2>Add a Month</h2>
+{% csrf_token %}
+{{ new_programme_form.as_p }}
+<input type="submit" value="Add new month">
+</form>
+
 <form method="POST" enctype="multipart/form-data">
 {% csrf_token %}
 {{ formset.management_form }}
@@ -49,13 +56,6 @@ Cube Programmes
     {% endif %}
 {% endfor %}
 </ul>
-</form>
-
-<form method="POST" action="{% url "add-printed-programme" %}" enctype="multipart/form-data">
-<h2>Add a Month</h2>
-{% csrf_token %}
-{{ new_programme_form.as_p }}
-<input type="submit" value="Add new month">
 </form>
 
 {% endblock %}
