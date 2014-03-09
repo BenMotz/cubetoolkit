@@ -511,7 +511,13 @@ class RotaEntry(models.Model):
     required = models.BooleanField(default=True)
     rank = models.IntegerField(default=1)
 
-    name = models.TextField(max_length=256, null=True, blank=True)
+    volunteer = models.ForeignKey(
+        'members.Volunteer',
+        related_name='rota_entries',
+        limit_choices_to={'active': True},
+        null=True,
+        on_delete=models.SET_NULL,  # don't delete if the volunteer is deleted!
+    )
 
     # created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)

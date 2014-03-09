@@ -20,6 +20,7 @@ CUBE role rota
     }
     td.rer { width: 3.5cm; }
     td.rel { width: 3.5cm; text-align: right;}
+    .na { color: gray; }
 </style>
 {% endblock %}
 
@@ -29,9 +30,17 @@ CUBE role rota
 <script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.jeditable.mini.js"></script>
 <script>
  $(document).ready(function() {
+         volunteer_list = {{ json_active_volunteer_list }};
+         // All valid keys will contain '_'
+         volunteer_list['noselection'] = '------';
+         volunteer_list['deletesignup'] = 'Un-sign-up';
+         volunteer_list['selected'] = 'noselection';
          $('.rota_name').editable('', {
             width: "3.4cm",
+            type: "select",
+            data: volunteer_list,
             placeholder: '{{ placeholder_text }}',
+            submit: "OK",
             submitdata: {
                 csrfmiddlewaretoken: "{{ csrf_token }}"
             }
@@ -49,9 +58,9 @@ CUBE role rota
     <tr><td> </td><td class="cell_day">{{ showing.start|date:"D"}}&nbsp;{{ showing.start|date:"j" }}</td><td>{{ showing.start|date:"H:i" }}</td><td class="event_name" colspan="4">{{ showing.event.name.upper }} </td></tr>
     {% for rota_entry in showing.rotaentry_set.all %}
         {% if forloop.counter|divisibleby:2 %}
-        <td class="rer">| <span class="rota_name" id="{{ rota_entry.pk }}">{{ rota_entry.name|default:placeholder_text }}</span>   </td><td>&gt; {{ rota_entry.role.name }}-{{ rota_entry.rank }} </td></tr>
+        <td class="rer">| <span class="rota_name" id="{{ rota_entry.pk }}">{{ rota_entry.volunteer.member.name|default:placeholder_text }}</span>   </td><td>&gt; {{ rota_entry.role.name }}-{{ rota_entry.rank }} </td></tr>
         {% else %}
-        <tr><td colspan="3"></td><td class="rl"> {{ rota_entry.role.name }}-{{ rota_entry.rank }} &lt; </td><td class="rel"><span class="rota_name" id="{{ rota_entry.pk }}">{{ rota_entry.name|default:placeholder_text }}</span> |</td>
+        <tr><td colspan="3"></td><td class="rl"> {{ rota_entry.role.name }}-{{ rota_entry.rank }} &lt; </td><td class="rel"><span class="rota_name" id="{{ rota_entry.pk }}">{{ rota_entry.volunteer.member.name|default:placeholder_text }}</span> |</td>
             {% if forloop.last %}
                 <td colspan="2"></td></tr>
             {% endif %}

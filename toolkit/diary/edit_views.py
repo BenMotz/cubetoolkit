@@ -15,6 +15,7 @@ import django.template
 import django.db
 from django.db.models import Q
 import django.utils.timezone as timezone
+from django.utils.safestring import mark_safe
 from django.contrib.auth.decorators import permission_required, login_required
 from django.views.decorators.http import require_POST, require_http_methods
 
@@ -27,6 +28,8 @@ import toolkit.members.tasks
 
 # Shared utility method:
 from toolkit.diary.daterange import get_date_range
+
+from toolkit.members.models import Volunteer
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -701,31 +704,73 @@ def rota_edit(request):
                                    .filter(confirmed=True)
                                    .filter(start__range=[start_date, end_date])
                                    .order_by('start')
-                                   .prefetch_related('rotaentry_set__role')  # mildly hacky optimisation for rota view
+                                   # force sane number of queries:
+                                   .prefetch_related('rotaentry_set__role')
                                    .select_related())
+        # Build JSON mapping active volunteer key to name.
+        # The keys are actually 'volunteer name_id' to make sure the selection
+        # comes out sorted.
+        volunteer_list = (Volunteer.objects
+            .filter(active=True)
+            .order_by('member__name')
+            # Avoid a separate query-per-volunteer:
+            .prefetch_related('member'))
+
+        # Don't use dict literal, for backward compatibilty with python 2.6:
+        volunteer_dict = OrderedDict(
+            (u"{0}_{1}".format(v.member.name, v.pk), v.member.name)
+                for v in volunteer_list
+        )
+        json_active_volunteer_list = json.dumps(volunteer_dict)
 
         context = {
             'start_date': start_date,
             'end_date': end_date,
             'days_ahead': days_ahead,
             'showings': showings,
-            'placeholder_text': 'Click to edit',
+            'placeholder_text': mark_safe('<span class="na">Click to edit</span>'),
+            'json_active_volunteer_list': mark_safe(json_active_volunteer_list),
         }
 
         return render(request, u'edit_rota.html', context)
+
     if request.method == 'POST':
-        logger.debug("POOOOST")
+        # Get rota entry
         try:
-            entry_id = int(request.POST.get('id'))
-        except ValueError:
+            entry_id = int(request.POST[u'id'])
+        except (ValueError, KeyError):
             logger.error("Invalid entry_id")
             return HttpResponse("Invalid entry id", status=400, content_type="text/plain")
-        name = request.POST.get('value')
-        if len(name) > 200:
-            return HttpResponse("Invalid name", status=400, content_type="text/plain")
-
         rota_entry = get_object_or_404(RotaEntry, pk=entry_id)
-        rota_entry.name = name
+
+        # Get action
+        try:
+            selection = request.POST[u'value']
+        except KeyError:
+            return HttpResponse("Invalid request", status=400, content_type="text/plain")
+
+        # Magic values:
+        if selection == u'noselection':
+            # --> no action
+            return HttpResponse("No change", status=400, content_type="text/plain")
+        if selection == u'deletesignup':
+            logger.info("Removing volunteer {0} from rota entry {1}".format(
+                rota_entry.volunteer.pk if rota_entry.volunteer else '[none]',
+                rota_entry.pk
+            ))
+            volunteer = None
+            response_text = ""
+        else:
+            # Normal action
+            try:
+                volunteer_id = int(selection.split(u'_')[-1])
+            except (ValueError, TypeError):
+                logger.exception("Invalid volunteer name/value. Post was: {0}".format(request.POST))
+                return HttpResponse("Invalid volunteer", status=400, content_type="text/plain")
+            volunteer = get_object_or_404(Volunteer, pk=volunteer_id)
+            response_text = volunteer.member.name
+
+        rota_entry.volunteer = volunteer
         rota_entry.save()
 
-        return HttpResponse(name)
+        return HttpResponse(response_text, content_type="text/plain")
