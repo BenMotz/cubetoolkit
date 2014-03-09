@@ -5,8 +5,6 @@ import logging
 
 from toolkit.util.ordereddict import OrderedDict
 
-import celery.result
-
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.core.urlresolvers import reverse
@@ -18,10 +16,11 @@ import django.db
 from django.db.models import Q
 import django.utils.timezone as timezone
 from django.contrib.auth.decorators import permission_required, login_required
-from django.views.decorators.http import require_GET, require_POST, require_http_methods
+from django.views.decorators.http import require_POST, require_http_methods
 
 from toolkit.diary.models import (Showing, Event, DiaryIdea, MediaItem,
-                                  EventTemplate, EventTag, Role, RotaEntry)
+                                  EventTemplate, EventTag, Role, RotaEntry,
+                                  PrintedProgramme)
 import toolkit.diary.forms as diary_forms
 import toolkit.diary.edit_prefs as edit_prefs
 import toolkit.members.tasks
@@ -247,7 +246,7 @@ def add_event(request):
             new_event = Event(name=form.cleaned_data['event_name'],
                               template=form.cleaned_data['event_template'],
                               duration=form.cleaned_data['duration'],
-                              outside_hire=form.cleaned_data['external'],
+                              outside_hire=form.cleaned_data['outside_hire'],
                               private=form.cleaned_data['private'])
             # Set event tags to those from its template:
             new_event.save()
@@ -644,145 +643,41 @@ def edit_roles(request):
     return render(request, 'form_edit_roles.html', {'formset': formset})
 
 
-def _render_mailout_body(days_ahead):
-    # Render default mail contents;
+@permission_required('toolkit.write')
+def printed_programme_edit(request, operation):
+    assert(operation in ('edit', 'add'))
 
-    # Read data
-    start_date = timezone.now()
-    end_date = start_date + datetime.timedelta(days=days_ahead)
-    showings = (Showing.objects.public()
-                               .not_cancelled()
-                               .start_in_range(start_date, end_date)
-                               .order_by('start')
-                               .select_related()
-                               .prefetch_related('event__showings'))
+    programme_queryset = PrintedProgramme.objects.order_by('month')
+    programme_formset = modelformset_factory(PrintedProgramme,
+                                             can_delete=True,
+                                             extra=0)
 
-    # Render into mail template
-    mail_template = django.template.loader.get_template("mailout_body.txt")
+    # Blank forms, for use in GET or for whichever form hasn't been POSTed
+    formset = programme_formset(queryset=programme_queryset)
+    new_programme_form = diary_forms.NewPrintedProgrammeForm()
+
+    if request.method == 'POST':
+        if operation == "edit":
+            formset = programme_formset(request.POST,
+                                        request.FILES,
+                                        queryset=programme_queryset)
+            edited_form = formset
+        elif operation == "add":
+            new_programme_form = diary_forms.NewPrintedProgrammeForm(request.POST,
+                                                                     request.FILES)
+            edited_form = new_programme_form
+
+        if edited_form.is_valid():
+            edited_form.save()
+            logger.info("Printed programme archive updated")
+            return HttpResponseRedirect(reverse("edit-printed-programmes"))
 
     context = {
-        'start_date': start_date,
-        'end_date': end_date,
-        'showings': showings,
+        'formset': formset,
+        'new_programme_form': new_programme_form,
     }
 
-    return mail_template.render(django.template.Context(context))
-
-
-def _render_mailout_form(request, body_text, subject_text):
-    form = diary_forms.MailoutForm(initial={'subject': subject_text, 'body': body_text})
-    email_count = (toolkit.members.models.Member.objects.mailout_recipients()
-                                                        .count())
-    context = {
-        'form': form,
-        'email_count': email_count,
-    }
-
-    return render(request, 'form_mailout.html', context)
-
-
-@permission_required('toolkit.write')
-@require_http_methods(["GET", "POST"])
-def mailout(request):
-    # This view loads a form with a draft mailout subject & body. When the user
-    # is happy, they click "Send", which POSTs the data back to this view. If
-    # the data pases the basic checks then it gets sent back in the
-    # "mailout_send" form. That form has javascript which, if the user
-    # confirms, posts to the "exec-mailout" view
-
-    if request.method == 'GET':
-        try:
-            query_days_ahead = int(request.GET.get('daysahead', 9))
-        except ValueError:
-            query_days_ahead = 9
-        body_text = _render_mailout_body(query_days_ahead)
-        subject_text = "CUBE Microplex forthcoming events"
-        return _render_mailout_form(request, body_text, subject_text)
-    elif request.method == 'POST':
-        form = diary_forms.MailoutForm(request.POST)
-        if not form.is_valid():
-            return render(request, 'form_mailout.html', {'form': form})
-        return render(request, 'mailout_send.html', form.cleaned_data)
-
-
-# @condition(etag_func=None, last_modified_func=None)
-@permission_required('toolkit.write')
-@require_POST
-def exec_mailout(request):
-
-    form = diary_forms.MailoutForm(request.POST)
-    if not form.is_valid():
-        logger.error("Mailout failed: {0}".format(repr(form.errors)))
-        response = {
-            'status': 'error',
-            'errors': dict(form.errors),
-        }
-        return HttpResponse(json.dumps(response), mimetype="application/json")
-
-    result = toolkit.members.tasks.send_mailout.delay(form.cleaned_data['subject'],
-                                                      form.cleaned_data['body'])
-
-    response = HttpResponse(
-        json.dumps({'status': 'ok', 'task_id': result.task_id, 'progress': 0}),
-        mimetype="application/json"
-    )
-
-    return response
-
-
-@permission_required('toolkit.write')
-@require_GET
-def mailout_progress(request):
-    async_result = celery.result.AsyncResult(id=request.GET['task_id'])
-    state = async_result.state
-    progress = 0
-    complete = False
-    # Following values are set if complete:
-    error = None
-    sent_count = None
-    error_msg = None
-
-    if state:
-        progress_parts = state.split("PROGRESS")
-        if len(progress_parts) > 1:
-            try:
-                progress = int(progress_parts[1])
-            except ValueError:
-                logger.error("Invalid progress from async mailout task: {0}".format(state))
-        elif state == "SUCCESS":
-            progress = 100
-            complete = True
-            if (async_result.result
-                    and isinstance(async_result.result, tuple)
-                    and len(async_result.result) == 3):
-                error, sent_count, error_msg = async_result.result
-            else:
-                error = True
-                sent_count = 0
-                error_msg = u"Couldn't retrieve status from completed job"
-        elif state == "FAILURE":
-            complete = True
-            error = True
-            if async_result.result:
-                error_msg = unicode(async_result.result)
-            else:
-                error_msg = "Failed: Unknown error"
-        elif state == "PENDING":
-            progress = 0
-        else:
-            logger.error(u"Invalid data from async mailout task: {0}".format(state))
-
-    return HttpResponse(
-        json.dumps({
-            'task_id': async_result.task_id,
-            'complete': complete,
-            'progress': progress,
-            'error': error,
-            'error_msg': error_msg,
-            'sent_count': sent_count,
-        }),
-        mimetype="application/json"
-    )
+    return render(request, 'form_printedprogramme_archive.html', context)
 
 
 @permission_required('toolkit.write')
@@ -834,4 +729,3 @@ def rota_edit(request):
         rota_entry.save()
 
         return HttpResponse(name)
-

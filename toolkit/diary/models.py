@@ -3,6 +3,7 @@ import logging
 
 import html2text
 import HTMLParser
+import datetime
 
 from django.db import models
 from django.conf import settings
@@ -210,7 +211,7 @@ class Event(models.Model):
     _wrap_re = re.compile(r'(.{70,})\n')
     _lotsofnewlines_re = re.compile(r'\n\n+')
     # Catch well-formatted links (ie. beginning http://)
-    _link_re_1 = re.compile(r'(http:\/\/\S{4,})')
+    _link_re_1 = re.compile(r'(https?:\/\/\S{4,})')
     # Optimistic stab at spotting other things that are probably links, based on
     # a smattering of TLDs:
     _link_re_2 = re.compile(r'(\s)(www\.[\w.]+\.(com|org|net|uk|de|ly|us|tk)[^\t\n\r\f\v\. ]*)')
@@ -238,11 +239,15 @@ class Event(models.Model):
             # Now replace all new lines with a single line break;
             result = result.replace('\n', ' <br>\n')
 
-            # Attempt to magically convert any links to markdown:
+            # Attempt to magically convert any links to HTML markup:
             result = self._link_re_1.sub(r'<a href="\1">\1</a>', result)
             result = self._link_re_2.sub(r'\1<a href="http://\2">\2</a>', result)
 
             return mark_safe(result)
+
+    # This RE needs to be compiled so that the flags can be specified, as the
+    # flags option to re.sub() wasn't added until python 2.7
+    _plaintext_re = re.compile(ur'\[(.*?)\]\((https?://.*?)\)', flags=re.DOTALL)
 
     @property
     def copy_plaintext(self):
@@ -255,7 +260,12 @@ class Event(models.Model):
         else:
             # Use html2text library to do a quick and happy conversion to
             # plain text; http://www.aaronsw.com/2002/html2text/
+
+            # Don't try to substitute ASCII characters for unicode ones:
+            html2text.UNICODE_SNOB = True
             text = html2text.html2text(self.copy)
+            # Convert links from markdown format to just the URL:
+            text = self._plaintext_re.sub(ur'\1: \2', text)
 
         return mark_safe(text)
 
@@ -331,6 +341,7 @@ class Showing(models.Model):
 
     class Meta:
         db_table = 'Showings'
+        ordering = ['start']
 
     def __init__(self, *args, **kwargs):
         # Allow "copy_from" and "start_offset" keyword args to be supplied.
@@ -529,3 +540,36 @@ class RotaEntry(models.Model):
             self.required = template.required
             self.rank = template.rank
             logger.info(u"Cloning rota entry from existing rota entry with role_id {0}".format(template.role.pk))
+
+
+class PrintedProgrammeManager(models.Manager):
+    def month_in_range(self, start, end):
+        """Select printed programmes for months in given range"""
+        # The idea being that even if 'start' is some day after the first of
+        # the month, the programme for that month is still returned
+        start_date = datetime.date(start.year, start.month, 1)
+
+        return self.filter(month__range=[start_date, end])
+
+class PrintedProgramme(models.Model):
+    month = models.DateField(editable=False, unique=True)
+    programme = models.FileField(upload_to="printedprogramme", max_length=256,
+                                 null=False, blank=False, verbose_name='Programme PDF')
+    designer = models.CharField(max_length=256, null=True, blank=True)
+    notes = models.TextField(max_length=8192, null=True, blank=True)
+
+    objects = PrintedProgrammeManager()
+
+    class Meta:
+        db_table = 'PrintedProgrammes'
+
+    def __unicode__(self):
+        return u"Printed programme for {0}/{1}".format(self.month.month, self.month.year)
+
+    def save(self, *args, **kwargs):
+        # Enforce month column always being a date for the first of the month:
+        if self.month.day != 1:
+            logger.error("PrintedProgramme has month value which isn't the 1st"
+                         " of the month")
+            self.month = datetime.date(self.month.year, self.month.month, 1)
+        return super(PrintedProgramme, self).save(*args, **kwargs)

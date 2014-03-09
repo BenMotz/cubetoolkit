@@ -88,10 +88,18 @@ diary_urls = patterns(
     url("""^(?P<field>rota|copy|terms|copy_summary)(/|/(?P<year>\d{4})/(?P<month>\d{1,2})/?(?P<day>(?<=/)\d{0,2})?/?)?$""",
         'view_event_field', name="view_event_field"),
 
+    # Ajax calls:
+    url("^edit/setprefs$", 'set_edit_preferences', name="set_edit_preferences"),
+
+    # Printed programme archive edit/upload:
+    url("^printedprogrammes$", 'printed_programme_edit', name="edit-printed-programmes", kwargs={'operation': 'edit'}),
+    url("^printedprogrammes/add$", 'printed_programme_edit', name="add-printed-programme", kwargs={'operation': 'add'}),
+)
+
+diary_urls += patterns(
+    'toolkit.diary.mailout_views',
+
     url("^mailout/$", 'mailout', name="members-mailout"),
     url("^mailout/send$", 'exec_mailout', name="exec-mailout"),
     url("^mailout/send/progress$", 'mailout_progress', name="mailout-progress"),
-
-    # Ajax calls:
-    url("^edit/setprefs$", 'set_edit_preferences', name="set_edit_preferences"),
 )

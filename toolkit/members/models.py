@@ -1,5 +1,4 @@
 import os.path
-import PIL.Image
 import logging
 import binascii
 
@@ -8,7 +7,7 @@ from django.conf import settings
 from django.db import models
 
 from toolkit.diary.models import Role
-from toolkit.util import generate_random_string, image
+from toolkit.util import generate_random_string
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +63,7 @@ class Member(models.Model):
     number = models.CharField(max_length=10, editable=False)
 
     name = models.CharField(max_length=64)
-    email = models.CharField(max_length=64, blank=True, null=True)  # , unique=True)
+    email = models.EmailField(max_length=64, blank=True, null=True) # , unique=True)
 
     address = models.CharField(max_length=128, blank=True, null=True)
     posttown = models.CharField(max_length=64, blank=True, null=True)
@@ -176,40 +175,8 @@ class Volunteer(models.Model):
     def __init__(self, *args, **kwargs):
         super(Volunteer, self).__init__(*args, **kwargs)
         # Store current filename of portrait (if any) so that, at save, changes
-        # can be detected and the thumbnail updated:
+        # can be detected and the old image deleted:
         try:
             self.__original_portrait = self.portrait.file.name if self.portrait else None
         except (IOError, OSError, ValueError):
             self.__original_portrait = None
-
-    def _update_portrait_thumbnail(self):
-        # Delete old thumbnail, if any:
-        if self.portrait_thumb and self.portrait_thumb != '':
-            logger.info(u"Deleting old portrait thumbnail for {0}, file {1}"
-                        .format(self.pk, self.portrait_thumb))
-            try:
-                self.portrait_thumb.delete(save=False)
-            except (IOError, OSError) as ose:
-                logger.exception(u"Failed deleting old thumbnail: {0}".format(ose))
-
-        # If there's not actually a new image to thumbnail, give up:
-        if self.portrait is None or self.portrait == '':
-            self.portrait_thumb = ''
-            return
-
-        thumb_filename = os.path.join(
-            settings.MEDIA_ROOT,
-            settings.VOLUNTEER_PORTRAIT_PREVIEW_DIR,
-            os.path.basename(str(self.portrait))
-        )
-
-        try:
-            act_thumb_filename = image.generate_thumbnail(
-                self.portrait.file,
-                thumb_filename,
-                settings.THUMBNAIL_SIZE
-            )
-            self.portrait_thumb = os.path.relpath(act_thumb_filename, settings.MEDIA_ROOT)
-        except image.ThumbnailError as te:
-            logger.error("Failed generating thumbnail: {0}".format(te))
-            self.portrait_thumb = None

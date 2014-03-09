@@ -4,12 +4,13 @@
 [TODO] -- do JS close of popup using a redirect?
 [TODO] -- code to sync remote images/media to local
 
-[BUG] -- iframes / youtube links in wysihtml5 are totes borked
+[BUG] -- Mailout entities and links are somewhat broken
 [BUG] -- Automatic linkifying of programme copy should detect https as URLs (+ unit test)
 [BUG] -- make more forms redirect after submit, to avoid reload adding duplicates (done for members)
 [BUG] -- handle errors for saving Event details if image and image is missing
 [QUERY] -- Should cancelled events appear in the mailout by default?
 
+[FIXED] -- iframes / youtube links in wysihtml5 are totes borked
 [DONE] -- html2text not in the requirements files
 [DONE] -- New 'import' script to dump and import DB from live for devserver
 [DONE] -- result count in member search?

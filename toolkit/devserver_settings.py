@@ -1,15 +1,29 @@
 from toolkit.settings_common import *
 
-APP_ROOT = '/home/ben/data/python/cube'
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'toolkit',
+        'USER': 'toolkit',
+        # Substitute password for your local test database here:
+        'PASSWORD': 'devserver_db_password',
+        'HOST': '',  # Set to empty string for localhost.
+        'PORT': '',  # Set to empty string for default.
+    }
+}
+
+# Different to the key used in production!
+SECRET_KEY = '*@t05l5a7+uos5*9=c7ph1t#s(l*tlcdx(n(isztw^4w2c&mu-'
+
+LOGGING['handlers']['file']['filename'] = 'django_test.log'
+
+# Enable logging of *everything* to the console:
+LOGGING['root'] = {
+    'handlers': ['console'],
+    'level': 'DEBUG',
+}
 
 EMAIL_UNSUBSCRIBE_HOST = "localhost:8000"
-
-# URL that handles the media served from MEDIA_ROOT. Make sure to use a
-# trailing slash.
-# Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
-# MEDIA_URL = 'http://localhost:8000/media/'
-MEDIA_URL = '/media/'
-# MEDIA_ROOT = '/var/www_toolkit/site/media'
 
 # Enable Debug mode, add in Django toolbar:
 DEBUG = True
@@ -22,12 +36,6 @@ MIDDLEWARE_CLASSES = list(MIDDLEWARE_CLASSES)
 MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')
 INSTALLED_APPS = list(INSTALLED_APPS)
 INSTALLED_APPS.append('debug_toolbar')
-
-# Enable logging of *everything* to the console:
-LOGGING['root'] = {
-    'handlers': ['console'],
-    'level': 'DEBUG',
-}
 
 import warnings
 warnings.filterwarnings('error', r"DateTimeField received a naive datetime",

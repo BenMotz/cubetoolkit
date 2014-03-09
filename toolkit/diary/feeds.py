@@ -13,17 +13,16 @@ class BasicWhatsOnFeed(Feed):
     DAYS_AHEAD = 7
     title = "Cube cinema forthcoming events"
     description = "Events at the cube cinema over the next %d days. E&OE." % (DAYS_AHEAD, )
-    link = "/diary"
+    link = "/programme"
 
     def items(self):
         startdate = timezone.now()
         enddate = startdate + datetime.timedelta(days=self.DAYS_AHEAD)
-        showings = (Showing.objects.filter(confirmed=True)
-                                   .filter(hide_in_programme=False)
-                                   .filter(start__range=[startdate, enddate])
-                                   .filter(event__private=False)
-                                   .order_by('start')
-                                   .select_related())
+        showings = (Showing.objects.public()
+                               .start_in_range(startdate, enddate)
+                               .order_by('start')
+                               .select_related()
+                               .select_related())
         return showings.all()
 
     def item_title(self, showing):
@@ -35,4 +34,4 @@ class BasicWhatsOnFeed(Feed):
 
     def item_link(self, showing):
         # Add the showing ID at the end to ensure that this link is unique (cf. RSS spec)
-        return reverse("single-event-view", kwargs={'event_id': showing.event_id}) + "#" + str(showing.pk)
+        return reverse("single-event-view", kwargs={'event_id': showing.event_id})

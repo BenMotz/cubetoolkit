@@ -1,5 +1,7 @@
 *.pyc
+*.log
 venv
+venv26
 site_transfer.tgz
 toolkit/settings.py
-./static
+static

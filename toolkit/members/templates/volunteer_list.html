@@ -18,11 +18,11 @@
 
 {% block body %}
 {# {% for v, n in roles.iteritems %} <p><b>{{ v }}</b><br> {{ n }} </p> {% endfor %} #}
-<img src="{{ STATIC_URL }}members/cube_microplex_logo.gif" width="200"><p><h2>Cube volunteers report.</h2>
+<img src="{{ STATIC_URL }}members/cube_microplex_logo.gif" alt="Cube Microplex logo" width="200"><p><h2>Cube volunteers report.</h2>
 {% include "messages.html" %}
 Total cube volunteers: {{ volunteers|length }}<p>
 Report generated: {% now "d/m/Y" %}<p>
-<a href="{% url "add-volunteer" %}"title="add new volunteer">[add volunteer]</a>
+<a href="{% url "add-volunteer" %}" title="add new volunteer">[add volunteer]</a>
 <a href="{% url "retire-select-volunteer" %}" title="retire volunteer">[retire volunteer]</a>
 <a href="{% url "unretire-select-volunteer" %}" title="unretire volunteer">[unretire volunteer]</a><br>
 <h3>Contact details:</h3>
@@ -34,9 +34,9 @@ Report generated: {% now "d/m/Y" %}<p>
 <td valign="top" align="right">
 {% if volunteer.portrait %}
 <a href="{{ volunteer.portrait.url }}">
-    <img src="{{ volunteer.portrait|thumbnail_url:'portrait' }}" border="0" width="75"></a><br>
+    <img src="{{ volunteer.portrait|thumbnail_url:'portrait' }}" border="0" width="75" alt="Photo of {{ member.name }}"></a><br>
 {% else %}
-<img src="{{ default_mugshot }}" border="0" width="75"><br>
+<img src="{{ default_mugshot }}"  alt="Photo of {{ member.name }}" border="0" width="75"><br>
 {% endif %}
 <a href="{% url "edit-volunteer" volunteer.pk %}">[update]</a></td>
 <td>&nbsp;&nbsp;</td>

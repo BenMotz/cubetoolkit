@@ -21,10 +21,14 @@ def _assert_target_set():
 def staging():
     """Configure to deploy to staging server"""
     env.target = "staging"
-    env.site_root = "/var/www_toolkit/site"
-    env.user = "ben"
-    env.hosts = ["localhost"]
+    env.site_root = "/home/staging/site"
+    env.user = "staging"
+    env.hosts = ["sparror.cubecinema.com"]
     env.settings = "staging_settings.py"
+    # For running manage.py commands use this settings file; this is mostly
+    # so that a different logfile can be set, as the deploy user may not have
+    # permission to access the normal log file
+    env.deploy_script_settings = "toolkit.deploy_settings"
 
 
 def production():
@@ -34,6 +38,8 @@ def production():
     env.user = "toolkit"
     env.hosts = ["sparror.cubecinema.com"]
     env.settings = "live_settings.py"
+    # See note above:
+    env.deploy_script_settings = "toolkit.deploy_settings"
 
 
 def deploy_code():
@@ -62,11 +68,14 @@ def deploy_code():
             utils.puts("Deleting {0}".format(target))
             run("rm -rf {0}".format(target))
             utils.puts("Extracting {0}".format(archive))
-            run("tar -xzf {0}".format(archive))
+            # Untar with -m to avoid trying to utime /media directories that
+            # may be owned by the webserver (which then fails)
+            run("tar -m -xzf {0}".format(archive))
 
             # Configure the correct settings file.
             run("rm -f toolkit/settings.py?")
-            run("ln -s {0} toolkit/settings.py".format(env.settings))
+            run("ln -s {0} toolkit/settings.py"
+                .format(os.path.join(env.site_root, env.settings)))
 
 
 def deploy_static():
@@ -78,7 +87,8 @@ def deploy_static():
         utils.puts("Running collectstatic (pwd is '{0}')".format(run("pwd")))
         static_path = os.path.join(env.site_root, "static")
         run("rm -rf {0}".format(static_path))
-        run("venv/bin/python manage.py collectstatic --noinput --settings=toolkit.import_settings")
+        run("venv/bin/python manage.py collectstatic --noinput --settings={0}"
+            .format(env.deploy_script_settings))
 
 
 def deploy_media():
@@ -89,6 +99,16 @@ def deploy_media():
     local('rsync -av --delete media/ {0}@{1}:{2}/media'.format(env.user, env.hosts[0], env.site_root))
 
 
+def sync_database():
+    """Run basic database sync - won't touch tables that are being managed by south"""
+    _assert_target_set()
+
+    with cd(env.site_root):
+        utils.puts("Running syncdb")
+        run("venv/bin/python manage.py syncdb --noinput --settings={0}"
+            .format(env.deploy_script_settings))
+
+
 def run_migrations():
     """Run south to make sure database schema is in sync with the application"""
 
@@ -96,7 +116,8 @@ def run_migrations():
 
     with cd(env.site_root):
         utils.puts("Running database migrations")
-        run("venv/bin/python manage.py migrate --noinput --settings=toolkit.import_settings")
+        run("venv/bin/python manage.py migrate --noinput --settings={0}"
+            .format(env.deploy_script_settings))
 
 
 def install_requirements(upgrade=False):
@@ -137,8 +158,9 @@ def bootstrap():
     else:
         run("virtualenv --system-site-packages {0}".format(venv_path))
 
-    # Now run deployment, as normal
-    deploy()
+    utils.puts("\nRemote site is prepared. Now copy the settings file to '{0}/{1}'"
+               " and run the 'deploy' command from this fabric file."
+               .format(env.site_root, env.settings))
 
 
 def _fetch_database_dump(dump_filename):
@@ -150,11 +172,17 @@ def _fetch_database_dump(dump_filename):
         dump_file_path = os.path.join(env.site_root, dump_filename)
 
         run("venv/bin/python manage.py mysqldump_database {dump_file_path} "
-            "--settings=toolkit.import_settings".format(
-                dump_file_path=dump_file_path
+            "--settings={deploy_script_settings}".format(
+                dump_file_path=dump_file_path,
+                deploy_script_settings=env.deploy_script_settings
                 ))
-        get(dump_file_path, local_path=dump_filename)
-        run("rm {0}".format(dump_file_path))
+        run("gzip {dump_file_path} -c > {dump_file_path}.gz".format(
+            dump_file_path=dump_file_path
+            ))
+        get(dump_file_path + ".gz", local_path=dump_filename + ".gz")
+        run("rm {0} {0}.gz".format(dump_file_path))
+
+        local("gunzip {0}.gz".format(dump_filename))
 
 
 def _load_database_dump(dump_filename):
@@ -199,4 +227,5 @@ def deploy():
     install_requirements()
 
     deploy_static()
+    sync_database()
     run_migrations()

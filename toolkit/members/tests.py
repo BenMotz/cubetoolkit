@@ -300,6 +300,7 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
             u"name": new_name,
             u"email": u"blah.blah-blah@hard-to-tell-if-genuine.uk",
             u"postcode": "SW1A 1AA",
+            u"mailout": "on",
         }, follow=True)
 
         self.assertRedirects(response, url)
@@ -308,6 +309,27 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
         member = Member.objects.get(name=new_name)
         self.assertEqual(member.email, u"blah.blah-blah@hard-to-tell-if-genuine.uk")
         self.assertEqual(member.postcode, u"SW1A 1AA")
+        self.assertEqual(member.mailout, True)
+
+        self.assertContains(response, u"Added member: {0}".format(member.number))
+
+    def test_post_minimal_submission(self):
+        new_name = u"Another New \u20acejit"
+
+        self.assertEqual(Member.objects.filter(name=new_name).count(), 0)
+
+        url = reverse("add-member")
+        response = self.client.post(url, data={
+            u"name": new_name,
+        }, follow=True)
+
+        self.assertRedirects(response, url)
+        self.assertTemplateUsed(response, "form_new_member.html")
+
+        member = Member.objects.get(name=new_name)
+        self.assertEqual(member.email, u"")
+        self.assertEqual(member.postcode, u"")
+        self.assertEqual(member.mailout, False)
 
         self.assertContains(response, u"Added member: {0}".format(member.number))
 
@@ -552,7 +574,7 @@ class TestEditMemberViewNotLoggedIn(MembersTestsMixin, TestCase):
         url = reverse("edit-member", kwargs={"member_id": 2})
         response = self.client.post(url, data={
             'name': new_name,
-            'email': 'snoo@whatver',
+            'email': 'snoo@whatver.com',
             'k': member_mailout_key,
             'address': "somewhere over the rainbow, I guess",
             'posttown': "Town Town Town!",
@@ -572,7 +594,7 @@ class TestEditMemberViewNotLoggedIn(MembersTestsMixin, TestCase):
 
         member = Member.objects.get(pk=2)
         self.assertEqual(member.name, new_name)
-        self.assertEqual(member.email, 'snoo@whatver')
+        self.assertEqual(member.email, 'snoo@whatver.com')
         self.assertEqual(member.address, "somewhere over the rainbow, I guess")
         self.assertEqual(member.posttown, "Town Town Town!")
         self.assertEqual(member.postcode, "< Sixteen chars?")
@@ -590,6 +612,30 @@ class TestEditMemberViewNotLoggedIn(MembersTestsMixin, TestCase):
 
         self.assertContains(response, new_name)
         self.assertContains(response, "Member 02 updated")
+
+    def test_edit_post_form_invalid_emails(self):
+        new_name = u'N\u018EW Name'
+
+        member = Member.objects.get(pk=2)
+        self.assertEqual(member.name, u"Tw\u020d Member")
+        member_mailout_key = member.mailout_key
+        self.assertTrue(member.is_member)
+
+        url = reverse("edit-member", kwargs={"member_id": 2})
+        response = self.client.post(url, data={
+            'name': new_name,
+            'email': 'definitely_invalid@example/com',
+            'k': member_mailout_key,
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_member.html")
+
+        self.assertFormError(response, 'form', 'email', u'Enter a valid email address.')
+
+        member = Member.objects.get(pk=2)
+        self.assertNotEqual(member.name, new_name)
+        self.assertEqual(member.email, "two@example.com")
+        self.assertEqual(member.mailout_key, member_mailout_key)
 
     def test_edit_post_form_invalid_data_missing(self):
         member = Member.objects.get(pk=2)
