@@ -81,6 +81,14 @@ class Migration(SchemaMigration):
             'media_file': ('django.db.models.fields.files.FileField', [], {'max_length': '256', 'null': 'True', 'blank': 'True'}),
             'mimetype': ('django.db.models.fields.CharField', [], {'max_length': '64'})
         },
+        u'diary.printedprogramme': {
+            'Meta': {'object_name': 'PrintedProgramme', 'db_table': "'PrintedProgrammes'"},
+            'designer': ('django.db.models.fields.CharField', [], {'max_length': '256', 'null': 'True', 'blank': 'True'}),
+            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'month': ('django.db.models.fields.DateField', [], {'unique': 'True'}),
+            'notes': ('django.db.models.fields.TextField', [], {'max_length': '8192', 'null': 'True', 'blank': 'True'}),
+            'programme': ('django.db.models.fields.files.FileField', [], {'max_length': '256'})
+        },
         u'diary.role': {
             'Meta': {'ordering': "['name']", 'object_name': 'Role', 'db_table': "'Roles'"},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
@@ -99,7 +107,7 @@ class Migration(SchemaMigration):
             'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
         },
         u'diary.showing': {
-            'Meta': {'object_name': 'Showing', 'db_table': "'Showings'"},
+            'Meta': {'ordering': "['start']", 'object_name': 'Showing', 'db_table': "'Showings'"},
             'booked_by': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
             'cancelled': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'confirmed': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
