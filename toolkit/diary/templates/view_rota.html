@@ -8,9 +8,13 @@ CUBE role rota
 {{ block.super }}
 <style type="text/css">
     h1, h2 { margin: 1mm; }
+    h1 { font-size: 16pt; }
+    h2 { font-size: 14pt; }
     td.cell_day {
-        font-weight: bold;
         text-align: right;
+    }
+    td.cell_day strong {
+        font-weight: bold;
     }
     td.event_name {
         font-weight: bold;
@@ -20,22 +24,29 @@ CUBE role rota
     }
     td.rer { width: 3.5cm; }
     td.rel { width: 3.5cm; text-align: right;}
+
+    @media print {
+        /* Don't show header when printed */
+        #eventfield_header {
+            display: none;
+        }
+    }
 </style>
 {% endblock %}
 
 {% block body %}
 {{ block.super }}
-<table border="0" cellspacing="0">
+<h1>Rota from {{ start_date|date:"D d/m/y" }} to {{ end_date|date:"D d/m/y" }}</h1>
+<table cellspacing="0">
 
 {% for showing in showings %}
-    {% ifchanged %}<tr><td><h1>{{ showing.start|date:"Y" }} </h1></td><td colspan="6"></td></tr>{% endifchanged %}
-    {% ifchanged %}<tr><td></td><td><h2>{{ showing.start|date:"F" }}</h2></td><td colspan="5"></td></tr>{% endifchanged %}
-    <tr><td> </td><td class="cell_day">{{ showing.start|date:"D"}}&nbsp;{{ showing.start|date:"j" }}</td><td>{{ showing.start|date:"H:i" }}</td><td class="event_name" colspan="4">{{ showing.event.name.upper }} </td></tr>
+    {% ifchanged %}<tr><td><h2>{{ showing.start|date:"F Y" }}</h2></td><td colspan="5"></td></tr>{% endifchanged %}
+    <tr><td class="cell_day">{{ showing.start|date:"D j <\s\t\r\o\n\g>H:i"|safe}}</strong></td><td class="event_name" colspan="5">{{ showing.event.name.upper }} </td></tr>
     {% for rota_entry in showing.rotaentry_set.all %}
         {% if forloop.counter|divisibleby:2 %}
             <td class="rer">|   </td><td>&gt; {{ rota_entry.role.name }}-{{ rota_entry.rank }} </td></tr>
         {% else %}
-            <tr><td colspan="3"></td><td class="rl"> {{ rota_entry.role.name }}-{{ rota_entry.rank }} &lt; </td><td class="rel">|</td>
+            <tr><td colspan="2"></td><td class="rl"> {{ rota_entry.role.name }}-{{ rota_entry.rank }} &lt; </td><td class="rel">|</td>
             {% if forloop.last %}
                 <td colspan="2"></td></tr>
             {% endif %}
