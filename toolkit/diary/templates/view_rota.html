@@ -7,6 +7,7 @@ CUBE role rota
 {% block css %}
 {{ block.super }}
 <style type="text/css">
+    body {font-family:Arial,Helvetica,sans-serif; }
     h1, h2 { margin: 1mm; }
     h1 { font-size: 16pt; }
     h2 { font-size: 14pt; }
@@ -18,15 +19,29 @@ CUBE role rota
     }
     td.event_name {
         font-weight: bold;
+        font-size: 14pt;
+    }
+    td.event_date {
+        font-weight: bold;
+        font-size: 14pt;
     }
     td.rl {
         text-align: right;
     }
-    td.rer { width: 3.5cm; }
-    td.rel { width: 3.5cm; text-align: right;}
+    td.rer { 
+        width: 5cm; height: 30px; 
+        border-style: solid; border-width: 1px;
+        border-color: gray;
+    } 
+    td.rel { 
+        width: 5cm; height: 30px;
+        border-style: solid; border-width: 1px;
+        border-color: gray;
+        text-align: right; 
+    }
 
     @media print {
-        /* Don't show header when printed */
+        /* Don't show header when printed */ 
         #eventfield_header {
             display: none;
         }
@@ -37,16 +52,16 @@ CUBE role rota
 {% block body %}
 {{ block.super }}
 <h1>Rota from {{ start_date|date:"D d/m/y" }} to {{ end_date|date:"D d/m/y" }}</h1>
-<table cellspacing="0">
+<table border="0" cellspacing="0">
 
 {% for showing in showings %}
-    {% ifchanged %}<tr><td><h2>{{ showing.start|date:"F Y" }}</h2></td><td colspan="5"></td></tr>{% endifchanged %}
-    <tr><td class="cell_day">{{ showing.start|date:"D j <\s\t\r\o\n\g>H:i"|safe}}</strong></td><td class="event_name" colspan="5">{{ showing.event.name.upper }} </td></tr>
+    {% ifchanged %}<tr><td colspan="6"><h2>{{ showing.start|date:"F Y" }}</h2></td></tr>{% endifchanged %}
+    <tr><td class="event_date" colspan="3">{{ showing.start|date:"D j H:i"|safe}}</td><td class="event_name" colspan="3">{{ showing.event.name }} </td></tr>
     {% for rota_entry in showing.rotaentry_set.all %}
         {% if forloop.counter|divisibleby:2 %}
-            <td class="rer">|   </td><td>&gt; {{ rota_entry.role.name }}-{{ rota_entry.rank }} </td></tr>
+            <td class="rer">   </td><td> {{ rota_entry.role.name }}-{{ rota_entry.rank }} </td></tr>
         {% else %}
-            <tr><td colspan="2"></td><td class="rl"> {{ rota_entry.role.name }}-{{ rota_entry.rank }} &lt; </td><td class="rel">|</td>
+            <tr><td colspan="2"></td><td class="rl"> {{ rota_entry.role.name }}-{{ rota_entry.rank }} </td><td class="rel"></td>
             {% if forloop.last %}
                 <td colspan="2"></td></tr>
             {% endif %}
