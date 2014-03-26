@@ -972,8 +972,8 @@ class ViewEventFieldTests(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "view_rota.html")
 
-        self.assertNotContains(response, u"EVENT THREE TITLE")
-        self.assertContains(response, u"EVENT FOUR TITL\u0112")
+        self.assertNotContains(response, u"Event three title")
+        self.assertContains(response, u"Event four titl\u0113")
         self.assertContains(response, u"Role 2 (nonstandard)-1")
 
     def test_view_event_field_copy(self):
@@ -1007,8 +1007,8 @@ class ViewEventFieldTests(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "view_rota.html")
 
-        self.assertContains(response, u"EVENT THREE TITLE")
-        self.assertContains(response, u"EVENT FOUR TITL\u0112")
+        self.assertContains(response, u"Event three title")
+        self.assertContains(response, u"Event four titl\u0113")
 
     def test_custom_start_date_rota_less_long_time(self):
         # Now shorter date range, should find one fewer event
@@ -1019,8 +1019,8 @@ class ViewEventFieldTests(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "view_rota.html")
 
-        self.assertContains(response, u"EVENT THREE TITLE")
-        self.assertNotContains(response, u"EVENT FOUR TITL\u0112")
+        self.assertContains(response, u"Event three title")
+        self.assertNotContains(response, u"Event four titl\u0113")
 
     def test_custom_start_date_rota_invalid_date(self):
         # Now shorter date range, should find one fewer event
