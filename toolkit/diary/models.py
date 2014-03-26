@@ -118,6 +118,7 @@ class EventTag(models.Model):
 
     class Meta:
         db_table = 'EventTags'
+        ordering = ['name']
 
     def __unicode__(self):
         return self.name
