@@ -4,6 +4,8 @@ var mailoutController = function (options) {
     var POLL_PERIOD = 1000; // milliseconds
 
     // Configured by setupPage:
+    var mail_subject;
+    var mail_body;
     var progressURL;
     var execURL;
     var progressBar;
@@ -22,6 +24,9 @@ var mailoutController = function (options) {
 
     function setupPage(options) {
         var progressBarId;
+
+        mail_subject = options.subject;
+        mail_body = options.body;
 
         progressURL = options.progressURL;
         execURL = options.execURL;
@@ -91,8 +96,8 @@ var mailoutController = function (options) {
         set_state(S_SENDING);
 
         data = 'csrfmiddlewaretoken=' + encodeURIComponent(csrftoken) +
-               '&subject=' +  encodeURIComponent(jQuery('p#subject').html()) +
-               '&body=' + encodeURIComponent(jQuery('p#body').html());
+               '&subject=' +  encodeURIComponent(mail_subject) +
+               '&body=' + encodeURIComponent(mail_body);
 
         send_xhr = jQuery.ajax(execURL, {
             'type': 'POST',

@@ -37,11 +37,15 @@ Mailout dispatch
 <script type="text/javascript" src="{{ STATIC_URL }}diary/js/mailout.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
+    var subject = "{{ subject|safe|escapejs }}";
+    var body = "{{ body|safe|escapejs }}";
     mailoutController({
         progressURL: "{% url "mailout-progress" %}",
         execURL: "{% url "exec-mailout" %}",
         progressBarId: "progress",
-        jQuery: $
+        jQuery: $,
+        subject: subject,
+        body: body
     });
 });
 </script>
