@@ -32,129 +32,18 @@ Mailout dispatch
 {% endblock %}
 
 {% block script %}
-<!-- Screw progressive enhancement -->
 <script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}diary/js/mailout.js"></script>
 <script type="text/javascript">
-
-var POLL_PERIOD = 1000; // milliseconds
-var progress = 0;
-var progressBar;
-var csrftoken;
-var send_xhr;
-
-function getCookie(name) {
-    var cookieValue = null;
-    if (document.cookie && document.cookie != '') {
-        var cookies = document.cookie.split(';');
-        for (var i = 0; i < cookies.length; i++) {
-            var cookie = jQuery.trim(cookies[i]);
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) == (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
-}
-
-function mail_send_progress_poll(data, textStatus, jqXHR) {
-    if (!data) {
-        return;
-    }
-
-    complete = data['complete'];
-
-    if (complete !== true) {
-        progress = data['progress'];
-        update_progress(progress);
-        window.setTimeout(function() {
-                $.getJSON('{% url "mailout-progress" %}?task_id=' + data['task_id'], mail_send_progress_poll);
-        }, POLL_PERIOD);
-    } else {
-        if (data['error'] === true) {
-            set_state(S_ERROR);
-            if (data['error_msg']) {
-                $('#error_msg').html(data['error_msg']);
-            }
-        } else {
-            set_state(S_COMPLETE);
-        }
-    }
-}
-
-
-function update_progress(percentage, error, error_message, count) {
-    progressBar.progressbar('value', percentage);
-}
-
-function mail_send_error(jqXHR, textStatus, errorThrown) {
-    alert("Error: " + textStatus + " " + errorThrown);
-}
-
-function start_send() {
-    set_state(S_SENDING);
-
-    progress = 0;
-    update_progress(progress);
-    data = 'csrfmiddlewaretoken=' + encodeURIComponent(csrftoken) +
-           '&subject=' +  encodeURIComponent($('p#subject').html()) +
-           '&body=' + encodeURIComponent($('p#body').html());
-
-    send_xhr = $.ajax('{% url "exec-mailout" %}', {
-            'type': 'POST',
-            'cache': false,
-            'data': data,
-            'dataType': 'json',
-            'error': mail_send_error,
-            'success': mail_send_progress_poll,
-            });
-
-    window.setTimeout(mail_send_progress_poll, 100);
-}
-
-function cancel_send() {
-    set_state(S_ABORTED);
-
-    progress = 1000;
-}
-
-var S_READY = 0;
-var S_SENDING = 1;
-var S_COMPLETE = 2;
-var S_ABORTED = 3;
-var S_ERROR = 4;
-
-function set_state(state) {
-    switch(state) {
-        case S_READY:
-            $('#status').html('Please read through and check the text below, then click <span id="send">Send</span> when you\'re sure...');
-            $('#send').button().click(start_send);
-            break;
-        case S_SENDING:
-            $('#status').html('Sending. If you change your mind then <span id="cancel">Cancel</span>');
-            $('#cancel').button().click(cancel_send);
-            break;
-        case S_ABORTED:
-            $('#status').html('Sending aborted not yet implemented!');
-            break;
-        case S_COMPLETE:
-            $('#status').html('Sent');
-            break;
-        case S_ERROR:
-            $('#status').html('An error occurred: <span id="error_msg">(unknown)</span>');
-            break;
-    }
-}
-
 $(document).ready(function() {
-    csrftoken = getCookie('csrftoken');
-    set_state(S_READY);
-    progressBar = $('#progress').progressbar(0);
+    mailoutController({
+        progressURL: "{% url "mailout-progress" %}",
+        execURL: "{% url "exec-mailout" %}",
+        progressBarId: "progress",
+        jQuery: $
+    });
 });
-
-
 </script>
 {% endblock %}
 
