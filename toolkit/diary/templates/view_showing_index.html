@@ -11,19 +11,27 @@
 {% block body %}
 
 <p><a name="top"></a></p>
-<div class="programme"><a href="http://www.cubecinema.com/"><img class="cubelogo" src="{{ STATIC_URL }}diary/prog_logo_captioned.png" alt="Cube Programme"></a><br>
-
-{% if printed_programmes %}
-    <p align='center'>
-    {% for printed_programme in printed_programmes %}
-    <img src="{{ STATIC_URL }}diary/tiny_pdf_file_icon.gif" alt="Link to PDF"><a href="{{ printed_programme.programme.url }}">Printed programme for {{ printed_programme.month|date:"M Y" }}</a><br>
-    {% endfor %}
-    </p>
-{% endif %}
-
-<p align='center'><a href="{% url "day-view" year=start.year day=start.day month=start.month %}?daysahead=30">See 1 month</a> |
-<a href="{% url "day-view" year=start.year day=start.day month=start.month %}?daysahead=60">See 2 months</a> |
-<a href="{% url "day-view" year=start.year day=start.day month=start.month %}?daysahead=90">See 3 months</a></p>
+<div class="programme">
+<table border="0" width="100%">
+<tr><td><a href="http://www.cubecinema.com/"><img class="cubelogo" src="{{ STATIC_URL }}diary/prog_logo_captioned_300.png" alt="Cube Programme"></a></td>
+<td>
+   {% if event_type %}
+       <strong>Events tagged "{{ event_type }}"</strong><br>
+   {% endif %}
+   See events tagged <a href="{% url "default-view" %}view/music">Music</a> | <a href="{% url "default-view" %}view/film">Film</a> |
+   <a href="{% url "default-view" %}">Everything</a><br>
+   <a href="{% url "day-view" year=start.year day=start.day month=start.month %}?daysahead=30">See 1 month</a> |
+   <a href="{% url "day-view" year=start.year day=start.day month=start.month %}?daysahead=60">See 2 months</a> |
+   <a href="{% url "day-view" year=start.year day=start.day month=start.month %}?daysahead=90">See 3 months</a><br>
+   <br>
+   {% if printed_programmes %}
+       {% for printed_programme in printed_programmes %}
+       <img src="{{ STATIC_URL }}diary/tiny_pdf_file_icon.gif" alt="Link to PDF"><a href="{{ printed_programme.programme.url }}">Printed programme for {{ printed_programme.month|date:"M Y" }}</a><br>
+       {% endfor %}
+   {% endif %}
+</td>
+</tr>
+</table>
 
 {% if showings|length == 0 %}
 <p>
