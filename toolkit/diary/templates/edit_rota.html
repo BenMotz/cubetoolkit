@@ -7,20 +7,31 @@ CUBE role rota
 {% block css %}
 <style type="text/css">
     @import url('{{ STATIC_URL }}css/lib/smoothness/jquery-ui.css');
+    body {font-family:Arial,Helvetica,sans-serif; }
     h1, h2 { margin: 1mm; }
+    h1 { font-size: 16pt; }
+    h2 { font-size: 14pt; }
+
     td.cell_day {
         font-weight: bold;
         text-align: right;
+        color: blue;
     }
     td.event_name {
         font-weight: bold;
+        color: blue;
     }
-    td.rl {
+    .right {
         text-align: right;
     }
-    td.rer { width: 3.5cm; }
-    td.rel { width: 3.5cm; text-align: right;}
-    .na { color: gray; }
+    td.rota_box {
+        width: 6cm;
+        height: 0.65cm;
+        border-style: solid;
+        border-width: 0px;
+        border-color: gray;
+    }
+    .na { color: lightgray; }
 </style>
 {% endblock %}
 
@@ -36,7 +47,7 @@ CUBE role rota
          volunteer_list['deletesignup'] = 'Un-sign-up';
          volunteer_list['selected'] = 'noselection';
          $('.rota_name').editable('', {
-            width: "3.4cm",
+            width: "5cm",
             type: "select",
             data: volunteer_list,
             placeholder: '{{ placeholder_text }}',
@@ -55,12 +66,23 @@ CUBE role rota
 {% for showing in showings %}
     {% ifchanged %}<tr><td><h1>{{ showing.start|date:"Y" }} </h1></td><td colspan="6"></td></tr>{% endifchanged %}
     {% ifchanged %}<tr><td></td><td><h2>{{ showing.start|date:"F" }}</h2></td><td colspan="5"></td></tr>{% endifchanged %}
-    <tr><td> </td><td class="cell_day">{{ showing.start|date:"D"}}&nbsp;{{ showing.start|date:"j" }}</td><td>{{ showing.start|date:"H:i" }}</td><td class="event_name" colspan="4">{{ showing.event.name.upper }} </td></tr>
+    <tr>
+        <td></td>
+        <td class="cell_day">{{ showing.start|date:"D"}}&nbsp;{{ showing.start|date:"j" }}</td>
+        <td class="cell_day">{{ showing.start|date:"H:i" }}</td><td class="event_name" colspan="4">{{ showing.event.name.upper }} </td>
+    </tr>
     {% for rota_entry in showing.rotaentry_set.all %}
         {% if forloop.counter|divisibleby:2 %}
-        <td class="rer">| <span class="rota_name" id="{{ rota_entry.pk }}">{{ rota_entry.volunteer.member.name|default:placeholder_text }}</span>   </td><td>&gt; {{ rota_entry.role.name }}-{{ rota_entry.rank }} </td></tr>
+        <td class="rota_box">
+        {{ rota_entry.role.name }}-{{ rota_entry.rank }} </td>
+        <td class="rota_box"><span class="rota_name" id="{{ rota_entry.pk }}">{{ rota_entry.volunteer.member.name|default:placeholder_text }}</span></td>
+        </tr>
         {% else %}
-        <tr><td colspan="3"></td><td class="rl"> {{ rota_entry.role.name }}-{{ rota_entry.rank }} &lt; </td><td class="rel"><span class="rota_name" id="{{ rota_entry.pk }}">{{ rota_entry.volunteer.member.name|default:placeholder_text }}</span> |</td>
+        <tr>
+        <td colspan="3"></td>
+        <td class="rota_box">
+        {{ rota_entry.role.name }}-{{ rota_entry.rank }} </td>
+        <td class="rota_box"><span class="rota_name" id="{{ rota_entry.pk }}">{{ rota_entry.volunteer.member.name|default:placeholder_text }}</span></td>
             {% if forloop.last %}
                 <td colspan="2"></td></tr>
             {% endif %}
