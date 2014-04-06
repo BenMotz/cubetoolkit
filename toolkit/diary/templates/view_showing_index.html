@@ -18,7 +18,7 @@
    {% if event_type %}
        <strong>Events tagged "{{ event_type }}"</strong><br>
    {% endif %}
-   See events tagged <a href="{% url "default-view" %}view/music">Music</a> | <a href="{% url "default-view" %}view/film">Film</a> |
+   See events tagged <a href="{% url "type-view" "music"%}">Music</a> | <a href="{% url "type-view" "film"%}">Film</a> |
    <a href="{% url "default-view" %}">Everything</a><br>
    <a href="{% url "day-view" year=start.year day=start.day month=start.month %}?daysahead=30">See 1 month</a> |
    <a href="{% url "day-view" year=start.year day=start.day month=start.month %}?daysahead=60">See 2 months</a> |
