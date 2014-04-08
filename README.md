@@ -22,7 +22,22 @@ up and running, in order to work on it themselves.
 
 License
 -------
-This code is copyright Ben Motz and other contributors. It's currently,
+The code is copyright Ben Motz and other contributors. It's currently,
 slightly arbitrarily, distributed under the GNU Affero license (see LICENSE).
-If you want to use this code under some other FLOSS license then do ask, as 
+If you want to use this code under some other FLOSS license then do ask, as
 it's unlikely to be a problem.
+
+This specifically excludes the following files:
+/toolkit/members/static/members/cube_microplex_logo.gif
+/toolkit/members/static/members/default_mugshot.gif
+and all the .gif and .png files in the directory:
+/toolkit/diary/static/diary/
+These images are copyright Cube Cinema Ltd, which has not given me permission
+to distribute them. Make of that what you will.
+
+This repository also includes code from other authors that may be under
+other licenses, as indicated. Specifically the contents of the following
+directories:
+/easy_thumbnails/
+toolkit/static_common/js/lib/
+toolkit/static_common/css/lib/
