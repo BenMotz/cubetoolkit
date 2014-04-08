@@ -71,7 +71,8 @@ def view_diary(request, year=None, month=None, day=None, event_type=None):
                                .start_in_range(startdate, enddate)
                                .order_by('start')
                                .select_related()
-                               .prefetch_related('event__media'))
+                               .prefetch_related('event__media')
+                               .prefetch_related('event__tags'))
     if event_type:
         showings = showings.filter(event__tags__name=event_type)
 
