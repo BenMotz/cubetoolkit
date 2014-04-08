@@ -1,4 +1,5 @@
 {% extends "base_public.html" %}
+{% load thumbnail %}
 
 {% block title %}
 {{ event_list_name|default:"Cube Programme" }}
@@ -8,67 +9,75 @@
 <link rel="stylesheet" href="{{ STATIC_URL }}diary/css/programme.css" type="text/css" title="Preferred" media="screen,projection">
 {% endblock %}
 
-{% block body %}
+{% block script %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+    $('a.more').click(function() {
+        var target = this.href;
+        var parentDiv = this.parentNode.parentNode;
+        $.getJSON(target, function(data, textStatus, jqXHR) {
+                var el = $(parentDiv);
+                var current_height = parentDiv.offsetHeight;
+                parentDiv.innerHTML = data.copy;
+                var auto_height = el.css('height', 'auto').height();
+                el.height(current_height).animate({height: auto_height});
+        });
+        return false;
+    });
+});
+</script>
+{% endblock %}
 
+{% block body %}
 <p><a name="top"></a></p>
 <div class="programme">
-<table border="0" width="100%">
-<tr><td><a href="http://www.cubecinema.com/"><img class="cubelogo" src="{{ STATIC_URL }}diary/prog_logo_captioned_300.png" alt="Cube Programme"></a></td>
-<td>
-   {% if event_type %}
-       <strong>Events tagged "{{ event_type }}"</strong><br>
-   {% endif %}
-   See events tagged <a href="{% url "type-view" "music"%}">Music</a> | <a href="{% url "type-view" "film"%}">Film</a> |
-   <a href="{% url "default-view" %}">Everything</a><br>
-   <a href="{% url "day-view" year=start.year day=start.day month=start.month %}?daysahead=30">See 1 month</a> |
-   <a href="{% url "day-view" year=start.year day=start.day month=start.month %}?daysahead=60">See 2 months</a> |
-   <a href="{% url "day-view" year=start.year day=start.day month=start.month %}?daysahead=90">See 3 months</a><br>
-   <br>
-   {% if printed_programmes %}
-       {% for printed_programme in printed_programmes %}
-       <img src="{{ STATIC_URL }}diary/tiny_pdf_file_icon.gif" alt="Link to PDF"><a href="{{ printed_programme.programme.url }}">Printed programme for {{ printed_programme.month|date:"M Y" }}</a><br>
-       {% endfor %}
-   {% endif %}
-</td>
-</tr>
-</table>
+    <table border="0" width="100%">
+    <tr><td><a href="http://www.cubecinema.com/"><img id="cubelogo" src="{{ STATIC_URL }}diary/prog_logo_captioned_300.png" alt="Cube Programme"></a></td>
+    <td>
+       {% if event_type %}
+           <strong>Events tagged "{{ event_type }}"</strong><br>
+       {% endif %}
+       See events tagged <a href="{% url "type-view" "music"%}">Music</a> | <a href="{% url "type-view" "film"%}">Film</a> |
+       <a href="{% url "default-view" %}">Everything</a><br>
+       <a href="{% url "day-view" year=start.year day=start.day month=start.month %}?daysahead=30">See 1 month</a> |
+       <a href="{% url "day-view" year=start.year day=start.day month=start.month %}?daysahead=60">See 2 months</a> |
+       <a href="{% url "day-view" year=start.year day=start.day month=start.month %}?daysahead=90">See 3 months</a><br>
+       <br>
+       {% if printed_programmes %}
+           {% for printed_programme in printed_programmes %}
+           <img src="{{ STATIC_URL }}diary/tiny_pdf_file_icon.gif" alt="Link to PDF"><a href="{{ printed_programme.programme.url }}">Printed programme for {{ printed_programme.month|date:"M Y" }}</a><br>
+           {% endfor %}
+       {% endif %}
+    </td>
+    </tr>
+    </table>
 
-{% if showings|length == 0 %}
-<p>
-{% if event_type %}
-Couldn't find anything tagged <strong>{{ event_type }}</strong>
-{% else %}
-Nothing on between {{ start|date:"l j M Y"  }} and {{ end|date:"l j M Y" }}
-{% endif %}
-</p>
-{% endif %}
-
-<table class="summary">
-{% for showing in showings %}
-    {% ifchanged %}<tr class="row_year"><td colspan="4"><h1>{{ showing.start|date:"Y" }} </h1></td></tr>{% endifchanged %}
-    {% ifchanged %}<tr class="row_month"><td colspan="4"><h2>{{ showing.start|date:"F" }}</h2></td></tr>{% endifchanged %}
-    {% ifchanged %}
-        <tr><td colspan="4">&nbsp;</td></tr>
-        {% if showing.start.weekday == 0 %}<tr class="row_weekstart"> {% else %} <tr class="row_day"> {% endif %}
-        {% if showing.start_date == today %}<td class="cell_day_today">{% else %}<td class="cell_day">{% endif %}
-        {{ showing.start|date:"D"}}&nbsp;{{ showing.start|date:"j" }}
-        </td>
+    {% if showings|length == 0 %}
+    <p>
+    {% if event_type %}
+    Couldn't find anything tagged <strong>{{ event_type }}</strong>
     {% else %}
-        <tr><td>&nbsp;</td>
-    {% endifchanged %}
-    <td class="cell_time">{{showing.start|date:"H:i"}}</td><td class="table_gap">&nbsp;</td>
-    <td class="cell_event"><a href="#event_{{showing.event.id}}">{% if showing.discounted %}<span class="discounted">{% endif %}{% if showing.cancelled %}<span class="cancelled">{% endif %}{{ showing.event.name|capfirst }}{% if showing.cancelled  and not "cancelled" in showing.event.name.lower %} (CANCELLED) </span>{% endif %}{% if showing.discounted %} {% if showing.start.weekday == 1 %}(<abbr title="Ticket Tout Tuesday">TTT</abbr>){% else %}(Discount){% endif %}</span>{% endif %}</a></td></tr>
-{% endfor %}
-
-</table>
-</div>
-<div class="details">
-{% for event, showings in events.iteritems %}
-<div class="event" id="event_{{ event.id }}">
-{% include "event_fragment.html" %}
-<p>[<a href="#top">top of page</a>]</p>
-</div>
-{% endfor %}
+    Nothing on between {{ start|date:"l j M Y"  }} and {{ end|date:"l j M Y" }}
+    {% endif %}
+    </p>
+    {% endif %}
+    <div id="listing">
+    {% for showing in showings %}
+        {% ifchanged %}<h1>{{ showing.start|date:"F" }}</h1>{% endifchanged %}
+        {% ifchanged %}
+            <h2>{{ showing.start|date:"D j"}}</h2>
+        {% endifchanged %}
+        <div class="showing{% if showing.start_date == today %} today{% endif %}{% if showing.discounted %} discounted{% if showing.start.weekday == 1 %} ttt{%endif%}{% endif %}{% if showing.cancelled %} cancelled{% endif %}">
+            <h3>{{showing.start|date:"H:i"}} {{ showing.event.name }}</h3>
+            {% with showing.event.media.all.0 as media_item %}{% if media_item %}<img src="{{ media_item.media_file|thumbnail_url:'indexview' }}" alt="Picture for event {{ showing.event.name }}">{% endif %}{% endwith %}
+            <div class="copy">
+            <p>{{ showing.event.copy_summary }} [<a class="more" href="{% url "single-event-view" showing.event.id %}">more...</a>]</p>
+            <p class="tags">{% for tag in showing.event.tags.all %}<a href="{% url "type-view" tag.name %}" class="tag_{{tag.name}}">{{tag.name}}</a> {% endfor %}</p>
+            </div>
+        </div>
+    {% endfor %}
+    </div>
 </div>
 {% endblock %}
 

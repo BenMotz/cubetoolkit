@@ -1,106 +1,131 @@
-/* This looks horrible. */
+/* This still looks horrible. */
 
 body {
 	font-family: sans-serif;
 	color: black;
-	background-color: #0065C9;
-	padding-left: 8px;
+	background-color: white;
+	font-size: 10pt;
 }
 
-img.cubelogo {
+img#cubelogo {
 	text-align: center;
 	border: none;
 }
+
 .programme {
-	background-color: white;
 	margin-left: 10%;
 	margin-right: 10%;
-	padding: 10px;
 	width: 80%;
-	border: thin solid black;
-}
-.footer {
-	background-color: white;
-	margin-left: 10%;
-	margin-right: 10%;
-	padding: 2px 10px 2px 10px;
-	margin-top: 20px;
-	width: 80%;
-	border: thin solid black;
 }
 
-h1.programme_title {
-	font-size: 1.1cm;
-	padding: 0;
-	margin: 1mm;
+#listing {
+	background-color: white;
 	border-bottom: thin solid black;
 }
-p.table_key {
-	font-weight: bold;
-	color: gray;
-}
-.row_year h1 {
-	font-size: 0.6cm;
-	margin: 0;	
-}
-.row_month h2 {
-	font-size: 0.5cm;
-	margin: 1px 0 3mm 4mm;
-}
-table.summary {
-	border-collapse: collapse;
-}
-td {
-	padding: 2mm;
-}
-table.summary td {
-	padding-top: 0; padding-bottom: 0;
-	vertical-align: bottom;
-}
-tr.row_weekstart td {
-	border-top: thick solid #efefef;
-	padding-top: 3mm;
-}
-td.cell_day_today {
-	text-align: right;
-	padding-left: 1.2cm;
-	font-weight: bold;
-	color: red;
-}
-td.cell_endofday { }
-td.cell_month { padding-left: 0.6cm; }
-td.cell_day {
-	text-align: right;
-	padding-left: 1.2cm;
-}
-td.cell_time { }
-td.cell_event { }
-td.table_gap {
-	width: 0.5cm;
-	border-bottom: thin dotted black;
-}
-.cancelled { color: red; }
-.discounted { color: green; }
 
-.event {
-	background-image: url(../line.jpg);
-	background-repeat: repeat-x;
-	background-color: white;
-	margin-left: 10%;
-	margin-right: 10%;
-	margin-top: 20px;
-	padding: 10px;
-	width: 80%;
-	border: thin solid gray;
-}
-.event h2 {
+#listing h1,#listing h2 {
+	font-size: 1.1em;
+	padding: 0.1em;
 	margin: 0;
+	border: thin solid black;
+	border-bottom: none;
+	clear: both;
 }
-.event img {
+#listing h3 {
+	font-size: 1.1em;
+	padding: 0.15em;
+	margin: 0;
+	border: thin solid black;
+	background-color: black;
+	color: white;
+}
+#listing .copy {
+	overflow: hidden;
+}
+
+#listing img {
 	border: none;
+	float: left;
+	padding-right: 0.5em;
 }
-p.image_caption {
-	font-style: italic;
+#listing .copy p {
+	padding: 0.5em;
+	margin: 0;
+	white-space: pre-line;
+
+}
+#listing .showing {
+	border-left: thin solid black;
+	border-right: thin solid black;
+}
+#listing .today h3::before{
+	content: "Today";
+	border-radius: 0.2em;
+	padding: 0.05em 0.15em 0.09em 0.15em;
+	margin-right: 0.5em;
+	color: black;
+	background-color: white;
+
+}
+#listing .showing:after {
+	content: "";
+	clear: both;
+	display: table;
 }
 
+#listing .discounted h3::after {
+	content: "Discounted!";
+	color: black;
+	font-weight: normal;
+	margin-left: 1em;
+	padding: 0 0.15em;
+	border-radius: 0.2em;
+	background-color: yellow;
+}
+#listing .ttt h3::after {
+	content: "Ticket Tout Tuesday";
+}
+#listing .cancelled h3::before {
+	content: "CANCELLED (sorry)";
+	text-decoration: none;
+	color: white;
+	background-color: red;
+	font-size: 2em;
+	display: inline-block;
+	position: absolute;
+	left: 30%;
+	margin: 0;
+	padding: 0 0.15em;
+	border-radius: 0.2em;
+	transform: rotate(15deg);
+	transform-origin: 0 50%;
+	-webkit-transform: rotate(15deg);
+	-webkit-transform-origin: 0 50%;
+}
 
+p.tags {
+	padding: none;
+	margin: none;
+	text-align: right;
+}
+p.tags a {
+	color: black;
+	background: gray;
+	margin: 0.1em;
+	padding: 0 0.15em;
+	border-radius: 0.2em;
+	background-color: gray;
+	text-decoration: none;
+}
+p.tags .tag_music { background: lightblue; }
+p.tags .tag_film { background: lightgreen; }
+p.tags .tag_party { background: pink; }
+p.tags .tag_talk { background: orange; }
+p.tags .tag_cabaret { background: brown; color: white;}
+p.tags .tag_bluescreen { background: blue; color: gray;}
+
+.footer {
+	margin-top: 2em;
+	padding: 0.4em;
+	border: thin solid black;
+}

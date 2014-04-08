@@ -1,7 +1,7 @@
 {% load hash_filter %}
 {% load thumbnail %}
 {# backwards-compatible anchor: #}{% if event.legacy_id %}<a name="{{ event.legacy_id }}"></a>{% endif %}
-<h2>{{ event.name|capfirst}}</h2>
+<h3>{{ event.name|capfirst}}</h3>
 
 {% with event.media.all.0 as media_item %}
 {% if media_item %}
@@ -21,6 +21,6 @@
     {% if showing.cancelled %} (cancelled)</span>{% endif %}<br>
 {% endfor %}
 </p>
-
+<div class="copy">
 {{ event.copy_html }}
-{# <p>{% for tag in event.tags.all %}{{tag.name}} {% endfor %}</p> #}
+</div>

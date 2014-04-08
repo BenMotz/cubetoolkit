@@ -181,6 +181,17 @@ def view_event(request, event_id=None, legacy_id=None):
     if event.private or len(showings) == 0:
         raise Http404("Event not found")
 
+    http_accept = request.META.get('HTTP_ACCEPT')
+
+    # Dirty hack to return JSON if requested at any priority:
+    if "application/json" in http_accept:
+        json_data = json.dumps({
+            'name': event.name,
+            'copy': event.copy_html,
+            # etc. etc.
+        })
+        return HttpResponse(json_data, mimetype="application/json")
+
     context = {
         'event': event,
         'showings': showings,

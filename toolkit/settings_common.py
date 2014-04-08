@@ -67,6 +67,10 @@ THUMBNAIL_ALIASES = {
             # Slightly arbitrary (inherited) bounding box
             'size': (250, 187),
         },
+        'indexview': {
+            # Crop to always be 200 pixels (or less) wide:
+            'size': (200, 0),
+        },
     },
 }
 
