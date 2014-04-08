@@ -89,9 +89,6 @@ def view_diary(request, year=None, month=None, day=None, event_type=None):
     context['printed_programmes'] = PrintedProgramme.objects.month_in_range(
         startdate, enddate)
 
-    if request.GET.get('template'):
-        return render(request, 'view_showing_index_oto.html', context)
-
     return render(request, 'view_showing_index.html', context)
 
 
