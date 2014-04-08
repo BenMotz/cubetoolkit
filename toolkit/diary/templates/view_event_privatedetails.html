@@ -6,26 +6,32 @@ Details for: {{ event.name }}
 {% endblock %}
 {% block css %}
 <style type="text/css">
-    h3 { font-family: Arial; }
-
-    div#booking h1 {
+    body {
+        font-size: 100%;
         font-family: Arial;
-        font-size: 18pt;
-        margin: 0 16px;
-        padding: 5px;
+    }
+    div#booking {
+        margin: 0 2em;
+    }
+    h1 {
+        font-size: 1.8em;
+        margin: 0;
+        padding: 0.5em 1em;
         background-color: #c0c0c0;
     }
-    div#booking p {
-        margin: 0 16px 0 16px;
-        padding: 16px;
+    p {
+        margin: 0;
+        padding: 0.5em 1em;
         background-color: #c0c0c0;
     }
-    div#detail p {
-        margin: 0 16px 0 16px;
-        padding: 16px;
-        background-color: #c0c0c0;
+    p.d {
+        background-color: #d0d0d0;
     }
-    div#detail p.d {
+    .copy {
+        background-color: #d0d0d0;
+        padding: 0.5em;
+    }
+    .copy p {
         background-color: #d0d0d0;
     }
     p.image_caption {
@@ -33,6 +39,9 @@ Details for: {{ event.name }}
     }
     .pre {
         white-space: pre-wrap;
+    }
+    p#cancel {
+        margin: 1em;
     }
 
 </style>
@@ -43,27 +52,29 @@ Details for: {{ event.name }}
 <h3>CUBE events diary</h3>
 
 <div id="booking">
-<h1>Details for {{ event.name }}</h1>
-<p>
-{% for showing in event.showings.all %}
-Booked for: <a href="{% url "edit-showing" showing.pk %}">{{ showing.start|date:"H:i d/m/Y"  }}</a><br>
-{% endfor %}
-</p>
-</div>
-
-<div id="detail">
-    <p class="d"><b>Name:</b>{{ event.name }} <a href="{% url "edit-event-details" event.pk %}">[edit]</a></p>
+<h1>Details for {{ event.name }} [<a href="{% url "edit-event-details" event.pk %}">edit</a>]</h1>
+    <p class="d">
+    <b>Pre-title:</b> {{event.pre_title }} <br>
+    <b>Name:</b>{{ event.name }}<br>
+    <b>Post-title:</b> {{event.post_title }} </p>
     <p class="d"><b>Tags:</b> {{ event.tags.all|join:", " }}</p>
-    <p ><b>Programmer's notes:</b><br>
+    <p>
+{% for showing in event.showings.all %}
+    Booked for: <a href="{% url "edit-showing" showing.pk %}">{{ showing.start|date:"H:i d/m/Y"  }}</a><br>
+{% endfor %}
+    </p>
+    <p><b>Pricing:</b> {{ event.pricing }}
+    </p>
+    <p class="d"><b>Film information:</b> {{ event.film_information }}<br>
+    <p class="d"><b>Programmer's notes:</b><br>
     {{event.notes}}<br>
-    <a href="{% url "edit-event-details" event.pk %}">[edit]</a></p>
     {% comment %}
     {% if event.template %}
     <p class="d"><b>Created from template:</b>{{ event.template }} </p>
     {% endif %}
     {% endcomment %}
 
-<p class="d"><b>Event image.</b><br>
+<p><b>Event image.</b><br>
 
 {% with event.media.all.0 as media_item %}
 {% if media_item %}
@@ -78,21 +89,18 @@ Booked for: <a href="{% url "edit-showing" showing.pk %}">{{ showing.start|date:
 </p>
 
 <p class="d"><b>Copy for "{{ event.name }}" (for web page)</b></p>
-<p>{{event.copy_html}}</p>
-<p><a href="{% url "edit-event-details" event.pk %}">[edit]</a></p>
+<div class="copy">{{event.copy_html}}</div>
 
-<p class="d"><b>Copy summary for "{{ event.name }}" (for printed programme)</b></p>
+<p><b>Copy summary for "{{ event.name }}" (for printed programme)</b></p>
 <p class="pre">{{event.copy_summary}}</p>
-<p><a href="{% url "edit-event-details" event.pk %}">[edit]</a></p>
 
 <p class="d"><b>Terms for "{{ event.name }}"</b></p>
-<p class="pre">{{event.terms}}</p>
-<p><a href="{% url "edit-event-details" event.pk %}">[edit]</a></p>
+<p class="d pre">{{event.terms}}</p>
 
 <p><a href="{% url "edit-event-details" event.pk %}">[edit]</a></p>
 </div>
 <!-- urgh -->
-<p><a href="{% url "cancel-edit" %}">Back</a></p>
+<p id="cancel"><a href="{% url "cancel-edit" %}">Back</a></p>
 
 {% endblock %}
 
