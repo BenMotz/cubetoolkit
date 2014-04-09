@@ -184,6 +184,12 @@ class Event(models.Model):
     class Meta:
         db_table = 'Events'
 
+    def __init__(self, *args, **kwargs):
+        super(Event, self).__init__(*args, **kwargs)
+        # Set field from template (if specified):
+        if 'template' in kwargs and not self.pricing:
+            self.pricing = kwargs['template'].pricing
+
     def __unicode__(self):
         return u"{0} ({1})".format(self.name, self.id)
 

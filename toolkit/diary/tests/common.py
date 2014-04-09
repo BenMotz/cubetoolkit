@@ -254,22 +254,24 @@ class DiaryTestsMixin(object):
         i.save()
 
         # Templates:
-        tmpl = EventTemplate(name="Template 1")
-        tmpl.save()
-        tmpl.roles = [r1]
-        tmpl.tags = [t1]
-        tmpl.save()
+        # One role, one tag, pricing
+        self.tmpl1 = EventTemplate(name="Template 1")
+        self.tmpl1.save()
+        self.tmpl1.roles = [r1]
+        self.tmpl1.tags = [t1]
+        self.tmpl1.pricing = u"Entry: \u00a35 / \u20ac10"
+        self.tmpl1.save()
 
-        tmpl = EventTemplate(name="Template 2")
-        tmpl.save()
-        tmpl.roles = [r2]
-        tmpl.tags = [t2]
-        tmpl.save()
+        # Two roles, two tags
+        self.tmpl2 = EventTemplate(name="Template 2")
+        self.tmpl2.save()
+        self.tmpl2.roles = [r1, r2]
+        self.tmpl2.tags = [t1, t3]
+        self.tmpl2.save()
 
-        tmpl = EventTemplate(name="Template 3")
-        tmpl.save()
-        tmpl.roles = [r1, r2, r3]
-        tmpl.save()
+        # No roles, no tags, no pricing
+        self.tmpl3 = EventTemplate(name="Template 3")
+        self.tmpl3.save()
 
         # Members:
         m1 = Member(name="Member One", email="one@example.com", number="1",

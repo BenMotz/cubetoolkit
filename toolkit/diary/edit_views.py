@@ -244,6 +244,9 @@ def add_event(request):
         # days from form. Uses template to set rota roles and tags.
         form = diary_forms.NewEventForm(request.POST)
         if form.is_valid():
+            # Event constructor will pull things from the template as
+            # appropriate (excluding many/many relation which can only be set
+            # after saving)
             new_event = Event(name=form.cleaned_data['event_name'],
                               template=form.cleaned_data['event_template'],
                               duration=form.cleaned_data['duration'],
