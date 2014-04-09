@@ -96,6 +96,12 @@ td.table_gap {
 .event h2 {
 	margin: 0;
 }
+.event h2 .extra {
+	display: block;
+	font-style: italic;
+	font-weight: normal;
+	font-size: 0.7em;
+}
 .event img {
 	border: none;
 }

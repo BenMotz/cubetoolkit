@@ -81,7 +81,11 @@ class DiaryTestsMixin(object):
         # Events:
         e1 = Event(
             name="Event one title",
+            pricing="PRICING_ONE",
             copy="Event one copy",
+            pre_title="PRETITLE One",
+            post_title="POSTTITLE One",
+            film_information="FILM_INFO_One",
             copy_summary="Event one copy summary",
             duration="01:30:00",
             outside_hire=True,
@@ -91,6 +95,7 @@ class DiaryTestsMixin(object):
         e2 = Event(
             name="Event two title",
             copy="Event\n two\n copy",  # newlines will be stripped at legacy conversion
+            pricing="Pricing TWO",
             copy_summary="Event two\n copy summary",
             duration="01:30:00",
             legacy_id="100",
@@ -100,7 +105,11 @@ class DiaryTestsMixin(object):
 
         e3 = Event(
             name="Event three title",
+            pricing="Pricing THREE",
             copy="Event three Copy",
+            pre_title="PRETITLE THREE",
+            post_title="POSTTITLE THREE",
+            film_information="FILM_INFO_THREE",
             copy_summary="Copy three summary",
             duration="03:00:00",
             notes="Notes",
@@ -112,6 +121,10 @@ class DiaryTestsMixin(object):
         e4 = Event(
             name=u"Event four titl\u0113",
             copy=u"Event four C\u014dpy",
+            pricing=u"\u00a3milliion per thing",
+            pre_title=u"Pretitle four",
+            post_title=u"Posttitle four",
+            film_information=u"Film info for four",
             copy_summary=u"\u010copy four summary",
             terms=u"Terminal price: \u00a31 / \u20ac3",
             duration="01:00:00",
