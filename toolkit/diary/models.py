@@ -142,6 +142,12 @@ class Event(models.Model):
 
     name = models.CharField(max_length=256, blank=False)
 
+    # Eg; "Prodco presents..."
+    pre_title = models.CharField(max_length=256, null=False, blank=True)
+
+    # Eg. "with support from The Supporters"
+    post_title = models.CharField(max_length=256, null=False, blank=True)
+
     # This is the primary key used in the old perl/bdb system
     legacy_id = models.CharField(max_length=256, null=True, editable=False)
 
@@ -155,6 +161,11 @@ class Event(models.Model):
     private = models.BooleanField(default=False)
 
     media = models.ManyToManyField(MediaItem, db_table='Event_MediaItems')
+
+    # Free text pricing info:
+    pricing = models.CharField(max_length=256, null=False, blank=True)
+    # Free text film information:
+    film_information = models.CharField(max_length=256, null=False, blank=True)
 
     copy = models.TextField(max_length=8192, null=True, blank=True)
     copy_summary = models.TextField(max_length=4096, null=True, blank=True)
@@ -172,6 +183,12 @@ class Event(models.Model):
 
     class Meta:
         db_table = 'Events'
+
+    def __init__(self, *args, **kwargs):
+        super(Event, self).__init__(*args, **kwargs)
+        # Set field from template (if specified):
+        if 'template' in kwargs and not self.pricing:
+            self.pricing = kwargs['template'].pricing
 
     def __unicode__(self):
         return u"{0} ({1})".format(self.name, self.id)
@@ -496,6 +513,8 @@ class EventTemplate(models.Model):
     roles = models.ManyToManyField(Role, db_table='EventTemplates_Roles')
     # Default tags for this event
     tags = models.ManyToManyField(EventTag, db_table='EventTemplate_Tags', blank=True)
+    # Default pricing for this event
+    pricing = models.CharField(max_length=256, null=False, blank=True)
 
     class Meta:
         db_table = 'EventTemplates'

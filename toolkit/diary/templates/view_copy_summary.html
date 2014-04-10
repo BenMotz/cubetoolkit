@@ -7,26 +7,41 @@ CUBE programme of events - copy summary report
 {% block css %}
 {{ block.super }}
 <style type="text/css">
+    body {
+        font-size: 100%;
+    }
     p {
         font-family: monospace;
+        padding: 0.8em;
+        margin: 0;
+    }
+    h2 {
+        font-size: 1.1em;
+        font-weight: bold;
+        padding: 0.4em;
+        margin: 0;
     }
     div.index p {
         white-space: pre;
-        padding: 0;
-        margin: 0;
-    }
-    div.index p.pad {
-        padding: 10pt;
-    }
-    div.index p.day {
-        padding-top: 10pt;
+        padding: 0.2em 0;
     }
 
-    div.copy p.divider {
-        padding: 10pt;
+    p.title {
+        text-decoration: underline;
+        padding: 0.1em;
+    }
+    p.pre_title, p.post_title {
+        font-style: italic;
+        padding: 0.1em;
     }
     p.copy_summary {
         white-space: pre-line;
+    }
+    p.pricing {
+        padding-top: 0.05em;
+    }
+    p.film_info {
+        padding-bottom: 0.05em;
     }
 </style>
 {% endblock %}
@@ -56,25 +71,23 @@ $(document).ready(function() {
 <h3>CUBE programme of events - copy summary report</h3>
 <p>[<a href="#" id="hide_index">Hide index</a>]</p>
 <div class="index">
-<p class="pad">CUBE MICROPLEX</p>
-
-<p class="pad">Programme of events.</p>
-
 {% for showing in showings %}
-    {% ifchanged %}<p class="pad">{{ showing.start|date:"Y" }}</p>{% endifchanged %}
-    {% ifchanged %}<p class="pad">{{ showing.start|date:"F"|upper }}</p>{% endifchanged %}
-    {% ifchanged %}<p class="day">{{ showing.start|date:"D"}} {{ showing.start|date:"d" }}{% else %}
+    {% ifchanged %}<h2>{{ showing.start|date:"F Y" }}</h2>{% endifchanged %}
+    {% ifchanged %}<p>{{ showing.start|date:"D"}} {{ showing.start|date:"d" }}{% else %}
     <p>      {% endifchanged %} {{showing.start|date:"H:i"}} ......... {% if showing.hide_in_programme or showing.event.private %}Closed for private event.{% else %}{{ showing.event.name|capfirst }}{% if showing.cancelled %} (CANCELLED){% endif %}{% if showing.discounted %} (TTT){% endif %}{% endif %}</p>
 {% endfor %}
-
 </div>
 <div class="copy">
 
 {% for showing in showings %}
 {% if not showing.event.private and not showing.hide_in_programme %}
 {% ifchanged %}
-<p class="divider">------------------------------------------------------------------------------</p>
-<p>{{ showing.event.name|upper }}</p>
+<p>------------------------------------------------------------------------------</p>
+{% if showing.event.pre_title %}<p class="pre_title">{{ showing.event.pre_title }}</p>{% endif %}
+<p class="title">{{ showing.event.name }}</p>
+{% if showing.event.post_title %}<p class="post_title">{{ showing.event.post_title }}</p>{% endif %}
+{% if showing.event.film_information %}<p class="film_info">{{ showing.event.film_information }}</p>{% endif %}
+{% if showing.event.pricing %}<p class="pricing">{{ showing.event.pricing }}</p>{% endif %}
 <p class="copy_summary">{{ showing.event.copy_summary}}</p>
 <p><a href="{% url "edit-event-details" showing.event.id %}">[edit]</a></p>
 {% endifchanged %}

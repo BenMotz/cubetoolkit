@@ -35,6 +35,10 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         # Should test the contents better, I suspect...
         self.assertContains(response, u'Event three title')
         self.assertContains(response, u'Event three Copy')
+        self.assertContains(response, u'Pricing THREE')
+        self.assertContains(response, u'PRETITLE THREE')
+        self.assertContains(response, u'POSTTITLE THREE')
+        self.assertContains(response, u'FILM_INFO_THREE')
         # Not confirmed / private:
         self.assertNotContains(response, u'Event one title')
         self.assertNotContains(response, u'Event one copy')

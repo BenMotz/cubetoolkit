@@ -622,6 +622,10 @@ class EditEventView(DiaryTestsMixin, TestCase):
         self.assertContains(response, u"Event one title")
         self.assertContains(response, u"Event one copy")
         self.assertContains(response, u"Event one copy summary")
+        self.assertContains(response, u"PRICING_ONE")
+        self.assertContains(response, u"PRETITLE One")
+        self.assertContains(response, u"POSTTITLE One")
+        self.assertContains(response, u"FILM_INFO_One")
         self.assertContains(response, u"01:30:00")
         self.assertContains(response, u'<input id="id_outside_hire" checked="checked" name="outside_hire" type="checkbox" />', html=True)
         self.assertContains(response, u'<input id="id_private" name="private" type="checkbox" />', html=True)
@@ -696,6 +700,10 @@ class EditEventView(DiaryTestsMixin, TestCase):
 
         event = Event.objects.get(id=2)
         self.assertEqual(event.name, u'New \u20acvent Name')
+        self.assertEqual(event.pre_title, u'')
+        self.assertEqual(event.post_title, u'')
+        self.assertEqual(event.pricing, u'')
+        self.assertEqual(event.film_information, u'')
         self.assertEqual(event.duration, time(0, 10))
         self.assertEqual(event.copy, u'')
         self.assertEqual(event.copy_summary, u'')
@@ -716,6 +724,10 @@ class EditEventView(DiaryTestsMixin, TestCase):
             'duration': u'01:10:09',
             'copy': u'Some more copy',
             'copy_summary': u'Copy summary blah',
+            'pre_title': u'The thing that will be',
+            'post_title': u'The thing that was',
+            'pricing': u'Full \u00A35',
+            'film_information': u'Blah blah films',
             'terms': u'Always term time',
             'notes': u'This is getting\n boring',
             'outside_hire': u'on',
@@ -733,6 +745,11 @@ class EditEventView(DiaryTestsMixin, TestCase):
         self.assertEqual(event.media.count(), 0)
         self.assertEqual(event.outside_hire, True)
         self.assertEqual(event.private, True)
+        self.assertEqual(event.legacy_id, u'100')
+        self.assertEqual(event.pre_title, u'The thing that will be')
+        self.assertEqual(event.post_title, u'The thing that was')
+        self.assertEqual(event.pricing, u'Full \u00a35')
+        self.assertEqual(event.film_information, u'Blah blah films')
         # Shouldn't have changed:
         self.assertEqual(event.legacy_id, u'100')
 
@@ -986,6 +1003,22 @@ class ViewEventFieldTests(DiaryTestsMixin, TestCase):
         self.assertContains(response, u"Sun 09 18:00 ......... Event four titl\u0113")
         self.assertContains(response, u"<p>EVENT FOUR TITL\u0112</p>", html=True)
         self.assertContains(response, u"<p>Event four C\u014dpy</p>", html=True)
+
+    def test_view_event_field_copy_summary(self):
+        url = reverse("view_event_field", kwargs={"field": "copy_summary"})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_copy_summary.html")
+
+        self.assertNotContains(response, u"EVENT THREE TITLE")
+        self.assertContains(response, u'Sun 09 18:00 ......... Event four titl\u0113')
+        self.assertContains(response, u'<p class="title">Event four titl\u0113</p>', html=True)
+        self.assertContains(response, u'<p class="copy_summary">\u010copy four summary</p>', html=True)
+
+        self.assertContains(response, u"\u00a3milliion per thing")
+        self.assertContains(response, u"Pretitle four")
+        self.assertContains(response, u"Posttitle four")
+        self.assertContains(response, u"Film info for four")
 
     def test_view_event_field_terms(self):
         url = reverse("view_event_field", kwargs={"field": "terms"})

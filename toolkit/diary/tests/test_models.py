@@ -168,3 +168,118 @@ class PrintedProgrammeModelTests(TestCase):
         pp = PrintedProgramme.objects.get(pk=pp.pk)
         self.assertEqual(pp.month, date(2010, 2, 1))
 
+
+class EventPricingFromTemplate(DiaryTestsMixin, TestCase):
+    def test_set_pricing_from_template(self):
+        # No pricing specified when creating the event, and pricing specified
+        # in the template:
+        new_event = Event(
+            name=u"Event Title",
+            template=self.tmpl1,
+        )
+        self.assertEqual(new_event.pricing, u"Entry: \u00a35 / \u20ac10")
+        new_event.save()
+        self.assertEqual(new_event.pricing, u"Entry: \u00a35 / \u20ac10")
+
+    def test_dont_set_pricing_from_template(self):
+        # Pricing specified when creating the event, and pricing specified in
+        # the template:
+        new_event = Event(
+            name=u"Event Title",
+            pricing=u"Actual pricing",
+            template=self.tmpl1,
+        )
+        self.assertEqual(new_event.pricing, u"Actual pricing")
+        new_event.save()
+        self.assertEqual(new_event.pricing, u"Actual pricing")
+
+    def test_cant_set_pricing_from_template(self):
+        # Pricing specified when creating the event, and no pricing specified
+        # in the template:
+        new_event = Event(
+            name=u"Event Title",
+            pricing=u"Actual pricing",
+            template=self.tmpl3,
+        )
+        self.assertEqual(new_event.pricing, u"Actual pricing")
+        new_event.save()
+        self.assertEqual(new_event.pricing, u"Actual pricing")
+
+    def test_set_from_template_no_pricing(self):
+        # No pricing specified when creating the event, and no pricing
+        # specified in the template:
+        new_event = Event(
+            name=u"Event Title",
+            template=self.tmpl3,
+        )
+        self.assertEqual(new_event.pricing, u"")
+        new_event.save()
+        self.assertEqual(new_event.pricing, u"")
+
+    def test_no_template(self):
+        # Pricing specified when creating the event, and no pricing specified
+        # in the template:
+        new_event = Event(
+            name=u"Event Title",
+            pricing=u"Actual pricing",
+        )
+        self.assertEqual(new_event.pricing, u"Actual pricing")
+        new_event.save()
+        self.assertEqual(new_event.pricing, u"Actual pricing")
+
+
+class EventTagsFromTemplate(DiaryTestsMixin, TestCase):
+    def test_set_one_tag_from_template(self):
+        new_event = Event(
+            name=u"Event Title",
+            template=self.tmpl1,
+        )
+        new_event.save()
+        # Tags shouldn't have been set yet:
+        self.assertEqual(new_event.tags.count(), 0)
+
+        new_event.reset_tags_to_default()
+
+        self.assertEqual(new_event.tags.count(), 1)
+        self.assertEqual(new_event.tags.all()[0].name, u"tag one")
+
+    def test_set_two_tags_from_template(self):
+        new_event = Event(
+            name=u"Event Title",
+            template=self.tmpl2,
+        )
+        new_event.save()
+        # Tags shouldn't have been set yet:
+        self.assertEqual(new_event.tags.count(), 0)
+
+        new_event.reset_tags_to_default()
+
+        self.assertEqual(new_event.tags.count(), 2)
+        self.assertEqual(new_event.tags.all()[0].name, u"tag one")
+        self.assertEqual(new_event.tags.all()[1].name, u"\u0167ag \u0165hre\u0119")
+
+    def test_set_no_tags_from_template(self):
+        new_event = Event(
+            name=u"Event Title",
+            template=self.tmpl3,
+        )
+        new_event.save()
+        # Tags shouldn't have been set yet:
+        self.assertEqual(new_event.tags.count(), 0)
+
+        new_event.reset_tags_to_default()
+
+        # Still no tags
+        self.assertEqual(new_event.tags.count(), 0)
+
+    def test_set_tags_no_template(self):
+        # No template set, call reset_tags
+        new_event = Event(
+            name=u"Event Title",
+        )
+        new_event.save()
+        self.assertEqual(new_event.tags.count(), 0)
+
+        new_event.reset_tags_to_default()
+
+        self.assertEqual(new_event.tags.count(), 0)
