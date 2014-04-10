@@ -6,7 +6,7 @@
 
 {% with event.media.all.0 as media_item %}
 {% if media_item %}
-<p><a href="{{ media_url }}{{ media_item.media_file }}"><img src="{{ media_item.media_file|thumbnail_url:'std' }}" alt="Picture for event {{ showing.event.name }}"></a></p>
+<p><a href="{{ media_url }}{{ media_item.media_file }}"><img src="{{ media_item.media_file|thumbnail_url:'eventdetail' }}" alt="Picture for event {{ showing.event.name }}"></a></p>
 {% if media_item.credit %}
 <p class="image_caption">Image by: {{ media_item.credit }}</p>
 {% endif %}

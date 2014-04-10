@@ -1,10 +1,14 @@
 /* This still looks horrible. */
 
 body {
-	font-family: sans-serif;
+	font-family: 'Droid Sans', sans-serif;
 	color: black;
-	background-color: white;
+	background-color: #bcbcbc;
 	font-size: 10pt;
+}
+
+.programme {
+	background-color: white;
 }
 
 img#cubelogo {
@@ -13,9 +17,10 @@ img#cubelogo {
 }
 
 .programme {
-	margin-left: 10%;
-	margin-right: 10%;
-	width: 80%;
+	margin-left: auto;
+	margin-right: auto;
+	width: 60%;
+	padding: 1.4em;
 }
 
 #listing {
@@ -31,13 +36,21 @@ img#cubelogo {
 	border-bottom: none;
 	clear: both;
 }
+
+.pre_title, .post_title {
+	font-weight: normal;
+	display: block;
+	font-weight: bold;
+	font-size: 0.6em;
+}
 #listing h3 {
-	font-size: 1.1em;
+	font-size: 1.5em;
 	padding: 0.15em;
 	margin: 0;
-	border: thin solid black;
-	background-color: black;
-	color: white;
+	text-transform: uppercase;
+}
+#listing .factoids {
+	font-weight: bold;
 }
 #listing .copy {
 	overflow: hidden;
@@ -46,26 +59,17 @@ img#cubelogo {
 #listing img {
 	border: none;
 	float: left;
-	padding-right: 0.5em;
+	padding-right: 1.5em;
 }
 #listing .copy p {
-	padding: 0.5em;
+	padding: 0.5em 0.5em 0.5em 0;
 	margin: 0;
 	white-space: pre-line;
 
 }
 #listing .showing {
-	border-left: thin solid black;
-	border-right: thin solid black;
-}
-#listing .today h3::before{
-	content: "Today";
-	border-radius: 0.2em;
-	padding: 0.05em 0.15em 0.09em 0.15em;
-	margin-right: 0.5em;
-	color: black;
-	background-color: white;
-
+	padding: 0.8em 0;
+	border-bottom: 2px solid darkgray;
 }
 #listing .showing:after {
 	content: "";
@@ -103,26 +107,25 @@ img#cubelogo {
 	-webkit-transform-origin: 0 50%;
 }
 
-p.tags {
+span.tags {
 	padding: none;
 	margin: none;
-	text-align: right;
+	font-weight: normal;
+	font-size: 0.8em;
+	display: block;
 }
-p.tags a {
-	color: black;
-	background: gray;
+span.tags a {
 	margin: 0.1em;
-	padding: 0 0.15em;
 	border-radius: 0.2em;
-	background-color: gray;
 	text-decoration: none;
+	display: none;
 }
-p.tags .tag_music { background: lightblue; }
-p.tags .tag_film { background: lightgreen; }
-p.tags .tag_party { background: pink; }
-p.tags .tag_talk { background: orange; }
-p.tags .tag_cabaret { background: brown; color: white;}
-p.tags .tag_bluescreen { background: blue; color: gray;}
+span.tags .tag_music { color: blue; display: inline;}
+span.tags .tag_film { color: green; display: inline;}
+span.tags .tag_party { color: red; display: inline;}
+span.tags .tag_talk { color: orange; display: inline;}
+span.tags .tag_cabaret { color: brown; display: inline;}
+span.tags .tag_bluescreen { color: blue; display: inline;}
 
 .footer {
 	margin-top: 2em;

@@ -63,13 +63,13 @@ THUMBNAIL_ALIASES = {
         },
     },
     'diary.MediaItem': {
-        'std': {
-            # Slightly arbitrary (inherited) bounding box
-            'size': (250, 187),
-        },
         'indexview': {
             # Crop to always be 200 pixels (or less) wide:
-            'size': (200, 0),
+            'size': (150, 0),
+        },
+        'eventdetail': {
+            # Crop to always be 200 pixels (or less) wide:
+            'size': (800, 0),
         },
     },
 }
