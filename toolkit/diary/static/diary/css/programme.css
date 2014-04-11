@@ -5,6 +5,7 @@ body {
 	color: black;
 	background-color: #bcbcbc;
 	font-size: 10pt;
+	margin: 0.6em;
 }
 
 .programme {
@@ -14,6 +15,18 @@ body {
 img#cubelogo {
 	text-align: center;
 	border: none;
+	display: inline-block;
+}
+
+#programmelinks {
+	display: inline-block;
+}
+
+/* < 440px, scale the logo down */
+@media screen and (max-width: 440px) {
+	img#cubelogo {
+		max-width: 100%;
+	}
 }
 
 .programme {
@@ -22,6 +35,44 @@ img#cubelogo {
 	width: 60%;
 	padding: 1.4em;
 }
+/* Above width=1400px, fix the content at 830px */
+@media screen and (min-width: 1400px) {
+	.programme {
+		margin-left: auto;
+		margin-right: auto;
+		width: 830px;
+		padding: 1.4em;
+	}
+}
+/* 1024-1399px, content is 60% */
+@media screen and (min-width: 900px) and (max-width: 1299px) {
+	.programme {
+		margin-left: auto;
+		margin-right: auto;
+		width: 60%;
+		padding: 1.4em;
+	}
+}
+/* 650-1024px, content is 605px */
+@media screen and (min-width: 650px) and (max-width: 1024px) {
+	.programme {
+		margin-left: auto;
+		margin-right: auto;
+		width: 605px;
+		padding: 1.4em;
+	}
+}
+/* < 650px, content is full width */
+@media screen and (max-width: 649px) {
+	.programme {
+		margin-left: 0;
+		margin-right: 0;
+		width: auto;
+		padding: 0.4em;
+	}
+}
+/* There's further shuffling for < 440px below... */
+
 
 #listing {
 	background-color: white;
@@ -61,6 +112,14 @@ img#cubelogo {
 	float: left;
 	padding-right: 1.5em;
 }
+
+/* < 440px, de-float the images */
+@media screen and (max-width: 440px) {
+	#listing img {
+		float: none;
+	}
+}
+
 #listing .copy p {
 	padding: 0.5em 0.5em 0.5em 0;
 	margin: 0;
@@ -132,3 +191,4 @@ span.tags .tag_bluescreen { color: blue; display: inline;}
 	padding: 0.4em;
 	border: thin solid black;
 }
+
