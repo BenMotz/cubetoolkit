@@ -518,6 +518,7 @@ class EventTemplate(models.Model):
 
     class Meta:
         db_table = 'EventTemplates'
+        ordering = ['name']
 
     def __unicode__(self):
         return self.name

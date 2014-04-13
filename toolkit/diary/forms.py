@@ -6,7 +6,8 @@ import django.db.models
 from django.conf import settings
 
 # Custom form widgets:
-from toolkit.diary.form_widgets import HtmlTextarea, JQueryDateTimePicker
+from toolkit.diary.form_widgets import (HtmlTextarea, JQueryDateTimePicker,
+                                        ChosenSelectMultiple)
 
 import toolkit.diary.models
 from toolkit.util.ordereddict import OrderedDict
@@ -55,6 +56,7 @@ class EventForm(forms.ModelForm):
                 'placeholder': (u"Text displayed after / below the event name, "
                                 u" e.g. 'with support from A Band'"),
                 }),
+            'tags': ChosenSelectMultiple(width="70%"),
         }
         order = ('tags', )
         fields = ('name', 'tags', 'pricing', 'film_information', 'pre_title',
