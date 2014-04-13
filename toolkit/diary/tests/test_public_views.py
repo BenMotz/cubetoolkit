@@ -34,11 +34,10 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
 
         # Should test the contents better, I suspect...
         self.assertContains(response, u'Event three title')
-        self.assertContains(response, u'Event three Copy')
+        self.assertContains(response, u'Copy three summary')
         self.assertContains(response, u'Pricing THREE')
         self.assertContains(response, u'PRETITLE THREE')
         self.assertContains(response, u'POSTTITLE THREE')
-        self.assertContains(response, u'FILM_INFO_THREE')
         # Not confirmed / private:
         self.assertNotContains(response, u'Event one title')
         self.assertNotContains(response, u'Event one copy')
@@ -81,7 +80,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         # Eh (shrug)
         self.assertEqual(data, [{
                          u"name": u"Event three title",
-                         u"tags": u"tag two",
+                         u"tags": u"tag_two",
                          u"image": None,
                          u"start": u"13/04/2013 18:00",
                          u"link": u"/programme/event/id/3/",
