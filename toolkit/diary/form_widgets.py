@@ -6,6 +6,49 @@ from django.forms.util import flatatt
 from django.utils.encoding import force_unicode
 
 
+class ChosenSelectMultiple(forms.SelectMultiple):
+    """
+    SelectMultiple widget using the "Chosen" jquery plugin:
+    http://harvesthq.github.io/chosen/
+    """
+    class Media(object):
+        # Define media (CSS & JS) used by this control. To include this
+        # automatically the template containing the form must have the
+        # {{ form.media }} tag
+        js = (
+            'js/lib/jquery.min.js',
+            'js/lib/chosen.jquery.js',
+        )
+        css = {
+            'all': ('css/lib/chosen.min.css',),
+        }
+
+    def __init__(self, *args, **kwargs):
+        self.width = kwargs.pop('width', None)
+        super(ChosenSelectMultiple, self).__init__(*args, **kwargs)
+
+    def render(self, name, value, attrs=None, choices=()):
+        # Use the default rendering:
+        output = super(ChosenSelectMultiple, self).render(name, value, attrs=attrs, choices=choices)
+
+        final_attrs = self.build_attrs(attrs, name=name)
+
+        if self.width:
+            options = "{width: '%s'}" % self.width
+        else:
+            options = "{}"
+
+        # Add JS code to get the "Chosen" library to do the setup
+        output += (u"<script type='text/javascript'>"
+                   "$('#{control_id}').chosen({options});"
+                   "</script>".format(
+                       control_id=final_attrs[u'id'],
+                       options=options
+                   ))
+
+        return mark_safe(output)
+
+
 class HtmlTextarea(forms.Textarea):
     """TextArea widget overloaded to provide a wysiwyg HTML editor, using the
     'CKEditor' editor
