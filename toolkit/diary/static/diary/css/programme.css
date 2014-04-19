@@ -91,6 +91,15 @@ img#cubelogo {
 	text-transform: uppercase;
 }
 
+#listing h1 a {
+	text-decoration: none;
+	color: black;
+}
+
+#listing h1 a:visited {
+	color: black;
+}
+
 #listing .start_and_pricing {
 	font-weight: bold;
 }
