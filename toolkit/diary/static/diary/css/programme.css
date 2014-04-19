@@ -73,19 +73,8 @@ img#cubelogo {
 }
 /* There's further shuffling for < 440px below... */
 
-
 #listing {
 	background-color: white;
-	border-bottom: thin solid black;
-}
-
-#listing h1,#listing h2 {
-	font-size: 1.1em;
-	padding: 0.1em;
-	margin: 0;
-	border: thin solid black;
-	border-bottom: none;
-	clear: both;
 }
 
 .pre_title, .post_title {
@@ -94,16 +83,23 @@ img#cubelogo {
 	font-weight: bold;
 	font-size: 0.6em;
 }
-#listing h3 {
+
+#listing h1 {
 	font-size: 1.5em;
-	padding: 0.15em;
+	padding: 0 0.15em 0.15em 0.15em;
 	margin: 0;
 	text-transform: uppercase;
 }
-#listing .factoids {
+
+#listing .start_and_pricing {
 	font-weight: bold;
 }
-#listing .copy {
+
+#listing .copy p {
+	padding: 0.5em 0.5em 0.5em 0;
+	margin: 0;
+	white-space: pre-line;
+	/* Stop the paragraph from wrapping below the image (if any): */
 	overflow: hidden;
 }
 
@@ -120,35 +116,13 @@ img#cubelogo {
 	}
 }
 
-#listing .copy p {
-	padding: 0.5em 0.5em 0.5em 0;
-	margin: 0;
-	white-space: pre-line;
-
-}
 #listing .showing {
 	padding: 0.8em 0;
 	border-bottom: 2px solid darkgray;
+	/* Force the showing to clear below the image */
+	overflow: auto;
 }
-#listing .showing:after {
-	content: "";
-	clear: both;
-	display: table;
-}
-
-#listing .discounted h3::after {
-	content: "Discounted!";
-	color: black;
-	font-weight: normal;
-	margin-left: 1em;
-	padding: 0 0.15em;
-	border-radius: 0.2em;
-	background-color: yellow;
-}
-#listing .ttt h3::after {
-	content: "Ticket Tout Tuesday";
-}
-#listing .cancelled h3::before {
+#listing .cancelled h1::before {
 	content: "CANCELLED (sorry)";
 	text-decoration: none;
 	color: white;
@@ -167,10 +141,11 @@ img#cubelogo {
 }
 
 span.tags {
-	padding: none;
+	text-transform: uppercase;
+	padding: 0.3em 0 0 0;
 	margin: none;
 	font-weight: normal;
-	font-size: 0.8em;
+	font-size: 0.75em;
 	display: block;
 }
 span.tags a {
@@ -191,4 +166,3 @@ span.tags .tag_bluescreen { color: blue; display: inline;}
 	padding: 0.4em;
 	border: thin solid black;
 }
-
