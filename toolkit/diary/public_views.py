@@ -182,6 +182,7 @@ def view_event(request, event_id=None, legacy_id=None):
     context = {
         'event': event,
         'showings': showings,
+        'all_showings_cancelled': all([s.cancelled for s in showings]),
         'media': {event.id: media},
         'media_url': settings.MEDIA_URL
     }

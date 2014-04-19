@@ -1,0 +1,150 @@
+/* This still looks horrible. */
+
+body {
+	font-family: 'Droid Sans', sans-serif;
+	color: black;
+	background-color: #bcbcbc;
+	font-size: 10pt;
+	margin: 0.6em;
+}
+
+.event {
+	background-color: white;
+	margin-left: auto;
+	margin-right: auto;
+	width: 60%;
+	padding: 1.4em;
+	overflow: auto;
+}
+/* Above width=1400px, fix the content at 830px */
+@media screen and (min-width: 1400px) {
+	.event {
+		margin-left: auto;
+		margin-right: auto;
+		width: 830px;
+		padding: 1.4em;
+	}
+}
+/* 1024-1399px, content is 60% */
+@media screen and (min-width: 900px) and (max-width: 1299px) {
+	.event {
+		margin-left: auto;
+		margin-right: auto;
+		width: 60%;
+		padding: 1.4em;
+	}
+}
+/* 650-1024px, content is 605px */
+@media screen and (min-width: 650px) and (max-width: 1024px) {
+	.event {
+		margin-left: auto;
+		margin-right: auto;
+		width: 605px;
+		padding: 1.4em;
+	}
+}
+/* < 650px, content is full width */
+@media screen and (max-width: 649px) {
+	.event {
+		margin-left: 0;
+		margin-right: 0;
+		width: auto;
+		padding: 0.4em;
+	}
+}
+/* There's further shuffling for < 440px below... */
+
+.pre_title, .post_title {
+	font-weight: normal;
+	display: block;
+	font-weight: bold;
+	font-size: 0.6em;
+}
+
+h1 {
+	font-size: 1.5em;
+	padding: 0 0.15em 0.15em 0.15em;
+	margin: 0;
+	text-transform: uppercase;
+}
+h1 a {
+	text-decoration: none;
+	color: black;
+}
+h1 a:visited {
+	color: black;
+}
+
+.showings {
+	font-weight: bold;
+}
+.info {
+	font-weight: bold;
+}
+
+.copy p {
+	padding: 0.5em 0.5em 0.5em 0;
+	margin: 0;
+}
+
+.event img {
+	border: none;
+	float: left;
+	padding-right: 1.5em;
+	max-width: 50%;
+}
+
+.event iframe {
+	max-width: 100%;
+}
+
+/* < 440px, de-float the images */
+@media screen and (max-width: 440px) {
+	.event img {
+		float: none;
+		max-width: 100%;
+	}
+}
+
+div.cancelled::before {
+	/* If entire event series is cancelled */
+	content: "CANCELLED (sorry)";
+	text-decoration: none;
+	color: white;
+	background-color: red;
+	font-size: 3em;
+	display: inline-block;
+	position: absolute;
+	left: 30%;
+	margin: 0;
+	padding: 0 0.15em;
+	border-radius: 0.2em;
+	transform: rotate(15deg);
+	transform-origin: 0 50%;
+	-webkit-transform: rotate(15deg);
+	-webkit-transform-origin: 0 50%;
+}
+
+p span.cancelled {
+	color: red;
+}
+.footer {
+	border-top: thin solid black;
+	margin-top: 1em;
+	padding-bottom: 0;
+	padding-top: 0;
+}
+.header {
+	border-bottom: thin solid black;
+	margin-bottom: 1em;
+	padding-bottom: 0;
+	padding-top: 0;
+}
+.header p, .footer p {
+	padding: 0.5em 0;
+	margin: 0;
+}
+.header a, .header a:visited, .footer a, .footer a:visited{
+	color: blue;
+	text-decoration: none;
+}
