@@ -261,9 +261,18 @@ class Event(models.Model):
         else:
             # Use html2text library to do a quick and happy conversion to
             # plain text; http://www.aaronsw.com/2002/html2text/
+            # Now let's set some options for html2text ...
 
+            # 0 for no wrapping - let the email clients do the wrapping:
+            html2text.BODY_WIDTH = 0
             # Don't try to substitute ASCII characters for unicode ones:
             html2text.UNICODE_SNOB = True
+            # **Bold** and _italics_ doesn't look great in members mailout, so don't do it
+            html2text.IGNORE_EMPHASIS = True
+
+            # TODO Make email links render to orchestra@orchestra.cubecinema.com
+            # rather than [orchestra@orchestra.cubecinema.com](mailto:orchestra@orchestra.cubecinema.com)
+
             text = html2text.html2text(self.copy)
             # Convert links from markdown format to just the URL:
             text = self._plaintext_re.sub(ur'\1: \2', text)
