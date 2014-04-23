@@ -1,8 +1,9 @@
 """Simple filter for use in django templates that allows extraction of a given
 key from a dictionary"""
 
-from django.template.defaultfilters import register
+from django import template
 
+register = template.Library()
 
 @register.filter(name='lookup')
 def lookup(dictionary, key):
