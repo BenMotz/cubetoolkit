@@ -5,11 +5,13 @@ body {
 	color: black;
 	background-color: #bcbcbc;
 	font-size: 10pt;
-	margin: 0.6em;
+	margin: 0;
 }
 
 .programme {
 	background-color: white;
+	padding: 1.4em;
+	margin-top: 0.6em;
 }
 
 img#cubelogo {
@@ -18,60 +20,121 @@ img#cubelogo {
 	display: inline-block;
 }
 
+#calendar {
+	position: fixed;
+	top: 0.83em;
+	background: white;
+	padding: 0.3em;
+	margin: 0;
+	font-size: 0.7em;
+
+}
+
 #programmelinks {
 	display: inline-block;
 }
 
-/* < 440px, scale the logo down */
-@media screen and (max-width: 440px) {
+/* < 550px, scale the logo down */
+@media screen and (max-width: 550px) {
 	img#cubelogo {
 		max-width: 100%;
 	}
 }
 
-.programme {
-	margin-left: auto;
-	margin-right: auto;
-	width: 60%;
-	padding: 1.4em;
-}
 /* Above width=1400px, fix the content at 830px */
 @media screen and (min-width: 1400px) {
 	.programme {
 		margin-left: auto;
 		margin-right: auto;
 		width: 830px;
-		padding: 1.4em;
+	}
+	#calendar {
+		right: 50%;
+		margin-right: 445px;
+		width: 240px;
 	}
 }
 /* 1024-1399px, content is 60% */
-@media screen and (min-width: 900px) and (max-width: 1299px) {
+@media screen and (min-width: 1024px) and (max-width: 1399px) {
 	.programme {
 		margin-left: auto;
 		margin-right: auto;
 		width: 60%;
-		padding: 1.4em;
+	}
+	#calendar {
+		left: 10px;
+		width: 16%;
 	}
 }
-/* 650-1024px, content is 605px */
-@media screen and (min-width: 650px) and (max-width: 1024px) {
+/* 840-1024px, content is 605px */
+@media screen and (min-width: 845px) and (max-width: 1023px) {
 	.programme {
-		margin-left: auto;
+		margin-left: 185px;
 		margin-right: auto;
-		width: 605px;
-		padding: 1.4em;
+		width: 616px;
+	}
+	#calendar {
+		left: 10px;
+		width: 164px;
 	}
 }
-/* < 650px, content is full width */
-@media screen and (max-width: 649px) {
+/* 650-840px, hide calendar */
+@media screen and (min-width: 450px) and (max-width: 844px) {
+	.programme {
+		margin-left: 184px;
+		margin-right: 10px;
+		width: auto;
+	}
+	#calendar {
+		left: 10px;
+		width: 164px;
+	}
+}
+
+/* < 550px, content is full width, hide calendar */
+@media screen and (max-width: 449px) {
 	.programme {
 		margin-left: 0;
 		margin-right: 0;
 		width: auto;
 		padding: 0.4em;
 	}
+	#calendar {
+		display: none;
+	}
 }
 /* There's further shuffling for < 440px below... */
+
+#calendar h1 {
+	padding: 0;
+	margin: 0;
+	font-size: 1em;
+}
+
+#calendar ul {
+	padding: 0;
+	margin: 0;
+}
+
+#calendar li {
+	list-style-type: none;
+	margin: 0.1em 0;
+}
+
+#calendar .date {
+	display: inline-block;
+	float: left;
+	width: 4em;
+	padding: 0;
+	margin: 0;
+}
+
+#calendar a, #calendar a:visited  {
+	display: block;
+	overflow: hidden;
+	text-decoration: none;
+	color: darkblue;
+}
 
 #listing {
 	background-color: white;
@@ -100,16 +163,23 @@ img#cubelogo {
 	color: black;
 }
 
-#listing .start_and_pricing {
-	font-weight: bold;
-}
-
-#listing .copy p {
-	padding: 0.5em 0.5em 0.5em 0;
-	margin: 0;
-	white-space: pre-line;
+#listing .event_details {
 	/* Stop the paragraph from wrapping below the image (if any): */
 	overflow: hidden;
+}
+
+#listing .event_details p {
+	padding: 0.2em 0.5em 0.2em 0;
+	margin: 0;
+}
+
+#listing p.copy {
+	white-space: pre-line;
+}
+
+#listing p.start_and_pricing {
+	font-weight: bold;
+	white-space: normal;
 }
 
 #listing img {
@@ -118,9 +188,10 @@ img#cubelogo {
 	padding-right: 1.5em;
 }
 
-/* < 440px, de-float the images */
-@media screen and (max-width: 440px) {
+/* < 600px, de-float the images */
+@media screen and (max-width: 600px) {
 	#listing img {
+		padding-right: 0;
 		float: none;
 	}
 }

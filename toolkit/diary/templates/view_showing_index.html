@@ -11,6 +11,19 @@
 {% endblock %}
 
 {% block body %}
+<div id="calendar">
+    <ul>
+    {% for showing in showings %}
+    {% ifchanged %}
+    </ul>
+    <h1>{{ showing.start|date:"F" }}</h1>
+    <ul>
+    {% endifchanged %}
+    <li><span class="date">{{showing.start|date:"D j"}}</span> <a href="#event_{{ showing.event.id }}">{{ showing.event.name }}</a></li>
+    {% endfor %}
+    </ul>
+</div>
+
 <div class="programme">
     <a href="http://www.cubecinema.com/"><img id="cubelogo" src="{{ STATIC_URL }}diary/prog_logo_captioned_300.png" alt="Cube Programme"></a>
     <div id="programmelinks">
@@ -40,23 +53,28 @@
     </p>
     {% endif %}
     <div id="listing">
-    {% for showing in showings %}
-        <div class="showing{% if showing.start_date == today %} today{% endif %}{% if showing.cancelled %} cancelled{% endif %}">
-            {% with showing.event.media.all.0 as media_item %}{% if media_item %}<img src="{{ media_item.media_file|thumbnail_url:'indexview' }}" alt="Picture for event {{ showing.event.name }}">{% endif %}{% endwith %}
-            {% if showing.event.tags.all or showing.discounted %}<span class="tags">{% if showing.discounted %}{% if showing.start.weekday == 1 %}<abbr title="Ticket Tout Tuesday">ttt</abbr>{%else%}discounted{% endif %}{% endif %}{% for tag in showing.event.tags.all %}<a href="{% url "type-view" tag.name %}" class="tag_{{tag.name}}">{{tag.name}}</a> {% endfor %}</span>{% endif %}
+    {% for event, showings in events.iteritems %}
+        <div class="showing" id="event_{{ event.id }}">
+            {% with event.media.all.0 as media_item %}{% if media_item %}<img src="{{ media_item.media_file|thumbnail_url:'indexview' }}" alt="Picture for event {{ event.name }}">{% endif %}{% endwith %}
+            {% if event.tags.all %}<span class="tags">{% for tag in event.tags.all %}<a href="{% url "type-view" tag.name %}" class="tag_{{tag.name}}">{{tag.name}}</a> {% endfor %}</span>{% endif %}
             <h1>
-                <a href="{% url "single-event-view" showing.event.id %}"><span class="pre_title">
-                    {{ showing.event.pre_title }}
+                <a href="{% url "single-event-view" event.id %}"><span class="pre_title">
+                    {{ event.pre_title }}
                 </span>
-                {{ showing.event.name }}
+                {{ event.name }}
                 <span class="post_title">
-                    {{ showing.event.post_title }}
+                    {{ event.post_title }}
                 </span>
                 </a>
             </h1>
-            <div class="copy">
-                <p class="start_and_pricing">{{showing.start|date:"D j F H:i"}} {% if showing.event.pricing %}/ {{ showing.event.pricing }}{% endif %}</p>
-            <p>{{ showing.event.copy_summary|truncatewords:50 }} [<a class="more" href="{% url "single-event-view" showing.event.id %}">more...</a>]</p>
+            <div class="event_details">
+                <p class="start_and_pricing">
+                    {% for showing in showings %}
+                        {{showing.start|date:"D j F H:i"}}<br>
+                    {% endfor %}
+                </p>
+                {% if event.pricing %}<p class="start_and_pricing">{{ event.pricing }}</p>{% endif %}
+                <p class="copy">{{ event.copy_summary|truncatewords:50 }} [<a class="more" href="{% url "single-event-view" event.id %}">more...</a>]</p>
             </div>
         </div>
     {% endfor %}
