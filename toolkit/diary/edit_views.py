@@ -17,7 +17,6 @@ from django.db.models import Q
 import django.utils.timezone as timezone
 from django.contrib.auth.decorators import permission_required, login_required
 from django.views.decorators.http import require_POST, require_http_methods
-import django.views.generic as generic
 
 from toolkit.diary.models import (Showing, Event, DiaryIdea, MediaItem,
                                   EventTemplate, EventTag, Role,
@@ -41,9 +40,10 @@ def _return_to_editindex(request):
     prefs = edit_prefs.get_preferences(request.session)
     # (nb: the pref is stored as 'true'/'false', not a python bool!)
     if prefs['popups'] == 'true':
-        # Use a really, really dirty way to emulate the original functionality and
-        # close the popped up window: return a hard-coded page that contains
-        # javacsript to close the open window and reload the source page.
+        # Use a really, really dirty way to emulate the original functionality
+        # and close the popped up window: return a hard-coded page that
+        # contains javascript to close the open window and reload the source
+        # page.
         return HttpResponse("<!DOCTYPE html><html>"
                             "<head><title>-</title></head>"
                             "<body onload='self.close(); opener.location.reload(true);'>Ok</body>"
@@ -133,7 +133,8 @@ def edit_diary_list(request, year=None, day=None, month=None):
     # be shown
 
     # Now get all 'ideas' in date range. Fiddle the date range to be from the
-    # start of the month in startdate, so the idea for that month gets included:
+    # start of the month in startdate, so the idea for that month gets
+    # included:
     idea_startdate = datetime.date(day=1, month=startdate.month, year=startdate.year)
     idea_list = (DiaryIdea.objects.filter(month__range=[idea_startdate, enddatetime])
                                   .order_by('month').select_related())
@@ -353,9 +354,9 @@ def edit_showing(request, showing_id=None):
 
 
 def _edit_event_handle_post(request, event_id):
-    # Handle POSTing of the "edit event" form. The slightly higher than expected
-    # complexity is because there can be more than one media items for an event
-    # (even though this isn't currently reflected in the UI).
+    # Handle POSTing of the "edit event" form. The slightly higher than
+    # expected complexity is because there can be more than one media items for
+    # an event (even though this isn't currently reflected in the UI).
     #
     # This means that there are two forms: one for the event, and one for the
     # media item. The extra logic is to cover the fact that both records need
@@ -624,8 +625,8 @@ def edit_event_tags(request):
 @permission_required('toolkit.write')
 def edit_roles(request):
     # This is pretty slow,but it's not a commonly used bit of the UI...
-    # (To be precise, save involves >120 queries. TThis is because I've been lazy
-    # and used the formset save method)
+    # (To be precise, save involves >120 queries. This is because I've been
+    # lazy and used the formset save method)
 
     RoleFormset = modelformset_factory(Role, diary_forms.RoleForm, can_delete=True)
 

@@ -356,11 +356,11 @@ class Showing(models.Model):
     def __init__(self, *args, **kwargs):
         # Allow "copy_from" and "start_offset" keyword args to be supplied.
         # If "copy_from" is supplied, all showing details except for rota
-        # items (which require DB writes) aare copied from the supplied Showing
+        # items (which require DB writes) are copied from the supplied Showing
         # object.
-        # If "start_offset" is passed and "copy_from" is also passed, then the
+        # If "start_offset" is passed and "copy_from" is also passed then the
         # given TimeDelta is added to copy_from.start
-        # (If start_offset is defined by copy_from is not then a ValueError is
+        # (If start_offset is defined but copy_from is not then a ValueError is
         # raised)
 
         copy_from = kwargs.pop('copy_from', None)
@@ -392,9 +392,9 @@ class Showing(models.Model):
     def save(self, *args, **kwargs):
         # Don't allow showings to be edited if they're finished. This isn't a
         # complete fix, as operations on querysets (or just SQL) will bypass
-        # this, but this will stop the forms deleting records. (Stored procedures,
-        # anyone?). This also doesn't stop showings having their start date
-        # moved from the past to the future!
+        # this, but this will stop the forms deleting records. (Stored
+        # procedures, anyone?). This also doesn't stop showings having their
+        # start date moved from the past to the future!
         #
         # (For the purposes of the import script, if force=True is passed then
         # this check is bypassed)
@@ -446,9 +446,9 @@ class Showing(models.Model):
     def update_rota(self, _rota):
         """Update rota from supplied dict. Dict should be a map of
         role_id: no. entries
-        If no. entries is 0, any existing RotaEntries are deleted. If it's greater
-        than the number of RotaEntries, they'r added as required. If a role_id is
-        not in the dict, then any RotaEntries aren't affected"""
+        If no. entries is 0, any existing RotaEntries are deleted. If it's
+        greater than the number of RotaEntries, they'r added as required. If a
+        role_id is not in the dict, then any RotaEntries aren't affected"""
 
         # copy rota:
         rota = dict(_rota)
