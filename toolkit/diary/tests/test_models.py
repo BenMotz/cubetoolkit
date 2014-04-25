@@ -100,11 +100,10 @@ class EventModelNonLegacyCopy(TestCase):
 
     def test_plaintext_copy(self):
         expected = (
-            u"Simple & tidy HTML/unicode \u00a9\u014dpy\n\n"
+            u"Simple & tidy HTML/unicode \u00a9\u014dpy \n\n"
             u"With a link!: http://example.com/foo/\n\n"
             u"And another! link!: https://example.com/bar/"
-            # The extra \n after the first two \xa3 is from the line wrapping:
-            u" and some equivalent things; \u00a3 \u00a3\n\u00a3\n\n"
+            u" and some equivalent things; \u00a3 \u00a3 \u00a3  \n\n"
         )
         self.assertEqual(self.event.copy_plaintext, expected)
 
