@@ -9,16 +9,17 @@ Editing Event types
   @import url('{{ STATIC_URL }}css/lib/smoothness/jquery-ui.css');
   body {
       font-family: sans-serif;
-      font-size: 9pt;
+      font-size: 1em;
   }
   li {
       list-style-type: none;
-      margin: 5pt;
-      line-height: 35pt;
-      padding: 7pt;
-      width: auto;
-      display: inline;
+      margin: 0.4em;
+      padding: 0.3em;
+      width: 12em;
       background: lightblue;
+      display: inline-block;
+      line-height: 1;
+      border-radius: 0.3em;
   }
   .unsaved {
       background: pink;
@@ -44,23 +45,47 @@ Editing Event types
 var tags = { {% for tag in tags %}
     '{{ tag.pk }}' : '{{ tag.name }}', {% endfor %}
 }
+var tags_to_delete = [];
 var next_key = -1;
-var deletions = false;
+
+function process_response(data) {
+    var errors = data.errors;
+    var message = "Operation failed\n";
+
+    if (data.failed === true) {
+        // For now, an ugly alert...
+        for (error_name in errors) {
+            if (errors.hasOwnProperty(error_name)) {
+                message += error_name + ": " + errors[error_name] + "\n";
+            }
+        }
+        alert(message);
+    }
+    // And force the page to reload
+    window.location.reload(true);
+}
 
 function submit() {
-    if(deletions) {
+    var tag_id, tag_data, new_tags = [];
+
+    if(tags_to_delete.length > 0) {
         if(!confirm('You are about to delete one or more tags, which will untag all events that use that tag. This cannot be undone!')) {
             return;
         }
     }
     $('#save').button('disable').text('Saving...');
-    var tag_data = {
+    for (tag_id in tags) {
+        if (tags.hasOwnProperty(tag_id) && tag_id < 0) {
+            new_tags.push(tags[tag_id]);
+        }
+    }
+
+    tag_data = {
         'csrfmiddlewaretoken' : '{{ csrf_token }}',
-        'tags' : tags,
+        'new_tags' : new_tags,
+        'deleted_tags': tags_to_delete
     };
-    $.post('{% url "edit_event_tags" %}', tag_data, function() {
-                window.location.href = '{% url "edit_event_tags" %}';
-            });
+    $.post('', tag_data, process_response, 'json');
 
 }
 function add_tag() {
@@ -79,8 +104,7 @@ function add_tag() {
 function delete_tag(e) {
     var key = e.target.id.split('_')[1];
     if(key > 0) {
-        console.log(key);
-        deletions = true;
+        tags_to_delete.push(key);
     }
     $('#tag_' + key).remove();
     tags[key] = '';

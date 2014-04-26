@@ -14,7 +14,7 @@ from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 
 from toolkit.diary.models import (Showing, Event, Role, DiaryIdea,
-                                  EventTemplate, MediaItem)
+                                  EventTemplate, MediaItem, EventTag)
 import toolkit.diary.edit_prefs
 
 from .common import DiaryTestsMixin
@@ -1150,3 +1150,96 @@ class PreferencesTests(DiaryTestsMixin, TestCase):
         # should now 302 to edit list:
         response = self.client.get(url)
         self.assertRedirects(response, reverse("default-edit"))
+
+
+class EditTagsViewTests(DiaryTestsMixin, TestCase):
+    def setUp(self):
+        super(EditTagsViewTests, self).setUp()
+        self.client.login(username="admin", password="T3stPassword!")
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_page_loads(self):
+        url = reverse("edit_event_tags")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "edit_event_tags.html")
+
+    def test_post_noop(self):
+        initial_tag_count = EventTag.objects.count()
+
+        url = reverse("edit_event_tags")
+        response = self.client.post(url, data={
+            "deleted_tags[]": [],
+            "new_tags[]": [],
+        })
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data['failed'], False)
+
+        final_tag_count = EventTag.objects.count()
+        self.assertEqual(initial_tag_count, final_tag_count)
+
+    def test_post_delete(self):
+        url = reverse("edit_event_tags")
+        response = self.client.post(url, data={
+            "deleted_tags[]": [1,3],
+            "new_tags[]": [],
+        })
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data['failed'], False)
+
+        self.assertEqual(EventTag.objects.filter(id=1).count(), 0)
+        self.assertEqual(EventTag.objects.filter(id=2).count(), 1)
+        self.assertEqual(EventTag.objects.filter(id=3).count(), 0)
+
+    def test_post_add(self):
+        url = reverse("edit_event_tags")
+        response = self.client.post(url, data={
+            "deleted_tags[]": [],
+            "new_tags[]": ["new_tag_one", "new_tag_TWO "],
+        })
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data['failed'], False)
+
+        nt1 = EventTag.objects.get(name="new_tag_one")
+        nt2 = EventTag.objects.get(name="new_tag_two")
+
+        self.assertEqual(nt1.read_only, False)
+        self.assertEqual(nt2.read_only, False)
+
+    def test_post_bad_delete(self):
+        initial_tag_count = EventTag.objects.count()
+
+        url = reverse("edit_event_tags")
+        response = self.client.post(url, data={
+            "deleted_tags[]": [1000],
+            "new_tags[]": [],
+        })
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data['failed'], True)
+        self.assertIn(u'delete', response_data['errors'])
+
+        final_tag_count = EventTag.objects.count()
+        self.assertEqual(initial_tag_count, final_tag_count)
+
+    def test_post_bad_new_tag(self):
+        initial_tag_count = EventTag.objects.count()
+
+        url = reverse("edit_event_tags")
+        response = self.client.post(url, data={
+            "deleted_tags[]": [1],
+            "new_tags[]": ["bad&tag"],
+        })
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data['failed'], True)
+
+        self.assertIn('bad&tag', response_data['errors'])
+
+        final_tag_count = EventTag.objects.count()
+        self.assertEqual(initial_tag_count, final_tag_count)

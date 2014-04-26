@@ -212,3 +212,8 @@ class NewPrintedProgrammeForm(forms.ModelForm):
         self.instance.month = programme_month
 
         return cleaned_data
+
+
+class TagForm(forms.ModelForm):
+    class Meta(object):
+        model = toolkit.diary.models.EventTag

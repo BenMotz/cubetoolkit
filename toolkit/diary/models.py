@@ -123,8 +123,16 @@ class EventTag(models.Model):
     def __unicode__(self):
         return self.name
 
-    # Overloaded Django ORM method:
+    def clean(self):
+        # Force to lowercase:
+        self.name = self.name.lower().strip()
+        # Check for unwanted characters:
+        if re.search(ur"\s|&|\?|#", self.name):
+            raise django.core.exceptions.ValidationError(
+                u"Tag names may not contain the characters & ? # or spaces"
+            )
 
+    # Overloaded Django ORM methods:
     def save(self, *args, **kwargs):
         if self.pk and self.read_only:
             return False

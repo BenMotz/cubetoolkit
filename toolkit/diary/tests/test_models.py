@@ -5,7 +5,9 @@ from datetime import datetime, date
 
 from django.test import TestCase
 
-from toolkit.diary.models import Showing, Event, PrintedProgramme
+import django.db
+from django.core.exceptions import ValidationError
+from toolkit.diary.models import Showing, Event, PrintedProgramme, EventTag
 
 from .common import DiaryTestsMixin
 
@@ -167,3 +169,75 @@ class PrintedProgrammeModelTests(TestCase):
         pp = PrintedProgramme.objects.get(pk=pp.pk)
         self.assertEqual(pp.month, date(2010, 2, 1))
 
+class EventTagTests(TestCase):
+    def test_can_delete_not_readonly(self):
+        tag = EventTag(name="test", read_only=False)
+        tag.save()
+        pk = tag.pk
+
+        tag.delete()
+
+        self.assertEqual(EventTag.objects.filter(id=pk).count(), 0)
+
+    def test_cant_delete_readonly(self):
+        tag = EventTag(name="test", read_only=True)
+        tag.save()
+        pk = tag.pk
+
+        tag.delete()
+
+        self.assertEqual(EventTag.objects.filter(id=pk).count(), 1)
+        tag = EventTag.objects.get(id=pk)
+        self.assertEqual(tag.name, "test")
+
+
+    def test_can_edit_not_readonly(self):
+        tag = EventTag(name="test", read_only=False)
+        tag.save()
+        pk = tag.pk
+        # Try to edit:
+        tag.name = "crispin"
+        tag.save()
+
+        tag = EventTag.objects.get(id=pk)
+        self.assertEqual(tag.name, "crispin")
+
+    def test_cant_edit_readonly(self):
+        tag = EventTag(name="test", read_only=True)
+        tag.save()
+        pk = tag.pk
+        # Try to edit:
+        tag.name = "crispin"
+        tag.save()
+
+        tag = EventTag.objects.get(id=pk)
+        self.assertEqual(tag.name, "test")
+
+    def test_clean_case(self):
+        tag = EventTag(name="BIGlettersHERE")
+        tag.full_clean()
+        self.assertEqual(tag.name, "biglettershere")
+
+    def test_reject_characters(self):
+        tag = EventTag(name="with space")
+        self.assertRaises(ValidationError, tag.full_clean)
+
+        tag = EventTag(name="with&ampersand")
+        self.assertRaises(ValidationError, tag.full_clean)
+
+        tag = EventTag(name="with?questionmark")
+        self.assertRaises(ValidationError, tag.full_clean)
+
+        tag = EventTag(name="with#hash")
+        self.assertRaises(ValidationError, tag.full_clean)
+
+    def test_reject_blank(self):
+        tag = EventTag(name="")
+        self.assertRaises(ValidationError, tag.full_clean)
+
+    def test_must_be_unique(self):
+        t1 = EventTag(name="jim")
+        t1.save()
+
+        t2 = EventTag(name="jim")
+        self.assertRaises(django.db.IntegrityError, t2.save)

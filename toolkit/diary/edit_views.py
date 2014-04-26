@@ -569,57 +569,58 @@ def edit_event_templates(request):
 @permission_required('toolkit.write')
 def edit_event_tags(request):
     # View for editing event tags.
-    # GET: Reads tags and renders the (JavaScript heavy) template
-    # POST: Process list of tags. Expected to be submitted via AJAX, so doesn't
-    #       return much.
+    # GET: Reads tags and renders the (JavaScript based) template
+    # POST: Process list of tags. Expected to be submitted via AJAX, retuns
+    # json.
     tags = EventTag.objects.all()
 
     if request.method != 'POST':
         context = {'tags': tags}
         return render(request, 'edit_event_tags.html', context)
-    # Data was posted
 
-    # First, pull out mapping of tag key : name
-    # The form returns the data as a set of key/values where the keys are;
-    # "tags[x]" where x is either a positive integer which is the key of an
-    # existing tag, or a negative integer indicating that this is a new tag.
-    # Tags to be deleted have their value set to '' (the empty string)
-    tags_submitted = {}
-    # regex to recognise the "tags[x]" format:
-    tag_re = re.compile("^tags\[([-\d]+)\]$")
-    for key, val in request.POST.iteritems():
-        m = tag_re.match(key)
-        if m:
-            tags_submitted[int(m.group(1), 10)] = val.strip().lower()
+    errors = {}
 
-    # Build dict of existing tags:
-    tags_by_pk = dict((tag.pk, tag) for tag in tags)
-    # Now update / add as appropriate. Any tag keys that aren't included in
-    # the update are deleted.
-    for submitted_pk, submitted_name in tags_submitted.iteritems():
-        extant_tag = tags_by_pk.pop(submitted_pk, None)
-        if extant_tag:
-            if submitted_name == '':
-                logger.info(u"Deleting tag {0} (key {1})".format(extant_tag.name, extant_tag.pk))
-                extant_tag.delete()
-            elif extant_tag.name != submitted_name:
-                logger.info(u"Changing name of tag id {0} from {1} to {2}"
-                            .format(extant_tag.pk, extant_tag.name, submitted_name))
-                extant_tag.name = submitted_name
-                extant_tag.save()
-        elif extant_tag is None:
-            new_tag = EventTag(name=submitted_name)
-            logger.info(u"Creating new tag {0}".format(submitted_name))
-            # database constraints will enforce uniqueness of tag name
-            try:
-                new_tag.save()
-            except django.db.IntegrityError as interr:
-                logger.error(u"Failed adding tag {0}: {1}".format(submitted_name, interr))
-    # There shouldn't be any tags left in tags_by_pk:
-    if len(tags_by_pk) != 0:
-        logger.error(u"Tag(s) {0} not included in update".format(",".join(tags_by_pk.values())))
+    # Retrieve posted data:
+    new_tag_names = request.POST.getlist('new_tags[]', [])
+    deleted_tag_keys = request.POST.getlist('deleted_tags[]', [])
+    # Ensure keys are all integers
+    deleted_tag_keys = [int(k) for k in deleted_tag_keys]
 
-    return HttpResponse("OK")
+    # process new tags:
+    for new_tag in new_tag_names:
+        tag_form = diary_forms.TagForm({'name': new_tag, 'readonly': False})
+        if tag_form.is_valid():
+            logger.info(u"Creating new tag {0}".format(
+                tag_form.cleaned_data['name']))
+            tag_form.save()
+        else:
+            errors[new_tag] = [
+                u",".join(msg) for msg in tag_form.errors.itervalues()
+            ]
+
+    if errors:
+        # Bail out before deleting anything
+        return HttpResponse(
+            json.dumps({'failed': True, 'errors': errors}),
+            mimetype="application/json"
+        )
+
+    # process deleted tags
+    for deleted_key in deleted_tag_keys:
+        try:
+            tag = EventTag.objects.get(id=deleted_key)
+        except EventTag.DoesNotExist:
+            err = "Tag with key {0} can't be deleted: not found".format(deleted_key)
+            errors.setdefault('delete', []).append(err)
+            logger.error(err)
+        else:
+            logger.info(u"Deleting tag {0} (key {1})".format(tag.name, tag.pk))
+            tag.delete()
+
+    return HttpResponse(
+        json.dumps({'failed': bool(errors), 'errors': errors}),
+        mimetype="application/json"
+    )
 
 
 @permission_required('toolkit.write')
