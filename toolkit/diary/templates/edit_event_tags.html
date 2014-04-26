@@ -14,7 +14,7 @@ Editing Event types
   li {
       list-style-type: none;
       margin: 0.4em;
-      padding: 0.3em;
+      padding: 0.6em;
       width: 12em;
       background: lightblue;
       display: inline-block;
@@ -34,6 +34,13 @@ Editing Event types
   .del {
       color: red;
   }
+  .deleted {
+      color: red;
+      text-decoration: line-through;
+  }
+  #additem {
+      width: 20em;
+   }
 </style>
 {% endblock %}
 
@@ -106,7 +113,8 @@ function delete_tag(e) {
     if(key > 0) {
         tags_to_delete.push(key);
     }
-    $('#tag_' + key).remove();
+    $('#tag_' + key).addClass("deleted").addClass("unsaved");
+    $('#tag_' + key + " a").remove();
     tags[key] = '';
 }
 
