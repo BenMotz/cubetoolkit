@@ -4,6 +4,7 @@ from toolkit.diary.models import Event
 from django.contrib.auth.decorators import login_required
 
 import toolkit.diary.feeds
+from toolkit.diary.edit_views import EditEventView
 from toolkit.diary.public_views import (ArchiveIndex, ArchiveYear,
                                         ArchiveMonth, ArchiveSearch)
 
@@ -60,7 +61,7 @@ diary_urls = patterns(
             template_name='view_event_privatedetails.html')), name="edit-event-details-view"
         ),
     # Edit an event
-    url(r'^edit/event/id/(?P<event_id>\d+)/$', 'edit_event', name="edit-event-details"),
+    url(r'^edit/event/id/(?P<event_id>\d+)/$', EditEventView.as_view(), name="edit-event-details"),
     # Edit a showing (includes delete / add a new showing)
     url(r'^edit/showing/id/(?P<showing_id>\d+)/$', 'edit_showing', name="edit-showing"),
     # Edit ideas

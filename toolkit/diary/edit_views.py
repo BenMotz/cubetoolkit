@@ -10,12 +10,14 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.forms.models import modelformset_factory
 from django.contrib import messages
+from django.views.generic import View
 import django.template
 import django.db
 from django.db.models import Q
 import django.utils.timezone as timezone
 from django.contrib.auth.decorators import permission_required, login_required
 from django.views.decorators.http import require_POST, require_http_methods
+from django.utils.decorators import method_decorator
 
 from toolkit.diary.models import (Showing, Event, DiaryIdea, MediaItem,
                                   EventTemplate, EventTag, Role,
@@ -357,28 +359,18 @@ def edit_showing(request, showing_id=None):
     return render(request, 'form_showing.html', context)
 
 
-def _edit_event_handle_post(request, event_id):
-    # Handle POSTing of the "edit event" form. The slightly higher than
-    # expected complexity is because there can be more than one media items for
-    # an event (even though this isn't currently reflected in the UI).
-    #
-    # This means that there are two forms: one for the event, and one for the
-    # media item. The extra logic is to cover the fact that both records need
-    # to be updated.
+class EditEventView(View):
+    """Handle the "edit event" form."""
+    # Quite complex, so a class based view
 
-    # Event object
-    event = get_object_or_404(Event, pk=event_id)
+    @method_decorator(permission_required('toolkit.write'))
+    def dispatch(self, request, *args, **kwargs):
+        return super(EditEventView, self).dispatch(request, *args, **kwargs)
 
-    # Get the event's media item, or start a new one:
-    media_item = event.get_main_mediaitem() or MediaItem()
+    def _save(self, event, media_item, form, media_form):
+        # Some factored out code: method is passed valid event and media form,
+        # and commits the data.
 
-    logger.info(u"Updating event {0}".format(event_id))
-    # Create and populate forms:
-    form = diary_forms.EventForm(request.POST, instance=event)
-    media_form = diary_forms.MediaItemForm(request.POST, request.FILES, instance=media_item)
-
-    # Validate
-    if form.is_valid() and media_form.is_valid():
         # When the form was created the copy was converted to HTML, so when
         # saved always clear the "legacy" flag:
         event.legacy_copy = False
@@ -402,48 +394,62 @@ def _edit_event_handle_post(request, event_id):
             # the old toolkit used to do. No image thrown away!
             media_form.save()
             event.set_main_mediaitem(media_item)
-        messages.add_message(request, messages.SUCCESS, u"Updated details for event '{0}'".format(event.name))
         # If the media_form was submitted with blank file name/no data then
         # don't save it (caption is ignored)
-        return _return_to_editindex(request)
 
-    # Got here if there's a form validation error:
-    context = {
-        'event': event,
-        'form': form,
-        'media_form': media_form,
-    }
-    return render(request, 'form_event.html', context)
+    def post(self, request, event_id):
+        # Handle POSTing of the "edit event" form. The slightly higher than
+        # expected complexity is because there can be more than one media items for
+        # an event (even though this isn't currently reflected in the UI).
+        #
+        # This means that there are two forms: one for the event, and one for the
+        # media item. The extra logic is to cover the fact that both records need
+        # to be updated.
 
+        # Event object
+        event = get_object_or_404(Event, pk=event_id)
 
-@permission_required('toolkit.write')
-def edit_event(request, event_id=None):
-    # Event edit form. The 'POST' case, for submitting edits, is a bit of a
-    # monster, and is a separate method
+        # Get the event's media item, or start a new one:
+        media_item = event.get_main_mediaitem() or MediaItem()
 
-    # Handling of POST (ie updates) is factored out into a separate function
-    if request.method == 'POST':
-        return _edit_event_handle_post(request, event_id)
+        logger.info(u"Updating event {0}".format(event_id))
+        # Create and populate forms:
+        form = diary_forms.EventForm(request.POST, instance=event)
+        media_form = diary_forms.MediaItemForm(request.POST, request.FILES, instance=media_item)
 
-    # So now just dealing with a GET:
-    event = get_object_or_404(Event, pk=event_id)
-    # For now only support a single media item:
-    media_item = event.get_main_mediaitem() or MediaItem()
+        # Validate
+        if form.is_valid() and media_form.is_valid():
+            self._save(event, media_item, form, media_form)
+            messages.add_message(request, messages.SUCCESS, u"Updated details for event '{0}'".format(event.name))
+            return _return_to_editindex(request)
 
-    # If the event has "legacy" (ie. non-html) copy then convert it to HTML;
-    if event.legacy_copy:
-        event.copy = event.copy_html
+        # Got here if there's a form validation error:
+        context = {
+            'event': event,
+            'form': form,
+            'media_form': media_form,
+        }
+        return render(request, 'form_event.html', context)
 
-    form = diary_forms.EventForm(instance=event)
-    media_form = diary_forms.MediaItemForm(instance=media_item)
+    def get(self, request, event_id):
+        event = get_object_or_404(Event, pk=event_id)
+        # For now only support a single media item:
+        media_item = event.get_main_mediaitem() or MediaItem()
 
-    context = {
-        'event': event,
-        'form': form,
-        'media_form': media_form,
-    }
+        # If the event has "legacy" (ie. non-html) copy then convert it to HTML;
+        if event.legacy_copy:
+            event.copy = event.copy_html
 
-    return render(request, 'form_event.html', context)
+        form = diary_forms.EventForm(instance=event)
+        media_form = diary_forms.MediaItemForm(instance=media_item)
+
+        context = {
+            'event': event,
+            'form': form,
+            'media_form': media_form,
+        }
+
+        return render(request, 'form_event.html', context)
 
 
 @permission_required('toolkit.write')
