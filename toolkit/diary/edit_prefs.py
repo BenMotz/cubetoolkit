@@ -8,6 +8,7 @@ KNOWN_PREFS = {
     'daysahead': '90',
 }
 
+
 def get_preferences(session):
     edit_prefs = dict(
         (pref, session.get('editpref_' + pref, default))
@@ -15,15 +16,18 @@ def get_preferences(session):
     )
     return edit_prefs
 
+
 def get_preference(session, name):
     value = None
     if name in KNOWN_PREFS:
         value = session.get('editpref_' + name, KNOWN_PREFS[name])
     return value
 
+
 def set_preferences(session, prefs_requested):
     for name, value in prefs_requested.iteritems():
         set_preference(session, name, value)
+
 
 def set_preference(session, name, value):
     if name in KNOWN_PREFS:

@@ -208,4 +208,3 @@ class EditPrintedProgrammeTests(DiaryTestsMixin, TestCase):
         self.assertEqual(pp2.notes, u"")
         self.assertEqual(pp2.designer, u"Someon\u0113")
         self.assertEqual(pp2.programme, u"/what/bar/Nun")
-

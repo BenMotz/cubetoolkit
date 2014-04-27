@@ -109,6 +109,7 @@ class EventModelNonLegacyCopy(TestCase):
         )
         self.assertEqual(self.event.copy_plaintext, expected)
 
+
 class EventModelLegacyCopy(TestCase):
 
     def setUp(self):
@@ -147,12 +148,13 @@ class EventModelLegacyCopy(TestCase):
         )
         self.assertEqual(self.event.copy_plaintext, expected)
 
+
 class PrintedProgrammeModelTests(TestCase):
 
     def test_month_ok(self):
         pp = PrintedProgramme(
             programme="/foo/bar",
-            month = date(2010, 2, 1)
+            month=date(2010, 2, 1)
         )
         pp.save()
 
@@ -162,12 +164,13 @@ class PrintedProgrammeModelTests(TestCase):
     def test_month_normalised(self):
         pp = PrintedProgramme(
             programme="/foo/bar",
-            month = date(2010, 2, 2)
+            month=date(2010, 2, 2)
         )
         pp.save()
 
         pp = PrintedProgramme.objects.get(pk=pp.pk)
         self.assertEqual(pp.month, date(2010, 2, 1))
+
 
 class EventTagTests(TestCase):
     def test_can_delete_not_readonly(self):
@@ -189,7 +192,6 @@ class EventTagTests(TestCase):
         self.assertEqual(EventTag.objects.filter(id=pk).count(), 1)
         tag = EventTag.objects.get(id=pk)
         self.assertEqual(tag.name, "test")
-
 
     def test_can_edit_not_readonly(self):
         tag = EventTag(name="test", read_only=False)

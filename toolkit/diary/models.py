@@ -50,11 +50,10 @@ class Role(models.Model):
         return self.name
 
     def __init__(self, *args, **kwargs):
-        result = super(Role, self).__init__(*args, **kwargs)
+        super(Role, self).__init__(*args, **kwargs)
         # Store original value of name, so it can't be edited for
         # read only roles
         self._original_name = self.name
-        return result
 
     def save(self, *args, **kwargs):
         if self.read_only and self._original_name != self.name:
@@ -446,7 +445,7 @@ class Showing(models.Model):
                 RotaEntry(role=role, showing=self).save()
 
     def clone_rota_from_showing(self, source_showing):
-        assert(self.pk is not None)
+        assert self.pk is not None
         for rota_entry in source_showing.rotaentry_set.all():
             new_entry = RotaEntry(showing=self, template=rota_entry)
             new_entry.save()
@@ -463,8 +462,8 @@ class Showing(models.Model):
 
         # Build map of rota entries by role id
         rota_entries_by_id = {}
-        for re in self.rotaentry_set.select_related():
-            rota_entries_by_id.setdefault(re.role.pk, []).append(re)
+        for rota_entry in self.rotaentry_set.select_related():
+            rota_entries_by_id.setdefault(rota_entry.role.pk, []).append(rota_entry)
 
         for role_id, count in rota.iteritems():
             # Number of existing rota entries for this role_id.
@@ -568,6 +567,7 @@ class PrintedProgrammeManager(models.Manager):
         start_date = datetime.date(start.year, start.month, 1)
 
         return self.filter(month__range=[start_date, end])
+
 
 class PrintedProgramme(models.Model):
     month = models.DateField(editable=False, unique=True)
