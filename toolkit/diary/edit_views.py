@@ -1,4 +1,3 @@
-import re
 import json
 import datetime
 import logging
@@ -192,9 +191,14 @@ def add_showing(request, event_id):
     try:
         copy_from_pk = int(copy_from, 10)
         source_showing = Showing.objects.get(pk=copy_from_pk)
+        target_event_id = int(event_id, 10)
     except (TypeError, ValueError, django.core.exceptions.ObjectDoesNotExist) as err:
         logger.error(u"Failed getting object for showing clone operation: {0}".format(err))
         raise Http404("Requested source showing for clone not found")
+
+    if source_showing.event_id != target_event_id:
+        logger.error("Cloned showing event ID != URL event id")
+        raise Http404("Requested source showing not associated with given event id")
 
     # Create form using submitted data:
     clone_showing_form = diary_forms.CloneShowingForm(request.POST)
@@ -453,7 +457,7 @@ def edit_ideas(request, year=None, month=None):
 
     # Use get or create in order to silently create the ideas entry if it
     # didn't already exist:
-    instance, created = DiaryIdea.objects.get_or_create(
+    instance, _ = DiaryIdea.objects.get_or_create(
         month=datetime.date(year=year, month=month, day=1)
     )
 
@@ -648,7 +652,7 @@ def edit_roles(request):
 
 @permission_required('toolkit.write')
 def printed_programme_edit(request, operation):
-    assert(operation in ('edit', 'add'))
+    assert operation in ('edit', 'add')
 
     programme_queryset = PrintedProgramme.objects.order_by('month')
     programme_formset = modelformset_factory(PrintedProgramme,

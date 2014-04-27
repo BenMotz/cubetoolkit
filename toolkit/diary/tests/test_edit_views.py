@@ -117,6 +117,30 @@ class AddShowingView(DiaryTestsMixin, TestCase):
 
         self.assertEqual(response.status_code, 405)
 
+    @patch('django.utils.timezone.now')
+    def test_add_showing_mismatching_event_id(self, now_patch):
+        now_patch.return_value = self._fake_now
+
+        url = reverse("add-showing", kwargs={"event_id": 1})
+        url += "?copy_from=2"
+
+        showing_count_before = Showing.objects.count()
+
+        source = Showing.objects.get(id=2)
+
+        self.assertEqual(source.event.showings.count(), 5)
+
+        # do add/clone:
+        response = self.client.post(url, data={
+            "booked_by": u"Someone or the other - \u20ac",
+            "clone_start": "13/07/2013 20:00"
+        })
+
+        showing_count_after = Showing.objects.count()
+        self.assertEqual(showing_count_after, showing_count_before)
+
+        self.assertEqual(response.status_code, 404)
+
     def test_add_showing_no_copy_from(self):
         # No copy_from parameter: should return 404
         url = reverse("add-showing", kwargs={"event_id": 1})
@@ -124,7 +148,7 @@ class AddShowingView(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_add_showing_no_start(self):
-        url = reverse("add-showing", kwargs={"event_id": 1})
+        url = reverse("add-showing", kwargs={"event_id": 2})
         url += "?copy_from=2"
 
         showing_count_before = Showing.objects.count()
@@ -144,7 +168,7 @@ class AddShowingView(DiaryTestsMixin, TestCase):
                              u'This field is required.')
 
     def test_add_showing_no_booked_by(self):
-        url = reverse("add-showing", kwargs={"event_id": 1})
+        url = reverse("add-showing", kwargs={"event_id": 2})
         url += "?copy_from=2"
 
         showing_count_before = Showing.objects.count()
@@ -168,7 +192,7 @@ class AddShowingView(DiaryTestsMixin, TestCase):
     def test_add_showing_in_past(self, now_patch):
         now_patch.return_value = self._fake_now
 
-        url = reverse("add-showing", kwargs={"event_id": 1})
+        url = reverse("add-showing", kwargs={"event_id": 2})
         url += "?copy_from=2"
 
         showing_count_before = Showing.objects.count()
@@ -193,7 +217,7 @@ class AddShowingView(DiaryTestsMixin, TestCase):
     def test_add_showing(self, now_patch):
         now_patch.return_value = self._fake_now
 
-        url = reverse("add-showing", kwargs={"event_id": 1})
+        url = reverse("add-showing", kwargs={"event_id": 2})
         url += "?copy_from=2"
 
         showing_count_before = Showing.objects.count()
@@ -1184,7 +1208,7 @@ class EditTagsViewTests(DiaryTestsMixin, TestCase):
     def test_post_delete(self):
         url = reverse("edit_event_tags")
         response = self.client.post(url, data={
-            "deleted_tags[]": [1,3],
+            "deleted_tags[]": [1, 3],
             "new_tags[]": [],
         })
         self.assertEqual(response.status_code, 200)
