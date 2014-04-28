@@ -8,7 +8,7 @@ from django.contrib.auth.decorators import permission_required, login_required
 from django.contrib import messages
 from django.views.decorators.http import require_POST, require_safe
 
-import toolkit.members.forms
+from toolkit.members.forms import VolunteerForm, MemberFormWithoutNotes
 from toolkit.members.models import Member, Volunteer
 from toolkit.diary.models import Role
 
@@ -37,9 +37,12 @@ def view_volunteer_list(request):
         vol_role_map.setdefault(vol_id, []).append(role)
 
     # Now sort role_vol_map by role name:
-    role_vol_map = sorted(role_vol_map.iteritems(), key=lambda role_name_tuple: role_name_tuple[0])
-    # (now got a list  of (role, (name1, name2, ...)) tuples, rather than a dict,
-    # but that's fine)
+    role_vol_map = sorted(
+        role_vol_map.iteritems(),
+        key=lambda role_name_tuple: role_name_tuple[0]
+    )
+    # (now got a list  of (role, (name1, name2, ...)) tuples, rather than a
+    # dict, but that's fine)
 
     context = {
         'volunteers': volunteers,
@@ -54,13 +57,15 @@ def view_volunteer_list(request):
 @require_safe
 def select_volunteer(request, action, active=True):
     # This view is called to retire / unretire a volunteer. It presents a list
-    # of all volunteer names and a button. If the view is called with "action=retire"
-    # in the url then it shows a "retire" button linked to the# retire url, and
-    # if it's called with "action=unretire" it shows a link to the unretire url.
+    # of all volunteer names and a button. If the view is called with
+    # "action=retire" in the url then it shows a "retire" button linked to the
+    # retire url, and if it's called with "action=unretire" it shows a link to
+    # the unretire url.
     #
-    # The selection of volunteers (retired vs unretired) is decided by the "active"
-    # parameter to this method, which is set by the url route, depending on which
-    # view was used. This is probably not the simplest way to do this...
+    # The selection of volunteers (retired vs unretired) is decided by the
+    # "active" parameter to this method, which is set by the url route,
+    # depending on which view was used. This is probably not the simplest way
+    # to do this...
     action_urls = {
         'retire': reverse('inactivate-volunteer'),
         'unretire': reverse('activate-volunteer'),
@@ -104,8 +109,8 @@ def activate_volunteer(request, set_active=True):
 
 @permission_required('toolkit.write')
 def edit_volunteer(request, volunteer_id, create_new=False):
-    # If called from the "add" url, then create_new will be True. If called from
-    # the edit url then it'll be False
+    # If called from the "add" url, then create_new will be True. If called
+    # from the edit url then it'll be False
 
     # Depending on which way this method was called, either create a totally
     # new volunteer object with default values (add) or load the volunteer
@@ -124,21 +129,34 @@ def edit_volunteer(request, volunteer_id, create_new=False):
     # if it was called with POST then read the updated volunteer data from the
     # form data and update and save the volunteer object:
     if request.method == 'POST':
-        vol_form = toolkit.members.forms.VolunteerForm(request.POST, request.FILES, prefix="vol", instance=volunteer)
-        mem_form = toolkit.members.forms.MemberFormWithoutNotes(request.POST, prefix="mem", instance=member)
+        vol_form = VolunteerForm(
+            request.POST,
+            request.FILES,
+            prefix="vol",
+            instance=volunteer
+        )
+        mem_form = MemberFormWithoutNotes(
+            request.POST,
+            prefix="mem",
+            instance=member
+        )
         if vol_form.is_valid() and mem_form.is_valid():
             logger.info(u"Saving changes to volunteer '{0}' (id: {1})".format(volunteer.member.name, str(volunteer.pk)))
             mem_form.save()
             volunteer.member = member
             vol_form.save()
-            messages.add_message(request, messages.SUCCESS, u"{0} volunteer '{1}'".format(
-                u"Created" if create_new else u"Updated", member.name
-            ))
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                u"{0} volunteer '{1}'".format(
+                    u"Created" if create_new else u"Updated", member.name
+                )
+            )
             # Go to the volunteer list view:
             return HttpResponseRedirect(reverse("view-volunteer-list"))
     else:
-        vol_form = toolkit.members.forms.VolunteerForm(prefix="vol", instance=volunteer)
-        mem_form = toolkit.members.forms.MemberFormWithoutNotes(prefix="mem", instance=volunteer.member)
+        vol_form = VolunteerForm(prefix="vol", instance=volunteer)
+        mem_form = MemberFormWithoutNotes(prefix="mem", instance=volunteer.member)
 
     context = {
         'pagetitle': 'Add Volunteer' if create_new else 'Edit Volunteer',

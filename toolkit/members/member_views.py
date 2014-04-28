@@ -10,7 +10,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.http import require_POST, require_safe, require_http_methods
 
 
-import toolkit.members.forms
+from toolkit.members.forms import NewMemberForm, MemberForm
 from toolkit.members.models import Member
 from toolkit.util import compare_constant_time
 
@@ -26,22 +26,22 @@ def add_member(request):
     # the request and create a new member
     if request.method == 'POST':
         # Create new member object
-        instance = toolkit.members.models.Member()
+        instance = Member()
         # Create form object to process the submitted data (data is pulled
         # out of the request.POST automatically)
-        form = toolkit.members.forms.NewMemberForm(request.POST, instance=instance)
+        form = NewMemberForm(request.POST, instance=instance)
         # Validate form fields
         if form.is_valid():
             # Form is valid, save data:
             logger.info(u"Adding member '{0}'".format(instance.name))
             form.save()
             # Member added ok, new blank form:
-            form = toolkit.members.forms.NewMemberForm()
+            form = NewMemberForm()
             messages.add_message(request, messages.SUCCESS, u"Added member: {0}".format(instance.number))
             return HttpResponseRedirect(reverse("add-member"))
     elif request.method == 'GET':
         # GET request; create form object with default values
-        form = toolkit.members.forms.NewMemberForm()
+        form = NewMemberForm()
 
     context = {
         'form': form,
@@ -146,7 +146,7 @@ def edit_member(request, member_id):
     context = {}
 
     if request.method == 'POST':
-        form = toolkit.members.forms.MemberForm(request.POST, instance=member)
+        form = MemberForm(request.POST, instance=member)
         if form.is_valid():
             logger.info(u"Saving changes to member '{0}' (id: {1})".format(member.name, member.pk))
             form.save()
@@ -154,7 +154,7 @@ def edit_member(request, member_id):
             if request.user.has_perm('toolkit.write'):
                 return HttpResponseRedirect(reverse("search-members"))
     else:
-        form = toolkit.members.forms.MemberForm(instance=member)
+        form = MemberForm(instance=member)
 
     context = {
         'member': member,

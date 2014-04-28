@@ -24,8 +24,8 @@ logger.setLevel(logging.DEBUG)
 
 
 def view_diary(request, year=None, month=None, day=None, event_type=None):
-    # Returns public diary view, starting at specified year/month/day, filtered by
-    # event type.
+    # Returns public diary view, starting at specified year/month/day, filtered
+    # by event type.
     #
     # Returns different things depending on the supplied parameters;
     # - if only year is passed, and no daysahead parameter,listings for the
@@ -64,9 +64,9 @@ def view_diary(request, year=None, month=None, day=None, event_type=None):
         # Default title
         context['event_list_name'] = "Cube Programme"
 
-    # Build query. The select_related() and prefetch_related on the end encourages
-    # it to get the associated showing/event data, to reduce the number of SQL
-    # queries
+    # Build query. The select_related() and prefetch_related on the end
+    # encourages it to get the associated showing/event data, to reduce the
+    # number of SQL queries
     showings = (Showing.objects.public()
                                .start_in_range(startdate, enddate)
                                .order_by('start')
@@ -104,7 +104,10 @@ def view_diary_json(request, year, month, day):
         month = int(month) if month else None
         day = int(day) if day else None
     except ValueError:
-        logger.error(u"Invalid value in date range, one of day {0}, month {1}, year {2}".format(day, month, year))
+        logger.error(
+            u"Invalid value in date range, one of day {0}, month {1}, year {2}"
+            .format(day, month, year)
+        )
         raise Http404("Invalid values")
 
     startdatetime = timezone.get_current_timezone().localize(

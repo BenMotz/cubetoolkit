@@ -399,12 +399,12 @@ class EditEventView(View):
 
     def post(self, request, event_id):
         # Handle POSTing of the "edit event" form. The slightly higher than
-        # expected complexity is because there can be more than one media items for
-        # an event (even though this isn't currently reflected in the UI).
+        # expected complexity is because there can be more than one media items
+        # for an event (even though this isn't currently reflected in the UI).
         #
-        # This means that there are two forms: one for the event, and one for the
-        # media item. The extra logic is to cover the fact that both records need
-        # to be updated.
+        # This means that there are two forms: one for the event, and one for
+        # the media item. The extra logic is to cover the fact that both
+        # records need to be updated.
 
         # Event object
         event = get_object_or_404(Event, pk=event_id)
@@ -527,7 +527,8 @@ def view_event_field(request, field, year, month, day):
                                .confirmed()
                                .start_in_range(start_date, end_date)
                                .order_by('start')
-                               .prefetch_related('rotaentry_set__role')  # mildly hacky optimisation for rota view
+                               # following prefetch is for the rota view
+                               .prefetch_related('rotaentry_set__role')
                                .select_related())
 
     search = request.GET.get('search')
