@@ -5,7 +5,9 @@ from datetime import datetime, date
 
 from django.test import TestCase
 
-from toolkit.diary.models import Showing, Event, PrintedProgramme
+import django.db
+from django.core.exceptions import ValidationError
+from toolkit.diary.models import Showing, Event, PrintedProgramme, EventTag
 
 from .common import DiaryTestsMixin
 
@@ -100,13 +102,13 @@ class EventModelNonLegacyCopy(TestCase):
 
     def test_plaintext_copy(self):
         expected = (
-            u"Simple & tidy HTML/unicode \u00a9\u014dpy\n\n"
+            u"Simple & tidy HTML/unicode \u00a9\u014dpy \n\n"
             u"With a link!: http://example.com/foo/\n\n"
             u"And another! link!: https://example.com/bar/"
-            # The extra \n after the first two \xa3 is from the line wrapping:
-            u" and some equivalent things; \u00a3 \u00a3\n\u00a3\n\n"
+            u" and some equivalent things; \u00a3 \u00a3 \u00a3  \n\n"
         )
         self.assertEqual(self.event.copy_plaintext, expected)
+
 
 class EventModelLegacyCopy(TestCase):
 
@@ -146,12 +148,13 @@ class EventModelLegacyCopy(TestCase):
         )
         self.assertEqual(self.event.copy_plaintext, expected)
 
+
 class PrintedProgrammeModelTests(TestCase):
 
     def test_month_ok(self):
         pp = PrintedProgramme(
             programme="/foo/bar",
-            month = date(2010, 2, 1)
+            month=date(2010, 2, 1)
         )
         pp.save()
 
@@ -161,7 +164,7 @@ class PrintedProgrammeModelTests(TestCase):
     def test_month_normalised(self):
         pp = PrintedProgramme(
             programme="/foo/bar",
-            month = date(2010, 2, 2)
+            month=date(2010, 2, 2)
         )
         pp.save()
 
@@ -283,3 +286,76 @@ class EventTagsFromTemplate(DiaryTestsMixin, TestCase):
         new_event.reset_tags_to_default()
 
         self.assertEqual(new_event.tags.count(), 0)
+
+
+class EventTagTests(TestCase):
+    def test_can_delete_not_readonly(self):
+        tag = EventTag(name="test", read_only=False)
+        tag.save()
+        pk = tag.pk
+
+        tag.delete()
+
+        self.assertEqual(EventTag.objects.filter(id=pk).count(), 0)
+
+    def test_cant_delete_readonly(self):
+        tag = EventTag(name="test", read_only=True)
+        tag.save()
+        pk = tag.pk
+
+        tag.delete()
+
+        self.assertEqual(EventTag.objects.filter(id=pk).count(), 1)
+        tag = EventTag.objects.get(id=pk)
+        self.assertEqual(tag.name, "test")
+
+    def test_can_edit_not_readonly(self):
+        tag = EventTag(name="test", read_only=False)
+        tag.save()
+        pk = tag.pk
+        # Try to edit:
+        tag.name = "crispin"
+        tag.save()
+
+        tag = EventTag.objects.get(id=pk)
+        self.assertEqual(tag.name, "crispin")
+
+    def test_cant_edit_readonly(self):
+        tag = EventTag(name="test", read_only=True)
+        tag.save()
+        pk = tag.pk
+        # Try to edit:
+        tag.name = "crispin"
+        tag.save()
+
+        tag = EventTag.objects.get(id=pk)
+        self.assertEqual(tag.name, "test")
+
+    def test_clean_case(self):
+        tag = EventTag(name="BIGlettersHERE")
+        tag.full_clean()
+        self.assertEqual(tag.name, "biglettershere")
+
+    def test_reject_characters(self):
+        tag = EventTag(name="with space")
+        self.assertRaises(ValidationError, tag.full_clean)
+
+        tag = EventTag(name="with&ampersand")
+        self.assertRaises(ValidationError, tag.full_clean)
+
+        tag = EventTag(name="with?questionmark")
+        self.assertRaises(ValidationError, tag.full_clean)
+
+        tag = EventTag(name="with#hash")
+        self.assertRaises(ValidationError, tag.full_clean)
+
+    def test_reject_blank(self):
+        tag = EventTag(name="")
+        self.assertRaises(ValidationError, tag.full_clean)
+
+    def test_must_be_unique(self):
+        t1 = EventTag(name="jim")
+        t1.save()
+
+        t2 = EventTag(name="jim")
+        self.assertRaises(django.db.IntegrityError, t2.save)

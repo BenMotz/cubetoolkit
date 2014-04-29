@@ -19,10 +19,10 @@ class BasicWhatsOnFeed(Feed):
         startdate = timezone.now()
         enddate = startdate + datetime.timedelta(days=self.DAYS_AHEAD)
         showings = (Showing.objects.public()
-                               .start_in_range(startdate, enddate)
-                               .order_by('start')
-                               .select_related()
-                               .select_related())
+                    .start_in_range(startdate, enddate)
+                    .order_by('start')
+                    .select_related()
+                    .select_related())
         return showings.all()
 
     def item_title(self, showing):

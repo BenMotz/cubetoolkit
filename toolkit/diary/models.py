@@ -50,11 +50,10 @@ class Role(models.Model):
         return self.name
 
     def __init__(self, *args, **kwargs):
-        result = super(Role, self).__init__(*args, **kwargs)
+        super(Role, self).__init__(*args, **kwargs)
         # Store original value of name, so it can't be edited for
         # read only roles
         self._original_name = self.name
-        return result
 
     def save(self, *args, **kwargs):
         if self.read_only and self._original_name != self.name:
@@ -123,8 +122,16 @@ class EventTag(models.Model):
     def __unicode__(self):
         return self.name
 
-    # Overloaded Django ORM method:
+    def clean(self):
+        # Force to lowercase:
+        self.name = self.name.lower().strip()
+        # Check for unwanted characters:
+        if re.search(ur"\s|&|\?|#", self.name):
+            raise django.core.exceptions.ValidationError(
+                u"Tag names may not contain the characters & ? # or spaces"
+            )
 
+    # Overloaded Django ORM methods:
     def save(self, *args, **kwargs):
         if self.pk and self.read_only:
             return False
@@ -278,9 +285,18 @@ class Event(models.Model):
         else:
             # Use html2text library to do a quick and happy conversion to
             # plain text; http://www.aaronsw.com/2002/html2text/
+            # Now let's set some options for html2text ...
 
+            # 0 for no wrapping - let the email clients do the wrapping:
+            html2text.BODY_WIDTH = 0
             # Don't try to substitute ASCII characters for unicode ones:
             html2text.UNICODE_SNOB = True
+            # **Bold** and _italics_ doesn't look great in members mailout, so don't do it
+            html2text.IGNORE_EMPHASIS = True
+
+            # TODO Make email links render to orchestra@orchestra.cubecinema.com
+            # rather than [orchestra@orchestra.cubecinema.com](mailto:orchestra@orchestra.cubecinema.com)
+
             text = html2text.html2text(self.copy)
             # Convert links from markdown format to just the URL:
             text = self._plaintext_re.sub(ur'\1: \2', text)
@@ -364,11 +380,11 @@ class Showing(models.Model):
     def __init__(self, *args, **kwargs):
         # Allow "copy_from" and "start_offset" keyword args to be supplied.
         # If "copy_from" is supplied, all showing details except for rota
-        # items (which require DB writes) aare copied from the supplied Showing
+        # items (which require DB writes) are copied from the supplied Showing
         # object.
-        # If "start_offset" is passed and "copy_from" is also passed, then the
+        # If "start_offset" is passed and "copy_from" is also passed then the
         # given TimeDelta is added to copy_from.start
-        # (If start_offset is defined by copy_from is not then a ValueError is
+        # (If start_offset is defined but copy_from is not then a ValueError is
         # raised)
 
         copy_from = kwargs.pop('copy_from', None)
@@ -400,9 +416,9 @@ class Showing(models.Model):
     def save(self, *args, **kwargs):
         # Don't allow showings to be edited if they're finished. This isn't a
         # complete fix, as operations on querysets (or just SQL) will bypass
-        # this, but this will stop the forms deleting records. (Stored procedures,
-        # anyone?). This also doesn't stop showings having their start date
-        # moved from the past to the future!
+        # this, but this will stop the forms deleting records. (Stored
+        # procedures, anyone?). This also doesn't stop showings having their
+        # start date moved from the past to the future!
         #
         # (For the purposes of the import script, if force=True is passed then
         # this check is bypassed)
@@ -446,7 +462,7 @@ class Showing(models.Model):
                 RotaEntry(role=role, showing=self).save()
 
     def clone_rota_from_showing(self, source_showing):
-        assert(self.pk is not None)
+        assert self.pk is not None
         for rota_entry in source_showing.rotaentry_set.all():
             new_entry = RotaEntry(showing=self, template=rota_entry)
             new_entry.save()
@@ -454,17 +470,17 @@ class Showing(models.Model):
     def update_rota(self, _rota):
         """Update rota from supplied dict. Dict should be a map of
         role_id: no. entries
-        If no. entries is 0, any existing RotaEntries are deleted. If it's greater
-        than the number of RotaEntries, they'r added as required. If a role_id is
-        not in the dict, then any RotaEntries aren't affected"""
+        If no. entries is 0, any existing RotaEntries are deleted. If it's
+        greater than the number of RotaEntries, they'r added as required. If a
+        role_id is not in the dict, then any RotaEntries aren't affected"""
 
         # copy rota:
         rota = dict(_rota)
 
         # Build map of rota entries by role id
         rota_entries_by_id = {}
-        for re in self.rotaentry_set.select_related():
-            rota_entries_by_id.setdefault(re.role.pk, []).append(re)
+        for rota_entry in self.rotaentry_set.select_related():
+            rota_entries_by_id.setdefault(rota_entry.role.pk, []).append(rota_entry)
 
         for role_id, count in rota.iteritems():
             # Number of existing rota entries for this role_id.
@@ -570,6 +586,7 @@ class PrintedProgrammeManager(models.Manager):
         start_date = datetime.date(start.year, start.month, 1)
 
         return self.filter(month__range=[start_date, end])
+
 
 class PrintedProgramme(models.Model):
     month = models.DateField(editable=False, unique=True)

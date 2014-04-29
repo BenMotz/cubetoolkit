@@ -5,7 +5,7 @@ import toolkit.members.models
 class NewMemberForm(forms.ModelForm):
     class Meta(object):
         model = toolkit.members.models.Member
-        fields = ('name', 'email', 'postcode', 'mailout')
+        fields = ('name', 'email', 'postcode', 'is_member')
         widgets = {
                 'name': forms.TextInput(attrs={'autofocus': ''}),
         }

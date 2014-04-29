@@ -1,4 +1,3 @@
-import re
 import json
 import datetime
 import logging
@@ -11,13 +10,14 @@ from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.forms.models import modelformset_factory
 from django.contrib import messages
+from django.views.generic import View
 import django.template
 import django.db
 from django.db.models import Q
 import django.utils.timezone as timezone
 from django.contrib.auth.decorators import permission_required, login_required
 from django.views.decorators.http import require_POST, require_http_methods
-import django.views.generic as generic
+from django.utils.decorators import method_decorator
 
 from toolkit.diary.models import (Showing, Event, DiaryIdea, MediaItem,
                                   EventTemplate, EventTag, Role,
@@ -41,9 +41,10 @@ def _return_to_editindex(request):
     prefs = edit_prefs.get_preferences(request.session)
     # (nb: the pref is stored as 'true'/'false', not a python bool!)
     if prefs['popups'] == 'true':
-        # Use a really, really dirty way to emulate the original functionality and
-        # close the popped up window: return a hard-coded page that contains
-        # javacsript to close the open window and reload the source page.
+        # Use a really, really dirty way to emulate the original functionality
+        # and close the popped up window: return a hard-coded page that
+        # contains javascript to close the open window and reload the source
+        # page.
         return HttpResponse("<!DOCTYPE html><html>"
                             "<head><title>-</title></head>"
                             "<body onload='self.close(); opener.location.reload(true);'>Ok</body>"
@@ -133,7 +134,8 @@ def edit_diary_list(request, year=None, day=None, month=None):
     # be shown
 
     # Now get all 'ideas' in date range. Fiddle the date range to be from the
-    # start of the month in startdate, so the idea for that month gets included:
+    # start of the month in startdate, so the idea for that month gets
+    # included:
     idea_startdate = datetime.date(day=1, month=startdate.month, year=startdate.year)
     idea_list = (DiaryIdea.objects.filter(month__range=[idea_startdate, enddatetime])
                                   .order_by('month').select_related())
@@ -191,9 +193,14 @@ def add_showing(request, event_id):
     try:
         copy_from_pk = int(copy_from, 10)
         source_showing = Showing.objects.get(pk=copy_from_pk)
+        target_event_id = int(event_id, 10)
     except (TypeError, ValueError, django.core.exceptions.ObjectDoesNotExist) as err:
         logger.error(u"Failed getting object for showing clone operation: {0}".format(err))
         raise Http404("Requested source showing for clone not found")
+
+    if source_showing.event_id != target_event_id:
+        logger.error("Cloned showing event ID != URL event id")
+        raise Http404("Requested source showing not associated with given event id")
 
     # Create form using submitted data:
     clone_showing_form = diary_forms.CloneShowingForm(request.POST)
@@ -355,28 +362,18 @@ def edit_showing(request, showing_id=None):
     return render(request, 'form_showing.html', context)
 
 
-def _edit_event_handle_post(request, event_id):
-    # Handle POSTing of the "edit event" form. The slightly higher than expected
-    # complexity is because there can be more than one media items for an event
-    # (even though this isn't currently reflected in the UI).
-    #
-    # This means that there are two forms: one for the event, and one for the
-    # media item. The extra logic is to cover the fact that both records need
-    # to be updated.
+class EditEventView(View):
+    """Handle the "edit event" form."""
+    # Quite complex, so a class based view
 
-    # Event object
-    event = get_object_or_404(Event, pk=event_id)
+    @method_decorator(permission_required('toolkit.write'))
+    def dispatch(self, request, *args, **kwargs):
+        return super(EditEventView, self).dispatch(request, *args, **kwargs)
 
-    # Get the event's media item, or start a new one:
-    media_item = event.get_main_mediaitem() or MediaItem()
+    def _save(self, event, media_item, form, media_form):
+        # Some factored out code: method is passed valid event and media form,
+        # and commits the data.
 
-    logger.info(u"Updating event {0}".format(event_id))
-    # Create and populate forms:
-    form = diary_forms.EventForm(request.POST, instance=event)
-    media_form = diary_forms.MediaItemForm(request.POST, request.FILES, instance=media_item)
-
-    # Validate
-    if form.is_valid() and media_form.is_valid():
         # When the form was created the copy was converted to HTML, so when
         # saved always clear the "legacy" flag:
         event.legacy_copy = False
@@ -400,48 +397,62 @@ def _edit_event_handle_post(request, event_id):
             # the old toolkit used to do. No image thrown away!
             media_form.save()
             event.set_main_mediaitem(media_item)
-        messages.add_message(request, messages.SUCCESS, u"Updated details for event '{0}'".format(event.name))
         # If the media_form was submitted with blank file name/no data then
         # don't save it (caption is ignored)
-        return _return_to_editindex(request)
 
-    # Got here if there's a form validation error:
-    context = {
-        'event': event,
-        'form': form,
-        'media_form': media_form,
-    }
-    return render(request, 'form_event.html', context)
+    def post(self, request, event_id):
+        # Handle POSTing of the "edit event" form. The slightly higher than
+        # expected complexity is because there can be more than one media items
+        # for an event (even though this isn't currently reflected in the UI).
+        #
+        # This means that there are two forms: one for the event, and one for
+        # the media item. The extra logic is to cover the fact that both
+        # records need to be updated.
 
+        # Event object
+        event = get_object_or_404(Event, pk=event_id)
 
-@permission_required('toolkit.write')
-def edit_event(request, event_id=None):
-    # Event edit form. The 'POST' case, for submitting edits, is a bit of a
-    # monster, and is a separate method
+        # Get the event's media item, or start a new one:
+        media_item = event.get_main_mediaitem() or MediaItem()
 
-    # Handling of POST (ie updates) is factored out into a separate function
-    if request.method == 'POST':
-        return _edit_event_handle_post(request, event_id)
+        logger.info(u"Updating event {0}".format(event_id))
+        # Create and populate forms:
+        form = diary_forms.EventForm(request.POST, instance=event)
+        media_form = diary_forms.MediaItemForm(request.POST, request.FILES, instance=media_item)
 
-    # So now just dealing with a GET:
-    event = get_object_or_404(Event, pk=event_id)
-    # For now only support a single media item:
-    media_item = event.get_main_mediaitem() or MediaItem()
+        # Validate
+        if form.is_valid() and media_form.is_valid():
+            self._save(event, media_item, form, media_form)
+            messages.add_message(request, messages.SUCCESS, u"Updated details for event '{0}'".format(event.name))
+            return _return_to_editindex(request)
 
-    # If the event has "legacy" (ie. non-html) copy then convert it to HTML;
-    if event.legacy_copy:
-        event.copy = event.copy_html
+        # Got here if there's a form validation error:
+        context = {
+            'event': event,
+            'form': form,
+            'media_form': media_form,
+        }
+        return render(request, 'form_event.html', context)
 
-    form = diary_forms.EventForm(instance=event)
-    media_form = diary_forms.MediaItemForm(instance=media_item)
+    def get(self, request, event_id):
+        event = get_object_or_404(Event, pk=event_id)
+        # For now only support a single media item:
+        media_item = event.get_main_mediaitem() or MediaItem()
 
-    context = {
-        'event': event,
-        'form': form,
-        'media_form': media_form,
-    }
+        # If the event has "legacy" (ie. non-html) copy then convert it to HTML;
+        if event.legacy_copy:
+            event.copy = event.copy_html
 
-    return render(request, 'form_event.html', context)
+        form = diary_forms.EventForm(instance=event)
+        media_form = diary_forms.MediaItemForm(instance=media_item)
+
+        context = {
+            'event': event,
+            'form': form,
+            'media_form': media_form,
+        }
+
+        return render(request, 'form_event.html', context)
 
 
 @permission_required('toolkit.write')
@@ -455,7 +466,7 @@ def edit_ideas(request, year=None, month=None):
 
     # Use get or create in order to silently create the ideas entry if it
     # didn't already exist:
-    instance, created = DiaryIdea.objects.get_or_create(
+    instance, _ = DiaryIdea.objects.get_or_create(
         month=datetime.date(year=year, month=month, day=1)
     )
 
@@ -519,7 +530,8 @@ def view_event_field(request, field, year, month, day):
                                .confirmed()
                                .start_in_range(start_date, end_date)
                                .order_by('start')
-                               .prefetch_related('rotaentry_set__role')  # mildly hacky optimisation for rota view
+                               # following prefetch is for the rota view
+                               .prefetch_related('rotaentry_set__role')
                                .select_related())
 
     search = request.GET.get('search')
@@ -571,64 +583,65 @@ def edit_event_templates(request):
 @permission_required('toolkit.write')
 def edit_event_tags(request):
     # View for editing event tags.
-    # GET: Reads tags and renders the (JavaScript heavy) template
-    # POST: Process list of tags. Expected to be submitted via AJAX, so doesn't
-    #       return much.
+    # GET: Reads tags and renders the (JavaScript based) template
+    # POST: Process list of tags. Expected to be submitted via AJAX, retuns
+    # json.
     tags = EventTag.objects.all()
 
     if request.method != 'POST':
         context = {'tags': tags}
         return render(request, 'edit_event_tags.html', context)
-    # Data was posted
 
-    # First, pull out mapping of tag key : name
-    # The form returns the data as a set of key/values where the keys are;
-    # "tags[x]" where x is either a positive integer which is the key of an
-    # existing tag, or a negative integer indicating that this is a new tag.
-    # Tags to be deleted have their value set to '' (the empty string)
-    tags_submitted = {}
-    # regex to recognise the "tags[x]" format:
-    tag_re = re.compile("^tags\[([-\d]+)\]$")
-    for key, val in request.POST.iteritems():
-        m = tag_re.match(key)
-        if m:
-            tags_submitted[int(m.group(1), 10)] = val.strip().lower()
+    errors = {}
 
-    # Build dict of existing tags:
-    tags_by_pk = dict((tag.pk, tag) for tag in tags)
-    # Now update / add as appropriate. Any tag keys that aren't included in
-    # the update are deleted.
-    for submitted_pk, submitted_name in tags_submitted.iteritems():
-        extant_tag = tags_by_pk.pop(submitted_pk, None)
-        if extant_tag:
-            if submitted_name == '':
-                logger.info(u"Deleting tag {0} (key {1})".format(extant_tag.name, extant_tag.pk))
-                extant_tag.delete()
-            elif extant_tag.name != submitted_name:
-                logger.info(u"Changing name of tag id {0} from {1} to {2}"
-                            .format(extant_tag.pk, extant_tag.name, submitted_name))
-                extant_tag.name = submitted_name
-                extant_tag.save()
-        elif extant_tag is None:
-            new_tag = EventTag(name=submitted_name)
-            logger.info(u"Creating new tag {0}".format(submitted_name))
-            # database constraints will enforce uniqueness of tag name
-            try:
-                new_tag.save()
-            except django.db.IntegrityError as interr:
-                logger.error(u"Failed adding tag {0}: {1}".format(submitted_name, interr))
-    # There shouldn't be any tags left in tags_by_pk:
-    if len(tags_by_pk) != 0:
-        logger.error(u"Tag(s) {0} not included in update".format(",".join(tags_by_pk.values())))
+    # Retrieve posted data:
+    new_tag_names = request.POST.getlist('new_tags[]', [])
+    deleted_tag_keys = request.POST.getlist('deleted_tags[]', [])
+    # Ensure keys are all integers
+    deleted_tag_keys = [int(k) for k in deleted_tag_keys]
 
-    return HttpResponse("OK")
+    # process new tags:
+    for new_tag in new_tag_names:
+        tag_form = diary_forms.TagForm({'name': new_tag, 'readonly': False})
+        if tag_form.is_valid():
+            logger.info(u"Creating new tag {0}".format(
+                tag_form.cleaned_data['name']))
+            tag_form.save()
+        else:
+            errors[new_tag] = [
+                u",".join(msg) for msg in tag_form.errors.itervalues()
+            ]
+
+    if errors:
+        # Bail out before deleting anything
+        return HttpResponse(
+            json.dumps({'failed': True, 'errors': errors}),
+            mimetype="application/json"
+        )
+
+    # process deleted tags
+    for deleted_key in deleted_tag_keys:
+        try:
+            tag = EventTag.objects.get(id=deleted_key)
+        except EventTag.DoesNotExist:
+            err = "Tag with key {0} can't be deleted: not found".format(deleted_key)
+            errors.setdefault('delete', []).append(err)
+            logger.error(err)
+        else:
+            logger.info(u"Deleting tag {0} (key {1})".format(tag.name, tag.pk))
+            tag.delete()
+
+    return HttpResponse(
+        json.dumps({'failed': bool(errors), 'errors': errors}),
+        mimetype="application/json"
+    )
 
 
 @permission_required('toolkit.write')
 def edit_roles(request):
     # This is pretty slow,but it's not a commonly used bit of the UI...
-    # (To be precise, save involves >120 queries. TThis is because I've been lazy
-    # and used the formset save method)
+    # (To be precise, save involves >120 queries. This is because I've been
+    # lazy and used the formset save method)
 
     RoleFormset = modelformset_factory(Role, diary_forms.RoleForm, can_delete=True)
 
@@ -649,7 +662,7 @@ def edit_roles(request):
 
 @permission_required('toolkit.write')
 def printed_programme_edit(request, operation):
-    assert(operation in ('edit', 'add'))
+    assert operation in ('edit', 'add')
 
     programme_queryset = PrintedProgramme.objects.order_by('month')
     programme_formset = modelformset_factory(PrintedProgramme,
