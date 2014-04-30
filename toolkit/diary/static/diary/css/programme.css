@@ -131,7 +131,14 @@ span.tags .tag_bluescreen { color: blue; display: inline;}
 .footer {
 	margin-top: 2em;
 	padding: 0.4em;
-	border: thin solid black;
+	border-top: thin solid black;
+	color: white;
+	background: black;
+}
+.footer a, .footer a:visited {
+	color: white;
+	text-decoration: none;
+	margin: 1.4em;
 }
 /*  SECTIONS  */
 .section {
