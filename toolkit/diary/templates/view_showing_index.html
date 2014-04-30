@@ -18,11 +18,10 @@
        {% if event_type %}
            <strong>Events tagged "{{ event_type }}"</strong><br>
        {% endif %}
-       See events tagged <a href="{% url "type-view" "music"%}">Music</a> | <a href="{% url "type-view" "film"%}">Film</a> |
-       <a href="{% url "default-view" %}">Everything</a><br>
-       <a href="{% url "day-view" year=start.year day=start.day month=start.month %}?daysahead=30">See 1 month</a> |
-       <a href="{% url "day-view" year=start.year day=start.day month=start.month %}?daysahead=60">See 2 months</a> |
-       <a href="{% url "day-view" year=start.year day=start.day month=start.month %}?daysahead=90">See 3 months</a><br>
+       <a href="{% url "day-view" year=start.year day=start.day month=start.month %}?daysahead=7">This week</a> |
+       <a href="{% url "day-view" year=next_monday.year day=next_monday.day month=next_monday.month %}?daysahead=7">Next week</a> |
+       <a href="{% url "day-view" year=start.year day=start.day month=start.month %}?daysahead={{ days_left_in_month }}">This Month</a> |
+       <a href="{% url "day-view" year=start_of_next_month.year day=start_of_next_month.day month=start_of_next_month.month %}?daysahead={{ days_in_next_month }}">Next Month</a><br>
        <br>
        {% if printed_programmes %}
            {% for printed_programme in printed_programmes %}

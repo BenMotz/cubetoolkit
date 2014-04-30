@@ -1,6 +1,7 @@
 import json
 import datetime
 import logging
+import calendar
 
 from toolkit.util.ordereddict import OrderedDict
 
@@ -89,6 +90,17 @@ def view_diary(request, year=None, month=None, day=None, event_type=None):
 
     context['printed_programmes'] = PrintedProgramme.objects.month_in_range(
         startdate, enddate)
+
+    today = datetime.date.today()
+    context['next_monday'] = today + datetime.timedelta(days=7 - today.weekday())
+    days_left_in_month = calendar.monthrange(today.year, today.month)[1] - today.day
+    if days_left_in_month == 0:
+        days_left_in_month = calendar.monthrange(today.year, today.month + 1)[1]
+
+    context['days_left_in_month'] = days_left_in_month
+    start_of_next_month = today + datetime.timedelta(days=days_left_in_month)
+    context['start_of_next_month'] = start_of_next_month
+    context['days_in_next_month'] = calendar.monthrange(start_of_next_month.year, start_of_next_month.month)[1]
 
     return render(request, 'view_showing_index.html', context)
 
