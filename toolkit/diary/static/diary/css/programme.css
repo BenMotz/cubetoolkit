@@ -3,7 +3,6 @@
 body {
 	font-family: 'Droid Sans', sans-serif;
 	color: black;
-	background-color: #bcbcbc;
 	font-size: 10pt;
 	margin: 0;
 }
@@ -11,7 +10,6 @@ body {
 .programme {
 	background-color: white;
 	padding: 1.4em;
-	margin-top: 0.6em;
 }
 
 img#cubelogo {
@@ -20,15 +18,6 @@ img#cubelogo {
 	display: inline-block;
 }
 
-#calendar {
-	position: fixed;
-	top: 0.83em;
-	background: white;
-	padding: 0.3em;
-	margin: 0;
-	font-size: 0.7em;
-
-}
 
 #programmelinks {
 	display: inline-block;
@@ -41,100 +30,6 @@ img#cubelogo {
 	}
 }
 
-/* Above width=1400px, fix the content at 830px */
-@media screen and (min-width: 1400px) {
-	.programme {
-		margin-left: auto;
-		margin-right: auto;
-		width: 830px;
-	}
-	#calendar {
-		right: 50%;
-		margin-right: 445px;
-		width: 240px;
-	}
-}
-/* 1024-1399px, content is 60% */
-@media screen and (min-width: 1024px) and (max-width: 1399px) {
-	.programme {
-		margin-left: auto;
-		margin-right: auto;
-		width: 60%;
-	}
-	#calendar {
-		left: 10px;
-		width: 16%;
-	}
-}
-/* 840-1024px, content is 605px */
-@media screen and (min-width: 845px) and (max-width: 1023px) {
-	.programme {
-		margin-left: 185px;
-		margin-right: auto;
-		width: 616px;
-	}
-	#calendar {
-		left: 10px;
-		width: 164px;
-	}
-}
-/* 650-840px, hide calendar */
-@media screen and (min-width: 450px) and (max-width: 844px) {
-	.programme {
-		margin-left: 184px;
-		margin-right: 10px;
-		width: auto;
-	}
-	#calendar {
-		left: 10px;
-		width: 164px;
-	}
-}
-
-/* < 550px, content is full width, hide calendar */
-@media screen and (max-width: 449px) {
-	.programme {
-		margin-left: 0;
-		margin-right: 0;
-		width: auto;
-		padding: 0.4em;
-	}
-	#calendar {
-		display: none;
-	}
-}
-/* There's further shuffling for < 440px below... */
-
-#calendar h1 {
-	padding: 0;
-	margin: 0;
-	font-size: 1em;
-}
-
-#calendar ul {
-	padding: 0;
-	margin: 0;
-}
-
-#calendar li {
-	list-style-type: none;
-	margin: 0.1em 0;
-}
-
-#calendar .date {
-	display: inline-block;
-	float: left;
-	width: 4em;
-	padding: 0;
-	margin: 0;
-}
-
-#calendar a, #calendar a:visited  {
-	display: block;
-	overflow: hidden;
-	text-decoration: none;
-	color: darkblue;
-}
 
 #listing {
 	background-color: white;
@@ -184,23 +79,15 @@ img#cubelogo {
 
 #listing img {
 	border: none;
-	float: left;
+/*	float: left; */
 	padding-right: 1.5em;
-}
-
-/* < 600px, de-float the images */
-@media screen and (max-width: 600px) {
-	#listing img {
-		padding-right: 0;
-		float: none;
-	}
+	width: 100%;
 }
 
 #listing .showing {
 	padding: 0.8em 0;
-	border-bottom: 2px solid darkgray;
+	border-top: 2px solid darkgray;
 	/* Force the showing to clear below the image */
-	overflow: auto;
 }
 #listing .cancelled h1::before {
 	content: "CANCELLED (sorry)";
@@ -246,3 +133,63 @@ span.tags .tag_bluescreen { color: blue; display: inline;}
 	padding: 0.4em;
 	border: thin solid black;
 }
+/*  SECTIONS  */
+.section {
+	clear: both;
+	padding: 0px;
+	margin: 0px;
+}
+
+/*  COLUMN SETUP  */
+.col {
+	display: block;
+	float:left;
+	margin: 1% 0 1% 1.6%;
+}
+.col:first-child { margin-left: 0; }
+
+
+/*  GROUPING  */
+.group:before,
+.group:after {
+	content:"";
+	display:table;
+}
+.group:after {
+	clear:both;
+}
+.group {
+    zoom:1; /* For IE 6/7 */
+}
+
+/*  GRID OF THREE  */
+.span_3_of_3 {
+	width: 32%;
+}
+.span_2_of_3 {
+	width: 32%;
+}
+.span_1_of_3 {
+	width: 32%;
+}
+
+/*  GO FULL WIDTH AT LESS THAN 480 PIXELS */
+
+@media only screen and (max-width: 480px) {
+	.col { 
+		margin: 1% 0 1% 0%;
+	}
+}
+
+@media only screen and (max-width: 480px) {
+	.span_3_of_3 {
+		width: 100%;
+	}
+	.span_2_of_3 {
+		width: 100%; 
+	}
+	.span_1_of_3 {
+		width: 100%;
+	}
+}
+
