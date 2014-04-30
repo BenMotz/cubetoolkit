@@ -1,7 +1,7 @@
 try:
     from cStringIO import cStringIO as BytesIO
 except ImportError:
-    from six import BytesIO
+    from django.utils.six import BytesIO
 
 try:
     from PIL import Image
@@ -28,13 +28,17 @@ def pil_image(source, exif_orientation=True, **options):
     if not source:
         return
     source = BytesIO(source.read())
+
+    image = Image.open(source)
+    # Fully load the image now to catch any problems with the image contents.
     try:
-        image = Image.open(source)
-        # Fully load the image now to catch any problems with the image
-        # contents.
+        # An "Image file truncated" exception can occur for some images that
+        # are still mostly valid -- we'll swallow the exception.
         image.load()
-    except Exception:
-        return
+    except IOError:
+        pass
+    # Try a second time to catch any other potential exceptions.
+    image.load()
 
     if exif_orientation:
         image = utils.exif_orientation(image)

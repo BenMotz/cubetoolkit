@@ -2,7 +2,7 @@ import os
 try:
     from cStringIO import cStringIO as BytesIO
 except ImportError:
-    from six import BytesIO
+    from django.utils.six import BytesIO
 
 try:
     from PIL import Image
@@ -11,14 +11,18 @@ except ImportError:
 
 from easy_thumbnails import utils
 from easy_thumbnails.conf import settings
+from easy_thumbnails.options import ThumbnailOptions
 
 
-def _use_default_options(options):
-    if not settings.THUMBNAIL_DEFAULT_OPTIONS:
-        return options
-    default_options = settings.THUMBNAIL_DEFAULT_OPTIONS.copy()
-    default_options.update(options)
-    return default_options
+class NoSourceGenerator(Exception):
+    """
+    Exception that is raised if no source generator can process the source
+    file.
+    """
+
+    def __unicode__(self):
+        return "Tried {0} source generators with no success".format(
+            len(self.args))
 
 
 def process_image(source, processor_options, processors=None):
@@ -26,7 +30,7 @@ def process_image(source, processor_options, processors=None):
     Process a source PIL image through a series of image processors, returning
     the (potentially) altered image.
     """
-    processor_options = _use_default_options(processor_options)
+    processor_options = ThumbnailOptions(processor_options)
     if processors is None:
         processors = [
             utils.dynamic_import(name)
@@ -44,9 +48,12 @@ def save_image(image, destination=None, filename=None, **options):
     if destination is None:
         destination = BytesIO()
     filename = filename or ''
-    format = Image.EXTENSION.get(os.path.splitext(filename)[1], 'JPEG')
-    if format == 'JPEG':
+    # Ensure plugins are fully loaded so that Image.EXTENSION is populated.
+    Image.init()
+    format = Image.EXTENSION.get(os.path.splitext(filename)[1].lower(), 'JPEG')
+    if format in ('JPEG', 'WEBP'):
         options.setdefault('quality', 85)
+    if format == 'JPEG':
         try:
             image.save(destination, format=format, optimize=1, **options)
         except IOError:
@@ -59,7 +66,8 @@ def save_image(image, destination=None, filename=None, **options):
     return destination
 
 
-def generate_source_image(source_file, processor_options, generators=None):
+def generate_source_image(source_file, processor_options, generators=None,
+                          fail_silently=True):
     """
     Processes a source ``File`` through a series of source generators, stopping
     once a generator returns an image.
@@ -70,23 +78,45 @@ def generate_source_image(source_file, processor_options, generators=None):
     If the source file cannot be opened, it will be set to ``None`` and still
     passed to the generators.
     """
-    processor_options = _use_default_options(processor_options)
-    was_closed = source_file.closed
+    processor_options = ThumbnailOptions(processor_options)
+    # Keep record of whether the source file was originally closed. Not all
+    # file-like objects provide this attribute, so just fall back to False.
+    was_closed = getattr(source_file, 'closed', False)
     if generators is None:
         generators = [
             utils.dynamic_import(name)
             for name in settings.THUMBNAIL_SOURCE_GENERATORS]
+    exceptions = []
     try:
-        source = source_file
-        try:
-            source.open()
-        except Exception:
-            source = None
-            was_closed = False
         for generator in generators:
-            image = generator(source, **processor_options)
+            source = source_file
+            # First try to open the file.
+            try:
+                source.open()
+            except Exception:
+                # If that failed, maybe the file-like object doesn't support
+                # reopening so just try seeking back to the start of the file.
+                try:
+                    source.seek(0)
+                except Exception:
+                    source = None
+            try:
+                image = generator(source, **processor_options)
+            except Exception as e:
+                if not fail_silently:
+                    if len(generators) == 1:
+                        raise
+                    exceptions.append(e)
+                image = None
             if image:
                 return image
     finally:
+        # Attempt to close the file if it was closed originally (but fail
+        # silently).
         if was_closed:
-            source_file.close()
+            try:
+                source_file.close()
+            except Exception:
+                pass
+    if exceptions and not fail_silently:
+        raise NoSourceGenerator(*exceptions)

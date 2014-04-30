@@ -100,7 +100,7 @@ class Settings(AppSettings):
     THUMBNAIL_DEFAULT_STORAGE = (
         'easy_thumbnails.storage.ThumbnailFileSystemStorage')
     """
-    The default Django storage for thumbnails.
+    The default Django storage for *saving* generated thumbnails.
     """
     THUMBNAIL_MEDIA_ROOT = ''
     """
@@ -155,6 +155,7 @@ class Settings(AppSettings):
     (best). Technically, values up to 100 are allowed, but this is not
     recommended.
     """
+
     THUMBNAIL_EXTENSION = 'jpg'
     """
     The type of image to save thumbnails with no transparency layer as.
@@ -180,11 +181,39 @@ class Settings(AppSettings):
     The type of image to save thumbnails with a transparency layer (e.g. GIFs
     or transparent PNGs).
     """
+    THUMBNAIL_NAMER = 'easy_thumbnails.namers.default'
+    """
+    The function used to generate the filename for thumbnail images.
+
+    Three namers are included in easy_thumbnails:
+
+    ``easy_thumbnails.namers.default``
+        Descriptive filename containing the source and options like
+        ``source.jpg.100x100_q80_crop_upscale.jpg``.
+
+    ``easy_thumbnails.namers.hashed``
+        Short hashed filename like ``1xedFtqllFo9.jpg``.
+
+    ``easy_thumbnails.namers.source_hashed``
+        Filename with source hashed, size, then options hashed like
+        ``1xedFtqllFo9_100x100_QHCa6G1l.jpg``.
+
+    To write a custom namer, always catch all other keyword arguments arguments
+    (with \*\*kwargs). You have access to the following arguments:
+    ``thumbnailer``, ``source_filename``, ``thumbnail_extension`` (does *not*
+    include the ``'.'``), ``thumbnail_options``, ``prepared_options``.
+
+    The ``thumbnail_options`` are a copy of the options dictionary used to
+    build the thumbnail, ``prepared_options`` is a list of options prepared as
+    text, and excluding options that shouldn't be included in the filename.
+    """
+
     THUMBNAIL_PROCESSORS = (
         'easy_thumbnails.processors.colorspace',
         'easy_thumbnails.processors.autocrop',
         'easy_thumbnails.processors.scale_and_crop',
         'easy_thumbnails.processors.filters',
+        'easy_thumbnails.processors.background',
     )
     """
     Defaults to::
@@ -194,6 +223,7 @@ class Settings(AppSettings):
             'easy_thumbnails.processors.autocrop',
             'easy_thumbnails.processors.scale_and_crop',
             'easy_thumbnails.processors.filters',
+            'easy_thumbnails.processors.background',
         )
 
     The :doc:`processors` through which the source image is run when you create
@@ -212,6 +242,7 @@ class Settings(AppSettings):
     The order of the processors is the order in which they are sequentially
     tried.
     """
+
     THUMBNAIL_CHECK_CACHE_MISS = False
     """
     If this boolean setting is set to ``True``, and a thumbnail cannot
@@ -241,8 +272,43 @@ class Settings(AppSettings):
     """
     Enables thumbnails for retina displays.
 
-    Creates a "@2x" version of the thumbnails that can be used by a javascript
-    layer to display higher quality thumbnails for high DPI displays.
+    Creates a version of the thumbnails in high resolution that can be used by
+    a javascript layer to display higher quality thumbnails for high DPI
+    displays.
+
+    This can be overridden at a per-thumbnail level with the
+    ``HIGH_RESOLUTION`` thumbnail option::
+
+        opts = {'size': (100, 100), 'crop': True, HIGH_RESOLUTION: False}
+        only_basic = get_thumbnailer(obj.image).get_thumbnail(opts)
+
+    In a template tag, use a value of ``0`` to force the disabling of a high
+    resolution version or just the option name to enable it::
+
+        {% thumbnail obj.image 50x50 crop HIGH_RESOLUTION=0 %}  {# no hires #}
+        {% thumbnail obj.image 50x50 crop HIGH_RESOLUTION %}  {# force hires #}
+    """
+
+    THUMBNAIL_HIGHRES_INFIX = '@2x'
+    """
+    Sets the infix used to distinguish thumbnail images for retina displays.
+
+    Thumbnails generated for retina displays are distinguished from the
+    standard resolution counterparts, by adding an infix to the filename just
+    before the dot followed by the extension.
+
+    Apple Inc., formerly suggested to use ``@2x`` as infix, but later changed
+    their mind and now suggests to use ``_2x``, since this is more portable.
+    """
+
+    THUMBNAIL_CACHE_DIMENSIONS = False
+    """
+    Save thumbnail dimensions to the database.
+
+    When using remote storage backends it can be a slow process to get image
+    dimensions for a thumbnailed file. This option will store them in
+    the database to be recalled quickly when required. Note: the old method
+    still works as a fall back.
     """
 
 settings = Settings()

@@ -1,6 +1,8 @@
 from django.db import models
+from django.utils import timezone
 
 from easy_thumbnails import utils, signal_handlers
+from easy_thumbnails.conf import settings
 
 
 class FileManager(models.Manager):
@@ -13,31 +15,38 @@ class FileManager(models.Manager):
             if update_modified:
                 defaults = kwargs.setdefault('defaults', {})
                 defaults['modified'] = update_modified
-            object, created = self.get_or_create(**kwargs)
+            obj, created = self.get_or_create(**kwargs)
         else:
             created = False
             kwargs.pop('defaults', None)
             try:
-                object = self.get(**kwargs)
+                manager = self._get_thumbnail_manager()
+                obj = manager.get(**kwargs)
             except self.model.DoesNotExist:
 
                 if check_cache_miss and storage.exists(name):
                     # File already in storage, update cache
-                    object = self.create(**kwargs)
+                    obj = self.create(**kwargs)
                     created = True
                 else:
                     return
 
-        if update_modified and object and not created:
-            if object.modified != update_modified:
-                self.filter(pk=object.pk).update(modified=update_modified)
-        return object
+        if update_modified and not created:
+            if obj.modified != update_modified:
+                self.filter(pk=obj.pk).update(modified=update_modified)
+
+        return obj
+
+    def _get_thumbnail_manager(self):
+        if settings.THUMBNAIL_CACHE_DIMENSIONS:
+            return self.select_related("dimensions")
+        return self
 
 
 class File(models.Model):
     storage_hash = models.CharField(max_length=40, db_index=True)
     name = models.CharField(max_length=255, db_index=True)
-    modified = models.DateTimeField(default=utils.now)
+    modified = models.DateTimeField(default=timezone.now)
 
     objects = FileManager()
 
@@ -58,6 +67,19 @@ class Thumbnail(File):
 
     class Meta:
         unique_together = (('storage_hash', 'name', 'source'),)
+
+
+class ThumbnailDimensions(models.Model):
+    thumbnail = models.OneToOneField(Thumbnail, related_name="dimensions")
+    width = models.PositiveIntegerField(null=True)
+    height = models.PositiveIntegerField(null=True)
+
+    def __unicode__(self):
+        return "%sx%s" % (self.width, self.height)
+
+    @property
+    def size(self):
+        return self.width, self.height
 
 
 models.signals.pre_save.connect(signal_handlers.find_uncommitted_filefields)
