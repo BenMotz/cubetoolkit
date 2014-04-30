@@ -7,7 +7,7 @@ import django.utils.timezone
 logger = logging.getLogger(__name__)
 
 
-def get_date_range(year, month, day, user_days_ahead, default_days_ahead=30):
+def get_date_range(year, month, day, user_days_ahead, default_days_ahead=365):
     """Support method to take fields read from HTTP request and return a tuple
     (datetime, number_of_days)
     If month or day are blank, they default to 1. If all three are blank it
