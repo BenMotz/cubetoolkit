@@ -63,7 +63,7 @@
                         {% endfor %}
                     </p>
                     {% if event.pricing %}<p class="start_and_pricing">{{ event.pricing }}</p>{% endif %}
-                    <p class="copy">{{ event.copy_summary|truncatewords:50 }} [<a class="more" href="{% url "single-event-view" event.id %}">more...</a>]</p>
+                    <p class="copy">{{ event.copy_summary|truncatewords:30 }} [<a class="more" href="{% url "single-event-view" event.id %}">more...</a>]</p>
                 </div>
             </div>
             {% cycle "</div>" "</div>" "</div></div>" %}
