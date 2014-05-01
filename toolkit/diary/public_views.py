@@ -24,7 +24,49 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-def view_diary(request, year=None, month=None, day=None, event_type=None):
+def _view_diary(request, startdate, enddate, tag=None, extra_title=None):
+    # Returns public diary view, for given date range, optionally filtered by
+    # an event tag.
+
+    # Build query. The select_related() and prefetch_related on the end
+    # encourages it to get the associated showing/event data, to reduce the
+    # number of SQL queries
+    showings = (Showing.objects.public()
+                               .start_in_range(startdate, enddate)
+                               .order_by('start')
+                               .select_related()
+                               .prefetch_related('event__media')
+                               .prefetch_related('event__tags'))
+    if tag:
+        showings = showings.filter(event__tags__name=tag)
+
+    # Build a list of events for that list of showings:
+    events = OrderedDict()
+    for showing in showings:
+        events.setdefault(showing.event, list()).append(showing)
+
+    context = {
+        'start': startdate,
+        'end': enddate,
+        # Make sure user input is escaped:
+        'event_type': mark_for_escaping(tag) if tag else None,
+        # Set page title:
+        'extra_title': extra_title,
+        # Set of Showing objects for date range
+        'showings': showings,
+        # Ordered dict mapping event -> list of showings:
+        'events': events,
+        # This is prepended to filepaths from the MediaPaths table to use
+        # as a location for images:
+        'media_url': settings.MEDIA_URL,
+        'printed_programmes': PrintedProgramme.objects.month_in_range(
+            startdate, enddate)
+    }
+
+    return render(request, 'view_showing_index.html', context)
+
+
+def view_diary(request, year=None, month=None, day=None, req_days_ahead=None, event_type=None):
     # Returns public diary view, starting at specified year/month/day, filtered
     # by event type.
     #
@@ -37,72 +79,87 @@ def view_diary(request, year=None, month=None, day=None, event_type=None):
     #   only
     # - if dayssahead parameter is passed, that many days from the specified
     #   year/month/date
-    context = {}
-    query_days_ahead = request.GET.get('daysahead', None)
+
+    query_days_ahead = req_days_ahead or request.GET.get('daysahead', None)
 
     # Shared utility method to parse HTTP parameters and return a date range
     startdate, days_ahead = get_date_range(year, month, day, query_days_ahead)
+
     if startdate is None:
-        raise Http404(days_ahead)
+        raise Http404("Start date not found")
+
     enddate = startdate + datetime.timedelta(days=days_ahead)
 
-    # Start getting together data to send to the template...
+    return _view_diary(request, startdate, enddate, tag=event_type)
 
-    context['today'] = datetime.date.today()
-    context['start'] = startdate
-    context['end'] = enddate
-    # Following is user input passed back, so make doubly sure that it gets
-    # escaped in the template:
-    context['event_type'] = mark_for_escaping(event_type) if event_type else None
+def _today_date_aware():
+    """
+    Get a timezone aware datetime object representing local midnight at the
+    start of today
+    """
+    # Get the local date:
+    current_tz = timezone.get_current_timezone()
+    today = timezone.now().date()
+    # Now create a new datetime from the date, localise and return it:
+    naive_datetime = datetime.datetime(today.year, today.month, today.day)
+    return timezone.make_aware(naive_datetime, current_tz)
 
-    # Set page title
-    if year:
-        # If some specific dates were provided, use those
-        context['event_list_name'] = u"Cube Programme for {0}".format(
-            u"/".join([str(s) for s in (day, month, year) if s])
-        )
-    else:
-        # Default title
-        context['event_list_name'] = "Cube Programme"
 
-    # Build query. The select_related() and prefetch_related on the end
-    # encourages it to get the associated showing/event data, to reduce the
-    # number of SQL queries
-    showings = (Showing.objects.public()
-                               .start_in_range(startdate, enddate)
-                               .order_by('start')
-                               .select_related()
-                               .prefetch_related('event__media')
-                               .prefetch_related('event__tags'))
-    if event_type:
-        showings = showings.filter(event__tags__name=event_type)
+def view_diary_this_week(request):
+    """
+    Events in the next 7 days
+    """
+    startdate = _today_date_aware()
+    enddate = startdate + datetime.timedelta(days=7)
+    return _view_diary(request, startdate, enddate, extra_title="What's on this week")
 
-    # Build a list of events for that list of showings:
-    events = OrderedDict()
-    for showing in showings:
-        events.setdefault(showing.event, list()).append(showing)
 
-    context['showings'] = showings  # Set of Showing objects for date range
-    context['events'] = events  # Ordered dict mapping event -> list of showings
-    # This is prepended to filepaths from the MediaPaths table to use
-    # as a location for images:
-    context['media_url'] = settings.MEDIA_URL
+def view_diary_next_week(request):
+    """
+    Events from next Monday to next Sunday
+    """
+    today = _today_date_aware()
+    # Next monday is (7 - today) days ahead, if Monday is 0
+    startdate = today + datetime.timedelta(days=(7 - today.weekday()))
+    enddate = startdate + datetime.timedelta(days=7)
+    return _view_diary(request, startdate, enddate, extra_title="What's on next week")
 
-    context['printed_programmes'] = PrintedProgramme.objects.month_in_range(
-        startdate, enddate)
 
-    today = datetime.date.today()
-    context['next_monday'] = today + datetime.timedelta(days=7 - today.weekday())
-    days_left_in_month = calendar.monthrange(today.year, today.month)[1] - today.day
-    if days_left_in_month == 0:
-        days_left_in_month = calendar.monthrange(today.year, today.month + 1)[1]
+def view_diary_this_month(request):
+    """
+    Events from now until the end of this month, unless today is the last
+    day of the month, in which case the next 30 days of events
+    """
+    today = _today_date_aware()
 
-    context['days_left_in_month'] = days_left_in_month
-    start_of_next_month = today + datetime.timedelta(days=days_left_in_month)
-    context['start_of_next_month'] = start_of_next_month
-    context['days_in_next_month'] = calendar.monthrange(start_of_next_month.year, start_of_next_month.month)[1]
+    days_in_this_month = calendar.monthrange(today.year, today.month)[1]
+    days_left = days_in_this_month - today.day
 
-    return render(request, 'view_showing_index.html', context)
+    if days_left <= 1:
+        # If it's the end of the month, a slightly incorrect skip to next month
+        days_left += 30
+
+    enddate = today + datetime.timedelta(days=days_left)
+
+    return _view_diary(request, today, enddate, extra_title="What's on this month")
+
+
+def view_diary_next_month(request):
+    """
+    Events in the next month
+    """
+    today = _today_date_aware()
+
+    days_in_this_month = calendar.monthrange(today.year, today.month)[1]
+    days_to_next_month = days_in_this_month - today.day + 1
+
+    startdate = today + datetime.timedelta(days=days_to_next_month)
+
+    days_in_next_month = calendar.monthrange(startdate.year, startdate.month)[1]
+
+    enddate = startdate + datetime.timedelta(days=days_in_next_month)
+
+    return _view_diary(request, startdate, enddate, extra_title="What's on next month")
 
 
 def view_diary_json(request, year, month, day):
