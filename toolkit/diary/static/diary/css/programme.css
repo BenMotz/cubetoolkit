@@ -119,14 +119,19 @@ span.tags a {
 	margin: 0.1em;
 	border-radius: 0.2em;
 	text-decoration: none;
-	display: none;
+	color: #0055C0;
 }
-span.tags .tag_music { color: blue; display: inline;}
-span.tags .tag_film { color: green; display: inline;}
-span.tags .tag_party { color: red; display: inline;}
-span.tags .tag_talk { color: orange; display: inline;}
-span.tags .tag_cabaret { color: brown; display: inline;}
-span.tags .tag_bluescreen { color: blue; display: inline;}
+span.tags .tag_music { color: blue; }
+span.tags .tag_film { color: green; }
+span.tags .tag_party { color: red; }
+span.tags .tag_talk { color: orange; }
+span.tags .tag_cabaret { color: brown; }
+span.tags .tag_bluescreen { color: blue; }
+span.tags .tag_nanoplex { color: #CA678D; }
+span.tags .tag_animation { color: #FFAA00; }
+
+/* Hide film format tags: */
+.tag_dcp, .tag_35mm, .tag_dvd, .tag_dcp { display: none;}
 
 .footer {
 	margin-top: 2em;
