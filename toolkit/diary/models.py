@@ -113,6 +113,7 @@ class MediaItem(models.Model):
 
 class EventTag(models.Model):
     name = models.CharField(max_length=32, unique=True)
+    slug = models.SlugField(max_length=50, unique=True)
     read_only = models.BooleanField(default=False, editable=False)
 
     class Meta:
