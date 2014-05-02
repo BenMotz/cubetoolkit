@@ -1251,19 +1251,22 @@ class EditTagsViewTests(DiaryTestsMixin, TestCase):
         final_tag_count = EventTag.objects.count()
         self.assertEqual(initial_tag_count, final_tag_count)
 
-    def test_post_bad_new_tag(self):
+    def test_post_duplicate_new_tag(self):
         initial_tag_count = EventTag.objects.count()
+
+        existing_name = EventTag.objects.get(id=1).name
 
         url = reverse("edit_event_tags")
         response = self.client.post(url, data={
             "deleted_tags[]": [1],
-            "new_tags[]": ["bad&tag"],
+            "new_tags[]": [existing_name],
         })
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content)
         self.assertEqual(response_data['failed'], True)
-
-        self.assertIn('bad&tag', response_data['errors'])
-
+        self.assertEqual(
+            response_data[u'errors'],
+            {existing_name: [u'Event tag with this Name already exists.']}
+        )
         final_tag_count = EventTag.objects.count()
         self.assertEqual(initial_tag_count, final_tag_count)

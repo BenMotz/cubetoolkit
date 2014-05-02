@@ -217,3 +217,4 @@ class NewPrintedProgrammeForm(forms.ModelForm):
 class TagForm(forms.ModelForm):
     class Meta(object):
         model = toolkit.diary.models.EventTag
+        fields = ('name',)

@@ -11,6 +11,7 @@ import django.utils.timezone
 import django.core.exceptions
 from django.utils.safestring import mark_safe
 from django.db.models.query import QuerySet
+from django.utils.text import slugify
 
 from south.modelsinspector import add_introspection_rules
 
@@ -126,11 +127,8 @@ class EventTag(models.Model):
     def clean(self):
         # Force to lowercase:
         self.name = self.name.lower().strip()
-        # Check for unwanted characters:
-        if re.search(ur"\s|&|\?|#", self.name):
-            raise django.core.exceptions.ValidationError(
-                u"Tag names may not contain the characters & ? # or spaces"
-            )
+        # Generate slug:
+        self.slug = slugify(self.name)
 
     # Overloaded Django ORM methods:
     def save(self, *args, **kwargs):
