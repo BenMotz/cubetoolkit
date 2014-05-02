@@ -50,6 +50,7 @@ def view_diary(request, year=None, month=None, day=None, event_type=None):
     context['today'] = datetime.date.today()
     context['start'] = startdate
     context['end'] = enddate
+
     # Following is user input passed back, so make doubly sure that it gets
     # escaped in the template:
     context['event_type'] = mark_for_escaping(event_type) if event_type else None
@@ -73,7 +74,7 @@ def view_diary(request, year=None, month=None, day=None, event_type=None):
                                .select_related()
                                .prefetch_related('event__media'))
     if event_type:
-        showings = showings.filter(event__tags__name=event_type)
+        showings = showings.filter(event__tags__slug=event_type)
 
     # Build a list of events for that list of showings:
     events = OrderedDict()
