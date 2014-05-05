@@ -10,25 +10,27 @@ body {
 .programme {
 	background-color: white;
 	padding: 1.4em;
+	width:90%;
+	margin:0 auto;
 }
 
-img#cubelogo {
+/*img#cubelogo {
 	text-align: center;
 	border: none;
 	display: inline-block;
-}
+}*/
 
 
 #programmelinks {
-	display: inline-block;
+	display: inline-block;	
 }
 
-/* < 550px, scale the logo down */
-@media screen and (max-width: 550px) {
+/* < 632px, scale the logo down */
+/*@media screen and (max-width: 632px) {
 	img#cubelogo {
 		max-width: 100%;
 	}
-}
+}*/
 
 
 #listing {
@@ -85,12 +87,12 @@ img#cubelogo {
 }
 
 #listing .showing {
-	padding: 0.8em 0;
-	border-top: 2px solid darkgray;
+	padding: 1.4em 0;
+	border-top: thin dotted black;
 	/* Force the showing to clear below the image */
 }
 #listing .cancelled h1::before {
-	content: "CANCELLED (sorry)";
+	content: "CANCELLED";
 	text-decoration: none;
 	color: white;
 	background-color: red;
@@ -128,69 +130,111 @@ span.tags .tag_talk { color: orange; display: inline;}
 span.tags .tag_cabaret { color: brown; display: inline;}
 span.tags .tag_bluescreen { color: blue; display: inline;}
 
+.footer-wrapper {
+	background-color: white;	
+	margin: 0 auto;
+	width: 100%;
+}
 .footer {
-	margin-top: 2em;
-	padding: 0.4em;
-	border-top: thin solid black;
-	color: white;
-	background: black;
+	border-top: thin dotted black;
+	margin:0 auto;
+	padding-top: 1.4em;
+	padding-bottom: 1.4em;	
+ 	position:relative;
+ 	width:90%;
 }
 .footer a, .footer a:visited {
-	color: white;
+	color: black;
 	text-decoration: none;
-	margin: 1.4em;
 }
-/*  SECTIONS  */
+.footer p {
+	color: black;
+	font-size: 	0.8em;
+	line-height: 1.6;
+	margin: 0;
+}
+.header {
+	background-color: white;
+	padding-top: 1.4em;	
+	padding-left: 1.4em;
+	padding-right: 1.4em;
+	clear: both;
+	margin:0 auto;
+	width:90%;	
+}
+.header p {
+	padding: 0;
+	margin: 0;
+}
+.header a, .header a:visited {
+	font-size: 1.0em;
+	color: black;
+	text-decoration: underline;
+}
+/*  SECTIONS  ============================================================================= */
+
 .section {
 	clear: both;
 	padding: 0px;
 	margin: 0px;
 }
 
-/*  COLUMN SETUP  */
+/*  GROUPING  ============================================================================= */
+
+
+.group:before,
+.group:after {
+    content:"";
+    display:table;
+}
+.group:after {
+    clear:both;
+}
+.group {
+    zoom:1; /* For IE 6/7 (trigger has Layout) */
+}
+
+/*  GRID COLUMN SETUP   ==================================================================== */
+
 .col {
 	display: block;
 	float:left;
-	margin: 1% 0 1% 1.6%;
-}
-.col:first-child { margin-left: 0; }
-
-
-/*  GROUPING  */
-.group:before,
-.group:after {
-	content:"";
-	display:table;
-}
-.group:after {
-	clear:both;
-}
-.group {
-    zoom:1; /* For IE 6/7 */
+/*	margin: 1% 0 1% 1.6%;*/
+	margin: 0 0 0 1.6%;
 }
 
-/*  GRID OF THREE  */
-.span_3_of_3 {
-	width: 32%;
-}
-.span_2_of_3 {
-	width: 32%;
-}
-.span_1_of_3 {
-	width: 32%;
-}
+.col:first-child { margin-left: 0; } /* all browsers except IE6 and lower */
 
-/*  GO FULL WIDTH AT LESS THAN 480 PIXELS */
 
-@media only screen and (max-width: 480px) {
+/*  REMOVE MARGINS AND PADDING AS ALL GO FULL WIDTH AT 632 PIXELS */
+
+@media only screen and (max-width: 632px) {
 	.col { 
 		margin: 1% 0 1% 0%;
 	}
 }
 
-@media only screen and (max-width: 480px) {
+/*  GRID OF THREE   ============================================================================= */
+
+	
+.span_3_of_3 {
+	width: 100%; 
+}
+
+.span_2_of_3 {
+	width: 66.13%; 
+}
+
+.span_1_of_3 {
+	width: 32.26%; 
+}
+
+
+/*  GO FULL WIDTH AT LESS THAN 632 PIXELS */
+
+@media only screen and (max-width: 632px) {
 	.span_3_of_3 {
-		width: 100%;
+		width: 100%; 
 	}
 	.span_2_of_3 {
 		width: 100%; 
@@ -200,3 +244,52 @@ span.tags .tag_bluescreen { color: blue; display: inline;}
 	}
 }
 
+/*  GRID OF SIX   ============================================================================= */
+
+
+.span_6_of_6 {
+	width: 100%;
+}
+
+.span_5_of_6 {
+  	width: 83.06%;
+}
+
+.span_4_of_6 {
+  	width: 66.13%;
+}
+
+.span_3_of_6 {
+  	width: 49.2%;
+}
+
+.span_2_of_6 {
+  	width: 32.26%;
+}
+
+.span_1_of_6 {
+  	width: 15.33%;
+}
+
+/*  GO FULL WIDTH AT LESS THAN 632 PIXELS */
+
+@media only screen and (max-width: 632px) {
+	.span_6_of_6 {
+		width: 100%; 
+	}
+	.span_5_of_6 {
+		width: 100%; 
+	}
+	.span_4_of_6 {
+		width: 100%; 
+	}
+	.span_3_of_6 {
+		width: 100%; 
+	}
+	.span_2_of_6 {
+		width: 100%; 
+	}
+	.span_1_of_6 {
+		width: 100%; 
+	}
+}
