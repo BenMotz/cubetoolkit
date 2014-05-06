@@ -21,6 +21,9 @@ Editing {{ event_list_name }}
   .cancelled {
     color: red;
   }
+  .daytime {
+    background-color: #FFFF99;
+  }
   h3 { font-family: Arial; }
 
   table { border-collapse: collapse; }
@@ -115,7 +118,8 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
 <p><span class="private">Private events are in italics</span><br>
 <span class="external">Outside hires are bolded</span><br>
 <span class="discounted">Discounted events (like TTT) are magenta</span><br>
-<span class="cancelled">Cancelled events are red</span></p>
+<span class="cancelled">Cancelled events are red</span><br>
+<span class="daytime">Daytime (before 6pm) events have a light background</span></p>
 
 <div class="programme"><p align='center'><a href="{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=90">See 3 months</a> |
 <a href="{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=183">See 6 months</a> |
@@ -142,7 +146,7 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
     </td>
     <td class="table_gap">&nbsp;</td>
     <td>{{ showing.booked_by }} <a href="{% url "edit-event-details-view" pk=showing.event.pk %}">
-    <span class="{% if showing.cancelled %}cancelled{% endif %}{% if showing.discounted %} discounted{% endif %}{% if showing.event.private %} private{% endif %}{% if showing.event.outside_hire %} external{% endif %}">
+            <span class="{% if showing.cancelled %}cancelled{% endif %}{% if showing.discounted %} discounted{% endif %}{% if showing.event.private %} private{% endif %}{% if showing.event.outside_hire %} external{% endif %}{% if showing.start.hour <= 17 %} daytime{% endif %}">
         {% if showing.confirmed %}
         {{ showing.event.name|upper }}
         {% else %}
