@@ -10,7 +10,7 @@ REQUIREMENTS_PYTHON_ONLY = "requirements_python_only.txt"
 REQUIREMENTS_C_COMPONENT = "requirements_c_components.txt"
 
 # This is deleted whenever code is deployed
-CODE_DIR = "toolkit"
+CODE_DIRS = ["toolkit", "easy_thumbnails"]
 
 
 def _assert_target_set():
@@ -63,10 +63,12 @@ def deploy_code():
         # On remote system. (Note that because of odd things about fabric's
         # environment vars the local pwd affects the remote commands. Yes.)
         with cd(env.site_root):
+            # Delete old code
+            for code_dir in CODE_DIRS:
+                target = os.path.join(env.site_root, code_dir)
+                utils.puts("Deleting {0}".format(target))
+                run("rm -rf {0}".format(target))
             # Extract:
-            target = os.path.join(env.site_root, CODE_DIR)
-            utils.puts("Deleting {0}".format(target))
-            run("rm -rf {0}".format(target))
             utils.puts("Extracting {0}".format(archive))
             # Untar with -m to avoid trying to utime /media directories that
             # may be owned by the webserver (which then fails)
