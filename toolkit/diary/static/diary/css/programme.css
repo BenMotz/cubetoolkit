@@ -14,11 +14,11 @@ body {
 	margin:0 auto;
 }
 
-/*img#cubelogo {
-	text-align: center;
+#cubelogo {
 	border: none;
-	display: inline-block;
-}*/
+	float: left;
+	max-width: 100%;
+}
 
 
 #programmelinks {
@@ -141,7 +141,7 @@ span.tags .tag_bluescreen { color: blue; display: inline;}
 	padding-top: 1.4em;
 	padding-bottom: 1.4em;	
  	position:relative;
- 	width:90%;
+ 	width: 100%;
 }
 .footer a, .footer a:visited {
 	color: black;

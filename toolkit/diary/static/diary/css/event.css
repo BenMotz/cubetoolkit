@@ -135,6 +135,11 @@ p span.cancelled {
 	color: black;
 	text-decoration: none;
 }
+#cubelogo {
+	border: none;
+	float: left;
+	max-width: 100%;
+}
 /*  SECTIONS  ============================================================================= */
 
 .section {
