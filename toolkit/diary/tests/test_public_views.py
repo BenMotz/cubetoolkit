@@ -80,7 +80,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         # Eh (shrug)
         self.assertEqual(data, [{
                          u"name": u"Event three title",
-                         u"tags": u"tag_two",
+                         u"tags": u"tag two",
                          u"image": None,
                          u"start": u"13/04/2013 18:00",
                          u"link": u"/programme/event/id/3/",

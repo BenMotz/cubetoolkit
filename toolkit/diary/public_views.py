@@ -38,7 +38,7 @@ def _view_diary(request, startdate, enddate, tag=None, extra_title=None):
                                .prefetch_related('event__media')
                                .prefetch_related('event__tags'))
     if tag:
-        showings = showings.filter(event__tags__name=tag)
+        showings = showings.filter(event__tags__slug=tag)
 
     # Build a list of events for that list of showings:
     events = OrderedDict()
