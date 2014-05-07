@@ -17,6 +17,12 @@ programme_urls = patterns(
     url(r'^view/(?P<year>\d{4})/?$', 'view_diary', name="year-view"),
     url(r'^view/(?P<year>\d{4})/(?P<month>\d{1,2})/?$', 'view_diary', name="month-view"),
     url(r'^view/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/?$', 'view_diary', name="day-view"),
+
+    url(r'^view/this_week$', 'view_diary_this_week', name="view-this-week"),
+    url(r'^view/next_week$', 'view_diary_next_week', name="view-next-week"),
+    url(r'^view/this_month$', 'view_diary_this_month', name="view-this-month"),
+    url(r'^view/next_month$', 'view_diary_next_month', name="view-next-month"),
+
     # View for events by tag. This needs to come *after* the year view, to
     # avoid years being parsed as tags:
     url(r'^view/(?P<event_type>[\w-]+)/$', 'view_diary', name="type-view"),

@@ -64,13 +64,11 @@ THUMBNAIL_ALIASES = {
     },
     'diary.MediaItem': {
         'indexview': {
-            # Crop to always be 200 pixels (or less) wide:
             'size': (500, 300),
             'crop': 'smart',
             'background': '#FFFFFF',
         },
         'eventdetail': {
-            # Crop to always be 200 pixels (or less) wide:
             'size': (800, 800),
         },
     },

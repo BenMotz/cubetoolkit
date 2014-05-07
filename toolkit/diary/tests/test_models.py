@@ -244,7 +244,8 @@ class EventTagsFromTemplate(DiaryTestsMixin, TestCase):
         new_event.reset_tags_to_default()
 
         self.assertEqual(new_event.tags.count(), 1)
-        self.assertEqual(new_event.tags.all()[0].name, u"tag_one")
+        self.assertEqual(new_event.tags.all()[0].name, u"tag one")
+        self.assertEqual(new_event.tags.all()[0].slug, u"tag-one")
 
     def test_set_two_tags_from_template(self):
         new_event = Event(
@@ -258,8 +259,10 @@ class EventTagsFromTemplate(DiaryTestsMixin, TestCase):
         new_event.reset_tags_to_default()
 
         self.assertEqual(new_event.tags.count(), 2)
-        self.assertEqual(new_event.tags.all()[0].name, u"tag_one")
+        self.assertEqual(new_event.tags.all()[0].name, u"tag one")
+        self.assertEqual(new_event.tags.all()[0].slug, u"tag-one")
         self.assertEqual(new_event.tags.all()[1].name, u"\u0167ag \u0165hre\u0119")
+        self.assertEqual(new_event.tags.all()[1].slug, u"ag-three")
 
     def test_set_no_tags_from_template(self):
         new_event = Event(
@@ -290,7 +293,7 @@ class EventTagsFromTemplate(DiaryTestsMixin, TestCase):
 
 class EventTagTests(TestCase):
     def test_can_delete_not_readonly(self):
-        tag = EventTag(name="test", read_only=False)
+        tag = EventTag(name=u"test", slug=u"test", read_only=False)
         tag.save()
         pk = tag.pk
 
@@ -299,7 +302,7 @@ class EventTagTests(TestCase):
         self.assertEqual(EventTag.objects.filter(id=pk).count(), 0)
 
     def test_cant_delete_readonly(self):
-        tag = EventTag(name="test", read_only=True)
+        tag = EventTag(name=u"test", slug=u"test", read_only=True)
         tag.save()
         pk = tag.pk
 
@@ -310,7 +313,7 @@ class EventTagTests(TestCase):
         self.assertEqual(tag.name, "test")
 
     def test_can_edit_not_readonly(self):
-        tag = EventTag(name="test", read_only=False)
+        tag = EventTag(name=u"test", slug=u"test", read_only=False)
         tag.save()
         pk = tag.pk
         # Try to edit:
@@ -321,7 +324,7 @@ class EventTagTests(TestCase):
         self.assertEqual(tag.name, "crispin")
 
     def test_cant_edit_readonly(self):
-        tag = EventTag(name="test", read_only=True)
+        tag = EventTag(name=u"test", slug=u"test", read_only=True)
         tag.save()
         pk = tag.pk
         # Try to edit:
@@ -332,30 +335,39 @@ class EventTagTests(TestCase):
         self.assertEqual(tag.name, "test")
 
     def test_clean_case(self):
-        tag = EventTag(name="BIGlettersHERE")
-        tag.full_clean()
+        tag = EventTag(name=u"BIGlettersHERE")
+        tag.clean()
         self.assertEqual(tag.name, "biglettershere")
+        self.assertEqual(tag.slug, "biglettershere")
 
-    def test_reject_characters(self):
-        tag = EventTag(name="with space")
-        self.assertRaises(ValidationError, tag.full_clean)
+    def test_slugify(self):
+        tag = EventTag(name=u"with space", slug=u"")
+        tag.clean()
+        self.assertEqual(tag.name, "with space")
+        self.assertEqual(tag.slug, "with-space")
 
-        tag = EventTag(name="with&ampersand")
-        self.assertRaises(ValidationError, tag.full_clean)
+        tag = EventTag(name=u"with&ampersand")
+        tag.clean()
+        self.assertEqual(tag.name, "with&ampersand")
+        self.assertEqual(tag.slug, "withampersand")
 
-        tag = EventTag(name="with?questionmark")
-        self.assertRaises(ValidationError, tag.full_clean)
+        tag = EventTag(name=u"with?questionmark")
+        tag.clean()
+        self.assertEqual(tag.name, "with?questionmark")
+        self.assertEqual(tag.slug, "withquestionmark")
 
-        tag = EventTag(name="with#hash")
-        self.assertRaises(ValidationError, tag.full_clean)
+        tag = EventTag(name=u"with#hash")
+        tag.clean()
+        self.assertEqual(tag.name, "with#hash")
+        self.assertEqual(tag.slug, "withhash")
 
     def test_reject_blank(self):
-        tag = EventTag(name="")
+        tag = EventTag(name=u"")
         self.assertRaises(ValidationError, tag.full_clean)
 
     def test_must_be_unique(self):
-        t1 = EventTag(name="jim")
+        t1 = EventTag(name=u"jim", slug=u"jim")
         t1.save()
 
-        t2 = EventTag(name="jim")
+        t2 = EventTag(name=u"jim!", slug=u"jim")
         self.assertRaises(django.db.IntegrityError, t2.save)

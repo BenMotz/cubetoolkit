@@ -2,7 +2,7 @@
 {% load thumbnail %}
 
 {% block title %}
-{{ event_list_name|default:"Cube Programme" }}{% if event_type %}: {{ event_type }}{% endif %}
+Cube Programme{% if extra_title %}: {{ extra_title }}{% endif %}
 {% endblock %}
 
 {% block css %}
@@ -24,10 +24,10 @@
        {% if event_type %}
            <strong>Events tagged "{{ event_type }}"</strong><br>
        {% endif %}
-       <a href="{% url "day-view" year=start.year day=start.day month=start.month %}?daysahead=7">This week</a> |
-       <a href="{% url "day-view" year=next_monday.year day=next_monday.day month=next_monday.month %}?daysahead=7">Next week</a> |
-       <a href="{% url "day-view" year=start.year day=start.day month=start.month %}?daysahead={{ days_left_in_month }}">This Month</a> |
-       <a href="{% url "day-view" year=start_of_next_month.year day=start_of_next_month.day month=start_of_next_month.month %}?daysahead={{ days_in_next_month }}">Next Month</a> |
+       <a href="{% url "view-this-week" %}">This week</a> |
+       <a href="{% url "view-next-week" %}">Next week</a> |
+       <a href="{% url "view-this-month" %}">This Month</a> |
+       <a href="{% url "view-next-month" %}">Next Month</a> |
        <a href="{% url "default-view" %}">Everything</a><br>
        <br>
        {% if printed_programmes %}
@@ -57,7 +57,7 @@
         {% cycle "<div class='section group'><div class='col span_1_of_3'>" "<div class='col span_1_of_3'>" "<div class='col span_1_of_3'>" %}
             <div class="showing" id="event_{{ event.id }}">
                 {% with event.media.all.0 as media_item %}{% if media_item %}<a href="{% url "single-event-view" event.id %}"><img src="{{ media_item.media_file|thumbnail_url:'indexview' }}" alt="Picture for event {{ event.name }}"></a>{% endif %}{% endwith %}
-                {% if event.tags.all %}<span class="tags">{% for tag in event.tags.all %}<a href="{% url "type-view" tag.name %}" class="tag_{{tag.name}}">{{tag.name}}</a> {% endfor %}</span>{% endif %}
+                {% if event.tags.all %}<span class="tags">{% for tag in event.tags.all %}<a href="{% url "type-view" tag.slug %}" class="tag_{{tag.name}}">{{tag.name}}</a> {% endfor %}</span>{% endif %}
                 <h1>
                     <a href="{% url "single-event-view" event.id %}"><span class="pre_title">
                         {{ event.pre_title }}

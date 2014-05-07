@@ -46,11 +46,12 @@ class DiaryTestsMixin(object):
         r3.save()
 
         # Tags:
-        t1 = EventTag(name=u"tag_one", read_only=False)
+        t1 = EventTag(name=u"tag one", slug=u"tag-one", read_only=False)
         t1.save()
-        t2 = EventTag(name=u"tag_two", read_only=False)
+        t2 = EventTag(name=u"tag two", slug=u"tag-two", read_only=False)
         t2.save()
-        t3 = EventTag(name=u"\u0167ag \u0165hre\u0119", read_only=False)
+        # 'ag-three' is what slugify() gives for that name:
+        t3 = EventTag(name=u"\u0167ag \u0165hre\u0119", slug=u"ag-three", read_only=False)
         t3.save()
 
         """
