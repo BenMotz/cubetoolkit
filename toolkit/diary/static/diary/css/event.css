@@ -96,14 +96,13 @@ p span.cancelled {
 }
 .footer-wrapper {
 	background-color: white;	
-	margin: 0 auto;
+	margin: auto;
 	width: 100%;
 }
 .footer {
 	border-top: thin dotted black;
-	margin:0 auto;
- 	position:relative;
- 	width:80%;
+	margin: auto;
+ 	width: 100%;
 }
 .footer a, .footer a:visited {
 	color: black;
@@ -234,9 +233,9 @@ p span.cancelled {
 
 /*  GO FULL WIDTH FOR PORTRAIT ORIENTATION */
 
-@media (orientation: portrait) {
+@media (orientation: portrait) and (max-width: 500px) {
 	.span_6_of_6 {
-		width: 100%; 
+		width: 100%;
 	}
 	.span_5_of_6 {
 		width: 100%; 
@@ -308,7 +307,7 @@ p span.cancelled {
 
 /*  GO FULL WIDTH AT LESS THAN 632 PIXELS */
 
-@media only screen and (max-width: 632px) {
+/*@media only screen and (max-width: 632px) {
 	.span_12_of_12 {
 		width: 100%; 
 	}
@@ -345,11 +344,11 @@ p span.cancelled {
 	.span_1_of_12 {
 		width: 100%; 
 	}
-}
+}*/
 
 /*  GO FULL WIDTH FOR PORTRAIT ORIENTATION */
 
-@media (orientation: portrait) {
+@media (orientation: portrait) and (max-width: 500px) {
 	.span_12_of_12 {
 		width: 100%; 
 	}
