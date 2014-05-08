@@ -94,11 +94,6 @@ div.cancelled::before {
 p span.cancelled {
 	color: red;
 }
-.footer-wrapper {
-	background-color: white;	
-	margin: auto;
-	width: 100%;
-}
 .footer {
 	border-top: thin dotted black;
 	margin: auto;
@@ -175,7 +170,7 @@ p span.cancelled {
 
 /*  REMOVE MARGINS AND PADDING AS ALL GO FULL WIDTH AT 632 PIXELS */
 
-@media only screen and (max-width: 632px) {
+@media only screen and (max-width: 550px) {
 	.col { 
 		margin: 1% 0 1% 0%;
 	}
@@ -208,9 +203,9 @@ p span.cancelled {
   	width: 15.33%;
 }
 
-/*  GO FULL WIDTH AT LESS THAN 632 PIXELS */
+/*  GO FULL WIDTH AT LESS THAN 550 PIXELS */
 
-@media only screen and (max-width: 632px) {
+@media only screen and (max-width: 550px) {
 	.span_6_of_6 {
 		width: 100%; 
 	}
@@ -233,7 +228,7 @@ p span.cancelled {
 
 /*  GO FULL WIDTH FOR PORTRAIT ORIENTATION */
 
-@media (orientation: portrait) and (max-width: 500px) {
+@media (orientation: portrait) {
 	.span_6_of_6 {
 		width: 100%;
 	}
@@ -305,9 +300,9 @@ p span.cancelled {
 }
 
 
-/*  GO FULL WIDTH AT LESS THAN 632 PIXELS */
+/*  GO FULL WIDTH AT LESS THAN 550 PIXELS */
 
-/*@media only screen and (max-width: 632px) {
+@media only screen and (max-width: 550px) {
 	.span_12_of_12 {
 		width: 100%; 
 	}
@@ -344,11 +339,11 @@ p span.cancelled {
 	.span_1_of_12 {
 		width: 100%; 
 	}
-}*/
+}
 
 /*  GO FULL WIDTH FOR PORTRAIT ORIENTATION */
 
-@media (orientation: portrait) and (max-width: 500px) {
+@media (orientation: portrait) {
 	.span_12_of_12 {
 		width: 100%; 
 	}

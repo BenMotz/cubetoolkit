@@ -135,11 +135,7 @@ span.tags .tag_animation { color: #FFAA00; }
 /* Hide film format tags: */
 .tag_dcp, .tag_35mm, .tag_dvd, .tag_dcp { display: none;}
 
-.footer-wrapper {
-	background-color: white;	
-	margin: 0 auto;
-	width: 100%;
-}
+
 .footer {
 	border-top: thin dotted black;
 	margin:0 auto;
@@ -204,16 +200,15 @@ span.tags .tag_animation { color: #FFAA00; }
 .col {
 	display: block;
 	float:left;
-/*	margin: 1% 0 1% 1.6%;*/
-	margin: 0 0 0 1.6%;
+	margin: 1% 0 1% 1.6%;
 }
 
 .col:first-child { margin-left: 0; } /* all browsers except IE6 and lower */
 
 
-/*  REMOVE MARGINS AND PADDING AS ALL GO FULL WIDTH AT 632 PIXELS */
+/*  REMOVE MARGINS AND PADDING AS ALL GO FULL WIDTH AT 550 PIXELS */
 
-@media only screen and (max-width: 632px) {
+@media only screen and (max-width: 550px) {
 	.col { 
 		margin: 1% 0 1% 0%;
 	}
@@ -235,9 +230,9 @@ span.tags .tag_animation { color: #FFAA00; }
 }
 
 
-/*  GO FULL WIDTH AT LESS THAN 632 PIXELS */
+/*  GO FULL WIDTH AT LESS THAN 550 PIXELS */
 
-@media only screen and (max-width: 632px) {
+@media only screen and (max-width: 550px) {
 	.span_3_of_3 {
 		width: 100%; 
 	}
@@ -290,9 +285,9 @@ span.tags .tag_animation { color: #FFAA00; }
   	width: 15.33%;
 }
 
-/*  GO FULL WIDTH AT LESS THAN 632 PIXELS */
+/*  GO FULL WIDTH AT LESS THAN 550 PIXELS */
 
-@media only screen and (max-width: 632px) {
+@media only screen and (max-width: 550px) {
 	.span_6_of_6 {
 		width: 100%; 
 	}
