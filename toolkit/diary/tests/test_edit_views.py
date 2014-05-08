@@ -622,12 +622,13 @@ class AddEventView(DiaryTestsMixin, TestCase):
 
         self.assertTemplateUsed(response, "form_new_event_and_showing.html")
 
-        # Check error was as expected:
+        # Check errors as expected:
         self.assertFormError(response, 'form', 'start', u'This field is required.')
         self.assertFormError(response, 'form', 'duration', u'This field is required.')
         self.assertFormError(response, 'form', 'number_of_days', u'This field is required.')
         self.assertFormError(response, 'form', 'event_name', u'This field is required.')
         self.assertFormError(response, 'form', 'booked_by', u'This field is required.')
+        self.assertFormError(response, 'form', 'event_template', u'This field is required.')
 
 
 class EditEventView(DiaryTestsMixin, TestCase):
