@@ -249,6 +249,20 @@ span.tags .tag_animation { color: #FFAA00; }
 	}
 }
 
+/*  GO FULL WIDTH FOR PORTRAIT ORIENTATION */
+
+@media (orientation: portrait) {
+	.span_3_of_3 {
+		width: 100%; 
+	}
+	.span_2_of_3 {
+		width: 100%; 
+	}
+	.span_1_of_3 {
+		width: 100%;
+	}
+}
+
 /*  GRID OF SIX   ============================================================================= */
 
 
@@ -279,6 +293,29 @@ span.tags .tag_animation { color: #FFAA00; }
 /*  GO FULL WIDTH AT LESS THAN 632 PIXELS */
 
 @media only screen and (max-width: 632px) {
+	.span_6_of_6 {
+		width: 100%; 
+	}
+	.span_5_of_6 {
+		width: 100%; 
+	}
+	.span_4_of_6 {
+		width: 100%; 
+	}
+	.span_3_of_6 {
+		width: 100%; 
+	}
+	.span_2_of_6 {
+		width: 100%; 
+	}
+	.span_1_of_6 {
+		width: 100%; 
+	}
+}
+
+/*  GO FULL WIDTH FOR PORTRAIT ORIENTATION */
+
+@media (orientation: portrait) {
 	.span_6_of_6 {
 		width: 100%; 
 	}
