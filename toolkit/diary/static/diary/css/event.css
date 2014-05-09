@@ -13,7 +13,6 @@ body {
 	margin-left: auto;
 	margin-right: auto;
 	width: 80%;
-	padding: 1.4em;
 	overflow: auto;
 }
 
@@ -168,9 +167,17 @@ p span.cancelled {
 .col:first-child { margin-left: 0; } /* all browsers except IE6 and lower */
 
 
-/*  REMOVE MARGINS AND PADDING AS ALL GO FULL WIDTH AT 632 PIXELS */
+/*  REMOVE MARGINS AND PADDING AS ALL GO FULL WIDTH AT 480 PIXELS */
 
-@media only screen and (max-width: 550px) {
+@media only screen and (max-width: 480px) {
+	.col { 
+		margin: 1% 0 1% 0%;
+	}
+}
+
+/*  REMOVE MARGINS AND PADDING FOR PORTRAIT ORIENTATION */
+
+@media only screen and (orientation: portrait)  {
 	.col { 
 		margin: 1% 0 1% 0%;
 	}
@@ -203,9 +210,9 @@ p span.cancelled {
   	width: 15.33%;
 }
 
-/*  GO FULL WIDTH AT LESS THAN 550 PIXELS */
+/*  GO FULL WIDTH AT LESS THAN 480 PIXELS */
 
-@media only screen and (max-width: 550px) {
+@media only screen and (max-width: 480px) {
 	.span_6_of_6 {
 		width: 100%; 
 	}
@@ -300,9 +307,9 @@ p span.cancelled {
 }
 
 
-/*  GO FULL WIDTH AT LESS THAN 550 PIXELS */
+/*  GO FULL WIDTH AT LESS THAN 480 PIXELS */
 
-@media only screen and (max-width: 550px) {
+@media only screen and (max-width: 480px) {
 	.span_12_of_12 {
 		width: 100%; 
 	}

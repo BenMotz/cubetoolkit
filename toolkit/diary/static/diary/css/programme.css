@@ -9,7 +9,6 @@ body {
 
 .programme {
 	background-color: white;
-	padding: 1.4em;
 	width:90%;
 	margin:0 auto;
 }
@@ -206,9 +205,17 @@ span.tags .tag_animation { color: #FFAA00; }
 .col:first-child { margin-left: 0; } /* all browsers except IE6 and lower */
 
 
-/*  REMOVE MARGINS AND PADDING AS ALL GO FULL WIDTH AT 550 PIXELS */
+/*  REMOVE MARGINS AND PADDING AS ALL GO FULL WIDTH AT 480 PIXELS */
 
-@media only screen and (max-width: 550px) {
+@media only screen and (max-width: 480px) {
+	.col { 
+		margin: 1% 0 1% 0%;
+	}
+}
+
+/*  REMOVE MARGINS AND PADDING FOR PORTRAIT ORIENTATION */
+
+@media only screen and (orientation: portrait)  {
 	.col { 
 		margin: 1% 0 1% 0%;
 	}
@@ -230,9 +237,9 @@ span.tags .tag_animation { color: #FFAA00; }
 }
 
 
-/*  GO FULL WIDTH AT LESS THAN 550 PIXELS */
+/*  GO FULL WIDTH AT LESS THAN 481 PIXELS */
 
-@media only screen and (max-width: 550px) {
+@media only screen and (max-width: 480px) {
 	.span_3_of_3 {
 		width: 100%; 
 	}
@@ -285,9 +292,9 @@ span.tags .tag_animation { color: #FFAA00; }
   	width: 15.33%;
 }
 
-/*  GO FULL WIDTH AT LESS THAN 550 PIXELS */
+/*  GO FULL WIDTH AT LESS THAN 480 PIXELS */
 
-@media only screen and (max-width: 550px) {
+@media only screen and (max-width: 480px) {
 	.span_6_of_6 {
 		width: 100%; 
 	}
