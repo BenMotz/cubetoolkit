@@ -205,9 +205,9 @@ span.tags .tag_animation { color: #FFAA00; }
 .col:first-child { margin-left: 0; } /* all browsers except IE6 and lower */
 
 
-/*  REMOVE MARGINS AND PADDING AS ALL GO FULL WIDTH AT 421 PIXELS */
+/*  REMOVE MARGINS AND PADDING AS ALL GO FULL WIDTH AT 480 PIXELS */
 
-@media only screen and (max-width: 421px) {
+@media only screen and (max-width: 480px) {
 	.col { 
 		margin: 1% 0 1% 0%;
 	}
@@ -230,9 +230,9 @@ span.tags .tag_animation { color: #FFAA00; }
 }
 
 
-/*  GO FULL WIDTH AT LESS THAN 421 PIXELS */
+/*  GO FULL WIDTH AT LESS THAN 480 PIXELS */
 
-@media only screen and (max-width: 421px) {
+@media only screen and (max-width: 480px) {
 	.span_3_of_3 {
 		width: 100%; 
 	}
@@ -271,9 +271,9 @@ span.tags .tag_animation { color: #FFAA00; }
   	width: 15.33%;
 }
 
-/*  GO FULL WIDTH AT LESS THAN 421 PIXELS */
+/*  GO FULL WIDTH AT LESS THAN 480 PIXELS */
 
-@media only screen and (max-width: 421px) {
+@media only screen and (max-width: 480px) {
 	.span_6_of_6 {
 		width: 100%; 
 	}
