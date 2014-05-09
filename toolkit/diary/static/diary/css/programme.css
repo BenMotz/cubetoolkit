@@ -197,7 +197,7 @@ span.tags .tag_animation { color: #FFAA00; }
 /*  GRID COLUMN SETUP   ==================================================================== */
 
 .col {
-	display: block;4n4g3m3nt
+	display: block;
 	float:left;
 	margin: 1% 0 1% 1.6%;
 }
@@ -213,13 +213,6 @@ span.tags .tag_animation { color: #FFAA00; }
 	}
 }
 
-/*  REMOVE MARGINS AND PADDING FOR PORTRAIT ORIENTATION */
-
-/*@media only screen and (orientation: portrait) {
-	.col { 
-		margin: 1% 0 1% 0%;
-	}
-}*/
 
 /*  GRID OF THREE   ============================================================================= */
 
