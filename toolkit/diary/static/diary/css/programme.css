@@ -205,9 +205,9 @@ span.tags .tag_animation { color: #FFAA00; }
 .col:first-child { margin-left: 0; } /* all browsers except IE6 and lower */
 
 
-/*  REMOVE MARGINS AND PADDING AS ALL GO FULL WIDTH AT 321 PIXELS */
+/*  REMOVE MARGINS AND PADDING AS ALL GO FULL WIDTH AT 381 PIXELS */
 
-@media only screen and (max-width: 321px) {
+@media only screen and (max-width: 381px) {
 	.col { 
 		margin: 1% 0 1% 0%;
 	}
@@ -237,9 +237,9 @@ span.tags .tag_animation { color: #FFAA00; }
 }
 
 
-/*  GO FULL WIDTH AT LESS THAN 321 PIXELS */
+/*  GO FULL WIDTH AT LESS THAN 381 PIXELS */
 
-@media only screen and (max-width: 321px) {
+@media only screen and (max-width: 381px) {
 	.span_3_of_3 {
 		width: 100%; 
 	}
@@ -250,20 +250,6 @@ span.tags .tag_animation { color: #FFAA00; }
 		width: 100%;
 	}
 }
-
-/*  GO FULL WIDTH FOR PORTRAIT ORIENTATION */
-
-/*@media (orientation: portrait) {
-	.span_3_of_3 {
-		width: 100%; 
-	}
-	.span_2_of_3 {
-		width: 100%; 
-	}
-	.span_1_of_3 {
-		width: 100%;
-	}
-}*/
 
 /*  GRID OF SIX   ============================================================================= */
 
@@ -292,9 +278,9 @@ span.tags .tag_animation { color: #FFAA00; }
   	width: 15.33%;
 }
 
-/*  GO FULL WIDTH AT LESS THAN 321 PIXELS */
+/*  GO FULL WIDTH AT LESS THAN 381 PIXELS */
 
-@media only screen and (max-width: 321px) {
+@media only screen and (max-width: 381px) {
 	.span_6_of_6 {
 		width: 100%; 
 	}
@@ -315,25 +301,3 @@ span.tags .tag_animation { color: #FFAA00; }
 	}
 }
 
-/*  GO FULL WIDTH FOR PORTRAIT ORIENTATION */
-
-/*@media (orientation: portrait) {
-	.span_6_of_6 {
-		width: 100%; 
-	}
-	.span_5_of_6 {
-		width: 100%; 
-	}
-	.span_4_of_6 {
-		width: 100%; 
-	}
-	.span_3_of_6 {
-		width: 100%; 
-	}
-	.span_2_of_6 {
-		width: 100%; 
-	}
-	.span_1_of_6 {
-		width: 100%; 
-	}
-}*/
