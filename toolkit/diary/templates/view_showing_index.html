@@ -9,7 +9,7 @@ Cube Programme{% if extra_title %}: {{ extra_title }}{% endif %}
 {{ block.super }}
 <link rel="stylesheet" href="{{ STATIC_URL }}diary/css/programme.css" type="text/css">
 {% endblock %}
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 {% block header %}
 {{ block.super }}
 
@@ -24,11 +24,11 @@ Cube Programme{% if extra_title %}: {{ extra_title }}{% endif %}
        {% if event_type %}
            <strong>Events tagged "{{ event_type }}"</strong><br>
        {% endif %}
-       <a href="{% url "view-this-week" %}">This week</a> |
-       <a href="{% url "view-next-week" %}">Next week</a> |
-       <a href="{% url "view-this-month" %}">This Month</a> |
-       <a href="{% url "view-next-month" %}">Next Month</a> |
-       <a href="{% url "default-view" %}">Everything</a><br>
+       <a href="{% url "view-this-week" %}">THIS WEEK</a> |
+       <a href="{% url "view-next-week" %}">NEXT WEEK</a> |
+       <a href="{% url "view-this-month" %}">THIS MONTH</a> |
+       <a href="{% url "view-next-month" %}">NEXT MONTH</a> |
+       <a href="{% url "default-view" %}">EVERYTHING</a><br>
        <br>
        {% if printed_programmes %}
            {% for printed_programme in printed_programmes %}
