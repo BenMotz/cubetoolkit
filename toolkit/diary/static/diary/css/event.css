@@ -1,10 +1,10 @@
 /* This still looks horrible. */
 
 body {
-	font-family: 'Droid Sans', sans-serif;
-	color: black;
+	font-family: 'Roboto', sans-serif;
+	color: black;;
 	background-color: #FFFFF;
-	font-size: 10pt;
+	font-size: 12pt;
 	margin: 0.5em;
 }
 
@@ -12,23 +12,23 @@ body {
 	background-color: white;
 	margin-left: auto;
 	margin-right: auto;
-	width: 80%;
+	width: 90%;
 	overflow: auto;
 }
 
 
 .pre_title, .post_title {
-	font-weight: normal;
+	font-weight: 300;
 	display: block;
 	text-transform: uppercase;
-	font-size: 0.7em;
-	line-height: 1.4;
+	font-size: 0.5em;
+	line-height: 1.2;
 }
 
 h1 {
-	font-weight: normal;
-	font-size: 2.0em;
-	line-height: 1.4;
+	font-weight: 400;
+	font-size: 1.75em;
+	line-height: 1.2;
 	margin: 0;
 	text-transform: uppercase;
 }
@@ -40,22 +40,30 @@ h1 a:visited {
 	color: black;
 }
 
-.showings {
-	font-weight: bold;
-	font-size: 1.0em;
+.showings {	
+	font-weight: 300;
+	font-size: 0.8em;
 	line-height: 1.4;
 }
 .info {
-	font-weight: normal;
-	font-size: 1.0em;
+	font-weight: 300;
+	font-size: 0.8em;
 	line-height: 1.4;
 }
 
 .copy p {
-	font-size: 	1.05em;
+	font-weight: 400;
+	font-size: 	1em;
 	line-height: 1.4;	
 	padding: 0.5em 0.5em 0.5em 0;
 	margin: 0;
+}
+.copy p a {
+	text-decoration: underline;
+	color: black;
+}
+.copy p a:visited {
+	color: black;
 }
 
 .event img {
@@ -103,6 +111,7 @@ p span.cancelled {
 	text-decoration: none;
 }
 .footer p {
+	font-weight: 300;
 	color: black;
 	font-size: 	0.8em;
 	line-height: 1.6;
@@ -117,10 +126,11 @@ p span.cancelled {
 	background-color: white;
 	margin-left: auto;
 	margin-right: auto;
-	width: 80%;
+	width: 90%;
 	overflow: auto;	
 }
 .header p {
+	font-weight: 300;
 	padding: 0;
 	margin: 0;
 }

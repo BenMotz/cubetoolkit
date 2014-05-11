@@ -24,11 +24,11 @@ Cube Programme{% if extra_title %}: {{ extra_title }}{% endif %}
        {% if event_type %}
            <strong>Events tagged "{{ event_type }}"</strong><br>
        {% endif %}
-       <a href="{% url "view-this-week" %}">THIS WEEK</a> |
-       <a href="{% url "view-next-week" %}">NEXT WEEK</a> |
-       <a href="{% url "view-this-month" %}">THIS MONTH</a> |
-       <a href="{% url "view-next-month" %}">NEXT MONTH</a> |
-       <a href="{% url "default-view" %}">EVERYTHING</a><br>
+       <a href="{% url "view-this-week" %}">THIS WEEK</a> &nbsp; | &nbsp;
+       <a href="{% url "view-next-week" %}">NEXT WEEK</a> &nbsp; | &nbsp;
+       <a href="{% url "view-this-month" %}">THIS MONTH</a> &nbsp; | &nbsp;
+       <a href="{% url "view-next-month" %}">NEXT MONTH</a>  &nbsp; &#9632; &nbsp;
+       <a href="{% url "default-view" %}"> EVERYTHING </a><br>
        <br>
        {% if printed_programmes %}
            {% for printed_programme in printed_programmes %}
@@ -86,7 +86,7 @@ Cube Programme{% if extra_title %}: {{ extra_title }}{% endif %}
 {% block footer %}
 {{ block.super }}
 <div class="footer">
-	<p><a href="http://www.cubecinema.com/">Home</a> | <a href="http://www.cubecinema.com/cubewebsite/directions.html">Directions</a> | <a href="http://www.cubecinema.com/cubewebsite/contact.html">Contact</a> | <a href="/freehold">Freehold Project</a>  </p>
+	<p><a href="http://www.cubecinema.com/">Home</a> &nbsp; | &nbsp; <a href="http://www.cubecinema.com/cubewebsite/directions.html">Directions</a> &nbsp; | &nbsp; <a href="http://www.cubecinema.com/cubewebsite/contact.html">Contact</a> &nbsp; | &nbsp; <a href="/freehold">Freehold Project</a>  </p>
 </div>
 
 {% endblock %}

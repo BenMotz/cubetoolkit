@@ -1,7 +1,7 @@
 /* This still looks horrible. */
 
 body {
-	font-family: 'Droid Sans', sans-serif;
+	font-family: 'Roboto', sans-serif;
 	color: black;
 	font-size: 10pt;
 	margin: 0;
@@ -37,14 +37,14 @@ body {
 }
 
 .pre_title, .post_title {
-	font-weight: normal;
 	display: block;
-	font-weight: bold;
+	font-weight: 400;
 	font-size: 0.6em;
 }
 
 #listing h1 {
-	font-size: 1.5em;
+	font-weight: 500;
+	font-size: 1.6em;
 	padding: 0.15em 0;
 	margin: 0;
 	text-transform: uppercase;
@@ -74,7 +74,7 @@ body {
 }
 
 #listing p.start_and_pricing {
-	font-weight: bold;
+	font-weight: 500;
 	white-space: normal;
 }
 
@@ -112,7 +112,7 @@ span.tags {
 	text-transform: uppercase;
 	padding: 0.3em 0 0 0;
 	margin: none;
-	font-weight: normal;
+	font-weight: 400;
 	font-size: 0.75em;
 	display: block;
 }
@@ -137,19 +137,19 @@ span.tags .tag_animation { color: #FFAA00; }
 
 .footer {
 	border-top: thin dotted black;
-	margin:0 auto;
 	padding-top: 1.4em;
-	padding-bottom: 1.4em;	
- 	position:relative;
- 	width: 100%;
+	padding-bottom: 1.4em;
+	margin:auto;		
+ 	width: 90%;
 }
 .footer a, .footer a:visited {
 	color: black;
 	text-decoration: none;
 }
 .footer p {
+	font-weight: 300;
 	color: black;
-	font-size: 	0.8em;
+	font-size: 	1em;
 	line-height: 1.6;
 	margin: 0;
 }
@@ -163,13 +163,15 @@ span.tags .tag_animation { color: #FFAA00; }
 	width:90%;	
 }
 .header p {
+	font-weight: 100;
+	word-spacing: 1.2;
 	padding: 0;
 	margin: 0;
 }
 .header a, .header a:visited {
 	font-size: 1.0em;
 	color: black;
-	text-decoration: underline;
+	text-decoration: none;
 }
 /*  SECTIONS  ============================================================================= */
 
@@ -205,9 +207,9 @@ span.tags .tag_animation { color: #FFAA00; }
 .col:first-child { margin-left: 0; } /* all browsers except IE6 and lower */
 
 
-/*  REMOVE MARGINS AND PADDING AS ALL GO FULL WIDTH AT 480 PIXELS */
+/*  REMOVE MARGINS AND PADDING AS ALL GO FULL WIDTH AT 481 PIXELS */
 
-@media only screen and (max-width: 480px) {
+@media only screen and (max-device-width: 481px) {
 	.col { 
 		margin: 1% 0 1% 0%;
 	}
@@ -230,9 +232,9 @@ span.tags .tag_animation { color: #FFAA00; }
 }
 
 
-/*  GO FULL WIDTH AT LESS THAN 480 PIXELS */
+/*  GO FULL WIDTH AT LESS THAN 481 PIXELS */
 
-@media only screen and (max-width: 480px) {
+@media only screen and (max-device-width: 481px) {
 	.span_3_of_3 {
 		width: 100%; 
 	}
@@ -271,9 +273,9 @@ span.tags .tag_animation { color: #FFAA00; }
   	width: 15.33%;
 }
 
-/*  GO FULL WIDTH AT LESS THAN 480 PIXELS */
+/*  GO FULL WIDTH AT LESS THAN 481 PIXELS */
 
-@media only screen and (max-width: 480px) {
+@media only screen and (max-device-width: 481px) {
 	.span_6_of_6 {
 		width: 100%; 
 	}
