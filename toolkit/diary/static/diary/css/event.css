@@ -70,7 +70,7 @@ h1 a:visited {
 	border: none;
 	float: left;
 	padding-right: 1.5em;
-	max-width: 100%;
+	width: 100%;
 }
 
 .event iframe {
