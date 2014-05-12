@@ -1,157 +1,155 @@
 /* This still looks horrible. */
 
 body {
-	font-family: 'Roboto', sans-serif;
-	color: black;;
-	background-color: #FFFFF;
-	font-size: 12pt;
-	margin: 0.5em;
+    font-family: 'Roboto', sans-serif;
+    color: black;;
+    background-color: #FFFFF;
+    font-size: 12pt;
+    margin: 0.5em;
 }
 
 .event {
-	background-color: white;
-	margin-left: auto;
-	margin-right: auto;
-	width: 90%;
-	overflow: auto;
+    background-color: white;
+    margin-left: auto;
+    margin-right: auto;
+    width: 90%;
+    overflow: auto;
 }
 
 
 .pre_title, .post_title {
-	font-weight: 300;
-	display: block;
-	text-transform: uppercase;
-	font-size: 0.5em;
-	line-height: 1.2;
+    font-weight: 300;
+    display: block;
+    text-transform: uppercase;
+    font-size: 0.5em;
+    line-height: 1.2;
 }
 
 h1 {
-	font-weight: 400;
-	font-size: 1.75em;
-	line-height: 1.2;
-	margin: 0;
-	text-transform: uppercase;
+    font-weight: 400;
+    font-size: 1.75em;
+    line-height: 1.2;
+    margin: 0;
+    text-transform: uppercase;
 }
 h1 a {
-	text-decoration: none;
-	color: black;
+    text-decoration: none;
+    color: black;
 }
 h1 a:visited {
-	color: black;
+    color: black;
 }
 
-.showings {	
-	font-weight: 300;
-	font-size: 0.8em;
-	line-height: 1.4;
+.showings {
+    font-weight: 300;
+    font-size: 0.8em;
+    line-height: 1.4;
 }
 .info {
-	font-weight: 300;
-	font-size: 0.8em;
-	line-height: 1.4;
+    font-weight: 300;
+    font-size: 0.8em;
+    line-height: 1.4;
 }
 
 .copy p {
-	font-weight: 400;
-	font-size: 	1em;
-	line-height: 1.4;	
-	padding: 0.5em 0.5em 0.5em 0;
-	margin: 0;
+    font-weight: 400;
+    font-size:     1em;
+    line-height: 1.4;
+    padding: 0.5em 0.5em 0.5em 0;
+    margin: 0;
 }
 .copy p a {
-	text-decoration: underline;
-	color: black;
+    text-decoration: underline;
+    color: black;
 }
 .copy p a:visited {
-	color: black;
+    color: black;
 }
 
 .event img {
-	border: none;
-	float: left;
-	padding-right: 1.5em;
-	width: 100%;
+    border: none;
+    float: left;
+    padding-right: 1.5em;
+    width: 100%;
 }
 
 .event iframe {
-	max-width: 100%;
+    max-width: 100%;
 }
 
-
-
 div.cancelled::before {
-	/* If entire event series is cancelled */
-	content: "CANCELLED (sorry)";
-	text-decoration: none;
-	color: red;;
-	
-	font-size: 3em;
-	display: inline-block;
-	position: absolute;
-	left: 30%;
-	margin: 0;
-	padding: 0 0.15em;
-	border-radius: 0.2em;
-	transform: rotate(15deg);
-	transform-origin: 0 50%;
-	-webkit-transform: rotate(15deg);
-	-webkit-transform-origin: 0 50%;
+    /* If entire event series is cancelled */
+    content: "CANCELLED (sorry)";
+    text-decoration: none;
+    color: red;;
+
+    font-size: 3em;
+    display: inline-block;
+    position: absolute;
+    left: 30%;
+    margin: 0;
+    padding: 0 0.15em;
+    border-radius: 0.2em;
+    transform: rotate(15deg);
+    transform-origin: 0 50%;
+    -webkit-transform: rotate(15deg);
+    -webkit-transform-origin: 0 50%;
 }
 
 p span.cancelled {
-	color: red;
+    color: red;
 }
 .footer {
-	border-top: thin dotted black;
-	margin: auto;
- 	width: 100%;
+    border-top: thin dotted black;
+    margin: auto;
+     width: 100%;
 }
 .footer a, .footer a:visited {
-	color: black;
-	text-decoration: none;
+    color: black;
+    text-decoration: none;
 }
 .footer p {
-	font-weight: 300;
-	color: black;
-	font-size: 	0.8em;
-	line-height: 1.6;
-	margin: 0;
+    font-weight: 300;
+    color: black;
+    font-size:     0.8em;
+    line-height: 1.6;
+    margin: 0;
 }
 .header {
-	border-bottom: thin dotted black;
-	margin-top: 0;	
-	margin-bottom: 0;
-	padding-bottom: 1em;
-	padding-top: 0;
-	background-color: white;
-	margin-left: auto;
-	margin-right: auto;
-	width: 90%;
-	overflow: auto;	
+    border-bottom: thin dotted black;
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-bottom: 1em;
+    padding-top: 0;
+    background-color: white;
+    margin-left: auto;
+    margin-right: auto;
+    width: 90%;
+    overflow: auto;
 }
 .header p {
-	font-weight: 300;
-	padding: 0;
-	margin: 0;
+    font-weight: 300;
+    padding: 0;
+    margin: 0;
 }
 .header a, .header a:visited {
-	color: black;
-	text-decoration: none;
+    color: black;
+    text-decoration: none;
 }
 #cubelogo {
-	border: none;
-	float: left;
-	max-width: 100%;
+    border: none;
+    float: left;
+    max-width: 100%;
 }
-/*  SECTIONS  ============================================================================= */
+/*  SECTIONS  ============================================================== */
 
 .section {
-	clear: both;
-	padding: 0px;
-	margin: 0px;
+    clear: both;
+    padding: 0px;
+    margin: 0px;
 }
 
-/*  GROUPING  ============================================================================= */
+/*  GROUPING  ============================================================== */
 
 
 .group:before,
@@ -166,12 +164,12 @@ p span.cancelled {
     zoom:1; /* For IE 6/7 (trigger hasLayout) */
 }
 
-/*  GRID COLUMN SETUP   ==================================================================== */
+/*  GRID COLUMN SETUP  ===================================================== */
 
 .col {
-	display: block;
-	float:left;
-	margin: 1% 0 1% 1.6%;
+    display: block;
+    float:left;
+    margin: 1% 0 1% 1.6%;
 }
 
 .col:first-child { margin-left: 0; } /* all browsers except IE6 and lower */
@@ -180,221 +178,221 @@ p span.cancelled {
 /*  REMOVE MARGINS AND PADDING AS ALL GO FULL WIDTH AT 480 PIXELS */
 
 @media only screen and (max-width: 480px) {
-	.col { 
-		margin: 1% 0 1% 0%;
-	}
+    .col {
+        margin: 1% 0 1% 0%;
+    }
 }
 
 /*  REMOVE MARGINS AND PADDING FOR PORTRAIT ORIENTATION */
 
 @media only screen and (orientation: portrait)  {
-	.col { 
-		margin: 1% 0 1% 0%;
-	}
+    .col {
+        margin: 1% 0 1% 0%;
+    }
 }
 
-/*  GRID OF SIX   ============================================================================= */
+/*  GRID OF SIX  =========================================================== */
 
 
 .span_6_of_6 {
-	width: 100%;
+    width: 100%;
 }
 
 .span_5_of_6 {
-  	width: 83.06%;
+      width: 83.06%;
 }
 
 .span_4_of_6 {
-  	width: 66.13%;
+      width: 66.13%;
 }
 
 .span_3_of_6 {
-  	width: 49.2%;
+      width: 49.2%;
 }
 
 .span_2_of_6 {
-  	width: 32.26%;
+      width: 32.26%;
 }
 
 .span_1_of_6 {
-  	width: 15.33%;
+      width: 15.33%;
 }
 
 /*  GO FULL WIDTH AT LESS THAN 480 PIXELS */
 
 @media only screen and (max-width: 480px) {
-	.span_6_of_6 {
-		width: 100%; 
-	}
-	.span_5_of_6 {
-		width: 100%; 
-	}
-	.span_4_of_6 {
-		width: 100%; 
-	}
-	.span_3_of_6 {
-		width: 100%; 
-	}
-	.span_2_of_6 {
-		width: 100%; 
-	}
-	.span_1_of_6 {
-		width: 100%; 
-	}
+    .span_6_of_6 {
+        width: 100%;
+    }
+    .span_5_of_6 {
+        width: 100%;
+    }
+    .span_4_of_6 {
+        width: 100%;
+    }
+    .span_3_of_6 {
+        width: 100%;
+    }
+    .span_2_of_6 {
+        width: 100%;
+    }
+    .span_1_of_6 {
+        width: 100%;
+    }
 }
 
 /*  GO FULL WIDTH FOR PORTRAIT ORIENTATION */
 
 @media (orientation: portrait) {
-	.span_6_of_6 {
-		width: 100%;
-	}
-	.span_5_of_6 {
-		width: 100%; 
-	}
-	.span_4_of_6 {
-		width: 100%; 
-	}
-	.span_3_of_6 {
-		width: 100%; 
-	}
-	.span_2_of_6 {
-		width: 100%; 
-	}
-	.span_1_of_6 {
-		width: 100%; 
-	}
+    .span_6_of_6 {
+        width: 100%;
+    }
+    .span_5_of_6 {
+        width: 100%;
+    }
+    .span_4_of_6 {
+        width: 100%;
+    }
+    .span_3_of_6 {
+        width: 100%;
+    }
+    .span_2_of_6 {
+        width: 100%;
+    }
+    .span_1_of_6 {
+        width: 100%;
+    }
 }
 
-/*  GRID OF TWELVE   ============================================================================= */
+/*  GRID OF TWELVE ========================================================= */
 
 .span_12_of_12 {
-	width: 100%;
+    width: 100%;
 }
 
 .span_11_of_12 {
-	width: 91.53%;
+    width: 91.53%;
 }
 
 .span_10_of_12 {
-	width: 83.06%;
+    width: 83.06%;
 }
 
 .span_9_of_12 {
-	width: 74.6%;
+    width: 74.6%;
 }
 
 .span_8_of_12 {
-	width: 66.13%;
+    width: 66.13%;
 }
 
 .span_7_of_12 {
-	width: 57.66%; 
+    width: 57.66%;
 }
 
 .span_6_of_12 {
-	width: 49.2%; 
+    width: 49.2%;
 }
 
 .span_5_of_12 {
-	width: 40.73%; 
+    width: 40.73%;
 }
 
 .span_4_of_12 {
-	width: 32.26%; 
+    width: 32.26%;
 }
 
 .span_3_of_12 {
-	width: 23.8%;
+    width: 23.8%;
 }
 
 .span_2_of_12 {
-	width: 15.33%; 
+    width: 15.33%;
 }
 
 .span_1_of_12 {
-	width: 6.86%; 
+    width: 6.86%;
 }
 
 
 /*  GO FULL WIDTH AT LESS THAN 480 PIXELS */
 
 @media only screen and (max-width: 480px) {
-	.span_12_of_12 {
-		width: 100%; 
-	}
-	.span_11_of_12 {
-		width: 100%; 
-	}
-	.span_10_of_12 {
-		width: 100%; 
-	}
-	.span_9_of_12 {
-		width: 100%; 
-	}
-	.span_8_of_12 {
-		width: 100%; 
-	}
-	.span_7_of_12 {
-		width: 100%; 
-	}
-	.span_6_of_12 {
-		width: 100%; 
-	}
-	.span_5_of_12 {
-		width: 100%; 
-	}
-	.span_4_of_12 {
-		width: 100%; 
-	}
-	.span_3_of_12 {
-		width: 100%; 
-	}
-	.span_2_of_12 {
-		width: 100%; 
-	}
-	.span_1_of_12 {
-		width: 100%; 
-	}
+    .span_12_of_12 {
+        width: 100%;
+    }
+    .span_11_of_12 {
+        width: 100%;
+    }
+    .span_10_of_12 {
+        width: 100%;
+    }
+    .span_9_of_12 {
+        width: 100%;
+    }
+    .span_8_of_12 {
+        width: 100%;
+    }
+    .span_7_of_12 {
+        width: 100%;
+    }
+    .span_6_of_12 {
+        width: 100%;
+    }
+    .span_5_of_12 {
+        width: 100%;
+    }
+    .span_4_of_12 {
+        width: 100%;
+    }
+    .span_3_of_12 {
+        width: 100%;
+    }
+    .span_2_of_12 {
+        width: 100%;
+    }
+    .span_1_of_12 {
+        width: 100%;
+    }
 }
 
 /*  GO FULL WIDTH FOR PORTRAIT ORIENTATION */
 
 @media (orientation: portrait) {
-	.span_12_of_12 {
-		width: 100%; 
-	}
-	.span_11_of_12 {
-		width: 100%; 
-	}
-	.span_10_of_12 {
-		width: 100%; 
-	}
-	.span_9_of_12 {
-		width: 100%; 
-	}
-	.span_8_of_12 {
-		width: 100%; 
-	}
-	.span_7_of_12 {
-		width: 100%; 
-	}
-	.span_6_of_12 {
-		width: 100%; 
-	}
-	.span_5_of_12 {
-		width: 100%; 
-	}
-	.span_4_of_12 {
-		width: 100%; 
-	}
-	.span_3_of_12 {
-		width: 100%; 
-	}
-	.span_2_of_12 {
-		width: 100%; 
-	}
-	.span_1_of_12 {
-		width: 100%; 
-	}
+    .span_12_of_12 {
+        width: 100%;
+    }
+    .span_11_of_12 {
+        width: 100%;
+    }
+    .span_10_of_12 {
+        width: 100%;
+    }
+    .span_9_of_12 {
+        width: 100%;
+    }
+    .span_8_of_12 {
+        width: 100%;
+    }
+    .span_7_of_12 {
+        width: 100%;
+    }
+    .span_6_of_12 {
+        width: 100%;
+    }
+    .span_5_of_12 {
+        width: 100%;
+    }
+    .span_4_of_12 {
+        width: 100%;
+    }
+    .span_3_of_12 {
+        width: 100%;
+    }
+    .span_2_of_12 {
+        width: 100%;
+    }
+    .span_1_of_12 {
+        width: 100%;
+    }
 }

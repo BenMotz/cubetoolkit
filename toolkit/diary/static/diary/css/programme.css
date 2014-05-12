@@ -1,126 +1,126 @@
 /* This still looks horrible. */
 
 body {
-	font-family: 'Roboto', sans-serif;
-	color: black;
-	font-size: 10pt;
-	margin: 0;
+    font-family: 'Roboto', sans-serif;
+    color: black;
+    font-size: 10pt;
+    margin: 0;
 }
 
 .programme {
-	background-color: white;
-	width:90%;
-	margin:0 auto;
+    background-color: white;
+    width:90%;
+    margin:0 auto;
 }
 
 #cubelogo {
-	border: none;
-	float: left;
-	max-width: 100%;
+    border: none;
+    float: left;
+    max-width: 100%;
 }
 
 
 .programmelinks {
-	display: inline-block;	
+    display: inline-block;
 }
 
 /* < 632px, scale the logo down */
 /*@media screen and (max-width: 632px) {
-	img#cubelogo {
-		max-width: 100%;
-	}
+    img#cubelogo {
+        max-width: 100%;
+    }
 }*/
 
 
 #listing {
-	background-color: white;
+    background-color: white;
 }
 
 .pre_title, .post_title {
-	display: block;
-	font-weight: 400;
-	font-size: 0.6em;
+    display: block;
+    font-weight: 400;
+    font-size: 0.6em;
 }
 
 #listing h1 {
-	font-weight: 500;
-	font-size: 1.6em;
-	padding: 0.15em 0;
-	margin: 0;
-	text-transform: uppercase;
+    font-weight: 500;
+    font-size: 1.6em;
+    padding: 0.15em 0;
+    margin: 0;
+    text-transform: uppercase;
 }
 
 #listing h1 a {
-	text-decoration: none;
-	color: black;
+    text-decoration: none;
+    color: black;
 }
 
 #listing h1 a:visited {
-	color: black;
+    color: black;
 }
 
 #listing .event_details {
-	/* Stop the paragraph from wrapping below the image (if any): */
-	overflow: hidden;
+    /* Stop the paragraph from wrapping below the image (if any): */
+    overflow: hidden;
 }
 
 #listing .event_details p {
-	padding: 0.2em 0.5em 0.2em 0;
-	margin: 0;
+    padding: 0.2em 0.5em 0.2em 0;
+    margin: 0;
 }
 
 #listing p.copy {
-	white-space: pre-line;
+    white-space: pre-line;
 }
 
 #listing p.start_and_pricing {
-	font-weight: 500;
-	white-space: normal;
+    font-weight: 500;
+    white-space: normal;
 }
 
 #listing img {
-	border: none;
-/*	float: left; */
-	padding-right: 1.5em;
-	width: 100%;
+    border: none;
+/*    float: left; */
+    padding-right: 1.5em;
+    width: 100%;
 }
 
 #listing .showing {
-	padding: 1.4em 0;
-	border-top: thin dotted black;
-	/* Force the showing to clear below the image */
+    padding: 1.4em 0;
+    border-top: thin dotted black;
+    /* Force the showing to clear below the image */
 }
 #listing .cancelled h1::before {
-	content: "CANCELLED";
-	text-decoration: none;
-	color: white;
-	background-color: red;
-	font-size: 2em;
-	display: inline-block;
-	position: absolute;
-	left: 30%;
-	margin: 0;
-	padding: 0 0.15em;
-	border-radius: 0.2em;
-	transform: rotate(15deg);
-	transform-origin: 0 50%;
-	-webkit-transform: rotate(15deg);
-	-webkit-transform-origin: 0 50%;
+    content: "CANCELLED";
+    text-decoration: none;
+    color: white;
+    background-color: red;
+    font-size: 2em;
+    display: inline-block;
+    position: absolute;
+    left: 30%;
+    margin: 0;
+    padding: 0 0.15em;
+    border-radius: 0.2em;
+    transform: rotate(15deg);
+    transform-origin: 0 50%;
+    -webkit-transform: rotate(15deg);
+    -webkit-transform-origin: 0 50%;
 }
 
 span.tags {
-	text-transform: uppercase;
-	padding: 0.3em 0 0 0;
-	margin: none;
-	font-weight: 400;
-	font-size: 0.75em;
-	display: block;
+    text-transform: uppercase;
+    padding: 0.3em 0 0 0;
+    margin: none;
+    font-weight: 400;
+    font-size: 0.75em;
+    display: block;
 }
 span.tags a {
-	margin: 0.1em;
-	border-radius: 0.2em;
-	text-decoration: none;
-	color: #0055C0;
+    margin: 0.1em;
+    border-radius: 0.2em;
+    text-decoration: none;
+    color: #0055C0;
 }
 span.tags .tag_music { color: blue; }
 span.tags .tag_film { color: green; }
@@ -136,52 +136,52 @@ span.tags .tag_animation { color: #FFAA00; }
 
 
 .footer {
-	border-top: thin dotted black;
-	padding-top: 1.4em;
-	padding-bottom: 1.4em;
-	margin:auto;		
- 	width: 100%;
+    border-top: thin dotted black;
+    padding-top: 1.4em;
+    padding-bottom: 1.4em;
+    margin:auto;
+     width: 100%;
 }
 .footer a, .footer a:visited {
-	color: black;
-	text-decoration: none;
+    color: black;
+    text-decoration: none;
 }
 .footer p {
-	font-weight: 400;
-	color: black;
-	font-size: 	1em;
-	line-height: 1.6;
-	margin: 0;
+    font-weight: 400;
+    color: black;
+    font-size:     1em;
+    line-height: 1.6;
+    margin: 0;
 }
 .header {
-	background-color: white;
-	padding-top: 1.4em;	
-	padding-left: 1.4em;
-	padding-right: 1.4em;
-	clear: both;
-	margin:0 auto;
-	width:90%;	
+    background-color: white;
+    padding-top: 1.4em;
+    padding-left: 1.4em;
+    padding-right: 1.4em;
+    clear: both;
+    margin:0 auto;
+    width:90%;
 }
 .header p {
-	font-weight: 100;
-	word-spacing: 1.2;
-	padding: 0;
-	margin: 0;
+    font-weight: 100;
+    word-spacing: 1.2;
+    padding: 0;
+    margin: 0;
 }
 .header a, .header a:visited {
-	font-size: 1.0em;
-	color: black;
-	text-decoration: none;
+    font-size: 1.0em;
+    color: black;
+    text-decoration: none;
 }
-/*  SECTIONS  ============================================================================= */
+/*  SECTIONS  ============================================================== */
 
 .section {
-	clear: both;
-	padding: 0px;
-	margin: 0px;
+    clear: both;
+    padding: 0px;
+    margin: 0px;
 }
 
-/*  GROUPING  ============================================================================= */
+/*  GROUPING  ============================================================== */
 
 
 .group:before,
@@ -196,12 +196,12 @@ span.tags .tag_animation { color: #FFAA00; }
     zoom:1; /* For IE 6/7 (trigger has Layout) */
 }
 
-/*  GRID COLUMN SETUP   ==================================================================== */
+/*  GRID COLUMN SETUP   ==================================================== */
 
 .col {
-	display: block;
-	float:left;
-	margin: 1% 0 1% 1.6%;
+    display: block;
+    float:left;
+    margin: 1% 0 1% 1.6%;
 }
 
 .col:first-child { margin-left: 0; } /* all browsers except IE6 and lower */
@@ -210,89 +210,89 @@ span.tags .tag_animation { color: #FFAA00; }
 /*  REMOVE MARGINS AND PADDING AS ALL GO FULL WIDTH AT 481 PIXELS */
 
 @media only screen and (max-device-width: 481px) {
-	.col { 
-		margin: 1% 0 1% 0%;
-	}
+    .col {
+        margin: 1% 0 1% 0%;
+    }
 }
 
 
-/*  GRID OF THREE   ============================================================================= */
+/*  GRID OF THREE ========================================================== */
 
-	
+
 .span_3_of_3 {
-	width: 100%; 
+    width: 100%;
 }
 
 .span_2_of_3 {
-	width: 66.13%; 
+    width: 66.13%;
 }
 
 .span_1_of_3 {
-	width: 32.26%; 
+    width: 32.26%;
 }
 
 
 /*  GO FULL WIDTH AT LESS THAN 481 PIXELS */
 
 @media only screen and (max-device-width: 481px) {
-	.span_3_of_3 {
-		width: 100%; 
-	}
-	.span_2_of_3 {
-		width: 100%; 
-	}
-	.span_1_of_3 {
-		width: 100%;
-	}
+    .span_3_of_3 {
+        width: 100%;
+    }
+    .span_2_of_3 {
+        width: 100%;
+    }
+    .span_1_of_3 {
+        width: 100%;
+    }
 }
 
-/*  GRID OF SIX   ============================================================================= */
+/*  GRID OF SIX   ========================================================== */
 
 
 .span_6_of_6 {
-	width: 100%;
+    width: 100%;
 }
 
 .span_5_of_6 {
-  	width: 83.06%;
+      width: 83.06%;
 }
 
 .span_4_of_6 {
-  	width: 66.13%;
+      width: 66.13%;
 }
 
 .span_3_of_6 {
-  	width: 49.2%;
+      width: 49.2%;
 }
 
 .span_2_of_6 {
-  	width: 32.26%;
+      width: 32.26%;
 }
 
 .span_1_of_6 {
-  	width: 15.33%;
+      width: 15.33%;
 }
 
 /*  GO FULL WIDTH AT LESS THAN 481 PIXELS */
 
 @media only screen and (max-device-width: 481px) {
-	.span_6_of_6 {
-		width: 100%; 
-	}
-	.span_5_of_6 {
-		width: 100%; 
-	}
-	.span_4_of_6 {
-		width: 100%; 
-	}
-	.span_3_of_6 {
-		width: 100%; 
-	}
-	.span_2_of_6 {
-		width: 100%; 
-	}
-	.span_1_of_6 {
-		width: 100%; 
-	}
+    .span_6_of_6 {
+        width: 100%;
+    }
+    .span_5_of_6 {
+        width: 100%;
+    }
+    .span_4_of_6 {
+        width: 100%;
+    }
+    .span_3_of_6 {
+        width: 100%;
+    }
+    .span_2_of_6 {
+        width: 100%;
+    }
+    .span_1_of_6 {
+        width: 100%;
+    }
 }
 

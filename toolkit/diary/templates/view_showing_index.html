@@ -14,13 +14,13 @@ Cube Programme{% if extra_title %}: {{ extra_title }}{% endif %}
 {{ block.super }}
 
 <div class="header group">
-	<div class="col span_1_of_6">
-    	<a href="http://www.cubecinema.com/"><img id="cubelogo" src="{{ STATIC_URL }}diary/cube_microplex_logo_178.png" alt="Cube Programme"></a>
-	</div>
+    <div class="col span_1_of_6">
+        <a href="http://www.cubecinema.com/"><img id="cubelogo" src="{{ STATIC_URL }}diary/cube_microplex_logo_178.png" alt="Cube Programme"></a>
+    </div>
 </div>
 <div class="header group">
-	<div class="col span_6_of_6">     
-		<div id="programmelinks">    
+    <div class="col span_6_of_6">
+        <div id="programmelinks">
        {% if event_type %}
            <strong>Events tagged "{{ event_type }}"</strong><br>
        {% endif %}
@@ -35,8 +35,8 @@ Cube Programme{% if extra_title %}: {{ extra_title }}{% endif %}
            <img src="{{ STATIC_URL }}diary/tiny_pdf_file_icon.gif" alt="Link to PDF"><a href="{{ printed_programme.programme.url }}">Printed programme for {{ printed_programme.month|date:"M Y" }}</a><br>
            {% endfor %}
        {% endif %}
-       </div>   
-	</div>
+       </div>
+    </div>
 </div>
 {% endblock %}
 
@@ -86,7 +86,7 @@ Cube Programme{% if extra_title %}: {{ extra_title }}{% endif %}
 {% block footer %}
 {{ block.super }}
 <div class="footer">
-	<p><a href="http://www.cubecinema.com/">Home</a> &nbsp; | &nbsp; <a href="http://www.cubecinema.com/cubewebsite/directions.html">Directions</a> &nbsp; | &nbsp; <a href="http://www.cubecinema.com/cubewebsite/contact.html">Contact</a> &nbsp; | &nbsp; <a href="/freehold">Freehold Project</a>  </p>
+    <p><a href="http://www.cubecinema.com/">Home</a> &nbsp; | &nbsp; <a href="http://www.cubecinema.com/cubewebsite/directions.html">Directions</a> &nbsp; | &nbsp; <a href="http://www.cubecinema.com/cubewebsite/contact.html">Contact</a> &nbsp; | &nbsp; <a href="/freehold">Freehold Project</a>  </p>
 </div>
 
 {% endblock %}
