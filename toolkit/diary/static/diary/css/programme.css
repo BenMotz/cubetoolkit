@@ -20,7 +20,7 @@ body {
 }
 
 
-#programmelinks {
+.programmelinks {
 	display: inline-block;	
 }
 
@@ -140,14 +140,14 @@ span.tags .tag_animation { color: #FFAA00; }
 	padding-top: 1.4em;
 	padding-bottom: 1.4em;
 	margin:auto;		
- 	width: 90%;
+ 	width: 100%;
 }
 .footer a, .footer a:visited {
 	color: black;
 	text-decoration: none;
 }
 .footer p {
-	font-weight: 300;
+	font-weight: 400;
 	color: black;
 	font-size: 	1em;
 	line-height: 1.6;
