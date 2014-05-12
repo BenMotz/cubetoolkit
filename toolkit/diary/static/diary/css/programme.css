@@ -107,6 +107,9 @@ body {
 	-webkit-transform: rotate(15deg);
 	-webkit-transform-origin: 0 50%;
 }
+p span.cancelled {
+	color: red;
+}
 
 span.tags {
 	text-transform: uppercase;
