@@ -8,8 +8,8 @@ Cube Programme{% if extra_title %}: {{ extra_title }}{% endif %}
 {% block css %}
 {{ block.super }}
 <link rel="stylesheet" href="{{ STATIC_URL }}diary/css/programme.css" type="text/css">
-{% endblock %}
 <meta name="viewport" content="width=device-width, initial-scale=1">
+{% endblock %}
 {% block header %}
 {{ block.super }}
 
@@ -78,6 +78,10 @@ Cube Programme{% if extra_title %}: {{ extra_title }}{% endif %}
                 </div>
             </div>
             {% cycle "</div>" "</div>" "</div></div>" %}
+            {# Note that the cycle won't close the last div if the number of items isn't a multipe of 3, so the following is needed: #}
+            {% if forloop.last and not forloop.counter|divisibleby:"3" %}
+            </div>
+            {% endif %}
     {% endfor %}
     </div>
 </div>
