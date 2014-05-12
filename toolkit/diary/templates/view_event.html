@@ -6,6 +6,7 @@ Cube: {{ event.name }}
 {% endblock %}
 
 {% block css %}
+{{ block.super }}
 <link rel="stylesheet" href="{{ STATIC_URL }}diary/css/event.css">
 {% endblock %}
 
@@ -13,55 +14,50 @@ Cube: {{ event.name }}
 {{ block.super }}
 <div class="header group">
 <div class="col span_1_of_6">
-
-    	<a href="{% url "default-view" %}"><img id="cubelogo" src="{{ STATIC_URL }}diary/cube_microplex_logo_178.png" alt="Cube Programme"></a>
-
+    <a href="{% url "default-view" %}"><img id="cubelogo" src="{{ STATIC_URL }}diary/cube_microplex_logo_178.png" alt="Cube Programme"></a>
 </div>
 </div>
 {% endblock %}
-
 
 {% block body %}
 
 <div class="event {% if all_showings_cancelled %}cancelled{% endif %}">
 
-
 <div class="section group">
 <div class="col span_1_of_6">
-&nbsp
+&nbsp;
 </div>
 <div class="col span_3_of_6">
-	{% with event.media.all.0 as media_item %}
-	{% if media_item %}
-	<a href="{{ media_url }}{{ media_item.media_file }}"><img src="{{ media_item.media_file|thumbnail_url:'eventdetail' }}" alt="Picture for event {{ showing.event.name }}" {% if media_item.credit %}title="Image credit: {{ media_item.credit }}"{% endif %}></a>
-	{% endif %}
-	{% endwith %}
-
-	
+    {% with event.media.all.0 as media_item %}
+    {% if media_item %}
+    <a href="{{ media_url }}{{ media_item.media_file }}"><img src="{{ media_item.media_file|thumbnail_url:'eventdetail' }}" alt="Picture for event {{ showing.event.name }}" {% if media_item.credit %}title="Image credit: {{ media_item.credit }}"{% endif %}></a>
+    {% endif %}
+    {% endwith %}
 </div>
+
 <div class="col span_2_of_6">
-	<h1>{% if event.pre_title %}<span class="pre_title">{{ event.pre_title }}</span>{% endif %}{{ event.name|capfirst}}{% if event.post_title %}<span class="post_title">{{ event.post_title }}</span>{% endif %}</h1>
+    <h1>{% if event.pre_title %}<span class="pre_title">{{ event.pre_title }}</span>{% endif %}{{ event.name|capfirst}}{% if event.post_title %}<span class="post_title">{{ event.post_title }}</span>{% endif %}</h1>
 
-	{% with event.media.all.0 as media_item %}
-	{% if media_item %}
+    {% with event.media.all.0 as media_item %}
+    {% if media_item %}
 
-	{% endif %}
-	{% endwith %}	
-	
-	{% if event.film_information %}
+    {% endif %}
+    {% endwith %}
+
+    {% if event.film_information %}
    <p class="info">{{ event.film_information }}</p>
-	{% endif %}
-	<p class="showings">
-	{% for showing in showings %}
-	{% if showing.cancelled %}<span class="cancelled">{% endif %}
+    {% endif %}
+    <p class="showings">
+    {% for showing in showings %}
+    {% if showing.cancelled %}<span class="cancelled">{% endif %}
    {% if showing.discounted %}<span class="discounted">{{ showing.start|date:"D jS M | P" }} <abbr title="Ticket Tout Tuesday">(TTT)</abbr></span>
    {% else %}
    {{ showing.start|date:"D jS M | P" }} {% endif %}
    {% if showing.cancelled %} (cancelled)</span>{% endif %}<br>
-	{% endfor %}
-	{% if event.pricing %}
+    {% endfor %}
+    {% if event.pricing %}
    <p class="info">Tickets: {{ event.pricing }}</p>
-	{% endif %}
+    {% endif %}
 </div>
 
 </div>
@@ -69,28 +65,26 @@ Cube: {{ event.name }}
 
 <div class="section group">
 <div class="col span_1_of_6">
-&nbsp
+&nbsp;
 </div>
 <div class="col span_3_of_6">
-	<div class="copy">
-	{{ event.copy_html }}
-	</div>
+    <div class="copy">
+    {{ event.copy_html }}
+    </div>
 </div>
 <div class="col span_2_of_6">
-&nbsp
+&nbsp;
 </div>
 </div>
-
-
 {% endblock %}
 
 
 {% block footer %}
 {{ block.super }}
 <div class="footer group">
-	<div class="col span_12_of_12">
-		<p><a href="http://www.cubecinema.com/">Home</a> &nbsp; | &nbsp; <a href="/toolkit/programme/">Cube Programme</a> &nbsp; | &nbsp; <a href="http://www.cubecinema.com/cubewebsite/directions.html">Directions</a> &nbsp; | &nbsp; <a href="http://www.cubecinema.com/cubewebsite/contact.html">Contact</a>  </p>
-	</div>
+    <div class="col span_12_of_12">
+        <p><a href="http://www.cubecinema.com/">Home</a> &nbsp; | &nbsp; <a href="/toolkit/programme/">Cube Programme</a> &nbsp; | &nbsp; <a href="http://www.cubecinema.com/cubewebsite/directions.html">Directions</a> &nbsp; | &nbsp; <a href="http://www.cubecinema.com/cubewebsite/contact.html">Contact</a>  </p>
+</div>
 
 </div>
 {% endblock %}
