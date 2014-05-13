@@ -44,7 +44,7 @@ body {
 
 #listing h1 {
     font-weight: 500;
-    font-size: 1.6em;
+    font-size: 1.4em;
     padding: 0.15em 0;
     margin: 0;
     text-transform: uppercase;
@@ -140,7 +140,7 @@ span.tags .tag_animation { color: #FFAA00; }
     padding-top: 1.4em;
     padding-bottom: 1.4em;
     margin:auto;
-     width: 100%;
+     width: 90%;
 }
 .footer a, .footer a:visited {
     color: black;
@@ -150,7 +150,7 @@ span.tags .tag_animation { color: #FFAA00; }
     font-weight: 400;
     color: black;
     font-size:     1em;
-    line-height: 1.6;
+    line-height: 1.4;
     margin: 0;
 }
 .header {
@@ -169,7 +169,7 @@ span.tags .tag_animation { color: #FFAA00; }
     margin: 0;
 }
 .header a, .header a:visited {
-    font-size: 1.0em;
+    font-size: 0.9em;
     color: black;
     text-decoration: none;
 }
