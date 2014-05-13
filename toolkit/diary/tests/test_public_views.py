@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 import json
 import pytz
-from datetime import datetime, date
+from datetime import datetime
 
 from mock import patch
 
@@ -102,7 +102,6 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertContains(response, "Event two title")
         self.assertContains(response, '<span class="cancelled"> Wed 3 April 19:00 (cancelled)</span>', html=True)
         self.assertContains(response, "Event two copy summary")
-        print response
 
     @patch('django.utils.timezone.now')
     def test_view_next_week(self, now_patch):
