@@ -71,7 +71,7 @@ Cube Programme{% if extra_title %}: {{ extra_title }}{% endif %}
                 <div class="event_details">
                     <p class="start_and_pricing">
                         {% for showing in showings %}
-                            {{showing.start|date:"D j F H:i"}}<br>
+                            {{showing.start|date:"D j F | H:i"}}<br>
                         {% endfor %}
                     </p>
                     <p class="copy">{{ event.copy_summary|truncatewords:30 }} [<a class="more" href="{% url "single-event-view" event.id %}">more...</a>]</p>
@@ -90,7 +90,7 @@ Cube Programme{% if extra_title %}: {{ extra_title }}{% endif %}
 {% block footer %}
 {{ block.super }}
 <div class="footer">
-    <p><a href="http://www.cubecinema.com/">Home</a> &nbsp; | &nbsp; <a href="http://www.cubecinema.com/cubewebsite/directions.html">Directions</a> &nbsp; | &nbsp; <a href="http://www.cubecinema.com/cubewebsite/contact.html">Contact</a> &nbsp; | &nbsp; <a href="/freehold">Freehold Project</a>  </p>
+    <p><a href="http://www.cubecinema.com/">HOME</a> &nbsp; | &nbsp; <a href="http://www.cubecinema.com/cubewebsite/directions.html">DIRECTIONS</a> &nbsp; | &nbsp; <a href="http://www.cubecinema.com/cubewebsite/contact.html">CONTACT</a> &nbsp; | &nbsp; <a href="/freehold">FREEHOLD PROJECT</a>  </p>
 </div>
 
 {% endblock %}
