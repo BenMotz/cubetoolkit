@@ -155,7 +155,7 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
         <td>{{ showing.booked_by }} <a href="{% url "edit-event-details-view" pk=showing.event.pk %}"
                 class="{% if showing.cancelled %}cancelled{% endif %}{% if showing.discounted %} discounted{% endif %}{% if showing.event.private %} private{% endif %}{% if showing.event.outside_hire %} external{% endif %}{% if showing.start.hour <= 17 %} daytime{% endif %}">
             {% if showing.confirmed %}
-            {{ showing.event.name|upper }}
+            {{ showing.event.pre_title|upper }} {{ showing.event.name|upper }} {{ showing.event.post_title|upper }}
             {% else %}
             {{ showing.event.name }}
             {% endif %}{% if showing.discounted %}(TTT){% endif %}{% if showing.cancelled %}(CANCELLED){% endif %}
