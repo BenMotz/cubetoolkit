@@ -21,6 +21,9 @@ Editing {{ event_list_name }}
   .cancelled {
     color: red;
   }
+  .daytime {
+    background-color: #FFFF99;
+  }
   h3 { font-family: Arial; }
 
   table { border-collapse: collapse; }
@@ -115,7 +118,8 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
 <p><span class="private">Private events are in italics</span><br>
 <span class="external">Outside hires are bolded</span><br>
 <span class="discounted">Discounted events (like TTT) are magenta</span><br>
-<span class="cancelled">Cancelled events are red</span></p>
+<span class="cancelled">Cancelled events are red</span><br>
+<span class="daytime">Daytime (before 6pm) events have a light background</span></p>
 
 <div class="programme"><p align='center'><a href="{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=90">See 3 months</a> |
 <a href="{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=183">See 6 months</a> |
@@ -125,8 +129,7 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
 {% include "messages.html" %}
 
 <table class="summary">
-    <tr><td></td><td colspan="3"><a href="{% url "add-event" %}">New event</a></td></tr>
-
+<tr><td></td><td colspan="3"><a href="{% url "add-event" %}">New event</a></td></tr>
 {% for day, showings in dates.items %}
     {% ifchanged %}<tr class="row_year"><td><h1>{{ day|date:"Y" }} </h1></td><td colspan="3"></td></tr>{% endifchanged %}
     {% ifchanged %}<tr class="row_month"><td><h2>{{ day|date:"F" }}</h2></td><td colspan="3"></td></tr></tr>
@@ -134,28 +137,35 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
     {% if day in ideas %}
     <tr><td><a href="{% url "edit-ideas" year=day.year month=day.month %}">IDEAS</a></td><td colspan="3" class="ideas">{{ ideas|lookup:day }}</td></tr>
     {% endif %}
-    <tr class="row_day"><td class="cell_day"><a href="{% url "add-event" %}?date={{day|date:"j-m-Y"}}">{{ day|date:"D"}}&nbsp;{{ day|date:"j" }}</a></td>
 
     {% for showing in showings %}
-    <td>
-    <a href="{% url "edit-showing" showing_id=showing.pk %}">{{ showing.start|date:"H:i" }}</a>
-    </td>
-    <td class="table_gap">&nbsp;</td>
-    <td>{{ showing.booked_by }} <a href="{% url "edit-event-details-view" pk=showing.event.pk %}">
-    <span class="{% if showing.cancelled %}cancelled{% endif %}{% if showing.discounted %} discounted{% endif %}{% if showing.event.private %} private{% endif %}{% if showing.event.outside_hire %} external{% endif %}">
-        {% if showing.confirmed %}
-        {{ showing.event.name|upper }}
+        <tr>
+        {% if forloop.first %}
+            {# First showing of the day, blank row plus add an event link #}
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="{% url "add-event" %}?date={{day|date:"j-m-Y"}}">{{ day|date:"D j"}}</a></td>
         {% else %}
-        {{ showing.event.name }}
-        {% endif %}{% if showing.discounted %}(TTT){% endif %}{% if showing.cancelled %}(CANCELLED){% endif %}
-    </span>
-    </a></td></tr>
-    <tr><td>&nbsp;</td>
+            {# Subsequent showings for this day #}
+            <td>&nbsp;</td>
+        {% endif %}
+        <td>
+        <a href="{% url "edit-showing" showing_id=showing.pk %}" {% if showing.start.hour <= 17 %}class="daytime"{% endif %}>{{ showing.start|date:"H:i" }}</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>{{ showing.booked_by }} <a href="{% url "edit-event-details-view" pk=showing.event.pk %}"
+                class="{% if showing.cancelled %}cancelled{% endif %}{% if showing.discounted %} discounted{% endif %}{% if showing.event.private %} private{% endif %}{% if showing.event.outside_hire %} external{% endif %}{% if showing.start.hour <= 17 %} daytime{% endif %}">
+            {% if showing.confirmed %}
+            {{ showing.event.name|upper }}
+            {% else %}
+            {{ showing.event.name }}
+            {% endif %}{% if showing.discounted %}(TTT){% endif %}{% if showing.cancelled %}(CANCELLED){% endif %}
+        </a></td>
+        </tr>
+    {% empty %}
+        {# No showings on this day, but show the day anyway (with a link to add an event) #}
+        <tr><td><a href="{% url "add-event" %}?date={{day|date:"j-m-Y"}}">{{ day|date:"D j"}}</a></td><td colspan="3"></td></tr>
     {% endfor %}
-    <td colspan="3">&nbsp;</td></tr>
-
 {% endfor %}
-
 </table>
 </div>
 
