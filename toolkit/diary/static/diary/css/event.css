@@ -4,7 +4,7 @@ body {
     font-family: 'Roboto', sans-serif;
     color: black;;
     background-color: #FFFFF;
-    font-size: 12pt;
+    font-size: 15px;
     margin: 0.5em;
 }
 
@@ -18,16 +18,16 @@ body {
 
 
 .pre_title, .post_title {
-    font-weight: 300;
+    font-weight: 500;
     display: block;
     text-transform: uppercase;
-    font-size: 0.5em;
-    line-height: 1.2;
+    font-size: 0.6em;
+    line-height: 0.8;
 }
 
 h1 {
-    font-weight: 400;
-    font-size: 1.75em;
+    font-weight: 500;
+    font-size: 1.8em;
     line-height: 1.2;
     margin: 0;
     text-transform: uppercase;
@@ -41,20 +41,20 @@ h1 a:visited {
 }
 
 .showings {
-    font-weight: 300;
-    font-size: 0.8em;
-    line-height: 1.4;
+    font-weight: 400;
+    font-size: 1em;
+    line-height: 1.2;
 }
 .info {
     font-weight: 300;
-    font-size: 0.8em;
-    line-height: 1.4;
+    font-size: 1em;
+    line-height: 1.2;
 }
 
 .copy p {
-    font-weight: 400;
-    font-size:     1em;
-    line-height: 1.4;
+    font-weight: 300;
+    font-size:     1.1em;
+    line-height: 1.2;
     padding: 0.5em 0.5em 0.5em 0;
     margin: 0;
 }
@@ -112,7 +112,7 @@ p span.cancelled {
     font-weight: 300;
     color: black;
     font-size:     0.8em;
-    line-height: 1.6;
+    line-height: 1.4;
     margin: 0;
 }
 .header {
@@ -129,6 +129,7 @@ p span.cancelled {
 }
 .header p {
     font-weight: 300;
+    font-size: 0.9em;
     padding: 0;
     margin: 0;
 }

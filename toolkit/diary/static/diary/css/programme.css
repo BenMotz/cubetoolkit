@@ -3,7 +3,7 @@
 body {
     font-family: 'Roboto', sans-serif;
     color: black;
-    font-size: 10pt;
+    font-size: 15px;
     margin: 0;
 }
 
@@ -38,13 +38,15 @@ body {
 
 .pre_title, .post_title {
     display: block;
-    font-weight: 400;
-    font-size: 0.6em;
+    font-weight: 500;
+    font-size: 0.8em;
+    line-height: 1;
 }
 
 #listing h1 {
     font-weight: 500;
-    font-size: 1.4em;
+    font-size: 1.2em;
+    line-height: 1.2;
     padding: 0.15em 0;
     margin: 0;
     text-transform: uppercase;
@@ -70,13 +72,16 @@ body {
 }
 
 #listing p.copy {
-    white-space: pre-line;
-    font-size: 0.8em;
+    /*white-space: pre-line;*/
+    font-size: 1em;
+    line-height: 1.2;
+    font-weight: 300;
 }
 
 #listing p.start_and_pricing {
-    font-weight: 500;
-    white-space: normal;
+	font-size: 0.8em;
+   font-weight: 400;
+   line-height: 1.2;
 }
 
 #listing img {
@@ -114,7 +119,8 @@ span.tags {
     padding: 0.3em 0 0 0;
     margin: none;
     font-weight: 400;
-    font-size: 0.75em;
+    font-size: 0.6em;
+    line-height: 0.8;
     display: block;
 }
 span.tags a {
