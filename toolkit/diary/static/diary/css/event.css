@@ -81,7 +81,10 @@ div.cancelled::before {
     /* If entire event series is cancelled */
     content: "CANCELLED (sorry)";
     text-decoration: none;
-    color: red;;
+    color: red;
+    background-color: white;
+    border: thin solid lightgray;
+    opacity: 0.9;
 
     font-size: 3em;
     display: inline-block;
@@ -102,7 +105,7 @@ p span.cancelled {
 .footer {
     border-top: thin dotted black;
     margin: auto;
-     width: 100%;
+     width: 90%;
 }
 .footer a, .footer a:visited {
     color: black;
