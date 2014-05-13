@@ -16,7 +16,7 @@ body {
 #cubelogo {
     border: none;
     float: left;
-    max-width: 100%;
+    width: 100%;
 }
 
 
@@ -293,7 +293,7 @@ span.tags .tag_animation { color: #FFAA00; }
         width: 100%;
     }
     .span_1_of_6 {
-        width: 100%;
+        width: 32.26%;
     }
 }
 
