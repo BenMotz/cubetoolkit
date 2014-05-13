@@ -20,15 +20,15 @@ body {
 .pre_title, .post_title {
     font-weight: 500;
     display: block;
-    text-transform: uppercase;
+    text-transform: none;
     font-size: 0.6em;
-    line-height: 0.8;
+    line-height: 1.2;
 }
 
 h1 {
     font-weight: 500;
     font-size: 1.8em;
-    line-height: 1.2;
+    line-height: 1.1;
     margin: 0;
     text-transform: uppercase;
 }

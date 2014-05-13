@@ -73,7 +73,7 @@ body {
 
 #listing p.copy {
     /*white-space: pre-line;*/
-    font-size: 1em;
+    font-size: 0.8em;
     line-height: 1.2;
     font-weight: 300;
 }
