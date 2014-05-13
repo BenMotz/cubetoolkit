@@ -102,7 +102,7 @@ p span.cancelled {
 .footer {
     border-top: thin dotted black;
     margin: auto;
-     width: 100%;
+     width: 90%;
 }
 .footer a, .footer a:visited {
     color: black;
