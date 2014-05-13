@@ -81,7 +81,10 @@ div.cancelled::before {
     /* If entire event series is cancelled */
     content: "CANCELLED (sorry)";
     text-decoration: none;
-    color: red;;
+    color: red;
+    background-color: white;
+    border: thin solid lightgray;
+    opacity: 0.9;
 
     font-size: 3em;
     display: inline-block;
