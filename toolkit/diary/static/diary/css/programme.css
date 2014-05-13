@@ -24,6 +24,14 @@ body {
     display: inline-block;
 }
 
+.discounted {
+    font-weight: normal;
+}
+
+.cancelled {
+    color: red;
+}
+
 /* < 632px, scale the logo down */
 /*@media screen and (max-width: 632px) {
     img#cubelogo {
@@ -90,23 +98,6 @@ body {
     padding: 1.4em 0;
     border-top: thin dotted black;
     /* Force the showing to clear below the image */
-}
-#listing .cancelled h1::before {
-    content: "CANCELLED";
-    text-decoration: none;
-    color: white;
-    background-color: red;
-    font-size: 2em;
-    display: inline-block;
-    position: absolute;
-    left: 30%;
-    margin: 0;
-    padding: 0 0.15em;
-    border-radius: 0.2em;
-    transform: rotate(15deg);
-    transform-origin: 0 50%;
-    -webkit-transform: rotate(15deg);
-    -webkit-transform-origin: 0 50%;
 }
 
 span.tags {

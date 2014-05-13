@@ -71,7 +71,10 @@ Cube Programme{% if extra_title %}: {{ extra_title }}{% endif %}
                 <div class="event_details">
                     <p class="start_and_pricing">
                         {% for showing in showings %}
-                            {{showing.start|date:"D j F H:i"}}<br>
+                        {% if showing.cancelled %}<span class="cancelled">{% endif %}
+                        {{ showing.start|date:"D j F H:i" }}
+                        {% if showing.cancelled %} (cancelled)</span>{% endif %}
+                        {% if showing.discounted %}<abbr class="discounted" title="Ticket Tout Tuesday">(TTT)</abbr>{% endif %}<br>
                         {% endfor %}
                     </p>
                     <p class="copy">{{ event.copy_summary|truncatewords:30 }} [<a class="more" href="{% url "single-event-view" event.id %}">more...</a>]</p>
