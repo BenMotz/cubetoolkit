@@ -1,19 +1,39 @@
-CUBE PROGRAMME OF EVENTS{# This is all a bit gnarly, because newlines are significant... #}
+{% load strip_lines %}{# This is a bit gnarly in places, because newlines are significant... #}
+CUBE PROGRAMME OF EVENTS
 
 http://www.cubecinema.com/programme/
-{% for showing in showings %}
-{% ifchanged %}{{ showing.start|date:"Y" }}
-{% endifchanged %}{% ifchanged %} {{ showing.start|date:"F"|upper }}
-{% endifchanged %}{% ifchanged %}  {{ showing.start|date:"D"}} {{ showing.start|date:"d" }}{% else %}        {% endifchanged %} {{showing.start|date:"H:i"}} ........ {% if showing.hide_in_programme or showing.event.private %}Closed for private event.{% else %}{{ showing.event.name|capfirst }}{% if showing.cancelled %} (CANCELLED){% endif %}{% if showing.discounted %} (TTT){% endif %}{% endif %}{% endfor %}
 
+{% filterblanklines %}
+{% for showing in showings %}
+{%     ifchanged %}
+{{         showing.start|date:"Y" }}
+{%     endifchanged %}
+{%     ifchanged %}
+ {{        showing.start|date:"F"|upper }}
+{%     endifchanged %}
+{%     ifchanged %}
+  {{ showing.start|date:"D"}} {{ showing.start|date:"d" }}{% else %}        {% endifchanged %} {{showing.start|date:"H:i"}} ........ {% if showing.hide_in_programme or showing.event.private %}Closed for private event.{% else %}{{ showing.event.name|capfirst }}{% if showing.cancelled %} (CANCELLED){% endif %}{% if showing.discounted %} (TTT){% endif %}{% endif %}
+{% endfor %}
+{% endfilterblanklines %}
+{% filtermultipleblanklines %}
 {% for showing in showings.public %}{% ifchanged %}------------------------------------------------------------------------------
 
-{{ showing.event.name|upper }}
+{% if showing.event.pre_title %}{{ showing.event.pre_title }}:
+{% endif %}{{ showing.event.name|upper }}
+ {{ showing.event.post_title }}
 
-{% for showing in showing.event.showings.public %}{{ showing.start|date:"H:i d/m/Y" }}
+{% filterblanklines %}
+{% for showing in showing.event.showings.public %}
+{{ showing.start|date:"H:i d/m/Y" }}
 {% endfor %}
+{% endfilterblanklines %}
+{% if showing.event.pricing %}Tickets: {{ showing.event.pricing }}{% endif %}
+
 {{ showing.event.copy_plaintext }}
-{% endifchanged %}{% endfor %}--
+{% endifchanged %}
+{% endfor %}
+--
+{% endfiltermultipleblanklines %}
 
 Cube Cinema Microplex
 is located at:
@@ -29,4 +49,3 @@ BS2 8NQ
 http://www.cubecinema.com
 
 tel: 0117 907 4190
-

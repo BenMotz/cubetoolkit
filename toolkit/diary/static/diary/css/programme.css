@@ -1,106 +1,296 @@
-/* This looks horrible. */
+/* This still looks horrible. */
 
 body {
-	font-family: sans-serif;
-	color: black;
-	background-color: #0065C9;
-	padding-left: 8px;
+    font-family: 'Roboto', sans-serif;
+    color: black;
+    font-size: 15px;
+    margin: 0;
 }
 
-img.cubelogo {
-	text-align: center;
-	border: none;
-}
 .programme {
-	background-color: white;
-	margin-left: 10%;
-	margin-right: 10%;
-	padding: 10px;
-	width: 80%;
-	border: thin solid black;
+    background-color: white;
+    width:90%;
+    margin:0 auto;
 }
+
+#cubelogo {
+    border: none;
+    float: left;
+    width: 100%;
+}
+
+
+.programmelinks {
+    display: inline-block;
+}
+
+.discounted {
+    font-weight: normal;
+}
+
+.cancelled {
+    color: red;
+}
+
+/* < 632px, scale the logo down */
+/*@media screen and (max-width: 632px) {
+    img#cubelogo {
+        max-width: 100%;
+    }
+}*/
+
+
+#listing {
+    background-color: white;
+}
+
+.pre_title, .post_title {
+    display: block;
+    font-weight: 500;
+    font-size: 0.8em;
+    line-height: 1;
+}
+
+#listing h1 {
+    font-weight: 500;
+    font-size: 1.2em;
+    line-height: 1.2;
+    padding: 0.15em 0;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+#listing h1 a {
+    text-decoration: none;
+    color: black;
+}
+
+#listing h1 a:visited {
+    color: black;
+}
+
+#listing .event_details {
+    /* Stop the paragraph from wrapping below the image (if any): */
+    overflow: hidden;
+}
+
+#listing .event_details p {
+    padding: 0.2em 0.5em 0.2em 0;
+    margin: 0;
+}
+
+#listing p.copy {
+    /*white-space: pre-line;*/
+    font-size: 0.8em;
+    line-height: 1.2;
+    font-weight: 300;
+}
+
+#listing p.start_and_pricing {
+	font-size: 0.8em;
+   font-weight: 400;
+   line-height: 1.2;
+}
+
+#listing img {
+    border: none;
+/*    float: left; */
+    padding-right: 1.5em;
+    width: 100%;
+}
+
+#listing .showing {
+    padding: 1.4em 0;
+    border-top: thin dotted black;
+    /* Force the showing to clear below the image */
+}
+
+span.tags {
+    text-transform: uppercase;
+    padding: 0.3em 0 0 0;
+    margin: none;
+    font-weight: 400;
+    font-size: 0.6em;
+    line-height: 0.8;
+    display: block;
+}
+span.tags a {
+    margin: 0.1em;
+    border-radius: 0.2em;
+    text-decoration: none;
+    color: #0055C0;
+}
+span.tags .tag_music { color: blue; }
+span.tags .tag_film { color: green; }
+span.tags .tag_party { color: red; }
+span.tags .tag_talk { color: orange; }
+span.tags .tag_cabaret { color: brown; }
+span.tags .tag_bluescreen { color: blue; }
+span.tags .tag_nanoplex { color: #CA678D; }
+span.tags .tag_animation { color: #FFAA00; }
+
+/* Hide film format tags: */
+.tag_dcp, .tag_35mm, .tag_dvd, .tag_dcp { display: none;}
+
+
 .footer {
-	background-color: white;
-	margin-left: 10%;
-	margin-right: 10%;
-	padding: 2px 10px 2px 10px;
-	margin-top: 20px;
-	width: 80%;
-	border: thin solid black;
+    border-top: thin dotted black;
+    padding-top: 1.4em;
+    padding-bottom: 1.4em;
+    margin:auto;
+     width: 90%;
+}
+.footer a, .footer a:visited {
+    color: black;
+    text-decoration: none;
+}
+.footer p {
+    font-weight: 400;
+    color: black;
+    font-size: 0.8em;
+    line-height: 1.4;
+    margin: 0;
+}
+.header {
+    background-color: white;
+    padding-top: 1.4em;
+    padding-left: 1.4em;
+    padding-right: 1.4em;
+    clear: both;
+    margin:0 auto;
+    width:90%;
+}
+.header p {
+    font-weight: 100;
+    word-spacing: 1.2;
+    padding: 0;
+    margin: 0;
+}
+.header a, .header a:visited {
+    font-size: 0.8em;
+    color: black;
+    text-decoration: none;
+}
+/*  SECTIONS  ============================================================== */
+
+.section {
+    clear: both;
+    padding: 0px;
+    margin: 0px;
 }
 
-h1.programme_title {
-	font-size: 1.1cm;
-	padding: 0;
-	margin: 1mm;
-	border-bottom: thin solid black;
-}
-p.table_key {
-	font-weight: bold;
-	color: gray;
-}
-.row_year h1 {
-	font-size: 0.6cm;
-	margin: 0;	
-}
-.row_month h2 {
-	font-size: 0.5cm;
-	margin: 1px 0 3mm 4mm;
-}
-table.summary {
-	border-collapse: collapse;
-}
-td {
-	padding: 2mm;
-}
-table.summary td {
-	padding-top: 0; padding-bottom: 0;
-	vertical-align: bottom;
-}
-tr.row_weekstart td {
-	border-top: thick solid #efefef;
-	padding-top: 3mm;
-}
-td.cell_day_today {
-	text-align: right;
-	padding-left: 1.2cm;
-	font-weight: bold;
-	color: red;
-}
-td.cell_endofday { }
-td.cell_month { padding-left: 0.6cm; }
-td.cell_day {
-	text-align: right;
-	padding-left: 1.2cm;
-}
-td.cell_time { }
-td.cell_event { }
-td.table_gap {
-	width: 0.5cm;
-	border-bottom: thin dotted black;
-}
-.cancelled { color: red; }
-.discounted { color: green; }
+/*  GROUPING  ============================================================== */
 
-.event {
-	background-image: url(../line.jpg);
-	background-repeat: repeat-x;
-	background-color: white;
-	margin-left: 10%;
-	margin-right: 10%;
-	margin-top: 20px;
-	padding: 10px;
-	width: 80%;
-	border: thin solid gray;
+
+.group:before,
+.group:after {
+    content:"";
+    display:table;
 }
-.event h2 {
-	margin: 0;
+.group:after {
+    clear:both;
 }
-.event img {
-	border: none;
-}
-p.image_caption {
-	font-style: italic;
+.group {
+    zoom:1; /* For IE 6/7 (trigger has Layout) */
 }
 
+/*  GRID COLUMN SETUP   ==================================================== */
+
+.col {
+    display: block;
+    float:left;
+    margin: 1% 0 1% 1.6%;
+}
+
+.col:first-child { margin-left: 0; } /* all browsers except IE6 and lower */
+
+
+/*  REMOVE MARGINS AND PADDING AS ALL GO FULL WIDTH AT 481 PIXELS */
+
+@media only screen and (max-device-width: 481px) {
+    .col {
+        margin: 1% 0 1% 0%;
+    }
+}
+
+
+/*  GRID OF THREE ========================================================== */
+
+
+.span_3_of_3 {
+    width: 100%;
+}
+
+.span_2_of_3 {
+    width: 66.13%;
+}
+
+.span_1_of_3 {
+    width: 32.26%;
+}
+
+
+/*  GO FULL WIDTH AT LESS THAN 481 PIXELS */
+
+@media only screen and (max-device-width: 481px) {
+    .span_3_of_3 {
+        width: 100%;
+    }
+    .span_2_of_3 {
+        width: 100%;
+    }
+    .span_1_of_3 {
+        width: 100%;
+    }
+}
+
+/*  GRID OF SIX   ========================================================== */
+
+
+.span_6_of_6 {
+    width: 100%;
+}
+
+.span_5_of_6 {
+      width: 83.06%;
+}
+
+.span_4_of_6 {
+      width: 66.13%;
+}
+
+.span_3_of_6 {
+      width: 49.2%;
+}
+
+.span_2_of_6 {
+      width: 32.26%;
+}
+
+.span_1_of_6 {
+      width: 15.33%;
+}
+
+/*  GO FULL WIDTH AT LESS THAN 481 PIXELS */
+
+@media only screen and (max-device-width: 481px) {
+    .span_6_of_6 {
+        width: 100%;
+    }
+    .span_5_of_6 {
+        width: 100%;
+    }
+    .span_4_of_6 {
+        width: 100%;
+    }
+    .span_3_of_6 {
+        width: 100%;
+    }
+    .span_2_of_6 {
+        width: 100%;
+    }
+    .span_1_of_6 {
+        width: 32.26%;
+    }
+}
 

@@ -14,7 +14,7 @@ from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 
 from toolkit.diary.models import (Showing, Event, Role, DiaryIdea,
-                                  EventTemplate, MediaItem)
+                                  EventTemplate, MediaItem, EventTag)
 import toolkit.diary.edit_prefs
 
 from .common import DiaryTestsMixin
@@ -117,6 +117,30 @@ class AddShowingView(DiaryTestsMixin, TestCase):
 
         self.assertEqual(response.status_code, 405)
 
+    @patch('django.utils.timezone.now')
+    def test_add_showing_mismatching_event_id(self, now_patch):
+        now_patch.return_value = self._fake_now
+
+        url = reverse("add-showing", kwargs={"event_id": 1})
+        url += "?copy_from=2"
+
+        showing_count_before = Showing.objects.count()
+
+        source = Showing.objects.get(id=2)
+
+        self.assertEqual(source.event.showings.count(), 5)
+
+        # do add/clone:
+        response = self.client.post(url, data={
+            "booked_by": u"Someone or the other - \u20ac",
+            "clone_start": "13/07/2013 20:00"
+        })
+
+        showing_count_after = Showing.objects.count()
+        self.assertEqual(showing_count_after, showing_count_before)
+
+        self.assertEqual(response.status_code, 404)
+
     def test_add_showing_no_copy_from(self):
         # No copy_from parameter: should return 404
         url = reverse("add-showing", kwargs={"event_id": 1})
@@ -124,7 +148,7 @@ class AddShowingView(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 404)
 
     def test_add_showing_no_start(self):
-        url = reverse("add-showing", kwargs={"event_id": 1})
+        url = reverse("add-showing", kwargs={"event_id": 2})
         url += "?copy_from=2"
 
         showing_count_before = Showing.objects.count()
@@ -144,7 +168,7 @@ class AddShowingView(DiaryTestsMixin, TestCase):
                              u'This field is required.')
 
     def test_add_showing_no_booked_by(self):
-        url = reverse("add-showing", kwargs={"event_id": 1})
+        url = reverse("add-showing", kwargs={"event_id": 2})
         url += "?copy_from=2"
 
         showing_count_before = Showing.objects.count()
@@ -168,7 +192,7 @@ class AddShowingView(DiaryTestsMixin, TestCase):
     def test_add_showing_in_past(self, now_patch):
         now_patch.return_value = self._fake_now
 
-        url = reverse("add-showing", kwargs={"event_id": 1})
+        url = reverse("add-showing", kwargs={"event_id": 2})
         url += "?copy_from=2"
 
         showing_count_before = Showing.objects.count()
@@ -193,7 +217,7 @@ class AddShowingView(DiaryTestsMixin, TestCase):
     def test_add_showing(self, now_patch):
         now_patch.return_value = self._fake_now
 
-        url = reverse("add-showing", kwargs={"event_id": 1})
+        url = reverse("add-showing", kwargs={"event_id": 2})
         url += "?copy_from=2"
 
         showing_count_before = Showing.objects.count()
@@ -598,12 +622,13 @@ class AddEventView(DiaryTestsMixin, TestCase):
 
         self.assertTemplateUsed(response, "form_new_event_and_showing.html")
 
-        # Check error was as expected:
+        # Check errors as expected:
         self.assertFormError(response, 'form', 'start', u'This field is required.')
         self.assertFormError(response, 'form', 'duration', u'This field is required.')
         self.assertFormError(response, 'form', 'number_of_days', u'This field is required.')
         self.assertFormError(response, 'form', 'event_name', u'This field is required.')
         self.assertFormError(response, 'form', 'booked_by', u'This field is required.')
+        self.assertFormError(response, 'form', 'event_template', u'This field is required.')
 
 
 class EditEventView(DiaryTestsMixin, TestCase):
@@ -622,6 +647,10 @@ class EditEventView(DiaryTestsMixin, TestCase):
         self.assertContains(response, u"Event one title")
         self.assertContains(response, u"Event one copy")
         self.assertContains(response, u"Event one copy summary")
+        self.assertContains(response, u"PRICING_ONE")
+        self.assertContains(response, u"PRETITLE One")
+        self.assertContains(response, u"POSTTITLE One")
+        self.assertContains(response, u"FILM_INFO_One")
         self.assertContains(response, u"01:30:00")
         self.assertContains(response, u'<input id="id_outside_hire" checked="checked" name="outside_hire" type="checkbox" />', html=True)
         self.assertContains(response, u'<input id="id_private" name="private" type="checkbox" />', html=True)
@@ -696,6 +725,10 @@ class EditEventView(DiaryTestsMixin, TestCase):
 
         event = Event.objects.get(id=2)
         self.assertEqual(event.name, u'New \u20acvent Name')
+        self.assertEqual(event.pre_title, u'')
+        self.assertEqual(event.post_title, u'')
+        self.assertEqual(event.pricing, u'')
+        self.assertEqual(event.film_information, u'')
         self.assertEqual(event.duration, time(0, 10))
         self.assertEqual(event.copy, u'')
         self.assertEqual(event.copy_summary, u'')
@@ -716,6 +749,10 @@ class EditEventView(DiaryTestsMixin, TestCase):
             'duration': u'01:10:09',
             'copy': u'Some more copy',
             'copy_summary': u'Copy summary blah',
+            'pre_title': u'The thing that will be',
+            'post_title': u'The thing that was',
+            'pricing': u'Full \u00A35',
+            'film_information': u'Blah blah films',
             'terms': u'Always term time',
             'notes': u'This is getting\n boring',
             'outside_hire': u'on',
@@ -733,6 +770,11 @@ class EditEventView(DiaryTestsMixin, TestCase):
         self.assertEqual(event.media.count(), 0)
         self.assertEqual(event.outside_hire, True)
         self.assertEqual(event.private, True)
+        self.assertEqual(event.legacy_id, u'100')
+        self.assertEqual(event.pre_title, u'The thing that will be')
+        self.assertEqual(event.post_title, u'The thing that was')
+        self.assertEqual(event.pricing, u'Full \u00a35')
+        self.assertEqual(event.film_information, u'Blah blah films')
         # Shouldn't have changed:
         self.assertEqual(event.legacy_id, u'100')
 
@@ -972,8 +1014,8 @@ class ViewEventFieldTests(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "view_rota.html")
 
-        self.assertNotContains(response, u"EVENT THREE TITLE")
-        self.assertContains(response, u"EVENT FOUR TITL\u0112")
+        self.assertNotContains(response, u"Event three title")
+        self.assertContains(response, u"Event four titl\u0113")
         self.assertContains(response, u"Role 2 (nonstandard)-1")
 
     def test_view_event_field_copy(self):
@@ -986,6 +1028,22 @@ class ViewEventFieldTests(DiaryTestsMixin, TestCase):
         self.assertContains(response, u"Sun 09 18:00 ......... Event four titl\u0113")
         self.assertContains(response, u"<p>EVENT FOUR TITL\u0112</p>", html=True)
         self.assertContains(response, u"<p>Event four C\u014dpy</p>", html=True)
+
+    def test_view_event_field_copy_summary(self):
+        url = reverse("view_event_field", kwargs={"field": "copy_summary"})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_copy_summary.html")
+
+        self.assertNotContains(response, u"EVENT THREE TITLE")
+        self.assertContains(response, u'Sun 09 18:00 ......... Event four titl\u0113')
+        self.assertContains(response, u'<p class="title">Event four titl\u0113</p>', html=True)
+        self.assertContains(response, u'<p class="copy_summary">\u010copy four summary</p>', html=True)
+
+        self.assertContains(response, u"\u00a3milliion per thing")
+        self.assertContains(response, u"Pretitle four")
+        self.assertContains(response, u"Posttitle four")
+        self.assertContains(response, u"Film info for four")
 
     def test_view_event_field_terms(self):
         url = reverse("view_event_field", kwargs={"field": "terms"})
@@ -1007,8 +1065,8 @@ class ViewEventFieldTests(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "view_rota.html")
 
-        self.assertContains(response, u"EVENT THREE TITLE")
-        self.assertContains(response, u"EVENT FOUR TITL\u0112")
+        self.assertContains(response, u"Event three title")
+        self.assertContains(response, u"Event four titl\u0113")
 
     def test_custom_start_date_rota_less_long_time(self):
         # Now shorter date range, should find one fewer event
@@ -1019,8 +1077,8 @@ class ViewEventFieldTests(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "view_rota.html")
 
-        self.assertContains(response, u"EVENT THREE TITLE")
-        self.assertNotContains(response, u"EVENT FOUR TITL\u0112")
+        self.assertContains(response, u"Event three title")
+        self.assertNotContains(response, u"Event four titl\u0113")
 
     def test_custom_start_date_rota_invalid_date(self):
         # Now shorter date range, should find one fewer event
@@ -1150,3 +1208,99 @@ class PreferencesTests(DiaryTestsMixin, TestCase):
         # should now 302 to edit list:
         response = self.client.get(url)
         self.assertRedirects(response, reverse("default-edit"))
+
+
+class EditTagsViewTests(DiaryTestsMixin, TestCase):
+    def setUp(self):
+        super(EditTagsViewTests, self).setUp()
+        self.client.login(username="admin", password="T3stPassword!")
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_page_loads(self):
+        url = reverse("edit_event_tags")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "edit_event_tags.html")
+
+    def test_post_noop(self):
+        initial_tag_count = EventTag.objects.count()
+
+        url = reverse("edit_event_tags")
+        response = self.client.post(url, data={
+            "deleted_tags[]": [],
+            "new_tags[]": [],
+        })
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data['failed'], False)
+
+        final_tag_count = EventTag.objects.count()
+        self.assertEqual(initial_tag_count, final_tag_count)
+
+    def test_post_delete(self):
+        url = reverse("edit_event_tags")
+        response = self.client.post(url, data={
+            "deleted_tags[]": [1, 3],
+            "new_tags[]": [],
+        })
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data['failed'], False)
+
+        self.assertEqual(EventTag.objects.filter(id=1).count(), 0)
+        self.assertEqual(EventTag.objects.filter(id=2).count(), 1)
+        self.assertEqual(EventTag.objects.filter(id=3).count(), 0)
+
+    def test_post_add(self):
+        url = reverse("edit_event_tags")
+        response = self.client.post(url, data={
+            "deleted_tags[]": [],
+            "new_tags[]": ["new_tag_one", "new_tag_TWO "],
+        })
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data['failed'], False)
+
+        nt1 = EventTag.objects.get(name="new_tag_one")
+        nt2 = EventTag.objects.get(name="new_tag_two")
+
+        self.assertEqual(nt1.read_only, False)
+        self.assertEqual(nt2.read_only, False)
+
+    def test_post_bad_delete(self):
+        initial_tag_count = EventTag.objects.count()
+
+        url = reverse("edit_event_tags")
+        response = self.client.post(url, data={
+            "deleted_tags[]": [1000],
+            "new_tags[]": [],
+        })
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data['failed'], True)
+        self.assertIn(u'delete', response_data['errors'])
+
+        final_tag_count = EventTag.objects.count()
+        self.assertEqual(initial_tag_count, final_tag_count)
+
+    def test_post_duplicate_new_tag(self):
+        initial_tag_count = EventTag.objects.count()
+
+        existing_name = EventTag.objects.get(id=1).name
+
+        url = reverse("edit_event_tags")
+        response = self.client.post(url, data={
+            "deleted_tags[]": [1],
+            "new_tags[]": [existing_name],
+        })
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data['failed'], True)
+        self.assertEqual(
+            response_data[u'errors'],
+            {existing_name: [u'Event tag with this Name already exists.']}
+        )
+        final_tag_count = EventTag.objects.count()
+        self.assertEqual(initial_tag_count, final_tag_count)

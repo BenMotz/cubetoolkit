@@ -63,12 +63,20 @@ THUMBNAIL_ALIASES = {
         },
     },
     'diary.MediaItem': {
-        'std': {
-            # Slightly arbitrary (inherited) bounding box
-            'size': (250, 187),
+        'indexview': {
+            'size': (500, 300),
+            'crop': 'smart',
+            'background': '#FFFFFF',
+        },
+        'eventdetail': {
+            'size': (800, 800),
         },
     },
 }
+SOUTH_MIGRATION_MODULES = {
+    'easy_thumbnails': 'easy_thumbnails.south_migrations',
+}
+
 
 
 # Custom tweaks:

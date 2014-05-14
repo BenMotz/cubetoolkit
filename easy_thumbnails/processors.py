@@ -1,12 +1,14 @@
+import itertools
 import re
-import six
 
+from django.utils import six
 try:
     from PIL import Image, ImageChops, ImageFilter
 except ImportError:
     import Image
     import ImageChops
     import ImageFilter
+
 from easy_thumbnails import utils
 
 
@@ -31,6 +33,15 @@ def _compare_entropy(start_slice, end_slice, slice, difference):
         return slice, 0
 
 
+def _points_table():
+    """
+    Iterable to map a 16 bit grayscale image to 8 bits.
+    """
+    for i in range(256):
+        for j in itertools.repeat(i, 256):
+            yield j
+
+
 def colorspace(im, bw=False, replace_alpha=False, **kwargs):
     """
     Convert images to the correct color space.
@@ -50,28 +61,33 @@ def colorspace(im, bw=False, replace_alpha=False, **kwargs):
         white.
 
     """
-    is_transparent = utils.is_transparent(im)
-    if bw:
-        if im.mode in ('L', 'LA'):
-            return im
-        if is_transparent:
-            return im.convert('LA')
-        else:
-            return im.convert('L')
+    if im.mode == 'I':
+        # PIL (and pillow) have can't convert 16 bit grayscale images to lower
+        # modes, so manually convert them to an 8 bit grayscale.
+        im = im.point(list(_points_table()), 'L')
 
-    if im.mode in ('L', 'RGB'):
-        return im
+    is_transparent = utils.is_transparent(im)
+    is_grayscale = im.mode in ('L', 'LA')
+    new_mode = im.mode
+    if is_grayscale or bw:
+        new_mode = 'L'
+    else:
+        new_mode = 'RGB'
 
     if is_transparent:
-        if im.mode != 'RGBA':
-            im = im.convert('RGBA')
-        if not replace_alpha:
-            return im
-        base = Image.new('RGBA', im.size, replace_alpha)
-        base.paste(im, mask=im)
-        im = base
+        if replace_alpha:
+            if im.mode != 'RGBA':
+                im = im.convert('RGBA')
+            base = Image.new('RGBA', im.size, replace_alpha)
+            base.paste(im, mask=im)
+            im = base
+        else:
+            new_mode = new_mode + 'A'
 
-    return im.convert('RGB')
+    if im.mode != new_mode:
+        im = im.convert(new_mode)
+
+    return im
 
 
 def autocrop(im, autocrop=False, **kwargs):
@@ -86,18 +102,25 @@ def autocrop(im, autocrop=False, **kwargs):
 
     """
     if autocrop:
-        bw = im.convert('1')
-        bw = bw.filter(ImageFilter.MedianFilter)
+        # If transparent, flatten.
+        if utils.is_transparent(im) and False:
+            no_alpha = Image.new('L', im.size, (255))
+            no_alpha.paste(im, mask=im.split()[-1])
+        else:
+            no_alpha = im.convert('L')
+        # Convert to black and white image.
+        bw = no_alpha.convert('L')
+        # bw = bw.filter(ImageFilter.MedianFilter)
         # White background.
-        bg = Image.new('1', im.size, 255)
-        diff = ImageChops.difference(bw, bg)
-        bbox = diff.getbbox()
+        bg = Image.new('L', im.size, 255)
+        bbox = ImageChops.difference(bw, bg).getbbox()
         if bbox:
             im = im.crop(bbox)
     return im
 
 
-def scale_and_crop(im, size, crop=False, upscale=False, **kwargs):
+def scale_and_crop(im, size, crop=False, upscale=False, zoom=None, target=None,
+                   **kwargs):
     """
     Handle scaling and cropping the source image.
 
@@ -135,9 +158,27 @@ def scale_and_crop(im, size, crop=False, upscale=False, **kwargs):
     upscale
         Allow upscaling of the source image during scaling.
 
+    zoom
+        A percentage to zoom in on the scaled image. For example, a zoom of
+        ``40`` will clip 20% off each side of the source image before
+        thumbnailing.
+
+    target
+        Set the focal point as a percentage for the image if it needs to be
+        cropped (defaults to ``(50, 50)``).
+
+        For example, ``target="10,20"`` will set the focal point as 10% and 20%
+        from the left and top of the image, respectively. If the image needs to
+        be cropped, it will trim off the right and bottom edges until the focal
+        point is centered.
+
+        Can either be set as a two-item tuple such as ``(20, 30)`` or a comma
+        separated string such as ``"20,10"``.
+
+        A null value such as ``(20, None)`` or ``",60"`` will default to 50%.
     """
     source_x, source_y = [float(v) for v in im.size]
-    target_x, target_y = [float(v) for v in size]
+    target_x, target_y = [int(v) for v in size]
 
     if crop or not target_x or not target_y:
         scale = max(target_x / source_x, target_y / source_y)
@@ -146,9 +187,16 @@ def scale_and_crop(im, size, crop=False, upscale=False, **kwargs):
 
     # Handle one-dimensional targets.
     if not target_x:
-        target_x = source_x * scale
+        target_x = round(source_x * scale)
     elif not target_y:
-        target_y = source_y * scale
+        target_y = round(source_y * scale)
+
+    if zoom:
+        if not crop:
+            target_x = round(source_x * scale)
+            target_y = round(source_y * scale)
+            crop = True
+        scale *= (100 + int(zoom)) / 100.0
 
     if scale < 1.0 or (scale > 1.0 and upscale):
         # Resize the image to the target size boundary. Round the scaled
@@ -163,12 +211,25 @@ def scale_and_crop(im, size, crop=False, upscale=False, **kwargs):
         # Difference between new image size and requested size.
         diff_x = int(source_x - min(source_x, target_x))
         diff_y = int(source_y - min(source_y, target_y))
-        if diff_x or diff_y:
-            # Center cropping (default).
-            halfdiff_x, halfdiff_y = diff_x // 2, diff_y // 2
-            box = [halfdiff_x, halfdiff_y,
-                   min(source_x, int(target_x) + halfdiff_x),
-                   min(source_y, int(target_y) + halfdiff_y)]
+        if crop != 'scale' and (diff_x or diff_y):
+            if isinstance(target, six.string_types):
+                target = re.match(r'(\d+)?,(\d+)?$', target)
+                if target:
+                    target = target.groups()
+            if target:
+                focal_point = [int(n) if (n or n == 0) else 50 for n in target]
+            else:
+                focal_point = 50, 50
+            # Crop around the focal point
+            halftarget_x, halftarget_y = int(target_x / 2), int(target_y / 2)
+            focal_point_x = int(source_x * focal_point[0] / 100)
+            focal_point_y = int(source_y * focal_point[1] / 100)
+            box = [
+                max(0, min(source_x - target_x, focal_point_x - halftarget_x)),
+                max(0, min(source_y - target_y, focal_point_y - halftarget_y)),
+            ]
+            box.append(min(source_x, box[0] + target_x))
+            box.append(min(source_y, box[1] + target_y))
             # See if an edge cropping argument was provided.
             edge_crop = (isinstance(crop, six.string_types) and
                          re.match(r'(?:(-?)(\d+))?,(?:(-?)(\d+))?$', crop))
@@ -212,8 +273,7 @@ def scale_and_crop(im, size, crop=False, upscale=False, **kwargs):
                     diff_y = diff_y - add - remove
                 box = (left, top, right, bottom)
             # Finally, crop the image!
-            if crop != 'scale':
-                im = im.crop(box)
+            im = im.crop(box)
     return im
 
 
@@ -234,3 +294,32 @@ def filters(im, detail=False, sharpen=False, **kwargs):
     if sharpen:
         im = im.filter(ImageFilter.SHARPEN)
     return im
+
+
+def background(im, size, background=None, crop=None, replace_alpha=None,
+               **kwargs):
+    """
+    Add borders of a certain color to make the resized image fit exactly within
+    the dimensions given.
+
+    background
+        Background color to use
+    """
+    if not background:
+        # Primary option not given, nothing to do.
+        return im
+    if not size[0] or not size[1]:
+        # One of the dimensions aren't specified, can't do anything.
+        return im
+    x, y = im.size
+    if x >= size[0] and y >= size[1]:
+        # The image is already equal to (or larger than) the expected size, so
+        # there's nothing to do.
+        return im
+    im = colorspace(im, replace_alpha=background, **kwargs)
+    new_im = Image.new('RGB', size, background)
+    if new_im.mode != im.mode:
+        new_im = new_im.convert(im.mode)
+    offset = (size[0]-x)//2, (size[1]-y)//2
+    new_im.paste(im, offset)
+    return new_im

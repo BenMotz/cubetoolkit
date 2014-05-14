@@ -50,6 +50,7 @@ function dateRangeSelected(dateText, inst) {
 {% endblock %}
 
 {% block body %}
+<div id='eventfield_header'>
 <form id='daterange'>
 <p align='center'><label for="id_from_date">{{ event_field|capfirst }} from </label><input type="text" name="from_date" value="{{ start_date|date:'j-m-Y'}}" id="id_from_date" />
 <label for="id_to_date"> to </label><input type="text" name="to_date" value="{{ end_date|date:'j-m-Y'}}" id="id_to_date" />
@@ -61,5 +62,6 @@ function dateRangeSelected(dateText, inst) {
 <a id="copy_summary_link" href="{% url "view_event_field" field="copy_summary" %}/{{ start_date.year }}/{{ start_date.month }}/{{ start_date.day }}/?daysahead={{ days_ahead }}">Copy Summary Report</a> |
 <a id="rota_link" href="{% url "view_event_field" field="rota" %}/{{ start_date.year }}/{{ start_date.month }}/{{ start_date.day }}/?daysahead={{ days_ahead }}">Rota</a></p>
 </form>
+</div>
 {% endblock %}
 

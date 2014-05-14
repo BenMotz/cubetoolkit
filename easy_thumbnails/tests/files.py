@@ -1,11 +1,23 @@
+try:
+    from cStringIO import cStringIO as BytesIO
+except ImportError:
+    from django.utils.six import BytesIO
 from os import path
 
-from easy_thumbnails import files, utils, signals, test, exceptions
+from django.test import TestCase
+from django.utils import six, unittest
+from easy_thumbnails import (
+    files, utils, signals, test, exceptions, models, engine)
 from easy_thumbnails.conf import settings
+from easy_thumbnails.options import ThumbnailOptions
 try:
     from PIL import Image
 except ImportError:
     import Image
+try:
+    from testfixtures import LogCapture
+except ImportError:
+    LogCapture = None
 
 
 class FilesTest(test.BaseTest):
@@ -49,6 +61,12 @@ class FilesTest(test.BaseTest):
         self.remote_storage.delete_temporary_storage()
         super(FilesTest, self).tearDown()
 
+    def assertRegex(self, *args, **kwargs):
+        func = getattr(super(FilesTest, self), 'assertRegex', None)
+        if func is None:
+            func = self.assertRegexpMatches
+        return func(*args, **kwargs)
+
     def test_tag(self):
         local = self.thumbnailer.get_thumbnail({'size': (100, 100)})
         remote = self.remote_thumbnailer.get_thumbnail({'size': (100, 100)})
@@ -64,7 +82,15 @@ class FilesTest(test.BaseTest):
         self.assertEqual(
             remote.tag(use_size=False), '<img alt="" src="%s" />' % remote.url)
 
-        # Thumbnails on remote storage don't get dimensions...
+        # Even a remotely generated thumbnail has the dimensions cached if it
+        # was just created.
+        self.assertEqual(
+            remote.tag(),
+            '<img alt="" height="75" src="%s" width="100" />' % remote.url)
+
+        # Future requests to thumbnails on remote storage don't get
+        # dimensions...
+        remote = self.remote_thumbnailer.get_thumbnail({'size': (100, 100)})
         self.assertEqual(
             remote.tag(), '<img alt="" src="%s" />' % remote.url)
         # ...unless explicitly requested.
@@ -77,6 +103,16 @@ class FilesTest(test.BaseTest):
             local.tag(**{'rel': 'A&B', 'class': 'fish'}),
             '<img alt="" class="fish" height="75" rel="A&amp;B" '
             'src="%s" width="100" />' % local.url)
+
+    def test_tag_cached_dimensions(self):
+        settings.THUMBNAIL_CACHE_DIMENSIONS = True
+        self.remote_thumbnailer.get_thumbnail({'size': (100, 100)})
+
+        # Look up thumbnail again to ensure dimensions are a *really* cached.
+        remote = self.remote_thumbnailer.get_thumbnail({'size': (100, 100)})
+        self.assertEqual(
+            remote.tag(),
+            '<img alt="" height="75" src="%s" width="100" />' % remote.url)
 
     def test_transparent_thumbnailing(self):
         thumb_file = self.thumbnailer.get_thumbnail(
@@ -162,6 +198,102 @@ class FilesTest(test.BaseTest):
         thumb = Image.open(hires_thumb_file)
         self.assertEqual(thumb.size, (200, 150))
 
+    def test_subsampling(self):
+        samplings = {
+            0: (1, 1, 1, 1, 1, 1),
+            1: (2, 1, 1, 1, 1, 1),
+            2: (2, 2, 1, 1, 1, 1),
+        }
+        thumb = self.ext_thumbnailer.get_thumbnail({'size': (100, 100)})
+        im = Image.open(thumb.path)
+        self.assertNotIn('ss', thumb.name)
+        sampling = im.layer[0][1:3] + im.layer[1][1:3] + im.layer[2][1:3]
+        self.assertEqual(sampling, samplings[2])
+
+        thumb = self.ext_thumbnailer.get_thumbnail(
+            {'size': (100, 100), 'subsampling': 1})
+        im = Image.open(thumb.path)
+        self.assertIn('ss1', thumb.name)
+        sampling = im.layer[0][1:3] + im.layer[1][1:3] + im.layer[2][1:3]
+        self.assertEqual(sampling, samplings[1])
+
+        thumb = self.ext_thumbnailer.get_thumbnail(
+            {'size': (100, 100), 'subsampling': 0})
+        im = Image.open(thumb.path)
+        self.assertIn('ss0', thumb.name)
+        sampling = im.layer[0][1:3] + im.layer[1][1:3] + im.layer[2][1:3]
+        self.assertEqual(sampling, samplings[0])
+
+    def test_default_subsampling(self):
+        settings.THUMBNAIL_DEFAULT_OPTIONS = {'subsampling': 1}
+        thumb = self.ext_thumbnailer.get_thumbnail({'size': (100, 100)})
+        im = Image.open(thumb.path)
+        self.assertIn('ss1', thumb.name)
+        sampling = im.layer[0][1:3] + im.layer[1][1:3] + im.layer[2][1:3]
+        self.assertEqual(sampling, (2, 1, 1, 1, 1, 1))
+
+    def test_high_resolution_force_off(self):
+        self.ext_thumbnailer.thumbnail_high_resolution = True
+        thumb = self.ext_thumbnailer.get_thumbnail(
+            {'size': (100, 100), 'HIGH_RESOLUTION': False})
+        base, ext = path.splitext(thumb.path)
+        hires_thumb_file = ''.join([base + '@2x', ext])
+        self.assertFalse(path.exists(hires_thumb_file))
+
+    def test_high_resolution_force(self):
+        thumb = self.ext_thumbnailer.get_thumbnail(
+            {'size': (100, 100), 'HIGH_RESOLUTION': True})
+        base, ext = path.splitext(thumb.path)
+        hires_thumb_file = ''.join([base + '@2x', ext])
+        self.assertTrue(path.isfile(hires_thumb_file))
+        thumb = Image.open(hires_thumb_file)
+        self.assertEqual(thumb.size, (200, 150))
+
+    def test_highres_infix(self):
+        self.ext_thumbnailer.thumbnail_high_resolution = True
+        self.ext_thumbnailer.thumbnail_highres_infix = '_2x'
+        thumb = self.ext_thumbnailer.get_thumbnail({'size': (100, 100)})
+        base, ext = path.splitext(thumb.path)
+        hires_thumb_file = ''.join([base + '_2x', ext])
+        self.assertTrue(path.isfile(hires_thumb_file))
+        thumb = Image.open(hires_thumb_file)
+        self.assertEqual(thumb.size, (200, 150))
+
+    @unittest.skipIf(
+        'easy_thumbnails.optimize' not in settings.INSTALLED_APPS,
+        'optimize app not installed')
+    @unittest.skipIf(LogCapture is None, 'testfixtures not installed')
+    def test_postprocessor(self):
+        """use a mock image optimizing post processor doing nothing"""
+        settings.THUMBNAIL_OPTIMIZE_COMMAND = {
+            'png': 'easy_thumbnails/tests/mockoptim.py {filename}'}
+        with LogCapture() as logcap:
+            self.ext_thumbnailer.thumbnail_extension = 'png'
+            self.ext_thumbnailer.get_thumbnail({'size': (10, 10)})
+            actual = tuple(logcap.actual())[0]
+            self.assertEqual(actual[0], 'easy_thumbnails.optimize')
+            self.assertEqual(actual[1], 'INFO')
+            self.assertRegex(
+                actual[2],
+                '^easy_thumbnails/tests/mockoptim.py [^ ]+ returned nothing$')
+
+    @unittest.skipIf(
+        'easy_thumbnails.optimize' not in settings.INSTALLED_APPS,
+        'optimize app not installed')
+    @unittest.skipIf(LogCapture is None, 'testfixtures not installed')
+    def test_postprocessor_fail(self):
+        """use a mock image optimizing post processor doing nothing"""
+        settings.THUMBNAIL_OPTIMIZE_COMMAND = {
+            'png': 'easy_thumbnails/tests/mockoptim_fail.py {filename}'}
+        with LogCapture() as logcap:
+            self.ext_thumbnailer.thumbnail_extension = 'png'
+            self.ext_thumbnailer.get_thumbnail({'size': (10, 10)})
+            actual = tuple(logcap.actual())[0]
+            self.assertEqual(actual[0], 'easy_thumbnails.optimize')
+            self.assertEqual(actual[1], 'ERROR')
+            self.assertRegex(
+                actual[2], r'^Command\ .+returned non-zero exit status 1$')
+
     def test_USE_TZ(self):
         settings.USE_TZ = True
         self.thumbnailer.get_thumbnail({'size': (10, 20)})
@@ -172,13 +304,70 @@ class FilesTest(test.BaseTest):
     def test_thumbnailfile_options(self):
         opts = {'size': (50, 50), 'crop': True, 'upscale': True}
         thumb = self.thumbnailer.get_thumbnail(opts)
-        self.assertEqual(thumb.thumbnail_options, opts)
+        self.assertEqual(thumb.thumbnail_options, ThumbnailOptions(opts))
+
+    def test_get_thumbnail_name(self):
+        opts = {
+            'size': (50, 50), 'crop': 'smart', 'upscale': True,
+            'target': (10, 10)}
+        self.assertEqual(
+            self.thumbnailer.get_thumbnail_name(opts),
+            'test.jpg.50x50_q85_crop-smart_target-10,10_upscale.jpg')
 
     def test_default_options_setting(self):
         settings.THUMBNAIL_DEFAULT_OPTIONS = {'crop': True}
         opts = {'size': (50, 50)}
         thumb = self.thumbnailer.get_thumbnail(opts)
         self.assertEqual((thumb.width, thumb.height), (50, 50))
+
+    def test_dimensions_of_cached_image(self):
+        opts = {'size': (50, 50)}
+        thumb = self.thumbnailer.get_thumbnail(opts)
+        self.assertEqual((thumb.width, thumb.height), (50, 38))
+        # Now the thumb has been created, check that retrieving this still
+        # gives access to the dimensions.
+        thumb = self.thumbnailer.get_thumbnail(opts)
+        self.assertEqual((thumb.width, thumb.height), (50, 38))
+
+    def test_cached_dimensions_of_cached_image(self):
+        settings.THUMBNAIL_CACHE_DIMENSIONS = True
+        opts = {'size': (50, 50)}
+        thumb = self.thumbnailer.get_thumbnail(opts)
+        self.assertEqual((thumb.width, thumb.height), (50, 38))
+        # Now the thumb has been created, check that dimesions are in the
+        # database.
+        dimensions = models.ThumbnailDimensions.objects.all()[0]
+        self.assertEqual(
+            (thumb.width, thumb.height),
+            (dimensions.width, dimensions.height))
+
+    def test_remote_cached_dimensions_queries(self):
+        settings.THUMBNAIL_CACHE_DIMENSIONS = True
+        opts = {'size': (50, 50)}
+        thumb = self.remote_thumbnailer.get_thumbnail(opts)
+        thumb.height   # Trigger dimension caching.
+        # Get thumb again (which now has cached dimensions).
+        thumb = self.remote_thumbnailer.get_thumbnail(opts)
+        with self.assertNumQueries(0):
+            self.assertEqual(thumb.width, 50)
+
+    def test_add_dimension_cache(self):
+        settings.THUMBNAIL_CACHE_DIMENSIONS = True
+        opts = {'size': (50, 50)}
+        thumb = self.thumbnailer.get_thumbnail(opts)
+        self.assertEqual((thumb.width, thumb.height), (50, 38))
+        # Delete the created dimensions.
+        models.ThumbnailDimensions.objects.all().delete()
+        # Now access the thumbnail again.
+        thumb = self.thumbnailer.get_thumbnail(opts)
+        self.assertEqual(models.ThumbnailDimensions.objects.count(), 0)
+        thumb.height
+        dimensions = models.ThumbnailDimensions.objects.get()
+        # and make sure they match when fetched again.
+        thumb = self.thumbnailer.get_thumbnail(opts)
+        self.assertEqual(
+            (thumb.width, thumb.height),
+            (dimensions.width, dimensions.height))
 
     def test_thumbnail_created_signal(self):
 
@@ -239,6 +428,49 @@ class FilesTest(test.BaseTest):
             options = {'size': (10, 20)}
             thumb = self.thumbnailer.get_thumbnail(options, generate=False)
             self.assertEqual(thumb, None)
-            self.assertEqual(self.thumbnailer.missed_signal, options)
+            self.assertEqual(
+                self.thumbnailer.missed_signal, ThumbnailOptions(options))
         finally:
             signals.thumbnail_created.disconnect(signal_handler)
+
+
+class FakeSourceGenerator(object):
+
+    def __init__(self, fail=False):
+        self.fail = fail
+
+    def __call__(self, source, **kwargs):
+        if self.fail:
+            raise ValueError("Fake source generator failed")
+        return source
+
+
+class EngineTest(TestCase):
+
+    def setUp(self):
+        self.source = BytesIO(six.b('file-contents'))
+
+    def test_single_fail(self):
+        source_generators = [FakeSourceGenerator(fail=True)]
+        self.assertRaises(ValueError, engine.generate_source_image,
+            self.source, {}, source_generators, fail_silently=False)
+
+    def test_single_silent_fail(self):
+        source_generators = [FakeSourceGenerator(fail=True)]
+        image = engine.generate_source_image(
+            self.source, {}, source_generators)
+        self.assertEqual(image, None)
+
+    def test_multiple_fail(self):
+        source_generators = [
+            FakeSourceGenerator(fail=True), FakeSourceGenerator(fail=True)]
+        self.assertRaises(engine.NoSourceGenerator,
+            engine.generate_source_image,
+            self.source, {}, source_generators, fail_silently=False)
+
+    def test_multiple_silent_fail(self):
+        source_generators = [
+            FakeSourceGenerator(fail=True), FakeSourceGenerator(fail=True)]
+        image = engine.generate_source_image(
+            self.source, {}, source_generators)
+        self.assertEqual(image, None)

@@ -329,7 +329,7 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
         member = Member.objects.get(name=new_name)
         self.assertEqual(member.email, u"")
         self.assertEqual(member.postcode, u"")
-        self.assertEqual(member.mailout, False)
+        self.assertEqual(member.is_member, False)
 
         self.assertContains(response, u"Added member: {0}".format(member.number))
 

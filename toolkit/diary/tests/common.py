@@ -46,11 +46,12 @@ class DiaryTestsMixin(object):
         r3.save()
 
         # Tags:
-        t1 = EventTag(name=u"tag one", read_only=False)
+        t1 = EventTag(name=u"tag one", slug=u"tag-one", read_only=False)
         t1.save()
-        t2 = EventTag(name=u"tag two", read_only=False)
+        t2 = EventTag(name=u"tag two", slug=u"tag-two", read_only=False)
         t2.save()
-        t3 = EventTag(name=u"\u0167ag \u0165hre\u0119", read_only=False)
+        # 'ag-three' is what slugify() gives for that name:
+        t3 = EventTag(name=u"\u0167ag \u0165hre\u0119", slug=u"ag-three", read_only=False)
         t3.save()
 
         """
@@ -81,7 +82,11 @@ class DiaryTestsMixin(object):
         # Events:
         e1 = Event(
             name="Event one title",
+            pricing="PRICING_ONE",
             copy="Event one copy",
+            pre_title="PRETITLE One",
+            post_title="POSTTITLE One",
+            film_information="FILM_INFO_One",
             copy_summary="Event one copy summary",
             duration="01:30:00",
             outside_hire=True,
@@ -91,6 +96,7 @@ class DiaryTestsMixin(object):
         e2 = Event(
             name="Event two title",
             copy="Event\n two\n copy",  # newlines will be stripped at legacy conversion
+            pricing="Pricing TWO",
             copy_summary="Event two\n copy summary",
             duration="01:30:00",
             legacy_id="100",
@@ -100,7 +106,11 @@ class DiaryTestsMixin(object):
 
         e3 = Event(
             name="Event three title",
+            pricing="Pricing THREE",
             copy="Event three Copy",
+            pre_title="PRETITLE THREE",
+            post_title="POSTTITLE THREE",
+            film_information="FILM_INFO_THREE",
             copy_summary="Copy three summary",
             duration="03:00:00",
             notes="Notes",
@@ -112,6 +122,10 @@ class DiaryTestsMixin(object):
         e4 = Event(
             name=u"Event four titl\u0113",
             copy=u"Event four C\u014dpy",
+            pricing=u"\u00a3milliion per thing",
+            pre_title=u"Pretitle four",
+            post_title=u"Posttitle four",
+            film_information=u"Film info for four",
             copy_summary=u"\u010copy four summary",
             terms=u"Terminal price: \u00a31 / \u20ac3",
             duration="01:00:00",
@@ -241,22 +255,24 @@ class DiaryTestsMixin(object):
         i.save()
 
         # Templates:
-        tmpl = EventTemplate(name="Template 1")
-        tmpl.save()
-        tmpl.roles = [r1]
-        tmpl.tags = [t1]
-        tmpl.save()
+        # One role, one tag, pricing
+        self.tmpl1 = EventTemplate(name="Template 1")
+        self.tmpl1.save()
+        self.tmpl1.roles = [r1]
+        self.tmpl1.tags = [t1]
+        self.tmpl1.pricing = u"Entry: \u00a35 / \u20ac10"
+        self.tmpl1.save()
 
-        tmpl = EventTemplate(name="Template 2")
-        tmpl.save()
-        tmpl.roles = [r2]
-        tmpl.tags = [t2]
-        tmpl.save()
+        # Two roles, two tags
+        self.tmpl2 = EventTemplate(name="Template 2")
+        self.tmpl2.save()
+        self.tmpl2.roles = [r1, r2]
+        self.tmpl2.tags = [t1, t3]
+        self.tmpl2.save()
 
-        tmpl = EventTemplate(name="Template 3")
-        tmpl.save()
-        tmpl.roles = [r1, r2, r3]
-        tmpl.save()
+        # No roles, no tags, no pricing
+        self.tmpl3 = EventTemplate(name="Template 3")
+        self.tmpl3.save()
 
         # Members:
         m1 = Member(name="Member One", email="one@example.com", number="1",

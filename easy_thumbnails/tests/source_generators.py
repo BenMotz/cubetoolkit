@@ -1,10 +1,10 @@
 import base64
-import six
+from django.utils import six
 
 try:
     from cStringIO import cStringIO as BytesIO
 except ImportError:
-    from six import BytesIO
+    from django.utils.six import BytesIO
 
 try:
     from PIL import Image, ImageChops
@@ -45,20 +45,26 @@ class PilImageTest(test.BaseTest):
 
     def test_not_image(self):
         """
-        Non-images are passed silently.
+        Non-images raise an exception.
         """
-        self.assertEqual(
-            source_generators.pil_image(BytesIO(six.b('not an image'))), None)
+        self.assertRaises(
+            IOError,
+            source_generators.pil_image, BytesIO(six.b('not an image')))
 
     def test_nearly_image(self):
         """
-        Broken images are passed silently.
+        Truncated images *don't* raise an exception if they can still be read.
         """
         data = self.create_image(None, None)
+        reference = source_generators.pil_image(data)
+        data.seek(0)
         trunc_data = BytesIO()
         trunc_data.write(data.read()[:-10])
         trunc_data.seek(0)
-        self.assertEqual(source_generators.pil_image(data), None)
+        im = source_generators.pil_image(trunc_data)
+        # im will be truncated, but it should be the same dimensions.
+        self.assertEqual(im.size, reference.size)
+        # self.assertRaises(IOError, source_generators.pil_image, trunc_data)
 
     def test_exif_orientation(self):
         """

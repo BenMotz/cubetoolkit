@@ -1,5 +1,5 @@
 import re
-import six
+from django.utils import six
 
 from django.template import (
     Library, Node, VariableDoesNotExist, TemplateSyntaxError)
@@ -9,9 +9,6 @@ from easy_thumbnails import utils
 from easy_thumbnails.alias import aliases
 from easy_thumbnails.conf import settings
 from easy_thumbnails.files import get_thumbnailer
-
-import logging
-logger = logging.getLogger(__file__)
 
 register = Library()
 
@@ -101,6 +98,16 @@ class ThumbnailNode(Node):
                     raise TemplateSyntaxError(
                         "%r is an invalid quality." % opts['quality'])
                 return self.bail_out(context)
+        # Ensure the subsampling level is an integer.
+        if 'subsampling' in opts:
+            try:
+                opts['subsampling'] = int(opts['subsampling'])
+            except (TypeError, ValueError):
+                if raise_errors:
+                    raise TemplateSyntaxError(
+                        "%r is an invalid subsampling level." %
+                        opts['subsampling'])
+                return self.bail_out(context)
 
         try:
             thumbnail = get_thumbnailer(source).get_thumbnail(opts)
@@ -157,7 +164,13 @@ def thumbnail(parser, token):
 
         {% thumbnail [source] [size] [options] as [variable] %}
 
-    When ``as [variable]`` is used, the tag doesn't output anything.
+    When ``as [variable]`` is used, the tag doesn't output anything. Instead,
+    use the variable like a standard ``ImageFieldFile`` object::
+
+        {% thumbnail obj.picture 200x200 upscale as thumb %}
+        <img href="{{ thumb.url }}"
+             width="{{ thumb.width }}"
+             height="{{ thumb.height }}" />
 
     **Debugging**
 
@@ -227,7 +240,7 @@ def thumbnailer(obj, relative_name=None):
                 {{ photo.square.tag }}
             </a>
         {% else %}
-            <img href="{% static 'template/fallback.png' %}" alt="" />
+            <img src="{% static 'template/fallback.png' %}" alt="" />
         {% endif %}
         {% endwith %}
 
@@ -273,12 +286,11 @@ def thumbnail_url(source, alias):
 
     Example usage::
 
-        <img href="{{ person.photo|thumbnail_url:'small' }}" alt="">
+        <img src="{{ person.photo|thumbnail_url:'small' }}" alt="">
     """
     try:
         thumb = get_thumbnailer(source)[alias]
     except Exception:
-        logger.exception("Failed generating thumbnail for {0}, {1}".format(source, alias))
         return ''
     return thumb.url
 

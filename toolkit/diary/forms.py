@@ -6,7 +6,8 @@ import django.db.models
 from django.conf import settings
 
 # Custom form widgets:
-from toolkit.diary.form_widgets import HtmlTextarea, JQueryDateTimePicker
+from toolkit.diary.form_widgets import (HtmlTextarea, JQueryDateTimePicker,
+                                        ChosenSelectMultiple)
 
 import toolkit.diary.models
 from toolkit.util.ordereddict import OrderedDict
@@ -40,10 +41,27 @@ class EventForm(forms.ModelForm):
                 'rows': 5,  # Arbitrary
                 'placeholder': "Programmer's notes - not visible to public",
                 }),
+            'pricing': forms.TextInput(attrs={
+                'placeholder': (u"e.g. '\u00A30 Full / \u00A30 Concession' "
+                                u"or '\u00A30 advance, \u00A30 on the door'"),
+                }),
+            'film_information': forms.TextInput(attrs={
+                'placeholder': u"e.g. Dir: [director], 1990, USA, 120 mins, Cert: 15",
+                }),
+            'pre_title': forms.TextInput(attrs={
+                'placeholder': (u"Text displayed before / above the event name, "
+                                u" e.g. 'Cube Productions present'"),
+                }),
+            'post_title': forms.TextInput(attrs={
+                'placeholder': (u"Text displayed after / below the event name, "
+                                u" e.g. 'with support from A Band'"),
+                }),
+            'tags': ChosenSelectMultiple(width="70%"),
         }
         order = ('tags', )
-        fields = ('name', 'tags', 'notes', 'duration', 'outside_hire',
-                  'private', 'copy', 'copy_summary', 'terms')
+        fields = ('name', 'tags', 'pricing', 'film_information', 'pre_title',
+                 'post_title', 'notes', 'duration', 'outside_hire', 'private',
+                 'copy', 'copy_summary', 'terms')
 
 
 class MediaItemForm(forms.ModelForm):
@@ -143,7 +161,7 @@ class NewEventForm(forms.Form):
     duration = forms.TimeField(required=True, initial=datetime.time(hour=1))
     number_of_days = forms.IntegerField(min_value=1, max_value=31, required=True, initial=1)
     event_name = forms.CharField(min_length=1, max_length=256, required=True)
-    event_template = forms.ModelChoiceField(queryset=toolkit.diary.models.EventTemplate.objects.all(), required=False)
+    event_template = forms.ModelChoiceField(queryset=toolkit.diary.models.EventTemplate.objects.all(), required=True)
     booked_by = forms.CharField(min_length=1, max_length=64, required=True)
     private = forms.BooleanField(required=False)
     outside_hire = forms.BooleanField(required=False)
@@ -210,3 +228,9 @@ class NewPrintedProgrammeForm(forms.ModelForm):
         self.instance.month = programme_month
 
         return cleaned_data
+
+
+class TagForm(forms.ModelForm):
+    class Meta(object):
+        model = toolkit.diary.models.EventTag
+        fields = ('name',)

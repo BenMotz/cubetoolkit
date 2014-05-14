@@ -5,7 +5,9 @@ from datetime import datetime, date
 
 from django.test import TestCase
 
-from toolkit.diary.models import Showing, Event, PrintedProgramme
+import django.db
+from django.core.exceptions import ValidationError
+from toolkit.diary.models import Showing, Event, PrintedProgramme, EventTag
 
 from .common import DiaryTestsMixin
 
@@ -100,13 +102,13 @@ class EventModelNonLegacyCopy(TestCase):
 
     def test_plaintext_copy(self):
         expected = (
-            u"Simple & tidy HTML/unicode \u00a9\u014dpy\n\n"
+            u"Simple & tidy HTML/unicode \u00a9\u014dpy \n\n"
             u"With a link!: http://example.com/foo/\n\n"
             u"And another! link!: https://example.com/bar/"
-            # The extra \n after the first two \xa3 is from the line wrapping:
-            u" and some equivalent things; \u00a3 \u00a3\n\u00a3\n\n"
+            u" and some equivalent things; \u00a3 \u00a3 \u00a3  \n\n"
         )
         self.assertEqual(self.event.copy_plaintext, expected)
+
 
 class EventModelLegacyCopy(TestCase):
 
@@ -146,12 +148,13 @@ class EventModelLegacyCopy(TestCase):
         )
         self.assertEqual(self.event.copy_plaintext, expected)
 
+
 class PrintedProgrammeModelTests(TestCase):
 
     def test_month_ok(self):
         pp = PrintedProgramme(
             programme="/foo/bar",
-            month = date(2010, 2, 1)
+            month=date(2010, 2, 1)
         )
         pp.save()
 
@@ -161,10 +164,210 @@ class PrintedProgrammeModelTests(TestCase):
     def test_month_normalised(self):
         pp = PrintedProgramme(
             programme="/foo/bar",
-            month = date(2010, 2, 2)
+            month=date(2010, 2, 2)
         )
         pp.save()
 
         pp = PrintedProgramme.objects.get(pk=pp.pk)
         self.assertEqual(pp.month, date(2010, 2, 1))
 
+
+class EventPricingFromTemplate(DiaryTestsMixin, TestCase):
+    def test_set_pricing_from_template(self):
+        # No pricing specified when creating the event, and pricing specified
+        # in the template:
+        new_event = Event(
+            name=u"Event Title",
+            template=self.tmpl1,
+        )
+        self.assertEqual(new_event.pricing, u"Entry: \u00a35 / \u20ac10")
+        new_event.save()
+        self.assertEqual(new_event.pricing, u"Entry: \u00a35 / \u20ac10")
+
+    def test_dont_set_pricing_from_template(self):
+        # Pricing specified when creating the event, and pricing specified in
+        # the template:
+        new_event = Event(
+            name=u"Event Title",
+            pricing=u"Actual pricing",
+            template=self.tmpl1,
+        )
+        self.assertEqual(new_event.pricing, u"Actual pricing")
+        new_event.save()
+        self.assertEqual(new_event.pricing, u"Actual pricing")
+
+    def test_cant_set_pricing_from_template(self):
+        # Pricing specified when creating the event, and no pricing specified
+        # in the template:
+        new_event = Event(
+            name=u"Event Title",
+            pricing=u"Actual pricing",
+            template=self.tmpl3,
+        )
+        self.assertEqual(new_event.pricing, u"Actual pricing")
+        new_event.save()
+        self.assertEqual(new_event.pricing, u"Actual pricing")
+
+    def test_set_from_template_no_pricing(self):
+        # No pricing specified when creating the event, and no pricing
+        # specified in the template:
+        new_event = Event(
+            name=u"Event Title",
+            template=self.tmpl3,
+        )
+        self.assertEqual(new_event.pricing, u"")
+        new_event.save()
+        self.assertEqual(new_event.pricing, u"")
+
+    def test_no_template(self):
+        # Pricing specified when creating the event, and no pricing specified
+        # in the template:
+        new_event = Event(
+            name=u"Event Title",
+            pricing=u"Actual pricing",
+        )
+        self.assertEqual(new_event.pricing, u"Actual pricing")
+        new_event.save()
+        self.assertEqual(new_event.pricing, u"Actual pricing")
+
+
+class EventTagsFromTemplate(DiaryTestsMixin, TestCase):
+    def test_set_one_tag_from_template(self):
+        new_event = Event(
+            name=u"Event Title",
+            template=self.tmpl1,
+        )
+        new_event.save()
+        # Tags shouldn't have been set yet:
+        self.assertEqual(new_event.tags.count(), 0)
+
+        new_event.reset_tags_to_default()
+
+        self.assertEqual(new_event.tags.count(), 1)
+        self.assertEqual(new_event.tags.all()[0].name, u"tag one")
+        self.assertEqual(new_event.tags.all()[0].slug, u"tag-one")
+
+    def test_set_two_tags_from_template(self):
+        new_event = Event(
+            name=u"Event Title",
+            template=self.tmpl2,
+        )
+        new_event.save()
+        # Tags shouldn't have been set yet:
+        self.assertEqual(new_event.tags.count(), 0)
+
+        new_event.reset_tags_to_default()
+
+        self.assertEqual(new_event.tags.count(), 2)
+        self.assertEqual(new_event.tags.all()[0].name, u"tag one")
+        self.assertEqual(new_event.tags.all()[0].slug, u"tag-one")
+        self.assertEqual(new_event.tags.all()[1].name, u"\u0167ag \u0165hre\u0119")
+        self.assertEqual(new_event.tags.all()[1].slug, u"ag-three")
+
+    def test_set_no_tags_from_template(self):
+        new_event = Event(
+            name=u"Event Title",
+            template=self.tmpl3,
+        )
+        new_event.save()
+        # Tags shouldn't have been set yet:
+        self.assertEqual(new_event.tags.count(), 0)
+
+        new_event.reset_tags_to_default()
+
+        # Still no tags
+        self.assertEqual(new_event.tags.count(), 0)
+
+    def test_set_tags_no_template(self):
+        # No template set, call reset_tags
+        new_event = Event(
+            name=u"Event Title",
+        )
+        new_event.save()
+        self.assertEqual(new_event.tags.count(), 0)
+
+        new_event.reset_tags_to_default()
+
+        self.assertEqual(new_event.tags.count(), 0)
+
+
+class EventTagTests(TestCase):
+    def test_can_delete_not_readonly(self):
+        tag = EventTag(name=u"test", slug=u"test", read_only=False)
+        tag.save()
+        pk = tag.pk
+
+        tag.delete()
+
+        self.assertEqual(EventTag.objects.filter(id=pk).count(), 0)
+
+    def test_cant_delete_readonly(self):
+        tag = EventTag(name=u"test", slug=u"test", read_only=True)
+        tag.save()
+        pk = tag.pk
+
+        tag.delete()
+
+        self.assertEqual(EventTag.objects.filter(id=pk).count(), 1)
+        tag = EventTag.objects.get(id=pk)
+        self.assertEqual(tag.name, "test")
+
+    def test_can_edit_not_readonly(self):
+        tag = EventTag(name=u"test", slug=u"test", read_only=False)
+        tag.save()
+        pk = tag.pk
+        # Try to edit:
+        tag.name = "crispin"
+        tag.save()
+
+        tag = EventTag.objects.get(id=pk)
+        self.assertEqual(tag.name, "crispin")
+
+    def test_cant_edit_readonly(self):
+        tag = EventTag(name=u"test", slug=u"test", read_only=True)
+        tag.save()
+        pk = tag.pk
+        # Try to edit:
+        tag.name = "crispin"
+        tag.save()
+
+        tag = EventTag.objects.get(id=pk)
+        self.assertEqual(tag.name, "test")
+
+    def test_clean_case(self):
+        tag = EventTag(name=u"BIGlettersHERE")
+        tag.clean()
+        self.assertEqual(tag.name, "biglettershere")
+        self.assertEqual(tag.slug, "biglettershere")
+
+    def test_slugify(self):
+        tag = EventTag(name=u"with space", slug=u"")
+        tag.clean()
+        self.assertEqual(tag.name, "with space")
+        self.assertEqual(tag.slug, "with-space")
+
+        tag = EventTag(name=u"with&ampersand")
+        tag.clean()
+        self.assertEqual(tag.name, "with&ampersand")
+        self.assertEqual(tag.slug, "withampersand")
+
+        tag = EventTag(name=u"with?questionmark")
+        tag.clean()
+        self.assertEqual(tag.name, "with?questionmark")
+        self.assertEqual(tag.slug, "withquestionmark")
+
+        tag = EventTag(name=u"with#hash")
+        tag.clean()
+        self.assertEqual(tag.name, "with#hash")
+        self.assertEqual(tag.slug, "withhash")
+
+    def test_reject_blank(self):
+        tag = EventTag(name=u"")
+        self.assertRaises(ValidationError, tag.full_clean)
+
+    def test_must_be_unique(self):
+        t1 = EventTag(name=u"jim", slug=u"jim")
+        t1.save()
+
+        t2 = EventTag(name=u"jim!", slug=u"jim")
+        self.assertRaises(django.db.IntegrityError, t2.save)
