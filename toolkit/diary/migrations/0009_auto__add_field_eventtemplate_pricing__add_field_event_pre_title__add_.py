@@ -87,7 +87,8 @@ class Migration(SchemaMigration):
             'Meta': {'ordering': "['name']", 'object_name': 'EventTag', 'db_table': "'EventTags'"},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '32'}),
-            'read_only': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
+            'read_only': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '50'})
         },
         u'diary.eventtemplate': {
             'Meta': {'object_name': 'EventTemplate', 'db_table': "'EventTemplates'"},
