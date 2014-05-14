@@ -42,6 +42,7 @@ class Migration(SchemaMigration):
             'copy_summary': ('django.db.models.fields.TextField', [], {'max_length': '4096', 'null': 'True', 'blank': 'True'}),
             'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             'duration': ('django.db.models.fields.TimeField', [], {'null': 'True'}),
+            'film_information': ('django.db.models.fields.CharField', [], {'max_length': '256', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'legacy_copy': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'legacy_id': ('django.db.models.fields.CharField', [], {'max_length': '256', 'null': 'True'}),
@@ -49,6 +50,9 @@ class Migration(SchemaMigration):
             'name': ('django.db.models.fields.CharField', [], {'max_length': '256'}),
             'notes': ('django.db.models.fields.TextField', [], {'max_length': '4096', 'null': 'True', 'blank': 'True'}),
             'outside_hire': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'post_title': ('django.db.models.fields.CharField', [], {'max_length': '256', 'blank': 'True'}),
+            'pre_title': ('django.db.models.fields.CharField', [], {'max_length': '256', 'blank': 'True'}),
+            'pricing': ('django.db.models.fields.CharField', [], {'max_length': '256', 'blank': 'True'}),
             'private': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'tags': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['diary.EventTag']", 'symmetrical': 'False', 'db_table': "'Event_Tags'", 'blank': 'True'}),
             'template': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'template'", 'null': 'True', 'to': u"orm['diary.EventTemplate']"}),
@@ -56,16 +60,18 @@ class Migration(SchemaMigration):
             'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
         },
         u'diary.eventtag': {
-            'Meta': {'object_name': 'EventTag', 'db_table': "'EventTags'"},
+            'Meta': {'ordering': "['name']", 'object_name': 'EventTag', 'db_table': "'EventTags'"},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'unique': 'True', 'max_length': '32'}),
-            'read_only': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
+            'read_only': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
+            'slug': ('django.db.models.fields.SlugField', [], {'unique': 'True', 'max_length': '50'})
         },
         u'diary.eventtemplate': {
-            'Meta': {'object_name': 'EventTemplate', 'db_table': "'EventTemplates'"},
+            'Meta': {'ordering': "['name']", 'object_name': 'EventTemplate', 'db_table': "'EventTemplates'"},
             'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '32'}),
+            'pricing': ('django.db.models.fields.CharField', [], {'max_length': '256', 'blank': 'True'}),
             'roles': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['diary.Role']", 'db_table': "'EventTemplates_Roles'", 'symmetrical': 'False'}),
             'tags': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['diary.EventTag']", 'symmetrical': 'False', 'db_table': "'EventTemplate_Tags'", 'blank': 'True'}),
             'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
@@ -94,7 +100,7 @@ class Migration(SchemaMigration):
             'standard': ('django.db.models.fields.BooleanField', [], {'default': 'False'})
         },
         u'diary.rotaentry': {
-            'Meta': {'object_name': 'RotaEntry', 'db_table': "'RotaEntries'"},
+            'Meta': {'ordering': "['role', 'rank']", 'object_name': 'RotaEntry', 'db_table': "'RotaEntries'"},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'rank': ('django.db.models.fields.IntegerField', [], {'default': '1'}),
             'required': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
@@ -130,7 +136,7 @@ class Migration(SchemaMigration):
             'is_member': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'mailout': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'mailout_failed': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'mailout_key': ('django.db.models.fields.CharField', [], {'default': "'SOECLNfD30FOWrNrSZOTOmULKCIyYwfO'", 'max_length': '32'}),
+            'mailout_key': ('django.db.models.fields.CharField', [], {'default': "'6CgUCPJaE3Bgl0SAJoB2ux48KMijIJia'", 'max_length': '32'}),
             'name': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
             'notes': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
             'number': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
