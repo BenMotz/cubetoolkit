@@ -1,0 +1,99 @@
+{% extends "base_public.html" %}
+{% load thumbnail %}
+
+{% block title %}
+Cube Programme{% if extra_title %}: {{ extra_title }}{% endif %}
+{% endblock %}
+
+{% block css %}
+{{ block.super }}
+<link rel="stylesheet" href="{{ STATIC_URL }}diary/css/programme.css" type="text/css">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+{% endblock %}
+{% block header %}
+{{ block.super }}
+
+<div class="header group">
+    <div class="col span_1_of_6">
+        <a href="http://www.cubecinema.com/"><img id="cubelogo" src="{{ STATIC_URL }}diary/cube_microplex_logo_178.png" alt="Cube Programme"></a>
+    </div>
+</div>
+<div class="header group">
+    <div class="col span_6_of_6">
+        <div id="programmelinks">
+       {% if event_type %}
+           <strong>Events tagged "{{ event_type }}"</strong><br>
+       {% endif %}
+       <a href="{% url "view-this-week" %}">THIS WEEK</a> &nbsp; | &nbsp;
+       <a href="{% url "view-next-week" %}">NEXT WEEK</a> &nbsp; | &nbsp;
+       <a href="{% url "view-this-month" %}">THIS MONTH</a> &nbsp; | &nbsp;
+       <a href="{% url "view-next-month" %}">NEXT MONTH</a>  &nbsp; &#9632; &nbsp;
+       <a href="{% url "default-view" %}"> EVERYTHING </a><br>
+       <br>
+       {% if printed_programmes %}
+           {% for printed_programme in printed_programmes %}
+           <img src="{{ STATIC_URL }}diary/tiny_pdf_file_icon.gif" alt="Link to PDF"><a href="{{ printed_programme.programme.url }}">Printed programme for {{ printed_programme.month|date:"M Y" }}</a><br>
+           {% endfor %}
+       {% endif %}
+       </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block body %}
+
+<div class="programme">
+    {% if showings|length == 0 %}
+    <p>
+    {% if event_type %}
+    Couldn't find anything tagged <strong>{{ event_type }}</strong>
+    {% else %}
+    Nothing on between {{ start|date:"l j M Y"  }} and {{ end|date:"l j M Y" }}
+    {% endif %}
+    </p>
+    {% endif %}
+    <div id="listing">
+    {% for event, showings in events.iteritems %}
+        {% cycle "<div class='section group'><div class='col span_1_of_3'>" "<div class='col span_1_of_3'>" "<div class='col span_1_of_3'>" %}
+            <div class="showing" id="event_{{ event.id }}">
+                {% with event.media.all.0 as media_item %}{% if media_item %}<a href="{% url "single-event-view" event.id %}"><img src="{{ media_item.media_file|thumbnail_url:'indexview' }}" alt="Picture for event {{ event.name }}"></a>{% endif %}{% endwith %}
+                {% if event.tags.all %}<span class="tags">{% for tag in event.tags.all %}<a href="{% url "type-view" tag.slug %}" class="tag_{{tag.name}}">{{tag.name}}</a> {% endfor %}</span>{% endif %}
+                <h1>
+                    <a href="{% url "single-event-view" event.id %}"><span class="pre_title">
+                        {{ event.pre_title }}
+                    </span>
+                    {{ event.name }}
+                    <span class="post_title">
+                        {{ event.post_title }}
+                    </span>
+                    </a>
+                </h1>
+                <div class="event_details">
+                    <p class="start_and_pricing">
+                        {% for showing in showings %}
+                        {% if showing.cancelled %}<span class="cancelled">{% endif %}
+                        {{ showing.start|date:"D j F H:i" }}
+                        {% if showing.cancelled %} (cancelled)</span>{% endif %}
+                        {% if showing.discounted %}<abbr class="discounted" title="Ticket Tout Tuesday">(TTT)</abbr>{% endif %}<br>
+                        {% endfor %}
+                    </p>
+                    <p class="copy">{{ event.copy_summary|truncatewords:30 }} [<a class="more" href="{% url "single-event-view" event.id %}">more...</a>]</p>
+                </div>
+            </div>
+            {% cycle "</div>" "</div>" "</div></div>" %}
+            {# Note that the cycle won't close the last div if the number of items isn't a multipe of 3, so the following is needed: #}
+            {% if forloop.last and not forloop.counter|divisibleby:"3" %}
+            </div>
+            {% endif %}
+    {% endfor %}
+    </div>
+</div>
+{% endblock %}
+
+{% block footer %}
+{{ block.super }}
+<div class="footer">
+    <p><a href="http://www.cubecinema.com/">Home</a> &nbsp; | &nbsp; <a href="http://www.cubecinema.com/cubewebsite/directions.html">Directions</a> &nbsp; | &nbsp; <a href="http://www.cubecinema.com/cubewebsite/contact.html">Contact</a> &nbsp; | &nbsp; <a href="/freehold">Freehold Project</a>  </p>
+</div>
+
+{% endblock %}

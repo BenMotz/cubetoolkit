@@ -1,5 +1,9 @@
 from __future__ import absolute_import
 import json
+import pytz
+from datetime import datetime
+
+from mock import patch
 
 from django.test import TestCase
 from django.core.urlresolvers import reverse, resolve
@@ -21,21 +25,23 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         url = reverse("default-view")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_showing_index.html")
 
     def test_view_by_type(self):
         url = reverse("type-view", kwargs={"event_type": "film"})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_showing_index.html")
 
     def test_view_by_year(self):
         url = reverse("year-view", kwargs={"year": "2013"})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_showing_index.html")
 
         # Should test the contents better, I suspect...
         self.assertContains(response, u'Event three title')
         self.assertContains(response, u'Copy three summary')
-        self.assertContains(response, u'Pricing THREE')
         self.assertContains(response, u'PRETITLE THREE')
         self.assertContains(response, u'POSTTITLE THREE')
         # Not confirmed / private:
@@ -46,16 +52,19 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         url = reverse("month-view", kwargs={"year": "2010", "month": "12"})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_showing_index.html")
 
     def test_view_by_day(self):
         url = reverse("day-view", kwargs={"year": "2010", "month": "12", "day": "31"})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_showing_index.html")
 
     def test_view_by_tag_nothing_found(self):
         url = reverse("type-view", kwargs={"event_type": "folm"})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_showing_index.html")
         self.assertContains(response,
                             "<p>Couldn't find anything tagged <strong>folm</strong></p>",
                             html=True)
@@ -64,11 +73,65 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         url = reverse("year-view", kwargs={"year": "2093"})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_showing_index.html")
         self.assertContains(
             response,
             "<p>Nothing on between Thursday 1 Jan 2093 and Friday 1 Jan 2094</p>",
             html=True
         )
+
+    @patch('django.utils.timezone.now')
+    def test_view_this_week(self, now_patch):
+        now_patch.return_value = pytz.timezone("Europe/London").localize(datetime(2013, 4, 1, 11, 00))
+
+        url = reverse("view-this-week")
+        response = self.client.get(url)
+        self.assertTemplateUsed(response, "view_showing_index.html")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Wed 3 April 19:00")
+
+    @patch('django.utils.timezone.now')
+    def test_view_this_month(self, now_patch):
+        now_patch.return_value = pytz.timezone("Europe/London").localize(datetime(2013, 4, 1, 11, 00))
+
+        url = reverse("view-this-month")
+        response = self.client.get(url)
+
+        self.assertTemplateUsed(response, "view_showing_index.html")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Event two title")
+        self.assertContains(response, '<span class="cancelled"> Wed 3 April 19:00 (cancelled)</span>', html=True)
+        self.assertContains(response, "Event two copy summary")
+
+    @patch('django.utils.timezone.now')
+    def test_view_next_week(self, now_patch):
+        now_patch.return_value = pytz.timezone("Europe/London").localize(datetime(2013, 4, 1, 11, 00))
+
+        url = reverse("view-next-week")
+        response = self.client.get(url)
+
+        self.assertTemplateUsed(response, "view_showing_index.html")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "PRETITLE THREE")
+        self.assertContains(response, "Event three title")
+        self.assertContains(response, "POSTTITLE THREE")
+        self.assertContains(response, "Sat 13 April 18:00")
+        self.assertContains(response, "Copy three summary")
+
+    @patch('django.utils.timezone.now')
+    def test_view_next_month(self, now_patch):
+        now_patch.return_value = pytz.timezone("Europe/London").localize(datetime(2013, 3, 1, 11, 00))
+
+        url = reverse("view-next-month")
+        response = self.client.get(url)
+
+        self.assertTemplateUsed(response, "view_showing_index.html")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "PRETITLE THREE")
+        self.assertContains(response, "Event three title")
+        self.assertContains(response, "POSTTITLE THREE")
+        self.assertContains(response, "Sat 13 April 18:00")
+        self.assertContains(response, "Copy three summary")
 
     # JSON day data:
     def test_day_json(self):
@@ -113,8 +176,8 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertContains(response, u'Event <br>\n two <br>\n copy')
         self.assertEqual(response.status_code, 200)
         # Some showings *should* be listed:
-        self.assertContains(response, "Tue 2nd Apr, 7 p.m.")
-        self.assertContains(response, "Wed 3rd Apr, 7 p.m.")
+        self.assertContains(response, "Tue 2nd Apr | 7 p.m.")
+        self.assertContains(response, "Wed 3rd Apr | 7 p.m.")
         # Some showings should *not* be listed:
         self.assertNotContains(response, "1 Apr")
         self.assertNotContains(response, "4 Apr")

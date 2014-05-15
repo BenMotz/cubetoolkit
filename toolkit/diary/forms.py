@@ -161,7 +161,7 @@ class NewEventForm(forms.Form):
     duration = forms.TimeField(required=True, initial=datetime.time(hour=1))
     number_of_days = forms.IntegerField(min_value=1, max_value=31, required=True, initial=1)
     event_name = forms.CharField(min_length=1, max_length=256, required=True)
-    event_template = forms.ModelChoiceField(queryset=toolkit.diary.models.EventTemplate.objects.all(), required=False)
+    event_template = forms.ModelChoiceField(queryset=toolkit.diary.models.EventTemplate.objects.all(), required=True)
     booked_by = forms.CharField(min_length=1, max_length=64, required=True)
     private = forms.BooleanField(required=False)
     outside_hire = forms.BooleanField(required=False)
