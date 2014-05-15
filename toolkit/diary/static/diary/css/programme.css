@@ -49,6 +49,7 @@ body {
     font-weight: 400;
     font-size: 0.7em;
     line-height: 1;
+    text-transform: none;
 }
 
 #listing h1 {
