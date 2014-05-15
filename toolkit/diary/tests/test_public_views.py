@@ -88,7 +88,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         response = self.client.get(url)
         self.assertTemplateUsed(response, "view_showing_index.html")
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Wed 3 April 19:00")
+        self.assertContains(response, "Wed 3 April | 19:00")
 
     @patch('django.utils.timezone.now')
     def test_view_this_month(self, now_patch):
@@ -100,7 +100,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "view_showing_index.html")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Event two title")
-        self.assertContains(response, '<span class="cancelled"> Wed 3 April 19:00 (cancelled)</span>', html=True)
+        self.assertContains(response, '<span class="cancelled"> Wed 3 April | 19:00 (cancelled)</span>', html=True)
         self.assertContains(response, "Event two copy summary")
 
     @patch('django.utils.timezone.now')
@@ -115,7 +115,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertContains(response, "PRETITLE THREE")
         self.assertContains(response, "Event three title")
         self.assertContains(response, "POSTTITLE THREE")
-        self.assertContains(response, "Sat 13 April 18:00")
+        self.assertContains(response, "Sat 13 April | 18:00")
         self.assertContains(response, "Copy three summary")
 
     @patch('django.utils.timezone.now')
@@ -130,7 +130,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertContains(response, "PRETITLE THREE")
         self.assertContains(response, "Event three title")
         self.assertContains(response, "POSTTITLE THREE")
-        self.assertContains(response, "Sat 13 April 18:00")
+        self.assertContains(response, "Sat 13 April | 18:00")
         self.assertContains(response, "Copy three summary")
 
     # JSON day data:
