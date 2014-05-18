@@ -21,6 +21,7 @@ http://www.cubecinema.com/programme/
 {% if showing.event.pre_title %}{{ showing.event.pre_title }}:
 {% endif %}{{ showing.event.name|upper }}
  {{ showing.event.post_title }}
+{% if showing.event.film_information %}{{ showing.event.film_information }} {% endif %}
 
 {% filterblanklines %}
 {% for showing in showing.event.showings.public %}
