@@ -24,7 +24,7 @@ http://www.cubecinema.com/programme/
 
 {% filterblanklines %}
 {% for showing in showing.event.showings.public %}
-{{ showing.start|date:"H:i d/m/Y" }}
+{{ showing.start|date:"D j F, g:i A" }}
 {% endfor %}
 {% endfilterblanklines %}
 {% if showing.event.pricing %}Tickets: {{ showing.event.pricing }}{% endif %}
