@@ -41,7 +41,11 @@ Cube: {{ event.name }}
                 {% for showing in showings %}
                     {% if showing.cancelled %}<span class="cancelled">{% endif %}
                     {% if showing.discounted %}<span class="discounted">{% endif %}
-                    {{ showing.start|date:"D jS M | P" }}
+                    {% if showing.start.year != current_year %}
+                        {{ showing.start|date:"D jS M Y | P" }}
+                    {% else %}
+                        {{ showing.start|date:"D jS M | P" }}
+                    {% endif %}
                     {% if showing.discounted %} <abbr title="Ticket Tout Tuesday">(TTT)</abbr></span>{% endif %}
                     {% if showing.cancelled %} (cancelled)</span>{% endif %}
                     <br>
