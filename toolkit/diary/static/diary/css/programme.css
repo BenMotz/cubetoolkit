@@ -46,9 +46,10 @@ body {
 
 .pre_title, .post_title {
     display: block;
-    font-weight: 500;
-    font-size: 0.8em;
+    font-weight: 400;
+    font-size: 0.7em;
     line-height: 1;
+    text-transform: none;
 }
 
 #listing h1 {
@@ -207,7 +208,7 @@ span.tags .tag_animation { color: #FFAA00; }
 
 /*  REMOVE MARGINS AND PADDING AS ALL GO FULL WIDTH AT 481 PIXELS */
 
-@media only screen and (max-device-width: 481px) {
+@media only screen and (max-width: 481px) {
     .col {
         margin: 1% 0 1% 0%;
     }
@@ -232,7 +233,7 @@ span.tags .tag_animation { color: #FFAA00; }
 
 /*  GO FULL WIDTH AT LESS THAN 481 PIXELS */
 
-@media only screen and (max-device-width: 481px) {
+@media only screen and (max-width: 481px) {
     .span_3_of_3 {
         width: 100%;
     }
@@ -273,7 +274,7 @@ span.tags .tag_animation { color: #FFAA00; }
 
 /*  GO FULL WIDTH AT LESS THAN 481 PIXELS */
 
-@media only screen and (max-device-width: 481px) {
+@media only screen and (max-width: 481px) {
     .span_6_of_6 {
         width: 100%;
     }

@@ -71,6 +71,9 @@ THUMBNAIL_ALIASES = {
         'eventdetail': {
             'size': (800, 800),
         },
+        'editpreview': {
+            'size': (250, 250),
+        }
     },
 }
 SOUTH_MIGRATION_MODULES = {

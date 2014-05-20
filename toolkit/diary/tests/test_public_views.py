@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 import json
 import pytz
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from mock import patch
 
@@ -88,7 +88,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         response = self.client.get(url)
         self.assertTemplateUsed(response, "view_showing_index.html")
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Wed 3 April 19:00")
+        self.assertContains(response, "Wed 3 April | 19:00")
 
     @patch('django.utils.timezone.now')
     def test_view_this_month(self, now_patch):
@@ -100,7 +100,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "view_showing_index.html")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Event two title")
-        self.assertContains(response, '<span class="cancelled"> Wed 3 April 19:00 (cancelled)</span>', html=True)
+        self.assertContains(response, '<span class="cancelled"> Wed 3 April | 19:00 (cancelled)</span>', html=True)
         self.assertContains(response, "Event two copy summary")
 
     @patch('django.utils.timezone.now')
@@ -115,7 +115,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertContains(response, "PRETITLE THREE")
         self.assertContains(response, "Event three title")
         self.assertContains(response, "POSTTITLE THREE")
-        self.assertContains(response, "Sat 13 April 18:00")
+        self.assertContains(response, "Sat 13 April | 18:00")
         self.assertContains(response, "Copy three summary")
 
     @patch('django.utils.timezone.now')
@@ -130,7 +130,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertContains(response, "PRETITLE THREE")
         self.assertContains(response, "Event three title")
         self.assertContains(response, "POSTTITLE THREE")
-        self.assertContains(response, "Sat 13 April 18:00")
+        self.assertContains(response, "Sat 13 April | 18:00")
         self.assertContains(response, "Copy three summary")
 
     # JSON day data:
@@ -164,7 +164,10 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 404)
 
     # Event series view:
-    def test_view_event(self):
+    @patch('django.utils.timezone.now')
+    def test_view_event_this_year(self, now_patch):
+        now_patch.return_value = self._fake_now
+
         url = reverse("single-event-view", kwargs={"event_id": "2"})
         response = self.client.get(url)
 
@@ -179,6 +182,26 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertContains(response, "Tue 2nd Apr | 7 p.m.")
         self.assertContains(response, "Wed 3rd Apr | 7 p.m.")
         # Some showings should *not* be listed:
+        self.assertNotContains(response, "1 Apr")
+        self.assertNotContains(response, "4 Apr")
+        self.assertNotContains(response, "5 Apr")
+
+    @patch('django.utils.timezone.now')
+    def test_view_event_last_year(self, now_patch):
+        # When event is in the distant past, list the year...
+        now_patch.return_value = self._fake_now + timedelta(days=366)
+
+        url = reverse("single-event-view", kwargs={"event_id": "2"})
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_event.html")
+
+        self.assertContains(response, u'Event two title')
+        self.assertContains(response, u'Event <br>\n two <br>\n copy')
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Tue 2nd Apr 2013 | 7 p.m.")
+        self.assertContains(response, "Wed 3rd Apr 2013 | 7 p.m.")
         self.assertNotContains(response, "1 Apr")
         self.assertNotContains(response, "4 Apr")
         self.assertNotContains(response, "5 Apr")

@@ -21,10 +21,11 @@ http://www.cubecinema.com/programme/
 {% if showing.event.pre_title %}{{ showing.event.pre_title }}:
 {% endif %}{{ showing.event.name|upper }}
  {{ showing.event.post_title }}
+{% if showing.event.film_information %}{{ showing.event.film_information }} {% endif %}
 
 {% filterblanklines %}
 {% for showing in showing.event.showings.public %}
-{{ showing.start|date:"H:i d/m/Y" }}
+{{ showing.start|date:"D j F, g:i A" }}
 {% endfor %}
 {% endfilterblanklines %}
 {% if showing.event.pricing %}Tickets: {{ showing.event.pricing }}{% endif %}
