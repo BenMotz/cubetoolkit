@@ -717,9 +717,9 @@ def rota_edit(request):
             days_ahead = 30
 
         end_date = start_date + datetime.timedelta(days=days_ahead)
-        showings = (Showing.objects.filter(cancelled=False)
-                                   .filter(confirmed=True)
-                                   .filter(start__range=[start_date, end_date])
+        showings = (Showing.objects.not_cancelled()
+                                   .confirmed()
+                                   .start_in_range(start_date, end_date)
                                    .order_by('start')
                                    # force sane number of queries:
                                    .prefetch_related('rotaentry_set__role')
@@ -769,7 +769,8 @@ def rota_edit(request):
         # Magic values:
         if selection == u'noselection':
             # --> no action
-            return HttpResponse("No change", status=400, content_type="text/plain")
+            response_text = rota_entry.volunteer.member.name if rota_entry.volunteer else ""
+            return HttpResponse(response_text, status=200, content_type="text/plain")
         if selection == u'deletesignup':
             logger.info("Removing volunteer {0} from rota entry {1}".format(
                 rota_entry.volunteer.pk if rota_entry.volunteer else '[none]',
