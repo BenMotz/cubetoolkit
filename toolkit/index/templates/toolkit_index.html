@@ -26,6 +26,7 @@ Cube Toolkit
     <li><a href="{% url "default-edit" %}">Edit the diary</a></li>
     <li><a href="{% url "view_event_field" field="rota" %}">Print the rota</a></li>
     <li><a href="{% url "view_event_field" field="copy" %}">Copy report</a></li>
+    <li><a href="{% url "view_event_field" field="copy_summary" %}">Copy summary report</a></li>
     <li><a href="{% url "view_event_field" field="terms" %}">Terms report</a></li>
     <li><a href="{% url "edit-printed-programmes" %}">Upload printed programme PDFs</a></li>
 </ul>
@@ -63,7 +64,7 @@ Cube Toolkit
 </ul>
 <hr>
 <p><a href="{% url "create-index-link" %}">Add link</a> &#xb7;
-<a href="{% url "create-index-category" %}">Add link group</a>&#xb7;
+<a href="{% url "create-index-category" %}">Add link group</a> &#xb7;
 <a href="{% url "logout" %}">Log out</a></p>
 
 {% endblock %}
