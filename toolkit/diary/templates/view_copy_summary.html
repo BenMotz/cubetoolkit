@@ -38,10 +38,10 @@ CUBE programme of events - copy summary report
         white-space: pre-line;
     }
     p.pricing {
-        padding-top: 0.05em;
+        padding-bottom: 0.05em;
     }
     p.film_info {
-        padding-bottom: 0.05em;
+        padding-top: 0.05em;
     }
 </style>
 {% endblock %}
@@ -86,8 +86,8 @@ $(document).ready(function() {
 {% if showing.event.pre_title %}<p class="pre_title">{{ showing.event.pre_title }}</p>{% endif %}
 <p class="title">{{ showing.event.name }}</p>
 {% if showing.event.post_title %}<p class="post_title">{{ showing.event.post_title }}</p>{% endif %}
-{% if showing.event.film_information %}<p class="film_info">{{ showing.event.film_information }}</p>{% endif %}
 {% if showing.event.pricing %}<p class="pricing">{{ showing.event.pricing }}</p>{% endif %}
+{% if showing.event.film_information %}<p class="film_info">{{ showing.event.film_information }}</p>{% endif %}
 <p class="copy_summary">{{ showing.event.copy_summary}}</p>
 <p><a href="{% url "edit-event-details" showing.event.id %}">[edit]</a></p>
 {% endifchanged %}
