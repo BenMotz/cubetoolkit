@@ -32,6 +32,7 @@ class SecurityTests(TestCase):
             response = self.client.post(url)
             self.assertRedirects(response, expected_redirect)
 
+
 class TestViews(TestCase):
     # Fairly incomplete set of tests, but good enough
 
@@ -75,7 +76,6 @@ class TestViews(TestCase):
 
         # And login:
         self.assertTrue(self.client.login(username="admin", password="T3stPassword!"))
-
 
     def tearDown(self):
         self.client.logout()
@@ -131,4 +131,3 @@ class TestViews(TestCase):
 
         cat = IndexCategory.objects.get(id=1)
         self.assertEqual(cat.name, 'Category 1 Links!')
-

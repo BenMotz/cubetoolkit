@@ -19,24 +19,21 @@ urlpatterns = patterns(
             # (this data structure) has been defined.
             success_url=functional.lazy(reverse, str)("toolkit-index"),
         )),
-        name='create-index-link'
-    ),
+        name='create-index-link'),
     url('^update/link/(?P<pk>\d+)$',
         write_decorator(generic_edit.UpdateView.as_view(
             model=IndexLink,
             template_name="index_generic_form.html",
             success_url=functional.lazy(reverse, str)("toolkit-index"),
         )),
-        name='update-index-link'
-    ),
+        name='update-index-link'),
     url('^delete/link/(?P<pk>\d+)$',
         write_decorator(generic_edit.DeleteView.as_view(
             model=IndexLink,
             template_name="index_delete_form.html",
             success_url=functional.lazy(reverse, str)("toolkit-index"),
         )),
-        name='delete-index-link'
-    ),
+        name='delete-index-link'),
     # Category edit:
     url('^create/category$',
         write_decorator(generic_edit.CreateView.as_view(
@@ -44,14 +41,12 @@ urlpatterns = patterns(
             template_name="index_generic_form.html",
             success_url=functional.lazy(reverse, str)("toolkit-index"),
         )),
-        name='create-index-category'
-    ),
+        name='create-index-category'),
     url('^update/category/(?P<pk>\d+)$',
         write_decorator(generic_edit.UpdateView.as_view(
             model=IndexCategory,
             template_name="index_generic_form.html",
             success_url=functional.lazy(reverse, str)("toolkit-index"),
         )),
-        name='update-index-category'
-    ),
+        name='update-index-category'),
 )

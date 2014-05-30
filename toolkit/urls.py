@@ -26,8 +26,7 @@ urlpatterns = patterns(
             model=IndexLink,
             template_name='toolkit_index.html')
         ),
-        name="toolkit-index"
-    ),
+        name="toolkit-index"),
 
     # Static content, only used when running in the development server
     # (django.views.static.serve only works when DEBUG=True)
