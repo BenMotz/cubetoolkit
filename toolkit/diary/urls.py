@@ -86,14 +86,19 @@ diary_urls = patterns(
     # Edit event roles
     url(r'^edit/roles/', 'edit_roles', name='edit_roles'),
 
-    url(r"^edit/rota$", 'rota_edit', name="rota-edit"),
-
     # The slightly OTT regex in the following will match:
     # "rota" "rota/" "rota/2001/01" "rota/2001/01/" "rota/2001/1/02" "rota/2001/1/2/"
     # (ie needs at least year/month, not just a year)
     # View rota
     url(r"""^(?P<field>rota|copy|terms|copy_summary)(/|/(?P<year>\d{4})/(?P<month>\d{1,2})/?(?P<day>(?<=/)\d{0,2})?/?)?$""",
         'view_event_field', name="view_event_field"),
+
+    # As above, will match:
+    # "edit/rota" "edit/rota/" "edit/rota/2001/01" "edit/rota/2001/01/"
+    # "edit/rota/2001/1/02" "edit/rota/2001/1/2/"
+    # (ie needs at least year/month, not just a year)
+    url(r"^edit/rota(/|/(?P<year>\d{4})/(?P<month>\d{1,2})/?(?P<day>(?<=/)\d{0,2})?/?)?$$",
+        'rota_edit', name="rota-edit"),
 
     # Ajax calls:
     url("^edit/setprefs$", 'set_edit_preferences', name="set_edit_preferences"),

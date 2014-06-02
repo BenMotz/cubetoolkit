@@ -40,7 +40,41 @@ CUBE role rota
 <script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.jeditable.mini.js"></script>
 <script>
- $(document).ready(function() {
+function configureDatePickerControls() {
+        // Add date picker:
+        $('#id_from_date').datepicker({
+            dateFormat : 'dd-mm-yy',
+            onSelect : dateRangeSelected,
+        });
+        $('#id_to_date').datepicker({
+            dateFormat : 'dd-mm-yy',
+            onSelect : dateRangeSelected,
+        });
+        $('#daterange')[0].onsubmit = function() {
+            dateRangeSelected();
+            return false;
+        }
+};
+
+function parse_date_from_control(control_id) {
+    var text = $(control_id)[0].value;
+    return $.datepicker.parseDate('dd-mm-yy', text);
+}
+
+function dateRangeSelected(dateText, inst) {
+    var from_date = parse_date_from_control('#id_from_date');
+    var to_date = parse_date_from_control('#id_to_date');
+    // Calculate days between those two dates:
+    var days_ahead = Math.ceil((to_date.getTime() - from_date.getTime())/86400000);
+    if(days_ahead <= 0) {
+        days_ahead = 0;
+    }
+    window.location.href = "{% url "rota-edit" %}/" +
+        (from_date.getYear() + 1900) + "/" + (from_date.getMonth() + 1) + "/" +
+        from_date.getDate() + "?daysahead=" + days_ahead;
+}
+
+function configureEditInPlaceControls() {
          volunteer_list = {{ json_active_volunteer_list }};
          // All valid keys will contain '_'
          volunteer_list['noselection'] = '------';
@@ -56,11 +90,21 @@ CUBE role rota
                 csrfmiddlewaretoken: "{{ csrf_token }}"
             }
          });
+}
+ $(document).ready(function() {
+         configureDatePickerControls();
+         configureEditInPlaceControls();
  });
 </script>
 {% endblock %}
 
 {% block body %}
+<form id='daterange'>
+<p align='center'><label for="id_from_date">{{ event_field|capfirst }} from </label><input type="text" name="from_date" value="{{ start_date|date:'j-m-Y'}}" id="id_from_date" />
+<label for="id_to_date"> to </label><input type="text" name="to_date" value="{{ end_date|date:'j-m-Y'}}" id="id_to_date" />
+</p>
+</form>
+
 <table border="0" cellspacing="0">
 
 {% for showing in showings %}

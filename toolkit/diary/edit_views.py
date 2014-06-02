@@ -702,7 +702,7 @@ def printed_programme_edit(request, operation):
 
 @permission_required('toolkit.write')
 @require_http_methods(["GET", "POST"])
-def rota_edit(request):
+def rota_edit(request, year=None, day=None, month=None):
     if request.method == 'GET':
         # Fiddly way to set startdate to the start of the local day:
         # Get current UTC time and convert to local time:
@@ -711,10 +711,9 @@ def rota_edit(request):
         current_tz = django.utils.timezone.get_current_timezone()
         start_date = current_tz.localize(datetime.datetime(now_local.year, now_local.month, now_local.day))
 
-        try:
-            days_ahead = int(request.GET.get('daysahead', 30))
-        except ValueError:
-            days_ahead = 30
+        query_days_ahead = request.GET.get('daysahead', None)
+        start_date, days_ahead = get_date_range(
+            year, month, day, query_days_ahead, default_days_ahead=30)
 
         end_date = start_date + datetime.timedelta(days=days_ahead)
         showings = (Showing.objects.not_cancelled()
