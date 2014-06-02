@@ -4,7 +4,7 @@ from toolkit.diary.models import Event
 from django.contrib.auth.decorators import login_required
 
 import toolkit.diary.feeds
-from toolkit.diary.edit_views import EditEventView
+from toolkit.diary.edit_views import EditEventView, EditRotaView
 from toolkit.diary.public_views import (ArchiveIndex, ArchiveYear,
                                         ArchiveMonth, ArchiveSearch)
 
@@ -98,7 +98,7 @@ diary_urls = patterns(
     # "edit/rota/2001/1/02" "edit/rota/2001/1/2/"
     # (ie needs at least year/month, not just a year)
     url(r"^edit/rota(/|/(?P<year>\d{4})/(?P<month>\d{1,2})/?(?P<day>(?<=/)\d{0,2})?/?)?$$",
-        'rota_edit', name="rota-edit"),
+        EditRotaView.as_view(), name="rota-edit"),
 
     # Ajax calls:
     url("^edit/setprefs$", 'set_edit_preferences', name="set_edit_preferences"),

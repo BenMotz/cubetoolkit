@@ -700,16 +700,22 @@ def printed_programme_edit(request, operation):
     return render(request, 'form_printedprogramme_archive.html', context)
 
 
-@permission_required('toolkit.write')
-@require_http_methods(["GET", "POST"])
-def rota_edit(request, year=None, day=None, month=None):
-    if request.method == 'GET':
+class EditRotaView(View):
+    """Handle the "edit rota" page."""
+
+    # The following ensure that a user with "write" permission is logged in:
+    @method_decorator(permission_required('toolkit.write'))
+    def dispatch(self, request, *args, **kwargs):
+        return super(EditRotaView, self).dispatch(request, *args, **kwargs)
+
+    def get(self, request, year=None, day=None, month=None):
         # Fiddly way to set startdate to the start of the local day:
         # Get current UTC time and convert to local time:
         now_local = django.utils.timezone.localtime(django.utils.timezone.now())
         # Create a new local time with hour/min/sec set to zero:
         current_tz = django.utils.timezone.get_current_timezone()
-        start_date = current_tz.localize(datetime.datetime(now_local.year, now_local.month, now_local.day))
+        start_date = current_tz.localize(datetime.datetime(
+            now_local.year, now_local.month, now_local.day))
 
         query_days_ahead = request.GET.get('daysahead', None)
         start_date, days_ahead = get_date_range(
@@ -750,7 +756,7 @@ def rota_edit(request, year=None, day=None, month=None):
 
         return render(request, u'edit_rota.html', context)
 
-    if request.method == 'POST':
+    def post(self, request, year=None, day=None, month=None):
         # Get rota entry
         try:
             entry_id = int(request.POST[u'id'])
