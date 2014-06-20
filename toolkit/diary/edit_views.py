@@ -765,6 +765,11 @@ class EditRotaView(View):
             return HttpResponse("Invalid entry id", status=400, content_type="text/plain")
         rota_entry = get_object_or_404(RotaEntry, pk=entry_id)
 
+        # Get associated showing:
+        if rota_entry.showing.in_past():
+            return HttpResponse(u"Can't change rota for showings in the past",
+                    status=403)
+
         # Get action
         try:
             selection = request.POST[u'value']
