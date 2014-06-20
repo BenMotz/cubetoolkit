@@ -704,7 +704,7 @@ class EditRotaView(View):
     """Handle the "edit rota" page."""
 
     # The following ensure that a user with "write" permission is logged in:
-    @method_decorator(permission_required('toolkit.write'))
+    @method_decorator(permission_required('diary.change_rotaentry'))
     def dispatch(self, request, *args, **kwargs):
         return super(EditRotaView, self).dispatch(request, *args, **kwargs)
 
