@@ -25,6 +25,10 @@ def create_or_update_user(name, email, permissions):
         print "User '{0}' exists: not changing password".format(name)
         user = auth_models.User.objects.get(username=name)
 
+    # Remove all permissions:
+    user.user_permissions.clear()
+
+    # Set to requested:
     for permission in permissions:
         user.user_permissions.add(permission)
 
@@ -43,19 +47,27 @@ def main():
         codename='write'
     )[0]
 
+    # Create 'read' permission:
+    read_permission = auth_models.Permission.objects.get_or_create(
+        name='Read access to all toolkit content',
+        content_type=ct,
+        codename='read'
+    )[0]
+
     # retrieve permission for editing diary.models.RotaEntry rows:
     diary_content_type = contenttypes.models.ContentType.objects.get(
             app_label='diary',
             model='rotaentry',
     )
+
     edit_rota_permission = auth_models.Permission.objects.get(
         codename='change_rotaentry',
         content_type=diary_content_type
     )
 
-    # Configure "admin" user with the write permission:
+    # Configure "admin" user with the read and write permissions:
     create_or_update_user("admin", 'toolkit_admin@localhost',
-        [write_permission, edit_rota_permission])
+        [write_permission, read_permission, edit_rota_permission])
 
     # Read only (and write to the rota) user:
     create_or_update_user("volunteer", 'toolkit_admin_readonly@localhost',
