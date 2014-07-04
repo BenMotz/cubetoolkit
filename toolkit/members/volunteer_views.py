@@ -4,7 +4,7 @@ from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.core.urlresolvers import reverse
 from django.conf import settings
-from django.contrib.auth.decorators import permission_required, login_required
+from django.contrib.auth.decorators import permission_required
 from django.contrib import messages
 from django.views.decorators.http import require_POST, require_safe
 
@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-@login_required
+@permission_required('toolkit.read')
 @require_safe
 def view_volunteer_list(request):
     # Get all volunteers, sorted by name:
@@ -53,7 +53,7 @@ def view_volunteer_list(request):
     return render(request, 'volunteer_list.html', context)
 
 
-@login_required
+@permission_required('toolkit.read')
 @require_safe
 def select_volunteer(request, action, active=True):
     # This view is called to retire / unretire a volunteer. It presents a list

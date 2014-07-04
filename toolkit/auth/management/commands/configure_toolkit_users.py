@@ -56,8 +56,8 @@ def _configure_users():
 
     # retrieve permission for editing diary.models.RotaEntry rows:
     diary_content_type = contenttypes.models.ContentType.objects.get(
-            app_label='diary',
-            model='rotaentry',
+        app_label='diary',
+        model='rotaentry',
     )
 
     edit_rota_permission = auth_models.Permission.objects.get(
@@ -66,11 +66,13 @@ def _configure_users():
     )
 
     # Configure "admin" user with the read and write permissions:
-    _create_or_update_user("admin", 'toolkit_admin@localhost',
+    _create_or_update_user(
+        "admin", 'toolkit_admin@localhost',
         [write_permission, read_permission, edit_rota_permission])
 
     # Read only (and write to the rota) user:
-    _create_or_update_user("volunteer", 'toolkit_admin_readonly@localhost',
+    _create_or_update_user(
+        "volunteer", 'toolkit_admin_readonly@localhost',
         [edit_rota_permission])
 
 
@@ -80,7 +82,6 @@ class Command(BaseCommand):
 
     can_import_settings = True
     requires_model_validation = True
-
 
     def handle(self, *args, **options):
         if len(args) != 0:

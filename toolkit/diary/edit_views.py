@@ -16,7 +16,7 @@ import django.db
 from django.db.models import Q
 import django.utils.timezone as timezone
 from django.utils.safestring import mark_safe
-from django.contrib.auth.decorators import permission_required, login_required
+from django.contrib.auth.decorators import permission_required
 from django.views.decorators.http import require_POST, require_http_methods
 from django.utils.decorators import method_decorator
 
@@ -65,7 +65,7 @@ def cancel_edit(request):
     return _return_to_editindex(request)
 
 
-@login_required
+@permission_required('toolkit.read')
 def edit_diary_list(request, year=None, day=None, month=None):
     # Basic "edit" list view. Logic about processing of year/month/day
     # parameters is basically the same as for the public diary view.
@@ -166,7 +166,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
     return render(request, 'edit_event_index.html', context)
 
 
-@login_required
+@permission_required('toolkit.read')
 def set_edit_preferences(request):
     # Store user preferences as specified in the request's GET variables,
     # and return a JSON object containing all current user preferences
@@ -178,7 +178,7 @@ def set_edit_preferences(request):
     return HttpResponse(json.dumps(prefs), mimetype="application/json")
 
 
-@login_required
+@permission_required('toolkit.write')
 @require_POST
 def add_showing(request, event_id):
     # Add a showing to an existing event. Must be called via POST. Uses POSTed
@@ -512,7 +512,7 @@ def delete_showing(request, showing_id):
     return _return_to_editindex(request)
 
 
-@login_required
+@permission_required('toolkit.read')
 def view_event_field(request, field, year, month, day):
     # Method shared across various (slightly primitive) views into event data;
     # the copy, terms and rota reports.
