@@ -75,15 +75,8 @@ function dateRangeSelected(dateText, inst) {
 }
 
 function configureEditInPlaceControls() {
-         volunteer_list = {{ json_active_volunteer_list }};
-         // All valid keys will contain '_'
-         volunteer_list['noselection'] = '------';
-         volunteer_list['deletesignup'] = 'Un-sign-up';
-         volunteer_list['selected'] = 'noselection';
          $('.rota_name').editable('', {
             width: "5cm",
-            type: "select",
-            data: volunteer_list,
             placeholder: '{{ placeholder_text }}',
             submit: "OK",
             submitdata: {
@@ -119,14 +112,14 @@ function configureEditInPlaceControls() {
         {% if forloop.counter|divisibleby:2 %}
         <td class="rota_box">
         {{ rota_entry.role.name }}-{{ rota_entry.rank }} </td>
-        <td class="rota_box"><span class="rota_name" id="{{ rota_entry.pk }}">{{ rota_entry.volunteer.member.name|default:placeholder_text }}</span></td>
+        <td class="rota_box"><span class="rota_name" id="{{ rota_entry.pk }}">{{ rota_entry.name|default:placeholder_text }}</span></td>
         </tr>
         {% else %}
         <tr>
         <td colspan="3"></td>
         <td class="rota_box">
         {{ rota_entry.role.name }}-{{ rota_entry.rank }} </td>
-        <td class="rota_box"><span class="rota_name" id="{{ rota_entry.pk }}">{{ rota_entry.volunteer.member.name|default:placeholder_text }}</span></td>
+        <td class="rota_box"><span class="rota_name" id="{{ rota_entry.pk }}">{{ rota_entry.name|default:placeholder_text }}</span></td>
             {% if forloop.last %}
                 <td colspan="2"></td></tr>
             {% endif %}

@@ -8,20 +8,20 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding field 'RotaEntry.volunteer'
-        db.add_column('RotaEntries', 'volunteer',
-                      self.gf('django.db.models.fields.related.ForeignKey')(related_name='rota_entries', null=True, on_delete=models.SET_NULL, to=orm['members.Volunteer']),
+        # Adding field 'RotaEntry.name'
+        db.add_column('RotaEntries', 'name',
+                      self.gf('django.db.models.fields.TextField')(default='', max_length=256, blank=True),
                       keep_default=False)
 
         # Adding field 'RotaEntry.updated_at'
         db.add_column('RotaEntries', 'updated_at',
-                      self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2014, 3, 9, 0, 0), blank=True),
+                      self.gf('django.db.models.fields.DateTimeField')(auto_now=True, default=datetime.datetime(2014, 7, 1, 0, 0), blank=True),
                       keep_default=False)
 
 
     def backwards(self, orm):
-        # Deleting field 'RotaEntry.volunteer'
-        db.delete_column('RotaEntries', 'volunteer_id')
+        # Deleting field 'RotaEntry.name'
+        db.delete_column('RotaEntries', 'name')
 
         # Deleting field 'RotaEntry.updated_at'
         db.delete_column('RotaEntries', 'updated_at')
@@ -102,12 +102,12 @@ class Migration(SchemaMigration):
         u'diary.rotaentry': {
             'Meta': {'ordering': "['role', 'rank']", 'object_name': 'RotaEntry', 'db_table': "'RotaEntries'"},
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
+            'name': ('django.db.models.fields.TextField', [], {'max_length': '256', 'blank': 'True'}),
             'rank': ('django.db.models.fields.IntegerField', [], {'default': '1'}),
             'required': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
             'role': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['diary.Role']"}),
             'showing': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['diary.Showing']"}),
-            'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'volunteer': ('django.db.models.fields.related.ForeignKey', [], {'related_name': "'rota_entries'", 'null': 'True', 'on_delete': 'models.SET_NULL', 'to': u"orm['members.Volunteer']"})
+            'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
         },
         u'diary.showing': {
             'Meta': {'ordering': "['start']", 'object_name': 'Showing', 'db_table': "'Showings'"},
@@ -123,38 +123,6 @@ class Migration(SchemaMigration):
             u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
             'roles': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['diary.Role']", 'through': u"orm['diary.RotaEntry']", 'symmetrical': 'False'}),
             'start': ('toolkit.diary.models.FutureDateTimeField', [], {'db_index': 'True'}),
-            'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
-        },
-        u'members.member': {
-            'Meta': {'object_name': 'Member', 'db_table': "'Members'"},
-            'address': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'}),
-            'altphone': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True', 'blank': 'True'}),
-            'country': ('django.db.models.fields.CharField', [], {'max_length': '32', 'null': 'True', 'blank': 'True'}),
-            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            'email': ('django.db.models.fields.EmailField', [], {'max_length': '64', 'null': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'is_member': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'mailout': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'mailout_failed': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
-            'mailout_key': ('django.db.models.fields.CharField', [], {'default': "'6CgUCPJaE3Bgl0SAJoB2ux48KMijIJia'", 'max_length': '32'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '64'}),
-            'notes': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
-            'number': ('django.db.models.fields.CharField', [], {'max_length': '10'}),
-            'phone': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True', 'blank': 'True'}),
-            'postcode': ('django.db.models.fields.CharField', [], {'max_length': '16', 'null': 'True', 'blank': 'True'}),
-            'posttown': ('django.db.models.fields.CharField', [], {'max_length': '64', 'null': 'True', 'blank': 'True'}),
-            'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'}),
-            'website': ('django.db.models.fields.CharField', [], {'max_length': '128', 'null': 'True', 'blank': 'True'})
-        },
-        u'members.volunteer': {
-            'Meta': {'object_name': 'Volunteer', 'db_table': "'Volunteers'"},
-            'active': ('django.db.models.fields.BooleanField', [], {'default': 'True'}),
-            'created_at': ('django.db.models.fields.DateTimeField', [], {'auto_now_add': 'True', 'blank': 'True'}),
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'member': ('django.db.models.fields.related.OneToOneField', [], {'related_name': "'volunteer'", 'unique': 'True', 'to': u"orm['members.Member']"}),
-            'notes': ('django.db.models.fields.TextField', [], {'null': 'True', 'blank': 'True'}),
-            'portrait': ('django.db.models.fields.files.ImageField', [], {'max_length': '256', 'null': 'True', 'blank': 'True'}),
-            'roles': ('django.db.models.fields.related.ManyToManyField', [], {'to': u"orm['diary.Role']", 'symmetrical': 'False', 'db_table': "'Volunteer_Roles'", 'blank': 'True'}),
             'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
         }
     }

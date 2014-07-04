@@ -703,7 +703,7 @@ def printed_programme_edit(request, operation):
 class EditRotaView(View):
     """Handle the "edit rota" page."""
 
-    # The following ensure that a user with "write" permission is logged in:
+    # The following ensure that a user with the correct permission is logged in:
     @method_decorator(permission_required('diary.change_rotaentry'))
     def dispatch(self, request, *args, **kwargs):
         return super(EditRotaView, self).dispatch(request, *args, **kwargs)
@@ -729,21 +729,6 @@ class EditRotaView(View):
                                    # force sane number of queries:
                                    .prefetch_related('rotaentry_set__role')
                                    .select_related())
-        # Build JSON mapping active volunteer key to name.
-        # The keys are actually 'volunteer name_id' to make sure the selection
-        # comes out sorted.
-        volunteer_list = (Volunteer.objects
-            .filter(active=True)
-            .order_by('member__name')
-            # Avoid a separate query-per-volunteer:
-            .prefetch_related('member'))
-
-        # Don't use dict literal, for backward compatibilty with python 2.6:
-        volunteer_dict = OrderedDict(
-            (u"{0}_{1}".format(v.member.name, v.pk), v.member.name)
-                for v in volunteer_list
-        )
-        json_active_volunteer_list = json.dumps(volunteer_dict)
 
         context = {
             'start_date': start_date,
@@ -751,7 +736,6 @@ class EditRotaView(View):
             'days_ahead': days_ahead,
             'showings': showings,
             'placeholder_text': mark_safe('<span class="na">Click to edit</span>'),
-            'json_active_volunteer_list': mark_safe(json_active_volunteer_list),
         }
 
         return render(request, u'edit_rota.html', context)
@@ -765,40 +749,19 @@ class EditRotaView(View):
             return HttpResponse("Invalid entry id", status=400, content_type="text/plain")
         rota_entry = get_object_or_404(RotaEntry, pk=entry_id)
 
-        # Get associated showing:
+        # Check associated showing:
         if rota_entry.showing.in_past():
             return HttpResponse(u"Can't change rota for showings in the past",
                     status=403)
 
-        # Get action
+        # Get entered name, and store in rota entry:
         try:
-            selection = request.POST[u'value']
+            name = request.POST[u'value']
         except KeyError:
             return HttpResponse("Invalid request", status=400, content_type="text/plain")
 
-        # Magic values:
-        if selection == u'noselection':
-            # --> no action
-            response_text = rota_entry.volunteer.member.name if rota_entry.volunteer else ""
-            return HttpResponse(response_text, status=200, content_type="text/plain")
-        if selection == u'deletesignup':
-            logger.info("Removing volunteer {0} from rota entry {1}".format(
-                rota_entry.volunteer.pk if rota_entry.volunteer else '[none]',
-                rota_entry.pk
-            ))
-            volunteer = None
-            response_text = ""
-        else:
-            # Normal action
-            try:
-                volunteer_id = int(selection.split(u'_')[-1])
-            except (ValueError, TypeError):
-                logger.exception("Invalid volunteer name/value. Post was: {0}".format(request.POST))
-                return HttpResponse("Invalid volunteer", status=400, content_type="text/plain")
-            volunteer = get_object_or_404(Volunteer, pk=volunteer_id)
-            response_text = volunteer.member.name
-
-        rota_entry.volunteer = volunteer
+        rota_entry.name = name
         rota_entry.save()
 
-        return HttpResponse(response_text, content_type="text/plain")
+        # Returned text is displayed as the rota entry:
+        return HttpResponse(name, content_type="text/plain")
