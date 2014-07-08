@@ -16,6 +16,9 @@ Special Terms -
 Tech needed -
 Additonal Info -"""
 
+EDIT_INDEX_DEFAULT_DAYS_AHEAD = 365
+EDIT_INDEX_DEFAULT_USE_POPUPS = True
+
 DEFAULT_MUGSHOT = "/static/members/default_mugshot.gif"
 
 # This is used as the hostname for unsubscribe links in emails (i.e. emails

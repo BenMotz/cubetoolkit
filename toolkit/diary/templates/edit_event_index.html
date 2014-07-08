@@ -121,9 +121,9 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
 <span class="cancelled">Cancelled events are red</span><br>
 <span class="daytime">Daytime (before 6pm) events have a light background</span></p>
 
-<div class="programme"><p align='center'><a href="{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=90">See 3 months</a> |
-<a href="{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=183">See 6 months</a> |
-<a href="{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=365">See 12 months</a></p>
+<div class="programme"><p align='center'><a href="{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=183">See 6 months</a> |
+<a href="{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=365">See 1 year</a> |
+<a href="{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=730">See 2 years</a></p>
 <p align='center'><label for="id_start">See from now until:</label> <input type="text" name="lookahead_to" value="{{ end|date:'j-m-Y'}}" id="id_lookahead_to" /></p>
 
 {% include "messages.html" %}

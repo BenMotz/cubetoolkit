@@ -1160,7 +1160,7 @@ class PreferencesTests(DiaryTestsMixin, TestCase):
     def test_set_get_single_missing_pref(self):
         session_mock = {}
         retrieved_pref = toolkit.diary.edit_prefs.get_preference(session_mock, 'daysahead')
-        self.assertEqual(retrieved_pref, '90')
+        self.assertEqual(retrieved_pref, '365')
 
     def test_set_get_single_bad_pref(self):
         session_mock = {'spangles': 'foo'}
