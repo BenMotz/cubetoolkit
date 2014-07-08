@@ -4,7 +4,6 @@ Details for: {{ showing.event.name }}
 {% endblock %}
 {% block script %}
 {{ block.super }}
-<script type="text/javascript" src="{{ STATIC_URL }}js/lib/ui.spinner.min.js"></script>
 <script type="text/javascript">
 $(document).ready(function() {
         $('#delete_form').bind("submit", function() {
@@ -36,14 +35,14 @@ $(document).ready(function() {
     tr:nth-child(even) td, tr:nth-child(even) th {
         background-color: #c0c0c0;
     }
-    form textarea, form input[type=text] {
+    #delete_form input[type=text], #clone_form input[type=text] {
         width: 90%;
     }
     th {
         font-weight: normal;
         text-align: left;
-        padding: 5px 5px 5px 127px;
-        width: 25%;
+        padding: 5px 5px 5px 50px;
+        width: 100px;
     }
     td {
         padding: 5px;
@@ -83,45 +82,44 @@ $(document).ready(function() {
     {% endfor %}
 </ul>
 {% endif %}
-<pre>
-</pre>
 
+<form id="clone_form" action="{% url "add-showing" event_id=showing.event.id %}?copy_from={{showing.id}}" method="post">
 <table>
     <tr><td colspan="2" /></tr>
         <tr><td colspan="2" /><h2>BOOKING: <a href="{% url "edit-event-details-view" pk=showing.event_id %}">{{ showing.event.name }}</a></h2></tr>
     <tr><td colspan="2" /></tr>
 
     <tr><th colspan="2"><h5>Clone booking.</h5></th></tr>
-    <tr><td colspan="2" /></tr>
-
-    <form action="{% url "add-showing" event_id=showing.event.id %}?copy_from={{showing.id}}" method="post">
-    {% csrf_token %}
+    <tr><td colspan="2" />{% csrf_token %}</tr>
     <tr><th>Event:</th><td>{{ showing.event.name }}</td>
     {{ clone_showing_form.as_table }}
     <tr><th colspan="2">
         <input type="submit" value="Clone" /> <a href="{% url "cancel-edit" %}">Cancel</a>
     </th></tr>
-    </form>
     <tr><td colspan="2" class="spacer"/></tr>
+</table>
+</form>
+
+<form id="delete_form" action="{% url "delete-showing" showing_id=showing.id %}" method="post">
+<table>
     <tr><th colspan="2"><h5>Delete booking.</h5></th></tr>
     <tr><th>Date:</th><td>{{ showing.start|date:"d F Y" }}</td></tr>
     <tr><th>Time:</th><td>{{ showing.start|date:"H:i" }}</td></tr>
     <tr><th>Event:</th><td>{{ showing.event.name }}</td></tr>
     <tr><th colspan="2" />
-        <form id="delete_form" action="{% url "delete-showing" showing_id=showing.id %}" method="post">
-            {% csrf_token %}
             <input type="submit" value="Delete" /> <a href="{% url "cancel-edit" %}">Cancel</a>
-        </form>
     </th></tr>
-    <tr><td colspan="2" class="spacer"/></tr>
+    <tr><td colspan="2" />{% csrf_token %}</tr>
+    </table>
+</form>
 
+<form action="{% url "edit-showing" showing_id=showing.id %}" method="post">
+    <table>
     <tr><th colspan="2"><h5>Edit booking.</h5></th></tr>
-    <tr><th>Event:</th><td>{{ showing.event.name }}</td>
-    <form action="{% url "edit-showing" showing_id=showing.id %}" method="post">
-    {% csrf_token %}
+    <tr><th>Event:</th><td>{{ showing.event.name }}{% csrf_token %}</td>
     {{ form.as_table }}
     <tr>
-        <th colspan="2">Rota:</th></tr>
+        <th colspan="2">Rota:</th>
     </tr>
     <tr><td colspan="2" id="rota_form_cell">
         {{ rota_form.as_p }}
@@ -129,7 +127,7 @@ $(document).ready(function() {
     <tr><th colspan="2">
         <input type="submit" value="Update" /> <a href="{% url "cancel-edit" %}">Cancel</a>
     </th></tr>
-    </form>
-</table>
+    </table>
+</form>
 {% endblock %}
 
