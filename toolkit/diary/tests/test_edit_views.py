@@ -1087,7 +1087,7 @@ class ViewEventFieldTests(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "view_copy_summary.html")
 
         self.assertNotContains(response, u"EVENT THREE TITLE")
-        self.assertContains(response, u'Sun 09 18:00 ......... Event four titl\u0113')
+        self.assertContains(response, u'Sun 09 18:00 ......... Pretitle four Event four titl\u0113 Posttitle four')
         self.assertContains(response, u'<p class="title">Event four titl\u0113</p>', html=True)
         self.assertContains(response, u'<p class="copy_summary">\u010copy four summary</p>', html=True)
 

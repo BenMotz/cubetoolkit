@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.exceptions import ValidationError
 
+
 class IndexLink(models.Model):
 
     text = models.CharField(max_length=1024, blank=True, null=False)
@@ -10,7 +11,7 @@ class IndexLink(models.Model):
 
     class Meta:
         db_table = 'IndexLinks'
-        ordering = ['category',]
+        ordering = ['category', ]
 
     def clean(self):
         if self.link:
