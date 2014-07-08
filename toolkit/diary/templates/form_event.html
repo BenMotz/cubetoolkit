@@ -35,6 +35,10 @@ Details for: {{ event.name }}
     div#forms p:nth-child(even) {
         background-color: #c0c0c0;
     }
+    /* Hide 'Hold down "Control" etc.' text that Django is incapable of
+    turning hiding pre 1.6 */
+    .helptext { display: none; }
+
     form label {
         font-weight: bold;
         vertical-align: top;
