@@ -97,6 +97,14 @@ function dateRangeSelected(dateText, inst) {
 }
 
 function configureEditInPlaceControls() {
+    /* Horrible way to get submission URL. showing_edit_url_sample is inserted
+       by Django. */
+    var showing_edit_url_sample = "{% url "edit-showing-rota-notes" "6543" %}";
+    var match = /([^\d]*)6543(.*)/.exec(showing_edit_url_sample);
+    var showing_edit_url_prefix = match[1];
+    var showing_edit_url_suffix = match[2];
+
+
          $('.rota_name').editable('', {
             width: "5cm",
             placeholder: '{{ placeholder_text }}',
@@ -113,7 +121,7 @@ function configureEditInPlaceControls() {
             var showing_id_match = showing_id_re.exec(element.attr('id'));
             if (showing_id_match) {
                 showing_id = showing_id_match[1];
-                element.editable('/diary/edit/showing/id/' + showing_id + '/rota_notes/', {
+                element.editable(showing_edit_url_prefix + showing_id + showing_edit_url_suffix, {
                     name: 'rota_notes',
                     type: 'textarea',
                     rows: 5,
