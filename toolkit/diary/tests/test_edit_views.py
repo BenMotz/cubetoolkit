@@ -325,6 +325,8 @@ class EditShowing(DiaryTestsMixin, TestCase):
         self.client.login(username="admin", password="T3stPassword!")
 
     def tests_edit_showing_get(self):
+        showing = Showing.objects.get(pk=7)
+
         url = reverse("edit-showing", kwargs={"showing_id": 7})
         response = self.client.get(url)
 
@@ -365,6 +367,9 @@ class EditShowing(DiaryTestsMixin, TestCase):
             response,
             u'<input id="id_discounted" name="discounted" type="checkbox" />'
         )
+
+        # Shouldn't contain excluded fields:
+        self.assertNotContains(response, showing.rota_notes)
 
         # Rota edit:
         self.assertContains(

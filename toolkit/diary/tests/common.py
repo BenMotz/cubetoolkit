@@ -202,7 +202,8 @@ class DiaryTestsMixin(object):
             start=pytz.timezone("Europe/London").localize(datetime(2013, 6, 9, 18, 00)),
             event=e4,
             booked_by=u"\u0102nother \u0170ser",
-            confirmed=True
+            confirmed=True,
+            rota_notes="Some notes about the Rota!",
         )
         self.e4s3.save(force=True)  # Force start date in the past
 
