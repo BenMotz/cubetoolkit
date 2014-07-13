@@ -31,7 +31,29 @@ CUBE role rota
         border-width: 0px;
         border-color: gray;
     }
-    .na { color: lightgray; }
+    .na {
+        color: lightgray;
+        cursor: pointer;
+    }
+    .rota_name {
+        cursor: pointer;
+    }
+    td.event_name a, td.event_name a:visited{
+        color: blue;
+        text-decoration: none;
+    }
+    td.event_name a:hover {
+        text-decoration: underline;
+    }
+    .showing_rota_notes {
+        border-top: thin dashed lightgray;
+        border-bottom: thin solid lightgray;
+        width: 90%;
+        font-family: monospace;
+        white-space: pre-wrap;
+        padding: 0.4em 1em;
+        overflow: auto;
+    }
 </style>
 {% endblock %}
 
@@ -78,11 +100,33 @@ function configureEditInPlaceControls() {
          $('.rota_name').editable('', {
             width: "5cm",
             placeholder: '{{ placeholder_text }}',
-            submit: "OK",
+            submit: "Save",
             submitdata: {
                 csrfmiddlewaretoken: "{{ csrf_token }}"
             }
          });
+         var showing_id_re = /showing_rota_notes_(\d+)/;
+
+         $('.showing_rota_notes span').each(function () {
+            var showing_id;
+            var element = $(this);
+            var showing_id_match = showing_id_re.exec(element.attr('id'));
+            if (showing_id_match) {
+                showing_id = showing_id_match[1];
+                element.editable('/diary/edit/showing/id/' + showing_id + '/rota_notes/', {
+                    name: 'rota_notes',
+                    type: 'textarea',
+                    rows: 5,
+                    width: '90%',
+                    //placeholder: '{{ placeholder_text }}',
+                    placeholder: '<span class="na">General notes (click to edit)</span>',
+                    submit: 'Save',
+                    submitdata: {
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    }
+                 });
+            }
+        });
 }
  $(document).ready(function() {
          configureDatePickerControls();
@@ -106,7 +150,7 @@ function configureEditInPlaceControls() {
     <tr>
         <td></td>
         <td class="cell_day">{{ showing.start|date:"D"}}&nbsp;{{ showing.start|date:"j" }}</td>
-        <td class="cell_day">{{ showing.start|date:"H:i" }}</td><td class="event_name" colspan="4">{{ showing.event.name.upper }} </td>
+        <td class="cell_day">{{ showing.start|date:"H:i" }}</td><td class="event_name" colspan="4"><a href="{% url "edit-showing" showing.pk %}">{{ showing.event.name.upper }}</a></td>
     </tr>
     {% for rota_entry in showing.rotaentry_set.all %}
         {% if forloop.counter|divisibleby:2 %}
@@ -125,6 +169,9 @@ function configureEditInPlaceControls() {
             {% endif %}
         {% endif %}
     {% endfor %}
+    <tr>
+        <td colspan="3"></td><td class="showing_rota_notes" colspan="4"><span id="showing_rota_notes_{{ showing.pk }}">{{ showing.rota_notes }}</span></td>
+    </tr>
 {% endfor %}
 
 </table>

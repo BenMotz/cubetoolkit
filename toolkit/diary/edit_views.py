@@ -19,6 +19,7 @@ from django.utils.safestring import mark_safe
 from django.contrib.auth.decorators import permission_required
 from django.views.decorators.http import require_POST, require_http_methods
 from django.utils.decorators import method_decorator
+from django.utils.html import escape
 
 from toolkit.diary.models import (Showing, Event, DiaryIdea, MediaItem,
                                   EventTemplate, EventTag, Role, RotaEntry,
@@ -763,5 +764,23 @@ class EditRotaView(View):
         rota_entry.name = name
         rota_entry.save()
 
+        response = escape(name)
+
         # Returned text is displayed as the rota entry:
-        return HttpResponse(name, content_type="text/plain")
+        return HttpResponse(response, content_type="text/plain")
+
+@permission_required('diary.change_rotaentry')
+@require_POST
+def edit_showing_rota_notes(request, showing_id):
+    showing = get_object_or_404(Showing, pk=showing_id)
+    form = diary_forms.ShowingRotaNotesForm(request.POST, instance=showing)
+
+    if showing.in_past():
+        return HttpResponse(u"Can't change rota for showings in the past",
+                status=403)
+    elif form.is_valid():
+        form.save()
+
+    response = escape(showing.rota_notes)
+
+    return HttpResponse(escape(response), content_type="text/plain")

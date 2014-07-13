@@ -84,6 +84,12 @@ class ShowingForm(forms.ModelForm):
         }
 
 
+class ShowingRotaNotesForm(forms.ModelForm):
+    class Meta(object):
+        model = toolkit.diary.models.Showing
+        fields = ('rota_notes',)
+
+
 def rota_form_factory(showing):
     # Dynamically generate a form to edit the rota for the given showing
 

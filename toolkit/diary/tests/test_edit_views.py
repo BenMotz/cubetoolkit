@@ -59,6 +59,7 @@ class ViewSecurity(DiaryTestsMixin, TestCase):
 
     rota_edit_required = {
         "rota-edit": {},
+        "edit-showing-rota-notes": {"showing_id": "1"},
     }
 
     def _assert_need_login(self, views_to_test):

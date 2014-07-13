@@ -70,6 +70,8 @@ diary_urls = patterns(
     url(r'^edit/event/id/(?P<event_id>\d+)/$', EditEventView.as_view(), name="edit-event-details"),
     # Edit a showing (includes delete / add a new showing)
     url(r'^edit/showing/id/(?P<showing_id>\d+)/$', 'edit_showing', name="edit-showing"),
+    # Edit rota notes for a showing
+    url(r'^edit/showing/id/(?P<showing_id>\d+)/rota_notes/$', 'edit_showing_rota_notes', name="edit-showing-rota-notes"),
     # Edit ideas
     url(r'^edit/ideas/(?P<year>\d{4})/(?P<month>\d{1,2})/$', 'edit_ideas', name="edit-ideas"),
     # Add a new showing (to an existing event) - submission URL for edit-showing
