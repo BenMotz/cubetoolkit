@@ -31,8 +31,6 @@ import toolkit.members.tasks
 # Shared utility method:
 from toolkit.diary.daterange import get_date_range
 
-from toolkit.members.models import Volunteer
-
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
@@ -753,7 +751,7 @@ class EditRotaView(View):
         # Check associated showing:
         if rota_entry.showing.in_past():
             return HttpResponse(u"Can't change rota for showings in the past",
-                    status=403)
+                                status=403)
 
         # Get entered name, and store in rota entry:
         try:
@@ -769,6 +767,7 @@ class EditRotaView(View):
         # Returned text is displayed as the rota entry:
         return HttpResponse(response, content_type="text/plain")
 
+
 @permission_required('diary.change_rotaentry')
 @require_POST
 def edit_showing_rota_notes(request, showing_id):
@@ -777,7 +776,7 @@ def edit_showing_rota_notes(request, showing_id):
 
     if showing.in_past():
         return HttpResponse(u"Can't change rota for showings in the past",
-                status=403)
+                            status=403)
     elif form.is_valid():
         form.save()
 
