@@ -64,88 +64,17 @@ CUBE role rota
 {% endblock %}
 
 {% block script %}
-<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.jeditable.mini.js"></script>
+<script src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
+<script src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
+<script src="{{ STATIC_URL }}js/lib/jquery.jeditable.mini.js"></script>
+<script src="{{ STATIC_URL }}diary/js/edit_rota.js"> </script>
 <script>
-function configureDatePickerControls() {
-        // Add date picker:
-        $('#id_from_date').datepicker({
-            dateFormat : 'dd-mm-yy',
-            onSelect : dateRangeSelected,
-        });
-        $('#id_to_date').datepicker({
-            dateFormat : 'dd-mm-yy',
-            onSelect : dateRangeSelected,
-        });
-        $('#daterange')[0].onsubmit = function() {
-            dateRangeSelected();
-            return false;
-        }
-};
-
-function parse_date_from_control(control_id) {
-    var text = $(control_id)[0].value;
-    return $.datepicker.parseDate('dd-mm-yy', text);
-}
-
-function dateRangeSelected(dateText, inst) {
-    var from_date = parse_date_from_control('#id_from_date');
-    var to_date = parse_date_from_control('#id_to_date');
-    // Calculate days between those two dates:
-    var days_ahead = Math.ceil((to_date.getTime() - from_date.getTime())/86400000);
-    if(days_ahead <= 0) {
-        days_ahead = 0;
-    }
-    window.location.href = "{% url "rota-edit" %}/" +
-        (from_date.getYear() + 1900) + "/" + (from_date.getMonth() + 1) + "/" +
-        from_date.getDate() + "?daysahead=" + days_ahead;
-}
-
-function configureEditInPlaceControls() {
-    /* Horrible way to get submission URL. showing_edit_url_sample is inserted
-       by Django. */
-    var showing_edit_url_sample = "{% url "edit-showing-rota-notes" "6543" %}";
-    var match = /([^\d]*)6543(.*)/.exec(showing_edit_url_sample);
-    var showing_edit_url_prefix = match[1];
-    var showing_edit_url_suffix = match[2];
-
-
-         $('.rota_name').editable('', {
-            width: "5cm",
-            placeholder: '{{ placeholder_text }}',
-            submit: "Save",
-            submitdata: {
-                csrfmiddlewaretoken: "{{ csrf_token }}"
-            }
-         });
-         var showing_id_re = /showing_rota_notes_(\d+)/;
-
-         $('.showing_rota_notes span').each(function () {
-            var showing_id;
-            var element = $(this);
-            var showing_id_match = showing_id_re.exec(element.attr('id'));
-            if (showing_id_match) {
-                showing_id = showing_id_match[1];
-                element.editable(showing_edit_url_prefix + showing_id + showing_edit_url_suffix, {
-                    name: 'rota_notes',
-                    type: 'textarea',
-                    rows: 5,
-                    width: '90%',
-                    //placeholder: '{{ placeholder_text }}',
-                    placeholder: '<span class="na">General notes (click to edit)</span>',
-                    submit: 'Save',
-                    submitdata: {
-                        csrfmiddlewaretoken: '{{ csrf_token }}'
-                    }
-                 });
-            }
-        });
-}
- $(document).ready(function() {
-         configureDatePickerControls();
-         configureEditInPlaceControls();
- });
+edit_rota(
+    jQuery,
+    "{% url "rota-edit" %}",
+    "{{ edit_showing_notes_url_prefix }}",
+    "{{ csrf_token }}"
+);
 </script>
 {% endblock %}
 
@@ -157,7 +86,7 @@ function configureEditInPlaceControls() {
 </form>
 
 <table border="0" cellspacing="0">
-
+{% with placeholder_text="<span class='na'>Click to edit</span>" %}
 {% for showing in showings %}
     {% ifchanged %}<tr><td><h1>{{ showing.start|date:"Y" }} </h1></td><td colspan="6"></td></tr>{% endifchanged %}
     {% ifchanged %}<tr><td></td><td><h2>{{ showing.start|date:"F" }}</h2></td><td colspan="5"></td></tr>{% endifchanged %}
@@ -187,6 +116,7 @@ function configureEditInPlaceControls() {
         <td colspan="3"></td><td class="showing_rota_notes" colspan="4"><span id="showing_rota_notes_{{ showing.pk }}">{{ showing.rota_notes }}</span></td>
     </tr>
 {% endfor %}
+{% endwith %}
 
 </table>
 

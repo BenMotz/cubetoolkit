@@ -15,7 +15,6 @@ import django.template
 import django.db
 from django.db.models import Q
 import django.utils.timezone as timezone
-from django.utils.safestring import mark_safe
 from django.contrib.auth.decorators import permission_required
 from django.views.decorators.http import require_POST, require_http_methods
 from django.utils.decorators import method_decorator
@@ -729,12 +728,16 @@ class EditRotaView(View):
                                    .prefetch_related('rotaentry_set__role')
                                    .select_related())
 
+        # Used by per-showing rota notes click to edit control:
+        url_with_id = reverse('edit-showing-rota-notes', kwargs={'showing_id': 999})
+        showing_notes_url_prefix = url_with_id[:url_with_id.find("999")]
+
         context = {
             'start_date': start_date,
             'end_date': end_date,
             'days_ahead': days_ahead,
             'showings': showings,
-            'placeholder_text': mark_safe('<span class="na">Click to edit</span>'),
+            'edit_showing_notes_url_prefix': showing_notes_url_prefix
         }
 
         return render(request, u'edit_rota.html', context)
