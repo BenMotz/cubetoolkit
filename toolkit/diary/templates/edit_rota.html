@@ -31,6 +31,9 @@ CUBE role rota
         border-width: 0px;
         border-color: gray;
     }
+    td.role_box {
+        font-weight: bold;
+    }
     .na {
         color: lightgray;
         cursor: pointer;
@@ -53,6 +56,9 @@ CUBE role rota
         white-space: pre-wrap;
         padding: 0.4em 1em;
         overflow: auto;
+    }
+    .showing_rota_notes span {
+        cursor: pointer;
     }
 </style>
 {% endblock %}
@@ -162,15 +168,15 @@ function configureEditInPlaceControls() {
     </tr>
     {% for rota_entry in showing.rotaentry_set.all %}
         {% if forloop.counter|divisibleby:2 %}
-        <td class="rota_box">
-        <s>{{ rota_entry.role.name }}-{{ rota_entry.rank }}</s></td>
+        <td class="role_box rota_box">
+        {{ rota_entry.role.name }}-{{ rota_entry.rank }}</td>
         <td class="rota_box"><span class="rota_name" id="{{ rota_entry.pk }}">{{ rota_entry.name|default:placeholder_text }}</span></td>
         </tr>
         {% else %}
         <tr>
         <td colspan="3"></td>
-        <td class="rota_box">
-        <s>{{ rota_entry.role.name }}-{{ rota_entry.rank }}</s></td>
+        <td class="role_box rota_box">
+        {{ rota_entry.role.name }}-{{ rota_entry.rank }}</td>
         <td class="rota_box"><span class="rota_name" id="{{ rota_entry.pk }}">{{ rota_entry.name|default:placeholder_text }}</span></td>
             {% if forloop.last %}
                 <td colspan="2"></td></tr>
