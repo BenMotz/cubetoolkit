@@ -163,14 +163,14 @@ function configureEditInPlaceControls() {
     {% for rota_entry in showing.rotaentry_set.all %}
         {% if forloop.counter|divisibleby:2 %}
         <td class="rota_box">
-        {{ rota_entry.role.name }}-{{ rota_entry.rank }} </td>
+        <s>{{ rota_entry.role.name }}-{{ rota_entry.rank }}</s></td>
         <td class="rota_box"><span class="rota_name" id="{{ rota_entry.pk }}">{{ rota_entry.name|default:placeholder_text }}</span></td>
         </tr>
         {% else %}
         <tr>
         <td colspan="3"></td>
         <td class="rota_box">
-        {{ rota_entry.role.name }}-{{ rota_entry.rank }} </td>
+        <s>{{ rota_entry.role.name }}-{{ rota_entry.rank }}</s></td>
         <td class="rota_box"><span class="rota_name" id="{{ rota_entry.pk }}">{{ rota_entry.name|default:placeholder_text }}</span></td>
             {% if forloop.last %}
                 <td colspan="2"></td></tr>
