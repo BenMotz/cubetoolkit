@@ -759,6 +759,11 @@ class EditRotaView(View):
         except KeyError:
             return HttpResponse("Invalid request", status=400, content_type="text/plain")
 
+        logger.info("Update role id {0} (#{1}) for showing {2} '{3}' -> '{4}' ({5})"
+                    .format(rota_entry.role_id, rota_entry.rank,
+                            rota_entry.showing_id, rota_entry.name, name,
+                            rota_entry.pk))
+
         rota_entry.name = name
         rota_entry.save()
 
