@@ -38,6 +38,14 @@ function edit_rota(jQuery, rota_edit_base_url, edit_rota_notes_url_prefix, CSRF_
         };
     }
 
+    function nameEditedCallback(value) {
+        if (value === "" && this.revert !== "") {
+            window.alert("Rota entry cleared.\nPlease consider emailing " +
+                         "volunteers@cubecinema.com to say that the shift " +
+                         "needs covering.");
+        }
+    }
+
     function configureRotaNameEditInPlaceControls() {
         $('.rota_name').editable('', {
             width: "5cm",
@@ -45,7 +53,8 @@ function edit_rota(jQuery, rota_edit_base_url, edit_rota_notes_url_prefix, CSRF_
             submit: "Save",
             submitdata: {
                 csrfmiddlewaretoken: CSRF_TOKEN
-            }
+            },
+            callback: nameEditedCallback
         });
     }
 
