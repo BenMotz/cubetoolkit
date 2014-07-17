@@ -8,17 +8,19 @@ from django.contrib.auth.decorators import permission_required, login_required
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.http import require_POST, require_safe, require_http_methods
-
+from django.conf import settings
 
 from toolkit.members.forms import NewMemberForm, MemberForm
 from toolkit.members.models import Member
 from toolkit.util import compare_constant_time
+from toolkit.auth.decorators import ip_or_permission_required
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-@permission_required('toolkit.write')
+@ip_or_permission_required(ip_addresses=settings.CUBE_IP_ADDRESSES,
+                           permission='toolkit.write')
 @require_http_methods(["GET", "POST"])
 def add_member(request):
     # If this view is called with GET then display the form to enter a new

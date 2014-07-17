@@ -10,6 +10,7 @@ from mock import patch, call
 
 from django.test import TestCase
 from django.test.utils import override_settings
+from django.test.client import RequestFactory
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
@@ -18,6 +19,7 @@ import django.contrib.contenttypes as contenttypes
 
 from toolkit.members.models import Member, Volunteer
 from toolkit.diary.models import Role
+import toolkit.members.member_views as member_views
 import toolkit.members.tasks
 
 
@@ -171,6 +173,46 @@ class SecurityTests(MembersTestsMixin, TestCase):
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)
             self.assertContains(response, member.name)
+
+
+class AddMemberIPAuth(TestCase):
+
+    def setUp(self):
+        factory = RequestFactory()
+        self.url = reverse("add-member")
+        self.request = factory.get(self.url)
+        self.request.user = auth_models.AnonymousUser()
+
+    def test_auth_by_ip_matching_ip_denied(self):
+        # Request should be denied from 127.0.0.1
+
+        # Check that this shouldn't work
+        self.assertNotIn('127.0.0.1', settings.CUBE_IP_ADDRESSES)
+
+        # Issue the request
+        response = member_views.add_member(self.request)
+
+        expected_redirect = (
+            "{0}?next={1}"
+            .format(reverse("django.contrib.auth.views.login"), self.url)
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['Location'], expected_redirect)
+
+    def test_auth_by_ip_matching_ip_permitted(self):
+        # Request should be permitted from IP in settings
+
+        # Check that this should work:
+        self.assertTrue(len(settings.CUBE_IP_ADDRESSES))
+
+        # set source IP:
+        self.request.META['REMOTE_ADDR'] = settings.CUBE_IP_ADDRESSES[0]
+
+        # Issue the request
+        response = member_views.add_member(self.request)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertNotIn('Location', response)
 
 
 class TestMemberModelManager(MembersTestsMixin, TestCase):
