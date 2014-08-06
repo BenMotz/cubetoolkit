@@ -39,7 +39,7 @@ Deposit paid before the night (p/h only) -
 Amount needed to be collected (p/h only) -
 Special Terms -
 Tech needed -
-Additonal Info -"""
+Additional Info -"""
 
 EDIT_INDEX_DEFAULT_DAYS_AHEAD = 365
 EDIT_INDEX_DEFAULT_USE_POPUPS = True
