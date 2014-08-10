@@ -317,6 +317,9 @@ class DiaryTestsMixin(object):
         user_r = auth_models.User.objects.create_user('read_only', 'toolkit_admin@localhost', 'T3stPassword!1')
         # no permission user:
         auth_models.User.objects.create_user('no_perm', 'toolkit_admin@localhost', 'T3stPassword!2')
+        # rota edit only user:
+        user_rota = auth_models.User.objects.create_user('rota_editor', 'toolkit_admin@localhost', 'T3stPassword!3')
+
         # Create dummy ContentType:
         ct = contenttypes.models.ContentType.objects.get_or_create(
             model='',
@@ -334,8 +337,22 @@ class DiaryTestsMixin(object):
             content_type=ct,
             codename='read'
         )[0]
+
+        # retrieve permission for editing diary.models.RotaEntry rows:
+        diary_content_type = contenttypes.models.ContentType.objects.get(
+            app_label='diary',
+            model='rotaentry',
+        )
+
+        edit_rota_permission = auth_models.Permission.objects.get(
+            codename='change_rotaentry',
+            content_type=diary_content_type
+        )
+
         # Set user permissions, r/w:
         user_rw.user_permissions.add(write_permission)
         user_rw.user_permissions.add(read_permission)
         # read only:
         user_r.user_permissions.add(read_permission)
+        # rota_editor:
+        user_rota.user_permissions.add(edit_rota_permission)

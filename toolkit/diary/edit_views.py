@@ -787,6 +787,9 @@ def edit_showing_rota_notes(request, showing_id):
                             status=403)
     elif form.is_valid():
         form.save()
+    else:
+        logger.error("Rota notes edit form not valid!")
+        return HttpResponse("Unknown error", status=500, content_type="text/plain")
 
     response = escape(showing.rota_notes)
 

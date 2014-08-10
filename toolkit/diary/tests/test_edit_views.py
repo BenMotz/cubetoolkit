@@ -114,6 +114,21 @@ class ViewSecurity(DiaryTestsMixin, TestCase):
 
         self._assert_need_login(views_to_test)
 
+    def test_rota_editor_no_access(self):
+        """
+        Checks all URLs that shouldn't work when logged in user doesn't have
+        'toolkit.write' or 'toolkit.read' permission
+        """
+        views_to_test = {}
+        views_to_test.update(self.write_required)
+        views_to_test.update(self.only_read_required)
+        # i.e. everything except self.rota_edit_required
+
+        # login as rota editing permission user:
+        self.client.login(username="rota_editor", password="T3stPassword!3")
+
+        self._assert_need_login(views_to_test)
+
 
 class EditDiaryViews(DiaryTestsMixin, TestCase):
 
