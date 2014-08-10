@@ -13,6 +13,7 @@ class DiaryTestsMixin(object):
 
     def setUp(self):
         self._setup_test_data()
+        self._setup_test_users()
 
         return super(DiaryTestsMixin, self).setUp()
 
@@ -201,7 +202,8 @@ class DiaryTestsMixin(object):
             start=pytz.timezone("Europe/London").localize(datetime(2013, 6, 9, 18, 00)),
             event=e4,
             booked_by=u"\u0102nother \u0170ser",
-            confirmed=True
+            confirmed=True,
+            rota_notes="Some notes about the Rota!",
         )
         self.e4s3.save(force=True)  # Force start date in the past
 
@@ -308,18 +310,32 @@ class DiaryTestsMixin(object):
         v3.roles = [r3]
         v3.save()
 
-        # System user:
+    def _setup_test_users(self):
+        # Read/write user:
         user_rw = auth_models.User.objects.create_user('admin', 'toolkit_admin@localhost', 'T3stPassword!')
+        # read only user:
+        user_r = auth_models.User.objects.create_user('read_only', 'toolkit_admin@localhost', 'T3stPassword!1')
+        # no permission user:
+        auth_models.User.objects.create_user('no_perm', 'toolkit_admin@localhost', 'T3stPassword!2')
         # Create dummy ContentType:
         ct = contenttypes.models.ContentType.objects.get_or_create(
             model='',
             app_label='toolkit'
         )[0]
-        # Create 'write' permission:
+        # Create 'read' and 'write' permissions:
         write_permission = auth_models.Permission.objects.get_or_create(
             name='Write access to all toolkit content',
             content_type=ct,
             codename='write'
         )[0]
-        # Give "admin" user the write permission:
+
+        read_permission = auth_models.Permission.objects.get_or_create(
+            name='Read access to all toolkit content',
+            content_type=ct,
+            codename='read'
+        )[0]
+        # Set user permissions, r/w:
         user_rw.user_permissions.add(write_permission)
+        user_rw.user_permissions.add(read_permission)
+        # read only:
+        user_r.user_permissions.add(read_permission)

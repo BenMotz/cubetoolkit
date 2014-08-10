@@ -366,6 +366,9 @@ class Showing(models.Model):
     # Rota entries
     roles = models.ManyToManyField(Role, through='RotaEntry')
 
+    # Free text rota field for this showing
+    rota_notes = models.TextField(max_length=1024, blank=True)
+
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -547,8 +550,10 @@ class RotaEntry(models.Model):
     required = models.BooleanField(default=True)
     rank = models.IntegerField(default=1)
 
+    name = models.TextField(max_length=256, null=False, blank=True)
+
     # created_at = models.DateTimeField(auto_now_add=True)
-    # updated_at = models.DateTimeField(auto_now=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         db_table = 'RotaEntries'

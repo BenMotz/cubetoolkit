@@ -1,10 +1,10 @@
 from django.conf.urls import patterns, url
 from django.views.generic import DetailView
 from toolkit.diary.models import Event
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import permission_required
 
 import toolkit.diary.feeds
-from toolkit.diary.edit_views import EditEventView
+from toolkit.diary.edit_views import EditEventView, EditRotaView
 from toolkit.diary.public_views import (ArchiveIndex, ArchiveYear,
                                         ArchiveMonth, ArchiveSearch)
 
@@ -62,7 +62,7 @@ diary_urls = patterns(
 
     # Edit an event: view event before editing
     url(r'^edit/event/id/(?P<pk>\d+)/view/$',
-        login_required(DetailView.as_view(
+        permission_required('toolkit.read')(DetailView.as_view(
             model=Event,
             template_name='view_event_privatedetails.html')), name="edit-event-details-view"
         ),
@@ -70,6 +70,8 @@ diary_urls = patterns(
     url(r'^edit/event/id/(?P<event_id>\d+)/$', EditEventView.as_view(), name="edit-event-details"),
     # Edit a showing (includes delete / add a new showing)
     url(r'^edit/showing/id/(?P<showing_id>\d+)/$', 'edit_showing', name="edit-showing"),
+    # Edit rota notes for a showing
+    url(r'^edit/showing/id/(?P<showing_id>\d+)/rota_notes/$', 'edit_showing_rota_notes', name="edit-showing-rota-notes"),
     # Edit ideas
     url(r'^edit/ideas/(?P<year>\d{4})/(?P<month>\d{1,2})/$', 'edit_ideas', name="edit-ideas"),
     # Add a new showing (to an existing event) - submission URL for edit-showing
@@ -92,6 +94,13 @@ diary_urls = patterns(
     # View rota
     url(r"""^(?P<field>rota|copy|terms|copy_summary)(/|/(?P<year>\d{4})/(?P<month>\d{1,2})/?(?P<day>(?<=/)\d{0,2})?/?)?$""",
         'view_event_field', name="view_event_field"),
+
+    # As above, will match:
+    # "edit/rota" "edit/rota/" "edit/rota/2001/01" "edit/rota/2001/01/"
+    # "edit/rota/2001/1/02" "edit/rota/2001/1/2/"
+    # (ie needs at least year/month, not just a year)
+    url(r"^edit/rota(/|/(?P<year>\d{4})/(?P<month>\d{1,2})/?(?P<day>(?<=/)\d{0,2})?/?)?$$",
+        EditRotaView.as_view(), name="rota-edit"),
 
     # Ajax calls:
     url("^edit/setprefs$", 'set_edit_preferences', name="set_edit_preferences"),

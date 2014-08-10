@@ -76,12 +76,18 @@ class MediaItemForm(forms.ModelForm):
 class ShowingForm(forms.ModelForm):
     class Meta(object):
         model = toolkit.diary.models.Showing
-        # Exclude these for now:
-        exclude = ('event', 'extra_copy', 'extra_copy_summary', 'roles')
+        fields = ('start', 'booked_by', 'confirmed', 'hide_in_programme',
+                   'cancelled', 'discounted', )
 
         widgets = {
             'start': JQueryDateTimePicker(),
         }
+
+
+class ShowingRotaNotesForm(forms.ModelForm):
+    class Meta(object):
+        model = toolkit.diary.models.Showing
+        fields = ('rota_notes',)
 
 
 def rota_form_factory(showing):

@@ -15,12 +15,13 @@ import django.template
 import django.db
 from django.db.models import Q
 import django.utils.timezone as timezone
-from django.contrib.auth.decorators import permission_required, login_required
+from django.contrib.auth.decorators import permission_required
 from django.views.decorators.http import require_POST, require_http_methods
 from django.utils.decorators import method_decorator
+from django.utils.html import escape
 
 from toolkit.diary.models import (Showing, Event, DiaryIdea, MediaItem,
-                                  EventTemplate, EventTag, Role,
+                                  EventTemplate, EventTag, Role, RotaEntry,
                                   PrintedProgramme)
 import toolkit.diary.forms as diary_forms
 import toolkit.diary.edit_prefs as edit_prefs
@@ -62,7 +63,7 @@ def cancel_edit(request):
     return _return_to_editindex(request)
 
 
-@login_required
+@permission_required('toolkit.read')
 def edit_diary_list(request, year=None, day=None, month=None):
     # Basic "edit" list view. Logic about processing of year/month/day
     # parameters is basically the same as for the public diary view.
@@ -163,7 +164,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
     return render(request, 'edit_event_index.html', context)
 
 
-@login_required
+@permission_required('toolkit.read')
 def set_edit_preferences(request):
     # Store user preferences as specified in the request's GET variables,
     # and return a JSON object containing all current user preferences
@@ -175,7 +176,7 @@ def set_edit_preferences(request):
     return HttpResponse(json.dumps(prefs), mimetype="application/json")
 
 
-@login_required
+@permission_required('toolkit.write')
 @require_POST
 def add_showing(request, event_id):
     # Add a showing to an existing event. Must be called via POST. Uses POSTed
@@ -509,7 +510,7 @@ def delete_showing(request, showing_id):
     return _return_to_editindex(request)
 
 
-@login_required
+@permission_required('toolkit.read')
 def view_event_field(request, field, year, month, day):
     # Method shared across various (slightly primitive) views into event data;
     # the copy, terms and rota reports.
@@ -693,4 +694,100 @@ def printed_programme_edit(request, operation):
         'formset': formset,
         'new_programme_form': new_programme_form,
     }
+
     return render(request, 'form_printedprogramme_archive.html', context)
+
+
+class EditRotaView(View):
+    """Handle the "edit rota" page."""
+
+    # The following ensure that a user with the correct permission is logged in:
+    @method_decorator(permission_required('diary.change_rotaentry'))
+    def dispatch(self, request, *args, **kwargs):
+        return super(EditRotaView, self).dispatch(request, *args, **kwargs)
+
+    def get(self, request, year=None, day=None, month=None):
+        # Fiddly way to set startdate to the start of the local day:
+        # Get current UTC time and convert to local time:
+        now_local = django.utils.timezone.localtime(django.utils.timezone.now())
+        # Create a new local time with hour/min/sec set to zero:
+        current_tz = django.utils.timezone.get_current_timezone()
+        start_date = current_tz.localize(datetime.datetime(
+            now_local.year, now_local.month, now_local.day))
+
+        query_days_ahead = request.GET.get('daysahead', None)
+        start_date, days_ahead = get_date_range(
+            year, month, day, query_days_ahead, default_days_ahead=30)
+
+        end_date = start_date + datetime.timedelta(days=days_ahead)
+        showings = (Showing.objects.not_cancelled()
+                                   .confirmed()
+                                   .start_in_range(start_date, end_date)
+                                   .order_by('start')
+                                   # force sane number of queries:
+                                   .prefetch_related('rotaentry_set__role')
+                                   .select_related())
+
+        # Used by per-showing rota notes click to edit control:
+        url_with_id = reverse('edit-showing-rota-notes', kwargs={'showing_id': 999})
+        showing_notes_url_prefix = url_with_id[:url_with_id.find("999")]
+
+        context = {
+            'start_date': start_date,
+            'end_date': end_date,
+            'days_ahead': days_ahead,
+            'showings': showings,
+            'edit_showing_notes_url_prefix': showing_notes_url_prefix
+        }
+
+        return render(request, u'edit_rota.html', context)
+
+    def post(self, request, year=None, day=None, month=None):
+        # Get rota entry
+        try:
+            entry_id = int(request.POST[u'id'])
+        except (ValueError, KeyError):
+            logger.error("Invalid entry_id")
+            return HttpResponse("Invalid entry id", status=400, content_type="text/plain")
+        rota_entry = get_object_or_404(RotaEntry, pk=entry_id)
+
+        # Check associated showing:
+        if rota_entry.showing.in_past():
+            return HttpResponse(u"Can't change rota for showings in the past",
+                                status=403)
+
+        # Get entered name, and store in rota entry:
+        try:
+            name = request.POST[u'value']
+        except KeyError:
+            return HttpResponse("Invalid request", status=400, content_type="text/plain")
+
+        logger.info(u"Update role id {0} (#{1}) for showing {2} '{3}' -> '{4}' ({5})"
+                    .format(rota_entry.role_id, rota_entry.rank,
+                            rota_entry.showing_id, rota_entry.name, name,
+                            rota_entry.pk))
+
+        rota_entry.name = name
+        rota_entry.save()
+
+        response = escape(name)
+
+        # Returned text is displayed as the rota entry:
+        return HttpResponse(response, content_type="text/plain")
+
+
+@permission_required('diary.change_rotaentry')
+@require_POST
+def edit_showing_rota_notes(request, showing_id):
+    showing = get_object_or_404(Showing, pk=showing_id)
+    form = diary_forms.ShowingRotaNotesForm(request.POST, instance=showing)
+
+    if showing.in_past():
+        return HttpResponse(u"Can't change rota for showings in the past",
+                            status=403)
+    elif form.is_valid():
+        form.save()
+
+    response = escape(showing.rota_notes)
+
+    return HttpResponse(escape(response), content_type="text/plain")

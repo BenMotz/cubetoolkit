@@ -20,47 +20,99 @@ import toolkit.diary.edit_prefs
 from .common import DiaryTestsMixin
 
 
-class EditDiaryViewsLoginRequired(DiaryTestsMixin, TestCase):
+class ViewSecurity(DiaryTestsMixin, TestCase):
 
-    """Basic test that the private diary pages do not load without a login"""
+    """Basic test that the private diary pages require the correct
+    permissions"""
 
-    def test_urls(self):
-        views_to_test = {
-            "default-edit": {},
-            "year-edit": {"year": "2013"},
-            "month-edit": {"year": "2013", "month": "1"},
-            "day-edit": {"year": "2013", "month": "1", "day": "1"},
-            "edit-event-details-view": {"pk": "1"},
-            "edit-event-details": {"event_id": "1"},
-            "edit-showing": {"showing_id": "1"},
-            "edit-ideas": {"year": "2012", "month": "1"},
-            "add-showing": {"event_id": "1"},
-            "delete-showing": {"showing_id": "1"},
-            "add-event": {},
+    write_required = {
+        "edit-event-details": {"event_id": "1"},
+        "edit-showing": {"showing_id": "1"},
+        "edit-ideas": {"year": "2012", "month": "1"},
+        "add-showing": {"event_id": "1"},
+        "delete-showing": {"showing_id": "1"},
+        "add-event": {},
 
-            "edit_event_templates": {},
-            "edit_event_tags": {},
-            "edit_roles": {},
-            "members-mailout": {},
-            "exec-mailout": {},
-            "mailout-progress": {},
-            "set_edit_preferences": {},
+        "edit_event_templates": {},
+        "edit_event_tags": {},
+        "edit_roles": {},
+        "members-mailout": {},
+        "exec-mailout": {},
+        "mailout-progress": {},
 
-            "edit-printed-programmes": {},
-            "add-printed-programme": {},
-        }
+        "add-printed-programme": {},
+    }
+
+    only_read_required = {
+        "default-edit": {},
+        "year-edit": {"year": "2013"},
+        "month-edit": {"year": "2013", "month": "1"},
+        "day-edit": {"year": "2013", "month": "1", "day": "1"},
+        "edit-event-details-view": {"pk": "1"},
+        "cancel-edit": {},
+        "view_event_field": {"field": "rota"},
+
+        "set_edit_preferences": {},
+
+        "edit-printed-programmes": {},
+    }
+
+    rota_edit_required = {
+        "rota-edit": {},
+        "edit-showing-rota-notes": {"showing_id": "1"},
+    }
+
+    def _assert_need_login(self, views_to_test):
         for view_name, kwargs in views_to_test.iteritems():
             url = reverse(view_name, kwargs=kwargs)
             expected_redirect = ("{0}?next={1}"
                                  .format(reverse("django.contrib.auth.views.login"), url))
-
             # Test GET:
             response = self.client.get(url)
             self.assertRedirects(response, expected_redirect)
-
             # Test POST:
             response = self.client.post(url)
             self.assertRedirects(response, expected_redirect)
+
+    def test_need_login(self):
+        """
+        Checks all URLs that shouldn't work when not logged in at all
+        """
+        views_to_test = {}
+        views_to_test.update(self.write_required)
+        views_to_test.update(self.only_read_required)
+        views_to_test.update(self.rota_edit_required)
+
+        self._assert_need_login(views_to_test)
+
+    def test_need_write(self):
+        """
+        Checks all URLs that shouldn't work when logged in user doesn't have
+        'toolkit.write' permission
+        """
+        # login as read only user:
+        self.client.login(username="read_only", password="T3stPassword!1")
+
+        views_to_test = {}
+        views_to_test.update(self.write_required)
+        views_to_test.update(self.rota_edit_required)
+
+        self._assert_need_login(views_to_test)
+
+    def test_need_read_or_write(self):
+        """
+        Checks all URLs that shouldn't work when logged in user doesn't have
+        'toolkit.write' or 'toolkit.read' permission
+        """
+        views_to_test = {}
+        views_to_test.update(self.write_required)
+        views_to_test.update(self.only_read_required)
+        views_to_test.update(self.rota_edit_required)
+
+        # login as no permission user:
+        self.client.login(username="no_perm", password="T3stPassword!2")
+
+        self._assert_need_login(views_to_test)
 
 
 class EditDiaryViews(DiaryTestsMixin, TestCase):
@@ -274,6 +326,8 @@ class EditShowing(DiaryTestsMixin, TestCase):
         self.client.login(username="admin", password="T3stPassword!")
 
     def tests_edit_showing_get(self):
+        showing = Showing.objects.get(pk=7)
+
         url = reverse("edit-showing", kwargs={"showing_id": 7})
         response = self.client.get(url)
 
@@ -314,6 +368,9 @@ class EditShowing(DiaryTestsMixin, TestCase):
             response,
             u'<input id="id_discounted" name="discounted" type="checkbox" />'
         )
+
+        # Shouldn't contain excluded fields:
+        self.assertNotContains(response, showing.rota_notes)
 
         # Rota edit:
         self.assertContains(
@@ -690,7 +747,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
             self.assertTemplateUsed(response, "form_event.html")
 
             self.assertContains(response, media_item.media_file)
-                    # Submit the minimum amount of data to validate:
+            # Submit the minimum amount of data to validate:
             self.assertContains(response, "Image Credit!")
             # Caption not currently exposed to user
 
