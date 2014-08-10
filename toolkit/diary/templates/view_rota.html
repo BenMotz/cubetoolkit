@@ -35,6 +35,11 @@ CUBE role rota
         border-style: solid;
         border-width: 1px;
         border-color: gray;
+        font-family: monospace;
+    }
+    td.rota_notes {
+        font-family: monospace;
+        white-space: pre-wrap;
     }
     td {
         padding: 0.5em;
@@ -60,14 +65,17 @@ CUBE role rota
     <tr class="event_head"><td>{{ showing.start|date:"D j H:i"}}</td><td colspan="2">{{ showing.event.name }} </td><td> </td></tr>
     {% for rota_entry in showing.rotaentry_set.all %}
         {% if forloop.counter|divisibleby:2 %}
-            <td class="rota_box">   </td><td> {{ rota_entry.role.name }}-{{ rota_entry.rank }} </td></tr>
+            <td class="rota_box">   {{ rota_entry.name }}</td><td> {{ rota_entry.role.name }}-{{ rota_entry.rank }} </td></tr>
         {% else %}
-            <tr><td class="right"> {{ rota_entry.role.name }}-{{ rota_entry.rank }} </td><td class="rota_box"></td>
+            <tr><td class="right"> {{ rota_entry.role.name }}-{{ rota_entry.rank }} </td><td class="rota_box">{{ rota_entry.name }}</td>
             {% if forloop.last %}
             <td></td><td></td></tr>
             {% endif %}
         {% endif %}
     {% endfor %}
+    {% if showing.rota_notes %}
+        <tr><td class="right">Notes: </td><td class="rota_notes" colspan="2">{{ showing.rota_notes }}</td><td> </td></tr>
+    {% endif %}
 {% endfor %}
     </tbody>
 </table>
