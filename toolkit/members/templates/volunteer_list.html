@@ -42,9 +42,8 @@ Report generated: {% now "d/m/Y" %}<p>
 <td>&nbsp;&nbsp;</td>
 <td valign="top">
 <b><font size="4">{{ member.name }}</font></b><p>
-<b>notes:</b> {{ volunteer.notes|default:"" }}
-<a href="{% url "edit-volunteer" volunteer.pk %}">[update]</a><p>
-<b>roles:</b>{{ vol_role_map|lookup:volunteer.id|join:", "|lower|default:"<em>Request role information</em>" }} <a href="{% url "edit-volunteer" volunteer.pk %}">[update]</a><p>
+<b>notes:</b> {{ volunteer.notes|default:"" }}<p>
+<b>roles:</b>{{ vol_role_map|lookup:volunteer.id|join:", "|lower|default:"<em>Request role information</em>" }}<p>
 {{ member.email|urlize|default:"<em>Request email address</em>" }}<br>
 {{ member.address }}{% if member.address %}<br>{% endif %}
 {{ member.postcode }}{% if member.postcode %}<br>{% endif %}
