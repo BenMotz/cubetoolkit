@@ -1,11 +1,11 @@
 /**
- * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2013, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.html or http://ckeditor.com/license
  */
 
 CKEDITOR.editorConfig = function( config ) {
 	// Define changes to default configuration here.
-	// For the complete reference:
+	// For complete reference see:
 	// http://docs.ckeditor.com/#!/api/CKEDITOR.config
 
 	// The toolbar groups arrangement, optimized for a single toolbar row.
@@ -26,10 +26,10 @@ CKEDITOR.editorConfig = function( config ) {
 	];
 
 	// The default plugins included in the basic setup define some buttons that
-	// we don't want too have in a basic editor. We remove them here.
+	// are not needed in a basic editor. They are removed here.
 	config.removeButtons = 'Cut,Copy,Paste,Anchor,Underline';
 
-	// Let's have it basic on dialogs as well.
+	// Dialog windows are also simplified.
 	config.removeDialogTabs = 'link:advanced';
 
 	// Allow iframe with all attributes:
@@ -39,6 +39,7 @@ CKEDITOR.editorConfig = function( config ) {
 		config.extraAllowedContent = '';
 	}
 	config.extraAllowedContent += 'iframe[*]';
-        // Enable the built-in spell checker if the browser provides one:
-        config.disableNativeSpellChecker = false;
+	// Enable the built-in spell checker if the browser provides one:
+	config.disableNativeSpellChecker = false;
+
 };
