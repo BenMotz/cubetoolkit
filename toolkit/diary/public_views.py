@@ -236,7 +236,7 @@ def view_showing(request, showing_id=None):
     return view_event(request, event_id=showings[0].event_id)
 
 
-def view_event(request, event_id=None, legacy_id=None):
+def view_event(request, event_id=None, legacy_id=None, event_slug=None):
     # Show details of an individual event, with given event_id. Also allows
     # lookup by 'legacy_id', the non-primary key id used in the old toolkit.
     context = {}
