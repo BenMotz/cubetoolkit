@@ -989,6 +989,47 @@ class EditEventView(DiaryTestsMixin, TestCase):
             # Media item should be gone:
             self.assertEqual(event.media.count(), 0)
 
+    @override_settings(PROGRAMME_COPY_SUMMARY_MAX_CHARS=50)
+    def test_post_edit_event_too_much_copy_summary(self):
+        url = reverse("edit-event-details", kwargs={"event_id": 2})
+
+        original_summary = Event.objects.get(id=2).copy_summary
+        copy_summary_data = u"X" * 51
+
+        # Submit the minimum amount of data to validate, plus some overly-long
+        # copy summary data:
+        response = self.client.post(url, data={
+            'name': u'New \u20acvent Name',
+            'duration': u'00:10:00',
+            'copy_summary': copy_summary_data,
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_event.html")
+        self.assertFormError(response, 'form', u'copy_summary',
+            u'Copy summary must be 50 characters or fewer (currently 51 characters)')
+
+        event = Event.objects.get(id=2)
+        self.assertEqual(event.copy_summary, original_summary)
+
+    @override_settings(PROGRAMME_COPY_SUMMARY_MAX_CHARS=50)
+    def test_post_edit_event_just_enough_copy_summary(self):
+        url = reverse("edit-event-details", kwargs={"event_id": 2})
+
+        copy_summary_data = u"X" * 50
+
+        # Submit the minimum amount of data to validate, plus some overly-long
+        # copy summary data:
+        response = self.client.post(url, data={
+            'name': u'New \u20acvent Name',
+            'duration': u'00:10:00',
+            'copy_summary': copy_summary_data,
+        })
+
+        self.assert_return_to_index(response)
+
+        event = Event.objects.get(id=2)
+        self.assertEqual(event.copy_summary, copy_summary_data)
 
 class EditIdeasViewTests(DiaryTestsMixin, TestCase):
 

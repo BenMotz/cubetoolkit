@@ -60,8 +60,18 @@ class EventForm(forms.ModelForm):
         }
         order = ('tags', )
         fields = ('name', 'tags', 'pricing', 'film_information', 'pre_title',
-                 'post_title', 'notes', 'duration', 'outside_hire', 'private',
-                 'copy', 'copy_summary', 'terms')
+                  'post_title', 'notes', 'duration', 'outside_hire', 'private',
+                  'copy', 'copy_summary', 'terms')
+
+    def clean_copy_summary(self):
+        copy_summary = self.cleaned_data.get(u'copy_summary', u'')
+        if len(copy_summary) > settings.PROGRAMME_COPY_SUMMARY_MAX_CHARS:
+            raise forms.ValidationError(
+                "Copy summary must be {0} characters or fewer (currently {1} "
+                "characters)".format(
+                    settings.PROGRAMME_COPY_SUMMARY_MAX_CHARS, len(copy_summary)
+                ))
+        return copy_summary
 
 
 class MediaItemForm(forms.ModelForm):
@@ -77,7 +87,7 @@ class ShowingForm(forms.ModelForm):
     class Meta(object):
         model = toolkit.diary.models.Showing
         fields = ('start', 'booked_by', 'confirmed', 'hide_in_programme',
-                   'cancelled', 'discounted', )
+                  'cancelled', 'discounted', )
 
         widgets = {
             'start': JQueryDateTimePicker(),

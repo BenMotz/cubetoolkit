@@ -44,6 +44,12 @@ Additional Info -"""
 EDIT_INDEX_DEFAULT_DAYS_AHEAD = 365
 EDIT_INDEX_DEFAULT_USE_POPUPS = True
 
+# A soft limit on the max length of copy summary. The hard limit is the size of
+# the database field (at time of writing, 4096 characters.) This is (currently)
+# only enforced by the EditEvent form (i.e. it'll be ignored if other code
+# directly sets and saves some longer text)
+PROGRAMME_COPY_SUMMARY_MAX_CHARS = 400
+
 DEFAULT_MUGSHOT = "/static/members/default_mugshot.gif"
 
 # This is used as the hostname for unsubscribe links in emails (i.e. emails
