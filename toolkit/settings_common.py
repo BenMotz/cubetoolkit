@@ -49,6 +49,8 @@ EDIT_INDEX_DEFAULT_USE_POPUPS = True
 # only enforced by the EditEvent form (i.e. it'll be ignored if other code
 # directly sets and saves some longer text)
 PROGRAMME_COPY_SUMMARY_MAX_CHARS = 400
+# Max size of uploaded diary media items (enforced by MediaItemForm)
+PROGRAMME_MEDIA_MAX_SIZE_MB = 5  # Megabytes (i.e. * 1024 * 1024 bytes)
 
 DEFAULT_MUGSHOT = "/static/members/default_mugshot.gif"
 

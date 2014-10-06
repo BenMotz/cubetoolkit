@@ -989,6 +989,54 @@ class EditEventView(DiaryTestsMixin, TestCase):
             # Media item should be gone:
             self.assertEqual(event.media.count(), 0)
 
+    @override_settings(MEDIA_ROOT="/tmp", PROGRAMME_MEDIA_MAX_SIZE_MB=1)
+    def test_post_edit_event_add_media_too_big(self):
+        url = reverse("edit-event-details", kwargs={"event_id": 2})
+
+        with tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-", suffix=".jpg") as temp_jpg:
+            # Write 1 MB + 1 byte:
+            one_k_data = "X" * 1024
+            for _ in xrange(1024):
+                temp_jpg.write(one_k_data)
+            temp_jpg.write('x')
+            temp_jpg.seek(0)
+
+            response = self.client.post(url, data={
+                'name': u'New \u20acvent Name',
+                'duration': u'00:10:00',
+                'media_file': temp_jpg,
+                'credit': u'All new image credit!'
+            })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_event.html")
+        self.assertFormError(response, 'media_form', u'media_file',
+            u'Media file must be 1 MB or less (uploaded file is 1.00 MB)')
+
+        event = Event.objects.get(id=2)
+        self.assertEqual(event.media.count(), 0)
+
+
+    @override_settings(MEDIA_ROOT="/tmp", PROGRAMME_MEDIA_MAX_SIZE_MB=1)
+    def test_post_edit_event_add_media_max_size(self):
+        url = reverse("edit-event-details", kwargs={"event_id": 2})
+
+        with tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-", suffix=".jpg") as temp_jpg:
+            # Write 1 MB + 1 byte:
+            one_k_data = "X" * 1024
+            for _ in xrange(1024):
+                temp_jpg.write(one_k_data)
+            temp_jpg.seek(0)
+
+            response = self.client.post(url, data={
+                'name': u'New \u20acvent Name',
+                'duration': u'00:10:00',
+                'media_file': temp_jpg,
+                'credit': u'All new image credit!'
+            })
+        self.assert_return_to_index(response)
+
+
     @override_settings(PROGRAMME_COPY_SUMMARY_MAX_CHARS=50)
     def test_post_edit_event_too_much_copy_summary(self):
         url = reverse("edit-event-details", kwargs={"event_id": 2})

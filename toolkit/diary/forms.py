@@ -67,8 +67,8 @@ class EventForm(forms.ModelForm):
         copy_summary = self.cleaned_data.get(u'copy_summary', u'')
         if len(copy_summary) > settings.PROGRAMME_COPY_SUMMARY_MAX_CHARS:
             raise forms.ValidationError(
-                "Copy summary must be {0} characters or fewer (currently {1} "
-                "characters)".format(
+                u"Copy summary must be {0} characters or fewer (currently {1} "
+                u"characters)".format(
                     settings.PROGRAMME_COPY_SUMMARY_MAX_CHARS, len(copy_summary)
                 ))
         return copy_summary
@@ -81,6 +81,17 @@ class MediaItemForm(forms.ModelForm):
             'media_file': forms.ClearableFileInput(attrs={'accept': 'image/jpeg,image/gif,image/png'}),
         }
         exclude = ('mimetype', 'caption')
+
+    def clean_media_file(self):
+        media_file = self.cleaned_data.get(u'media_file', None)
+        if media_file:
+            size_MB = media_file.size / 1048576.0
+            max_MB = settings.PROGRAMME_MEDIA_MAX_SIZE_MB
+            if size_MB > max_MB:
+                raise forms.ValidationError(
+                    u"Media file must be {0} MB or less (uploaded file is {1:.2f} MB)"
+                    .format(max_MB, size_MB))
+        return media_file
 
 
 class ShowingForm(forms.ModelForm):
