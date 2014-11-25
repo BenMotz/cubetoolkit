@@ -58,6 +58,7 @@ def get_date_range(year, month, day, user_days_ahead, default_days_ahead=365):
     if user_days_ahead:
         try:
             days_ahead = int(user_days_ahead)
+            days_ahead = 0 if days_ahead < 0 else days_ahead
         except (ValueError, TypeError):
             pass
 

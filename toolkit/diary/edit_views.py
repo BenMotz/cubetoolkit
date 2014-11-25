@@ -711,12 +711,17 @@ class EditRotaView(View):
         now_local = django.utils.timezone.localtime(django.utils.timezone.now())
         # Create a new local time with hour/min/sec set to zero:
         current_tz = django.utils.timezone.get_current_timezone()
-        start_date = current_tz.localize(datetime.datetime(
+        today_local_date = current_tz.localize(datetime.datetime(
             now_local.year, now_local.month, now_local.day))
+        yesterday_local_date = today_local_date - datetime.timedelta(days=1)
 
         query_days_ahead = request.GET.get('daysahead', None)
         start_date, days_ahead = get_date_range(
             year, month, day, query_days_ahead, default_days_ahead=30)
+
+        # Don't allow data from before yesterday to be displayed:
+        if start_date < yesterday_local_date:
+            start_date = yesterday_local_date
 
         end_date = start_date + datetime.timedelta(days=days_ahead)
         showings = (Showing.objects.not_cancelled()

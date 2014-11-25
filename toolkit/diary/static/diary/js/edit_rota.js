@@ -26,11 +26,13 @@ function edit_rota(jQuery, rota_edit_base_url, edit_rota_notes_url_prefix, CSRF_
         // Add date picker:
         $('#id_from_date').datepicker({
             dateFormat : 'dd-mm-yy',
-            onSelect : dateRangeSelected
+            onSelect : dateRangeSelected,
+            minDate : 0
         });
         $('#id_to_date').datepicker({
             dateFormat : 'dd-mm-yy',
-            onSelect : dateRangeSelected
+            onSelect : dateRangeSelected,
+            minDate : 0
         });
         $('#daterange')[0].onsubmit = function() {
             dateRangeSelected();
