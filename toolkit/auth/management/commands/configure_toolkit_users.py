@@ -1,3 +1,4 @@
+import getpass
 import django.contrib.auth.models as auth_models
 import django.contrib.contenttypes as contenttypes
 
@@ -6,13 +7,15 @@ from django.core.management.base import BaseCommand, CommandError
 
 def _get_password(use):
     print "*" * 80
-    password = raw_input("Please enter string to use as {0} password: "
-                         .format(use))
+    password = ""
     check_password = None
 
     while check_password != password:
-        print
-        check_password = raw_input("Please re-enter for confirmation: ")
+        password = getpass.getpass("Please enter password for {0}: "
+                             .format(use))
+        check_password = getpass.getpass("Please re-enter for confirmation: ")
+        if check_password != password:
+            print "Passwords don't match; please try again..."
 
     return password
 
