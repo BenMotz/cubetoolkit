@@ -27,6 +27,26 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "view_showing_index.html")
 
+    @patch('django.utils.timezone.now')
+    def test_view_empty_slug(self, now_patch):
+        # When an event has a name that results in a slugified event name of
+        # ""
+        now_patch.return_value = pytz.timezone("Europe/London").localize(datetime(2013, 4, 1, 11, 00))
+
+        self.e2.name = "?"
+        self.e2.save()
+
+        url = reverse("default-view")
+        response = self.client.get(url)
+
+        self.assertTemplateUsed(response, "view_showing_index.html")
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(
+            response,
+            r'<a href="/programme/event/,2/">'
+            r'<span class="pre_title"> </span> ? <span class="post_title">'
+            r'</span> </a>', html=True)
+
     def test_view_by_type(self):
         url = reverse("type-view", kwargs={"event_type": "film"})
         response = self.client.get(url)

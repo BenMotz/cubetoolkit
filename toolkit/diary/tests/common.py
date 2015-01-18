@@ -94,7 +94,7 @@ class DiaryTestsMixin(object):
         )
         e1.save()
 
-        e2 = Event(
+        self.e2 = Event(
             name="Event two title",
             copy="Event\n two\n copy",  # newlines will be stripped at legacy conversion
             pricing="Pricing TWO",
@@ -103,7 +103,7 @@ class DiaryTestsMixin(object):
             legacy_id="100",
             legacy_copy=True,
         )
-        e2.save()
+        self.e2.save()
 
         e3 = Event(
             name="Event three title",
@@ -164,27 +164,27 @@ class DiaryTestsMixin(object):
         # Showings:
         self.e2s1 = Showing(  # pk :1
             start=pytz.timezone("Europe/London").localize(datetime(2013, 4, 1, 19, 00)),
-            event=e2, booked_by="User",
+            event=self.e2, booked_by="User",
             confirmed=False, hide_in_programme=False, cancelled=False, discounted=False)
         self.e2s1.save(force=True)
         self.e2s2 = Showing(  # pk :2
             start=pytz.timezone("Europe/London").localize(datetime(2013, 4, 2, 19, 00)),
-            event=e2, booked_by="User",
+            event=self.e2, booked_by="User",
             confirmed=True, hide_in_programme=False, cancelled=False, discounted=False)
         self.e2s2.save(force=True)
         e2s3 = Showing(  # pk :3
             start=pytz.timezone("Europe/London").localize(datetime(2013, 4, 3, 19, 00)),
-            event=e2, booked_by="User",
+            event=self.e2, booked_by="User",
             confirmed=True, hide_in_programme=False, cancelled=True, discounted=False)
         e2s3.save(force=True)
         e2s4 = Showing(  # pk :4
             start=pytz.timezone("Europe/London").localize(datetime(2013, 4, 4, 19, 00)),
-            event=e2, booked_by="User",
+            event=self.e2, booked_by="User",
             confirmed=True, hide_in_programme=True, cancelled=False, discounted=False)
         e2s4.save(force=True)
         e2s5 = Showing(  # pk :5
             start=pytz.timezone("Europe/London").localize(datetime(2013, 4, 5, 19, 00)),
-            event=e2, booked_by="User",
+            event=self.e2, booked_by="User",
             confirmed=True, hide_in_programme=True, cancelled=True, discounted=False)
         e2s5.save(force=True)
 

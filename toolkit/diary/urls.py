@@ -31,7 +31,7 @@ programme_urls = patterns(
     url(r'^showing/id/(?P<showing_id>\d+)/$', 'view_showing', name="single-showing-view"),
     # All showings for a given event
     url(r'^event/id/(?P<event_id>\d+)/$', 'view_event', name="single-event-view"),
-    url(r'^event/(?P<event_slug>[\w\-_]+),(?P<event_id>\d+)/$', 'view_event', name="single-event-view-with-slug"),
+    url(r'^event/(?P<event_slug>[\w\-_]*),(?P<event_id>\d+)/$', 'view_event', name="single-event-view-with-slug"),
     # As above, for legacy event ID:
     url(r'^event/oldid/(?P<legacy_id>\d+)/$', 'view_event', name="single-event-view-legacyid"),
 
