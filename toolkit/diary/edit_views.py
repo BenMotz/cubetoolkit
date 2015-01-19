@@ -801,5 +801,4 @@ def edit_showing_rota_notes(request, showing_id):
 
 @permission_required('toolkit.write')
 def view_force_error(request):
-    logger.error("Forcing an error")
     raise AssertionError("Forced exception")
