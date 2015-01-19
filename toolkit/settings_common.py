@@ -297,7 +297,14 @@ LOGGING = {
             'format': '%(asctime)s %(module)s %(funcName)s %(levelname)s : %(message)s',
         },
     },
-
+    'filters': {
+        'require_debug_false': {
+            '()': 'django.utils.log.RequireDebugFalse',
+        },
+        'require_debug_true': {
+            '()': 'django.utils.log.RequireDebugTrue',
+        },
+    },
     'handlers': {
         'console': {
             'level': 'DEBUG',
@@ -315,6 +322,11 @@ LOGGING = {
             'mode': 'a',
             'maxBytes': 10485760,
             'backupCount': 5,
+        },
+        'mail_admins' : {
+            'level': 'ERROR',
+            'filters': ['require_debug_false'],
+            'class': 'django.utils.log.AdminEmailHandler',
         },
         # 'null': {
         #     'level': 'DEBUG',
