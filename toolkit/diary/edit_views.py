@@ -798,3 +798,8 @@ def edit_showing_rota_notes(request, showing_id):
     response = escape(showing.rota_notes)
 
     return HttpResponse(escape(response), content_type="text/plain")
+
+@permission_required('toolkit.write')
+def view_force_error(request):
+    logger.error("Forcing an error")
+    raise AssertionError("Forced exception")

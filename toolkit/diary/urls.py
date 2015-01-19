@@ -109,6 +109,9 @@ diary_urls = patterns(
     # Printed programme archive edit/upload:
     url("^printedprogrammes$", 'printed_programme_edit', name="edit-printed-programmes", kwargs={'operation': 'edit'}),
     url("^printedprogrammes/add$", 'printed_programme_edit', name="add-printed-programme", kwargs={'operation': 'add'}),
+
+    # Force a 500 error, to test error emailing
+    url(r'error/$', 'view_force_error'),
 )
 
 diary_urls += patterns(
