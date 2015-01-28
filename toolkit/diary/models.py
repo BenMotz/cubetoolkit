@@ -76,7 +76,7 @@ class MediaItem(models.Model):
     """Media (eg. video, audio, html fragment?). Currently to be assoicated
     with events, in future with other things?"""
 
-    media_file = models.FileField(upload_to="diary", max_length=256, null=True, blank=True, verbose_name='Image file')
+    media_file = models.ImageField(upload_to="diary", max_length=256, null=True, blank=True, verbose_name='Image file')
     mimetype = models.CharField(max_length=64, editable=False)
 
     credit = models.CharField(max_length=256, null=True, blank=True,

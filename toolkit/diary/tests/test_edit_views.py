@@ -19,6 +19,23 @@ import toolkit.diary.edit_prefs
 
 from .common import DiaryTestsMixin
 
+TINY_VALID_PNG = bytearray(
+    b'\x89PNG\r\n\x1a\n\x00\x00\x00\rIHDR\x00\x00\x00\x01\x00\x00\x00\x01\x08'
+    b'\x02\x00\x00\x00\x90wS\xde\x00\x00\x00\x01sRGB\x00\xae\xce\x1c\xe9\x00'
+    b'\x00\x00\x04gAMA\x00\x00\xb1\x8f\x0b\xfca\x05\x00\x00\x00\tpHYs\x00\x00'
+    b'\x0e\xc3\x00\x00\x0e\xc3\x01\xc7o\xa8d\x00\x00\x00\x0cIDAT\x18Wc\xf8\xff'
+    b'\xff?\x00\x05\xfe\x02\xfe\xa75\x81\x84\x00\x00\x00\x00IEND\xaeB`\x82')
+
+TINY_VALID_JPEG = bytearray(
+    b'\xff\xd8\xff\xe0\x00\x10JFIF\x00\x01\x01\x02\x00&\x00&\x00\x00\xff'
+    b'\xdb\x00C\x00\x03\x02\x02\x02\x02\x02\x03\x02\x02\x02\x03\x03\x03\x03'
+    b'\x04\x06\x04\x04\x04\x04\x04\x08\x06\x06\x05\x06\t\x08\n\n\t\x08\t'
+    b'\t\n\x0c\x0f\x0c\n\x0b\x0e\x0b\t\t\r\x11\r\x0e\x0f\x10\x10\x11\x10'
+    b'\n\x0c\x12\x13\x12\x10\x13\x0f\x10\x10\x10\xff\xc0\x00\x0b\x08\x00'
+    b'\x01\x00\x01\x01\x01\x11\x00\xff\xc4\x00\x14\x00\x01\x00\x00\x00\x00'
+    b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\t\xff\xc4\x00\x14\x10'
+    b'\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
+    b'\xff\xda\x00\x08\x01\x01\x00\x00?\x00T\xdf\xff\xd9')
 
 class ViewSecurity(DiaryTestsMixin, TestCase):
 
@@ -871,9 +888,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
         event = Event.objects.get(id=2)
         self.assertEqual(event.media.count(), 0)
 
-    @patch("toolkit.util.image.get_mimetype")
-    def test_post_edit_event_add_media_not_an_image(self, get_mimetype_patch):
-        get_mimetype_patch.return_value = "text/plain"
+    def test_post_edit_event_add_media_not_an_image(self):
 
         url = reverse("edit-event-details", kwargs={"event_id": 2})
 
@@ -887,29 +902,22 @@ class EditEventView(DiaryTestsMixin, TestCase):
                 'credit': u'All new image credit!'
             })
 
-        self.assert_return_to_index(response)
-
-        self.assertTrue(get_mimetype_patch.called)
+        self.assertFormError(response, 'media_form', u'media_file',
+            u'Upload a valid image. The file you uploaded was either '
+            u'not an image or a corrupted image.')
 
         event = Event.objects.get(id=2)
-        self.assertEqual(event.media.count(), 1)
-        media_item = event.media.all()[0]
-        self.assertEqual(media_item.mimetype, "text/plain")
-        self.assertEqual(media_item.credit, u'All new image credit!')
-        self.assertEqual(media_item.caption, None)
+        self.assertEqual(event.media.count(), 0)
 
-    @patch("toolkit.util.image.get_mimetype")
     @override_settings(MEDIA_ROOT="/tmp")
-    def test_post_edit_event_add_media_jpeg(self, get_mimetype_patch):
-        get_mimetype_patch.return_value = "image/jpeg"
+    def test_post_edit_event_add_media_jpeg(self):
 
         url = reverse("edit-event-details", kwargs={"event_id": 2})
 
         with tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-", suffix=".jpg") as temp_jpg:
             # used for assertion:
             temp_file_name = os.path.basename(temp_jpg.name)
-
-            temp_jpg.write("Dummy jpeg")
+            temp_jpg.write(TINY_VALID_JPEG)
             temp_jpg.seek(0)
             response = self.client.post(url, data={
                 'name': u'New \u20acvent Name',
@@ -919,8 +927,6 @@ class EditEventView(DiaryTestsMixin, TestCase):
             })
 
         self.assert_return_to_index(response)
-
-        self.assertTrue(get_mimetype_patch.called)
 
         event = Event.objects.get(id=2)
         self.assertEqual(event.media.count(), 1)
@@ -932,17 +938,14 @@ class EditEventView(DiaryTestsMixin, TestCase):
                          os.path.join("diary", temp_file_name))
 
     @override_settings(MEDIA_ROOT="/tmp")
-    @patch("toolkit.util.image.get_mimetype")
-    def test_post_edit_event_add_media_png(self, get_mimetype_patch):
-        get_mimetype_patch.return_value = "image/png"
-
+    def test_post_edit_event_add_media_png(self):
         url = reverse("edit-event-details", kwargs={"event_id": 2})
 
         with tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-", suffix=".png") as temp_png:
             # used for assertion:
             temp_file_name = os.path.basename(temp_png.name)
 
-            temp_png.write("Dummy png")
+            temp_png.write(TINY_VALID_PNG)
             temp_png.seek(0)
             response = self.client.post(url, data={
                 'name': u'New \u20acvent Name',
@@ -952,8 +955,6 @@ class EditEventView(DiaryTestsMixin, TestCase):
             })
 
         self.assert_return_to_index(response)
-
-        self.assertTrue(get_mimetype_patch.called)
 
         event = Event.objects.get(id=2)
         self.assertEqual(event.media.count(), 1)
@@ -994,11 +995,16 @@ class EditEventView(DiaryTestsMixin, TestCase):
         url = reverse("edit-event-details", kwargs={"event_id": 2})
 
         with tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-", suffix=".jpg") as temp_jpg:
-            # Write 1 MB + 1 byte:
-            one_k_data = "X" * 1024
-            for _ in xrange(1024):
+            # Write 1 MB + 1 byte, consisting of valid JPEG data followed by
+            # nulls:
+            temp_jpg.write(TINY_VALID_JPEG)
+            temp_jpg.write('\0' * (1024 - len(TINY_VALID_JPEG)))
+
+            one_k_data = "\0" * 1024
+            for _ in xrange(1023):
                 temp_jpg.write(one_k_data)
-            temp_jpg.write('x')
+            # the extra byte!
+            temp_jpg.write('\0')
             temp_jpg.seek(0)
 
             response = self.client.post(url, data={
@@ -1022,9 +1028,13 @@ class EditEventView(DiaryTestsMixin, TestCase):
         url = reverse("edit-event-details", kwargs={"event_id": 2})
 
         with tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-", suffix=".jpg") as temp_jpg:
-            # Write 1 MB + 1 byte:
-            one_k_data = "X" * 1024
-            for _ in xrange(1024):
+            # Write 1 MB, consisting of valid JPEG data followed by
+            # nulls:
+            temp_jpg.write(TINY_VALID_JPEG)
+            temp_jpg.write('\0' * (1024 - len(TINY_VALID_JPEG)))
+
+            one_k_data = "\0" * 1024
+            for _ in xrange(1023):
                 temp_jpg.write(one_k_data)
             temp_jpg.seek(0)
 
