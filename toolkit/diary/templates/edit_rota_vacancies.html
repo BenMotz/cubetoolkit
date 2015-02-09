@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}
+CUBE role rota vacancies
+{% endblock %}
+
+{% block css %}
+<style type="text/css">
+    body { font-family:Arial,Helvetica,sans-serif; }
+    h1, h2 { margin: 1mm; }
+    h1 { font-size: 13pt; }
+    h2 { font-size: 11pt; }
+    p { font-size: 10pt; }
+    .today { color: red; }
+
+    #missing_list a, #missing_list a:visited{
+        color: black;
+        text-decoration: none;
+    }
+    #missing_list a:hover {
+        text-decoration: underline;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<h1>Rota roles that need filling</h1>
+<p><i>Skip to the <a href="{% url "rota-edit" %}">full rota</a></i></p>
+<div id="missing_list">
+{% for showing, vacant_roles in showings_vacant_roles.items %}
+    <p><b>
+        {% if showing.start < tomorrow %}
+        <span class="today">Today!</span>
+        {% else %}
+            {{ showing.start|date:"D H:i"}}
+        {% endif %} &mdash;
+        <a href="{% url "single-showing-view" showing.pk %}">{{ showing.event.name }}</a></b> <i>needs</i>
+        {% for rota_entry in vacant_roles %}
+            {{ rota_entry.role.name }}{% if rota_entry.rank > 1 %} #{{ rota_entry.rank }}{% endif %}{% if not forloop.last %},{% endif %}
+        {% empty %}
+            Nobody!
+        {% endfor %}
+    </p>
+{% endfor %}
+</div>
+{% endblock %}

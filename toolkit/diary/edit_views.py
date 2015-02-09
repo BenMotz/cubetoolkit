@@ -697,6 +697,39 @@ def printed_programme_edit(request, operation):
     return render(request, 'form_printedprogramme_archive.html', context)
 
 
+@permission_required('toolkit.read')
+def rota_edit_vacancies(request):
+    days_ahead = 6
+    start = timezone.now()
+    end_date = start + datetime.timedelta(days=days_ahead)
+    showings = (Showing.objects.not_cancelled()
+                               .confirmed()
+                               .start_in_range(start, end_date)
+                               .order_by('start')
+                               .prefetch_related('rotaentry_set__role')
+                               .select_related())
+    showings_vacant_roles = OrderedDict(
+        (
+            showing,
+            showing.rotaentry_set.filter(Q(name="") | Q(name__isnull=True))
+        ) for showing in showings
+    )
+
+    # Surprisingly round-about way to get tomorrow's date:
+    now_local = django.utils.timezone.localtime(django.utils.timezone.now())
+    # Create a new local time with hour/min/sec set to zero:
+    current_tz = django.utils.timezone.get_current_timezone()
+    today_local_date = current_tz.localize(datetime.datetime(
+        now_local.year, now_local.month, now_local.day))
+
+    context = {
+        'tomorrow': today_local_date + datetime.timedelta(days=1),
+        'showings_vacant_roles': showings_vacant_roles,
+    }
+
+    return render(request, u'edit_rota_vacancies.html', context)
+
+
 class EditRotaView(View):
     """Handle the "edit rota" page."""
 

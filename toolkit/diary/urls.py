@@ -103,6 +103,9 @@ diary_urls = patterns(
     url(r"^edit/rota(/|/(?P<year>\d{4})/(?P<month>\d{1,2})/?(?P<day>(?<=/)\d{0,2})?/?)?$$",
         EditRotaView.as_view(), name="rota-edit"),
 
+    url(r"^rota/vacancies$",
+        'rota_edit_vacancies', name="rota-edit-vacancies"),
+
     # Ajax calls:
     url("^edit/setprefs$", 'set_edit_preferences', name="set_edit_preferences"),
 
