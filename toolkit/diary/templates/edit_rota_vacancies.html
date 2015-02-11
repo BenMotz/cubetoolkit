@@ -11,28 +11,20 @@ CUBE role rota vacancies
     h1 { font-size: 13pt; }
     h2 { font-size: 11pt; }
     p { font-size: 10pt; }
-    .today { color: red; }
-
-    #missing_list a, #missing_list a:visited{
-        color: black;
-        text-decoration: none;
-    }
-    #missing_list a:hover {
-        text-decoration: underline;
-    }
 </style>
 {% endblock %}
 
 {% block body %}
 <h1>Rota roles that need filling</h1>
-<p><i>Skip to the <a href="{% url "rota-edit" %}">full rota</a></i></p>
+<p><i>See the <a href="{{ rota_edit_url }}">full rota</a> at {{ rota_edit_url}}</i></p>
 <div id="missing_list">
 {% for showing, vacant_roles in showings_vacant_roles.items %}
+    {% if vacant_roles %}
     <p><b>
-        {% if showing.start < tomorrow %}
-        <span class="today">Today!</span>
+        {% if showing.start < now_plus_1d %}
+        <span style="color: red;">Urgent!</span>
         {% else %}
-            {{ showing.start|date:"D H:i"}}
+            {{ showing.start|date:"D jS H:i"}}
         {% endif %} &mdash;
         <a href="{% url "single-showing-view" showing.pk %}">{{ showing.event.name }}</a></b> <i>needs</i>
         {% for rota_entry in vacant_roles %}
@@ -41,6 +33,7 @@ CUBE role rota vacancies
             Nobody!
         {% endfor %}
     </p>
+    {% endif %}
 {% endfor %}
 </div>
 {% endblock %}

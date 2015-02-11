@@ -717,13 +717,10 @@ def rota_edit_vacancies(request):
 
     # Surprisingly round-about way to get tomorrow's date:
     now_local = django.utils.timezone.localtime(django.utils.timezone.now())
-    # Create a new local time with hour/min/sec set to zero:
-    current_tz = django.utils.timezone.get_current_timezone()
-    today_local_date = current_tz.localize(datetime.datetime(
-        now_local.year, now_local.month, now_local.day))
 
     context = {
-        'tomorrow': today_local_date + datetime.timedelta(days=1),
+        'now_plus_1d': now_local + datetime.timedelta(days=1),
+        'rota_edit_url': request.build_absolute_uri(reverse("rota-edit")),
         'showings_vacant_roles': showings_vacant_roles,
     }
 
