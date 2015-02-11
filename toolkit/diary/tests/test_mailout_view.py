@@ -44,7 +44,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             u" Posttitle four\n"
             u"Film info for four\n"
             u"\n"
-            u"Sun 9 June, 6:00 PM\n"
+            u"Sun 9th / 6pm\n"
             u"Tickets: \u00a3milliion per thing\n"
             u"\n"
             u"Event four C\u014dpy\n"
