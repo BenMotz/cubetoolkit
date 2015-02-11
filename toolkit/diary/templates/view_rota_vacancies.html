@@ -15,7 +15,7 @@ CUBE role rota vacancies
 {% endblock %}
 
 {% block body %}
-<h1>Rota roles that need filling</h1>
+<h1>Rota roles that need filling in the next {{ days_ahead }} days</h1>
 <p><i>See the <a href="{{ rota_edit_url }}">full rota</a> at {{ rota_edit_url}}</i></p>
 <div id="missing_list">
 {% for showing, vacant_roles in showings_vacant_roles.items %}

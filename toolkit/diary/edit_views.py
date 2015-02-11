@@ -719,6 +719,7 @@ def view_rota_vacancies(request):
     now_local = django.utils.timezone.localtime(django.utils.timezone.now())
 
     context = {
+        'days_ahead': days_ahead,
         'now_plus_1d': now_local + datetime.timedelta(days=1),
         'rota_edit_url': request.build_absolute_uri(reverse("rota-edit")),
         'showings_vacant_roles': showings_vacant_roles,
