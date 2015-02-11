@@ -72,6 +72,8 @@ class ViewSecurity(DiaryTestsMixin, TestCase):
         "set_edit_preferences": {},
 
         "edit-printed-programmes": {},
+
+        "view-rota-vacancies": {},
     }
 
     rota_edit_required = {

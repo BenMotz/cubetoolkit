@@ -698,7 +698,7 @@ def printed_programme_edit(request, operation):
 
 
 @permission_required('toolkit.read')
-def rota_edit_vacancies(request):
+def view_rota_vacancies(request):
     days_ahead = 6
     start = timezone.now()
     end_date = start + datetime.timedelta(days=days_ahead)
@@ -724,7 +724,7 @@ def rota_edit_vacancies(request):
         'showings_vacant_roles': showings_vacant_roles,
     }
 
-    return render(request, u'edit_rota_vacancies.html', context)
+    return render(request, u'view_rota_vacancies.html', context)
 
 
 class EditRotaView(View):
