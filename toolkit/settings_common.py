@@ -70,7 +70,7 @@ MAILOUT_FROM_ADDRESS = u"mailout@cubecinema.com"
 
 # The maximum number of each type of role that can be assigned to a showing
 # (so, for example, can't have more than this number of bar staff)
-MAX_COUNT_PER_ROLE = 6
+MAX_COUNT_PER_ROLE = 8
 
 # Probably don't want to change these: subdirectories of MEDIA directory where
 # volunteer images get saved:
