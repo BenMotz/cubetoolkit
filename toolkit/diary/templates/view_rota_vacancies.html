@@ -22,9 +22,16 @@ CUBE role rota vacancies
     {% if vacant_roles %}
     <p><b>
         {% if showing.start < now_plus_1d %}
-        <span style="color: red;">Urgent!</span>
+        <span style="color: red;">Urgent!
+            {% if showing.start.day == now.day %}
+             Today!
+            {% else %}
+             Tomorrow!
+            {% endif %}
+            ({{ showing.start|date:"D jS H:i" }})
+        </span>
         {% else %}
-            {{ showing.start|date:"D jS H:i"}}
+            {{ showing.start|date:"D jS H:i" }}
         {% endif %} &mdash;
         <a href="{% url "single-showing-view" showing.pk %}">{{ showing.event.name }}</a></b> <i>needs</i>
         {% for rota_entry in vacant_roles %}
