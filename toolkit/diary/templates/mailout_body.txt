@@ -30,19 +30,18 @@ http://www.cubecinema.com/programme/
 {% endifchanged %}
 {% endfor %}
 
-For full and up to date listings, please visit:
-http://www.cubecinema.com/programme/
-
 --
 {% endfiltermultipleblanklines %}
+For complete and up to date listings, please visit:
+http://www.cubecinema.com/programme/
 
-Cube Cinema Microplex
+Cube Microplex Cinema
 is located at:
 Dove Street South
 Bristol
 BS2 8JD
 
-postal:
+Postal:
 4 Princess Row
 Bristol
 BS2 8NQ
