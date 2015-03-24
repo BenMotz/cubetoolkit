@@ -63,6 +63,13 @@ EMAIL_UNSUBSCRIBE_HOST = "cubecinema.com"
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 25
 
+# Default number of days ahead for which to include detailed copy in the
+# member's mailout
+MAILOUT_DETAILS_DAYS_AHEAD = 9
+# Default number of days ahead for which to include listings in the member'sm
+# mailout
+MAILOUT_LISTINGS_DAYS_AHEAD = 14
+
 # Default address to which reports of a successful mailout delivery are sent:
 MAILOUT_DELIVERY_REPORT_TO = u"cubeadmin@cubecinema.com"
 # "From" address for mailout

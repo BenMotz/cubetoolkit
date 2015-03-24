@@ -11,6 +11,7 @@ import django.db
 import django.utils.timezone as timezone
 from django.contrib.auth.decorators import permission_required
 from django.views.decorators.http import require_GET, require_POST, require_http_methods
+from django.conf import settings
 
 from toolkit.diary.models import Showing
 import toolkit.diary.forms as diary_forms
@@ -22,12 +23,13 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-def _render_mailout_body(days_ahead):
+def _render_mailout_body(days_ahead, copy_days_ahead):
     # Render default mail contents;
 
     # Read data
     start_date = timezone.now()
     end_date = start_date + datetime.timedelta(days=days_ahead)
+    copy_end_date = start_date + datetime.timedelta(days=copy_days_ahead)
     showings = (Showing.objects.public()
                                .not_cancelled()
                                .start_in_range(start_date, end_date)
@@ -37,7 +39,7 @@ def _render_mailout_body(days_ahead):
 
     event_ids = set()
     showings_once_per_event = []
-    for s in showings.public():
+    for s in showings.public().start_in_range(start_date, copy_end_date):
         if s.event_id not in event_ids:
             showings_once_per_event.append(s)
             event_ids.add(s.event_id)
@@ -49,20 +51,21 @@ def _render_mailout_body(days_ahead):
         'start_date': start_date,
         'end_date': end_date,
         'showings': showings,
-        'showings_once_per_event': showings_once_per_event,
+        'showings_details': showings_once_per_event,
+        'copy_days_ahead': copy_days_ahead,
     }
 
     return mail_template.render(django.template.Context(context))
 
 
-def _render_mailout_form(request, body_text, subject_text):
+def _render_mailout_form(request, body_text, subject_text, context):
     form = diary_forms.MailoutForm(initial={'subject': subject_text, 'body': body_text})
     email_count = (toolkit.members.models.Member.objects.mailout_recipients()
                                                         .count())
-    context = {
+    context.update({
         'form': form,
         'email_count': email_count,
-    }
+    })
 
     return render(request, 'form_mailout.html', context)
 
@@ -76,14 +79,23 @@ def mailout(request):
     # "mailout_send" form. That form has javascript which, if the user
     # confirms, posts to the "exec-mailout" view
 
+
     if request.method == 'GET':
+        days_ahead = settings.MAILOUT_LISTINGS_DAYS_AHEAD
+        copy_days_ahead = settings.MAILOUT_DETAILS_DAYS_AHEAD
+
         try:
-            query_days_ahead = int(request.GET.get('daysahead', 9))
+            days_ahead = int(request.GET.get('daysahead', days_ahead))
+            copy_days_ahead = int(request.GET.get('copydaysahead', copy_days_ahead))
         except ValueError:
-            query_days_ahead = 9
-        body_text = _render_mailout_body(query_days_ahead)
+            pass
+        body_text = _render_mailout_body(days_ahead, copy_days_ahead)
         subject_text = "CUBE Microplex forthcoming events"
-        return _render_mailout_form(request, body_text, subject_text)
+        context = {
+            "days_ahead": days_ahead,
+            "copy_days_ahead": copy_days_ahead
+        }
+        return _render_mailout_form(request, body_text, subject_text, context)
     elif request.method == 'POST':
         form = diary_forms.MailoutForm(request.POST)
         if not form.is_valid():

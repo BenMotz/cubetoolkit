@@ -9,6 +9,9 @@
         width: 90ex;
         display: block;
     }
+    form input[type=number] {
+        width: 4em;
+    }
 
 </style>
 {% endblock %}
@@ -16,6 +19,13 @@
 {% block body %}
 <p><img src="{{ STATIC_URL }}members/cube_microplex_logo.gif" width="200"></p>
 <h3>Cube member's mailout.</h3>
+<form method="GET">
+    <p><label for="id_daysahead">Days of listings: </label>
+    <input type="number" id="id_daysahead" name="daysahead" min="0" value="{{ days_ahead }}">
+    <label for="id_copydaysahead">Days of copy: </label>
+    <input type="number" id="id_copydaysahead" name="copydaysahead" min="0" value="{{ copy_days_ahead }}">
+    <input type="submit" value="Regenerate mailout (lose any edits)"></p>
+</form>
 <p>Total of <b>{{ email_count }}</b> member emails to send from cube microplex</p>
 <form method="POST">
     {% csrf_token %}
