@@ -16,7 +16,7 @@ http://www.cubecinema.com/programme/
 {% endfor %}
 {% endfilterblanklines %}
 {% filtermultipleblanklines %}
-{% for showing in showings.public %}{% ifchanged %}------------------------------------------------------------------------------
+{% for showing in showings_once_per_event %}{% ifchanged %}------------------------------------------------------------------------------
 
 {% if showing.event.pre_title %}{{ showing.event.pre_title }}:
 {% endif %}{{ showing.event.name|upper }}

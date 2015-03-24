@@ -35,6 +35,13 @@ def _render_mailout_body(days_ahead):
                                .select_related()
                                .prefetch_related('event__showings'))
 
+    event_ids = set()
+    showings_once_per_event = []
+    for s in showings.public():
+        if s.event_id not in event_ids:
+            showings_once_per_event.append(s)
+            event_ids.add(s.event_id)
+
     # Render into mail template
     mail_template = django.template.loader.get_template("mailout_body.txt")
 
@@ -42,6 +49,7 @@ def _render_mailout_body(days_ahead):
         'start_date': start_date,
         'end_date': end_date,
         'showings': showings,
+        'showings_once_per_event': showings_once_per_event,
     }
 
     return mail_template.render(django.template.Context(context))
