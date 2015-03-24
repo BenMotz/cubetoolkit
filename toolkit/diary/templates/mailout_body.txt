@@ -29,6 +29,10 @@ http://www.cubecinema.com/programme/
 {{ showing.event.copy_plaintext }}
 {% endifchanged %}
 {% endfor %}
+
+For full and up to date listings, please visit:
+http://www.cubecinema.com/programme/
+
 --
 {% endfiltermultipleblanklines %}
 
