@@ -323,13 +323,30 @@ class EventTagTests(TestCase):
         tag = EventTag.objects.get(id=pk)
         self.assertEqual(tag.name, "crispin")
 
+    def test_can_change_to_readonly(self):
+        tag = EventTag(name=u"test", slug=u"test", read_only=False)
+        tag.save()
+        pk = tag.pk
+
+        tag = EventTag.objects.get(id=pk)
+        self.assertFalse(tag.read_only)
+
+        tag.read_only = True
+        tag.save()
+
+        tag = EventTag.objects.get(id=pk)
+        self.assertTrue(tag.read_only)
+
+        tag.name = "crispin"
+        self.assertFalse(tag.save())
+
     def test_cant_edit_readonly(self):
         tag = EventTag(name=u"test", slug=u"test", read_only=True)
         tag.save()
         pk = tag.pk
         # Try to edit:
         tag.name = "crispin"
-        tag.save()
+        self.assertFalse(tag.save())
 
         tag = EventTag.objects.get(id=pk)
         self.assertEqual(tag.name, "test")

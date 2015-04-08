@@ -121,6 +121,12 @@ class EventTag(models.Model):
         db_table = 'EventTags'
         ordering = ['name']
 
+    def __init__(self, *args, **kwargs):
+        super(EventTag, self).__init__(*args, **kwargs)
+        # Store original value of read_only, so we can tell when the flag has
+        # been set after load
+        self._read_only_at_load = self.read_only
+
     def __unicode__(self):
         return self.name
 
@@ -132,7 +138,7 @@ class EventTag(models.Model):
 
     # Overloaded Django ORM methods:
     def save(self, *args, **kwargs):
-        if self.pk and self.read_only:
+        if self.pk and self._read_only_at_load:
             return False
         else:
             return super(EventTag, self).save(*args, **kwargs)
