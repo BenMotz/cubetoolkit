@@ -159,7 +159,7 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
             {% else %}
             {{ showing.event.name }}
             {% endif %}{% if showing.discounted %}(TTT){% endif %}{% if showing.cancelled %}(CANCELLED){% endif %}
-        </a></td>
+        </a>{% if showing.sold_out %}(marked SOLD OUT){% endif %}</td>
         </tr>
     {% empty %}
         {# No showings on this day, but show the day anyway (with a link to add an event) #}

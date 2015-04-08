@@ -98,7 +98,7 @@ class ShowingForm(forms.ModelForm):
     class Meta(object):
         model = toolkit.diary.models.Showing
         fields = ('start', 'booked_by', 'confirmed', 'hide_in_programme',
-                  'cancelled', 'discounted', )
+                  'cancelled', 'sold_out', 'discounted', )
 
         widgets = {
             'start': JQueryDateTimePicker(),

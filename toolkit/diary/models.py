@@ -366,6 +366,7 @@ class Showing(models.Model):
     hide_in_programme = models.BooleanField(default=False)
     cancelled = models.BooleanField(default=False)
     discounted = models.BooleanField(default=False)
+    sold_out = models.BooleanField(default=False)
 
     # sales tables?
 
