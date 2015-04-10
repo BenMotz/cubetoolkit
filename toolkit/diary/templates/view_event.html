@@ -20,7 +20,7 @@ Cube: {{ event.name }}
 {% endblock %}
 
 {% block body %}
-    <div class="event {% if all_showings_cancelled %}cancelled{% endif %}">
+<div class="event{% if all_showings_sold_out %} sold_out{% endif %}{% if all_showings_cancelled %} cancelled{% endif %}">
         <div class="section group">
             <div class="col span_1_of_6">
                 &nbsp;
@@ -33,7 +33,7 @@ Cube: {{ event.name }}
                 {% endwith %}
             </div>
             <div class="col span_2_of_6">
-                <h1 {% if all_showings_cancelled %}class="cancelled"{% endif %}>{% if event.pre_title %}<span class="pre_title">{{ event.pre_title }}</span>{% endif %}{{ event.name|capfirst}}{% if event.post_title %}<span class="post_title">{{ event.post_title }}</span>{% endif %}</h1>
+                <h1>{% if event.pre_title %}<span class="pre_title">{{ event.pre_title }}</span>{% endif %}{{ event.name|capfirst }}{% if event.post_title %}<span class="post_title">{{ event.post_title }}</span>{% endif %}</h1>
                 {% if event.film_information %}
                     <p class="info">{{ event.film_information }}</p>
                 {% endif %}
@@ -47,6 +47,7 @@ Cube: {{ event.name }}
                         {{ showing.start|date:"D jS M | P" }}
                     {% endif %}
                     {% if showing.discounted %} <abbr title="Ticket Tout Tuesday">(TTT)</abbr></span>{% endif %}
+                    {% if showing.sold_out %}<span class="sold_out">(SOLD OUT)</span>{% endif %}
                     {% if showing.cancelled %} (cancelled)</span>{% endif %}
                     <br>
                 {% endfor %}

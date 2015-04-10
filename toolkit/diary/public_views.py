@@ -256,6 +256,7 @@ def view_event(request, event_id=None, legacy_id=None, event_slug=None):
         'showings': showings,
         'current_year': timezone.now().year,
         'all_showings_cancelled': all([s.cancelled for s in showings]),
+        'all_showings_sold_out': all([s.sold_out for s in showings]),
         'media': {event.id: media},
         'media_url': settings.MEDIA_URL
     }

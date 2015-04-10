@@ -32,6 +32,10 @@ body {
     color: red;
 }
 
+.sold_out {
+    color: darkgray;
+}
+
 /* < 632px, scale the logo down */
 /*@media screen and (max-width: 632px) {
     img#cubelogo {

@@ -78,6 +78,29 @@ h1 a:visited {
     max-width: 100%;
 }
 
+div.sold_out::before {
+    /* If entire event series is sold out */
+    content: "SOLD OUT";
+    text-decoration: none;
+    color: black;
+    background-color: white;
+    border: thin solid lightgray;
+    opacity: 0.9;
+
+    font-size: 3em;
+    display: inline-block;
+    position: absolute;
+    left: 20%;
+    top: 140px;
+    margin: 0;
+    padding: 0 0.15em;
+    border-radius: 0.2em;
+    transform: rotate(-15deg);
+    transform-origin: 0 50%;
+    -webkit-transform: rotate(-15deg);
+    -webkit-transform-origin: 0 50%;
+}
+
 div.cancelled::before {
     /* If entire event series is cancelled */
     content: "CANCELLED (sorry)";
@@ -103,6 +126,11 @@ div.cancelled::before {
 p span.cancelled {
     color: red;
 }
+
+p span.sold_out {
+    font-weight: bold;
+}
+
 .footer {
     border-top: thin dotted black;
     margin: auto;
