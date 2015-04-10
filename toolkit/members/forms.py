@@ -43,11 +43,9 @@ class VolunteerForm(forms.ModelForm):
             'roles': forms.CheckboxSelectMultiple(),
         }
 
+
 class PhotoForm(forms.Form):
     photo_data = forms.CharField(label="", required=False, widget=forms.HiddenInput)
-
-    def __init__(self, *args, **kwargs):
-        super(PhotoForm, self).__init__(*args, **kwargs)
 
     def _parse_data_uri(self, photo_data):
         prefix = "data:image/png;base64,"
@@ -64,7 +62,6 @@ class PhotoForm(forms.Form):
             raise forms.ValidationError("Photo data could not be decoded "
                                         "(base64 data invalid)")
         return data
-
 
     def clean(self):
         cleaned_data = super(PhotoForm, self).clean()
