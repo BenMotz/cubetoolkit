@@ -15,12 +15,10 @@ th {
 }
 #roles li {
     list-style-type: none;
-    /* display: inline-block; */
     margin: 5px;
 }
 .standard_role {
     font-weight: bold;
-    /* background: lightgreen; */
 }
 #vol_form, #mem_form {
     display: inline-block;
@@ -30,13 +28,29 @@ th {
 input[type="text"], textarea {
     width: 290px;
 }
+div#webcampreview {
+    display: none;
+}
+canvas {
+    display: none;
+}
 </style>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}members/js/webcam.js"></script>
+<script type="text/javascript">
+$(document).ready(function() {
+    setupPage();
+});
+</script>
 {% endblock %}
 
 {% block body %}
 <h3>{{ pagetitle }} {{ volunteer.member.name }}</h3>
 {% if message %}<h3>{{ message }}</h3>{% endif %}
-<form action="" method="POST" enctype="multipart/form-data">
+<form id="main_form" action="" method="POST" enctype="multipart/form-data">
 {% csrf_token %}
 
 <p><input type="submit" value="Save changes"> <a href="{% url "view-volunteer-list" %}">Cancel</a></p>
@@ -50,12 +64,19 @@ input[type="text"], textarea {
 <div id="vol_form">
 <table>
     <tr><td /><td>
+        <div id="webcampreview">
+            <video id="video"></video>
+            <button id="capturebutton">Take photo</button>
+        </div>
         {% if volunteer.portrait %}
         <a href="{{ volunteer.portrait.url }}">
-            <img src="{{ volunteer.portrait|thumbnail_url:'portrait' }}" border="0" width="75"></a><br>
+            <img src="{{ volunteer.portrait|thumbnail_url:'portrait' }}" id="photo" alt="Photo of {{ volunteer.member.name }}" border="0" width="75"></a><br>
         {% else %}
-        <img src="{{ default_mugshot }}" border="0" width="75"><br>
+        <img src="{{ default_mugshot }}" id="photo" alt="No photo yet" border="0" width="75"><br>
         {% endif %}
+        <button id="enablecapturebutton">Take photo using webcam</button>
+        <canvas id="canvas"></canvas>
+        <input type="hidden" id="photodata" name="vol-portrait-photo" value="">
     </td></tr>
     <tr><th><label for="id_vol-portrait">{{ vol_form.portrait.label }}:</label> </th><td> {{ vol_form.portrait.errors }}{{ vol_form.portrait }}</td></tr>
     <tr><th><label for="id_vol-notes">{{ vol_form.notes.label }}:</label> </th><td> {{ vol_form.notes.errors }}{{ vol_form.notes }}</td></tr>
@@ -73,6 +94,4 @@ input[type="text"], textarea {
 
 <p><input type="submit" value="Save changes"> <a href="{% url "view-volunteer-list" %}">Cancel</a></p>
 </form>
-
-
 {% endblock %}
