@@ -1,5 +1,11 @@
+import logging
+import binascii
+
 from django import forms
+from django.core.files.uploadedfile import SimpleUploadedFile
 import toolkit.members.models
+
+logger = logging.getLogger(__name__)
 
 
 class NewMemberForm(forms.ModelForm):
@@ -36,3 +42,47 @@ class VolunteerForm(forms.ModelForm):
             'notes': forms.Textarea(attrs={'wrap': 'soft'}),
             'roles': forms.CheckboxSelectMultiple(),
         }
+
+class PhotoForm(forms.Form):
+    photo_data = forms.CharField(label="", required=False, widget=forms.HiddenInput)
+
+    def __init__(self, *args, **kwargs):
+        super(PhotoForm, self).__init__(*args, **kwargs)
+
+    def _parse_data_uri(self, photo_data):
+        prefix = "data:image/png;base64,"
+
+        if not photo_data.startswith(prefix):
+            raise forms.ValidationError("Photo data format not recognised")
+
+        base64_data = photo_data[len(prefix):]
+
+        try:
+            data = binascii.a2b_base64(base64_data)
+        except (binascii.Incomplete, binascii.Error):
+            logger.exception("Invalid data")
+            raise forms.ValidationError("Photo data could not be decoded "
+                                        "(base64 data invalid)")
+        return data
+
+
+    def clean(self):
+        cleaned_data = super(PhotoForm, self).clean()
+
+        photo_data_uri = cleaned_data['photo_data']
+
+        if not photo_data_uri:
+            # No data / empty string
+            cleaned_data['photo_file'] = None
+            return cleaned_data
+
+        photo_data = self._parse_data_uri(photo_data_uri)
+
+        # Create a django image field, and use it to validate the uploaded
+        # data:
+        photo_file = SimpleUploadedFile("webcam_photo.png", photo_data, "image/png")
+        image_field = forms.ImageField()
+
+        cleaned_data['photo_file'] = image_field.clean(photo_file)
+
+        return cleaned_data

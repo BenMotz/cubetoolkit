@@ -1153,7 +1153,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertContains(response, "<title>Add Volunteer</title>", html=True)
         # Should have default mugshot:
         self.assertContains(response,
-                            '<img src="{0}" border="0" width="75">'.format(settings.DEFAULT_MUGSHOT),
+                            '<img id="photo" alt="No photo yet" src="{0}" border="0" width="75">'
+                            .format(settings.DEFAULT_MUGSHOT),
                             html=True)
 
     def test_get_form_edit_invalid_vol(self):

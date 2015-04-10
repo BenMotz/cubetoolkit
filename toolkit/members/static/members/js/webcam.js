@@ -62,7 +62,7 @@ var setupPage = function() {
         canvas.getContext('2d').drawImage(video, 0, 0, width, height);
         capturedimage = canvas.toDataURL('image/png');
         photo.setAttribute('src', capturedimage);
-        document.getElementById('photodata').value = capturedimage;
+        document.getElementById('id_photo_data').value = capturedimage;
     }
 
     capturebutton.addEventListener('click', function(ev) {
