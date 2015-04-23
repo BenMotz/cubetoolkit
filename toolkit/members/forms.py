@@ -29,6 +29,10 @@ class MemberFormWithoutNotes(forms.ModelForm):
 
 
 class VolunteerForm(forms.ModelForm):
+    # Extra non-model field. If this is returned with a base64 encoded PNG data
+    # URI then this is saved as the volunteer portrait.
+    image_data = forms.CharField(label="", required=False, widget=forms.HiddenInput)
+
     def __init__(self, *args, **kwargs):
         super(VolunteerForm, self).__init__(*args, **kwargs)
 
@@ -42,13 +46,6 @@ class VolunteerForm(forms.ModelForm):
             'notes': forms.Textarea(attrs={'wrap': 'soft'}),
             'roles': forms.CheckboxSelectMultiple(),
         }
-
-
-class DataURIImageForm(forms.Form):
-    """
-    Form to process PNG image data submitted as a data URI in a text field.
-    """
-    image_data = forms.CharField(label="", required=False, widget=forms.HiddenInput)
 
     def _parse_data_uri(self, image_data):
         prefix = "data:image/png;base64,"
@@ -67,22 +64,20 @@ class DataURIImageForm(forms.Form):
         return data
 
     def clean(self):
-        cleaned_data = super(DataURIImageForm, self).clean()
+        # Try to extract a photo from the image_data field. If successful, save
+        # as the portrait. Note that the image will be used in preference to
+        # any uploaded file, and will result in the 'clear' checkbox being
+        # ignored. This is intentional, as the photo is harder to replace than
+        # the uploaded image, if someone's managed to do both.
+
+        cleaned_data = super(VolunteerForm, self).clean()
 
         image_data_uri = cleaned_data['image_data']
 
-        if not image_data_uri:
-            # No data / empty string
-            cleaned_data['image_file'] = None
-            return cleaned_data
-
-        image_data = self._parse_data_uri(image_data_uri)
-
-        # Create a django image field, and use it to validate the uploaded
-        # data:
-        image_file = SimpleUploadedFile("webcam_photo.png", image_data, "image/png")
-        image_field = forms.ImageField()
-
-        cleaned_data['image_file'] = image_field.clean(image_file)
+        if image_data_uri:
+            image_data = self._parse_data_uri(image_data_uri)
+            image_file = SimpleUploadedFile("webcam_photo.png", image_data, "image/png")
+            # Use portrait field to validate the uploaded data:
+            cleaned_data['portrait'] = self.fields['portrait'].clean(image_file)
 
         return cleaned_data

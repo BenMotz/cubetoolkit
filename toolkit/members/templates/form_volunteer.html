@@ -76,7 +76,7 @@ $(document).ready(function() {
         {% endif %}
         <button id="enablecapturebutton">Take photo using webcam</button>
         <canvas id="canvas"></canvas>
-        {{ photo_form }}
+        {{ vol_form.image_data }}
     </td></tr>
     <tr><th><label for="id_vol-portrait">{{ vol_form.portrait.label }}:</label> </th><td> {{ vol_form.portrait.errors }}{{ vol_form.portrait }}</td></tr>
     <tr><th><label for="id_vol-notes">{{ vol_form.notes.label }}:</label> </th><td> {{ vol_form.notes.errors }}{{ vol_form.notes }}</td></tr>

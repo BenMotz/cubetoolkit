@@ -2,6 +2,7 @@ import shutil
 import urllib
 import os.path
 import tempfile
+import binascii
 import smtplib
 import email.parser
 import email.header
@@ -21,6 +22,11 @@ from toolkit.members.models import Member, Volunteer
 from toolkit.diary.models import Role
 import toolkit.members.member_views as member_views
 import toolkit.members.tasks
+
+TINY_VALID_BASE64_PNG = (
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAARnQU1BAACx"
+    "jwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAMSURBVBhXY/j//z8ABf4C/qc1gYQAAAAASUVO"
+    "RK5CYII=")
 
 
 class MembersTestsMixin(object):
@@ -1455,6 +1461,84 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
 
         # XXX do this properly:
         shutil.rmtree(os.path.join('/tmp', settings.VOLUNTEER_PORTRAIT_DIR))
+
+    @override_settings(MEDIA_ROOT="/tmp")
+    def test_post_update_vol_set_portrait_data_uri(self):
+        expected_upload_path = os.path.join(settings.VOLUNTEER_PORTRAIT_DIR, "webcam_photo.png")
+        expected_upload_location = os.path.join('/tmp', expected_upload_path)
+
+        # Ensure files get cleaned up:
+        self.files_in_use.append(expected_upload_location)
+
+        # Add to vol 1:
+        vol = Volunteer.objects.get(id=1)
+        self.assertNotEqual(vol.portrait, expected_upload_path)
+
+        # Post an edit to update the image:
+        url = reverse("edit-volunteer", kwargs={"volunteer_id": 1})
+        response = self.client.post(url, data={
+            u'mem-name': u'Pictureless Person',
+            u'vol-image_data': "data:image/png;base64,%s" % TINY_VALID_BASE64_PNG
+        })
+
+        self.assertRedirects(response, reverse("view-volunteer-list"))
+
+        vol = Volunteer.objects.get(id=1)
+        self.assertEqual(vol.member.name, u'Pictureless Person')
+
+        # Portrait path should be:
+        self.assertEqual(vol.portrait.name, expected_upload_path)
+        # And should have 'uploaded' file to:
+        self.assertTrue(os.path.isfile(expected_upload_location))
+        # And contents:
+        with open(expected_upload_location, "rb") as imgf:
+            self.assertEqual(imgf.read(), binascii.a2b_base64(TINY_VALID_BASE64_PNG))
+
+        # XXX do this properly!
+        shutil.rmtree(os.path.join('/tmp', settings.VOLUNTEER_PORTRAIT_DIR))
+
+    def test_post_update_vol_set_portrait_data_uri_bad_mimetype(self):
+        vol = Volunteer.objects.get(id=1)
+        initial_portrait = vol.portrait.name
+        self.assertNotEqual(initial_portrait, None)
+
+        url = reverse("edit-volunteer", kwargs={"volunteer_id": 1})
+        response = self.client.post(url, data={
+            u'mem-name': u'Pictureless Person',
+            u'vol-image_data': "data:image/jpeg;base64,%s" % TINY_VALID_BASE64_PNG
+        })
+
+        self.assertTemplateUsed(response, "form_volunteer.html")
+        # * No form error, as it's a form-wide validation fail, not per-field.
+        #   Settle for just being happy that the file hasn't been saved
+        # self.assertFormError(response, 'vol_form', 'image_data',
+        #                      u'Image data format not recognised')
+
+        vol = Volunteer.objects.get(id=1)
+        self.assertNotEqual(vol.member.name, u'Pictureless Person')
+        self.assertEqual(vol.portrait.name, initial_portrait)
+
+    def test_post_update_vol_set_portrait_data_bad_bytes(self):
+        vol = Volunteer.objects.get(id=1)
+        initial_portrait = vol.portrait.name
+        self.assertNotEqual(initial_portrait, None)
+
+        url = reverse("edit-volunteer", kwargs={"volunteer_id": 1})
+        INVALID_PNG = "Spinach" + TINY_VALID_BASE64_PNG
+        response = self.client.post(url, data={
+            u'mem-name': u'Pictureless Person',
+            u'vol-image_data': "data:image/png;base64,%s" % INVALID_PNG,
+        })
+
+        self.assertTemplateUsed(response, "form_volunteer.html")
+        # * No form error, as it's a form-wide validation fail, not per-field.
+        #   Settle for just being happy that the file hasn't been saved
+        # self.assertFormError(response, 'vol_form', 'image_data',
+        #                      u'Image data format not recognised')
+
+        vol = Volunteer.objects.get(id=1)
+        self.assertNotEqual(vol.member.name, u'Pictureless Person')
+        self.assertEqual(vol.portrait.name, initial_portrait)
 
 
 class TestMemberMailoutTask(MembersTestsMixin, TestCase):

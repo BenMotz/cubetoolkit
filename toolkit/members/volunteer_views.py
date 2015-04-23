@@ -8,8 +8,7 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib import messages
 from django.views.decorators.http import require_POST, require_safe
 
-from toolkit.members.forms import (VolunteerForm, MemberFormWithoutNotes,
-                                   DataURIImageForm)
+from toolkit.members.forms import VolunteerForm, MemberFormWithoutNotes
 from toolkit.members.models import Member, Volunteer
 from toolkit.diary.models import Role
 
@@ -142,17 +141,11 @@ def edit_volunteer(request, volunteer_id, create_new=False):
             prefix="mem",
             instance=member
         )
-        photo_form = DataURIImageForm(
-            request.POST
-        )
-        if vol_form.is_valid() and mem_form.is_valid() and photo_form.is_valid():
+        if vol_form.is_valid() and mem_form.is_valid():
             logger.info(u"Saving changes to volunteer '{0}' (id: {1})".format(volunteer.member.name, str(volunteer.pk)))
             mem_form.save()
             volunteer.member = member
             vol_form.save()
-            if photo_form.cleaned_data['image_file']:
-                volunteer.portrait = photo_form.cleaned_data['image_file']
-                volunteer.save()
             messages.add_message(
                 request,
                 messages.SUCCESS,
@@ -165,7 +158,6 @@ def edit_volunteer(request, volunteer_id, create_new=False):
     else:
         vol_form = VolunteerForm(prefix="vol", instance=volunteer)
         mem_form = MemberFormWithoutNotes(prefix="mem", instance=volunteer.member)
-        photo_form = DataURIImageForm()
 
     context = {
         'pagetitle': 'Add Volunteer' if create_new else 'Edit Volunteer',
@@ -173,6 +165,5 @@ def edit_volunteer(request, volunteer_id, create_new=False):
         'volunteer': volunteer,
         'vol_form': vol_form,
         'mem_form': mem_form,
-        'photo_form': photo_form,
     }
     return render(request, 'form_volunteer.html', context)
