@@ -44,42 +44,45 @@ class VolunteerForm(forms.ModelForm):
         }
 
 
-class PhotoForm(forms.Form):
-    photo_data = forms.CharField(label="", required=False, widget=forms.HiddenInput)
+class DataURIImageForm(forms.Form):
+    """
+    Form to process PNG image data submitted as a data URI in a text field.
+    """
+    image_data = forms.CharField(label="", required=False, widget=forms.HiddenInput)
 
-    def _parse_data_uri(self, photo_data):
+    def _parse_data_uri(self, image_data):
         prefix = "data:image/png;base64,"
 
-        if not photo_data.startswith(prefix):
-            raise forms.ValidationError("Photo data format not recognised")
+        if not image_data.startswith(prefix):
+            raise forms.ValidationError("Image data format not recognised")
 
-        base64_data = photo_data[len(prefix):]
+        base64_data = image_data[len(prefix):]
 
         try:
             data = binascii.a2b_base64(base64_data)
         except (binascii.Incomplete, binascii.Error):
             logger.exception("Invalid data")
-            raise forms.ValidationError("Photo data could not be decoded "
+            raise forms.ValidationError("Image data could not be decoded "
                                         "(base64 data invalid)")
         return data
 
     def clean(self):
-        cleaned_data = super(PhotoForm, self).clean()
+        cleaned_data = super(DataURIImageForm, self).clean()
 
-        photo_data_uri = cleaned_data['photo_data']
+        image_data_uri = cleaned_data['image_data']
 
-        if not photo_data_uri:
+        if not image_data_uri:
             # No data / empty string
-            cleaned_data['photo_file'] = None
+            cleaned_data['image_file'] = None
             return cleaned_data
 
-        photo_data = self._parse_data_uri(photo_data_uri)
+        image_data = self._parse_data_uri(image_data_uri)
 
         # Create a django image field, and use it to validate the uploaded
         # data:
-        photo_file = SimpleUploadedFile("webcam_photo.png", photo_data, "image/png")
+        image_file = SimpleUploadedFile("webcam_photo.png", image_data, "image/png")
         image_field = forms.ImageField()
 
-        cleaned_data['photo_file'] = image_field.clean(photo_file)
+        cleaned_data['image_file'] = image_field.clean(image_file)
 
         return cleaned_data

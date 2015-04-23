@@ -9,7 +9,7 @@ from django.contrib import messages
 from django.views.decorators.http import require_POST, require_safe
 
 from toolkit.members.forms import (VolunteerForm, MemberFormWithoutNotes,
-                                   PhotoForm)
+                                   DataURIImageForm)
 from toolkit.members.models import Member, Volunteer
 from toolkit.diary.models import Role
 
@@ -130,6 +130,7 @@ def edit_volunteer(request, volunteer_id, create_new=False):
     # if it was called with POST then read the updated volunteer data from the
     # form data and update and save the volunteer object:
     if request.method == 'POST':
+        # Three forms, one for each set of data
         vol_form = VolunteerForm(
             request.POST,
             request.FILES,
@@ -141,7 +142,7 @@ def edit_volunteer(request, volunteer_id, create_new=False):
             prefix="mem",
             instance=member
         )
-        photo_form = PhotoForm(
+        photo_form = DataURIImageForm(
             request.POST
         )
         if vol_form.is_valid() and mem_form.is_valid() and photo_form.is_valid():
@@ -149,9 +150,8 @@ def edit_volunteer(request, volunteer_id, create_new=False):
             mem_form.save()
             volunteer.member = member
             vol_form.save()
-            if photo_form.cleaned_data['photo_file']:
-                # volunteer.set_portrait(photo_form.cleaned_data['photo_file'])
-                volunteer.portrait = photo_form.cleaned_data['photo_file']
+            if photo_form.cleaned_data['image_file']:
+                volunteer.portrait = photo_form.cleaned_data['image_file']
                 volunteer.save()
             messages.add_message(
                 request,
@@ -165,7 +165,7 @@ def edit_volunteer(request, volunteer_id, create_new=False):
     else:
         vol_form = VolunteerForm(prefix="vol", instance=volunteer)
         mem_form = MemberFormWithoutNotes(prefix="mem", instance=volunteer.member)
-        photo_form = PhotoForm()
+        photo_form = DataURIImageForm()
 
     context = {
         'pagetitle': 'Add Volunteer' if create_new else 'Edit Volunteer',
