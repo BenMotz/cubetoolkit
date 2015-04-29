@@ -9,14 +9,14 @@ var setupPage = function() {
         capturebutton = document.getElementById('capturebutton'),
         enablecapturebutton = document.getElementById('enablecapturebutton'),
         width = 320,
-                    height = 0;
+        height = 0;
+
+    navigator.getMedia = (navigator.getUserMedia ||
+                          navigator.webkitGetUserMedia ||
+                          navigator.mozGetUserMedia ||
+                          navigator.msGetUserMedia);
 
     function startCapture() {
-        navigator.getMedia = (navigator.getUserMedia ||
-                              navigator.webkitGetUserMedia ||
-                              navigator.mozGetUserMedia ||
-                              navigator.msGetUserMedia);
-
         navigator.getMedia(
             {
                 video: true,
@@ -76,4 +76,10 @@ var setupPage = function() {
         startCapture();
         ev.preventDefault();
     });
+
+    if (navigator.getMedia != undefined) {
+        enablecapturebutton.style.display = 'initial';
+    } else {
+        console.log("WebRTC not supported");
+    }
 };

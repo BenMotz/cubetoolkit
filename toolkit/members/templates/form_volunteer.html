@@ -34,6 +34,9 @@ div#webcampreview {
 canvas {
     display: none;
 }
+#enablecapturebutton {
+    display: none;
+}
 </style>
 {% endblock %}
 
@@ -63,8 +66,9 @@ $(document).ready(function() {
 
 <div id="vol_form">
 <table>
-    <tr><td /><td>
+    <tr><td></td><td>
         <div id="webcampreview">
+            <i>Experimental - may not work correctly on all browsers</i>
             <video id="video"></video>
             <button id="capturebutton">Take photo</button>
         </div>
