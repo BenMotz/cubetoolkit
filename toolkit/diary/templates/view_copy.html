@@ -53,7 +53,7 @@ $(document).ready(function() {
     {% ifchanged %}<p class="pad">{{ showing.start|date:"Y" }}</p>{% endifchanged %}
     {% ifchanged %}<p class="pad">{{ showing.start|date:"F"|upper }}</p>{% endifchanged %}
     {% ifchanged %}<p class="day">{{ showing.start|date:"D"}} {{ showing.start|date:"d" }}{% else %}
-    <p>      {% endifchanged %} {{showing.start|date:"H:i"}} ......... {% if showing.hide_in_programme or showing.event.private %}Closed for private event.{% else %}{{ showing.event.name|capfirst }}{% if showing.cancelled %} (CANCELLED){% endif %}{% if showing.discounted %} (TTT){% endif %}{% endif %}</p>
+    <p>      {% endifchanged %} {{showing.start|date:"H:i"}} .... {% if showing.hide_in_programme or showing.event.private %}Closed for private event.{% else %}{{ showing.event.name|capfirst }}{% if showing.cancelled %} (CANCELLED){% endif %}{% if showing.discounted %} (TTT){% endif %}{% endif %}</p>
 {% endfor %}
 
 </div>

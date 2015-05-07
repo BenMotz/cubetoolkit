@@ -1198,7 +1198,7 @@ class ViewEventFieldTests(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "view_copy.html")
 
         self.assertNotContains(response, u"EVENT THREE TITLE")
-        self.assertContains(response, u"Sun 09 18:00 ......... Event four titl\u0113")
+        self.assertContains(response, u"Sun 09 18:00 .... Event four titl\u0113")
         self.assertContains(response, u"<p>EVENT FOUR TITL\u0112</p>", html=True)
         self.assertContains(response, u"<p>Event four C\u014dpy</p>", html=True)
 
@@ -1209,7 +1209,7 @@ class ViewEventFieldTests(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "view_copy_summary.html")
 
         self.assertNotContains(response, u"EVENT THREE TITLE")
-        self.assertContains(response, u'Sun 09 18:00 ......... Pretitle four Event four titl\u0113 Posttitle four')
+        self.assertContains(response, u'Sun 09 18:00 .... Pretitle four Event four titl\u0113 Posttitle four')
         self.assertContains(response, u'<p class="title">Event four titl\u0113</p>', html=True)
         self.assertContains(response, u'<p class="copy_summary">\u010copy four summary</p>', html=True)
 
@@ -1224,7 +1224,7 @@ class ViewEventFieldTests(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "view_terms.html")
 
-        self.assertContains(response, u"Sun 09 18:00 ......... Event four titl\u0113")
+        self.assertContains(response, u"Sun 09 18:00 .... Event four titl\u0113")
         self.assertContains(response, u"Cube event / Public event / Confirmed")
         self.assertContains(response, u"Terminal price: \u00a31 / \u20ac3")
 

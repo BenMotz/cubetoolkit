@@ -75,7 +75,7 @@ $(document).ready(function() {
 {% for showing in showings %}
     {% ifchanged %}<h2>{{ showing.start|date:"F Y" }}</h2>{% endifchanged %}
     {% ifchanged %}<p>{{ showing.start|date:"D"}} {{ showing.start|date:"d" }}{% else %}
-    <p>      {% endifchanged %} {{showing.start|date:"H:i"}} ......... {% if showing.hide_in_programme or showing.event.private %}Closed for private event.{% else %}{% if showing.event.pre_title %}{{ showing.event.pre_title.strip }} {% endif %}{{ showing.event.name.strip }}{% if showing.event.post_title.strip %} {{ showing.event.post_title }}{% endif %}{% if showing.cancelled %} (CANCELLED){% endif %}{% if showing.discounted %} (TTT){% endif %}{% endif %}</p>
+    <p>      {% endifchanged %} {{showing.start|date:"H:i"}} .... {% if showing.hide_in_programme or showing.event.private %}Closed for private event.{% else %}{% if showing.event.pre_title %}{{ showing.event.pre_title.strip }} {% endif %}{{ showing.event.name.strip }}{% if showing.event.post_title.strip %} {{ showing.event.post_title }}{% endif %}{% if showing.cancelled %} (CANCELLED){% endif %}{% if showing.discounted %} (TTT){% endif %}{% endif %}</p>
 {% endfor %}
 </div>
 <div class="copy">
