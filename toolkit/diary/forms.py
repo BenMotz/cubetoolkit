@@ -59,7 +59,8 @@ class EventForm(forms.ModelForm):
             'tags': ChosenSelectMultiple(width="70%"),
         }
         order = ('tags', )
-        fields = ('name', 'tags', 'pricing', 'film_information', 'pre_title',
+        fields = ('name', 'tags', 'pricing', 'ticket_link', 'ticket_shop',
+                  'film_information', 'pre_title',
                   'post_title', 'notes', 'duration', 'outside_hire', 'private',
                   'copy', 'copy_summary', 'terms')
 

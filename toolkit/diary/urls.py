@@ -89,6 +89,9 @@ diary_urls = patterns(
     # Edit event roles
     url(r'^edit/roles/', 'edit_roles', name='edit_roles'),
 
+    # Edit ticket shop details
+    url(r'^edit/ticketshops/', 'edit_ticket_shops', name='edit_ticket_shops'),
+
     # The slightly OTT regex in the following will match:
     # "rota" "rota/" "rota/2001/01" "rota/2001/01/" "rota/2001/1/02" "rota/2001/1/2/"
     # (ie needs at least year/month, not just a year)

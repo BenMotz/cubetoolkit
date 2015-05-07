@@ -47,6 +47,9 @@ h1 a:visited {
     font-size: 1em;
     line-height: 1.2;
 }
+.minor_info {
+    font-size: 0.8em;
+}
 
 .copy p {
     font-weight: 300;
