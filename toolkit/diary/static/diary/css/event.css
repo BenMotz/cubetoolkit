@@ -265,6 +265,7 @@ p span.sold_out {
     }
     .span_1_of_6 {
         width: 100%;
+        display: none;
     }
 }
 
@@ -288,5 +289,6 @@ p span.sold_out {
     }
     .span_1_of_6 {
         width: 100%;
+        display: none;
     }
 }
