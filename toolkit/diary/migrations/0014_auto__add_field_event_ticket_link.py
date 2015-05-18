@@ -8,34 +8,15 @@ from django.db import models
 class Migration(SchemaMigration):
 
     def forwards(self, orm):
-        # Adding model 'TicketShop'
-        db.create_table('TicketShops', (
-            (u'id', self.gf('django.db.models.fields.AutoField')(primary_key=True)),
-            ('name', self.gf('django.db.models.fields.CharField')(max_length=256)),
-            ('programme_notes', self.gf('django.db.models.fields.TextField')(max_length=2048, blank=True)),
-        ))
-        db.send_create_signal(u'diary', ['TicketShop'])
-
         # Adding field 'Event.ticket_link'
         db.add_column('Events', 'ticket_link',
                       self.gf('django.db.models.fields.URLField')(default='', max_length=256, blank=True),
                       keep_default=False)
 
-        # Adding field 'Event.ticket_shop'
-        db.add_column('Events', 'ticket_shop',
-                      self.gf('django.db.models.fields.related.ForeignKey')(to=orm['diary.TicketShop'], null=True, on_delete=models.SET_NULL, blank=True),
-                      keep_default=False)
-
 
     def backwards(self, orm):
-        # Deleting model 'TicketShop'
-        db.delete_table('TicketShops')
-
         # Deleting field 'Event.ticket_link'
         db.delete_column('Events', 'ticket_link')
-
-        # Deleting field 'Event.ticket_shop'
-        db.delete_column('Events', 'ticket_shop_id')
 
 
     models = {
@@ -69,7 +50,6 @@ class Migration(SchemaMigration):
             'template': ('django.db.models.fields.related.ForeignKey', [], {'blank': 'True', 'related_name': "'template'", 'null': 'True', 'to': u"orm['diary.EventTemplate']"}),
             'terms': ('django.db.models.fields.TextField', [], {'default': "'Contacts-\\nCompany-\\nAddress-\\nEmail-\\nPh No-\\nHire Fee (inclusive of VAT, if applicable) -\\nFinancial Deal (%/fee/split etc)-\\nDeposit paid before the night (p/h only) -\\nAmount needed to be collected (p/h only) -\\nSpecial Terms -\\nTech needed -\\nAdditional Info -'", 'max_length': '4096', 'null': 'True', 'blank': 'True'}),
             'ticket_link': ('django.db.models.fields.URLField', [], {'max_length': '256', 'blank': 'True'}),
-            'ticket_shop': ('django.db.models.fields.related.ForeignKey', [], {'to': u"orm['diary.TicketShop']", 'null': 'True', 'on_delete': 'models.SET_NULL', 'blank': 'True'}),
             'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
         },
         u'diary.eventtag': {
@@ -139,12 +119,6 @@ class Migration(SchemaMigration):
             'sold_out': ('django.db.models.fields.BooleanField', [], {'default': 'False'}),
             'start': ('toolkit.diary.models.FutureDateTimeField', [], {'db_index': 'True'}),
             'updated_at': ('django.db.models.fields.DateTimeField', [], {'auto_now': 'True', 'blank': 'True'})
-        },
-        u'diary.ticketshop': {
-            'Meta': {'ordering': "['name']", 'object_name': 'TicketShop', 'db_table': "'TicketShops'"},
-            u'id': ('django.db.models.fields.AutoField', [], {'primary_key': 'True'}),
-            'name': ('django.db.models.fields.CharField', [], {'max_length': '256'}),
-            'programme_notes': ('django.db.models.fields.TextField', [], {'max_length': '2048', 'blank': 'True'})
         }
     }
 

@@ -149,20 +149,6 @@ class EventTag(models.Model):
         else:
             return super(EventTag, self).delete(*args, **kwargs)
 
-class TicketShop(models.Model):
-    name = models.CharField(max_length=256, blank=False)
-    programme_notes = models.TextField(
-        max_length=2048, null=False, blank=True,
-        help_text="Comments specific to this ticket type/outlet, shown"
-        " under ticket links"
-    )
-
-    class Meta:
-        db_table = 'TicketShops'
-        ordering = ['name']
-
-    def __unicode__(self):
-        return self.name
 
 class Event(models.Model):
 
@@ -190,9 +176,7 @@ class Event(models.Model):
 
     # Free text pricing info:
     pricing = models.CharField(max_length=256, null=False, blank=True)
-
     ticket_link = models.URLField(max_length=256, null=False, blank=True)
-    ticket_shop = models.ForeignKey('TicketShop', null=True, blank=True, on_delete=models.SET_NULL)
 
     # Free text film information:
     film_information = models.CharField(max_length=256, null=False, blank=True)

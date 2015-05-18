@@ -22,7 +22,7 @@ from django.utils.html import escape
 
 from toolkit.diary.models import (Showing, Event, DiaryIdea, MediaItem,
                                   EventTemplate, EventTag, Role, RotaEntry,
-                                  PrintedProgramme, TicketShop)
+                                  PrintedProgramme)
 import toolkit.diary.forms as diary_forms
 import toolkit.diary.edit_prefs as edit_prefs
 import toolkit.members.tasks
@@ -658,28 +658,6 @@ def edit_roles(request):
         formset = RoleFormset()
 
     return render(request, 'form_edit_roles.html', {'formset': formset})
-
-@permission_required('toolkit.write')
-def edit_ticket_shops(request):
-    # View for editing details of ticket shops
-    # GET: Render multiple forms (using a formset)
-    # POST: Update formset
-    ticket_shop_formset = modelformset_factory(TicketShop, can_delete=True)
-
-    if request.method == 'POST':
-        formset = ticket_shop_formset(request.POST)
-        if formset.is_valid():
-            logger.info("Ticket shops updated")
-            formset.save()
-            # Reset formset, so get another blank one at the
-            # end, deleted ones disappera, etc.
-            formset = ticket_shop_formset()
-            messages.add_message(request, messages.SUCCESS, "Ticket shops updated")
-    else:
-        formset = ticket_shop_formset()
-    context = {'formset': formset}
-
-    return render(request, 'edit_ticket_shops.html', context)
 
 
 @permission_required('toolkit.write')

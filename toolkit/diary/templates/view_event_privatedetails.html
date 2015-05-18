@@ -65,7 +65,7 @@ Details for: {{ event.name }}
     </p>
     <p><b>Pricing:</b> {{ event.pricing }}
     </p>
-    {% if event.ticket_link %}<p><b>Online tickets:</b> <a href="{{ event.ticket_link }}">{{ event.ticket_link }}</a> {{ event.ticket_shop.name }}</p>{% endif %}
+    {% if event.ticket_link %}<p><b>Online tickets:</b> <a href="{{ event.ticket_link }}">{{ event.ticket_link }}</a></p>{% endif %}
     <p class="d"><b>Film information:</b> {{ event.film_information }}<br>
     <p class="d"><b>Programmer's notes:</b><br>
     {{event.notes}}<br>
