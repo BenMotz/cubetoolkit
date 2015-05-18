@@ -54,7 +54,7 @@ Cube: {{ event.name }}
                 {% if event.pricing %}
                     <p class="info">Tickets: {{ event.pricing }}</p>
                 {% endif %}
-                {% if event.ticket_link %}
+                {% if event.ticket_link and not event.all_showings_finished %}
                    <p class="action"><a href="{{ event.ticket_link }}">Buy tickets online</a></p>
                 {% endif %}
             </div>

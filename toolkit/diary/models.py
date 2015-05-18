@@ -310,6 +310,14 @@ class Event(models.Model):
 
         return mark_safe(text)
 
+    @property
+    def all_showings_finished(self):
+        now = django.utils.timezone.now()
+        # Use "not any" instead of all, as for the usual case of events in the
+        # future it'll involve fewer comparisons. (Also make sure to use
+        # 'public' filter so cached query is hit in event view)
+        return not any(s.start > now for s in self.showings.public.all())
+
 
 class ShowingQuerySet(QuerySet):
     """
