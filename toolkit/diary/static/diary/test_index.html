@@ -1,0 +1,2449 @@
+<!-- http://benfrain.com/independent-scrolling-panels-body-scroll-using-just-css/ -->
+<!-- http://blog.stevensanderson.com/2011/10/05/full-height-app-layouts-a-css-trick-to-make-it-easier/ -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>
+Editing Diary for 16-02-2015 to 16-02-2016
+</title>
+<link rel="stylesheet" type="text/css" href="/static/css/messages.css">
+<style type="text/css">
+  @import url('/static/css/lib/smoothness/jquery-ui.css');
+  .private {
+  font-style: italic;
+  }
+  .external {
+  font-weight: bold;
+  }
+  .discounted {
+    color: #a000FF;
+  }
+  .cancelled {
+    color: red;
+  }
+  .daytime {
+    background-color: #FFFF99;
+  }
+  h3 { font-family: Arial; }
+  table { border-collapse: collapse; }
+  .summary {
+      width: 45%;
+  }
+  iframe#form_frame {
+      width: 45%;
+      position: fixed;
+      left: 50%;
+      top: 10%;
+      height: 90%;
+  }
+  tr:nth-child(odd) td {
+      background-color: #d0d0d0;
+  }
+  tr:nth-child(even) td {
+      background-color: #c0c0c0;
+  }
+  td:first-child {
+      text-align: right;
+      width: 100px;
+      padding-right: 10px;
+  }
+  #controls {
+      border: thick solid black;
+      padding: 10px;
+      float: right;
+      position: absolute;
+      top: 0;
+      right: 10px;
+  }
+  .ideas {
+      white-space: pre-line;
+  }
+</style>
+<script type="text/javascript" src="/static/js/lib/jquery.min.js"></script>
+<script type="text/javascript" src="/static/js/lib/jquery-ui.min.js"></script>
+<script type="text/javascript">
+var edit_prefs = {
+    "daysahead" : "365",
+    "popups" : "true"
+};
+$(document).ready(function() {
+        // Add date picker:
+        $('#id_lookahead_to').datepicker({
+            dateFormat : 'dd-mm-yy',
+            onSelect : dateRangeSelected,
+            minDate : 0,
+        });
+        prefs_updated(edit_prefs);
+});
+function dateRangeSelected(dateText, inst) {
+    var enddate = $.datepicker.parseDate('dd-mm-yy', dateText);
+    var startdate = new Date(2015, 2 - 1, 16);
+    // Calculate days between those two dates:
+    var days_ahead = Math.ceil((enddate.getTime() - startdate.getTime())/86400000);
+    if(days_ahead <= 0) {
+        days_ahead = 0;
+    }
+    window.location.href = "/diary/edit/2015/2/16?daysahead=" + days_ahead;
+}
+function set_edit_pref(pref, value) {
+    if(edit_prefs[pref] !== value) {
+        edit_prefs[pref] = value;
+        $.getJSON('/diary/edit/setprefs', edit_prefs, prefs_updated);
+    }
+}
+function prefs_updated(data) {
+    edit_prefs = data;
+    if(edit_prefs['popups'] === 'false') {
+        $('#set_inline').replaceWith('<b id="set_inline">this window</b>');
+        $('#set_popups').replaceWith('<a id="set_popups" href="#">pop-ups</a>');
+        $('#set_popups').click(function() { set_edit_pref('popups',true); });
+        // Clear click handlers on links in table
+        $('table a').off('click');
+        $('table a').attr('target', 'form_frame');
+    } else {
+        $('#set_inline').replaceWith('<a id="set_inline" href="#">this window</a>');
+        $('#set_inline').click(function() { set_edit_pref('popups',false); });
+        $('#set_popups').replaceWith('<b id="set_popups">pop-ups</b>');
+        // Change links in table to open in a new window:
+        $('table a').click(function(e) {
+            window.open(e.currentTarget.href,"edit_form","height=800,width=800,scrollbars,resizable,toolbar");
+            return false;
+        });
+    }
+}
+</script>
+</head>
+<body>
+<img src="/static/diary/diary_edit_list_header.gif" alt="Cube Microplex" width="150px">
+<h3>CUBE events diary</h3>
+<p id="controls"><a href="/auth/logout/">Log out</a><br>
+Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">this window</a></p>
+<p><a name="top"></a></p>
+<h4>Key:</h4>
+<p><span class="private">Private events are in italics</span><br>
+<span class="external">Outside hires are bolded</span><br>
+<span class="discounted">Discounted events (like TTT) are magenta</span><br>
+<span class="cancelled">Cancelled events are red</span><br>
+<span class="daytime">Daytime (before 6pm) events have a light background</span></p>
+<div class="programme"><p align='center'><a href="/diary/edit/2015/2/16?daysahead=183">See 6 months</a> |
+<a href="/diary/edit/2015/2/16?daysahead=365">See 1 year</a> |
+<a href="/diary/edit/2015/2/16?daysahead=730">See 2 years</a></p>
+<p align='center'><label for="id_start">See from now until:</label> <input type="text" name="lookahead_to" value="16-02-2016" id="id_lookahead_to" /></p>
+<table class="summary">
+<tr><td></td><td colspan="3"><a href="/diary/edit/event/add">New event</a></td></tr>
+    <tr class="row_year"><td><h1>2015 </h1></td><td colspan="3"></td></tr>
+    <tr class="row_month"><td><h2>February</h2></td><td colspan="3"></td></tr></tr>
+    <tr><td><a href="/diary/edit/ideas/2015/2/">IDEAS</a></td><td colspan="3" class="ideas">SCRUFF SAYS: Thursday 5 Feb is now FREE! will have Waitangi Day copy in by monday. am in China, my email doesn&#39;t appear to work but the Cube diary does!
+Be nice to programme some stuff for LGBT history month
+Awards season filmorama time, might need 4/5 day runs to get good dates from distros! Whiplash sony out 16th Jan, hopefully get mid feb with a night of RR BIG BAND!
+birdman fox out early jan been told mid feb
+foxcatcher eone out early jan hope mid feb (wanna watch first)
+Love is strange (altitude 6th Feb) really sweet film, but maybe not a cube film
+want to do another Waitangi/NZ film night but it falls on a friday which is prob better left for a gig or something so might do it on the thursday instead. hmmmm. if you want the friday just ask!
+BRFF are taking a month off, so given that Feb 2nd is Groundhog Day we thought it&#39;d be fun to do a GD double/triple bill. Al/Dave
+</td></tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=16-02-2015">Mon 16</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6968/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7790/view/"
+                class="">
+             FOXCATCHER
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=17-02-2015">Tue 17</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7101/" class="daytime">15:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Leila  <a href="/diary/edit/event/id/7886/view/"
+                class=" private daytime">
+            Meeting with Mitchell and Taylor architects
+        </a></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        <td>
+        <a href="/diary/edit/showing/id/6969/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7790/view/"
+                class=" discounted">
+             FOXCATCHER
+            (TTT)
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=18-02-2015">Wed 18</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6970/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7790/view/"
+                class="">
+             FOXCATCHER
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=19-02-2015">Thu 19</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7138/" >18:29</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>jamie <a href="/diary/edit/event/id/7903/view/"
+                class="">
+            Cube Record Label Meet
+        </a></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        <td>
+        <a href="/diary/edit/showing/id/7139/" >19:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>jamie <a href="/diary/edit/event/id/7904/view/"
+                class="">
+            Programing Meeting [General]
+        </a></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        <td>
+        <a href="/diary/edit/showing/id/6856/" >19:30</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>kari <a href="/diary/edit/event/id/7704/view/"
+                class=" external">
+            BFI Animation Camp celebration screening
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=20-02-2015">Fri 20</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6808/" >19:32</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Jamie/frances <a href="/diary/edit/event/id/7673/view/"
+                class="">
+             COOL JAZZ AN EVENING OF COOL JAZZ WITH LIFT TO THE SCAFFOLD SCREENING + AVELLANA LIVE
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=21-02-2015">Sat 21</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6761/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Alice Holland <a href="/diary/edit/event/id/7632/view/"
+                class="">
+            SHADOW-PUPPETEERS THE CLOCKWORK MOTH PRESENT &#39;THE DEVIL WITH THE THREE GOLDEN HAIRS&#39;  BY THE BROTHERS GRIMM. A SHADOW PLAY FOR ADULTS AND CHILDREN
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=22-02-2015">Sun 22</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6983/" class="daytime">09:55</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Richie <a href="/diary/edit/event/id/7794/view/"
+                class=" private daytime">
+             RICHIE BIG R REHEARSAL
+        </a></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        <td>
+        <a href="/diary/edit/showing/id/7008/" class="daytime">14:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Alice H <a href="/diary/edit/event/id/7632/view/"
+                class=" daytime">
+            SHADOW-PUPPETEERS THE CLOCKWORK MOTH PRESENT &#39;THE DEVIL WITH THE THREE GOLDEN HAIRS&#39;  BY THE BROTHERS GRIMM. A SHADOW PLAY FOR ADULTS AND CHILDREN
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=23-02-2015">Mon 23</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6838/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Film Team <a href="/diary/edit/event/id/7690/view/"
+                class="">
+             WHIPLASH
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=24-02-2015">Tue 24</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6839/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Film Team <a href="/diary/edit/event/id/7690/view/"
+                class=" discounted">
+             WHIPLASH
+            (TTT)
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=25-02-2015">Wed 25</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7095/" class="daytime">15:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Leila  <a href="/diary/edit/event/id/7880/view/"
+                class=" private daytime">
+            Meeting with Mitchell and Taylor architects
+        </a></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        <td>
+        <a href="/diary/edit/showing/id/6840/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Film Team <a href="/diary/edit/event/id/7690/view/"
+                class="">
+             WHIPLASH
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=26-02-2015">Thu 26</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6957/" >19:30</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team / Richie P <a href="/diary/edit/event/id/7782/view/"
+                class="">
+             BIG R BIG BAND *SOLD OUT* WITH A SCREENING OF WHIPLASH
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=27-02-2015">Fri 27</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6776/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>matt d <a href="/diary/edit/event/id/7646/view/"
+                class="">
+            HELLFIRE VIDEO CLUB PRESENTS KINO POLSKA WITH  THE HOURGLASS SANATORIUM
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=28-02-2015">Sat 28</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7137/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>hen~dø <a href="/diary/edit/event/id/7902/view/"
+                class="">
+            CUBE PRODUCTIONS PRESENT: HEN~DØ IV: D.IV.ORCE HOTEL WITH INPUT FROM ALL INTERESTED IN INPUTTING
+        </a></td>
+        </tr>
+    <tr class="row_month"><td><h2>March</h2></td><td colspan="3"></td></tr></tr>
+    <tr><td><a href="/diary/edit/ideas/2015/3/">IDEAS</a></td><td colspan="3" class="ideas">inherant vice end of jan warner early march 148 mins
+a most violent yr (icon out 23rd jan) short bookings from 27th Feb 2 hours 5 mins
+Duke of Burgundy (from March 20 curzon)1 hour 41 mins
+appropriate behavior peccadillo 6th march 1 hour 30 mins
+Ex Machina from end of feb out mid Jan 1 hour 48 mins
+MOMMY 20th march release metrodome so prob april
+white god 27th feb release (metrodome) 1 hour 59 mins
+kumiko the treasure hunter - soda 1 hour 45 mins
+maidan dogwoof
+it follows - icon 1 hour 40 mins out end feb so end march
+Visual Music season with (hopefully) archive films from The Eye, Amsterdam ++. Focus on live classical music and motion graphics as well- with Tal Rosner. Please keep weekend in pencil free for rehearsals and/ or events.</td></tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=1-03-2015">Sun 1</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7082/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>kate <a href="/diary/edit/event/id/7869/view/"
+                class=" external">
+            BRISTOL RADICAL HISTORY GROUP PRESENTS GOING THROUGH THE CHANGE!
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=2-03-2015">Mon 2</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6820/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Joe Hatt <a href="/diary/edit/event/id/7684/view/"
+                class="">
+            HOWLING OWL RECORDS AND ART IS HARD PRESENT  ALEX G WITH SUPPORT FROM OLIVER WILDE AND IDES
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=3-03-2015">Tue 3</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7096/" class="daytime">15:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Leila  <a href="/diary/edit/event/id/7881/view/"
+                class=" private daytime">
+            Meeting with Mitchell and Taylor architects
+        </a></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        <td>
+        <a href="/diary/edit/showing/id/6863/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7710/view/"
+                class=" discounted">
+             INHERENT VICE
+            (TTT)
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=4-03-2015">Wed 4</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7088/" class="daytime">11:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>filmteam <a href="/diary/edit/event/id/7875/view/"
+                class=" daytime">
+            BABYCINEMA PRESENTS  INHERENT VICE
+        </a></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        <td>
+        <a href="/diary/edit/showing/id/6864/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7710/view/"
+                class="">
+             INHERENT VICE
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=5-03-2015">Thu 5</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6865/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7710/view/"
+                class="">
+             INHERENT VICE
+        </a></td>
+        </tr>
+        <tr><td><a href="/diary/edit/event/add?date=6-03-2015">Fri 6</a></td><td colspan="3"></td></tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=7-03-2015">Sat 7</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7063/" class="daytime">12:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>dave <a href="/diary/edit/event/id/7852/view/"
+                class=" daytime">
+            combo get in
+        </a></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        <td>
+        <a href="/diary/edit/showing/id/6758/" >19:30</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Al  <a href="/diary/edit/event/id/7629/view/"
+                class="">
+            COMEDY COMBO PRESENTS: LIVE STAND UP + WHO FRAMED ROGER RABBIT? FORGET IT EDDIE, IT&#39;S TOONTOWN.
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=8-03-2015">Sun 8</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6984/" class="daytime">10:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Richie <a href="/diary/edit/event/id/7795/view/"
+                class=" private daytime">
+             RICHIE BIG R REHEARSAL
+        </a></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        <td>
+        <a href="/diary/edit/showing/id/6986/" >19:30</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>kate <a href="/diary/edit/event/id/7797/view/"
+                class=" external">
+            BRISTOL CYCLE FESTIVAL PRESENTS WOMEN ON WHEELS FILM NIGHT
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=9-03-2015">Mon 9</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6872/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Liz <a href="/diary/edit/event/id/7716/view/"
+                class="">
+            BRISTOL RADICAL FILM FESTIVAL PRESENTS MINERS STRIKE ANNIVERSARY SHORTS
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=10-03-2015">Tue 10</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7039/" >18:30</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Film Team <a href="/diary/edit/event/id/7837/view/"
+                class=" discounted">
+             KUMIKO THE TREASURE HUNTER
+            (TTT)
+        </a></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        <td>
+        <a href="/diary/edit/showing/id/6910/" >20:45</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7751/view/"
+                class=" discounted">
+             EX MACHINA
+            (TTT)
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=11-03-2015">Wed 11</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7089/" class="daytime">11:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>filmteam <a href="/diary/edit/event/id/7876/view/"
+                class=" daytime">
+            BABYCINEMA PRESENTS EX MACHINA
+        </a></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        <td>
+        <a href="/diary/edit/showing/id/7040/" >18:30</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Film Team <a href="/diary/edit/event/id/7837/view/"
+                class="">
+             KUMIKO THE TREASURE HUNTER
+        </a></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        <td>
+        <a href="/diary/edit/showing/id/6911/" >20:45</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7751/view/"
+                class="">
+             EX MACHINA
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=12-03-2015">Thu 12</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7097/" class="daytime">17:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Leila  <a href="/diary/edit/event/id/7882/view/"
+                class=" private daytime">
+            Meeting with Mitchell and Taylor architects
+        </a></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        <td>
+        <a href="/diary/edit/showing/id/6912/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7751/view/"
+                class="">
+             EX MACHINA
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=13-03-2015">Fri 13</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6931/" >19:30</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>chiz <a href="/diary/edit/event/id/7759/view/"
+                class="">
+             GOOD
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=14-03-2015">Sat 14</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6988/" >19:30</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>chiz <a href="/diary/edit/event/id/7799/view/"
+                class="">
+             SAD
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=15-03-2015">Sun 15</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6989/" >18:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>chiz <a href="/diary/edit/event/id/7800/view/"
+                class="">
+             HAPPY BAD
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=16-03-2015">Mon 16</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7120/" class="daytime">08:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Leila  <a href="/diary/edit/event/id/7898/view/"
+                class=" private daytime">
+            Asbestos survey- leila keyholding
+        </a></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        <td>
+        <a href="/diary/edit/showing/id/7043/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Film Team <a href="/diary/edit/event/id/7840/view/"
+                class="">
+             COHERENCE
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=17-03-2015">Tue 17</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7121/" class="daytime">08:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Leila  <a href="/diary/edit/event/id/7899/view/"
+                class=" private daytime">
+            Asbestos survey- Hogge keyholding
+        </a></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        <td>
+        <a href="/diary/edit/showing/id/7044/" >18:30</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Film Team <a href="/diary/edit/event/id/7840/view/"
+                class=" discounted">
+             COHERENCE
+            (TTT)
+        </a></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        <td>
+        <a href="/diary/edit/showing/id/6917/" >20:30</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7753/view/"
+                class=" discounted">
+             WHITE GOD
+            (TTT)
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=18-03-2015">Wed 18</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7090/" class="daytime">11:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>filmeatm <a href="/diary/edit/event/id/7877/view/"
+                class=" daytime">
+            BABYCINEMA PRESENTS WHITE GOD
+        </a></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        <td>
+        <a href="/diary/edit/showing/id/7098/" class="daytime">15:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Leila  <a href="/diary/edit/event/id/7883/view/"
+                class=" private daytime">
+            Meeting with Mitchell and Taylor architects
+        </a></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        <td>
+        <a href="/diary/edit/showing/id/6918/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7753/view/"
+                class="">
+             WHITE GOD
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=19-03-2015">Thu 19</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6916/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7753/view/"
+                class="">
+             WHITE GOD
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=20-03-2015">Fri 20</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6777/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>matt d <a href="/diary/edit/event/id/7647/view/"
+                class="">
+            HELLFIRE VIDEO CLUB PRESENTS NIGHT OF THE NIGHT OF THE... WITH NIGHT OF THE CREEPS AND NIGHT OF THE COMET
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=21-03-2015">Sat 21</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6487/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Barry <a href="/diary/edit/event/id/7417/view/"
+                class="">
+             JEFF WARNER
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=22-03-2015">Sun 22</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6985/" class="daytime">10:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Richie <a href="/diary/edit/event/id/7796/view/"
+                class=" private daytime">
+             RICHIE BIG R REHEARSAL
+        </a></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        <td>
+        <a href="/diary/edit/showing/id/6913/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7752/view/"
+                class="">
+             THE DUKE OF BURGUNDY
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=23-03-2015">Mon 23</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6914/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7752/view/"
+                class="">
+             THE DUKE OF BURGUNDY
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=24-03-2015">Tue 24</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6915/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7752/view/"
+                class=" discounted">
+             THE DUKE OF BURGUNDY
+            (TTT)
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=25-03-2015">Wed 25</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7091/" class="daytime">11:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>filmteam <a href="/diary/edit/event/id/7878/view/"
+                class=" daytime">
+            BABYCINEMA PRESENTS DUKE OF BURGUNDY
+        </a></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        <td>
+        <a href="/diary/edit/showing/id/6815/" >19:30</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Steve P <a href="/diary/edit/event/id/7679/view/"
+                class="">
+             BLUESCREEN
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=26-03-2015">Thu 26</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7099/" class="daytime">15:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Leila  <a href="/diary/edit/event/id/7884/view/"
+                class=" private daytime">
+            Meeting with Mitchell and Taylor architects
+        </a></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        <td>
+        <a href="/diary/edit/showing/id/7037/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Marian <a href="/diary/edit/event/id/7835/view/"
+                class="">
+             20TH CENTURY FLICKS PRESENTS: QUIZ SHOW
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=27-03-2015">Fri 27</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6994/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>jamie <a href="/diary/edit/event/id/7805/view/"
+                class="">
+            LOCATRONICS PRESENTS:  FROG POCKET [PLANET MU]  + FILM SCREENING AND PARISH SOUND DJS  + OTHERS TBC
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=28-03-2015">Sat 28</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7061/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Zuleika <a href="/diary/edit/event/id/7851/view/"
+                class="">
+             THOMAS TRUAX
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=29-03-2015">Sun 29</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7080/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Film Team <a href="/diary/edit/event/id/7841/view/"
+                class="">
+             APPROPRIATE BEHAVIOUR
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=30-03-2015">Mon 30</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7092/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Film Team <a href="/diary/edit/event/id/7841/view/"
+                class="">
+             APPROPRIATE BEHAVIOUR
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=31-03-2015">Tue 31</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7093/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Film Team <a href="/diary/edit/event/id/7841/view/"
+                class=" discounted">
+             APPROPRIATE BEHAVIOUR
+            (TTT)
+        </a></td>
+        </tr>
+    <tr class="row_month"><td><h2>April</h2></td><td colspan="3"></td></tr></tr>
+    <tr><td><a href="/diary/edit/ideas/2015/4/">IDEAS</a></td><td colspan="3" class="ideas">blind - axiom
+still alice - curzon
+wild tales - curzon out 27th march usually wk 4 for us
+while we&#39;re young - Icon should be last wk april or early May
+bladerunner the final cut, 3rd of april reissue BFI (maybe also screen LA plays itself this month)
+the dark horse (kiwi not welsh one) out via Koch
+Zuleika is looking for a date for some workshops and thomas Truax</td></tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=1-04-2015">Wed 1</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6616/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>ben p <a href="/diary/edit/event/id/7507/view/"
+                class="">
+             ENABLERS + CARRIAGES + HARESS
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=2-04-2015">Thu 2</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7100/" class="daytime">15:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Leila  <a href="/diary/edit/event/id/7885/view/"
+                class=" private daytime">
+            Meeting with Mitchell and Taylor architects
+        </a></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        <td>
+        <a href="/diary/edit/showing/id/7054/" >19:30</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>chiz <a href="/diary/edit/event/id/7847/view/"
+                class="">
+             BRUCE MCCLURE + SALLY GOLDING + LOUISA FAIRCLOUGH
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=3-04-2015">Fri 3</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6785/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>dave <a href="/diary/edit/event/id/7654/view/"
+                class="">
+             STANDBY FOR TAPE BACK-UP THE TRUE STORY OF ONE MAN’S JOURNEY INTO SYNCHRONICITY AND MADNESS.
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=4-04-2015">Sat 4</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6995/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>jamie <a href="/diary/edit/event/id/7806/view/"
+                class="">
+            sons of kemet?
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=5-04-2015">Sun 5</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7013/" class="daytime">14:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>paul <a href="/diary/edit/event/id/7818/view/"
+                class=" private daytime">
+             VOLS CLEANING/ SOCIAL/ TRAINING/ SCREENING
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=6-04-2015">Mon 6</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6869/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Liz <a href="/diary/edit/event/id/7714/view/"
+                class="">
+            BRISTOL RADICAL FILM FESTIVAL PRESENTS WILL &amp; TESTAMENT
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=7-04-2015">Tue 7</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7079/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7867/view/"
+                class="">
+            film tbc
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=8-04-2015">Wed 8</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6794/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>scruff <a href="/diary/edit/event/id/7663/view/"
+                class="">
+             REX MANNING DAY
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=9-04-2015">Thu 9</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7034/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film <a href="/diary/edit/event/id/7832/view/"
+                class="">
+            poss flicks date
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=10-04-2015">Fri 10</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7021/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>jamie <a href="/diary/edit/event/id/7826/view/"
+                class="">
+            Princess RowdBurn feat Sonance,Anta plus others tbc
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=11-04-2015">Sat 11</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6950/" >19:30</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Al  <a href="/diary/edit/event/id/7776/view/"
+                class="">
+            Live stand up + Naked Gun
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=12-04-2015">Sun 12</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7073/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>chiz <a href="/diary/edit/event/id/7862/view/"
+                class="">
+            Tom Brousseau
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=13-04-2015">Mon 13</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6979/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Film Team <a href="/diary/edit/event/id/7793/view/"
+                class="">
+            Mommy
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=14-04-2015">Tue 14</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6980/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Film Team <a href="/diary/edit/event/id/7793/view/"
+                class="">
+            Mommy
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=15-04-2015">Wed 15</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6981/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Film Team <a href="/diary/edit/event/id/7793/view/"
+                class="">
+            Mommy
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=16-04-2015">Thu 16</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7002/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>chiz <a href="/diary/edit/event/id/7810/view/"
+                class="">
+            film sceening
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=17-04-2015">Fri 17</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7004/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>chiz <a href="/diary/edit/event/id/7811/view/"
+                class="">
+            film sceening
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=18-04-2015">Sat 18</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7064/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>James Mckernon <a href="/diary/edit/event/id/7853/view/"
+                class="">
+            Momus
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=19-04-2015">Sun 19</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6971/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7791/view/"
+                class="">
+            film run
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=20-04-2015">Mon 20</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6972/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7791/view/"
+                class="">
+            film run
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=21-04-2015">Tue 21</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6973/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7791/view/"
+                class="">
+            film run
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=22-04-2015">Wed 22</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7102/" >19:30</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>kari <a href="/diary/edit/event/id/7887/view/"
+                class="">
+            Show Me The Animation
+        </a></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        <td>
+        <a href="/diary/edit/showing/id/6974/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7791/view/"
+                class="">
+            film run
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=23-04-2015">Thu 23</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6959/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>dave <a href="/diary/edit/event/id/7784/view/"
+                class="">
+            Storytellers Club (pencil)
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=24-04-2015">Fri 24</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6961/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Matt d <a href="/diary/edit/event/id/7786/view/"
+                class="">
+            Hellfire Video club - hippies up against it
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=25-04-2015">Sat 25</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7020/" class="daytime">11:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>jamie <a href="/diary/edit/event/id/7825/view/"
+                class=" daytime">
+            Cruising/Leather setup
+        </a></td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td>
+        <td>
+        <a href="/diary/edit/showing/id/7019/" class="daytime">17:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>jamie <a href="/diary/edit/event/id/7824/view/"
+                class=" daytime">
+            The Cube and HorsePlay get leathered up and go cruising
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=26-04-2015">Sun 26</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6897/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Barry <a href="/diary/edit/event/id/7739/view/"
+                class="">
+            Diane Cluck
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=27-04-2015">Mon 27</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6975/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Film Team <a href="/diary/edit/event/id/7792/view/"
+                class="">
+            film run poss wild tales and while we&#39;re young
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=28-04-2015">Tue 28</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6976/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Film Team <a href="/diary/edit/event/id/7792/view/"
+                class="">
+            film run poss wild tales and while we&#39;re young
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=29-04-2015">Wed 29</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6977/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Film Team <a href="/diary/edit/event/id/7792/view/"
+                class="">
+            film run poss wild tales and while we&#39;re young
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=30-04-2015">Thu 30</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6908/" >19:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Ben E <a href="/diary/edit/event/id/7749/view/"
+                class="">
+            Unspeakable Freedom (working title) Jennet Thomas et. at.
+        </a></td>
+        </tr>
+    <tr class="row_month"><td><h2>May</h2></td><td colspan="3"></td></tr></tr>
+    <tr><td><a href="/diary/edit/ideas/2015/5/">IDEAS</a></td><td colspan="3" class="ideas">Centenary of ORSON WELLES!
+EUROVISION!!
+john wk, first week may warner
+vErtigo - Moomins on the Riviera
+15th may the tribe metrodome
+the falling metrodome (released 24 april)
+Turist rel. April Curzon force majeure...may 15th
+8th may eureka tokyo tribe
+</td></tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=1-05-2015">Fri 1</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7038/" >19:30</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Huw <a href="/diary/edit/event/id/7836/view/"
+                class="">
+            Cardinal Fuzz Night (TBC) - Mugstar/Demons/Apes
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=2-05-2015">Sat 2</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7052/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>kate <a href="/diary/edit/event/id/7845/view/"
+                class=" private external">
+             UWE GRAPHIC DESIGN PRIVATE SCREENING
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=3-05-2015">Sun 3</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7023/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Film Team <a href="/diary/edit/event/id/7828/view/"
+                class="">
+            film run poss while we&#39;re young
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=4-05-2015">Mon 4</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6963/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Liz <a href="/diary/edit/event/id/7788/view/"
+                class="">
+            Bristol Radical Film Festival presents
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=5-05-2015">Tue 5</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7024/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Film Team <a href="/diary/edit/event/id/7828/view/"
+                class="">
+            film run poss while we&#39;re young
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=6-05-2015">Wed 6</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6991/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>kate <a href="/diary/edit/event/id/7802/view/"
+                class=" external">
+            GMO OMG
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=7-05-2015">Thu 7</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6960/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>dave <a href="/diary/edit/event/id/7785/view/"
+                class="">
+            Storytellers Club (pencil)
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=8-05-2015">Fri 8</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6803/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Dani Landau <a href="/diary/edit/event/id/7668/view/"
+                class="">
+            Minema - Live Soundtrack - Phantom of the Opera (1925)
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=9-05-2015">Sat 9</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6806/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Alice Holland <a href="/diary/edit/event/id/7671/view/"
+                class="">
+            Virgie Tovar- LoseHateNotWeight Body Positivity Day
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=10-05-2015">Sun 10</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7025/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Film Team <a href="/diary/edit/event/id/7829/view/"
+                class="">
+            film run
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=11-05-2015">Mon 11</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7026/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Film Team <a href="/diary/edit/event/id/7829/view/"
+                class="">
+            film run
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=12-05-2015">Tue 12</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7027/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Film Team <a href="/diary/edit/event/id/7829/view/"
+                class="">
+            film run
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=13-05-2015">Wed 13</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7028/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Film Team <a href="/diary/edit/event/id/7829/view/"
+                class="">
+            film run
+        </a></td>
+        </tr>
+        <tr><td><a href="/diary/edit/event/add?date=14-05-2015">Thu 14</a></td><td colspan="3"></td></tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=15-05-2015">Fri 15</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7122/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>hen~dø <a href="/diary/edit/event/id/7900/view/"
+                class="">
+            hen~dø
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=16-05-2015">Sat 16</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6704/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Zuleika <a href="/diary/edit/event/id/7585/view/"
+                class="">
+            Quietus
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=17-05-2015">Sun 17</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6751/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Lina/Alice <a href="/diary/edit/event/id/7625/view/"
+                class=" external">
+            MAYFEST? pencil
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=18-05-2015">Mon 18</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7029/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Film Team <a href="/diary/edit/event/id/7830/view/"
+                class="">
+            film run
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=19-05-2015">Tue 19</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7030/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Film Team <a href="/diary/edit/event/id/7830/view/"
+                class="">
+            film run
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=20-05-2015">Wed 20</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6816/" >19:30</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Steve P <a href="/diary/edit/event/id/7680/view/"
+                class="">
+            Bluescreen
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=21-05-2015">Thu 21</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6752/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Lina/Alice <a href="/diary/edit/event/id/7626/view/"
+                class=" external">
+            MAYFEST? pencil
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=22-05-2015">Fri 22</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6753/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Lina/Alice <a href="/diary/edit/event/id/7626/view/"
+                class=" external">
+            MAYFEST? pencil
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=23-05-2015">Sat 23</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6851/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Paul H <a href="/diary/edit/event/id/7699/view/"
+                class="">
+            Eurovision
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=24-05-2015">Sun 24</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6755/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Lina/Alice <a href="/diary/edit/event/id/7626/view/"
+                class=" external">
+            MAYFEST? pencil
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=25-05-2015">Mon 25</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7031/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Film Team <a href="/diary/edit/event/id/7831/view/"
+                class="">
+            film run
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=26-05-2015">Tue 26</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7032/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Film Team <a href="/diary/edit/event/id/7831/view/"
+                class="">
+            film run
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=27-05-2015">Wed 27</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7033/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Film Team <a href="/diary/edit/event/id/7831/view/"
+                class="">
+            film run
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=28-05-2015">Thu 28</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7035/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film <a href="/diary/edit/event/id/7833/view/"
+                class="">
+            poss flicks date
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=29-05-2015">Fri 29</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6962/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>matt d <a href="/diary/edit/event/id/7787/view/"
+                class="">
+            Hellfire VC
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=30-05-2015">Sat 30</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6757/" >19:30</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Al  <a href="/diary/edit/event/id/7628/view/"
+                class="">
+            Musical Comedy + Little Shop Of Horrors
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=31-05-2015">Sun 31</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7014/" class="daytime">18:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>paul <a href="/diary/edit/event/id/7819/view/"
+                class=" private daytime">
+             VOLS CLEANING/ SOCIAL/ TRAINING/ SCREENING
+        </a></td>
+        </tr>
+    <tr class="row_month"><td><h2>June</h2></td><td colspan="3"></td></tr></tr>
+    <tr><td><a href="/diary/edit/ideas/2015/6/">IDEAS</a></td><td colspan="3" class="ideas">electric boogaloo 5th june release metrodome
+metrodome housebound
+5th june listen up philip eureka</td></tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=1-06-2015">Mon 1</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7103/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7888/view/"
+                class="">
+            film run
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=2-06-2015">Tue 2</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7104/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7888/view/"
+                class="">
+            film run
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=3-06-2015">Wed 3</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7105/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7888/view/"
+                class="">
+            film run
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=4-06-2015">Thu 4</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7015/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>jamie <a href="/diary/edit/event/id/7820/view/"
+                class="">
+            Surgeon &amp; Ali Wade  Live A.V Show
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=5-06-2015">Fri 5</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7071/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Chiz <a href="/diary/edit/event/id/7860/view/"
+                class="">
+            DRO
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=6-06-2015">Sat 6</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7012/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Joe Hatt <a href="/diary/edit/event/id/7817/view/"
+                class="">
+            Howling Owl Records TBC
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=7-06-2015">Sun 7</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7072/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>chiz <a href="/diary/edit/event/id/7861/view/"
+                class="">
+            DRO
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=8-06-2015">Mon 8</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7081/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>cube <a href="/diary/edit/event/id/7868/view/"
+                class="">
+            Dewis Dickstravaganza
+        </a></td>
+        </tr>
+        <tr><td><a href="/diary/edit/event/add?date=9-06-2015">Tue 9</a></td><td colspan="3"></td></tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=10-06-2015">Wed 10</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6997/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Joe Hatt <a href="/diary/edit/event/id/7808/view/"
+                class="">
+            Howling Owl Records TBC
+        </a></td>
+        </tr>
+        <tr><td><a href="/diary/edit/event/add?date=11-06-2015">Thu 11</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=12-06-2015">Fri 12</a></td><td colspan="3"></td></tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=13-06-2015">Sat 13</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7065/" >19:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>paul h <a href="/diary/edit/event/id/7854/view/"
+                class=" external">
+            seamas carey possible buster keaton hire
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=14-06-2015">Sun 14</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7005/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>chiz <a href="/diary/edit/event/id/7812/view/"
+                class="">
+            Music Show
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=15-06-2015">Mon 15</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7106/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7889/view/"
+                class="">
+            film run
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=16-06-2015">Tue 16</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7107/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7889/view/"
+                class="">
+            film run
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=17-06-2015">Wed 17</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7108/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7889/view/"
+                class="">
+            film run
+        </a></td>
+        </tr>
+        <tr><td><a href="/diary/edit/event/add?date=18-06-2015">Thu 18</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=19-06-2015">Fri 19</a></td><td colspan="3"></td></tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=20-06-2015">Sat 20</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7018/" >19:30</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Al  <a href="/diary/edit/event/id/7823/view/"
+                class="">
+            Live stand up + Tremors
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=21-06-2015">Sun 21</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7085/" class="daytime">18:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>dave <a href="/diary/edit/event/id/7872/view/"
+                class=" daytime">
+            Indie gaming throw down/Foxdog Studios performance
+        </a></td>
+        </tr>
+        <tr><td><a href="/diary/edit/event/add?date=22-06-2015">Mon 22</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=23-06-2015">Tue 23</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=24-06-2015">Wed 24</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=25-06-2015">Thu 25</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=26-06-2015">Fri 26</a></td><td colspan="3"></td></tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=27-06-2015">Sat 27</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7086/" class="daytime">18:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>dave <a href="/diary/edit/event/id/7873/view/"
+                class=" daytime">
+            Indie gaming throw down/Foxdog Studios performance
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=28-06-2015">Sun 28</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7109/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7890/view/"
+                class="">
+            film run
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=29-06-2015">Mon 29</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7110/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7890/view/"
+                class="">
+            film run
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=30-06-2015">Tue 30</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7111/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7890/view/"
+                class="">
+            film run
+        </a></td>
+        </tr>
+    <tr class="row_month"><td><h2>July</h2></td><td colspan="3"></td></tr></tr>
+    <tr><td><a href="/diary/edit/ideas/2015/7/">IDEAS</a></td><td colspan="3" class="ideas"></td></tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=1-07-2015">Wed 1</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7112/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>film team <a href="/diary/edit/event/id/7890/view/"
+                class="">
+            film run
+        </a></td>
+        </tr>
+        <tr><td><a href="/diary/edit/event/add?date=2-07-2015">Thu 2</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=3-07-2015">Fri 3</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=4-07-2015">Sat 4</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=5-07-2015">Sun 5</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=6-07-2015">Mon 6</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=7-07-2015">Tue 7</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=8-07-2015">Wed 8</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=9-07-2015">Thu 9</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=10-07-2015">Fri 10</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=11-07-2015">Sat 11</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=12-07-2015">Sun 12</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=13-07-2015">Mon 13</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=14-07-2015">Tue 14</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=15-07-2015">Wed 15</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=16-07-2015">Thu 16</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=17-07-2015">Fri 17</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=18-07-2015">Sat 18</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=19-07-2015">Sun 19</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=20-07-2015">Mon 20</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=21-07-2015">Tue 21</a></td><td colspan="3"></td></tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=22-07-2015">Wed 22</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7016/" >19:30</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Steve P/Tess <a href="/diary/edit/event/id/7821/view/"
+                class="">
+            Bluescreen
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=23-07-2015">Thu 23</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7123/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>paul <a href="/diary/edit/event/id/7901/view/"
+                class=" private">
+            closed for maintenance
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=24-07-2015">Fri 24</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7124/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>paul <a href="/diary/edit/event/id/7901/view/"
+                class=" private">
+            closed for maintenance
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=25-07-2015">Sat 25</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7125/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>paul <a href="/diary/edit/event/id/7901/view/"
+                class=" private">
+            closed for maintenance
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=26-07-2015">Sun 26</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7126/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>paul <a href="/diary/edit/event/id/7901/view/"
+                class=" private">
+            closed for maintenance
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=27-07-2015">Mon 27</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7127/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>paul <a href="/diary/edit/event/id/7901/view/"
+                class=" private">
+            closed for maintenance
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=28-07-2015">Tue 28</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7128/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>paul <a href="/diary/edit/event/id/7901/view/"
+                class=" private">
+            closed for maintenance
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=29-07-2015">Wed 29</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7129/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>paul <a href="/diary/edit/event/id/7901/view/"
+                class=" private">
+            closed for maintenance
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=30-07-2015">Thu 30</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7130/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>paul <a href="/diary/edit/event/id/7901/view/"
+                class=" private">
+            closed for maintenance
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=31-07-2015">Fri 31</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7131/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>paul <a href="/diary/edit/event/id/7901/view/"
+                class=" private">
+            closed for maintenance
+        </a></td>
+        </tr>
+    <tr class="row_month"><td><h2>August</h2></td><td colspan="3"></td></tr></tr>
+    <tr><td><a href="/diary/edit/ideas/2015/8/">IDEAS</a></td><td colspan="3" class="ideas"></td></tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=1-08-2015">Sat 1</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7132/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>paul <a href="/diary/edit/event/id/7901/view/"
+                class=" private">
+            closed for maintenance
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=2-08-2015">Sun 2</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7133/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>paul <a href="/diary/edit/event/id/7901/view/"
+                class=" private">
+            closed for maintenance
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=3-08-2015">Mon 3</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7134/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>paul <a href="/diary/edit/event/id/7901/view/"
+                class=" private">
+            closed for maintenance
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=4-08-2015">Tue 4</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7135/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>paul <a href="/diary/edit/event/id/7901/view/"
+                class=" private">
+            closed for maintenance
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=5-08-2015">Wed 5</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7136/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>paul <a href="/diary/edit/event/id/7901/view/"
+                class=" private">
+            closed for maintenance
+        </a></td>
+        </tr>
+        <tr><td><a href="/diary/edit/event/add?date=6-08-2015">Thu 6</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=7-08-2015">Fri 7</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=8-08-2015">Sat 8</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=9-08-2015">Sun 9</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=10-08-2015">Mon 10</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=11-08-2015">Tue 11</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=12-08-2015">Wed 12</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=13-08-2015">Thu 13</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=14-08-2015">Fri 14</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=15-08-2015">Sat 15</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=16-08-2015">Sun 16</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=17-08-2015">Mon 17</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=18-08-2015">Tue 18</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=19-08-2015">Wed 19</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=20-08-2015">Thu 20</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=21-08-2015">Fri 21</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=22-08-2015">Sat 22</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=23-08-2015">Sun 23</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=24-08-2015">Mon 24</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=25-08-2015">Tue 25</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=26-08-2015">Wed 26</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=27-08-2015">Thu 27</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=28-08-2015">Fri 28</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=29-08-2015">Sat 29</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=30-08-2015">Sun 30</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=31-08-2015">Mon 31</a></td><td colspan="3"></td></tr>
+    <tr class="row_month"><td><h2>September</h2></td><td colspan="3"></td></tr></tr>
+    <tr><td><a href="/diary/edit/ideas/2015/9/">IDEAS</a></td><td colspan="3" class="ideas">Scalarama</td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=1-09-2015">Tue 1</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=2-09-2015">Wed 2</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=3-09-2015">Thu 3</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=4-09-2015">Fri 4</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=5-09-2015">Sat 5</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=6-09-2015">Sun 6</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=7-09-2015">Mon 7</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=8-09-2015">Tue 8</a></td><td colspan="3"></td></tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=9-09-2015">Wed 9</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7068/" >19:30</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Steve P <a href="/diary/edit/event/id/7857/view/"
+                class="">
+            BLUESCREEN
+        </a></td>
+        </tr>
+        <tr><td><a href="/diary/edit/event/add?date=10-09-2015">Thu 10</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=11-09-2015">Fri 11</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=12-09-2015">Sat 12</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=13-09-2015">Sun 13</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=14-09-2015">Mon 14</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=15-09-2015">Tue 15</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=16-09-2015">Wed 16</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=17-09-2015">Thu 17</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=18-09-2015">Fri 18</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=19-09-2015">Sat 19</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=20-09-2015">Sun 20</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=21-09-2015">Mon 21</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=22-09-2015">Tue 22</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=23-09-2015">Wed 23</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=24-09-2015">Thu 24</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=25-09-2015">Fri 25</a></td><td colspan="3"></td></tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=26-09-2015">Sat 26</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/6900/" class="daytime">17:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>kate <a href="/diary/edit/event/id/7742/view/"
+                class=" private external daytime">
+             WEDDING HIRE
+        </a></td>
+        </tr>
+        <tr><td><a href="/diary/edit/event/add?date=27-09-2015">Sun 27</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=28-09-2015">Mon 28</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=29-09-2015">Tue 29</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=30-09-2015">Wed 30</a></td><td colspan="3"></td></tr>
+    <tr class="row_month"><td><h2>October</h2></td><td colspan="3"></td></tr></tr>
+    <tr><td><a href="/diary/edit/ideas/2015/10/">IDEAS</a></td><td colspan="3" class="ideas">BRISTOL CIRCUS FESTIVAL - lina involved in producing
+Bfi love season until dec
+</td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=1-10-2015">Thu 1</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=2-10-2015">Fri 2</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=3-10-2015">Sat 3</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=4-10-2015">Sun 4</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=5-10-2015">Mon 5</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=6-10-2015">Tue 6</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=7-10-2015">Wed 7</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=8-10-2015">Thu 8</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=9-10-2015">Fri 9</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=10-10-2015">Sat 10</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=11-10-2015">Sun 11</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=12-10-2015">Mon 12</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=13-10-2015">Tue 13</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=14-10-2015">Wed 14</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=15-10-2015">Thu 15</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=16-10-2015">Fri 16</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=17-10-2015">Sat 17</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=18-10-2015">Sun 18</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=19-10-2015">Mon 19</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=20-10-2015">Tue 20</a></td><td colspan="3"></td></tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=21-10-2015">Wed 21</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7069/" >19:30</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Steve P <a href="/diary/edit/event/id/7858/view/"
+                class="">
+            BLUESCREEN
+        </a></td>
+        </tr>
+        <tr><td><a href="/diary/edit/event/add?date=22-10-2015">Thu 22</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=23-10-2015">Fri 23</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=24-10-2015">Sat 24</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=25-10-2015">Sun 25</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=26-10-2015">Mon 26</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=27-10-2015">Tue 27</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=28-10-2015">Wed 28</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=29-10-2015">Thu 29</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=30-10-2015">Fri 30</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=31-10-2015">Sat 31</a></td><td colspan="3"></td></tr>
+    <tr class="row_month"><td><h2>November</h2></td><td colspan="3"></td></tr></tr>
+    <tr><td><a href="/diary/edit/ideas/2015/11/">IDEAS</a></td><td colspan="3" class="ideas"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=1-11-2015">Sun 1</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=2-11-2015">Mon 2</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=3-11-2015">Tue 3</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=4-11-2015">Wed 4</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=5-11-2015">Thu 5</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=6-11-2015">Fri 6</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=7-11-2015">Sat 7</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=8-11-2015">Sun 8</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=9-11-2015">Mon 9</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=10-11-2015">Tue 10</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=11-11-2015">Wed 11</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=12-11-2015">Thu 12</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=13-11-2015">Fri 13</a></td><td colspan="3"></td></tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=14-11-2015">Sat 14</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7041/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Alice H <a href="/diary/edit/event/id/7838/view/"
+                class="">
+            The Greatest Liar in all the World
+        </a></td>
+        </tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=15-11-2015">Sun 15</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7042/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>Alice H <a href="/diary/edit/event/id/7839/view/"
+                class="">
+            The Greatest Liar in all the World
+        </a></td>
+        </tr>
+        <tr><td><a href="/diary/edit/event/add?date=16-11-2015">Mon 16</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=17-11-2015">Tue 17</a></td><td colspan="3"></td></tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=18-11-2015">Wed 18</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7070/" >19:30</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>BLUESCREEN <a href="/diary/edit/event/id/7859/view/"
+                class="">
+            BLUESCREEN
+        </a></td>
+        </tr>
+        <tr><td><a href="/diary/edit/event/add?date=19-11-2015">Thu 19</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=20-11-2015">Fri 20</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=21-11-2015">Sat 21</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=22-11-2015">Sun 22</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=23-11-2015">Mon 23</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=24-11-2015">Tue 24</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=25-11-2015">Wed 25</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=26-11-2015">Thu 26</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=27-11-2015">Fri 27</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=28-11-2015">Sat 28</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=29-11-2015">Sun 29</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=30-11-2015">Mon 30</a></td><td colspan="3"></td></tr>
+    <tr class="row_month"><td><h2>December</h2></td><td colspan="3"></td></tr></tr>
+    <tr><td><a href="/diary/edit/ideas/2015/12/">IDEAS</a></td><td colspan="3" class="ideas"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=1-12-2015">Tue 1</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=2-12-2015">Wed 2</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=3-12-2015">Thu 3</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=4-12-2015">Fri 4</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=5-12-2015">Sat 5</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=6-12-2015">Sun 6</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=7-12-2015">Mon 7</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=8-12-2015">Tue 8</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=9-12-2015">Wed 9</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=10-12-2015">Thu 10</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=11-12-2015">Fri 11</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=12-12-2015">Sat 12</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=13-12-2015">Sun 13</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=14-12-2015">Mon 14</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=15-12-2015">Tue 15</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=16-12-2015">Wed 16</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=17-12-2015">Thu 17</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=18-12-2015">Fri 18</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=19-12-2015">Sat 19</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=20-12-2015">Sun 20</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=21-12-2015">Mon 21</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=22-12-2015">Tue 22</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=23-12-2015">Wed 23</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=24-12-2015">Thu 24</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=25-12-2015">Fri 25</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=26-12-2015">Sat 26</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=27-12-2015">Sun 27</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=28-12-2015">Mon 28</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=29-12-2015">Tue 29</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=30-12-2015">Wed 30</a></td><td colspan="3"></td></tr>
+        <tr>
+            <td colspan="4">&nbsp;</td></tr>
+            <tr><td><a href="/diary/edit/event/add?date=31-12-2015">Thu 31</a></td>
+        <td>
+        <a href="/diary/edit/showing/id/7050/" >20:00</a>
+        </td>
+        <td class="table_gap">&nbsp;</td>
+        <td>the cube <a href="/diary/edit/event/id/7844/view/"
+                class="">
+             NYE
+        </a></td>
+        </tr>
+    <tr class="row_year"><td><h1>2016 </h1></td><td colspan="3"></td></tr>
+    <tr class="row_month"><td><h2>January</h2></td><td colspan="3"></td></tr></tr>
+    <tr><td><a href="/diary/edit/ideas/2016/1/">IDEAS</a></td><td colspan="3" class="ideas"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=1-01-2016">Fri 1</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=2-01-2016">Sat 2</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=3-01-2016">Sun 3</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=4-01-2016">Mon 4</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=5-01-2016">Tue 5</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=6-01-2016">Wed 6</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=7-01-2016">Thu 7</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=8-01-2016">Fri 8</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=9-01-2016">Sat 9</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=10-01-2016">Sun 10</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=11-01-2016">Mon 11</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=12-01-2016">Tue 12</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=13-01-2016">Wed 13</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=14-01-2016">Thu 14</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=15-01-2016">Fri 15</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=16-01-2016">Sat 16</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=17-01-2016">Sun 17</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=18-01-2016">Mon 18</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=19-01-2016">Tue 19</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=20-01-2016">Wed 20</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=21-01-2016">Thu 21</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=22-01-2016">Fri 22</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=23-01-2016">Sat 23</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=24-01-2016">Sun 24</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=25-01-2016">Mon 25</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=26-01-2016">Tue 26</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=27-01-2016">Wed 27</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=28-01-2016">Thu 28</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=29-01-2016">Fri 29</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=30-01-2016">Sat 30</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=31-01-2016">Sun 31</a></td><td colspan="3"></td></tr>
+    <tr class="row_month"><td><h2>February</h2></td><td colspan="3"></td></tr></tr>
+    <tr><td><a href="/diary/edit/ideas/2016/2/">IDEAS</a></td><td colspan="3" class="ideas"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=1-02-2016">Mon 1</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=2-02-2016">Tue 2</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=3-02-2016">Wed 3</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=4-02-2016">Thu 4</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=5-02-2016">Fri 5</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=6-02-2016">Sat 6</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=7-02-2016">Sun 7</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=8-02-2016">Mon 8</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=9-02-2016">Tue 9</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=10-02-2016">Wed 10</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=11-02-2016">Thu 11</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=12-02-2016">Fri 12</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=13-02-2016">Sat 13</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=14-02-2016">Sun 14</a></td><td colspan="3"></td></tr>
+        <tr><td><a href="/diary/edit/event/add?date=15-02-2016">Mon 15</a></td><td colspan="3"></td></tr>
+</table>
+<iframe name="form_frame" id="form_frame" src="/static/diary/edit_event_index_blankframe.html">
+    <p>No iframe support!</p>
+</iframe>
+</div>
+</body>
+</html>

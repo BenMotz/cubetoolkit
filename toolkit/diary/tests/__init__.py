@@ -9,3 +9,4 @@ from .test_public_views import *
 from .test_archive_views import *
 from .test_printedprogramme_views import *
 from .test_templatetags_showing_date_format import *
+from .test_templatetags_noprefix_url import *

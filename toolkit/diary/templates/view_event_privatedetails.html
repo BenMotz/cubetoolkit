@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% load thumbnail %}
 {% load static %}
+{% load noprefix_url %}
 {% block title %}
 Details for: {{ event.name }}
 {% endblock %}
@@ -52,7 +53,8 @@ Details for: {{ event.name }}
 <h3>CUBE events diary</h3>
 
 <div id="booking">
-<h1>Details for {{ event.name }} [<a href="{% url "edit-event-details" event.pk %}">edit</a>]</h1>
+    <h1>Details for {{ event.name }} [<a href="{% url "edit-event-details" event.pk %}">edit</a>]
+        [{% if event.showings.public and not event.private %}<a href="{% noprefix_url "single-event-view" event.pk %}">in programme</a>{% else %}not visible in programme{% endif %}]</h1>
     <p class="d">
     <b>Pre-title:</b> {{event.pre_title }} <br>
     <b>Name:</b>{{ event.name }}<br>
