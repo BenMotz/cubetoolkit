@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load noprefix_url %}
 
 {% block title %}
 CUBE role rota
@@ -96,7 +97,7 @@ edit_rota(
     {% ifchanged %}<tr><td colspan="5"><h2>{{ showing.start|date:"F Y" }}</h2></td></tr>{% endifchanged %}
     <tr class="title_row{% if showing.in_past %} past_showing{% endif %}">
         <td class="cell_date">{{ showing.start|date:"D j H:i"}}</td>
-        <td class="event_name" colspan="4"><a href="{% url "single-showing-view" showing.pk %}">{{ showing.event.name.upper }}</a></td>
+        <td class="event_name" colspan="4"><a href="{% noprefix_url "single-showing-view" showing.pk %}">{{ showing.event.name.upper }}</a></td>
     </tr>
     {% for rota_entry in showing.rotaentry_set.all %}
         {% if forloop.counter|divisibleby:2 %}

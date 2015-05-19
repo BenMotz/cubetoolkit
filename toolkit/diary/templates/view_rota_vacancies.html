@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load noprefix_url %}
 
 {% block title %}
 CUBE role rota vacancies
@@ -33,7 +34,7 @@ CUBE role rota vacancies
         {% else %}
             {{ showing.start|date:"D jS H:i" }}
         {% endif %} &mdash;
-        <a href="{% url "single-showing-view" showing.pk %}">{{ showing.event.name }}</a></b> <i>needs</i>
+        <a href="{% noprefix_url "single-showing-view" showing.pk %}">{{ showing.event.name }}</a></b> <i>needs</i>
         {% for rota_entry in vacant_roles %}
             {{ rota_entry.role.name }}{% if rota_entry.rank > 1 %} #{{ rota_entry.rank }}{% endif %}{% if not forloop.last %},{% endif %}
         {% empty %}
