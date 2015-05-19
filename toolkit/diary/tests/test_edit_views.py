@@ -37,6 +37,7 @@ TINY_VALID_JPEG = bytearray(
     b'\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00'
     b'\xff\xda\x00\x08\x01\x01\x00\x00?\x00T\xdf\xff\xd9')
 
+
 class ViewSecurity(DiaryTestsMixin, TestCase):
 
     """Basic test that the private diary pages require the correct
@@ -904,7 +905,8 @@ class EditEventView(DiaryTestsMixin, TestCase):
                 'credit': u'All new image credit!'
             })
 
-        self.assertFormError(response, 'media_form', u'media_file',
+        self.assertFormError(
+            response, 'media_form', u'media_file',
             u'Upload a valid image. The file you uploaded was either '
             u'not an image or a corrupted image.')
 
@@ -1018,12 +1020,12 @@ class EditEventView(DiaryTestsMixin, TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_event.html")
-        self.assertFormError(response, 'media_form', u'media_file',
+        self.assertFormError(
+            response, 'media_form', u'media_file',
             u'Media file must be 1 MB or less (uploaded file is 1.00 MB)')
 
         event = Event.objects.get(id=2)
         self.assertEqual(event.media.count(), 0)
-
 
     @override_settings(MEDIA_ROOT="/tmp", PROGRAMME_MEDIA_MAX_SIZE_MB=1)
     def test_post_edit_event_add_media_max_size(self):
@@ -1048,7 +1050,6 @@ class EditEventView(DiaryTestsMixin, TestCase):
             })
         self.assert_return_to_index(response)
 
-
     @override_settings(PROGRAMME_COPY_SUMMARY_MAX_CHARS=50)
     def test_post_edit_event_too_much_copy_summary(self):
         url = reverse("edit-event-details", kwargs={"event_id": 2})
@@ -1066,7 +1067,8 @@ class EditEventView(DiaryTestsMixin, TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_event.html")
-        self.assertFormError(response, 'form', u'copy_summary',
+        self.assertFormError(
+            response, 'form', u'copy_summary',
             u'Copy summary must be 50 characters or fewer (currently 51 characters)')
 
         event = Event.objects.get(id=2)
@@ -1090,6 +1092,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
 
         event = Event.objects.get(id=2)
         self.assertEqual(event.copy_summary, copy_summary_data)
+
 
 class EditIdeasViewTests(DiaryTestsMixin, TestCase):
 

@@ -69,9 +69,12 @@ class MembersTestsMixin(object):
                             phone="", altphone="", address="", posttown="", postcode="", country="",
                             website="")
         self.mem_7.save()
-        self.mem_8 = Member(name=u"Number Eight, No mailout please", email="bart@bart.test", number="010", mailout=False)
+        self.mem_8 = Member(name=u"Number Eight, No mailout please",
+                            email="bart@bart.test", number="010", mailout=False)
         self.mem_8.save()
-        self.mem_8 = Member(name=u"Number Nine, mailout failed", email="frobney@squoo.test", number="010", mailout_failed=True)
+        self.mem_8 = Member(name=u"Number Nine, mailout failed",
+                            email="frobney@squoo.test", number="010",
+                            mailout_failed=True)
         self.mem_8.save()
 
         # Volunteers:

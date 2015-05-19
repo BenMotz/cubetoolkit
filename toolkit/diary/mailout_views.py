@@ -79,7 +79,6 @@ def mailout(request):
     # "mailout_send" form. That form has javascript which, if the user
     # confirms, posts to the "exec-mailout" view
 
-
     if request.method == 'GET':
         days_ahead = settings.MAILOUT_LISTINGS_DAYS_AHEAD
         copy_days_ahead = settings.MAILOUT_DETAILS_DAYS_AHEAD
@@ -150,9 +149,9 @@ def mailout_progress(request):
         elif state == "SUCCESS":
             progress = 100
             complete = True
-            if (async_result.result
-                    and isinstance(async_result.result, tuple)
-                    and len(async_result.result) == 3):
+            if (async_result.result and
+                    isinstance(async_result.result, tuple) and
+                    len(async_result.result) == 3):
                 error, sent_count, error_msg = async_result.result
             else:
                 error = True

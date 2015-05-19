@@ -60,10 +60,9 @@ def search(request):
     results = None
 
     if search_terms:
-        results = Member.objects.filter(  Q(name__icontains=search_terms)
-                                        | Q(email__icontains=search_terms)
-                                        | Q(number=search_terms)
-                                       ).order_by('name')
+        results = Member.objects.filter(Q(name__icontains=search_terms) |
+                                        Q(email__icontains=search_terms) |
+                                        Q(number=search_terms)).order_by('name')
         context = {
             'search_terms': search_terms,
             'members': results,
@@ -77,6 +76,7 @@ def search(request):
         'show_delete_link': show_delete_link,
     }
     return render(request, 'search_members.html', context)
+
 
 @permission_required('toolkit.read')
 @require_safe
@@ -92,7 +92,8 @@ def delete_member(request, member_id):
     member = get_object_or_404(Member, id=member_id)
     logger.info(u"Deleting member '{0}'".format(member.name))
     member.delete()  # This will delete associated volunteer record, if any
-    messages.add_message(request, messages.SUCCESS, u"Deleted member: {0} ({1})".format(member.number, member.name))
+    messages.add_message(request, messages.SUCCESS,
+                         u"Deleted member: {0} ({1})".format(member.number, member.name))
 
     return HttpResponseRedirect(reverse("search-members"))
 
@@ -113,7 +114,8 @@ def _check_access_permitted_for_member_key(permission, request, member_id):
             if isinstance(member_key, basestring):
                 # Use compare_constant_time instead of == to avoid timing
                 # attacks (no, really - read up on it)
-                access_permitted = compare_constant_time(member.mailout_key.encode("ascii"), member_key.encode("ascii"))
+                access_permitted = compare_constant_time(
+                    member.mailout_key.encode("ascii"), member_key.encode("ascii"))
                 # Keys should really both be ASCII, so this is very unlikely to
                 # raise an error unless someone intentionally feeds in
                 # junk
@@ -124,8 +126,9 @@ def _check_access_permitted_for_member_key(permission, request, member_id):
     return access_permitted
 
 
-# This view (and unsubscribe_member below) can be accessed both by logged in users and
-# if the magic key associated with the member record is passed in in the request
+# This view (and unsubscribe_member below) can be accessed both by logged in
+# users and if the magic key associated with the member record is passed in the
+# request
 @require_http_methods(["GET", "POST"])
 def edit_member(request, member_id):
 
@@ -183,8 +186,10 @@ def unsubscribe_member(request, member_id):
         if confirm == "yes" and action in ('unsubscribe', 'subscribe'):
             member.mailout = (action == 'subscribe')
             member.save()
-            logger.info(u"{0} member '{1}' (id: {2}) from mailing list".format(action, member.name, member.pk))
-            messages.add_message(request, messages.SUCCESS, u"Member {0} {1}d".format(member.number, action))
+            logger.info(u"{0} member '{1}' (id: {2}) from mailing list"
+                        .format(action, member.name, member.pk))
+            messages.add_message(request, messages.SUCCESS,
+                                 u"Member {0} {1}d".format(member.number, action))
 
     action = 'unsubscribe' if member.mailout else 'subscribe'
 
@@ -212,9 +217,11 @@ def member_statistics(request):
         'm_email_count': Member.objects.filter(email__isnull=False)
                                        .exclude(email='')
                                        .count(),
-        # Members with an email address that isn't null/blank, where mailout hasn't failed & they haven't unsubscribed:
+        # Members with an email address that isn't null/blank, where mailout
+        # hasn't failed & they haven't unsubscribed:
         'm_email_viable': Member.objects.mailout_recipients().count(),
-        # Members with an email address that isn't null/blank, where mailout hasn't failed & they have unsubscribed:
+        # Members with an email address that isn't null/blank, where mailout
+        # hasn't failed & they have unsubscribed:
         'm_email_unsub': Member.objects.filter(email__isnull=False)
                                        .exclude(email='')
                                        .exclude(mailout_failed=True)

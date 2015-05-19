@@ -146,9 +146,9 @@ def edit_diary_list(request, year=None, day=None, month=None):
         ideas[idea.month] = idea.ideas
     # Fiddle so that the idea for the first month is displayed, even if
     # startdate is after the first day of the month:
-    if (idea_startdate not in showings
-            and len(idea_list) > 0
-            and idea_list[0].month.month == startdate.month):
+    if (idea_startdate not in showings and
+            len(idea_list) > 0 and
+            idea_list[0].month.month == startdate.month):
         ideas[startdate] = idea_list[0].ideas
 
     context['ideas'] = ideas
@@ -540,8 +540,8 @@ def view_event_field(request, field, year, month, day):
         # Note slightly sneaky use of **; this effectively results in a method
         # call like: showings.filter(event__copy__icontains=search)
         showings = showings.filter(
-            Q(**{'event__' + field + '__icontains': search})
-            | Q(event__name__icontains=search)
+            Q(**{'event__' + field + '__icontains': search}) |
+            Q(event__name__icontains=search)
         )
 
     context = {
@@ -830,6 +830,7 @@ def edit_showing_rota_notes(request, showing_id):
     response = escape(showing.rota_notes)
 
     return HttpResponse(escape(response), content_type="text/plain")
+
 
 @permission_required('toolkit.write')
 def view_force_error(request):

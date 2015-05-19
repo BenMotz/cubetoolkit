@@ -15,10 +15,10 @@ from django.utils.text import slugify
 
 from south.modelsinspector import add_introspection_rules
 
-logger = logging.getLogger(__name__)
-
 from toolkit.diary.validators import validate_in_future
 import toolkit.util.image as imagetools
+
+logger = logging.getLogger(__name__)
 
 
 class FutureDateTimeField(models.DateTimeField):

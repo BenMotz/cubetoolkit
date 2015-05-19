@@ -63,7 +63,7 @@ class Member(models.Model):
     number = models.CharField(max_length=10, editable=False)
 
     name = models.CharField(max_length=64)
-    email = models.EmailField(max_length=64, blank=True, null=True) # , unique=True)
+    email = models.EmailField(max_length=64, blank=True, null=True)
 
     address = models.CharField(max_length=128, blank=True, null=True)
     posttown = models.CharField(max_length=64, blank=True, null=True)

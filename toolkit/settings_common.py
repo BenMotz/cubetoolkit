@@ -123,8 +123,6 @@ SOUTH_MIGRATION_MODULES = {
     'easy_thumbnails': 'easy_thumbnails.south_migrations',
 }
 
-
-
 # Custom tweaks:
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 APP_ROOT_DETECTED = os.path.abspath(os.path.join(os.path.dirname(
@@ -137,7 +135,6 @@ BROKER_URL = 'django://'
 CELERY_RESULT_BACKEND = 'database'
 CELERY_RESULT_DBURI = "django://"
 
-
 # Django settings for cube project.
 ALLOWED_HOSTS = ['.cubecinema.com', ]
 DEBUG = False
@@ -149,7 +146,7 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-## Authorisation related settings:
+# Authorisation related settings:
 LOGIN_URL = django.core.urlresolvers.reverse_lazy('login')
 
 PASSWORD_HASHERS = (
@@ -157,9 +154,9 @@ PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.PBKDF2SHA1PasswordHasher',
     'django.contrib.auth.hashers.BCryptPasswordHasher',
     'django.contrib.auth.hashers.SHA1PasswordHasher',
-    #   Don't allow:
-    #    'django.contrib.auth.hashers.MD5PasswordHasher',
-    #    'django.contrib.auth.hashers.CryptPasswordHasher',
+    # Don't allow:
+    # 'django.contrib.auth.hashers.MD5PasswordHasher',
+    # 'django.contrib.auth.hashers.CryptPasswordHasher',
 )
 
 # Local time zone for this installation. Choices can be found here:
@@ -213,7 +210,7 @@ STATIC_URL = '/static/'
 # Examples: "http://foo.com/static/admin/", "/static/admin/".
 ADMIN_MEDIA_PREFIX = '/static/admin/'
 
- # Additional locations of static files
+# Additional locations of static files
 STATICFILES_DIRS = (
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
@@ -272,7 +269,7 @@ INSTALLED_APPS = (
     'django.contrib.contenttypes',  # Needed by auth framework
     # Sessions framework: used to store preferences and login details
     'django.contrib.sessions',
-    #'django.contrib.sites',  # Not used
+    # 'django.contrib.sites',  # Not used
     # Messages: Used to transfer informative text and notifications between pages
     'django.contrib.messages',
     'django.contrib.staticfiles',
@@ -330,7 +327,7 @@ LOGGING = {
             'maxBytes': 10485760,
             'backupCount': 5,
         },
-        'mail_admins' : {
+        'mail_admins': {
             'level': 'ERROR',
             'filters': ['require_debug_false'],
             'class': 'django.utils.log.AdminEmailHandler',

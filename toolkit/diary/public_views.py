@@ -92,6 +92,7 @@ def view_diary(request, year=None, month=None, day=None, req_days_ahead=None, ev
 
     return _view_diary(request, startdate, enddate, tag=event_type)
 
+
 def _today_date_aware():
     """
     Get a timezone aware datetime object representing local midnight at the
@@ -338,8 +339,7 @@ class ArchiveSearch(generic.list.ListView, generic.edit.FormMixin):
                 # If a search term was provided and "search descriptions"
                 # was checked, filter on the event name and copy:
                 queryset = queryset.filter(
-                    Q(event__name__icontains=options['search_term'])
-                    |
+                    Q(event__name__icontains=options['search_term']) |
                     Q(event__copy__icontains=options['search_term'])
                 )
             else:

@@ -7,6 +7,7 @@ from django.core.urlresolvers import reverse
 
 from .common import DiaryTestsMixin
 
+
 class ArchiveViews(DiaryTestsMixin, TestCase):
     def setUp(self):
         super(ArchiveViews, self).setUp()

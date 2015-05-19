@@ -211,8 +211,7 @@ class SearchForm(forms.Form):
         cleaned_data = super(SearchForm, self).clean()
 
         # Check that either a search term or a searchh start or end date is supplied:
-        if (len(cleaned_data.get('search_term', '').strip()) == 0
-                and not
+        if (len(cleaned_data.get('search_term', '').strip()) == 0 and not
                 (cleaned_data.get('start_date') or cleaned_data.get('end_date'))):
             raise forms.ValidationError("Must give either a search term or a date range")
 
