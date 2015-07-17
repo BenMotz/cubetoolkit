@@ -1,8 +1,70 @@
+
+/*  NORMALISE  ============================================================== */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    font-size: 100%;
+    font: inherit;
+    vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+    display: block;
+}
+body {
+    line-height: 1;
+}
+ol, ul {
+    list-style: none;
+}
+blockquote, q {
+    quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+    content: '';
+    content: none;
+}
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+img {
+    border: 0;
+    -ms-interpolation-mode: bicubic;
+}
+img[src$=".gif"], img[src$=".png"] {
+    image-rendering: -moz-crisp-edges;         /* Firefox */
+    image-rendering:   -o-crisp-edges;         /* Opera */
+    image-rendering: -webkit-optimize-contrast;/* Webkit (non-standard naming) */
+    image-rendering: crisp-edges;
+    -ms-interpolation-mode: nearest-neighbor;  /* IE (non-standard property) */
+}
+
+
+/*  BASE  ============================================================== */
+
+
 body {
     font-family: 'Roboto', sans-serif;
     color: black;;
     background-color: #FFFFF;
     font-size: 15px;
+    line-height: 1.4em;
     margin: 0.5em;
 }
 
@@ -10,24 +72,29 @@ body {
     background-color: white;
     margin-left: auto;
     margin-right: auto;
-    width: 90%;
+    width: 75%;
 }
 
 
 .pre_title, .post_title {
-    font-weight: 500;
+    font-family: 'Roboto', sans-serif;
+    font-weight: 300;
     display: block;
-    text-transform: none;
-    font-size: 0.6em;
-    line-height: 1.2;
+    text-transform: uppercase;
+    font-size: 0.45em;
+    line-height: 1.2em;
+    padding-bottom: 0.8em;
 }
-
+.post_title {
+    padding-top: 0.8em;
+}
 h1 {
-    font-weight: 500;
+    font-weight: 300;
     font-size: 1.8em;
-    line-height: 1.1;
+    line-height: 1.2em;
     margin: 0;
     text-transform: uppercase;
+    padding-bottom: 0.8em;
 }
 h1 a {
     text-decoration: none;
@@ -38,26 +105,50 @@ h1 a:visited {
 }
 
 .showings {
+    font-family: 'Roboto', sans-serif;
     font-weight: 400;
-    font-size: 1em;
-    line-height: 1.2;
+    font-size: 0.9em;
+    line-height: 1.2em;
+    border-top: thin dotted black;
+    padding-top: 0.8em; 
+    border-bottom: thin dotted black; 
+    padding-bottom: 0.8em;  
 }
 .info {
     font-weight: 300;
-    font-size: 1em;
-    line-height: 1.2;
+    font-size: 0.9em;
+    line-height: 1.2em;
+    padding: 0.8em 0;
+}
+
+.action a {
+    color: white !important;
+    background: black !important;
+    border: 1px solid black;
+    border-radius: 0 !important;
+    outline: none;
+    font: 0.6em "Roboto", sans-serif;
+    line-height: 1.4em;
+    font-weight: 400;
+    padding: 8px 10px;
+    display: inline-block;
+    text-transform: uppercase;
+    cursor: pointer;
+    text-decoration: none;    
 }
 
 .copy p {
+    font-family: 'Roboto', sans-serif;
     font-weight: 300;
     font-size:     1em;
-    line-height: 1.2;
+    line-height: 1.2em;
     padding: 0.5em 0.5em 0.5em 0;
     margin: 0;
 }
 .copy p a {
-    text-decoration: underline;
-    color: black;
+    color: #282828;
+    text-decoration: none;
+    border-bottom: 1px dotted #282828;
 }
 .copy p a:visited {
     color: black;
@@ -131,7 +222,7 @@ p span.sold_out {
 .footer {
     border-top: thin dotted black;
     margin: auto;
-     width: 90%;
+     width: 75%;
 }
 .footer a, .footer a:visited {
     color: black;
@@ -148,12 +239,12 @@ p span.sold_out {
     border-bottom: thin dotted black;
     margin-top: 0;
     margin-bottom: 0;
-    padding-bottom: 1em;
+    padding-bottom: 0.6em;
     padding-top: 0;
     background-color: white;
     margin-left: auto;
     margin-right: auto;
-    width: 90%;
+    width: 75%;
     overflow: auto;
 }
 .header p {
@@ -171,6 +262,7 @@ p span.sold_out {
     float: left;
     max-width: 100%;
 }
+
 /*  SECTIONS  ============================================================== */
 
 .section {
@@ -203,9 +295,9 @@ p span.sold_out {
 
 .col:first-child { margin-left: 0; } /* all browsers except IE6 and lower */
 
-/*  REMOVE MARGINS AND PADDING AS ALL GO FULL WIDTH AT 480 PIXELS */
+/*  REMOVE MARGINS AND PADDING AS ALL GO FULL WIDTH AT 1023 PIXELS */
 
-@media only screen and (max-width: 480px) {
+@media only screen and (max-width: 1023px) {
     .col {
         margin: 1% 0 1% 0%;
     }
@@ -218,6 +310,7 @@ p span.sold_out {
         margin: 1% 0 1% 0%;
     }
 }
+
 
 /*  GRID OF SIX  =========================================================== */
 
@@ -245,9 +338,14 @@ p span.sold_out {
       width: 15.33%;
 }
 
-/*  GO FULL WIDTH AT LESS THAN 480 PIXELS */
 
-@media only screen and (max-width: 480px) {
+
+/*  GO FULL WIDTH AT LESS THAN 1023 PIXELS */
+
+@media only screen and (max-width: 1023px) {
+    #cubelogo {
+        width: 20%;
+    }
     .span_6_of_6 {
         width: 100%;
     }
@@ -265,8 +363,22 @@ p span.sold_out {
     }
     .span_1_of_6 {
         width: 100%;
-        display: none;
+        /*display: none;*/
     }
+}
+
+/*  INCREASE MARGIN BETWEEN 769 PIXELS AND 1023 PIXELS */
+
+@media only screen and (max-width: 769px) {
+    .header {
+        width: 90%;
+    }
+    .event {
+        width: 90%;
+    }
+    .footer {
+        width: 90%;
+    }    
 }
 
 /*  GO FULL WIDTH FOR PORTRAIT ORIENTATION */
@@ -289,6 +401,6 @@ p span.sold_out {
     }
     .span_1_of_6 {
         width: 100%;
-        display: none;
+        /*display: none;*/
     }
 }

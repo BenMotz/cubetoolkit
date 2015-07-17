@@ -176,6 +176,8 @@ class Event(models.Model):
 
     # Free text pricing info:
     pricing = models.CharField(max_length=256, null=False, blank=True)
+    ticket_link = models.URLField(max_length=256, null=False, blank=True)
+
     # Free text film information:
     film_information = models.CharField(max_length=256, null=False, blank=True)
 

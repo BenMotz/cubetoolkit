@@ -238,6 +238,55 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
+    def _assert_ticket_link_present(self, event_id, ticket_link):
+        url = reverse("single-event-view", kwargs={"event_id": str(event_id)})
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_event.html")
+        self.assertContains(
+            response,
+            u'<a href="{0}" target="_blank">Book tickets</a>'.format(ticket_link),
+            html=True
+        )
+
+    @patch('django.utils.timezone.now')
+    def test_view_event_buy_ticket_link(self, now_patch):
+        # Time is before any showings have started
+        first_public_showing = self.e2.showings.public()[0]
+        now_patch.return_value = first_public_showing.start - timedelta(seconds=1)
+        ticket_link = u"http://www.example.com/thing/#what"
+        self.e2.ticket_link = ticket_link
+        self.e2.save()
+        self._assert_ticket_link_present(self.e2.pk, ticket_link)
+
+    @patch('django.utils.timezone.now')
+    def test_view_event_buy_ticket_link_some_showings_finished(self, now_patch):
+        # Time is before last showings has started
+        last_public_showing = list(self.e2.showings.public())[-1]
+        now_patch.return_value = last_public_showing.start - timedelta(seconds=1)
+        ticket_link = u"http://www.example.com/goo/#what"
+        self.e2.ticket_link = ticket_link
+        self.e2.save()
+        self._assert_ticket_link_present(self.e2.pk, ticket_link)
+
+    @patch('django.utils.timezone.now')
+    def test_view_event_buy_ticket_link_finished_event(self, now_patch):
+        # Book ticket link should not be visible after all showings are complete
+        last_public_showing = list(self.e2.showings.public())[-1]
+        now_patch.return_value = last_public_showing.start + timedelta(seconds=1)
+        ticket_link = u"http://www.example.com/thing/#what"
+        self.e2.ticket_link = ticket_link
+        self.e2.save()
+
+        url = reverse("single-event-view", kwargs={"event_id": "2"})
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_event.html")
+        self.assertNotContains( response, u'Book tickets')
+        self.assertNotContains( response, ticket_link)
+
     # TODO: Cancelled/confirmed/visible/TTT
 
 

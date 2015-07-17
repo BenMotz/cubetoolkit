@@ -241,13 +241,17 @@ def view_event(request, event_id=None, legacy_id=None, event_slug=None):
     # Show details of an individual event, with given event_id. Also allows
     # lookup by 'legacy_id', the non-primary key id used in the old toolkit.
     context = {}
-    if event_id:
-        event = get_object_or_404(Event, id=event_id)
-    else:
-        event = get_object_or_404(Event, legacy_id=legacy_id)
+    try:
+        if event_id:
+            event = Event.objects.filter(pk=event_id).prefetch_related('media')[0]
+        else:
+            event = Event.objects.filter(legacy_id=legacy_id).prefetch_related('media')[0]
+    except IndexError:
+        raise Http404("Event not found")
 
     media = event.get_main_mediaitem()
     showings = event.showings.public()
+    now = timezone.now()
 
     if event.private or len(showings) == 0:
         raise Http404("Event not found")
@@ -258,6 +262,7 @@ def view_event(request, event_id=None, legacy_id=None, event_slug=None):
         'current_year': timezone.now().year,
         'all_showings_cancelled': all([s.cancelled for s in showings]),
         'all_showings_sold_out': all([s.sold_out for s in showings]),
+        'all_showings_finished': all([s.start < now for s in showings]),
         'media': {event.id: media},
         'media_url': settings.MEDIA_URL
     }

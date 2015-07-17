@@ -13,8 +13,8 @@ Cube: {{ event.name }}
 {% block header %}
     {{ block.super }}
     <div class="header group">
-        <div class="col span_2_of_6">
-            <a href="{% url "default-view" %}"><img id="cubelogo" src="{{ STATIC_URL }}diary/cube_microplex_logo_178.png" alt="Cube Programme"></a>
+        <div class="col span_1_of_6">
+            <a href="{% url "default-view" %}"><img id="cubelogo" src="{{ STATIC_URL }}diary/cube_logo.png" alt="Cube Programme"></a>
         </div>
     </div>
 {% endblock %}
@@ -22,10 +22,7 @@ Cube: {{ event.name }}
 {% block body %}
 <div class="event{% if all_showings_sold_out %} sold_out{% endif %}{% if all_showings_cancelled %} cancelled{% endif %}">
         <div class="section group">
-            <div class="col span_1_of_6">
-                &nbsp;
-            </div>
-            <div class="col span_3_of_6">
+            <div class="col span_4_of_6">
                 {% with event.media.all.0 as media_item %}
                     {% if media_item %}
                         <a href="{{ media_url }}{{ media_item.media_file }}"><img src="{{ media_item.media_file|thumbnail_url:'eventdetail' }}" alt="Picture for event {{ showing.event.name }}" {% if media_item.credit %}title="Image credit: {{ media_item.credit }}"{% endif %}></a>
@@ -53,6 +50,9 @@ Cube: {{ event.name }}
                 {% endfor %}
                 {% if event.pricing %}
                     <p class="info">Tickets: {{ event.pricing }}</p>
+                {% endif %}
+                {% if event.ticket_link and not all_showings_finished %}
+                   <p class="action"><a href="{{ event.ticket_link }}" target="_blank">Book tickets</a></p>
                 {% endif %}
             </div>
         </div>
