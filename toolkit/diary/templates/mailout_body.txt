@@ -24,12 +24,12 @@ http://www.cubecinema.com/programme/
 {% endif %}{{ showing.event.name|upper }}
  {{ showing.event.post_title }}
 {% if showing.event.film_information %}{{ showing.event.film_information }} {% endif %}
+{% if showing.event.ticket_link %}Advance tickets: {{ showing.event.ticket_link }}{% endif %}
 
 {{ showing.event.showings.public|showingdates }}
 {% if showing.event.pricing %}Tickets: {{ showing.event.pricing }}{% endif %}
 
 {{ showing.event.copy_plaintext }}
-{% if showing.event.ticket_link %}Advance tickets: {{ showing.event.ticket_link }}{% endif %}
 {% endifchanged %}
 {% endfor %}
 
