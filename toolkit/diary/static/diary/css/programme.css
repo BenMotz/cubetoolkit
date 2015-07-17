@@ -9,14 +9,14 @@ body {
 
 .programme {
     background-color: white;
-    width:90%;
+    width: 75%;
     margin:0 auto;
 }
 
 #cubelogo {
     border: none;
     float: left;
-    width: 100%;
+    max-width: 100%;
 }
 
 
@@ -50,17 +50,22 @@ body {
 
 .pre_title, .post_title {
     display: block;
-    font-weight: 400;
+    font-weight: 300;
     font-size: 0.7em;
     line-height: 1;
     text-transform: none;
+    padding-bottom: 0.3em;
+}
+
+.post_title {
+    padding-top: 0.3em;
 }
 
 #listing h1 {
-    font-weight: 500;
+    font-weight: 400;
     font-size: 1.2em;
     line-height: 1.2;
-    padding: 0.15em 0;
+    padding-bottom: 0.6em;
     margin: 0;
     text-transform: uppercase;
 }
@@ -80,7 +85,7 @@ body {
 }
 
 #listing .event_details p {
-    padding: 0.2em 0.5em 0.2em 0;
+    padding: 0em 0.5em 0.2em 0;
     margin: 0;
 }
 
@@ -95,6 +100,7 @@ body {
 	font-size: 0.8em;
    font-weight: 400;
    line-height: 1.2;
+   padding-bottom: 0.6em;
 }
 
 #listing img {
@@ -112,11 +118,11 @@ body {
 
 span.tags {
     text-transform: uppercase;
-    padding: 0.3em 0 0 0;
+    padding: 0.3em 0 0.6em 0;
     margin: none;
     font-weight: 400;
     font-size: 0.6em;
-    line-height: 0.8;
+    line-height: 1em;
     display: block;
 }
 span.tags a {
@@ -143,7 +149,7 @@ span.tags .tag_animation { color: #FFAA00; }
     padding-top: 1.4em;
     padding-bottom: 1.4em;
     margin:auto;
-     width: 90%;
+     width: 75%;
 }
 .footer a, .footer a:visited {
     color: black;
@@ -163,7 +169,7 @@ span.tags .tag_animation { color: #FFAA00; }
     padding-right: 1.4em;
     clear: both;
     margin:0 auto;
-    width:90%;
+    width: 75%;
 }
 .header p {
     font-weight: 100;
@@ -247,6 +253,20 @@ span.tags .tag_animation { color: #FFAA00; }
     .span_1_of_3 {
         width: 100%;
     }
+}
+
+/*  DECREASE MARGIN AT 1024 PIXELS */
+
+@media only screen and (max-width: 1024px) {
+    .header {
+        width: 90%;
+    }
+    .programme {
+        width: 90%;
+    }
+    .footer {
+        width: 90%;
+    }    
 }
 
 /*  GRID OF SIX   ========================================================== */
