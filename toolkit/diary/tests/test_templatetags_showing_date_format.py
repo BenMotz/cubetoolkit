@@ -51,6 +51,15 @@ class TestShowingDateFormatFilter(TestCase):
             u'Sat 2nd, Sun 3rd / 8pm'
         )
 
+    def test_two_showings_non_seq(self):
+        self._test_equiv(
+            [
+                (2013, 2, 2, 20, 00),
+                (2013, 2, 4, 20, 00),
+            ],
+            u'Sat 2nd, Mon 4th / 8pm'
+        )
+
     def test_two_showings_diff_time(self):
         self._test_equiv(
             [
