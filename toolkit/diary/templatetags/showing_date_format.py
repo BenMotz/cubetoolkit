@@ -48,7 +48,10 @@ def _output_month(year, month, day_list, d_time):
         else:
             # Current doesn't follow sequentially: output the (previously
             # seen) end of the sequence
-            if seq_len <= 2:
+            if seq_len == 1:
+                # Only two items in the sequence: output a list
+                op.append(u", {0}".format(_format_day(d)))
+            elif seq_len == 2:
                 # Only two items in the sequence: output a list
                 op.append(u", {0}, {1}".format(_format_day(prev), _format_day(d)))
             else:
