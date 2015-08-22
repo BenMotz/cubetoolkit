@@ -2,9 +2,14 @@
 
 {% block css %}
 <link href='http://fonts.googleapis.com/css?family=Roboto:400,100,300,500,100italic,300italic,400italic' rel='stylesheet' type='text/css'>
+<link href='http://fonts.googleapis.com/css?family=Roboto+Mono:400,100,100italic,300,300italic,500' rel='stylesheet' type='text/css'>
 {% endblock %}
 
 {% block footer %}
+<!-- Fluid Width Video -->
+<script>
+!function(e,t){for(var i=t.getElementsByTagName("iframe"),a=0;a<i.length;a++){var o=i[a],l=/www.youtube.com|player.vimeo.com/;if(o.src.search(l)>0){var s=o.height/o.width*100;o.style.position="absolute",o.style.top="0",o.style.left="0",o.width="100%",o.height="100%";var r=t.createElement("div");r.className="fluid-vids",r.style.width="100%",r.style.position="relative",r.style.paddingTop=s+"%";var d=o.parentNode;d.insertBefore(r,o),r.appendChild(o)}}}(window,document);
+</script>
 <!-- Piwik -->
 <script type="text/javascript">
 var pkBaseURL = (("https:" == document.location.protocol) ? "https://stats.sigsys.co.uk/analytics/" : "http://stats.sigsys.co.uk/analytics/");
