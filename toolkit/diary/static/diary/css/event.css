@@ -369,7 +369,7 @@ a {
 }
 #site-nav {
     display: block;
-    position: fixed;
+    position: absolute;
     left: -170px;
     top: 0px;
     width: 170px;
@@ -440,7 +440,7 @@ a {
     display: block;
     font-size: 0.7142em;
     line-height: 1.4;
-    padding: 3.5px 0;
+    padding: 3.5px 0 14px;
 }
 #site-nav ul li a:hover {
     text-decoration: underline;
@@ -459,7 +459,7 @@ a {
     
 }
 #navmenu ul ul a {
-    padding: 3.5px 0;
+    padding: 3.5px 0 14px;
     display: block;
     text-indent: -0.886em;
     padding-left: 0.714em;
@@ -513,15 +513,13 @@ a {
 
 .event_image {
     position: relative;
-    width: 298px;
     width: 100%;
     /*background: #1A1A1A;*/
     /*background-image: repeating-linear-gradient(45deg, transparent 1px, transparent 1px, #cccccc 2px, #cccccc 3px);*/
 }
 
 .event_image img {
-    max-width: 100%;
-    max-height: 300px;
+    width: 100%;
     height: auto;
     display: block;
     position: relative;
@@ -550,7 +548,7 @@ a {
     display: block;
     font-weight: 300;
     font-size: 0.6428em;
-    line-height: 1.6;
+    line-height: 1.4;
     color: #ffffff;
     text-transform: none;
     text-decoration: none;
@@ -564,7 +562,7 @@ a {
     padding: 0;
     margin: 0;
     font-size: 1.2857em;
-    line-height: 1.6;
+    line-height: 1.4;
 }
 
 .grid-item .event_details {
@@ -662,10 +660,10 @@ p.action {
         font-size: 1.5714em;
     }
     p.showings, p.info, p.tickets {
-        font-size: 0.571428571em;
+        font-size: 0.642857143em;
     }
     .action a, .copy p {
-        font-size: 0.642857143em;
+        font-size: 0.714285714em;
     }
     #mobile-menu-btn:before {
         font: normal 1.696375em;
@@ -673,7 +671,7 @@ p.action {
 
     /* --- Event Image --- */
     .event_image img {
-        max-height: 350px;
+        width: 100%;
     }
 }
 
@@ -749,10 +747,30 @@ p.action {
         width: 100%; 
     }
     .event_image img {
-        max-height: 550px;
+        width: 100%;
     }
     
     /* --- Text --- */
+    #site-title h1, .site-description h4, .social-media, .print-media, #site-nav ul li a {
+        font-size: 0.892754em;
+        line-height: 1.4;
+    }
+    .pre_title, .post_title {
+        font-size: 0.928571429em;
+        line-height: 1.6;
+    }
+    .grid-item h3 {
+        font-size: 1.714285714em;
+    }
+    p.showings, p.info, p.tickets {
+        font-size: 0.785714286em;
+    }
+    .action a, .copy p {
+        font-size: 0.892754em;
+    }
+    #mobile-menu-btn:before {
+        font: normal 1.696375em;
+    }
 
 }
 /* Minimum width of 1024 pixels (tablets landscape)
@@ -859,7 +877,7 @@ p.action {
         display: block;
         font-size: 0.7142em;
         line-height: 1.4;
-        padding: 3.5px 0;
+        padding: 3.5px 0 7px;
     }
     #site-nav ul li a:hover {
         text-decoration: underline;
@@ -872,7 +890,7 @@ p.action {
         display: none;
     }
     #navmenu ul ul a {
-        padding: 3.5px 0;
+        padding: 3.5px 0 7px;
         display: block;
         text-indent: -0.886em;
         padding-left: 0.714em;
@@ -904,7 +922,7 @@ p.action {
         width: 115px; 
     }
     .event_image img {
-        max-height: 100%;
+        width: 100%
     }
     .grid-item p:first-of-type {
         margin-top: 0;
@@ -918,7 +936,7 @@ p.action {
         width: 250px;
     }
     .grid-item--width2 > .event_image img {
-        max-height: 100%;
+        width: 100%;
     }
     .grid-item--width3 {
         width: 395px;
@@ -930,7 +948,6 @@ p.action {
     }
     .grid-item--width3 > .event_image img {
         width: 100%;
-        max-height: 100%;
     }
 
     /* --- Related Events --- */
@@ -957,13 +974,21 @@ p.action {
         font-size: 0.7142em;
         line-height: 1.4;
     }
-/*    .pre_title, .post_title {
-        font-size: 0.6428em;
-        line-height: 1.4;
+    .pre_title, .post_title {
+        font-size: 0.785714286em;
+        line-height: 1.6;
     }
-    p.start_and_pricing, p.copy, span.tags {
-        font-size: 0.571em;
-        line-height: 1.4;
+    .grid-item h3 {
+        font-size: 1.5714em;
+    }
+    p.showings, p.info, p.tickets {
+        font-size: 0.642857143em;
+    }
+    .action a, .copy p {
+        font-size: 0.714285714em;
+    }
+    #mobile-menu-btn:before {
+        font: normal 1.696375em;
     }
     
     /* --- Footer --- */
@@ -977,6 +1002,15 @@ p.action {
 
     /* --- General --- */
     
+    /* --- Menus --- */
+    #site-nav ul li a {
+        padding: 3.5px 0;
+    }
+
+    /* --- Sub menu --- */
+    #navmenu ul ul a {
+        padding: 3.5px 0;
+    }
 
     /* --- Grid --- */
     .grid {;
@@ -1013,7 +1047,27 @@ p.action {
         width: 165px;
     }
 
-    /* --- Menus --- */
+    /* --- Text --- */
+    #site-title h1, .site-description h4, .social-media, .print-media, #site-nav ul li a {
+        font-size: 0.7142em;
+        line-height: 1.4;
+    }
+    .pre_title, .post_title {
+        font-size: 0.785714286em;
+        line-height: 1.6;
+    }
+    .grid-item h3 {
+        font-size: 1.5714em;
+    }
+    p.showings, p.info, p.tickets {
+        font-size: 0.642857143em;
+    }
+    .action a, .copy p {
+        font-size: 0.714285714em;
+    }
+    #mobile-menu-btn:before {
+        font: normal 1.696375em;
+    }
 
 
     /* --- Footer --- */
@@ -1058,7 +1112,27 @@ p.action {
         width: 213px;
     }
     /* --- Text --- */
-    
+    #site-title h1, .site-description h4, .social-media, .print-media, #site-nav ul li a {
+        font-size: 0.857142857em;
+        line-height: 1.4;
+    }
+    .pre_title, .post_title {
+        font-size: 1em;
+        line-height: 1.4;
+    }
+    .grid-item h3 {
+        font-size: 2em;
+        line-height: 1.4;
+    }
+    p.showings, p.info, p.tickets {
+        font-size: 0.785714286em;
+    }
+    .action a, .copy p {
+        font-size: 0.857142857em;
+    }
+    #mobile-menu-btn:before {
+        font: normal 1.696375em;
+    }  
 
     /* --- Sidebar Layout --- */
     #sidebar {
@@ -1069,7 +1143,7 @@ p.action {
     
 
     /* --- Text --- */
-    #site-title h1, .site-description h4, .social-media, .print-media, #site-nav ul li a {
+/*    #site-title h1, .site-description h4, .social-media, .print-media, #site-nav ul li a {
         font-size: 0.892754em;
         line-height: 1.4;
     }
@@ -1083,7 +1157,7 @@ p.action {
     p.start_and_pricing, p.copy, span.tags {
         font-size: 0.802875em;
         line-height: 1.4;
-    }
+    }*/
 }
 
 @media screen and (min-width: 2048px) { 
@@ -1133,18 +1207,24 @@ p.action {
 
     /* --- Text --- */
     #site-title h1, .site-description h4, .social-media, .print-media, #site-nav ul li a {
-        font-size: 0.892754em;
+        font-size: 1em;
         line-height: 1.4;
     }
     .pre_title, .post_title {
-        font-size: 0.8035em;
+        font-size: 1.285714286em;
         line-height: 1.4;
+    }
+    .grid-item h3 {
+        font-size: 2.571428571em;
+        line-height: 1.4;
+    }
+    p.showings, p.info, p.tickets {
+        font-size: 0.857142857em;
+    }
+    .action a, .copy p {
+        font-size: 1em;
     }
     #mobile-menu-btn:before {
         font: normal 1.696375em;
-    }
-    p.start_and_pricing, p.copy, span.tags {
-        font-size: 0.802875em;
-        line-height: 1.4;
     }
 }

@@ -16,7 +16,7 @@ Cube: {{ event.name }}
     <script type="text/javascript">
         $(document).ready(function($){
 
-            $('.grid').masonry({ gutter: '.gutter-sizer', columnWidth: '.grid-sizer', itemSelector: '.grid-item' });
+            $('.grid').masonry({ percentPosition: true, gutter: '.gutter-sizer', columnWidth: '.grid-sizer', itemSelector: '.grid-item' });
 
             //If the User resizes the window, adjust the #container height
             $(window).bind("resize", resizeWindow);
