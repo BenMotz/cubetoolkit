@@ -16,7 +16,7 @@ Cube Programme{% if extra_title %}: {{ extra_title }}{% endif %}
 <script type="text/javascript">
     $(document).ready(function($){
 
-        $('.grid').masonry({ gutter: '.gutter-sizer', columnWidth: '.showing-sizer', itemSelector: '.showing' });
+        $('#programme').masonry({ gutter: '.gutter-sizer', columnWidth: '.showing-sizer', itemSelector: '.showing' });
 
         //If the User resizes the window, adjust the #container height
         $(window).bind("resize", resizeWindow);
@@ -24,62 +24,41 @@ Cube Programme{% if extra_title %}: {{ extra_title }}{% endif %}
             var newWindowWidth = $(window).width();
 
             if(newWindowWidth<1008){
-                $('.grid').masonry();
+                $('#programme').masonry();
             } else {
-                $('.grid').masonry();
+                $('#programme').masonry();
             }
         }
 
     });
 </script>
-
 <script type="text/javascript">
-$(document).ready(function () {
-    $('#mobile-menu-btn').on('click', function(event){
-      event.preventDefault();
-      // create menu variables
-      var slideoutMenu = $('#site-nav');
-      var pushoutNavwrap = $('.nav-wrap');
-      var pushoutGrid = $('.grid');
-      var pushoutList = $('.list');
-      
-
-      
-      // toggle open class
-      slideoutMenu.toggleClass("open");
-      
-      // slide menu
-      if (slideoutMenu.hasClass("open")) {
-        slideoutMenu.animate({
-          left: "0px"
-        }, 200); 
-        pushoutNavwrap.animate({
-        left: "170px"
-        }, 200);
-        pushoutGrid.animate({
-        left: "170px"
-        }, 200);
-        pushoutList.animate({
-        left: "170px"
-        }, 200);                
-      } else {
-        slideoutMenu.animate({
-          left: "-170px"
-        }, 200);  
-        pushoutNavwrap.animate({
-          left: "0px"
-        }, 200); 
-        pushoutGrid.animate({
-          left: "0px"
-        }, 200); 
-        pushoutList.animate({
-          left: "0px"
-        }, 200);   
-          
-      }
-    });
+  $(document).ready(function() {
+  $("#mobile-menu-btn").click(function() {
+    var toggle_el = $(this).data("toggle");
+    $(toggle_el).toggleClass("open-sidebar");
+    $(".black_overlay").toggleClass("active-search-bg");
+  });
+     
+});
+ 
+$(".black_overlay").swipe({
+    swipeStatus:function(event, phase, direction, distance, duration, fingers)
+        {
+            if (phase=="move" && direction =="right") {
+                 $(".grid").addClass("open-sidebar");
+                 $(".black_overlay").addClass("active-search-bg");
+                 return false;
+            }
+            if (phase=="move" && direction =="left") {
+                 $(".grid").removeClass("open-sidebar");
+                 $(".black_overlay").removeClass("active-search-bg");
+                 return false;
+            }
+        }
 });
 </script>
+
 <script>
 $(document).ready(function(){
 
@@ -141,7 +120,7 @@ $(function(){
 <div id="container" class="body">
 <div id="sidebar" class="panel">
   <div class="nav-wrap">
-      <div class="mobile-wrap">
+<!--      <div class="mobile-wrap">
         <a href="#nav-mobile" id="mobile-menu-btn"><i class="fa fa-bars"></i><span>Menu</span></a>
       </div><!-- end #mobile-wrap -->
       <div id="site-title" class="clearfix">
@@ -278,7 +257,30 @@ $(function(){
 {% block body %}
 -->
 <div class="grid">
-    
+    <div class="black_overlay"></div>
+    <div class="navigation-wrap">
+        <div class="mobile-wrap">
+          <a href="#nav-mobile" data-toggle=".grid" id="mobile-menu-btn"><i class="fa fa-bars"></i><span>Menu</span></a>
+        </div><!-- end #mobile-wrap -->
+        <div id="site-title" class="clearfix">
+            <h1><a href="/programme/" title= "Cube Programme">Cube Programme</a></h1>
+        </div><!-- end #site-title -->
+
+        <div class="site-description">
+            {% if event_type %}
+                <h4 class="site-description">{{ event_type }} events
+            {% endif %}
+            {% if showings|length == 0 %}
+                
+                {% if event_type %}
+                - couldn't find anything tagged {{ event_type }}
+                {% else %}
+                Nothing on between {{ start|date:"l j M Y"  }} and {{ end|date:"l j M Y" }}
+                {% endif %}
+                </h4>
+            {% endif %}
+        </div><!-- end .site-description -->
+    </div><!-- end .nav-wrap -->  
     <div id="programme">
             <div class="showing-sizer"></div>
             <div class="gutter-sizer"></div>

@@ -327,6 +327,18 @@ a {
 -------------------------------------------------------------------------------*/
 
 /* --- Main Menu + Main Search --- */
+.navigation-wrap {
+    position: relative;
+    border-top-width: 0px;
+    border-right-width: 0px;
+    border-bottom-width: 0px;
+    border-left-width: 0px;
+    border-spacing: 0px;
+    padding-top: 37px;
+    padding-right: 0;
+    padding-bottom: 20px;
+    padding-left: 10px;
+}
 .mobile-wrap {
     position: relative;
     height: 50px;
@@ -339,6 +351,7 @@ a {
     height: 50px;
     display: block;
     text-align: left;
+    z-index: 100;
 }
 #mobile-menu-btn:before {/
     display: inline-block;
@@ -354,27 +367,50 @@ a {
     text-indent: -99999px;
     display: block;
 }
+.black_overlay {
+    z-index: 20;
+    position: fixed;
+    background: #fff;
+    width: 0;
+    background-size: cover;
+    opacity: 0;
+    height: 100%;
+    top: 0;
+    left: 0;
+    transition: opacity 500ms;
+    -webkit-transition: opacity 500ms;
+}
+.black_overlay.active-search-bg {
+    opacity: .85;
+    left: 240px;
+    width: 100%;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=85)";
+    filter: alpha(opacity=85);
+}
 
 /* --- Sidebar Layout --- */
 #sidebar {
     display: block;
+    position: absolute;
     left: 0px;
     top: 0px;
+    height: 100%;
     min-height: 100%;
-    width: 170px;
+    width: 240px;
     margin: 0;
     padding: 0;
     background-color: #fff;
-
+    overflow-y: auto;
+}
+.grid.open-sidebar {
+    left: 240px;
 }
 #site-nav {
     display: block;
     position: absolute;
-    left: -170px;
+    left: 0px;
     top: 0px;
-    width: 170px;
-    height: 100%;
-    z-index: 100;
+    width: 220px;
     background: #fff;
     padding-top: 37px;
     padding-right: 0px;
@@ -382,10 +418,10 @@ a {
     padding-left: 22px;
 }
 .nav-wrap {
-    position: relative;
-    left: 0;
-    width: 170px;
-    height: 100%;
+    display: block;
+    position: absolute;
+    left: 0px;
+    width: 220px;
     border-top-width: 0px;
     border-right-width: 0px;
     border-bottom-width: 0px;
@@ -493,6 +529,11 @@ a {
 
 .grid {
     width: 100%;
+    position: relative;
+    background: #fff;
+    
+}
+#programme {
     position: relative;
     margin: 44px 5px 48px;
     margin-left: 1.5625%;
@@ -665,6 +706,7 @@ span.tags .tag_animation { color: #FFAA00; }
         position: relative;
         top: 0;
         margin: 44px 10px 48px;
+        background: #fff;
     }
     .list p {
         font-size: 0.7142em;
@@ -692,6 +734,7 @@ span.tags .tag_animation { color: #FFAA00; }
         display: block;
         padding-left: 58px;
     }
+
 
 /* Footer 
 -------------------------------------------------------------------------------*/
@@ -750,9 +793,10 @@ span.tags .tag_animation { color: #FFAA00; }
 @media screen and (min-width: 475px) {
 
     /* --- Grid --- */
-    .grid {
+    
+    #programme {
         margin-left: 1.0526%;
-        margin-right: 1.0526%;
+        margin-right: 1.0526%
     }
     .gutter-sizer {
         width: 1.0526%;
@@ -813,7 +857,7 @@ span.tags .tag_animation { color: #FFAA00; }
     /* --- General --- */
      
     /* --- Grid --- */
-    .grid {
+    #programme {
         margin: 64px 5px 48px;
         margin-left: 0.625%;
         margin-right: 0.625%;
@@ -880,6 +924,9 @@ span.tags .tag_animation { color: #FFAA00; }
         height: 100%;
         background-color: transparent;
     }
+    .navigation-wrap {
+        display: none;
+    }
     #mobile-menu-btn {
         display: none;
     }
@@ -895,13 +942,13 @@ span.tags .tag_animation { color: #FFAA00; }
         margin: 0;
         padding: 0;
         background-color: #fff;
+        overflow-y: hidden;
     }
     #site-nav {
         position: relative;
         left: 0;
         top: 0;
         width: 170px;
-        height: 100%;
         background: transparent;
         border-top-width: 0px;
         border-right-width: 0px;
@@ -914,8 +961,9 @@ span.tags .tag_animation { color: #FFAA00; }
         padding-left: 22px;
     }
     .nav-wrap {
+        position: relative;
+        left: 0;
         width: 170px;
-        height: 100%;
         border-top-width: 0px;
         border-right-width: 0px;
         border-bottom-width: 0px;
@@ -999,13 +1047,15 @@ span.tags .tag_animation { color: #FFAA00; }
     }
     /* --- Grid --- */
     .grid {
+        top: 0;
+        left: 192px;
+    }
+    #programme {
         margin: 64px 5px 48px;
         width: 840px;
         margin: 0px 6px 48px;
         display: block;
         position: relative;
-        top: 0;
-        left: 192px;
     }
     .gutter-sizer {
         width: 5px;
@@ -1108,7 +1158,7 @@ span.tags .tag_animation { color: #FFAA00; }
     
 
     /* --- Grid Layout --- */
-    .grid {
+    #programme {
         width: 1090px;
     }
 
@@ -1138,6 +1188,8 @@ span.tags .tag_animation { color: #FFAA00; }
     .grid {
         width: 1356px;
         left: 244px;
+    }
+    #programme {
         margin: 0px 6px 48px;
         display: block;
         position: relative;
@@ -1222,10 +1274,12 @@ span.tags .tag_animation { color: #FFAA00; }
 @media screen and (min-width: 2048px) { 
 
     /* --- Grid Layout --- */
-    
+
     .grid {
         width: 1702px;
         left: 312px;
+    }
+    .grid {
         margin: 0px 6px 48px;
         display: block;
         position: relative;
