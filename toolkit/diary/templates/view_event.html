@@ -12,23 +12,19 @@ Cube: {{ event.name }}
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="/static/diary/js/masonry.pkgd.min.js" ></script>
+    <script src="/static/diary/js/imagesloaded.pkgd.min.js" ></script>
 
     <script type="text/javascript">
         $(document).ready(function($){
 
-            $('.grid').masonry({ percentPosition: true, gutter: '.gutter-sizer', columnWidth: '.grid-sizer', itemSelector: '.grid-item' });
-
-            //If the User resizes the window, adjust the #container height
-            $(window).bind("resize", resizeWindow);
-            function resizeWindow( e ) {
-                var newWindowWidth = $(window).width();
-
-                if(newWindowWidth<1008){
-                    $('.grid').masonry();
-                } else {
-                    $('.grid').masonry();
-                }
-            }
+            // init Masonry
+        var $grid = $('.grid').masonry({
+          percentPosition: true, gutter: '.gutter-sizer', columnWidth: '.grid-sizer', itemSelector: '.grid-item'
+        });
+        // layout Masonry after each image loads
+        $grid.imagesLoaded().progress( function() {
+          $grid.masonry('layout');
+        });
 
         });
     </script>

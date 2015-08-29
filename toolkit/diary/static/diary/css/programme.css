@@ -1185,10 +1185,10 @@ span.tags .tag_animation { color: #FFAA00; }
     /* --- Grid Layout --- */
     
     .grid {
-        width: 1356px;
         left: 244px;
     }
     .programme {
+        width: 1356px;
         margin: 0px 6px 48px;
         display: block;
         position: relative;
@@ -1275,10 +1275,10 @@ span.tags .tag_animation { color: #FFAA00; }
     /* --- Grid Layout --- */
 
     .grid {
-        width: 1702px;
         left: 312px;
     }
-    .grid {
+    .programme {
+        width: 1702px;
         margin: 0px 6px 48px;
         display: block;
         position: relative;
