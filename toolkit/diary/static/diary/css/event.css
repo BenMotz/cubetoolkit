@@ -494,14 +494,16 @@ a {
 .grid {
     width: 100%;
     position: relative;
-    margin: 44px 5px 48px;
-    margin-left: 1.5625%;
-    margin-right: 1.5625%;
+    margin: 44px 0px 48px;
+    margin-left: 0;
+    margin-right: 0;
 }
 
 .grid-item {
     position: relative;
     padding: 0;
+    padding-left: 3.125%;
+    padding-right: 3.125%;
     padding-bottom: 3.125%;
     margin-bottom: 10px;
     float: left;
@@ -509,6 +511,11 @@ a {
     width: 310px;
     width: 96.875%;
     background-color: #1A1A1A;
+}
+.event-image {
+    width: 100%;
+    padding-left: 0;
+    padding-right: 0;
 }
 
 .event_image {
@@ -729,9 +736,7 @@ p.action {
      
     /* --- Grid --- */
     .grid {
-        margin: 64px 5px 48px;
-        margin-left: 3.666666667%;
-        margin-right: 3.666666667%;
+        margin: 64px 0 48px;
         display: block;
         position: relative;
     }
@@ -742,9 +747,16 @@ p.action {
         width: 95%;
     }
     .grid-item {
-        width: 92.666666664%;
+        width: 100%;
+        padding-left: 3.666666667%;
+        padding-right: 3.666666667%;
         padding-bottom: 40px;
         margin-bottom: 5px;
+    }
+    .event-image {
+        width: 100%;
+        padding-left: 0;
+        padding-right: 0;
     }
     .event_image {
         width: 100%; 

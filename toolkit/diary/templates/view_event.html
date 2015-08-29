@@ -148,7 +148,7 @@ Cube: {{ event.name }}
     <div class="grid{% if all_showings_sold_out %} sold_out{% endif %}{% if all_showings_cancelled %} cancelled{% endif %}">
         <div class="grid-sizer"></div>
         <div class="gutter-sizer"></div>
-        <div class="grid-item grid-item--width3">
+        <div class="grid-item grid-item--width3 event-image">
             <div class="event_image">
             {% with event.media.all.0 as media_item %}
                 {% if media_item %}
