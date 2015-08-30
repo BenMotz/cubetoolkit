@@ -515,7 +515,7 @@ a {
 
 .grid {
   display: flex;
-  min-height: 70vh;
+  min-height: 100vh;
   flex-direction: column;
 }
 
@@ -1051,6 +1051,7 @@ span.tags .tag_animation { color: #FFAA00; }
     }
     /* --- Grid --- */
     .grid {
+        width: 840px;
         top: 0;
         left: 192px;
     }
@@ -1161,7 +1162,7 @@ span.tags .tag_animation { color: #FFAA00; }
     
 
     /* --- Grid Layout --- */
-    .programme {
+    .grid, .programme {
         width: 1090px;
     }
 
