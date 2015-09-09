@@ -108,11 +108,6 @@ APP_ROOT_DETECTED = os.path.abspath(os.path.join(os.path.dirname(
 
 APPEND_SLASH = True
 
-# Celery
-BROKER_URL = 'django://'
-CELERY_RESULT_BACKEND = 'database'
-CELERY_RESULT_DBURI = "django://"
-
 # Django settings for cube project.
 ALLOWED_HOSTS = ['.cubecinema.com', ]
 DEBUG = False
@@ -261,8 +256,6 @@ INSTALLED_APPS = (
     # Django databaes migration tool:
     'south',
 
-    # Enabled use of database as 'message bus' to celery:
-    'kombu.transport.django',
     # Django-celery
     'djcelery',
 )
