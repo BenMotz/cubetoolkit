@@ -152,7 +152,7 @@ $(function(){
                 <ul class="sub-menu">
                     <li><a href="http://www.cubecinema.com/freehold/">Freehold</a></li>
                     <li><a href="http://www.cubecinema.com/film/">The Film That Buys The Cinema</a></li>
-                    <li><a href="http://nanoplex.cubecinema.com/haiti_kids_kino.php">Haiti Kids Kino Project</a></li>
+                    <li><a href="http://kidskino.cubecinema.com/">Kids Kino Project</a></li>
                     <li><a href="http://www.feraltrade.org/">Feral Trade</a></li>
                     <li><a href="http://cube-cola.org/">Cube Cola</a></li>
                     <li><a href="http://exhibitions.cubecinema.com/">Exhibitions</a></li>
@@ -217,38 +217,7 @@ $(function(){
       </div><!-- end .menu-wrap -->
     </nav><!-- end #site-nav -->
 </div><!-- end #sidebar -->
-<!--
-  <header id="masthead" class="cf" role="banner">
-      
-  </header><!-- end #header -->
 
-
-
-<!--
-<div class="header group">
-    <div class="col span_6_of_6">
-        <div id="programmelinks">
-       {% if event_type %}
-           <strong>Events tagged "{{ event_type }}"</strong><br>
-       {% endif %}
-       <a href="{% url "view-this-week" %}">THIS WEEK</a> &nbsp; | &nbsp;
-       <a href="{% url "view-next-week" %}">NEXT WEEK</a> &nbsp; | &nbsp;
-       <a href="{% url "view-this-month" %}">THIS MONTH</a> &nbsp; | &nbsp;
-       <a href="{% url "view-next-month" %}">NEXT MONTH</a>  &nbsp; | &nbsp;
-       <a href="{% url "default-view" %}"> EVERYTHING </a><br>
-       <br>
-       {% if printed_programmes %}
-           {% for printed_programme in printed_programmes %}
-           <img src="{{ STATIC_URL }}diary/tiny_pdf_file_icon.gif" alt="Link to PDF"><a href="{{ printed_programme.programme.url }}">Printed programme for {{ printed_programme.month|date:"M Y" }}</a><br>
-           {% endfor %}
-       {% endif %}
-       </div>
-    </div>
-</div> 
-{% endblock %}
-
-{% block body %}
--->
 <div class="grid">
     <div class="black_overlay"></div>
     <div class="navigation-wrap">

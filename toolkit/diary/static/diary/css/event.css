@@ -82,7 +82,7 @@ body {
 }
 
 a:focus {
-    outline: thin dotted;
+    outline: 0;
 }
 
 a:active,
@@ -126,7 +126,7 @@ abbr[title] {
 
 b,
 strong {
-    font-weight: bold;
+    font-weight: 500;
 }
 
 blockquote {
@@ -307,18 +307,18 @@ table {
 -------------------------------------------------------------------------------*/
 
 body {
-    background-color: #1A1A1A;
+    background-color: #fff;
 } 
 
 
 body {
     font-size: 1em;
     line-height: 1.4;
-    color: #ffffff;
+    color: #000000;
 }
 
 a {
-    color: #ffffff;
+    color: #000000;
     text-decoration: none;
 }
 
@@ -327,6 +327,18 @@ a {
 -------------------------------------------------------------------------------*/
 
 /* --- Main Menu + Main Search --- */
+.navigation-wrap {
+    position: relative;
+    border-top-width: 0px;
+    border-right-width: 0px;
+    border-bottom-width: 0px;
+    border-left-width: 0px;
+    border-spacing: 0px;
+    padding-top: 37px;
+    padding-right: 0;
+    padding-bottom: 20px;
+    padding-left: 10px;
+}
 .mobile-wrap {
     position: relative;
     height: 50px;
@@ -339,6 +351,7 @@ a {
     height: 50px;
     display: block;
     text-align: left;
+    z-index: 100;
 }
 #mobile-menu-btn:before {/
     display: inline-block;
@@ -354,38 +367,60 @@ a {
     text-indent: -99999px;
     display: block;
 }
+.black_overlay {
+    z-index: 20;
+    position: fixed;
+    background: #fff;
+    width: 0;
+    background-size: cover;
+    opacity: 0;
+    height: 100%;
+    top: 0;
+    left: 0;
+    transition: opacity 500ms;
+    -webkit-transition: opacity 500ms;
+}
+.black_overlay.active-search-bg {
+    opacity: .85;
+    left: 240px;
+    width: 100%;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=85)";
+    filter: alpha(opacity=85);
+}
 
 /* --- Sidebar Layout --- */
 #sidebar {
     display: block;
+    position: absolute;
     left: 0px;
     top: 0px;
     min-height: 100%;
-    width: 170px;
+    width: 240px;
     margin: 0;
     padding: 0;
-    background-color: #1A1A1A;
-
+    background-color: #fff;
+    overflow-y: auto;
+}
+.grid.open-sidebar {
+    left: 240px;
 }
 #site-nav {
     display: block;
     position: absolute;
-    left: -170px;
+    left: 0px;
     top: 0px;
-    width: 170px;
-    height: 100%;
-    z-index: 100;
-    background: #1A1A1A;
+    width: 220px;
+    background: #fff;
     padding-top: 37px;
     padding-right: 0px;
     padding-bottom: 20px;
     padding-left: 22px;
 }
 .nav-wrap {
-    position: relative;
-    left: 0;
-    width: 170px;
-    height: 100%;
+    display: block;
+    position: absolute;
+    left: 0px;
+    width: 220px;
     border-top-width: 0px;
     border-right-width: 0px;
     border-bottom-width: 0px;
@@ -425,12 +460,12 @@ a {
 .social-media {
     font-size: 0.7142em;
     line-height: 1.4;
-    margin-top: 1em;
+    margin-top: 2em;
 }
 .print-media {
     font-size: 0.7142em;
     line-height: 1.4;
-    margin-top: 1em;
+    margin-top: 2em;
 }
 /* --- Menus --- */
 #site-nav ul {
@@ -484,15 +519,20 @@ a {
   flex-direction: column;
 }
 
-#programme {
+.programme {
   flex: 1;
 }
 
-/* Grid 
+/* Grid
 -------------------------------------------------------------------------------*/
 
 .grid {
     width: 100%;
+    position: relative;
+    background: #fff;
+    
+}
+.programme {
     position: relative;
     margin: 44px 0px 48px;
     margin-left: 0;
@@ -510,7 +550,7 @@ a {
     overflow: hidden;
     width: 310px;
     width: 96.875%;
-    background-color: #1A1A1A;
+    background-color: #fff;
 }
 .event-image {
     width: 100%;
@@ -521,7 +561,7 @@ a {
 .event_image {
     position: relative;
     width: 100%;
-    /*background: #1A1A1A;*/
+    /*background: #fff;*/
     /*background-image: repeating-linear-gradient(45deg, transparent 1px, transparent 1px, #cccccc 2px, #cccccc 3px);*/
 }
 
@@ -559,7 +599,7 @@ a {
     font-weight: 300;
     font-size: 0.6428em;
     line-height: 1.4;
-    color: #ffffff;
+    color: #000000;
     text-transform: none;
     text-decoration: none;
     margin: 0;
@@ -585,7 +625,7 @@ p.showings, p.info, p.tickets {
     font-weight: 300;
     line-height: 1.6; 
     text-transform: none;
-    color: #ffffff; 
+    color: #000000; 
     padding: 0; 
     margin: 0;   
 }
@@ -610,9 +650,9 @@ p.action {
     margin: 40px 0;
 }
 .action a {
-    color: white !important;
-    background: #1A1A1A !important;
-    border: 0.1em solid white;
+    color: black !important;
+    background: #fff !important;
+    border: 0.1em solid black;
     border-radius: 0 !important;
     outline: none;
     font-size: 0.6428em;
@@ -624,22 +664,25 @@ p.action {
     cursor: pointer;
     text-decoration: none;    
 }
-
+.action a:hover {
+    color: #fff !important;
+    background: black !important;    
+}
 .copy p {
     font-size: 0.6428em;
     font-weight: 400; 
     text-transform: none;
     line-height: 1.6;
-    color: #fff;
+    color: #000000;
     padding: 0;       
 }
 .copy p a {
-    color: #fff;
+    color: #000000;
     text-decoration: none;
-    border-bottom: 1px dotted #fff;
+    border-bottom: 1px dotted #000000;
 }
 .copy p a:visited {
-    color: white;
+    color: #000000;
 }
 
 
@@ -689,6 +732,10 @@ p.action {
 ------------------------------------------------------------------------------------ */
 @media screen and (min-width: 475px) {
 
+    /* --- General --- */
+    .navigation-wrap {
+        padding-left: 18px;
+    } 
     /* --- Grid --- */
 /*    .grid {
         margin-left: 1.0526%;
@@ -733,9 +780,12 @@ p.action {
 @media screen and (min-width: 600px) {
 
     /* --- General --- */
+    .navigation-wrap {
+        padding-left: 22px;
+    } 
      
     /* --- Grid --- */
-    .grid {
+    .programme {
         margin: 64px 0 48px;
         display: block;
         position: relative;
@@ -801,6 +851,9 @@ p.action {
         height: 100%;
         background-color: transparent;
     }
+    .navigation-wrap {
+        display: none;
+    }
     #mobile-menu-btn {
         display: none;
     }
@@ -815,14 +868,14 @@ p.action {
         width: 170px;
         margin: 0;
         padding: 0;
-        background-color: #1A1A1A;
+        background-color: #fff;
+        overflow-y: hidden;
     }
     #site-nav {
         position: relative;
         left: 0;
         top: 0;
         width: 170px;
-        height: 100%;
         background: transparent;
         border-top-width: 0px;
         border-right-width: 0px;
@@ -835,8 +888,9 @@ p.action {
         padding-left: 22px;
     }
     .nav-wrap {
+        position: relative;
+        left: 0;
         width: 170px;
-        height: 100%;
         border-top-width: 0px;
         border-right-width: 0px;
         border-bottom-width: 0px;
@@ -866,15 +920,20 @@ p.action {
         color: #000000;
         margin: 0;
     }
+    .grid-switcher {
+        font-size: 0.7142em;
+        line-height: 1.4;
+        margin-top: 2em;
+    }
     .social-media {
         font-size: 0.7142em;
         line-height: 1.4;
-        margin-top: 1em;
+        margin-top: 2em;
     }
     .print-media {
         font-size: 0.7142em;
         line-height: 1.4;
-        margin-top: 1em;
+        margin-top: 2em;
     }
 
     /* --- Menus --- */
@@ -914,7 +973,12 @@ p.action {
         text-decoration: underline;
     }
     /* --- Grid --- */
-    .grid {;
+
+    .programme {
+        margin: 0px 0px 0px;
+        width: 665px;
+    }
+    .grid {
         width: 665px;
         margin: 0px 5px 48px;
         display: block;
@@ -969,7 +1033,7 @@ p.action {
     .related-events {
         display: block;
         position: absolute;
-        left: 872px;
+        left: 685px;
         top: 0;
         width: 125px;
         padding: 5px 5px 40px;
@@ -1028,8 +1092,11 @@ p.action {
     }
 
     /* --- Grid --- */
-    .grid {;
+    .grid, .programme {
         width: 865px;
+    }
+    .grid {
+        left: 170px;
     }
     .gutter-sizer {
         width: 10px;
@@ -1058,7 +1125,7 @@ p.action {
 
     /* --- Related Events --- */
     .related-events {
-        left: 1072px;
+        left: 885px;
         width: 165px;
     }
 
@@ -1093,8 +1160,13 @@ p.action {
 
     /* --- Grid --- */
     .grid {
-        left: 244px;
+        left: 192px;
+    }
+    .programme {
         width: 1105px;
+        margin: 0px 6px 48px;
+        display: block;
+        position: relative;
     }
     .gutter-sizer {
         width: 10px;
@@ -1123,27 +1195,27 @@ p.action {
 
     /* --- Related Events --- */
     .related-events {
-        left: 1364px;
+        left: 1125px;
         width: 213px;
     }
     /* --- Text --- */
     #site-title h1, .site-description h4, .social-media, .print-media, #site-nav ul li a {
-        font-size: 0.857142857em;
+        font-size: 0.785714286em;
         line-height: 1.4;
     }
     .pre_title, .post_title {
-        font-size: 1em;
+        font-size: 0.857142857em;
         line-height: 1.4;
     }
     .grid-item h3 {
-        font-size: 2em;
+        font-size: 1.8em;
         line-height: 1.4;
     }
     p.showings, p.info, p.tickets {
-        font-size: 0.785714286em;
+        font-size: 0.714285714em;
     }
     .action a, .copy p {
-        font-size: 0.857142857em;
+        font-size: 0.8035em;
     }
     #mobile-menu-btn:before {
         font: normal 1.696375em;
@@ -1151,38 +1223,36 @@ p.action {
 
     /* --- Sidebar Layout --- */
     #sidebar {
-        width: 244px;
+        width: 192px;
     }    
+    #site-nav {
+        width: 192px;
+        padding-bottom: 20px;
+        padding-left: 27px;
+    }
+    .nav-wrap {
+        width: 192px;
+        padding-top: 42px;
+        padding-left: 27px;
+    }
 
     /* --- List Layout --- */
     
-
-    /* --- Text --- */
-/*    #site-title h1, .site-description h4, .social-media, .print-media, #site-nav ul li a {
-        font-size: 0.892754em;
-        line-height: 1.4;
-    }
-    .pre_title, .post_title {
-        font-size: 0.8035em;
-        line-height: 1.4;
-    }
-    #mobile-menu-btn:before {
-        font: normal 1.696375em;
-    }
-    p.start_and_pricing, p.copy, span.tags {
-        font-size: 0.802875em;
-        line-height: 1.4;
-    }*/
 }
 
-@media screen and (min-width: 2048px) { 
+@media screen and (min-width: 1900px) { 
  
     /* --- Grid --- */
     .grid {
-        left: 312px;
-        width: 1430px;
+        left: 192px;
     }
-    .gutter-sizer {
+    .programme {
+        width: 1430px;
+        margin: 0px 6px 48px;
+        display: block;
+        position: relative;
+    }
+/*    .gutter-sizer {
         width: 10px;
     }
     .grid-sizer {
@@ -1209,7 +1279,7 @@ p.action {
 
     /* --- Related Events --- */
     .related-events {
-        left: 1747px;
+        left: 1430px;
         width: 276px;
     }
     /* --- Text --- */
@@ -1217,29 +1287,18 @@ p.action {
 
     /* --- Sidebar Layout --- */
     #sidebar {
-        width: 312px;
+        width: 244px;
     }    
+    #site-nav {
+        width: 192px;
+        padding-bottom: 20px;
+        padding-left: 30px;
+    }
+    .nav-wrap {
+        width: 192px;
+        padding-top: 42px;
+        padding-left: 30px;
+    }
 
-    /* --- Text --- */
-    #site-title h1, .site-description h4, .social-media, .print-media, #site-nav ul li a {
-        font-size: 1em;
-        line-height: 1.4;
-    }
-    .pre_title, .post_title {
-        font-size: 1.285714286em;
-        line-height: 1.4;
-    }
-    .grid-item h3 {
-        font-size: 2.571428571em;
-        line-height: 1.4;
-    }
-    p.showings, p.info, p.tickets {
-        font-size: 0.857142857em;
-    }
-    .action a, .copy p {
-        font-size: 1em;
-    }
-    #mobile-menu-btn:before {
-        font: normal 1.696375em;
-    }
+    
 }

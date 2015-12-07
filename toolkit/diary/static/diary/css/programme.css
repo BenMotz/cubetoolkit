@@ -82,7 +82,7 @@ body {
 }
 
 a:focus {
-    outline: thin dotted;
+    outline: 0;
 }
 
 a:active,
@@ -126,7 +126,7 @@ abbr[title] {
 
 b,
 strong {
-    font-weight: bold;
+    font-weight: 500;
 }
 
 blockquote {
@@ -460,12 +460,12 @@ a {
 .social-media {
     font-size: 0.7142em;
     line-height: 1.4;
-    margin-top: 1em;
+    margin-top: 2em;
 }
 .print-media {
     font-size: 0.7142em;
     line-height: 1.4;
-    margin-top: 1em;
+    margin-top: 2em;
 }
 /* --- Menus --- */
 #site-nav ul {
@@ -855,7 +855,9 @@ span.tags .tag_animation { color: #FFAA00; }
 @media screen and (min-width: 600px) {
 
     /* --- General --- */
-     
+    .navigation-wrap {
+        padding-left: 22px;
+    } 
     /* --- Grid --- */
     .programme {
         margin: 64px 5px 48px;
@@ -1005,12 +1007,12 @@ span.tags .tag_animation { color: #FFAA00; }
     .social-media {
         font-size: 0.7142em;
         line-height: 1.4;
-        margin-top: 1em;
+        margin-top: 2em;
     }
     .print-media {
         font-size: 0.7142em;
         line-height: 1.4;
-        margin-top: 1em;
+        margin-top: 2em;
     }
 
     /* --- Menus --- */
@@ -1053,7 +1055,7 @@ span.tags .tag_animation { color: #FFAA00; }
     .grid {
         width: 840px;
         top: 0;
-        left: 192px;
+        left: 170px;
     }
     .programme {
         margin: 64px 5px 48px;
@@ -1165,6 +1167,9 @@ span.tags .tag_animation { color: #FFAA00; }
     .grid, .programme {
         width: 1090px;
     }
+    .grid {
+        left: 170px;
+    }
 
     /* --- Site Nav --- */
     .mobile-wrap {
@@ -1190,7 +1195,8 @@ span.tags .tag_animation { color: #FFAA00; }
     /* --- Grid Layout --- */
     
     .grid {
-        left: 244px;
+        width: 1356px;
+        left: 192px;
     }
     .programme {
         width: 1356px;
@@ -1220,6 +1226,7 @@ span.tags .tag_animation { color: #FFAA00; }
         width: 316px; 
     }
     .event_image img {
+        max-width: 100%;
         max-height: 400px;
     }
     .showing:nth-child(7n+3) {
@@ -1234,16 +1241,26 @@ span.tags .tag_animation { color: #FFAA00; }
         width: 650px;
     }
     .showing:nth-child(7n+3) > .event_image img {
-        width: 100%;
-        max-height: 1000px;
+        max-width: 100%;
+        max-height: 600px;
     }  
     /* --- Text --- */
     
 
     /* --- Sidebar Layout --- */
     #sidebar {
-        width: 244px;
+        width: 192px;
     }      
+    #site-nav {
+        width: 192px;
+        padding-bottom: 20px;
+        padding-left: 27px;
+    }
+    .nav-wrap {
+        width: 192px;
+        padding-top: 42px;
+        padding-left: 27px;
+    }
 
     /* --- List Layout --- */
     p.day {
@@ -1259,47 +1276,47 @@ span.tags .tag_animation { color: #FFAA00; }
 
     /* --- Text --- */
     #site-title h1, .site-description h4, .grid-switcher, .social-media, .print-media, #site-nav ul li a, .showing h3, .list p {
-        font-size: 0.857142857em;
+        font-size: 0.785714286em;
         line-height: 1.4;
     }
     .pre_title, .post_title {
-        font-size: 0.8035em;
+        font-size: 0.714285714em;
         line-height: 1.4;
     }
     #mobile-menu-btn:before {
         font: normal 1.696375em;
     }
     p.start_and_pricing, p.copy, span.tags {
-        font-size: 0.802875em;
+        font-size: 0.714285714em;
         line-height: 1.4;
     }
 }
 
-@media screen and (min-width: 2048px) { 
+@media screen and (min-width: 1900px) { 
 
     /* --- Grid Layout --- */
 
     .grid {
-        left: 312px;
+        left: 192px;
     }
     .programme {
-        width: 1702px;
-        margin: 0px 6px 48px;
+        width: 1500px;
+        margin: 0px 10px 48px;
         display: block;
         position: relative;
     }
     .gutter-sizer {
-        width: 6px;
+        width: 10px;
     }
     .showing-sizer {
-        width: 421px;
+        width: 280px;
     }
     .showing {
-        width: 421px;
+        width: 280px;
         padding-top: 6px;
         padding-left: 6px;
         padding-right: 6px;
-        padding-bottom: 40px;
+        padding-bottom: 74px;
         margin-bottom: 6px;
         border: 0.07142857142857142em solid transparent;
     }
@@ -1307,33 +1324,59 @@ span.tags .tag_animation { color: #FFAA00; }
         border: 0.07142857142857142em solid #cccccc;
     }
     .event_image {
-        width: 407px; 
+        width: 266px; 
     }
     .event_image img {
-        max-height: 600px;
+        max-width: 100%;
+        max-height: 500px;
     }
     .showing:nth-child(7n+3) {
-        width: 848px;
+        width: 280px;
         padding-top: 6px;
         padding-left: 6px;
         padding-right: 6px;
-        padding-bottom: 40px;
+        padding-bottom: 74px;
         margin-bottom: 6px;
     }
     .showing:nth-child(7n+3) > .event_image {
-        width: 834px;
+        width: 266px;
     }
     .showing:nth-child(7n+3) > .event_image img {
-        width: 100%;
-        max-height: 1200px;
+        max-width: 100%;
+        max-height: 500px;
+    }  
+    .showing:nth-child(9n+3) {
+        width: 570px;
+        padding-top: 6px;
+        padding-left: 6px;
+        padding-right: 6px;
+        padding-bottom: 74px;
+        margin-bottom: 6px;
+    }
+    .showing:nth-child(9n+3) > .event_image {
+        width: 556px;
+    }
+    .showing:nth-child(9n+3) > .event_image img {
+        max-width: 100%;
+        max-height: 600px;
     }  
     /* --- Text --- */
     
 
     /* --- Sidebar Layout --- */
     #sidebar {
-        width: 312px;
+        width: 192px;
     }    
+    #site-nav {
+        width: 192px;
+        padding-bottom: 20px;
+        padding-left: 30px;
+    }
+    .nav-wrap {
+        width: 192px;
+        padding-top: 42px;
+        padding-left: 30px;
+    }
 
     /* --- List Layout --- */
     p.day {
@@ -1345,22 +1388,5 @@ span.tags .tag_animation { color: #FFAA00; }
         display: block;
         padding-left: 164px;
         text-indent: -94px;
-    }
-
-    /* --- Text --- */
-    #site-title h1, .site-description h4, .grid-switcher, .social-media, .print-media, #site-nav ul li a, .showing h3, .list p {
-        font-size: 1em;
-        line-height: 1.4;
-    }
-    .pre_title, .post_title {
-        font-size: 0.8035em;
-        line-height: 1.4;
-    }
-    #mobile-menu-btn:before {
-        font: normal 1.696375em;
-    }
-    p.start_and_pricing, p.copy, span.tags {
-        font-size: 0.802875em;
-        line-height: 1.4;
     }
 }
