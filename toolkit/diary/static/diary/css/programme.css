@@ -1338,7 +1338,6 @@ span.tags .tag_animation { color: #FFAA00; }
         padding-bottom: 74px;
         margin-bottom: 6px;
     }
-    /* test */
     .showing:nth-child(7n+3) > .event_image {
         width: 266px;
     }
