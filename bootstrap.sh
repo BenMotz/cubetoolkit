@@ -33,5 +33,6 @@ virtualenv $VENV_PATH $VIRTUALENV_OPTIONS
 
 source $VENV_PATH/bin/activate
 
+pip install --upgrade pip
 pip install --requirement $REQUIREMENTS_FILE
 pip install --requirement $REQUIREMENTS_DEV

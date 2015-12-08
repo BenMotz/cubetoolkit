@@ -14,6 +14,5 @@
 <tr><th>Current status:</th><td>{{ member.mailout|yesno:"Subscribed,Unsubscribed" }}</td>
 </table>
 <p><input type="submit" value="{{ member.mailout|yesno:'Unsubscribe,Re-subscribe' }}"></p>
-</table>
 </form>
 {% endblock %}
