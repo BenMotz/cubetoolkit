@@ -1083,6 +1083,7 @@ span.tags .tag_animation { color: #FFAA00; }
         width: 253px; 
     }
     .event_image img {
+        max-width: 100%;
         max-height: 300px;
     }
     .showing:nth-child(7n+3) {
@@ -1094,7 +1095,8 @@ span.tags .tag_animation { color: #FFAA00; }
         width: 528px;
     }
     .showing:nth-child(7n+3) > .event_image img {
-        max-height: 528px;
+        max-width: 100%;
+        max-height: 450px;
     }   
     
     /* --- List Layout --- */
@@ -1358,7 +1360,7 @@ span.tags .tag_animation { color: #FFAA00; }
     }
     .showing:nth-child(9n+3) > .event_image img {
         max-width: 100%;
-        max-height: 600px;
+        max-height: 500px;
     }  
     /* --- Text --- */
     
