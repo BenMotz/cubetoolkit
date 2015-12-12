@@ -108,7 +108,7 @@ THUMBNAIL_ALIASES = {
     'diary.MediaItem': {
         'indexview': {
             'upscale': 'true',
-            'size': (600, 0),
+            'size': (650, 0),
             'crop': 'scale',
         },
         'eventdetail': {
