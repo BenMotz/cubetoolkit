@@ -545,8 +545,8 @@ a {
     padding-top: 1.5625%;
     padding-left: 1.5625%;
     padding-right: 1.5625%;
-    padding-bottom: 3.125%;
-    margin-bottom: 10px;
+    padding-bottom: 6.25%;
+    margin-bottom: 20px;
     float: left;
     overflow: hidden;
     width: 310px;
@@ -593,7 +593,7 @@ a {
 .pre_title, .post_title {
     display: block;
     font-weight: 300;
-    font-size: 0.6428em;
+    font-size: 0.7142em;
     line-height: 1.4;
     color: #000000;
     text-transform: none;
@@ -607,7 +607,7 @@ a {
     text-transform: uppercase;
     padding: 0;
     margin: 0;
-    font-size: 0.7142em;
+    font-size: 0.7857em;
     line-height: 1.4;
 }
 
@@ -640,7 +640,7 @@ a {
 }
 
 p.start_and_pricing {
-    font-size: 0.571em;
+    font-size: 0.6428em;
     font-weight: 300;
     line-height: 1.4; 
     color: #000000; 
@@ -655,7 +655,7 @@ abbr.discounted {
 }
 
 p.copy {
-    font-size: 0.571em;
+    font-size: 0.6428em;
     font-weight: 400; 
     line-height: 1.4;
     color: #000000;
@@ -895,7 +895,7 @@ span.tags .tag_animation { color: #FFAA00; }
         padding-top: 0.625%;
         padding-left: 0.625%;
         padding-right: 0.625%;
-        padding-bottom: 1.25%;
+        padding-bottom: 40px;
         margin-bottom: 5px;
     }
     .showing:nth-child(7n+3) > .event_image {
