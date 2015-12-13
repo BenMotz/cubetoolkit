@@ -115,14 +115,7 @@ Cube: {{ event.name }}
       <nav id="site-nav" class="clearfix">
           <div id="navmenu" class="menu-wrap">
             {% include "fragment_navmenu.html" %}
-            <div class="social-media">
-                <p>Social Media:</p>
-                <a href="https://twitter.com/cubecinema" title="Twitter"><i class="fa fa-twitter"></i></a>
-                <a href="https://www.facebook.com/cubecinema/" title="Facebook"><i class="fa fa-facebook-official"></i></a>
-                <a href="https://secure.flickr.com/groups/cubemicroplex/" title="Flickr"><i class="fa fa-flickr"></i></a>
-                <a href="https://vimeo.com/cubemicroplex/" title="Vimeo"><i class="fa fa-vimeo-square"></i></a>
-                <a href="https://www.youtube.com/user/cubelog" title="Youtube"><i class="fa fa-youtube"></i></a>
-            </div><!-- end .social-media -->
+            {% include "fragment_sociallinks.html" %}
             <div class="print-media">
                 {% if printed_programmes %}
                 <p>Print:</p>
