@@ -114,62 +114,7 @@ Cube: {{ event.name }}
       </div><!-- end .nav-wrap -->
       <nav id="site-nav" class="clearfix">
           <div id="navmenu" class="menu-wrap">
-            <ul>
-                <li><a href="http://www.cubecinema.com/">Home</a></li>
-                <li><a href="/toolkit/programme/">Programme</a>
-                    <ul class="sub-menu">
-                        <li><a href="/toolkit/programme/view/film/"><span>Film</span></a></li>
-                        <li><a href="/toolkit/programme/view/music/">Music</a></li>
-                        <li><a href="/toolkit/programme/view/performance/">Performance</a></li>
-                        <li><a href="/toolkit/programme/view/comedy/">Comedy</a></li>
-                        <li><a href="/toolkit/programme/"><span>All</span></a></li>
-                    </ul>
-                </li>
-                <li><a href="#">Projects</a>
-                    <ul class="sub-menu">
-                        <li><a href="http://www.cubecinema.com/freehold/">Freehold</a></li>
-                        <li><a href="http://www.cubecinema.com/film/">The Film That Buys The Cinema</a></li>
-                        <li><a href="http://kidskino.cubecinema.com/">Kids Kino Project</a></li>
-                        <li><a href="http://www.feraltrade.org/">Feral Trade</a></li>
-                        <li><a href="http://cube-cola.org/">Cube Cola</a></li>
-                        <li><a href="http://exhibitions.cubecinema.com/">Exhibitions</a></li>
-                        <li><a href="http://www.bristol-channel.org/skomer/category/lab-activity/">Nachleben Film Lab</a></li>
-                    </ul>
-                </li>
-                <li><a href="#">Regular Events</a>
-                    <ul class="sub-menu">
-                        <li><a href="http://www.cubecinema.com/cubewebsite/babycinema.html">Babycinema</a></li>
-                        <li><a href="http://nanoplex.cubecinema.com/">Nanoplex</a></li>
-                        <li><a href="http://bluescreenfilms.weebly.com/">Bluescreen</a></li>
-                        <li><a href="http://www.cubecinema.com/bioskop/">Bioskop</a></li>
-                        <li><a href="http://qujunktions.com/">Qu Junktions</a></li>
-                    </ul>
-                </li>
-                <li><a href="#">Links</a>
-                    <ul class="sub-menu">
-                        <li><a href="http://blog.cubecinema.com/">Cube Blog</a></li>
-                        <li><a href="http://sparror.cubecinema.com/">Sparror Art Server</a></li>
-                        <li><a href="http://www.cubecinema.com/programme/archive/">Cube Programme Archive</a></li>
-                        <li><a href="http://sparror.cubecinema.com/adam/">Adam's Photo Archive</a></li>
-                        <li><a href="http://sparror.cubecinema.com/mr_hopkinson/">mr_hopkinson's Photo Archive</a></li>
-                        <li><a href="http://www.bruced.smugmug.com/Music/The-Cube-Bristol">Bruce's Photo Archive 1</a></li>
-                        <li><a href="http://www.bruced.smugmug.com/Performing-Arts/The-Cube-Bristol">Bruce's Photo Archive 2</a></li>
-                    </ul>
-                </li>
-                <li><a href="#">About</a>
-                    <ul class="sub-menu">
-                        <li><a href="http://www.cubecinema.com/cubewebsite/about.html">The Cube</a></li>
-                        <li><a href="http://www.cubecinema.com/cubewebsite/directions.html">Directions</a></li>
-                        <li><a href="http://www.cubecinema.com/cubewebsite/membership.html">Membership</a></li>
-                        <li><a href="http://www.cubecinema.com/cubewebsite/contact.html">Contact</a></li>
-                        <li><a href="http://www.cubecinema.com/signiup.html">Newsletter</a></li>
-                        <li><a href="http://www.cubecinema.com/cubewebsite/tickets.html">Advance Tickets</a></li>
-                        <li><a href="http://www.cubecinema.com/images-of-cube/">Pictures</a></li>
-                        <li><a href="http://www.cubecinema.com/cubewebsite/spec.html">Our Tech</a></li>
-                        <li><a href="http://www.cubecinema.com/cubewebsite/hires.html">Hire</a></li>
-                    </ul>
-                </li>
-            </ul>
+            {% include "fragment_navmenu.html" %}
             <div class="social-media">
                 <p>Social Media:</p>
                 <a href="https://twitter.com/cubecinema" title="Twitter"><i class="fa fa-twitter"></i></a>
