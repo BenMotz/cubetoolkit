@@ -36,11 +36,11 @@ Cube Programme{% if extra_title %}: {{ extra_title }}{% endif %}
     $(toggle_el).toggleClass("open-sidebar");
     $(".black_overlay").toggleClass("active-search-bg");
   });
-     
+
 });
 
 
-$(function() {      
+$(function() {
     $(".black_overlay").swipe( {
       swipe:function(event, direction, distance, duration, fingerCount, fingerData) {
         $(".grid").removeClass("open-sidebar");
@@ -49,7 +49,7 @@ $(function() {
       threshold:0
       });
     });
-  
+
 </script>
 
 <script>
@@ -59,26 +59,26 @@ $(document).ready(function(){
 
   $('#navmenu > ul > li > a').click(function() {
     var checkElement = $(this).next();
-    
+
     $('#navmenu li').removeClass('active');
-    $(this).closest('li').addClass('active'); 
-    
-    
+    $(this).closest('li').addClass('active');
+
+
     if((checkElement.is('ul')) && (checkElement.is(':visible'))) {
       $(this).closest('li').removeClass('active');
       checkElement.slideUp('normal');
     }
-    
+
     if((checkElement.is('ul')) && (!checkElement.is(':visible'))) {
       $('#navmenu ul ul:visible').slideUp('normal');
       checkElement.slideDown('normal');
     }
-    
+
     if (checkElement.is('ul')) {
       return false;
     } else {
-      return true;  
-    }   
+      return true;
+    }
   });
 
 });
@@ -86,8 +86,8 @@ $(document).ready(function(){
 </script>
 <script>
 
-$(function(){ 
-    $('a#listbtn.switcher').click(function(){    
+$(function(){
+    $('a#listbtn.switcher').click(function(){
         $('.programme').animate({opacity:0},function(){
             $('.programme').hide();
             $('.list').addClass('active');
@@ -95,7 +95,7 @@ $(function(){
         });
     });
 
-    $('a#gridbtn.switcher').click(function(){  
+    $('a#gridbtn.switcher').click(function(){
         $('.list').animate({opacity:0},function(){
             $('.list').removeClass('active');
             $('.programme').show();
@@ -125,7 +125,7 @@ $(function(){
               <h4 class="site-description">{{ event_type }} events
           {% endif %}
           {% if showings|length == 0 %}
-              
+
               {% if event_type %}
               - couldn't find anything tagged {{ event_type }}
               {% else %}
@@ -134,7 +134,7 @@ $(function(){
               </h4>
           {% endif %}
       </div><!-- end .site-description -->
-  </div><!-- end .nav-wrap -->      
+  </div><!-- end .nav-wrap -->
   <nav id="site-nav" class="clearfix">
       <div id="navmenu" class="menu-wrap">
         <ul>
@@ -192,7 +192,7 @@ $(function(){
                     <li><a href="http://www.cubecinema.com/cubewebsite/hires.html">Hire</a></li>
                 </ul>
             </li>
-        </ul>     
+        </ul>
         <div class="grid-switcher">
           <p>View:</p>
           <a href="#" id="listbtn" class="switcher"><i class="fa fa-th-list"></i>&nbspList</a>
@@ -233,7 +233,7 @@ $(function(){
                 <h4 class="site-description">{{ event_type }} events
             {% endif %}
             {% if showings|length == 0 %}
-                
+
                 {% if event_type %}
                 - couldn't find anything tagged {{ event_type }}
                 {% else %}
@@ -242,7 +242,7 @@ $(function(){
                 </h4>
             {% endif %}
         </div><!-- end .site-description -->
-    </div><!-- end .nav-wrap -->  
+    </div><!-- end .nav-wrap -->
     <div class="programme">
             <div class="showing-sizer"></div>
             <div class="gutter-sizer"></div>
@@ -252,7 +252,7 @@ $(function(){
                 {% with media_item=event.media.all.0 event_slug=event.name|slugify %}{% if media_item %}<a href="{% url "single-event-view-with-slug" event_id=event.id event_slug=event_slug %}"><img src="{{ media_item.media_file|thumbnail_url:'indexview' }}" alt="Picture for event {{ event.name }}"></a>{% endif %}
                 {% if event.tags.all %}<span class="tags">{% for tag in event.tags.all %}<a href="{% url "type-view" tag.slug %}" class="tag_{{tag.name}}">{{tag.name}}</a> {% endfor %}</span>{% endif %}
                 </div><!-- div event_image -->
-                
+
                 <p>
                     <a href="{% url "single-event-view-with-slug" event_id=event.id event_slug=event_slug %}"><span class="pre_title">
                         {{ event.pre_title }}
@@ -263,7 +263,7 @@ $(function(){
                     </span>
                     </a>
                 </p>
-                
+
                 <div class="event_details">
                     <p class="start_and_pricing">
                         {% for showing in showings %}
@@ -283,7 +283,7 @@ $(function(){
 
     <div class="list">
       {% for showing in showings %}
-        
+
         {% ifchanged %}<p class="month">{{ showing.start|date:"F"|upper }}{% endifchanged %}{% ifchanged %}<span class="year">{{ showing.start|date:" Y" }}</span>{% endifchanged %}</p>
         {% ifchanged %}<p class="day">{{ showing.start|date:"D"}} {{ showing.start|date:"d" }}{% else %}
         <p class="sameday"> {% endifchanged %} <span class="time">{{showing.start|date:"H:i"}}</span> .... {% if showing.hide_in_programme or showing.event.private %}Closed for private event.{% else %}<a href="{% url "single-event-view" event_id=showing.event_id %}">{{ showing.event.pre_title|title }} {{ showing.event.name|capfirst }} {{ showing.event.post_title|title }}{% if showing.cancelled %} (CANCELLED){% endif %}{% if showing.sold_out %} (SOLD OUT){% endif %}{% if showing.discounted %} (TTT){% endif %}{% endif %}</a></p>
@@ -309,7 +309,7 @@ $(function(){
                   <li>BS2 8JD</li>
                 </ul>
             </div>
-        </aside>   
+        </aside>
         <aside id="nav_menu-2" class="widget widget_nav_menu"><h3 class="widget-title">Postal Address</h3>
             <div class="menu-footer-menu-container">
                 <ul>
@@ -319,27 +319,27 @@ $(function(){
                   <li>BS2 8NQ</li>
                 </ul>
             </div>
-        </aside> 
+        </aside>
     </div><!-- .widget-area -->
     <div id="footer-sidebar-two" class="widget-area" role="complementary">
-      <aside id="categories-2" class="widget widget_categories"><h3 class="widget-title">Programme</h3>    
+      <aside id="categories-2" class="widget widget_categories"><h3 class="widget-title">Programme</h3>
         <ul>
           <li id="menu-item-111" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-111"><a href="/programme/view/film/">Film</a></li>
           <li id="menu-item-112" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-112"><a href="/programme/view/music/">Music</a></li>
           <li id="menu-item-113" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-113"><a href="/programme/view/performance/">Performance</a></li>
           <li id="menu-item-113" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-113"><a href="/programme/view/comedy/">Comedy</a></li>
         </ul>
-      </aside>    
+      </aside>
     </div><!-- .widget-area -->
     <div id="footer-sidebar-three" class="widget-area" role="complementary">
-      <aside id="categories-2" class="widget widget_categories"><h3 class="widget-title">Programme</h3>    
+      <aside id="categories-2" class="widget widget_categories"><h3 class="widget-title">Programme</h3>
         <ul>
           <li id="menu-item-111" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-111"><a href="/programme/view/film/">Film</a></li>
           <li id="menu-item-112" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-112"><a href="/programme/view/music/">Music</a></li>
           <li id="menu-item-113" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-113"><a href="/programme/view/performance/">Performance</a></li>
           <li id="menu-item-113" class="menu-item menu-item-type-taxonomy menu-item-object-category menu-item-113"><a href="/programme/view/comedy/">Comedy</a></li>
         </ul>
-      </aside>     
+      </aside>
     </div><!-- .widget-area -->
     <div id="footer-sidebar-four" class="widget-area" role="complementary">
       <aside id="blog_subscription-2" class="widget widget_blog_subscription"><h3 class="widget-title"><label for="subscribe-field">Weekly Newsletter via Email</label></h3>
@@ -357,9 +357,9 @@ $(function(){
             </p>
             <p id='bsub-subscribe-button'><input input value="Submit" type="submit" /></p>
         </form>
-      </aside>    
+      </aside>
     </div><!-- .widget-area -->
-      <div id="social" class="widget-area" role="complementary">  
+      <div id="social" class="widget-area" role="complementary">
         <div class="social-media">
           <p>Social:</p>
           <a href="https://twitter.com/cubecinema" title="Twitter"><i class="fa fa-twitter"></i></a><a href="https://secure.flickr.com/groups/cubemicroplex/" title="Flickr"><i class="fa fa-flickr"></i></a>

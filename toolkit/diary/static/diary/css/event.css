@@ -234,8 +234,8 @@ fieldset {
 legend {
     border: 0;
     padding: 0;
-    white-space: normal; 
-    *margin-left: -7px; 
+    white-space: normal;
+    *margin-left: -7px;
 }
 
 button,
@@ -245,7 +245,7 @@ textarea {
     font-size: 100%;
     margin: 0;
     vertical-align: baseline;
-    *vertical-align: middle; 
+    *vertical-align: middle;
 }
 
 button,
@@ -254,7 +254,7 @@ input {
 }
 
 button,
-html input[type="button"], 
+html input[type="button"],
 input[type="reset"],
 input[type="submit"] {
     -webkit-appearance: button;
@@ -272,13 +272,13 @@ input[type="radio"] {
     box-sizing: border-box;
     padding: 0;
     *height: 13px;
-    *width: 13px; 
+    *width: 13px;
 }
 
 input[type="search"] {
-    -webkit-appearance: textfield; 
+    -webkit-appearance: textfield;
     -moz-box-sizing: content-box;
-    -webkit-box-sizing: content-box; 
+    -webkit-box-sizing: content-box;
     box-sizing: content-box;
 }
 
@@ -295,7 +295,7 @@ input::-moz-focus-inner {
 
 textarea {
     overflow: auto;
-    vertical-align: top; 
+    vertical-align: top;
 }
 
 table {
@@ -303,12 +303,12 @@ table {
     border-spacing: 0;
 }
 
-/* Base 
+/* Base
 -------------------------------------------------------------------------------*/
 
 body {
     background-color: #fff;
-} 
+}
 
 
 body {
@@ -488,10 +488,10 @@ a {
     display: none;
 }
 #navmenu ul ul li {
-    
+
 }
 #navmenu ul ul li:last-child {
-    
+
 }
 #navmenu ul ul a {
     padding: 3.5px 0 14px;
@@ -510,7 +510,7 @@ a {
     text-decoration: underline;
 }
 
-/* Sticky Footer 
+/* Sticky Footer
 -------------------------------------------------------------------------------*/
 
 .grid {
@@ -530,7 +530,7 @@ a {
     width: 100%;
     position: relative;
     background: #fff;
-    
+
 }
 .programme {
     position: relative;
@@ -584,7 +584,7 @@ a {
 }
 
 
-/* Text 
+/* Text
 -------------------------------------------------------------------------------*/
 
 .grid-item p {
@@ -623,11 +623,11 @@ a {
 p.showings, p.info, p.tickets {
     font-size: 0.571em;
     font-weight: 300;
-    line-height: 1.6; 
+    line-height: 1.6;
     text-transform: none;
-    color: #000000; 
-    padding: 0; 
-    margin: 0;   
+    color: #000000;
+    padding: 0;
+    margin: 0;
 }
 p.showings {
     margin: 40px 0;
@@ -644,7 +644,7 @@ p.tickets {
     text-decoration: line-through;
 }
 abbr.discounted {
-    border-bottom: none !important;     
+    border-bottom: none !important;
 }
 p.action {
     margin: 40px 0;
@@ -662,19 +662,19 @@ p.action {
     display: inline-block;
     text-transform: uppercase;
     cursor: pointer;
-    text-decoration: none;    
+    text-decoration: none;
 }
 .action a:hover {
     color: #fff !important;
-    background: black !important;    
+    background: black !important;
 }
 .copy p {
     font-size: 0.6428em;
-    font-weight: 400; 
+    font-weight: 400;
     text-transform: none;
     line-height: 1.6;
     color: #000000;
-    padding: 0;       
+    padding: 0;
 }
 .copy p a {
     color: #000000;
@@ -687,13 +687,13 @@ p.action {
 
 
 
-/* Footer 
+/* Footer
 -------------------------------------------------------------------------------*/
 
 
 
 
-/* Media Queries 
+/* Media Queries
 -------------------------------------------------------------------------------*/
 
 /* Minimum width of 360 pixels (large smartphones portrait)
@@ -735,7 +735,7 @@ p.action {
     /* --- General --- */
     .navigation-wrap {
         padding-left: 18px;
-    } 
+    }
     /* --- Grid --- */
 /*    .grid {
         margin-left: 1.0526%;
@@ -782,8 +782,8 @@ p.action {
     /* --- General --- */
     .navigation-wrap {
         padding-left: 22px;
-    } 
-     
+    }
+
     /* --- Grid --- */
     .programme {
         margin: 64px 0 48px;
@@ -809,12 +809,12 @@ p.action {
         padding-right: 0;
     }
     .event_image {
-        width: 100%; 
+        width: 100%;
     }
     .event_image img {
         width: 100%;
     }
-    
+
     /* --- Text --- */
     #site-title h1, .site-description h4, .social-media, .print-media, #site-nav ul li a {
         font-size: 0.892754em;
@@ -942,7 +942,7 @@ p.action {
     }
     #site-nav {
         display: block;
-        margin-top: 1em;  
+        margin-top: 1em;
     }
     #site-nav ul {
         padding: 0;
@@ -998,7 +998,7 @@ p.action {
         margin-bottom: 5px;
     }
     .event_image {
-        width: 115px; 
+        width: 115px;
     }
     .event_image img {
         width: 100%
@@ -1069,10 +1069,10 @@ p.action {
     #mobile-menu-btn:before {
         font: normal 1.696375em;
     }
-    
+
     /* --- Footer --- */
-    
-}    
+
+}
 
 
 /* Minimum width of 1260 pixels
@@ -1080,7 +1080,7 @@ p.action {
 @media screen and (min-width: 1260px) {
 
     /* --- General --- */
-    
+
     /* --- Menus --- */
     #site-nav ul li a {
         padding: 3.5px 0;
@@ -1108,7 +1108,7 @@ p.action {
         width: 165px;
     }
     .event_image {
-        width: 155px; 
+        width: 155px;
     }
     .grid-item--width2 {
         width: 340px;
@@ -1153,10 +1153,10 @@ p.action {
 
 
     /* --- Footer --- */
-    
+
 }
 
-@media screen and (min-width: 1600px) { 
+@media screen and (min-width: 1600px) {
 
     /* --- Grid --- */
     .grid {
@@ -1178,7 +1178,7 @@ p.action {
         width: 213px;
     }
     .event_image {
-        width: 203px; 
+        width: 203px;
     }
     .grid-item--width2 {
         width: 436px;
@@ -1219,12 +1219,12 @@ p.action {
     }
     #mobile-menu-btn:before {
         font: normal 1.696375em;
-    }  
+    }
 
     /* --- Sidebar Layout --- */
     #sidebar {
         width: 192px;
-    }    
+    }
     #site-nav {
         width: 192px;
         padding-bottom: 20px;
@@ -1237,11 +1237,11 @@ p.action {
     }
 
     /* --- List Layout --- */
-    
+
 }
 
-@media screen and (min-width: 1900px) { 
- 
+@media screen and (min-width: 1900px) {
+
     /* --- Grid --- */
     .grid {
         left: 192px;
@@ -1262,7 +1262,7 @@ p.action {
         width: 276px;
     }
     .event_image {
-        width: 266px; 
+        width: 266px;
     }
     .grid-item--width2 {
         width: 562px;
@@ -1283,12 +1283,12 @@ p.action {
         width: 276px;
     }
     /* --- Text --- */
-    
+
 
     /* --- Sidebar Layout --- */
     #sidebar {
         width: 244px;
-    }    
+    }
     #site-nav {
         width: 192px;
         padding-bottom: 20px;
@@ -1300,5 +1300,5 @@ p.action {
         padding-left: 30px;
     }
 
-    
+
 }
