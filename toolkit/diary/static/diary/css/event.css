@@ -668,7 +668,7 @@ p.action {
     color: #fff !important;
     background: black !important;
 }
-.copy, .copy p {
+.copy p {
     font-size: 0.6785em;
     font-weight: 400;
     text-transform: none;
@@ -676,12 +676,12 @@ p.action {
     color: #000000;
     padding: 0;
 }
-.copy p a, .copy a {
+.copy p a, {
     color: #000000;
     text-decoration: none;
     border-bottom: 1px dotted #000000;
 }
-.copy p a:visited, .copy a:visited {
+.copy p a:visited {
     color: #000000;
 }
 
@@ -720,7 +720,7 @@ p.action {
     p.showings, p.info, p.tickets {
         font-size: 0.642857143em;
     }
-    .action a, .copy, .copy p {
+    .action a, .copy p {
         font-size: 0.714285714em;
     }
     #mobile-menu-btn:before {
@@ -799,7 +799,7 @@ p.action {
     p.showings, p.info, p.tickets {
         font-size: 0.785714286em;
     }
-    .action a, .copy, .copy p {
+    .action a, .copy p {
         font-size: 0.892754em;
     }
     #mobile-menu-btn:before {
@@ -1032,7 +1032,7 @@ p.action {
     p.showings, p.info, p.tickets {
         font-size: 0.7142em;
     }
-    .action a, .copy, .copy p {
+    .action a, .copy p {
         font-size: 0.7857em;
     }
     #mobile-menu-btn:before {
@@ -1113,7 +1113,7 @@ p.action {
     p.showings, p.info, p.tickets {
         font-size: 0.7142em;
     }
-    .action a, .copy, .copy p {
+    .action a, .copy p {
         font-size: 0.7857em;
     }
     #mobile-menu-btn:before {
@@ -1183,7 +1183,7 @@ p.action {
     p.showings, p.info, p.tickets {
         font-size: 0.714285714em;
     }
-    .action a, .copy, .copy p {
+    .action a, .copy p {
         font-size: 0.8035em;
     }
     #mobile-menu-btn:before {
