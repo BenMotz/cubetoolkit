@@ -1038,7 +1038,7 @@ span.tags .tag_animation { color: #FFAA00; }
         display: block;
         font-size: 0.7142em;
         line-height: 1.4;
-        padding: 3.5px 0 7px;
+        padding: 3.5px 0;
     }
     #site-nav ul li a:hover {
         text-decoration: underline;
@@ -1051,7 +1051,7 @@ span.tags .tag_animation { color: #FFAA00; }
         display: none;
     }
     #navmenu ul ul a {
-        padding: 3.5px 0 7px;
+        padding: 3.5px 0;
         display: block;
         text-indent: -0.886em;
         padding-left: 0.714em;
@@ -1152,7 +1152,7 @@ span.tags .tag_animation { color: #FFAA00; }
 
     /* --- Text --- */
     #site-title h1, .site-description h4, .grid-switcher, .social-media, .print-media, #site-nav ul li a {
-        font-size: 0.7857em;
+        font-size: 0.7142em;
         line-height: 1.4;
     }
     .showing h3, .list p {

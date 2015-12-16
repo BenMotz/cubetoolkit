@@ -137,7 +137,7 @@ Cube: {{ event.name }}
         <div class="black_overlay"></div>
         <div class="navigation-wrap">
             <div class="mobile-wrap">
-              <a href="#nav-mobile" data-toggle=".grid" id="mobile-menu-btn"><i class="fa fa-bars"></i><span>Menu</span></a>
+              <a href="#" data-toggle=".grid" id="mobile-menu-btn"><i class="fa fa-bars"></i><span>Menu</span></a>
             </div><!-- end #mobile-wrap -->
             <div id="site-title" class="clearfix">
                 <h1><a href="/toolkit/programme/" title= "Cube Programme">Cube Programme</a></h1>
@@ -180,7 +180,11 @@ Cube: {{ event.name }}
                     {% for showing in showings %}
                     {% if showing.sold_out %}<span class="sold_out">{% endif %}
                     {% if showing.cancelled %}<span class="cancelled">{% endif %}
-                    {{ showing.start|date:"D j F " }}//{{ showing.start|date:" H:i" }}
+                    {% if showing.start.year != current_year %}
+                        {{ showing.start|date:"D j F Y " }}//{{ showing.start|date:" H:i" }}
+                    {% else %}
+                        {{ showing.start|date:"D j F " }}//{{ showing.start|date:" H:i" }}
+                    {% endif %}
                     {% if showing.cancelled %}</span> (cancelled){% endif %}
                     {% if showing.sold_out %}</span> (SOLD OUT){% endif %}
                     {% if showing.discounted %}<abbr class="discounted" title="Ticket Tout Tuesday">(TTT)</abbr>{% endif %}<br>
