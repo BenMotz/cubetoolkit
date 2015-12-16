@@ -1038,7 +1038,7 @@ span.tags .tag_animation { color: #FFAA00; }
         display: block;
         font-size: 0.7142em;
         line-height: 1.4;
-        padding: 3.5px 0;
+        padding: 3.5px 0 7px;
     }
     #site-nav ul li a:hover {
         text-decoration: underline;
@@ -1051,7 +1051,7 @@ span.tags .tag_animation { color: #FFAA00; }
         display: none;
     }
     #navmenu ul ul a {
-        padding: 3.5px 0;
+        padding: 3.5px 0 7px;
         display: block;
         text-indent: -0.886em;
         padding-left: 0.714em;
