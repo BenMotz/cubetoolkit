@@ -438,14 +438,14 @@ a {
     text-transform: uppercase;
     padding: 0;
     margin: 0;
-    font-size: 0.7142em;
+    font-size: 0.7857em;
     line-height: 1.4;
 }
 #site-title h1 a {
     border-bottom: 0.1em solid;
 }
 .site-description h4 {
-    font-size: 0.7142em;
+    font-size: 0.7857em;
     font-weight: 400;
     text-transform: lowercase;
     line-height: 1.4;
@@ -453,17 +453,17 @@ a {
     margin: 0;
 }
 .grid-switcher {
-    font-size: 0.7142em;
+    font-size: 0.7857em;
     line-height: 1.4;
     margin-top: 2em;
 }
 .social-media {
-    font-size: 0.7142em;
+    font-size: 0.7857em;
     line-height: 1.4;
     margin-top: 2em;
 }
 .print-media {
-    font-size: 0.7142em;
+    font-size: 0.7857em;
     line-height: 1.4;
     margin-top: 2em;
 }
@@ -473,7 +473,7 @@ a {
 }
 #site-nav ul li a {
     display: block;
-    font-size: 0.7142em;
+    font-size: 0.7857em;
     line-height: 1.4;
     padding: 3.5px 0 14px;
 }
@@ -593,7 +593,7 @@ a {
 .pre_title, .post_title {
     display: block;
     font-weight: 300;
-    font-size: 0.7142em;
+    font-size: 0.7857em;
     line-height: 1.4;
     color: #000000;
     text-transform: none;
@@ -607,7 +607,7 @@ a {
     text-transform: uppercase;
     padding: 0;
     margin: 0;
-    font-size: 0.7857em;
+    font-size: 0.8214em;
     line-height: 1.4;
 }
 
@@ -640,7 +640,7 @@ a {
 }
 
 p.start_and_pricing {
-    font-size: 0.6428em;
+    font-size: 0.7142em;
     font-weight: 300;
     line-height: 1.4;
     color: #000000;
@@ -655,7 +655,7 @@ abbr.discounted {
 }
 
 p.copy {
-    font-size: 0.6428em;
+    font-size: 0.7142em;
     font-weight: 400;
     line-height: 1.4;
     color: #000000;
@@ -756,6 +756,10 @@ span.tags .tag_animation { color: #FFAA00; }
 ------------------------------------------------------------------------------------ */
 @media screen and (min-width: 360px) {
 
+    /* --- General --- */
+    .navigation-wrap {
+        padding-left: 12px;
+    }
     /* --- Text --- */
     #site-title h1, .site-description h4, .grid-switcher, .social-media, .print-media, #site-nav ul li a, .showing h3, .list p {
         font-size: 0.892754em;
@@ -792,6 +796,10 @@ span.tags .tag_animation { color: #FFAA00; }
 ------------------------------------------------------------------------------------ */
 @media screen and (min-width: 475px) {
 
+    /* --- General --- */
+    .navigation-wrap {
+        padding-left: 14px;
+    }
     /* --- Grid --- */
 
     .programme {
@@ -917,9 +925,9 @@ span.tags .tag_animation { color: #FFAA00; }
     }
 
 }
-/* Minimum width of 1023 pixels (tablets landscape)
+/* Minimum width of 1010 pixels (tablets landscape)
 ------------------------------------------------------------------------------------ */
-@media screen and (min-width: 1023px) {
+@media screen and (min-width: 1010px) {
 
     /* --- General --- */
     #container {
@@ -1053,13 +1061,13 @@ span.tags .tag_animation { color: #FFAA00; }
     }
     /* --- Grid --- */
     .grid {
-        width: 840px;
+        width: 820px;
         top: 0;
         left: 170px;
     }
     .programme {
         margin: 64px 5px 48px;
-        width: 840px;
+        width: 820px;
         margin: 0px 6px 48px;
         display: block;
         position: relative;
@@ -1096,7 +1104,10 @@ span.tags .tag_animation { color: #FFAA00; }
     }
     .showing:nth-child(7n+3) > .event_image img {
         max-width: 100%;
-        max-height: 450px;
+        max-height: 400px;
+    }
+    .showing:nth-child(7n+3) > .event_details > p.copy {
+        width: 90%;
     }
 
     /* --- List Layout --- */
@@ -1140,16 +1151,24 @@ span.tags .tag_animation { color: #FFAA00; }
     }
 
     /* --- Text --- */
-    #site-title h1, .site-description h4, .grid-switcher, .social-media, .print-media, #site-nav ul li a, .showing h3, .list p {
-        font-size: 0.7142em;
+    #site-title h1, .site-description h4, .grid-switcher, .social-media, .print-media, #site-nav ul li a {
+        font-size: 0.7857em;
+        line-height: 1.4;
+    }
+    .showing h3, .list p {
+        font-size: 0.7857em;
         line-height: 1.4;
     }
     .pre_title, .post_title {
-        font-size: 0.6428em;
+        font-size: 0.7142em;
         line-height: 1.4;
     }
-    p.start_and_pricing, p.copy, span.tags {
-        font-size: 0.571em;
+    p.start_and_pricing, p.copy {
+        font-size: 0.67857em;
+        line-height: 1.4;
+    }
+    span.tags {
+        font-size: 0.64285em;
         line-height: 1.4;
     }
 
@@ -1244,7 +1263,7 @@ span.tags .tag_animation { color: #FFAA00; }
     }
     .showing:nth-child(7n+3) > .event_image img {
         max-width: 100%;
-        max-height: 600px;
+        max-height: 500px;
     }
     /* --- Text --- */
 
@@ -1302,7 +1321,7 @@ span.tags .tag_animation { color: #FFAA00; }
         left: 192px;
     }
     .programme {
-        width: 1500px;
+        width: 1600px;
         margin: 0px 10px 48px;
         display: block;
         position: relative;
@@ -1311,10 +1330,10 @@ span.tags .tag_animation { color: #FFAA00; }
         width: 10px;
     }
     .showing-sizer {
-        width: 280px;
+        width: 360px;
     }
     .showing {
-        width: 280px;
+        width: 360px;
         padding-top: 6px;
         padding-left: 6px;
         padding-right: 6px;
@@ -1326,14 +1345,14 @@ span.tags .tag_animation { color: #FFAA00; }
         border: 0.07142857142857142em solid #cccccc;
     }
     .event_image {
-        width: 266px;
+        width: 346px;
     }
     .event_image img {
         max-width: 100%;
-        max-height: 500px;
+        max-height: 400px;
     }
     .showing:nth-child(7n+3) {
-        width: 280px;
+        width: 360px;
         padding-top: 6px;
         padding-left: 6px;
         padding-right: 6px;
@@ -1341,24 +1360,24 @@ span.tags .tag_animation { color: #FFAA00; }
         margin-bottom: 6px;
     }
     .showing:nth-child(7n+3) > .event_image {
-        width: 266px;
+        width: 346px;
     }
     .showing:nth-child(7n+3) > .event_image img {
         max-width: 100%;
-        max-height: 500px;
+        max-height: 350px;
     }
-    .showing:nth-child(9n+3) {
-        width: 570px;
+/*    .showing:nth-child(9n+5) {
+        width: 240px;
         padding-top: 6px;
         padding-left: 6px;
         padding-right: 6px;
         padding-bottom: 74px;
         margin-bottom: 6px;
     }
-    .showing:nth-child(9n+3) > .event_image {
-        width: 556px;
+    .showing:nth-child(9n+5) > .event_image {
+        width: 226px;
     }
-    .showing:nth-child(9n+3) > .event_image img {
+    .showing:nth-child(9n+5) > .event_image img {
         max-width: 100%;
         max-height: 500px;
     }
