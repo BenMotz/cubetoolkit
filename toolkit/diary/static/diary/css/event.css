@@ -807,9 +807,9 @@ p.action {
     }
 
 }
-/* Minimum width of 1010 pixels (tablets landscape)
+/* Minimum width of 1000 pixels (tablets landscape)
 ------------------------------------------------------------------------------------ */
-@media screen and (min-width: 1010px) {
+@media screen and (min-width: 1000px) {
 
     /* --- General --- */
     #container {
