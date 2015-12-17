@@ -454,16 +454,19 @@ a {
 }
 .grid-switcher {
     font-size: 0.7857em;
+    font-weight: 400;
     line-height: 1.4;
     margin-top: 2em;
 }
 .social-media {
     font-size: 0.7857em;
+    font-weight: 400;
     line-height: 1.4;
     margin-top: 2em;
 }
 .print-media {
     font-size: 0.7857em;
+    font-weight: 400;
     line-height: 1.4;
     margin-top: 2em;
 }
@@ -474,6 +477,7 @@ a {
 #site-nav ul li a {
     display: block;
     font-size: 0.7857em;
+    font-weight: 400;
     line-height: 1.4;
     padding: 3.5px 0 14px;
 }
