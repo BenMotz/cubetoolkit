@@ -1323,6 +1323,7 @@ span.tags .tag_animation { color: #FFAA00; }
 
     .grid {
         left: 192px;
+        width: 1700px;
     }
     .programme {
         width: 1670px;
@@ -1334,14 +1335,14 @@ span.tags .tag_animation { color: #FFAA00; }
         width: 10px;
     }
     .showing-sizer {
-        width: 360px;
+        width: 400px;
     }
     .showing {
         position: relative;
         float: left;
         overflow: hidden;
-        width: 410px;
-        height: 492px;
+        width: 400px;
+        height: 482px;
         padding-top: 6px;
         padding-left: 6px;
         padding-right: 6px;
@@ -1357,8 +1358,8 @@ span.tags .tag_animation { color: #FFAA00; }
         overflow: hidden;
         left: 0;
         top: 0;
-        width: 396px;
-        height: 238px;
+        width: 386px;
+        height: 232px;
     }
     .event_image img {
         min-width:100%;
@@ -1366,7 +1367,7 @@ span.tags .tag_animation { color: #FFAA00; }
         object-fit: cover;
     }
     .showing:nth-child(7n+3) {
-        width: 410px;
+        width: 400px;
         padding-top: 6px;
         padding-left: 6px;
         padding-right: 6px;
@@ -1374,7 +1375,7 @@ span.tags .tag_animation { color: #FFAA00; }
         margin-bottom: 6px;
     }
     .showing:nth-child(7n+3) > .event_image {
-        width: 396px;
+        width: 386px;
     }
     .showing:nth-child(7n+3) > .event_image img {
         min-width:100%;
