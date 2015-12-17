@@ -1337,7 +1337,11 @@ span.tags .tag_animation { color: #FFAA00; }
         width: 360px;
     }
     .showing {
+        position: relative;
+        float: left;
+        overflow: hidden;
         width: 360px;
+        height: 432px;
         padding-top: 6px;
         padding-left: 6px;
         padding-right: 6px;
@@ -1349,11 +1353,17 @@ span.tags .tag_animation { color: #FFAA00; }
         border: 0.07142857142857142em solid #cccccc;
     }
     .event_image {
+        position: relative;
+        overflow: hidden;
+        left: 0;
+        top: 0;
         width: 346px;
+        height: 208px;
     }
     .event_image img {
-        max-width: 100%;
-        max-height: 400px;
+        min-width:100%;
+        min-height:100%;
+    /*    max-height: 400px;*/
     }
     .showing:nth-child(7n+3) {
         width: 360px;
