@@ -1363,6 +1363,7 @@ span.tags .tag_animation { color: #FFAA00; }
     .event_image img {
         min-width:100%;
         min-height:100%;
+        object-fit: cover;
     /*    max-height: 400px;*/
     }
     .showing:nth-child(7n+3) {
