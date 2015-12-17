@@ -1325,7 +1325,7 @@ span.tags .tag_animation { color: #FFAA00; }
         left: 192px;
     }
     .programme {
-        width: 1600px;
+        width: 1670px;
         margin: 0px 10px 48px;
         display: block;
         position: relative;
@@ -1340,8 +1340,8 @@ span.tags .tag_animation { color: #FFAA00; }
         position: relative;
         float: left;
         overflow: hidden;
-        width: 360px;
-        height: 432px;
+        width: 410px;
+        height: 492px;
         padding-top: 6px;
         padding-left: 6px;
         padding-right: 6px;
@@ -1357,17 +1357,16 @@ span.tags .tag_animation { color: #FFAA00; }
         overflow: hidden;
         left: 0;
         top: 0;
-        width: 346px;
-        height: 208px;
+        width: 396px;
+        height: 238px;
     }
     .event_image img {
         min-width:100%;
         min-height:100%;
         object-fit: cover;
-    /*    max-height: 400px;*/
     }
     .showing:nth-child(7n+3) {
-        width: 360px;
+        width: 410px;
         padding-top: 6px;
         padding-left: 6px;
         padding-right: 6px;
@@ -1375,27 +1374,14 @@ span.tags .tag_animation { color: #FFAA00; }
         margin-bottom: 6px;
     }
     .showing:nth-child(7n+3) > .event_image {
-        width: 346px;
+        width: 396px;
     }
     .showing:nth-child(7n+3) > .event_image img {
-        max-width: 100%;
-        max-height: 350px;
+        min-width:100%;
+        min-height:100%;
+        object-fit: cover;
     }
-/*    .showing:nth-child(9n+5) {
-        width: 240px;
-        padding-top: 6px;
-        padding-left: 6px;
-        padding-right: 6px;
-        padding-bottom: 74px;
-        margin-bottom: 6px;
-    }
-    .showing:nth-child(9n+5) > .event_image {
-        width: 226px;
-    }
-    .showing:nth-child(9n+5) > .event_image img {
-        max-width: 100%;
-        max-height: 500px;
-    }
+
     /* --- Text --- */
 
 
