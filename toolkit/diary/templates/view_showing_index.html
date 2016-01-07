@@ -128,7 +128,7 @@ $(function(){
               <h4 class="site-description">{{ event_type }} events
           {% endif %}
           {% if showings|length == 0 %}
-
+              <h4>
               {% if event_type %}
               - couldn't find anything tagged {{ event_type }}
               {% else %}
@@ -174,7 +174,7 @@ $(function(){
                 <h4 class="site-description">{{ event_type }} events
             {% endif %}
             {% if showings|length == 0 %}
-
+                <h4>
                 {% if event_type %}
                 - couldn't find anything tagged {{ event_type }}
                 {% else %}

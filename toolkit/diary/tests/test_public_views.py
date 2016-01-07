@@ -96,7 +96,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "view_showing_index.html")
         self.assertContains(
             response,
-            "<p>Nothing on between Thursday 1 Jan 2093 and Friday 1 Jan 2094</p>",
+            "<h4>Nothing on between Thursday 1 Jan 2093 and Friday 1 Jan 2094</h4>",
             html=True
         )
 
