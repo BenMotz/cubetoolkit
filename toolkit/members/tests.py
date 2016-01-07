@@ -1577,7 +1577,7 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         self.assertEqual(result, (False, 6, 'Ok'))
 
         # Disconnect:
-        conn.quite.assert_called_once()
+        conn.quit.assert_called_once_with()
 
     @patch("smtplib.SMTP")
     @patch("toolkit.members.tasks.current_task")
