@@ -15,12 +15,10 @@
 {% block footer %}
 {% if user.is_authenticated %}
 <p>
-<a href="{% url "search-members" %}">Search</a> |
-<a href="{% url "add-member" %}">Add</a> |
-<a href="{% url "search-members" %}">Edit</a> |
-<a href="{% url "search-members" %}">Delete</a> |
+<a href="{% url "add-member" %}">Add member</a> |
+<a href="{% url "search-members" %}">Search / Edit / Delete</a> |
 <a href="{% url "member-statistics" %}">Statistics</a> |
-<a href="{% url "add-member" %}">Home</a> |
+<a href="{% url "toolkit-index" %}">Toolkit home</a> |
 <a href="{% url "logout" %}">Log out</a>
 </p>
 {% endif %}
