@@ -55,8 +55,6 @@ def add_member(request):
 @require_safe
 def search(request):
     search_terms = request.GET.get('q', None)
-    show_edit_link = bool(request.GET.get('show_edit_link', None))
-    show_delete_link = bool(request.GET.get('show_delete_link', None))
     results = None
 
     if search_terms:
@@ -66,16 +64,11 @@ def search(request):
         context = {
             'search_terms': search_terms,
             'members': results,
-            'show_edit_link': show_edit_link,
-            'show_delete_link': show_delete_link,
         }
         return render(request, 'search_members_results.html', context)
 
-    context = {
-        'show_edit_link': show_edit_link,
-        'show_delete_link': show_delete_link,
-    }
-    return render(request, 'search_members.html', context)
+    context = {}
+    return render(request, 'search_members.html', {})
 
 
 @permission_required('toolkit.read')
