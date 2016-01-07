@@ -13,6 +13,7 @@
 {% endblock %}
 
 {% block footer %}
+{% if user.is_authenticated %}
 <p>
 <a href="{% url "search-members" %}">Search</a> |
 <a href="{% url "add-member" %}">Add</a> |
@@ -22,4 +23,5 @@
 <a href="{% url "add-member" %}">Home</a> |
 <a href="{% url "logout" %}">Log out</a>
 </p>
+{% endif %}
 {% endblock %}

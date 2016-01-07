@@ -247,6 +247,7 @@ MIDDLEWARE_CLASSES = (
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.static',
+    'django.contrib.auth.context_processors.auth',
 )
 
 ROOT_URLCONF = 'toolkit.urls'
