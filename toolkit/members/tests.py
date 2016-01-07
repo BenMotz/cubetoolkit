@@ -149,6 +149,7 @@ class SecurityTests(MembersTestsMixin, TestCase):
     only_read_required = {
         # Volunteer urls:
         'view-volunteer-list': {},
+        'view-volunteer-role-report': {},
         'unretire-select-volunteer': {},
         'retire-select-volunteer': {},
         # Member urls:

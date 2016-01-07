@@ -20,12 +20,21 @@ logger.setLevel(logging.DEBUG)
 @require_safe
 def view_volunteer_list(request):
     # Get all volunteers, sorted by name:
-    volunteers = Volunteer.objects.filter(active=True).order_by('member__name').select_related()
+    volunteers = (Volunteer.objects.filter(active=True)
+                  .order_by('member__name')
+                  .select_related()
+                  .prefetch_related('roles'))
+    context = {
+        'volunteers': volunteers,
+        'default_mugshot': settings.DEFAULT_MUGSHOT,
+    }
+    return render(request, 'volunteer_list.html', context)
 
-    # Build dict of volunteer pk -> list of role names
-    # and dict of role names -> volunteer names
-    # (avoid lots of queries during template render)
-    vol_role_map = {}
+
+@permission_required('toolkit.read')
+@require_safe
+def view_volunteer_role_report(request):
+    # Build dict of role names -> volunteer names
     role_vol_map = {}
     # Query for active volunteers, sorted by name
     volunteer_query = (Role.objects.filter(volunteer__active=True)
@@ -34,7 +43,6 @@ def view_volunteer_list(request):
 
     for role, vol_id, vol_name in volunteer_query:
         role_vol_map.setdefault(role, []).append(vol_name)
-        vol_role_map.setdefault(vol_id, []).append(role)
 
     # Now sort role_vol_map by role name:
     role_vol_map = sorted(
@@ -45,12 +53,9 @@ def view_volunteer_list(request):
     # dict, but that's fine)
 
     context = {
-        'volunteers': volunteers,
-        'vol_role_map': vol_role_map,
         'role_vol_map': role_vol_map,
-        'default_mugshot': settings.DEFAULT_MUGSHOT,
     }
-    return render(request, 'volunteer_list.html', context)
+    return render(request, 'volunteer_role_report.html', context)
 
 
 @permission_required('toolkit.read')
