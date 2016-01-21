@@ -484,14 +484,14 @@ class TestSearchMemberView(MembersTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "search_members_results.html")
 
-        self.assertContains(response, u"<td>Member On\u0205</td>", html=True)
+        self.assertContains(response, u"<td><a href='/members/1'>Member On\u0205</a></td>", html=True)
         self.assertContains(response, u'<a href="mailto:one@example.com">one@example.com</a>', html=True)
         self.assertContains(response, u"<td>BS1 1AA</td>", html=True)
 
-        self.assertContains(response, u"<td>Tw\u020d Member</td>", html=True)
+        self.assertContains(response, u"<td><a href='/members/2'>Tw\u020d Member</a></td>", html=True)
         self.assertContains(response, u'<a href="mailto:two@example.com">two@example.com</a>', html=True)
 
-        self.assertContains(response, u"<td>Some Third Chap</td>", html=True)
+        self.assertContains(response, u"<td><a href='/members/3'>Some Third Chap</a></td>", html=True)
         self.assertContains(response, u'<td><a href="mailto:two@member.test">two@member.test</a></td>', html=True)
         self.assertContains(response, u"<td>NORAD</td>", html=True)
 

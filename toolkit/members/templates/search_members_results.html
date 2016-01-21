@@ -51,7 +51,7 @@ $(document).ready(function() {
 {% for member in members %}
 <tr>
 <td>{{ member.number }}</td>
-<td>{{ member.name|default_if_none:"-" }}</td>
+<td><a href="{% url "view-member" member.pk %}">{{ member.name|default_if_none:"-" }}</a></td>
 <td><form method="get" action="{% url "edit-member" member.pk %}"><input type="submit" value="Edit"></form></td>
 <td><form class="delete" method="post" action="{% url "delete-member" member.pk %}">{% csrf_token %}<input type="submit" value="Delete"></form></td>
 <td>{% if member.email %}{{ member.email|urlize }}{% else %} - {% endif %}</td>
