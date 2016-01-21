@@ -432,6 +432,7 @@ class EditEventView(View):
             'event': event,
             'form': form,
             'media_form': media_form,
+            'programme_copy_summary_max_chars': settings.PROGRAMME_COPY_SUMMARY_MAX_CHARS,
         }
         return render(request, 'form_event.html', context)
 
@@ -451,6 +452,7 @@ class EditEventView(View):
             'event': event,
             'form': form,
             'media_form': media_form,
+            'programme_copy_summary_max_chars': settings.PROGRAMME_COPY_SUMMARY_MAX_CHARS,
         }
 
         return render(request, 'form_event.html', context)

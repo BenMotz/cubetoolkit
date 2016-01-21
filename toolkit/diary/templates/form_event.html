@@ -80,6 +80,36 @@ Details for: {{ event.name }}
 </style>
 {% endblock %}
 
+{% block script %}
+<script src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
+<script>
+
+var COPY_LIMIT = {{ programme_copy_summary_max_chars }};
+
+$(document).ready(function() {
+    var copy_summary = $('#id_copy_summary');
+    var copy_summary_label = copy_summary.prev();
+    var count_span;
+
+    copy_summary_label.html("Copy summary:<br>(<span id='remaining_chars'></span>)");
+    count_span = $('#remaining_chars');
+
+    function update_character_count() {
+        var used = copy_summary.val().length;
+        var remaining = COPY_LIMIT - used;
+        if(remaining < 0) {
+            count_span.html(used + " characters, " + (used - COPY_LIMIT) + " over limit");
+        } else {
+            count_span.text(remaining + " remaining");
+        }
+    }
+
+    copy_summary.bind('input propertychange', update_character_count);
+    update_character_count();
+});
+</script>
+{% endblock %}
+
 {% block body %}
 <img src="{{ STATIC_URL }}diary/diary_edit_list_header.gif" alt="Cube Microplex" width="150px">
 <h3>CUBE events diary</h3>
