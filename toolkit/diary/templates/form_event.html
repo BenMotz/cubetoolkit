@@ -81,7 +81,7 @@ Details for: {{ event.name }}
 {% endblock %}
 
 {% block script %}
-<script src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
+{{ block.super }}
 <script>
 
 var COPY_LIMIT = {{ programme_copy_summary_max_chars }};
