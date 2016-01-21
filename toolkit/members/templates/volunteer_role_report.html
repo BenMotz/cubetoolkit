@@ -1,0 +1,35 @@
+{% extends 'base.html' %}
+{% load thumbnail %}
+{% load hash_filter %}
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
+<style>
+    em {
+        font-style: normal;
+        color: red;
+    }
+    tr {
+        page-break-inside: avoid;
+    }
+</style>
+{% endblock %}
+
+{% block title %}Cube volunteers{% endblock %}
+
+{% block body %}
+
+<h3>Role summary:</h3>
+<table>
+{% for role, names in role_vol_map %}
+{% cycle '<tr>' '' '' ''%}
+<td valign="top"><h5>{{ role }}</h5>
+{% for name in names %}
+{{ name }}<br>
+{% endfor %}
+<br>
+</td>
+{% cycle '' '' '' '</tr>' %}
+{% endfor %}
+</table>
+
+{% endblock %}

@@ -149,6 +149,7 @@ class SecurityTests(MembersTestsMixin, TestCase):
     only_read_required = {
         # Volunteer urls:
         'view-volunteer-list': {},
+        'view-volunteer-role-report': {},
         'unretire-select-volunteer': {},
         'retire-select-volunteer': {},
         # Member urls:
@@ -494,9 +495,19 @@ class TestSearchMemberView(MembersTestsMixin, TestCase):
         self.assertContains(response, u'<td><a href="mailto:two@member.test">two@member.test</a></td>', html=True)
         self.assertContains(response, u"<td>NORAD</td>", html=True)
 
-        # Shouldn't have Edit / Delete buttons:
-        self.assertNotContains(response, u'<input type="submit" value="Edit">', html=True)
-        self.assertNotContains(response, u'<input type="submit" value="Delete">', html=True)
+        # Should have Edit / Delete buttons:
+        self.assertContains(response, u'<input type="submit" value="Edit">', html=True)
+        self.assertContains(response, u'<input type="submit" value="Delete">', html=True)
+
+        expected_edit_form = ('<form method="get" action="{}">'
+                              '<input type="submit" value="Edit"></form>'
+                              .format(reverse("edit-member", kwargs={"member_id": 3})))
+
+        expected_delete_form = ('<form class="delete" method="post" '
+                                'action="{}">'
+                                .format(reverse("delete-member", kwargs={"member_id": 3})))
+        self.assertContains(response, expected_edit_form)
+        self.assertContains(response, expected_delete_form)
 
     def test_query_no_results(self):
         url = reverse("search-members")
@@ -505,45 +516,6 @@ class TestSearchMemberView(MembersTestsMixin, TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "search_members_results.html")
-
-    def test_query_with_edit_link(self):
-        url = reverse("search-members")
-        response = self.client.get(url, data={
-            'q': u'third chap',
-            'show_edit_link': u't',
-        })
-
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "search_members_results.html")
-
-        self.assertContains(
-            response,
-            u'<form method="get" action="{0}"><input type="submit" value="Edit"></form>'.format(
-                reverse("edit-member", kwargs={"member_id": 3})
-            ),
-            html=True,
-        )
-        self.assertNotContains(response, u'<input type="submit" value="Delete">', html=True)
-
-    def test_query_with_delete_link(self):
-        url = reverse("search-members")
-        response = self.client.get(url, data={
-            'q': u'third chap',
-            'show_delete_link': u't',
-        })
-
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "search_members_results.html")
-
-        self.assertContains(response,
-                            u'<input type="submit" value="Delete">',
-                            html=True,
-                            )
-
-        self.assertContains(response,
-                            reverse("delete-member", kwargs={"member_id": 3})
-                            )
-        self.assertNotContains(response, u'<input type="submit" value="Edit">', html=True)
 
 
 class TestDeleteMemberView(MembersTestsMixin, TestCase):
@@ -1606,7 +1578,7 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         self.assertEqual(result, (False, 6, 'Ok'))
 
         # Disconnect:
-        conn.quite.assert_called_once()
+        conn.quit.assert_called_once_with()
 
     @patch("smtplib.SMTP")
     @patch("toolkit.members.tasks.current_task")

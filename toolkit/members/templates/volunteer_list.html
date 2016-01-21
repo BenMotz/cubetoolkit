@@ -43,7 +43,7 @@ Report generated: {% now "d/m/Y" %}<p>
 <td valign="top">
 <b><font size="4">{{ member.name }}</font></b><p>
 <b>notes:</b> {{ volunteer.notes|default:"" }}<p>
-<b>roles:</b>{{ vol_role_map|lookup:volunteer.id|join:", "|lower|default:"<em>Request role information</em>" }}<p>
+<b>roles:</b>{{ volunteer.roles.all|join:", "|lower|default:"<em>Request role information</em>" }}<p>
 {{ member.email|urlize|default:"<em>Request email address</em>" }}<br>
 {{ member.address }}{% if member.address %}<br>{% endif %}
 {{ member.postcode }}{% if member.postcode %}<br>{% endif %}
@@ -57,19 +57,5 @@ Report generated: {% now "d/m/Y" %}<p>
 {% endwith %}
 {% endfor %}
 </table>
-
-<h3>Role summary:</h3>
-<table>
-{% for role, names in role_vol_map %}
-{% cycle '<tr>' '' '' ''%}
-<td valign="top"><h5>{{ role }}</h5>
-{% for name in names %}
-{{ name }}<br>
-{% endfor %}
-<br>
-</td>
-{% cycle '' '' '' '</tr>' %}
-{% endfor %}
-</table>
-
+<h2>The volunteer role report can now be found <a href="{% url "view-volunteer-role-report" %}">here</a>.</h2>
 {% endblock %}

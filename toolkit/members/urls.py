@@ -8,6 +8,8 @@ volunteer_urls = patterns(
         name='add-volunteer', kwargs={'volunteer_id': None, 'create_new': True}),
     url(r'^view/$', 'view_volunteer_list',
         name='view-volunteer-list'),
+    url(r'^view/rolereport/$', 'view_volunteer_role_report',
+        name='view-volunteer-role-report'),
     url(r'^retire/select$', 'select_volunteer',
         name='retire-select-volunteer', kwargs={'action': 'retire'}),
     url(r'^unretire/select$', 'select_volunteer',

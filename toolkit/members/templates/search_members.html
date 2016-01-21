@@ -4,11 +4,9 @@
 
 {% block body %}
 
-<h3>Search for a member {% if show_edit_link %}to edit{% endif %} {% if show_delete_link %}to delete{% endif %}</h3>
+<h3>Search members</h3>
 <form action="" method="get">
-{% if show_edit_link %}<input type="hidden" name="show_edit_link" value="t">{% endif %}
-{% if show_delete_link %}<input type="hidden" name="show_delete_link" value="t">{% endif %}
-Keyword: <input type="text" name="q" size=20 maxsize=30 autofocus><p>
+Keyword: <input type="text" name="q" size="20" maxsize="30" autofocus><p>
 <input type="submit" value="Search">
 </form>
 

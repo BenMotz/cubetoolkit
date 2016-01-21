@@ -12,6 +12,14 @@
     input[type="submit"] {
         width: auto;
     }
+    table {
+        border-collapse: collapse;
+    }
+    td {
+        border-bottom: thin dotted gray;
+            padding: 3px 5px;
+    }
+
 </style>
 {% endblock %}
 
@@ -31,28 +39,26 @@ $(document).ready(function() {
 {% block body %}
 <p>Searched for "{{ search_terms }}", {{ members|length }} results<p>
 
+<form action="" method="get">
+<input type="text" name="q" size="20" maxsize="30" autofocus value="{{ search_terms }}"> <input type="submit" value="Search"><p>
+</form>
 <table>
 <tr>
-{% if show_edit_link %}<th>Select</th>{% endif %}
-{% if show_delete_link %}<th>Delete</th>{% endif %}
-<th>Member</th><th>Name</th><th>Email</th><th>Homepage</th><th>Postal address</th><th>Settlement</th><th>Postcode</th><th>Country</th><th>Telephone</th><th>Mobile telephone</th><th>Last updated</th><th>Refuse mailshot</th><th>Status</th></tr>
+<th>Member #</th><th>Name</th><th>Email</th>
+<th></th>
+<th></th>
+<th>Homepage</th><th>Postcode</th><th>Last updated</th><th>Mailout?</th></tr>
 {% for member in members %}
 <tr>
-{% if show_edit_link %}<td><form method="get" action="{% url "edit-member" member.pk %}"><input type="submit" value="Edit"></form></td>{% endif %}
-{% if show_delete_link %}<td><form class="delete" method="post" action="{% url "delete-member" member.pk %}">{% csrf_token %}<input type="submit" value="Delete"></form></td>{% endif %}
 <td>{{ member.number }}</td>
 <td>{{ member.name|default_if_none:"-" }}</td>
+<td><form method="get" action="{% url "edit-member" member.pk %}"><input type="submit" value="Edit"></form></td>
+<td><form class="delete" method="post" action="{% url "delete-member" member.pk %}">{% csrf_token %}<input type="submit" value="Delete"></form></td>
 <td>{% if member.email %}{{ member.email|urlize }}{% else %} - {% endif %}</td>
 <td>{% if member.website %}{{ member.website|urlize }}{% else %} - {% endif %}</td>
-<td>{{ member.address|default_if_none:"-" }}</td>
-<td>{{ member.posttown|default_if_none:"-" }}</td>
 <td>{{ member.postcode|default_if_none:"-" }}</td>
-<td>{{ member.country|default_if_none:"-" }}</td>
-<td>{{ member.phone|default_if_none:"-" }}</td>
-<td>{{ member.altphone|default_if_none:"-" }}</td>
 <td>{{ member.updated_at|date:"d/m/Y" }}</td>
-<td>{{ member.mailout|yesno:",member removed self,-"}}</td>
-<td>{# there is no status! #}</td>
+<td>{{ member.mailout|yesno }}</td>
 {% endfor %}
 </table>
 
