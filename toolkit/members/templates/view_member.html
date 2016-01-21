@@ -13,6 +13,20 @@ Cube Member: {{ member.name }}
     }
 </style>
 {% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('form.delete').submit(
+        function(event) {
+            return confirm('Delete member? This cannot be undone.');
+        }
+    );
+});
+</script>
+{% endblock %}
+
 {% block body %}
 <div class="member">
     <h2>{{ member.name }}</h2>
@@ -31,9 +45,8 @@ Cube Member: {{ member.name }}
     <p>Mailout failed? {{ member.mailout_failed|yesno }}</p>
     <p>
 <form method="get" action="{% url "edit-member" member.pk %}"><input type="submit" value="Edit"></form> 
-<form method="post" action="{% url "delete-member" member.pk %}">{% csrf_token %}<input type="submit" value="Delete"></form>
+<form method="post" class="delete" action="{% url "delete-member" member.pk %}">{% csrf_token %}<input type="submit" value="Delete"></form>
 </p>
 </div>
 
 {% endblock %}
-
