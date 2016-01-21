@@ -499,12 +499,12 @@ class TestSearchMemberView(MembersTestsMixin, TestCase):
         self.assertContains(response, u'<input type="submit" value="Edit">', html=True)
         self.assertContains(response, u'<input type="submit" value="Delete">', html=True)
 
-        expected_edit_form = ('<form method="get" action="{}">'
+        expected_edit_form = ('<form method="get" action="{0}">'
                               '<input type="submit" value="Edit"></form>'
                               .format(reverse("edit-member", kwargs={"member_id": 3})))
 
         expected_delete_form = ('<form class="delete" method="post" '
-                                'action="{}">'
+                                'action="{0}">'
                                 .format(reverse("delete-member", kwargs={"member_id": 3})))
         self.assertContains(response, expected_edit_form)
         self.assertContains(response, expected_delete_form)
