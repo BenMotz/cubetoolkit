@@ -699,7 +699,7 @@ def printed_programme_edit(request, operation):
     return render(request, 'form_printedprogramme_archive.html', context)
 
 
-@permission_required('toolkit.read')
+@permission_required('diary.change_rotaentry')
 def view_rota_vacancies(request):
     days_ahead = 6
     start = timezone.now()
