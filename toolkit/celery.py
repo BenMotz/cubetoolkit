@@ -18,4 +18,8 @@ app.autodiscover_tasks(lambda: settings.INSTALLED_APPS)
 
 app.conf.update(
     CELERY_RESULT_BACKEND='djcelery.backends.database:DatabaseBackend',
-    BROKER_URL = 'django://',)
+    BROKER_URL = 'django://',
+    # Configure to not use 'pickle' serialisation (which is deprecated):
+    CELERY_ACCEPT_CONTENT=['json', 'msgpack', 'yaml'],
+    CELERY_TASK_SERIALIZER = 'json',
+    CELERY_RESULT_SERIALIZER = 'json',)
