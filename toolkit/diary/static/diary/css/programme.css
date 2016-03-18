@@ -425,6 +425,7 @@ span.tags a {
 }
 span.tags .tag_music { color: blue; }
 span.tags .tag_film { color: green; }
+span.tags .tag_35mm { color: green; }
 span.tags .tag_party { color: red; }
 span.tags .tag_talk { color: orange; }
 span.tags .tag_cabaret { color: brown; }
@@ -433,7 +434,7 @@ span.tags .tag_nanoplex { color: #CA678D; }
 span.tags .tag_animation { color: #FFAA00; }
 
 /* Hide film format tags: */
-.tag_dcp, .tag_35mm, .tag_dvd, .tag_dcp { display: none;}
+.tag_dcp, .tag_dvd, .tag_dcp { display: none;}
 
 
 .footer {
