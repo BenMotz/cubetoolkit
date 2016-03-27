@@ -1142,16 +1142,16 @@ span.tags .tag_animation { color: #FFAA00; }
     }
     p.day {
         display: block;
-        padding-left: 134px;
-        text-indent: -134px;
+        padding-left: 146px;
+        text-indent: -146px;
     }
     p.day > span.time {
         padding-left: 10px;
     }
     p.sameday {
         display: block;
-        padding-left: 134px;
-        text-indent: -76px;
+        padding-left: 146px;
+        text-indent: -83px;
     }
 
     /* --- Text --- */
@@ -1290,13 +1290,13 @@ span.tags .tag_animation { color: #FFAA00; }
     /* --- List Layout --- */
     p.day {
         display: block;
-        padding-left: 164px;
-        text-indent: -164px;
+        padding-left: 146px;
+        text-indent: -146px;
     }
     p.sameday {
         display: block;
-        padding-left: 164px;
-        text-indent: -94px;
+        padding-left: 146px;
+        text-indent: -83px;
     }
 
     /* --- Text --- */
@@ -1404,12 +1404,12 @@ span.tags .tag_animation { color: #FFAA00; }
     /* --- List Layout --- */
     p.day {
         display: block;
-        padding-left: 164px;
-        text-indent: -164px;
+        padding-left: 146px;
+        text-indent: -146px;
     }
     p.sameday {
         display: block;
-        padding-left: 164px;
-        text-indent: -94px;
+        padding-left: 146px;
+        text-indent: -83px;
     }
 }
