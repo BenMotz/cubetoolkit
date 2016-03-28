@@ -217,6 +217,7 @@ $(function(){
                         {% endfor %}
                     </p>
                     <p class="copy">{{ event.copy_summary|truncatewords:16 }} [<a class="more" href="{% url "single-event-view-with-slug" event_id=event.id event_slug=event_slug %}">more</a>]</p>
+                <a class="link" href="{% url "single-event-view-with-slug" event_id=event.id event_slug=event_slug %}"></a>
                 </div>{% endwith %}
 
             </div>{% endfor %}<!-- end .showing -->

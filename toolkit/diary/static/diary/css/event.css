@@ -9,7 +9,7 @@ audio:not([controls]) { display: none; }
 html { font-size: 100%; overflow-y: scroll; -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
 figure { margin: 10% 0; }
 figcaption { text-align: center; }
-img { border: 0; -ms-interpolation-mode: bicubic;}
+img { border: 0; width: 100%; -ms-interpolation-mode: bicubic;}
 a:hover, a:active, a:focus { outline: none; -moz-outline-style: none;}
 input {-webkit-border-radius:0; border-radius:0;}
 ::-webkit-input-placeholder {color: rgba(255, 255, 255, .66);}

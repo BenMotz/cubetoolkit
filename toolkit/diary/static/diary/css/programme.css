@@ -559,6 +559,15 @@ a {
     border: 0.07142857142857142em solid transparent;
 }
 
+.showing .link {
+    position: absolute;
+    display: block;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+}
+
 .event_image {
     position: relative;
     width: 298px;
@@ -697,7 +706,7 @@ span.tags .tag_nanoplex { color: #CA678D; }
 span.tags .tag_animation { color: #FFAA00; }
 
 /* Hide film format tags: */
-.tag_dcp, .tag_35mm, .tag_dvd, .tag_dcp { display: none;}
+.tag_dcp, .tag_dvd, .tag_dcp { display: none;}
 
 
 /* List Layout
