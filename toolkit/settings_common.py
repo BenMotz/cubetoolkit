@@ -4,7 +4,29 @@ import sys
 
 # The following list of IP addresses is used to restrict access to some pages
 # (at time of writing, only the 'add a new member' page)
-CUBE_IP_ADDRESSES = tuple("10.1.1.%d" % n for n in xrange(33,255))
+CUBE_IP_ADDRESSES = (
+    '10.20.134.1',
+    '10.20.134.1',
+    '10.20.134.2',
+    '10.20.134.3',
+    '10.20.134.4',
+    '10.20.134.5',
+    '10.20.134.6',
+    '10.20.134.7',
+    '10.20.134.8',
+    '10.20.134.9',
+    '10.20.134.10',
+    '10.20.134.11',
+    '10.20.134.12',
+    '10.20.134.13',
+    '10.20.134.14',
+    '10.20.134.15',
+    '10.20.134.16',
+    '10.20.134.17',
+    '10.20.134.18',
+    '10.20.134.19',
+    '10.20.134.20',
+)
 
 DEFAULT_TERMS_TEXT = """Contacts-
 Company-
@@ -26,7 +48,7 @@ EDIT_INDEX_DEFAULT_USE_POPUPS = True
 # the database field (at time of writing, 4096 characters.) This is (currently)
 # only enforced by the EditEvent form (i.e. it'll be ignored if other code
 # directly sets and saves some longer text)
-PROGRAMME_COPY_SUMMARY_MAX_CHARS = 450
+PROGRAMME_COPY_SUMMARY_MAX_CHARS = 400
 # Max size of uploaded diary media items (enforced by MediaItemForm)
 PROGRAMME_MEDIA_MAX_SIZE_MB = 5  # Megabytes (i.e. * 1024 * 1024 bytes)
 
@@ -85,9 +107,7 @@ THUMBNAIL_ALIASES = {
     },
     'diary.MediaItem': {
         'indexview': {
-            'size': (500, 300),
-            'crop': 'smart',
-            'background': '#FFFFFF',
+            'size': (600, 0),
         },
         'eventdetail': {
             'size': (800, 800),
@@ -225,7 +245,6 @@ MIDDLEWARE_CLASSES = (
 TEMPLATE_CONTEXT_PROCESSORS = (
     'django.contrib.messages.context_processors.messages',
     'django.core.context_processors.static',
-    'django.contrib.auth.context_processors.auth',
 )
 
 ROOT_URLCONF = 'toolkit.urls'
