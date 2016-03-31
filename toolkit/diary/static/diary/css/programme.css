@@ -559,15 +559,6 @@ a {
     border: 0.07142857142857142em solid transparent;
 }
 
-.showing .link {
-    position: absolute;
-    display: block;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-}
-
 .event_image {
     position: relative;
     width: 298px;
@@ -694,6 +685,7 @@ span.tags a {
     vertical-align: middle;
     padding: 0.071em 0.286em;
     margin: 0;
+    z-index: 50
 }
 /*
 span.tags .tag_music { color: blue; }
