@@ -474,6 +474,7 @@ a {
 #site-nav ul li a {
     display: block;
     font-size: 0.7857em;
+    font-weight: 400;
     line-height: 1.4;
     padding: 3.5px 0 14px;
 }
@@ -596,10 +597,10 @@ a {
 
 .pre_title, .post_title {
     display: block;
-    font-weight: 300;
+    font-weight: 400;
     font-size: 0.6785em;
     line-height: 1.4;
-    color: #000000;
+    color: #404040;
     text-transform: none;
     text-decoration: none;
     margin: 0;
@@ -622,10 +623,10 @@ a {
 
 p.showings, p.info, p.tickets {
     font-size: 0.6071em;
-    font-weight: 300;
+    font-weight: 400;
     line-height: 1.6;
     text-transform: none;
-    color: #000000;
+    color: #1a1a1a;
     padding: 0;
     margin: 0;
 }
@@ -1100,7 +1101,7 @@ p.action {
 
     /* --- Text --- */
     #site-title h1, .site-description h4, .social-media, .print-media, #site-nav ul li a {
-        font-size: 0.7857em;
+        font-size: 0.7142em;
         line-height: 1.4;
     }
     .pre_title, .post_title {
