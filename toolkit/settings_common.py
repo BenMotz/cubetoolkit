@@ -48,7 +48,7 @@ EDIT_INDEX_DEFAULT_USE_POPUPS = True
 # the database field (at time of writing, 4096 characters.) This is (currently)
 # only enforced by the EditEvent form (i.e. it'll be ignored if other code
 # directly sets and saves some longer text)
-PROGRAMME_COPY_SUMMARY_MAX_CHARS = 400
+PROGRAMME_COPY_SUMMARY_MAX_CHARS = 450
 # Max size of uploaded diary media items (enforced by MediaItemForm)
 PROGRAMME_MEDIA_MAX_SIZE_MB = 5  # Megabytes (i.e. * 1024 * 1024 bytes)
 
