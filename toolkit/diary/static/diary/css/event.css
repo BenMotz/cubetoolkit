@@ -598,7 +598,7 @@ a {
 .pre_title, .post_title {
     display: block;
     font-weight: 400;
-    font-size: 0.6785em;
+    font-size: .714285714em;
     line-height: 1.4;
     color: #404040;
     text-transform: none;
@@ -622,7 +622,7 @@ a {
 }
 
 p.showings, p.info, p.tickets {
-    font-size: 0.6071em;
+    font-size: 0.6785em;
     font-weight: 400;
     line-height: 1.6;
     text-transform: none;
@@ -656,7 +656,7 @@ p.action {
     border: 0.1em solid black;
     border-radius: 0 !important;
     outline: none;
-    font-size: 0.6785em;
+    font-size: .714285714em;
     line-height: 1.4;
     font-weight: 400;
     padding: 8px 10px;
@@ -670,7 +670,7 @@ p.action {
     background: black !important;
 }
 .copy p {
-    font-size: 0.6785em;
+    font-size: .714285714em;
     font-weight: 400;
     text-transform: none;
     line-height: 1.6;
@@ -679,7 +679,7 @@ p.action {
 }
 .copy p a, {
     color: #000000;
-    text-decoration: none;
+    text-decoration: underline;
     border-bottom: 1px dotted #000000;
 }
 .copy p a:visited {
@@ -719,10 +719,10 @@ p.action {
         font-size: 1.5714em;
     }
     p.showings, p.info, p.tickets {
-        font-size: 0.642857143em;
+        font-size: 0.714285714em;
     }
     .action a, .copy p {
-        font-size: 0.714285714em;
+        font-size: 0.785714286em;
     }
     #mobile-menu-btn:before {
         font: normal 1.696375em;
