@@ -677,12 +677,12 @@ p.action {
     color: #000000;
     padding: 0;
 }
-.copy p a, {
+.copy p > a {
     color: #000000;
-    text-decoration: underline;
+    text-decoration: none;
     border-bottom: 1px dotted #000000;
 }
-.copy p a:visited {
+.copy p > a:visited {
     color: #000000;
 }
 
