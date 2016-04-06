@@ -196,16 +196,18 @@ $(function(){
                 {% if event.tags.all %}<span class="tags">{% for tag in event.tags.all %}<a href="{% url "type-view" tag.slug %}" class="tag_{{tag.name}}">{{tag.name}}</a> {% endfor %}</span>{% endif %}
                 </div><!-- div event_image -->
                 
+                <a href="{% url "single-event-view-with-slug" event_id=event.id event_slug=event_slug %}">
                 <p>
-                    <a href="{% url "single-event-view-with-slug" event_id=event.id event_slug=event_slug %}"><span class="pre_title">
+                    <span class="pre_title">
                         {{ event.pre_title }}
                     </span>
+                </p>
                     <h3>{{ event.name }}</h3>
                     <span class="post_title">
                         {{ event.post_title }}
                     </span>
                     </a>
-                </p>
+                <p>
                 
                 <div class="event_details">
                     <p class="start_and_pricing">
@@ -227,7 +229,7 @@ $(function(){
     <div class="list">
       {% for showing in showings %}
         
-        {% ifchanged %}<p class="month">{{ showing.start|date:"F"|upper }}{% endifchanged %}{% ifchanged %}<span class="year">{{ showing.start|date:" Y" }}</span>{% endifchanged %}</p>
+        {% ifchanged %}<p class="month">{{ showing.start|date:"F"|upper }}{% endifchanged %}{% ifchanged %}<span class="year">{{ showing.start|date:" Y" }}</span>{% endifchanged %}
         {% ifchanged %}<p class="day">{{ showing.start|date:"D"}} {{ showing.start|date:"d" }}{% else %}
         <p class="sameday"> {% endifchanged %} <span class="time">{{showing.start|date:"H:i"}}</span> .... {% if showing.hide_in_programme or showing.event.private %}Closed for private event.{% else %}<a href="{% url "single-event-view" event_id=showing.event_id %}">{{ showing.event.pre_title|title }} {{ showing.event.name|capfirst }} {{ showing.event.post_title|title }}{% if showing.cancelled %} (CANCELLED){% endif %}{% if showing.sold_out %} (SOLD OUT){% endif %}{% if showing.discounted %} (TTT){% endif %}{% endif %}</a></p>
     {% endfor %}

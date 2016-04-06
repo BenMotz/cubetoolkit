@@ -44,8 +44,11 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertContains(
             response,
             r'<a href="/programme/event/,2/">'
-            r'<span class="pre_title"> </span> ? <span class="post_title">'
-            r'</span> </a>', html=True)
+            r'<p><span class="pre_title"></span></p>'
+            r'<h3>?</h3>'
+            r'<span class="post_title"></span>'
+            r'</a>',
+            html=True)
 
     def test_view_by_type(self):
         url = reverse("type-view", kwargs={"event_type": "film"})
@@ -120,7 +123,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "view_showing_index.html")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Event two title")
-        self.assertContains(response, '<span class="cancelled"> Wed 3 April // 19:00 (cancelled)</span>', html=True)
+        self.assertContains(response, '<span class="cancelled">Wed 3 April // 19:00</span>', html=True)
         self.assertContains(response, "Event two copy summary")
 
     @patch('django.utils.timezone.now')
