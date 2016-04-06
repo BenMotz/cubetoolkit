@@ -86,7 +86,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "view_showing_index.html")
         self.assertContains(response,
-                            "<p>Couldn't find anything tagged <strong>folm</strong></p>",
+                            "<h4 class=\"site-description\">folm events - couldn't find anything tagged folm</h4>",
                             html=True)
 
     def test_view_by_date_nothing_found(self):
@@ -108,7 +108,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         response = self.client.get(url)
         self.assertTemplateUsed(response, "view_showing_index.html")
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Wed 3 April | 19:00")
+        self.assertContains(response, "Wed 3 April // 19:00")
 
     @patch('django.utils.timezone.now')
     def test_view_this_month(self, now_patch):
@@ -120,7 +120,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "view_showing_index.html")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Event two title")
-        self.assertContains(response, '<span class="cancelled"> Wed 3 April | 19:00 (cancelled)</span>', html=True)
+        self.assertContains(response, '<span class="cancelled"> Wed 3 April // 19:00 (cancelled)</span>', html=True)
         self.assertContains(response, "Event two copy summary")
 
     @patch('django.utils.timezone.now')
@@ -135,7 +135,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertContains(response, "PRETITLE THREE")
         self.assertContains(response, "Event three title")
         self.assertContains(response, "POSTTITLE THREE")
-        self.assertContains(response, "Sat 13 April | 18:00")
+        self.assertContains(response, "Sat 13 April // 18:00")
         self.assertContains(response, "Copy three summary")
 
     @patch('django.utils.timezone.now')
@@ -150,7 +150,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertContains(response, "PRETITLE THREE")
         self.assertContains(response, "Event three title")
         self.assertContains(response, "POSTTITLE THREE")
-        self.assertContains(response, "Sat 13 April | 18:00")
+        self.assertContains(response, "Sat 13 April // 18:00")
         self.assertContains(response, "Copy three summary")
 
     # JSON day data:
@@ -199,8 +199,8 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertContains(response, u'Event <br>\n two <br>\n copy')
         self.assertEqual(response.status_code, 200)
         # Some showings *should* be listed:
-        self.assertContains(response, "Tue 2nd Apr | 7 p.m.")
-        self.assertContains(response, "Wed 3rd Apr | 7 p.m.")
+        self.assertContains(response, "Tue 2 April // 19:00")
+        self.assertContains(response, "Wed 3 April // 19:00")
         # Some showings should *not* be listed:
         self.assertNotContains(response, "1 Apr")
         self.assertNotContains(response, "4 Apr")
@@ -220,8 +220,8 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertContains(response, u'Event two title')
         self.assertContains(response, u'Event <br>\n two <br>\n copy')
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, "Tue 2nd Apr 2013 | 7 p.m.")
-        self.assertContains(response, "Wed 3rd Apr 2013 | 7 p.m.")
+        self.assertContains(response, "Tue 2 April 2013 // 19:00")
+        self.assertContains(response, "Wed 3 April 2013 // 19:00")
         self.assertNotContains(response, "1 Apr")
         self.assertNotContains(response, "4 Apr")
         self.assertNotContains(response, "5 Apr")
