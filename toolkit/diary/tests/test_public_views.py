@@ -287,8 +287,8 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "view_event.html")
-        self.assertNotContains( response, u'Book tickets')
-        self.assertNotContains( response, ticket_link)
+        self.assertNotContains(response, u'Book tickets')
+        self.assertNotContains(response, ticket_link)
 
     # TODO: Cancelled/confirmed/visible/TTT
 
