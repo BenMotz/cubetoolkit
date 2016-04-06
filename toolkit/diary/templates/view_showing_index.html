@@ -116,7 +116,7 @@ $(function(){
   <div class="nav-wrap">
 <!--      <div class="mobile-wrap">
         <a href="#nav-mobile" id="mobile-menu-btn"><i class="fa fa-bars"></i><span>Menu</span></a>
-      </div><!-- end #mobile-wrap -->
+      </div> !--><!-- end #mobile-wrap -->
       <div id="site-title" class="clearfix">
           <h1><a href="/toolkit/programme/" title= "Cube Programme">Cube Programme</a></h1>
       </div><!-- end #site-title -->
@@ -130,6 +130,7 @@ $(function(){
               {% if event_type %}
               - couldn't find anything tagged {{ event_type }}
               {% else %}
+              <h4 class="site-description">
               Nothing on between {{ start|date:"l j M Y"  }} and {{ end|date:"l j M Y" }}
               {% endif %}
               </h4>
@@ -141,8 +142,8 @@ $(function(){
         {% include "fragment_navmenu.html" %}
         <div class="grid-switcher">
           <p>View:</p>
-          <a href="#" id="listbtn" class="switcher"><i class="fa fa-th-list"></i>&nbspList</a>
-          <a href="#" id="gridbtn" class="switcher"><i class="fa fa-th"></i>&nbspGrid</a>
+          <a href="#" id="listbtn" class="switcher"><i class="fa fa-th-list"></i>&nbsp;List</a>
+          <a href="#" id="gridbtn" class="switcher"><i class="fa fa-th"></i>&nbsp;Grid</a>
         </div><!-- end .grid-switcher -->
         {% include "fragment_sociallinks.html" %}
         <div class="print-media">
@@ -176,6 +177,7 @@ $(function(){
                 {% if event_type %}
                 - couldn't find anything tagged {{ event_type }}
                 {% else %}
+                <h4 class="site-description">
                 Nothing on between {{ start|date:"l j M Y"  }} and {{ end|date:"l j M Y" }}
                 {% endif %}
                 </h4>
