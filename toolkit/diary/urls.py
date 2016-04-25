@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, url
-from django.views.generic import DetailView
+from django.views.generic import DetailView, TemplateView
 from toolkit.diary.models import Event
 from django.contrib.auth.decorators import permission_required
 
@@ -47,6 +47,25 @@ programme_urls = patterns(
 
     # RSS feed
     url(r'^rss/$', toolkit.diary.feeds.BasicWhatsOnFeed(), name="view-diary-rss", ),
+
+    # About the Cube
+    url(r'^about/$', TemplateView.as_view(template_name='template_about.html')),
+    # Volunteering at the Cube
+    url(r'^volunteer/$', TemplateView.as_view(template_name='template_volunteer.html')),
+    # Directions
+    url(r'^directions/$', TemplateView.as_view(template_name='template_directions.html')),
+    # Membership
+    url(r'^membership/$', TemplateView.as_view(template_name='template_membership.html')),
+    # Advance Tickets
+    url(r'^tickets/$', TemplateView.as_view(template_name='template_tickets.html')),
+    # Tech
+    url(r'^tech/$', TemplateView.as_view(template_name='template_tech.html')),
+    # Hire
+    url(r'^hire/$', TemplateView.as_view(template_name='template_hire.html')),
+    # Newsletter
+    url(r'^newsletter/$', TemplateView.as_view(template_name='template_newsletter.html')),
+    # Cube Images
+    url(r'^images/$', TemplateView.as_view(template_name='template_images.html')),
 )
 
 diary_urls = patterns(

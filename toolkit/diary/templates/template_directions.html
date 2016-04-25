@@ -1,0 +1,221 @@
+{% extends "base_public.html" %}
+{% load thumbnail %}
+
+{% block title %}
+Cube Microplex: Directions
+{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{{ STATIC_URL }}diary/css/static_pages.css">>
+    <link rel="stylesheet" href="{{ STATIC_URL }}diary/css/font-awesome/css/font-awesome.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+    <script src="{{ STATIC_URL }}diary/js/respond.min.js" ></script>
+    <script src="{{ STATIC_URL }}diary/js/masonry.pkgd.min.js" ></script>
+    <script src="{{ STATIC_URL }}diary/js/imagesloaded.pkgd.min.js" ></script>
+    <script src="{{ STATIC_URL }}diary/js/jquery.touchSwipe.min.js"></script>
+
+    <script type="text/javascript">
+        $(document).ready(function($){
+
+            // init Masonry
+        var $grid = $('.programme').masonry({
+          percentPosition: true, gutter: '.gutter-sizer', columnWidth: '.grid-sizer', itemSelector: '.grid-item'
+        });
+        // layout Masonry after each image loads
+        $grid.imagesLoaded().progress( function() {
+          $grid.masonry('layout');
+        });
+
+        });
+    </script>
+
+    <script type="text/javascript">
+      $(document).ready(function() {
+      $("#mobile-menu-btn").click(function() {
+        var toggle_el = $(this).data("toggle");
+        $(toggle_el).toggleClass("open-sidebar");
+        $(".black_overlay").toggleClass("active-search-bg");
+      });
+         
+    });
+
+
+    $(function() {      
+        $(".black_overlay").swipe( {
+          swipe:function(event, direction, distance, duration, fingerCount, fingerData) {
+            $(".grid").removeClass("open-sidebar");
+            $(".black_overlay").removeClass("active-search-bg");
+          },
+          threshold:0
+          });
+        });
+      
+    </script>
+
+    <script>
+        $(document).ready(function(){
+
+          $('#navmenu > ul > li:has(ul)').addClass("has-sub");
+
+          $('#navmenu > ul > li > a').click(function() {
+            var checkElement = $(this).next();
+            
+            $('#navmenu li').removeClass('active');
+            $(this).closest('li').addClass('active'); 
+            
+            
+            if((checkElement.is('ul')) && (checkElement.is(':visible'))) {
+              $(this).closest('li').removeClass('active');
+              checkElement.slideUp('normal');
+            }
+            
+            if((checkElement.is('ul')) && (!checkElement.is(':visible'))) {
+              $('#navmenu ul ul:visible').slideUp('normal');
+              checkElement.slideDown('normal');
+            }
+            
+            if (checkElement.is('ul')) {
+              return false;
+            } else {
+              return true;  
+            }   
+          });
+
+        });
+
+    </script>
+
+{% endblock %}
+
+{% block header %}
+{{ block.super }}
+<div id="container" class="body">
+    <div id="sidebar" class="panel">
+      <div class="nav-wrap">
+          <div id="site-title" class="clearfix">
+              <h1><a href="/toolkit/programme/" title= "Cube Programme">Cube Microplex</a></h1>
+          </div><!-- end #site-title -->
+
+      </div><!-- end .nav-wrap -->      
+      <nav id="site-nav" class="clearfix">
+          <div id="navmenu" class="menu-wrap">
+            {% include "fragment_navmenu.html" %}
+            {% include "fragment_sociallinks.html" %}
+            <div class="print-media">
+                {% if printed_programmes %}
+                <p>Print:</p>
+                {% for printed_programme in printed_programmes %}
+                <a href="{{ printed_programme.programme.url }}" title="Printed programme for {{ printed_programme.month|date:"M Y" }}"><i class="fa fa-file"></i></a>
+                {% endfor %}
+                {% endif %}
+            </div><!-- end .print-media -->
+          </div><!-- end .menu-wrap -->
+        </nav><!-- end #site-nav -->
+    </div><!-- end #sidebar -->
+
+    <div class="grid">
+        <div class="black_overlay"></div>
+        <div class="navigation-wrap">
+            <div class="mobile-wrap">
+              <a href="#" data-toggle=".grid" id="mobile-menu-btn"><i class="fa fa-bars"></i><span>Menu</span></a>
+            </div><!-- end #mobile-wrap -->
+            <div id="site-title" class="clearfix">
+                <h1><a href="/toolkit/programme/" title= "Cube Microplex">Cube Microplex</a></h1>
+            </div><!-- end #site-title -->
+
+            <div class="site-description">
+            </div><!-- end .site-description -->
+
+        </div><!-- end .nav-wrap -->  
+        <div class="programme{% if all_showings_sold_out %} sold_out{% endif %}{% if all_showings_cancelled %} cancelled{% endif %}">
+            <div class="grid-sizer"></div>
+            <div class="gutter-sizer"></div>
+            <div class="grid-item grid-item--width2">
+            	<p><h3>Contact</h3></p>
+                <br>
+                <div class="copy">
+                    <p><b>ENTRANCE ADDRESS:</b></p>
+                    <p>Dove Street South<br>
+                    [off top-left of King Square]<br>
+                    Kingsdown<br>
+                    Bristol<br>
+                    BS2 8JD</p>
+
+                    <p><b>POSTAL ADDRESS:</b></p>
+                    <p>4 Princess Row<br>
+                    Bristol<br>
+                    BS2 8NQ</p>
+                    <p>Tel: (0117) 907 4190<br>
+                    Email: <script type="text/javascript">
+					//<![CDATA[
+					<!--
+					var x="function f(x){var i,o=\"\",l=x.length;for(i=l-1;i>=0;i--) {try{o+=x.c" +
+					"harAt(i);}catch(e){}}return o;}f(\")\\\"function f(x,y){var i,o=\\\"\\\\\\\""+
+					"\\\\,l=x.length;for(i=0;i<l;i++){if(i==62)y+=i;y%=127;o+=String.fromCharCod" +
+					"e(x.charCodeAt(i)^(y++));}return o;}f(\\\"\\\\ZP#4/&*1h0: >. #fml0r;&00j\\\\"+
+					"\\\\004{7:51*0Z\\\\\\\\002\\\\\\\\027\\\\\\\\001\\\\\\\\001\\\\\\\\004\\\\\\"+
+					"\\002\\\\\\\\n\\\\\\\\001\\\\\\\\007*\\\\\\\\010\\\\\\\\031\\\\\\\\017\\\\\\"+
+					"\\013\\\\\\\\014\\\\\\\\031\\\\\\\\037\\\\\\\\027\\\\\\\\036\\\\\\\\025[\\\\"+
+					"\\\\025\\\\\\\\030\\\\\\\\025%X[OUIRZ}\\\\\\\\035`\\\\\\\\006)$/+h<9\\\\\\\\"+
+					"027ns-:24379<8\\\\\\\\027;,8>?40:\\\\\\\\r\\\\\\\\000L\\\\\\\\000\\\\\\\\01" +
+					"3\\\\\\\\010ZH\\\\\\\\tWHBW]U\\\"\\\\,62)\\\"(f};)lo,0(rtsbus.o nruter};)i(" +
+					"tArahc.x=+o{)--i;0=>i;1-l=i(rof}}{)e(hctac};l=+l;x=+x{yrt{)29=!)31/l(tAedoC" +
+					"rahc.x(elihw;lo=l,htgnel.x=lo,\\\"\\\"=o,i rav{)x(f noitcnuf\")"             ;
+					while(x=eval(x));
+					//-->
+					//]]>
+					</script><br>
+                    Music enquiries: <script type="text/javascript">
+					//<![CDATA[
+					<!--
+					var x="function f(x){var i,o=\"\",ol=x.length,l=ol;while(x.charCodeAt(l/13)!" +
+					"=51){try{x+=x;l+=l;}catch(e){}}for(i=l-1;i>=0;i--){o+=x.charAt(i);}return o" +
+					".substr(0,ol);}f(\")36,\\\"120\\\\130\\\\320\\\\610\\\\400\\\\330\\\\E410\\" +
+					"\\630\\\\LO|0|q~tp{rt`wSqxczc3.Wy|(kodiF \\\\\\\\C030\\\\020\\\\710\\\\320\\"+
+					"\\r\\\\XU*030\\\\330\\\\020\\\\\\\\\\\\020\\\\530\\\\n\\\\000\\\\400\\\\710" +
+					"\\\\610\\\\010\\\\430\\\\310\\\\'500\\\\410\\\\720\\\\620\\\\710\\\\[710\\\\"+
+					"+24=6x500\\\\e13'<s3mrg !)?#;?i2+!.7\\\"\\\\/[\\\"(f};o nruter};))++y(^)i(t" +
+					"AedoCrahc.x(edoCrahCmorf.gnirtS=+o;721=%y;2=*y))y+36(>i(fi{)++i;l<i;0=i(rof" +
+					";htgnel.x=l,\\\"\\\"=o,i rav{)y,x(f noitcnuf\")"                             ;
+					while(x=eval(x));
+					//-->
+					//]]>
+					</script></p>
+                    
+                </div><!-- end .copy -->
+            </div><!-- end .grid-item -->
+            <div class="grid-item grid-item--width3 event-image">
+            	<div class="open_maps">
+                	<iframe width="500" height="450" frameborder="0" frameborder="0" style="border:0" scrolling="no" marginheight="0" marginwidth="0" src="http://www.openstreetmap.org/export/embed.html?bbox=-2.5974082946777344%2C51.459161213131175%2C-2.5891900062561035%2C51.463191993983365&amp;layer=hot&amp;marker=51.461173305784136%2C-2.593299150466919" style="border: 1px solid black"></iframe>
+                </div><!-- end .open_maps -->
+                <!--<br>
+                <p><h3>Directions</h3></p>
+                <br>
+                <div class="copy">
+                    <p>Find Kings Square along Jamaica St. or Dighton St. Go to the top of Kings Square and turn left on to Dove Street. On your left you will see a car park in front of the cube cinema's main entrance. Please don't park in it - it doesn't belong to the Cube and you risk being fined or clamped. Park in the street.</p> -->
+                </div><!-- end .copy -->
+            </div><!-- end .grid-item -->
+            <div class="grid-item grid-item--width2">
+            	<p><h3>Directions</h3></p>
+                <br>
+                <div class="copy">
+                    <p>Find Kings Square along Jamaica St. or Dighton St. Go to the top of Kings Square and turn left on to Dove Street. On your left you will see a car park in front of the cube cinema's main entrance. Please don't park in it - it doesn't belong to the Cube and you risk being fined or clamped. Park in the street.</p>
+                </div><!-- end .copy -->
+            </div><!-- end .grid-item -->
+        <!--    <div class="grid-item grid-item--width3">
+                <div class="copy">
+                    {{ event.copy_html }}
+                </div><!-- end .copy -->
+        <!--    </div><!-- end .grid-item -->
+        </div><!-- end .programme -->   
+        <div class="related-events">
+            <!--<p>Related Events</p>-->
+        </div><!-- end .related-events --> 
+
+    </div><!-- end .grid -->
+</div><!-- end #container .body -->    
+{% endblock %}
+
+
