@@ -235,6 +235,7 @@ INSTALLED_APPS = (
     'toolkit.members',
     'toolkit.auth',
     'toolkit.index',
+    'toolkit.about',
     'toolkit.util',
     'easy_thumbnails',
     'django.contrib.auth',
