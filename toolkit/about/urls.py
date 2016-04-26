@@ -5,7 +5,7 @@ about_urls = patterns(
     'toolkit.about.views',
 
     # About the Cube
-    url(r'^about/$', TemplateView.as_view(template_name='template_about.html'),
+    url(r'^$', TemplateView.as_view(template_name='template_about.html'),
         name="about"),
     # Volunteering at the Cube
     url(r'^volunteer/$', TemplateView.as_view(template_name='template_volunteer.html'),
