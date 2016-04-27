@@ -83,3 +83,39 @@
     </script>
 
 {% endblock %}
+
+{% block header %}
+{{ block.super }}
+<div id="container" class="body">
+    <div id="sidebar" class="panel">
+      <div class="nav-wrap">
+          <div id="site-title" class="clearfix">
+              <h1><a href="/toolkit/programme/" title= "Cube Programme">Cube Microplex</a></h1>
+          </div><!-- end #site-title -->
+      </div><!-- end .nav-wrap -->
+      <nav id="site-nav" class="clearfix">
+          <div id="navmenu" class="menu-wrap">
+            {% include "fragment_navmenu.html" %}
+            {% include "fragment_sociallinks.html" %}
+          </div><!-- end .menu-wrap -->
+        </nav><!-- end #site-nav -->
+    </div><!-- end #sidebar -->
+    <div class="grid">
+        <div class="black_overlay"></div>
+        <div class="navigation-wrap">
+            <div class="mobile-wrap">
+              <a href="#" data-toggle=".grid" id="mobile-menu-btn"><i class="fa fa-bars"></i><span>Menu</span></a>
+            </div><!-- end #mobile-wrap -->
+            <div id="site-title" class="clearfix">
+                <h1><a href="/toolkit/programme/" title= "Cube Microplex">Cube Microplex</a></h1>
+            </div><!-- end #site-title -->
+            <div class="site-description">
+            </div><!-- end .site-description -->
+        </div><!-- end .nav-wrap -->
+{% endblock %}
+
+{% block footer %}
+    </div><!-- end .grid -->
+</div><!-- end #container .body -->
+{{ block.super }}
+{% endblock %}

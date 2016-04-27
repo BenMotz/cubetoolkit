@@ -1,134 +1,70 @@
 {% extends "base_about.html" %}
-{% load thumbnail %}
 
 {% block title %}
 Cube Microplex: Tech Spec
 {% endblock %}
 
-{% block header %}
+{% block body %}
 {{ block.super }}
-<div id="container" class="body">
-    <div id="sidebar" class="panel">
-      <div class="nav-wrap">
-          <div id="site-title" class="clearfix">
-              <h1><a href="/toolkit/programme/" title= "Cube Programme">Cube Microplex</a></h1>
-          </div><!-- end #site-title -->
-
-          <div class="site-description">
-              {% if event_type %}
-                  <h4 class="site-description">{{ event_type }} events
-              {% endif %}
-              {% if showings|length == 0 %}
-
-                  {% if event_type %}
-                  - couldn't find anything tagged {{ event_type }}
-                  {% else %}
-                  Nothing on between {{ start|date:"l j M Y"  }} and {{ end|date:"l j M Y" }}
-                  {% endif %}
-                  </h4>
-              {% endif %}
-          </div><!-- end .site-description -->
-      </div><!-- end .nav-wrap -->
-      <nav id="site-nav" class="clearfix">
-          <div id="navmenu" class="menu-wrap">
-            {% include "fragment_navmenu.html" %}
-            {% include "fragment_sociallinks.html" %}
-            <div class="print-media">
-                {% if printed_programmes %}
-                <p>Print:</p>
-                {% for printed_programme in printed_programmes %}
-                <a href="{{ printed_programme.programme.url }}" title="Printed programme for {{ printed_programme.month|date:"M Y" }}"><i class="fa fa-file"></i></a>
-                {% endfor %}
-                {% endif %}
-            </div><!-- end .print-media -->
-          </div><!-- end .menu-wrap -->
-        </nav><!-- end #site-nav -->
-    </div><!-- end #sidebar -->
-
-    <div class="grid">
-        <div class="black_overlay"></div>
-        <div class="navigation-wrap">
-            <div class="mobile-wrap">
-              <a href="#" data-toggle=".grid" id="mobile-menu-btn"><i class="fa fa-bars"></i><span>Menu</span></a>
-            </div><!-- end #mobile-wrap -->
-            <div id="site-title" class="clearfix">
-                <h1><a href="/toolkit/programme/" title= "Cube Microplex">Cube Microplex</a></h1>
-            </div><!-- end #site-title -->
-
-            <div class="site-description">
-            </div><!-- end .site-description -->
-
-        </div><!-- end .nav-wrap -->
-        <div class="programme{% if all_showings_sold_out %} sold_out{% endif %}{% if all_showings_cancelled %} cancelled{% endif %}">
-            <div class="grid-sizer"></div>
-            <div class="gutter-sizer"></div>
-            <div class="grid-item grid-item--width2 event-image">
-                <div class="event_image">
-                  <img src="{{ STATIC_URL }}about/projection-01.jpg" alt="Cube Projection Room">
-                </div><!-- end .event_image -->
-            </div><!-- end .grid-item -->
-            <div class="grid-item grid-item--width3">
-                <p><h3>Cube Cinema Tech Spec</h3></p>
-                <br>
-                <div class="copy">
-                    <p><b>AUDITORIUM</b></p>
-                    <p>107 seats.</p>
-                    <p>Screen measurements in MM
-                    <br>Screen H = 2640, W = 6230 (Scope)(6230 divided by 2640 = 2:35 Cinemascope)
-                    <br>Screen H = 2640, W = 4884 (Flat)(4884 divided by 2640 = 1:85 Flat, Widescreen)
-                    <br>Screen H = 2640, W = 3511 (Academy)(3511 divided by 2640 = 1:33, Academy)</p>
-                    <p>Projection Throw - 14m</p>
-                    <p>Stage 4.6m deep x 7m wide (13.8 ft x 21ft)</p>
-                    <p><b>SOUND</b></p>
-                    <p>2000W Bi-Amped PA.</p>
-                    <p>16ch/multicore. The Cube auditorum is acoustically dry with litle or no reverb.</p>
-                    <p><b>DESK</b></p>
-                    <p>Mixing Board - 32 Channel Soundcraft stage 16 channel multicore, soon to be upgraded</p>
-                    <p><b>OUTBOARD / CONTROL</b></p>
-                    <p>ELV GE-62 dual 31-band graphic
-                    <br>LA Audio EQ231S dual 31-band monitor graphic
-                    <br>Tascam CD writer.</p>
-                    <p><b>MONITORS</b></p>
-                    <p>2 x Turbosound TXD 12M wedges</p>
-                    <p><b>FOH</b></p>
-                    <p>Omnidrive SMS
-                    <br>Crest Audio FA2401 Power Amp
-                    <br>Amcron Geodyne II
-                    <br>Ecler APA1000 Switching Power Mosfet Amp</p>
-                    <p><b>MICS / DI's</b></p>
-                    <p>3 x SM58's
-                    <br>3 x SM57's
-                    <br>1 x AKG D112
-                    <br>2 x AKG C2000B's
-                    <br>4 x Stageline DIB-100 1-channel passive DI's
-                    <br>About 10 channels of DI via boxes</p>
-                    <p><b>PROJECTION</b></p>
-                    <p><b>AUDITORIUM PICTURE</b></p>
-                    <p>DCP (2k), 35mm, 16mm, Super 8 (inc sound), BD (upto 1080i), DVD. BeatSP, VHS, S-VHS, mini DV, DVCAM. Any file format within reason</p>
-                    <p><b>SOUND</b></p>
-                    <p>Dolby CP750 for all digital formtas. CP650 for analogue and historic formats.</p>
-                    <p>Live streaming from auditorium.</p>
-                    <p><b>BAR</b></p>
-                    <p>Technics Decks, CD & Tape Player, MP3 Server.</p>
-                    <p><b>PROGRAMME</b></p>
-                    <p>Between 3000 and 4000 two colour programmes are distributed across Bristol each month.</p>
-                    <p><b>WEB SPACE</b></p>
-                    <p>This site has extra space for publicity, projects or documentation of events. We have a server here made from trash. The url is <a href="http://sparror.cubecinema.com" title= "Sparror Art Server">sparror.cubecinema.com</a></p>
-
-                </div><!-- end .copy -->
-            </div><!-- end .grid-item -->
-        <!--    <div class="grid-item grid-item--width3">
-                <div class="copy">
-                    {{ event.copy_html }}
-                </div><!-- end .copy -->
-        <!--    </div><!-- end .grid-item -->
-        </div><!-- end .programme -->
-        <div class="related-events">
-            <!--<p>Related Events</p>-->
-        </div><!-- end .related-events -->
-
-    </div><!-- end .grid -->
-</div><!-- end #container .body -->
+<div class="programme">
+    <div class="grid-sizer"></div>
+    <div class="gutter-sizer"></div>
+    <div class="grid-item grid-item--width2 event-image">
+        <div class="event_image">
+          <img src="{{ STATIC_URL }}about/projection-01.jpg" alt="Cube Projection Room">
+        </div><!-- end .event_image -->
+    </div><!-- end .grid-item -->
+    <div class="grid-item grid-item--width3">
+        <h3>Cube Cinema Tech Spec</h3>
+        <br>
+        <div class="copy">
+            <p><b>AUDITORIUM</b></p>
+            <p>107 seats.</p>
+            <p>Screen measurements in MM
+            <br>Screen H = 2640, W = 6230 (Scope)(6230 divided by 2640 = 2:35 Cinemascope)
+            <br>Screen H = 2640, W = 4884 (Flat)(4884 divided by 2640 = 1:85 Flat, Widescreen)
+            <br>Screen H = 2640, W = 3511 (Academy)(3511 divided by 2640 = 1:33, Academy)</p>
+            <p>Projection Throw - 14m</p>
+            <p>Stage 4.6m deep x 7m wide (13.8 ft x 21ft)</p>
+            <p><b>SOUND</b></p>
+            <p>2000W Bi-Amped PA.</p>
+            <p>16ch/multicore. The Cube auditorum is acoustically dry with litle or no reverb.</p>
+            <p><b>DESK</b></p>
+            <p>Mixing Board - 32 Channel Soundcraft stage 16 channel multicore, soon to be upgraded</p>
+            <p><b>OUTBOARD / CONTROL</b></p>
+            <p>ELV GE-62 dual 31-band graphic
+            <br>LA Audio EQ231S dual 31-band monitor graphic
+            <br>Tascam CD writer.</p>
+            <p><b>MONITORS</b></p>
+            <p>2 x Turbosound TXD 12M wedges</p>
+            <p><b>FOH</b></p>
+            <p>Omnidrive SMS
+            <br>Crest Audio FA2401 Power Amp
+            <br>Amcron Geodyne II
+            <br>Ecler APA1000 Switching Power Mosfet Amp</p>
+            <p><b>MICS / DIs</b></p>
+            <p>3 x SM58's
+            <br>3 x SM57's
+            <br>1 x AKG D112
+            <br>2 x AKG C2000B's
+            <br>4 x Stageline DIB-100 1-channel passive DIs
+            <br>About 10 channels of DI via boxes</p>
+            <p><b>PROJECTION</b></p>
+            <p><b>AUDITORIUM PICTURE</b></p>
+            <p>DCP (2k), 35mm, 16mm, Super 8 (inc sound), BD (upto 1080i), DVD. BeatSP, VHS, S-VHS, mini DV, DVCAM. Any file format within reason</p>
+            <p><b>SOUND</b></p>
+            <p>Dolby CP750 for all digital formats. CP650 for analogue and historic formats.</p>
+            <p>Live streaming from auditorium.</p>
+            <p><b>BAR</b></p>
+            <p>Technics Decks, CD &amp; Tape Player, MP3 Server.</p>
+            <p><b>PROGRAMME</b></p>
+            <p>Between 3000 and 4000 two colour programmes are distributed across Bristol each month.</p>
+            <p><b>WEB SPACE</b></p>
+            <p>This site has extra space for publicity, projects or
+            documentation of events. We have a server here made from trash. The
+            url is <a href="http://sparror.cubecinema.com" title= "Sparror Art
+            Server">sparror.cubecinema.com</a></p>
+        </div><!-- end .copy -->
+    </div><!-- end .grid-item -->
+</div><!-- end .programme -->
 {% endblock %}
-
-

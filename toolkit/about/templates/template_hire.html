@@ -1,118 +1,64 @@
 {% extends "base_about.html" %}
-{% load thumbnail %}
 
 {% block title %}
 Cube Microplex: Tech Spec
 {% endblock %}
 
-{% block header %}
+{% block body %}
 {{ block.super }}
-<div id="container" class="body">
-    <div id="sidebar" class="panel">
-      <div class="nav-wrap">
-          <div id="site-title" class="clearfix">
-              <h1><a href="/toolkit/programme/" title= "Cube Programme">Cube Microplex</a></h1>
-          </div><!-- end #site-title -->
-
-          <div class="site-description">
-              {% if event_type %}
-                  <h4 class="site-description">{{ event_type }} events
-              {% endif %}
-              {% if showings|length == 0 %}
-
-                  {% if event_type %}
-                  - couldn't find anything tagged {{ event_type }}
-                  {% else %}
-                  Nothing on between {{ start|date:"l j M Y"  }} and {{ end|date:"l j M Y" }}
-                  {% endif %}
-                  </h4>
-              {% endif %}
-          </div><!-- end .site-description -->
-      </div><!-- end .nav-wrap -->
-      <nav id="site-nav" class="clearfix">
-          <div id="navmenu" class="menu-wrap">
-            {% include "fragment_navmenu.html" %}
-            {% include "fragment_sociallinks.html" %}
-            <div class="print-media">
-                {% if printed_programmes %}
-                <p>Print:</p>
-                {% for printed_programme in printed_programmes %}
-                <a href="{{ printed_programme.programme.url }}" title="Printed programme for {{ printed_programme.month|date:"M Y" }}"><i class="fa fa-file"></i></a>
-                {% endfor %}
-                {% endif %}
-            </div><!-- end .print-media -->
-          </div><!-- end .menu-wrap -->
-        </nav><!-- end #site-nav -->
-    </div><!-- end #sidebar -->
-
-    <div class="grid">
-        <div class="black_overlay"></div>
-        <div class="navigation-wrap">
-            <div class="mobile-wrap">
-              <a href="#" data-toggle=".grid" id="mobile-menu-btn"><i class="fa fa-bars"></i><span>Menu</span></a>
-            </div><!-- end #mobile-wrap -->
-            <div id="site-title" class="clearfix">
-                <h1><a href="/toolkit/programme/" title= "Cube Microplex">Cube Microplex</a></h1>
-            </div><!-- end #site-title -->
-
-            <div class="site-description">
-            </div><!-- end .site-description -->
-
-        </div><!-- end .nav-wrap -->
-        <div class="programme{% if all_showings_sold_out %} sold_out{% endif %}{% if all_showings_cancelled %} cancelled{% endif %}">
-            <div class="grid-sizer"></div>
-            <div class="gutter-sizer"></div>
-            <div class="grid-item grid-item--width2 event-image">
-                <div class="event_image">
-                  <img src="{{ STATIC_URL }}about/hire-seats-01.JPG" alt="Cube Seats">
-                </div><!-- end .event_image -->
-            </div><!-- end .grid-item -->
-            <div class="grid-item grid-item--width3">
-                <p><h3>Guide to private hire at the Cube Cinema</h3></p>
-                <br>
-                <div class="copy">
-                    <p>The Cube is open for all kinds of events and hires. It can be booked to put on private screenings, public meetings, rehearsals, conferences, music, festivals, etc.</p>
-                    <p>CINEMA seats: 105 people.
-                    <br>THE LICENSED BAR: 50 people comfortably.
-                    <br>THE GARDEN: 25 people</p>
-                    <p>Hire rates and conditions will vary depending on the type, timing, tech and staffing requirements of the event. Rates can vary from £150 to £1500. Sunday-Wednesday hires will generally be cheaper than weekends. If you have any further questions or would like to make a booking, please email us at <script type="text/javascript">
-                    //<![CDATA[
-                    <!--
-                    var x="function f(x){var i,o=\"\",l=x.length;for(i=l-1;i>=0;i--) {try{o+=x.c" +
-                    "harAt(i);}catch(e){}}return o;}f(\")\\\"function f(x,y){var i,o=\\\"\\\\\\\""+
-                    "\\\\,l=x.length;for(i=0;i<l;i++){if(i==62)y+=i;y%=127;o+=String.fromCharCod" +
-                    "e(x.charCodeAt(i)^(y++));}return o;}f(\\\"\\\\ZP#4/&*1h0: >. #fml0r;&00j\\\\"+
-                    "\\\\004{7:51*0Z\\\\\\\\002\\\\\\\\027\\\\\\\\001\\\\\\\\001\\\\\\\\004\\\\\\"+
-                    "\\002\\\\\\\\n\\\\\\\\001\\\\\\\\007*\\\\\\\\010\\\\\\\\031\\\\\\\\017\\\\\\"+
-                    "\\013\\\\\\\\014\\\\\\\\031\\\\\\\\037\\\\\\\\027\\\\\\\\036\\\\\\\\025[\\\\"+
-                    "\\\\025\\\\\\\\030\\\\\\\\025%X[OUIRZ}\\\\\\\\035`\\\\\\\\006)$/+h<9\\\\\\\\"+
-                    "027ns-:24379<8\\\\\\\\027;,8>?40:\\\\\\\\r\\\\\\\\000L\\\\\\\\000\\\\\\\\01" +
-                    "3\\\\\\\\010ZH\\\\\\\\tWHBW]U\\\"\\\\,62)\\\"(f};)lo,0(rtsbus.o nruter};)i(" +
-                    "tArahc.x=+o{)--i;0=>i;1-l=i(rof}}{)e(hctac};l=+l;x=+x{yrt{)29=!)31/l(tAedoC" +
-                    "rahc.x(elihw;lo=l,htgnel.x=lo,\\\"\\\"=o,i rav{)x(f noitcnuf\")"             ;
-                    while(x=eval(x));
-                    //-->
-                    //]]>
-                    </script>.</p>
-                    <p><b>NOTES</b></p>
-                    <p>Hire includes Cube manager, front of house, bar staff, projectionist, usher. Our evening opening times are 7pm-11/12pm; afternoon hires are also possible. If it is a public event, it it will also be put in our monthly publicity and Programme. Price does not include cost of Film/Video hire & transport and any extra specific equipment. Hirer should provide own DJs.</p>
-                    <p><b>BOOKING FILMS</b></p>
-                    <p>We also have extensive search facilities available to book films. Specialist searches can be undertaken at extra costs.</p>
-
-                </div><!-- end .copy -->
-            </div><!-- end .grid-item -->
-        <!--    <div class="grid-item grid-item--width3">
-                <div class="copy">
-                    {{ event.copy_html }}
-                </div><!-- end .copy -->
-        <!--    </div><!-- end .grid-item -->
-        </div><!-- end .programme -->
-        <div class="related-events">
-            <!--<p>Related Events</p>-->
-        </div><!-- end .related-events -->
-
-    </div><!-- end .grid -->
-</div><!-- end #container .body -->
+<div class="programme">
+    <div class="grid-sizer"></div>
+    <div class="gutter-sizer"></div>
+    <div class="grid-item grid-item--width2 event-image">
+        <div class="event_image">
+          <img src="{{ STATIC_URL }}about/hire-seats-01.JPG" alt="Cube Seats">
+        </div><!-- end .event_image -->
+    </div><!-- end .grid-item -->
+    <div class="grid-item grid-item--width3">
+        <h3>Guide to private hire at the Cube Cinema</h3>
+        <br>
+        <div class="copy">
+            <p>The Cube is open for all kinds of events and hires. It
+            can be booked to put on private screenings, public
+            meetings, rehearsals, conferences, music, festivals,
+            etc.</p>
+            <p>CINEMA seats: 105 people.
+            <br>THE LICENSED BAR: 50 people comfortably.
+            <br>THE GARDEN: 25 people</p>
+            <p>Hire rates and conditions will vary depending on the type,
+            timing, tech and staffing requirements of the event. Rates can vary
+            from £150 to £1500. Sunday-Wednesday hires will generally be
+            cheaper than weekends. If you have any further questions or would
+            like to make a booking, please email us at <script type="text/javascript">
+            //<![CDATA[
+            <!--
+            var x="function f(x){var i,o=\"\",l=x.length;for(i=l-1;i>=0;i--) {try{o+=x.c" +
+            "harAt(i);}catch(e){}}return o;}f(\")\\\"function f(x,y){var i,o=\\\"\\\\\\\""+
+            "\\\\,l=x.length;for(i=0;i<l;i++){if(i==62)y+=i;y%=127;o+=String.fromCharCod" +
+            "e(x.charCodeAt(i)^(y++));}return o;}f(\\\"\\\\ZP#4/&*1h0: >. #fml0r;&00j\\\\"+
+            "\\\\004{7:51*0Z\\\\\\\\002\\\\\\\\027\\\\\\\\001\\\\\\\\001\\\\\\\\004\\\\\\"+
+            "\\002\\\\\\\\n\\\\\\\\001\\\\\\\\007*\\\\\\\\010\\\\\\\\031\\\\\\\\017\\\\\\"+
+            "\\013\\\\\\\\014\\\\\\\\031\\\\\\\\037\\\\\\\\027\\\\\\\\036\\\\\\\\025[\\\\"+
+            "\\\\025\\\\\\\\030\\\\\\\\025%X[OUIRZ}\\\\\\\\035`\\\\\\\\006)$/+h<9\\\\\\\\"+
+            "027ns-:24379<8\\\\\\\\027;,8>?40:\\\\\\\\r\\\\\\\\000L\\\\\\\\000\\\\\\\\01" +
+            "3\\\\\\\\010ZH\\\\\\\\tWHBW]U\\\"\\\\,62)\\\"(f};)lo,0(rtsbus.o nruter};)i(" +
+            "tArahc.x=+o{)--i;0=>i;1-l=i(rof}}{)e(hctac};l=+l;x=+x{yrt{)29=!)31/l(tAedoC" +
+            "rahc.x(elihw;lo=l,htgnel.x=lo,\\\"\\\"=o,i rav{)x(f noitcnuf\")"             ;
+            while(x=eval(x));
+            //-->
+            //]]>
+            </script>.</p>
+            <p><b>NOTES</b></p>
+            <p>Hire includes Cube manager, front of house, bar staff,
+            projectionist, usher. Our evening opening times are 7pm-11/12pm;
+            afternoon hires are also possible. If it is a public event, it it
+            will also be put in our monthly publicity and Programme. Price does
+            not include cost of Film/Video hire &amp; transport and any extra
+            specific equipment. Hirer should provide own DJs.</p>
+            <p><b>BOOKING FILMS</b></p>
+            <p>We also have extensive search facilities available to book
+            films. Specialist searches can be undertaken at extra costs.</p>
+        </div><!-- end .copy -->
+    </div><!-- end .grid-item -->
+</div><!-- end .programme -->
 {% endblock %}
-
-

@@ -1,92 +1,29 @@
 {% extends "base_about.html" %}
-{% load thumbnail %}
 
 {% block title %}
 Cube Microplex: Membership
 {% endblock %}
 
-{% block header %}
+{% block body %}
 {{ block.super }}
-<div id="container" class="body">
-    <div id="sidebar" class="panel">
-      <div class="nav-wrap">
-          <div id="site-title" class="clearfix">
-              <h1><a href="/toolkit/programme/" title= "Cube Programme">Cube Microplex</a></h1>
-          </div><!-- end #site-title -->
-
-          <div class="site-description">
-              {% if event_type %}
-                  <h4 class="site-description">{{ event_type }} events
-              {% endif %}
-              {% if showings|length == 0 %}
-
-                  {% if event_type %}
-                  - couldn't find anything tagged {{ event_type }}
-                  {% else %}
-                  Nothing on between {{ start|date:"l j M Y"  }} and {{ end|date:"l j M Y" }}
-                  {% endif %}
-                  </h4>
-              {% endif %}
-          </div><!-- end .site-description -->
-      </div><!-- end .nav-wrap -->
-      <nav id="site-nav" class="clearfix">
-          <div id="navmenu" class="menu-wrap">
-            {% include "fragment_navmenu.html" %}
-            {% include "fragment_sociallinks.html" %}
-            <div class="print-media">
-                {% if printed_programmes %}
-                <p>Print:</p>
-                {% for printed_programme in printed_programmes %}
-                <a href="{{ printed_programme.programme.url }}" title="Printed programme for {{ printed_programme.month|date:"M Y" }}"><i class="fa fa-file"></i></a>
-                {% endfor %}
-                {% endif %}
-            </div><!-- end .print-media -->
-          </div><!-- end .menu-wrap -->
-        </nav><!-- end #site-nav -->
-    </div><!-- end #sidebar -->
-
-    <div class="grid">
-        <div class="black_overlay"></div>
-        <div class="navigation-wrap">
-            <div class="mobile-wrap">
-              <a href="#" data-toggle=".grid" id="mobile-menu-btn"><i class="fa fa-bars"></i><span>Menu</span></a>
-            </div><!-- end #mobile-wrap -->
-            <div id="site-title" class="clearfix">
-                <h1><a href="/toolkit/programme/" title= "Cube Microplex">Cube Microplex</a></h1>
-            </div><!-- end #site-title -->
-
-            <div class="site-description">
-            </div><!-- end .site-description -->
-
-        </div><!-- end .nav-wrap -->
-        <div class="programme{% if all_showings_sold_out %} sold_out{% endif %}{% if all_showings_cancelled %} cancelled{% endif %}">
-            <div class="grid-sizer"></div>
-            <div class="gutter-sizer"></div>
-            <div class="grid-item grid-item--width2 event-image">
-                <div class="event_image">
-                  <img src="{{ STATIC_URL }}about/membership-03.JPG" alt="Membership Cards">
-                </div><!-- end .event_image -->
-            </div><!-- end .grid-item -->
-            <div class="grid-item grid-item--width3">
-                <p><h3>Membership</h3></p>
-                <br>
-                <div class="copy">
-                    <p>The Cube is a membership Cinema, therefore you must purchase membership before you can come to any films or events promoted by us at The Cube Cinema. Membership costs £1 and you can purchase it on the door. Please remember to bring your membership card with you every time you visit.</p>
-
-                </div><!-- end .copy -->
-            </div><!-- end .grid-item -->
-        <!--    <div class="grid-item grid-item--width3">
-                <div class="copy">
-                    {{ event.copy_html }}
-                </div><!-- end .copy -->
-        <!--    </div><!-- end .grid-item -->
-        </div><!-- end .programme -->
-        <div class="related-events">
-            <!--<p>Related Events</p>-->
-        </div><!-- end .related-events -->
-
-    </div><!-- end .grid -->
-</div><!-- end #container .body -->
+<div class="programme">
+    <div class="grid-sizer"></div>
+    <div class="gutter-sizer"></div>
+    <div class="grid-item grid-item--width2 event-image">
+        <div class="event_image">
+          <img src="{{ STATIC_URL }}about/membership-03.JPG" alt="Membership Cards">
+        </div><!-- end .event_image -->
+    </div><!-- end .grid-item -->
+    <div class="grid-item grid-item--width3">
+        <h3>Membership</h3>
+        <br>
+        <div class="copy">
+            <p>The Cube is a membership Cinema, therefore you must purchase
+            membership before you can come to any films or events promoted by
+            us at The Cube Cinema. Membership costs £1 and you can purchase it
+            on the door. Please remember to bring your membership card with you
+            every time you visit.</p>
+        </div><!-- end .copy -->
+    </div><!-- end .grid-item -->
+</div><!-- end .programme -->
 {% endblock %}
-
-

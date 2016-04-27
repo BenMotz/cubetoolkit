@@ -1,107 +1,48 @@
 {% extends "base_about.html" %}
-{% load thumbnail %}
 
 {% block title %}
 Cube Microplex: Advance Tickets
 {% endblock %}
 
-{% block header %}
+{% block body %}
 {{ block.super }}
-<div id="container" class="body">
-    <div id="sidebar" class="panel">
-      <div class="nav-wrap">
-          <div id="site-title" class="clearfix">
-              <h1><a href="/toolkit/programme/" title= "Cube Programme">Cube Microplex</a></h1>
-          </div><!-- end #site-title -->
-
-          <div class="site-description">
-              {% if event_type %}
-                  <h4 class="site-description">{{ event_type }} events
-              {% endif %}
-              {% if showings|length == 0 %}
-
-                  {% if event_type %}
-                  - couldn't find anything tagged {{ event_type }}
-                  {% else %}
-                  Nothing on between {{ start|date:"l j M Y"  }} and {{ end|date:"l j M Y" }}
-                  {% endif %}
-                  </h4>
-              {% endif %}
-          </div><!-- end .site-description -->
-      </div><!-- end .nav-wrap -->
-      <nav id="site-nav" class="clearfix">
-          <div id="navmenu" class="menu-wrap">
-            {% include "fragment_navmenu.html" %}
-            {% include "fragment_sociallinks.html" %}
-            <div class="print-media">
-                {% if printed_programmes %}
-                <p>Print:</p>
-                {% for printed_programme in printed_programmes %}
-                <a href="{{ printed_programme.programme.url }}" title="Printed programme for {{ printed_programme.month|date:"M Y" }}"><i class="fa fa-file"></i></a>
-                {% endfor %}
-                {% endif %}
-            </div><!-- end .print-media -->
-          </div><!-- end .menu-wrap -->
-        </nav><!-- end #site-nav -->
-    </div><!-- end #sidebar -->
-
-    <div class="grid">
-        <div class="black_overlay"></div>
-        <div class="navigation-wrap">
-            <div class="mobile-wrap">
-              <a href="#" data-toggle=".grid" id="mobile-menu-btn"><i class="fa fa-bars"></i><span>Menu</span></a>
-            </div><!-- end #mobile-wrap -->
-            <div id="site-title" class="clearfix">
-                <h1><a href="/toolkit/programme/" title= "Cube Microplex">Cube Microplex</a></h1>
-            </div><!-- end #site-title -->
-
-            <div class="site-description">
-            </div><!-- end .site-description -->
-
-        </div><!-- end .nav-wrap -->
-        <div class="programme{% if all_showings_sold_out %} sold_out{% endif %}{% if all_showings_cancelled %} cancelled{% endif %}">
-            <div class="grid-sizer"></div>
-            <div class="gutter-sizer"></div>
-            <div class="grid-item grid-item--width2 event-image">
-                <div class="event_image">
-                  <img src="{{ STATIC_URL }}about/tickets-01.jpg" alt="Automaticket">
-                </div><!-- end .event_image -->
-            </div><!-- end .grid-item -->
-            <div class="grid-item grid-item--width3">
-                <p><h3>Advance Tickets</h3></p>
-                <br>
-                <div class="copy">
-                    <p>Tickets for cinema showings are sold from the door approximately 30 minutes before the advertised showing time. You can buy advance tickets on line for selected screenings through <a href="https://www.ticketsource.co.uk/venue/EGGKKD" title= "Ticket Source">www.ticketsource.co.uk</a> (booking fee applies).</p>
-                    <p>Tickets will be available to buy on line until 4 hours before the screening. There will usually be a small number of tickets available first-come-first-served on the door on the night even if the advance allocation is sold out. Early arrival is recommended.</p>
-                    <p>Advance tickets for other Cube events can be purchased from the following outlets:</p>
-                    <p>BRISTOL TICKET SHOP (telephone/internet bookings)
-                    <br>41 High St
-                    <br>Bristol
-                    <br>BS1 2AT
-                    <br>0870 4444 400
-                    <br>0117 929 9008
-                    <br><a href="http://www.bristolticketshop.co.uk/" title= "Bristol Ticket Shop">www.bristolticketshop.co.uk</a></p>
-                    <p>HERE SHOP
-                    <br>108 Stokes Croft
-                    <br>Bristol
-                    <br>BS1 3RU
-                    <br>0117 942 2222
-                    <br><a href="http://www.heregallery.co.uk/" title= "Here Shop">www.heregallery.co.uk</a></p>
-
-                </div><!-- end .copy -->
-            </div><!-- end .grid-item -->
-        <!--    <div class="grid-item grid-item--width3">
-                <div class="copy">
-                    {{ event.copy_html }}
-                </div><!-- end .copy -->
-        <!--    </div><!-- end .grid-item -->
-        </div><!-- end .programme -->
-        <div class="related-events">
-            <!--<p>Related Events</p>-->
-        </div><!-- end .related-events -->
-
-    </div><!-- end .grid -->
-</div><!-- end #container .body -->
+<div class="programme">
+    <div class="grid-sizer"></div>
+    <div class="gutter-sizer"></div>
+    <div class="grid-item grid-item--width2 event-image">
+        <div class="event_image">
+          <img src="{{ STATIC_URL }}about/tickets-01.jpg" alt="Automaticket">
+        </div><!-- end .event_image -->
+    </div><!-- end .grid-item -->
+    <div class="grid-item grid-item--width3">
+        <h3>Advance Tickets</h3>
+        <br>
+        <div class="copy">
+            <p>Tickets for cinema showings are sold from the door approximately
+            30 minutes before the advertised showing time. You can buy advance
+            tickets on line for selected screenings through <a
+            href="https://www.ticketsource.co.uk/venue/EGGKKD" title= "Ticket Source">www.ticketsource.co.uk</a> (booking fee applies).</p>
+            <p>Tickets will be available to buy on line until 4 hours before
+            the screening. There will usually be a small number of tickets
+            available first-come-first-served on the door on the night even if
+            the advance allocation is sold out. Early arrival is
+            recommended.</p>
+            <p>Advance tickets for other Cube events can be purchased from the
+            following outlets:</p>
+            <p>BRISTOL TICKET SHOP (telephone/internet bookings)
+            <br>41 High St
+            <br>Bristol
+            <br>BS1 2AT
+            <br>0870 4444 400
+            <br>0117 929 9008
+            <br><a href="http://www.bristolticketshop.co.uk/" title= "Bristol Ticket Shop">www.bristolticketshop.co.uk</a></p>
+            <p>HERE SHOP
+            <br>108 Stokes Croft
+            <br>Bristol
+            <br>BS1 3RU
+            <br>0117 942 2222
+            <br><a href="http://www.heregallery.co.uk/" title= "Here Shop">www.heregallery.co.uk</a></p>
+        </div><!-- end .copy -->
+    </div><!-- end .grid-item -->
+</div><!-- end .programme -->
 {% endblock %}
-
-
