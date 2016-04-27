@@ -38,11 +38,11 @@ Cube Microplex: Volunteer
         $(toggle_el).toggleClass("open-sidebar");
         $(".black_overlay").toggleClass("active-search-bg");
       });
-         
+
     });
 
 
-    $(function() {      
+    $(function() {
         $(".black_overlay").swipe( {
           swipe:function(event, direction, distance, duration, fingerCount, fingerData) {
             $(".grid").removeClass("open-sidebar");
@@ -51,7 +51,7 @@ Cube Microplex: Volunteer
           threshold:0
           });
         });
-      
+
     </script>
 
     <script>
@@ -61,26 +61,26 @@ Cube Microplex: Volunteer
 
           $('#navmenu > ul > li > a').click(function() {
             var checkElement = $(this).next();
-            
+
             $('#navmenu li').removeClass('active');
-            $(this).closest('li').addClass('active'); 
-            
-            
+            $(this).closest('li').addClass('active');
+
+
             if((checkElement.is('ul')) && (checkElement.is(':visible'))) {
               $(this).closest('li').removeClass('active');
               checkElement.slideUp('normal');
             }
-            
+
             if((checkElement.is('ul')) && (!checkElement.is(':visible'))) {
               $('#navmenu ul ul:visible').slideUp('normal');
               checkElement.slideDown('normal');
             }
-            
+
             if (checkElement.is('ul')) {
               return false;
             } else {
-              return true;  
-            }   
+              return true;
+            }
           });
 
         });
@@ -103,7 +103,7 @@ Cube Microplex: Volunteer
                   <h4 class="site-description">{{ event_type }} events
               {% endif %}
               {% if showings|length == 0 %}
-                  
+
                   {% if event_type %}
                   - couldn't find anything tagged {{ event_type }}
                   {% else %}
@@ -112,7 +112,7 @@ Cube Microplex: Volunteer
                   </h4>
               {% endif %}
           </div><!-- end .site-description -->
-      </div><!-- end .nav-wrap -->      
+      </div><!-- end .nav-wrap -->
       <nav id="site-nav" class="clearfix">
           <div id="navmenu" class="menu-wrap">
             {% include "fragment_navmenu.html" %}
@@ -142,7 +142,7 @@ Cube Microplex: Volunteer
             <div class="site-description">
             </div><!-- end .site-description -->
 
-        </div><!-- end .nav-wrap -->  
+        </div><!-- end .nav-wrap -->
         <div class="programme{% if all_showings_sold_out %} sold_out{% endif %}{% if all_showings_cancelled %} cancelled{% endif %}">
             <div class="grid-sizer"></div>
             <div class="gutter-sizer"></div>
@@ -160,7 +160,7 @@ Cube Microplex: Volunteer
                     <p>We mostly have events in the evenings, so this is when we need most of our volunteers to be available. People are around in the daytime too though, and we do have a few daytime events so don't be put off if you work unusual hours. We prefer people to try and work regularly, ideally once a week, as this helps you get more out of the cube and helps us with staffing events. Committing to work regular shifts is particularly useful (e.g. every monday evening), but by no means compulsary.</p>
                     <p>We always start new volunteers off on the bar or assisting the front of house manager with memberships. These two roles are a good introduction to working here and give you an understanding of how the place works. They are both responsible yet don't need quite as much specific training as some of the other jobs. They get you working here and interacting with other volunteers, and through this you'll get to see what the other jobs are, what they entail and find out who to contact if you're interested in doing them or being trained to do them.</p>
                     <p>We run regular induction sessions for new volunteers to allow us to give a bit more information about working here, and allow you to have a look around and ask us any questions you might have.</p>
-                    <p>If you would like to volunteer, please email 
+                    <p>If you would like to volunteer, please email
                     <script type="text/javascript">
                     //<![CDATA[
                     <!--
@@ -180,8 +180,8 @@ Cube Microplex: Volunteer
                     //-->
                     //]]>
                     </script> and tell us your name, and why you'd like to come and work here. It'd be useful to know when and how often you think you might be able to work too.</p>
-                    
-                    
+
+
                 </div><!-- end .copy -->
             </div><!-- end .grid-item -->
         <!--    <div class="grid-item grid-item--width3">
@@ -189,13 +189,13 @@ Cube Microplex: Volunteer
                     {{ event.copy_html }}
                 </div><!-- end .copy -->
         <!--    </div><!-- end .grid-item -->
-        </div><!-- end .programme -->   
+        </div><!-- end .programme -->
         <div class="related-events">
             <!--<p>Related Events</p>-->
-        </div><!-- end .related-events --> 
+        </div><!-- end .related-events -->
 
     </div><!-- end .grid -->
-</div><!-- end #container .body -->    
+</div><!-- end #container .body -->
 {% endblock %}
 
 

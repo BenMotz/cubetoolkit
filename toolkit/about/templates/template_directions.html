@@ -7,7 +7,7 @@ Cube Microplex: Directions
 
 {% block css %}
     {{ block.super }}
-    <link rel="stylesheet" href="{{ STATIC_URL }}about/css/static_pages.css">>
+    <link rel="stylesheet" href="{{ STATIC_URL }}about/css/static_pages.css">
     <link rel="stylesheet" href="{{ STATIC_URL }}css/font-awesome/css/font-awesome.min.css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
@@ -38,11 +38,11 @@ Cube Microplex: Directions
         $(toggle_el).toggleClass("open-sidebar");
         $(".black_overlay").toggleClass("active-search-bg");
       });
-         
+
     });
 
 
-    $(function() {      
+    $(function() {
         $(".black_overlay").swipe( {
           swipe:function(event, direction, distance, duration, fingerCount, fingerData) {
             $(".grid").removeClass("open-sidebar");
@@ -51,7 +51,7 @@ Cube Microplex: Directions
           threshold:0
           });
         });
-      
+
     </script>
 
     <script>
@@ -61,26 +61,26 @@ Cube Microplex: Directions
 
           $('#navmenu > ul > li > a').click(function() {
             var checkElement = $(this).next();
-            
+
             $('#navmenu li').removeClass('active');
-            $(this).closest('li').addClass('active'); 
-            
-            
+            $(this).closest('li').addClass('active');
+
+
             if((checkElement.is('ul')) && (checkElement.is(':visible'))) {
               $(this).closest('li').removeClass('active');
               checkElement.slideUp('normal');
             }
-            
+
             if((checkElement.is('ul')) && (!checkElement.is(':visible'))) {
               $('#navmenu ul ul:visible').slideUp('normal');
               checkElement.slideDown('normal');
             }
-            
+
             if (checkElement.is('ul')) {
               return false;
             } else {
-              return true;  
-            }   
+              return true;
+            }
           });
 
         });
@@ -98,7 +98,7 @@ Cube Microplex: Directions
               <h1><a href="/toolkit/programme/" title= "Cube Programme">Cube Microplex</a></h1>
           </div><!-- end #site-title -->
 
-      </div><!-- end .nav-wrap -->      
+      </div><!-- end .nav-wrap -->
       <nav id="site-nav" class="clearfix">
           <div id="navmenu" class="menu-wrap">
             {% include "fragment_navmenu.html" %}
@@ -128,7 +128,7 @@ Cube Microplex: Directions
             <div class="site-description">
             </div><!-- end .site-description -->
 
-        </div><!-- end .nav-wrap -->  
+        </div><!-- end .nav-wrap -->
         <div class="programme{% if all_showings_sold_out %} sold_out{% endif %}{% if all_showings_cancelled %} cancelled{% endif %}">
             <div class="grid-sizer"></div>
             <div class="gutter-sizer"></div>
@@ -183,7 +183,7 @@ Cube Microplex: Directions
 					//-->
 					//]]>
 					</script></p>
-                    
+
                 </div><!-- end .copy -->
             </div><!-- end .grid-item -->
             <div class="grid-item grid-item--width3 event-image">
@@ -209,13 +209,13 @@ Cube Microplex: Directions
                     {{ event.copy_html }}
                 </div><!-- end .copy -->
         <!--    </div><!-- end .grid-item -->
-        </div><!-- end .programme -->   
+        </div><!-- end .programme -->
         <div class="related-events">
             <!--<p>Related Events</p>-->
-        </div><!-- end .related-events --> 
+        </div><!-- end .related-events -->
 
     </div><!-- end .grid -->
-</div><!-- end #container .body -->    
+</div><!-- end #container .body -->
 {% endblock %}
 
 

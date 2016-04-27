@@ -38,11 +38,11 @@ Cube Microplex: Tech Spec
         $(toggle_el).toggleClass("open-sidebar");
         $(".black_overlay").toggleClass("active-search-bg");
       });
-         
+
     });
 
 
-    $(function() {      
+    $(function() {
         $(".black_overlay").swipe( {
           swipe:function(event, direction, distance, duration, fingerCount, fingerData) {
             $(".grid").removeClass("open-sidebar");
@@ -51,7 +51,7 @@ Cube Microplex: Tech Spec
           threshold:0
           });
         });
-      
+
     </script>
 
     <script>
@@ -61,26 +61,26 @@ Cube Microplex: Tech Spec
 
           $('#navmenu > ul > li > a').click(function() {
             var checkElement = $(this).next();
-            
+
             $('#navmenu li').removeClass('active');
-            $(this).closest('li').addClass('active'); 
-            
-            
+            $(this).closest('li').addClass('active');
+
+
             if((checkElement.is('ul')) && (checkElement.is(':visible'))) {
               $(this).closest('li').removeClass('active');
               checkElement.slideUp('normal');
             }
-            
+
             if((checkElement.is('ul')) && (!checkElement.is(':visible'))) {
               $('#navmenu ul ul:visible').slideUp('normal');
               checkElement.slideDown('normal');
             }
-            
+
             if (checkElement.is('ul')) {
               return false;
             } else {
-              return true;  
-            }   
+              return true;
+            }
           });
 
         });
@@ -103,7 +103,7 @@ Cube Microplex: Tech Spec
                   <h4 class="site-description">{{ event_type }} events
               {% endif %}
               {% if showings|length == 0 %}
-                  
+
                   {% if event_type %}
                   - couldn't find anything tagged {{ event_type }}
                   {% else %}
@@ -112,7 +112,7 @@ Cube Microplex: Tech Spec
                   </h4>
               {% endif %}
           </div><!-- end .site-description -->
-      </div><!-- end .nav-wrap -->      
+      </div><!-- end .nav-wrap -->
       <nav id="site-nav" class="clearfix">
           <div id="navmenu" class="menu-wrap">
             {% include "fragment_navmenu.html" %}
@@ -142,7 +142,7 @@ Cube Microplex: Tech Spec
             <div class="site-description">
             </div><!-- end .site-description -->
 
-        </div><!-- end .nav-wrap -->  
+        </div><!-- end .nav-wrap -->
         <div class="programme{% if all_showings_sold_out %} sold_out{% endif %}{% if all_showings_cancelled %} cancelled{% endif %}">
             <div class="grid-sizer"></div>
             <div class="gutter-sizer"></div>
@@ -198,7 +198,7 @@ Cube Microplex: Tech Spec
                     <p>Between 3000 and 4000 two colour programmes are distributed across Bristol each month.</p>
                     <p><b>WEB SPACE</b></p>
                     <p>This site has extra space for publicity, projects or documentation of events. We have a server here made from trash. The url is <a href="http://sparror.cubecinema.com" title= "Sparror Art Server">sparror.cubecinema.com</a></p>
-                    
+
                 </div><!-- end .copy -->
             </div><!-- end .grid-item -->
         <!--    <div class="grid-item grid-item--width3">
@@ -206,13 +206,13 @@ Cube Microplex: Tech Spec
                     {{ event.copy_html }}
                 </div><!-- end .copy -->
         <!--    </div><!-- end .grid-item -->
-        </div><!-- end .programme -->   
+        </div><!-- end .programme -->
         <div class="related-events">
             <!--<p>Related Events</p>-->
-        </div><!-- end .related-events --> 
+        </div><!-- end .related-events -->
 
     </div><!-- end .grid -->
-</div><!-- end #container .body -->    
+</div><!-- end #container .body -->
 {% endblock %}
 
 

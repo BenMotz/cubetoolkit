@@ -38,11 +38,11 @@ Cube Microplex: Membership
         $(toggle_el).toggleClass("open-sidebar");
         $(".black_overlay").toggleClass("active-search-bg");
       });
-         
+
     });
 
 
-    $(function() {      
+    $(function() {
         $(".black_overlay").swipe( {
           swipe:function(event, direction, distance, duration, fingerCount, fingerData) {
             $(".grid").removeClass("open-sidebar");
@@ -51,7 +51,7 @@ Cube Microplex: Membership
           threshold:0
           });
         });
-      
+
     </script>
 
     <script>
@@ -61,26 +61,26 @@ Cube Microplex: Membership
 
           $('#navmenu > ul > li > a').click(function() {
             var checkElement = $(this).next();
-            
+
             $('#navmenu li').removeClass('active');
-            $(this).closest('li').addClass('active'); 
-            
-            
+            $(this).closest('li').addClass('active');
+
+
             if((checkElement.is('ul')) && (checkElement.is(':visible'))) {
               $(this).closest('li').removeClass('active');
               checkElement.slideUp('normal');
             }
-            
+
             if((checkElement.is('ul')) && (!checkElement.is(':visible'))) {
               $('#navmenu ul ul:visible').slideUp('normal');
               checkElement.slideDown('normal');
             }
-            
+
             if (checkElement.is('ul')) {
               return false;
             } else {
-              return true;  
-            }   
+              return true;
+            }
           });
 
         });
@@ -103,7 +103,7 @@ Cube Microplex: Membership
                   <h4 class="site-description">{{ event_type }} events
               {% endif %}
               {% if showings|length == 0 %}
-                  
+
                   {% if event_type %}
                   - couldn't find anything tagged {{ event_type }}
                   {% else %}
@@ -112,7 +112,7 @@ Cube Microplex: Membership
                   </h4>
               {% endif %}
           </div><!-- end .site-description -->
-      </div><!-- end .nav-wrap -->      
+      </div><!-- end .nav-wrap -->
       <nav id="site-nav" class="clearfix">
           <div id="navmenu" class="menu-wrap">
             {% include "fragment_navmenu.html" %}
@@ -142,7 +142,7 @@ Cube Microplex: Membership
             <div class="site-description">
             </div><!-- end .site-description -->
 
-        </div><!-- end .nav-wrap -->  
+        </div><!-- end .nav-wrap -->
         <div class="programme{% if all_showings_sold_out %} sold_out{% endif %}{% if all_showings_cancelled %} cancelled{% endif %}">
             <div class="grid-sizer"></div>
             <div class="gutter-sizer"></div>
@@ -156,7 +156,7 @@ Cube Microplex: Membership
                 <br>
                 <div class="copy">
                     <p>The Cube is a membership Cinema, therefore you must purchase membership before you can come to any films or events promoted by us at The Cube Cinema. Membership costs £1 and you can purchase it on the door. Please remember to bring your membership card with you every time you visit.</p>
-                    
+
                 </div><!-- end .copy -->
             </div><!-- end .grid-item -->
         <!--    <div class="grid-item grid-item--width3">
@@ -164,13 +164,13 @@ Cube Microplex: Membership
                     {{ event.copy_html }}
                 </div><!-- end .copy -->
         <!--    </div><!-- end .grid-item -->
-        </div><!-- end .programme -->   
+        </div><!-- end .programme -->
         <div class="related-events">
             <!--<p>Related Events</p>-->
-        </div><!-- end .related-events --> 
+        </div><!-- end .related-events -->
 
     </div><!-- end .grid -->
-</div><!-- end #container .body -->    
+</div><!-- end #container .body -->
 {% endblock %}
 
 
