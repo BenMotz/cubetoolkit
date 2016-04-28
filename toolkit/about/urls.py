@@ -10,6 +10,9 @@ about_urls = patterns(
     # Volunteering at the Cube
     url(r'^volunteer/$', TemplateView.as_view(template_name='template_volunteer.html'),
         name="about-volunteer"),
+    # Contact
+    url(r'^contact/$', TemplateView.as_view(template_name='template_directions.html'),
+        name="about-contact"),
     # Directions
     url(r'^directions/$', TemplateView.as_view(template_name='template_directions.html'),
         name="about-directions"),
