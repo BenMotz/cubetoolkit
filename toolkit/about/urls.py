@@ -37,4 +37,7 @@ about_urls = patterns(
     # Babycinema
     url(r'^babycinema/$', TemplateView.as_view(template_name='template_babycinema.html'),
         name="about-babycinema"),
+    # ReBox
+    url(r'^rebox/$', TemplateView.as_view(template_name='template_rebox.html'),
+        name="about-rebox"),
 )
