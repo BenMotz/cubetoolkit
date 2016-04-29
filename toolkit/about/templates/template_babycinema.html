@@ -1,0 +1,29 @@
+{% extends "base_about.html" %}
+
+{% block title %}
+Cube Microplex: Babycinema
+{% endblock %}
+
+{% block body %}
+{{ block.super }}
+<div class="programme">
+    <div class="grid-sizer"></div>
+    <div class="gutter-sizer"></div>
+    <div class="grid-item grid-item--width2 event-image">
+        <div class="event_image">
+          <img src="{{ STATIC_URL }}about/cube-images/snowcube-small-01.jpg" alt="Snow Cube">
+        </div><!-- end .event_image -->
+    </div><!-- end .grid-item -->
+    <div class="grid-item grid-item--width3">
+        <h3>About The Cube</h3>
+        <br>
+        <div class="copy">
+            <p>Babycinema at The Cube Microplex most Wednesdays at 11am</p>
+            <p>The watching-with-baby screenings are for parents/carers with young babies (up to 1 year) to enjoy a movie in the company of other parents and their offspring.</p>
+            <p>With our film programme you'll be able to see the latest blockbusters, foreign language films and classic favourites. The Cube provides an area for prams, baby changing facilities, lowered movie volume and extra lighting in the auditorium. Our bar / cafe sells yummy homemade cakes and a wide range of beverages and soft drinks at reasonable prices. There will always be a friendly Front of House on hand to help.</p>
+            <p>See our <a href="{% url "babycinema" %}" title= "current babycinema programme">current babycinema programme</a> for film details.</p>
+            <p>If you would like more information, please email nanoplex at cubecinema.com</p>
+        </div><!-- end .copy -->
+    </div><!-- end .grid-item -->
+</div><!-- end .programme -->
+{% endblock %}

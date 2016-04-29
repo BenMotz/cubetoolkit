@@ -34,4 +34,7 @@ about_urls = patterns(
     # Cube Images
     url(r'^images/$', TemplateView.as_view(template_name='template_images.html'),
         name="about-images"),
+    # Babycinema
+    url(r'^babycinema/$', TemplateView.as_view(template_name='template_babycinema.html'),
+        name="about-babycinema"),
 )
