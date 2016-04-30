@@ -10,7 +10,7 @@ python-dateutil
 mock
 pytz
 # Not sure about:
-south
+south>=1.0
 # for easy_thumbnails:
 six
 # For generating non-html copy for mailout etc:
