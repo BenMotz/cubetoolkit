@@ -13,7 +13,7 @@ from django.conf import settings
 from toolkit.members.forms import NewMemberForm, MemberForm
 from toolkit.members.models import Member
 from toolkit.util import compare_constant_time
-from toolkit.auth.decorators import ip_or_permission_required
+from toolkit.toolkit_auth.decorators import ip_or_permission_required
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)

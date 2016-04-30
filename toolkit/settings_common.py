@@ -233,7 +233,7 @@ TEMPLATE_DIRS = (
 INSTALLED_APPS = (
     'toolkit.diary',
     'toolkit.members',
-    'toolkit.auth',
+    'toolkit.toolkit_auth',
     'toolkit.index',
     'toolkit.about',
     'toolkit.util',
