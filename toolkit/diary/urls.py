@@ -13,7 +13,7 @@ programme_urls = patterns(
     'toolkit.diary.public_views',
 
     # View lists of event for various time/dates
-    url(r'^(?:view/|)$', 'view_diary', name="default-view"),
+    url(r'^(?:view/)?$', 'view_diary', name="default-view"),
     url(r'^view/(?P<year>\d{4})/?$', 'view_diary', name="year-view"),
     url(r'^view/(?P<year>\d{4})/(?P<month>\d{1,2})/?$', 'view_diary', name="month-view"),
     url(r'^view/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/?$', 'view_diary', name="day-view"),
