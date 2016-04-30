@@ -222,7 +222,7 @@ def view_diary_json(request, year, month, day):
             'tags': ", ".join(n[0] for n in event.tags.values_list('name')),
         })
 
-    return HttpResponse(json.dumps(results), mimetype="application/json")
+    return HttpResponse(json.dumps(results), content_type="application/json")
 
 
 def view_showing(request, showing_id=None):

@@ -173,7 +173,7 @@ def set_edit_preferences(request):
     edit_prefs.set_preferences(request.session, request.GET)
     # Retrieve and return prefs:
     prefs = edit_prefs.get_preferences(request.session)
-    return HttpResponse(json.dumps(prefs), mimetype="application/json")
+    return HttpResponse(json.dumps(prefs), content_type="application/json")
 
 
 @permission_required('toolkit.write')
@@ -618,7 +618,7 @@ def edit_event_tags(request):
         # Bail out before deleting anything
         return HttpResponse(
             json.dumps({'failed': True, 'errors': errors}),
-            mimetype="application/json"
+            content_type="application/json"
         )
 
     # process deleted tags
@@ -635,7 +635,7 @@ def edit_event_tags(request):
 
     return HttpResponse(
         json.dumps({'failed': bool(errors), 'errors': errors}),
-        mimetype="application/json"
+        content_type="application/json"
     )
 
 

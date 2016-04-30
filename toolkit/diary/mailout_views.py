@@ -114,14 +114,14 @@ def exec_mailout(request):
             'status': 'error',
             'errors': dict(form.errors),
         }
-        return HttpResponse(json.dumps(response), mimetype="application/json")
+        return HttpResponse(json.dumps(response), content_type="application/json")
 
     result = toolkit.members.tasks.send_mailout.delay(form.cleaned_data['subject'],
                                                       form.cleaned_data['body'])
 
     response = HttpResponse(
         json.dumps({'status': 'ok', 'task_id': result.task_id, 'progress': 0}),
-        mimetype="application/json"
+        content_type="application/json"
     )
 
     return response
@@ -178,5 +178,5 @@ def mailout_progress(request):
             'error_msg': error_msg,
             'sent_count': sent_count,
         }),
-        mimetype="application/json"
+        content_type="application/json"
     )
