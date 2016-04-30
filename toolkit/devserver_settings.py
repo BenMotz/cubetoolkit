@@ -27,6 +27,7 @@ EMAIL_UNSUBSCRIBE_HOST = "localhost:8000"
 
 # Enable Debug mode, add in Django toolbar:
 DEBUG = True
+TEMPLATE_DEBUG = True
 
 # Django toolbar things:
 INTERNAL_IPS = ('127.0.0.1',)
