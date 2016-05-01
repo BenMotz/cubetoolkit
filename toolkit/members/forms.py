@@ -20,6 +20,7 @@ class NewMemberForm(forms.ModelForm):
 class MemberForm(forms.ModelForm):
     class Meta(object):
         model = toolkit.members.models.Member
+        exclude = ()
 
 
 class MemberFormWithoutNotes(forms.ModelForm):
