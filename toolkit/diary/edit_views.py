@@ -163,6 +163,89 @@ def edit_diary_list(request, year=None, day=None, month=None):
     context['edit_prefs'] = edit_prefs.get_preferences(request.session)
     return render(request, 'edit_event_index.html', context)
 
+@permission_required('toolkit.read')
+def edit_diary_data(request):
+    date_format = "%Y-%m-%d"
+    datetime_format = date_format + "T%H:%M:%S"
+
+    try:
+        start_raw = request.GET.get('start', None)
+        end_raw = request.GET.get('end', None)
+        start = datetime.datetime.strptime(start_raw, date_format)
+        end = datetime.datetime.strptime(end_raw, date_format)
+        print start,end
+    except ValueError:
+        logger.error(
+            u"Invalid value in date range, one of start '{0}' or end, '{1}"
+            .format(start_raw, end_raw)
+        )
+        raise Http404("Invalid request")
+
+    current_tz = timezone.get_current_timezone()
+    start_in_tz = current_tz.localize(start)
+    end_in_tz = current_tz.localize(end)
+
+    showings = (Showing.objects.start_in_range(start_in_tz, end_in_tz)
+                               .order_by('start')
+                               .select_related())
+
+    local_now = timezone.localtime(timezone.now())
+
+    results = []
+    for showing in showings:
+        # For showings in the future, go to the edit showing page, for showings
+        # in the past, show the event information (which should have edit links
+        # disabled, when I get around to it)
+        if showing.start >= local_now:
+            url = reverse("edit-showing", kwargs={'showing_id': showing.pk}),
+        else:
+            url = reverse("edit-event-details-view",
+                          kwargs={'pk': showing.event_id})
+
+        styles = []
+
+        if showing.cancelled:
+            styles.append("s_cancelled")
+        if showing.discounted:
+            styles.append("s_discounted")
+        if showing.event.private:
+            styles.append("s_private")
+        if showing.event.outside_hire:
+            styles.append("s_outside_hire")
+        if showing.confirmed:
+            color = "#C70040"
+        else:
+            color = "#E0CFCF"
+
+        results.append({
+            'id': showing.pk,
+            'title': showing.event.name,
+            'start': showing.start.strftime(datetime_format),
+            'end': showing.end_time.strftime(datetime_format),
+            'url': url,
+            'className': styles,
+            'color': color,
+        })
+
+    return HttpResponse(json.dumps(results),
+                        content_type="application/json; charset=utf-8")
+
+
+@permission_required('toolkit.read')
+def edit_diary_calendar(request, year=None, month=None):
+    if year and month:
+        display_month = datetime.date(int(year), int(month), 1)
+    elif year and not month:
+        raise Http404("Need year and month")
+    else:
+        display_month = timezone.localtime(timezone.now()).date()
+
+    context = {
+        'display_month': display_month,
+    }
+
+    return render(request, 'edit_event_calendar_index.html', context)
+
 
 @permission_required('toolkit.read')
 def set_edit_preferences(request):

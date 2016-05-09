@@ -462,6 +462,12 @@ class Showing(models.Model):
         # Used by templates
         return self.start.date()
 
+    @property
+    def end_time(self):
+        # Used by templates
+        duration = self.event.duration
+        return self.start + datetime.timedelta(hours=duration.hour, minutes=duration.minute)
+
     def in_past(self):
         return self.start < django.utils.timezone.now()
 

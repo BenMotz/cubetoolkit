@@ -57,6 +57,12 @@ diary_urls = patterns(
 
     # View lists of events for editing:
     url(r'^edit/?$', 'edit_diary_list', name="default-edit", ),
+
+    url(r'^edit/calendar/?$', 'edit_diary_calendar', name="diary-edit-calendar", ),
+    url(r'^edit/calendar/(?P<year>\d{4})/(?P<month>\d{1,2})/?$', 'edit_diary_calendar',),
+
+    url(r'^edit/json/$', 'edit_diary_data', name="edit-diary-data", ),
+
     url(r'^edit/(?P<year>\d{4})/?$', 'edit_diary_list', name="year-edit", ),
     url(r'^edit/(?P<year>\d{4})/(?P<month>\d{1,2})/?$', 'edit_diary_list', name="month-edit", ),
     url(r'^edit/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})', 'edit_diary_list', name="day-edit", ),
