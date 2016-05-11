@@ -4,7 +4,7 @@ import django.views.generic as generic
 from django.contrib.auth.decorators import login_required
 
 import toolkit.members.urls
-import toolkit.auth.urls
+import toolkit.toolkit_auth.urls
 import toolkit.index.urls
 import toolkit.diary.urls
 import toolkit.about.urls
@@ -17,7 +17,7 @@ urlpatterns = patterns(
     url(r'^diary/', include(toolkit.diary.urls.diary_urls)),
     url(r'^members/', include(toolkit.members.urls.member_urls)),
     url(r'^volunteers/', include(toolkit.members.urls.volunteer_urls)),
-    url(r'^auth/', include(toolkit.auth.urls.urlpatterns)),
+    url(r'^auth/', include(toolkit.toolkit_auth.urls.urlpatterns)),
     url(r'^index/', include(toolkit.index.urls.urlpatterns)),
     url(r'^about/', include(toolkit.about.urls.about_urls)),
 

@@ -173,7 +173,7 @@ def set_edit_preferences(request):
     edit_prefs.set_preferences(request.session, request.GET)
     # Retrieve and return prefs:
     prefs = edit_prefs.get_preferences(request.session)
-    return HttpResponse(json.dumps(prefs), mimetype="application/json")
+    return HttpResponse(json.dumps(prefs), content_type="application/json")
 
 
 @permission_required('toolkit.write')
@@ -564,7 +564,10 @@ def edit_event_templates(request):
     # GET: Render multiple forms (using a formset)
     # POST: Update formset
 
-    event_template_formset = modelformset_factory(EventTemplate, can_delete=True)
+    event_template_formset = modelformset_factory(
+        EventTemplate,
+        fields=('name', 'roles', 'tags', 'pricing'),
+        can_delete=True)
 
     if request.method == 'POST':
         formset = event_template_formset(request.POST)
@@ -618,7 +621,7 @@ def edit_event_tags(request):
         # Bail out before deleting anything
         return HttpResponse(
             json.dumps({'failed': True, 'errors': errors}),
-            mimetype="application/json"
+            content_type="application/json"
         )
 
     # process deleted tags
@@ -635,7 +638,7 @@ def edit_event_tags(request):
 
     return HttpResponse(
         json.dumps({'failed': bool(errors), 'errors': errors}),
-        mimetype="application/json"
+        content_type="application/json"
     )
 
 
@@ -645,7 +648,11 @@ def edit_roles(request):
     # (To be precise, save involves >120 queries. This is because I've been
     # lazy and used the formset save method)
 
-    RoleFormset = modelformset_factory(Role, diary_forms.RoleForm, can_delete=True)
+    RoleFormset = modelformset_factory(
+            Role,
+            diary_forms.RoleForm,
+            fields=('name', 'standard',),
+            can_delete=True)
 
     if request.method == 'POST':
         formset = RoleFormset(request.POST)
@@ -667,9 +674,11 @@ def printed_programme_edit(request, operation):
     assert operation in ('edit', 'add')
 
     programme_queryset = PrintedProgramme.objects.order_by('month')
-    programme_formset = modelformset_factory(PrintedProgramme,
-                                             can_delete=True,
-                                             extra=0)
+    programme_formset = modelformset_factory(
+        PrintedProgramme,
+        fields=('programme', 'designer', 'notes'),
+        can_delete=True,
+        extra=0)
 
     # Blank forms, for use in GET or for whichever form hasn't been POSTed
     formset = programme_formset(queryset=programme_queryset)

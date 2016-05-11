@@ -1,4 +1,5 @@
 import smtplib
+from email import charset
 from email.mime.text import MIMEText
 from email.Header import Header
 
@@ -67,6 +68,11 @@ def send_mailout(subject, body):
     (error, sent_count, error_message)
     where error is True if an error occurred.
     """
+
+    # Configure to 'intelligently' use shortest encoding for subject, but just
+    # send body of email as 8 bit plain. (This was the default behaviour in
+    # Django 1.5.x - retain it so as not to rock the boat for mail delivery)
+    charset.add_charset('utf-8', charset.SHORTEST, None, 'utf-8')
 
     header_template = u"Dear {0},\n\n"
     signature_template = (

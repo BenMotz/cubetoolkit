@@ -18,12 +18,13 @@ from toolkit.diary.validators import validate_in_future
 class RoleForm(forms.ModelForm):
     class Meta(object):
         model = toolkit.diary.models.Role
-        fields = ('name', 'standard')
+        fields = ('name', 'standard',)
 
 
 class DiaryIdeaForm(forms.ModelForm):
     class Meta(object):
         model = toolkit.diary.models.DiaryIdea
+        fields = ('ideas',)
 
 
 class EventForm(forms.ModelForm):
@@ -238,6 +239,7 @@ class NewPrintedProgrammeForm(forms.ModelForm):
 
     class Meta(object):
         model = toolkit.diary.models.PrintedProgramme
+        fields = ('month', 'programme', 'designer', 'notes')
 
     def clean(self):
         cleaned_data = super(NewPrintedProgrammeForm, self).clean()

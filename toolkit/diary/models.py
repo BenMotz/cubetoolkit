@@ -55,10 +55,15 @@ class Role(models.Model):
         # Store original value of name, so it can't be edited for
         # read only roles
         self._original_name = self.name
+        self._original_read_only = self.read_only
 
     def save(self, *args, **kwargs):
-        if self.read_only and self._original_name != self.name:
+        if self._original_read_only and self._original_name != self.name:
             logger.error(u"Tried to edit read-only role {0}".format(self.name))
+            return
+        elif self._original_read_only and not self.read_only:
+            # TODO: Unit test!
+            logger.error(u"Tried to unprotect read-only role {0}".format(self.name))
             return
         else:
             return super(Role, self).save(*args, **kwargs)

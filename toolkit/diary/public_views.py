@@ -7,7 +7,7 @@ from toolkit.util.ordereddict import OrderedDict
 
 from django.db.models import Q
 from django.http import HttpResponse, Http404
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.utils.safestring import mark_for_escaping
@@ -222,7 +222,7 @@ def view_diary_json(request, year, month, day):
             'tags': ", ".join(n[0] for n in event.tags.values_list('name')),
         })
 
-    return HttpResponse(json.dumps(results), mimetype="application/json")
+    return HttpResponse(json.dumps(results), content_type="application/json")
 
 
 def view_showing(request, showing_id=None):
