@@ -62,9 +62,12 @@ $(document).ready(function() {
         defaultDate: '{{ display_month|date:"Y-m-d" }}',
         editable: false,
         selectable: false,
-        eventLimit: true, // allow "more" link when too many events
-        timeFormat: 'H:mm', // uppercase H for 24-hour clock
+        eventLimit: true,
+        timeFormat: 'H:mm',
         scrollTime: '18:00:00',
+        nowIndicator: true,
+        // The server will provide localised time. Don't mess with them:
+        timezone: false,
         views: {
             agenda: {
                 scrollTime: '10:00:00'
@@ -73,7 +76,7 @@ $(document).ready(function() {
                 scrollTime: '10:00:00'
             }
         },
-        events: '/diary/edit/json/'
+        events: '{% url "edit-diary-data" %}'
     });
 });
 </script>

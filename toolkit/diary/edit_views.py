@@ -166,7 +166,6 @@ def edit_diary_list(request, year=None, day=None, month=None):
 @permission_required('toolkit.read')
 def edit_diary_data(request):
     date_format = "%Y-%m-%d"
-    datetime_format = date_format + "T%H:%M:%S"
 
     try:
         start_raw = request.GET.get('start', None)
@@ -213,15 +212,15 @@ def edit_diary_data(request):
         if showing.event.outside_hire:
             styles.append("s_outside_hire")
         if showing.confirmed:
-            color = "#C70040"
+            color = "#FF9080" if showing.in_past() else "#C70040"
         else:
             color = "#E0CFCF"
 
         results.append({
             'id': showing.pk,
             'title': showing.event.name,
-            'start': showing.start.strftime(datetime_format),
-            'end': showing.end_time.strftime(datetime_format),
+            'start': timezone.localtime(showing.start).isoformat(),
+            'end': timezone.localtime(showing.end_time).isoformat(),
             'url': url,
             'className': styles,
             'color': color,
