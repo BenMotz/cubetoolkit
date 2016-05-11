@@ -8,6 +8,7 @@ Event diary
 {% block css %}
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
 <link rel='stylesheet' href='{{ STATIC_URL }}diary/js/lib/fullcalendar/fullcalendar.min.css' />
+<link rel="stylesheet" href="{{ STATIC_URL }}diary/js/lib/fancybox/jquery.fancybox.css" />
 <style type="text/css">
   @import url('{{ STATIC_URL }}css/lib/smoothness/jquery-ui.css');
   .s_private {
@@ -50,9 +51,25 @@ Event diary
 <script src='{{ STATIC_URL }}diary/js/lib/fullcalendar/lib/jquery.min.js'></script>
 <script src='{{ STATIC_URL }}diary/js/lib/fullcalendar/lib/moment.min.js'></script>
 <script src='{{ STATIC_URL }}diary/js/lib/fullcalendar/fullcalendar.min.js'></script>
+<script src='{{ STATIC_URL }}diary/js/lib/fancybox/jquery.fancybox.js'></script>
 
 <script type="text/javascript">
 $(document).ready(function() {
+    function onEventClick(calEvent, jsEvent, view) {
+        $("#fb_target").attr('href', calEvent.url);
+        $("#fb_target").click();
+        return false;
+    }
+
+    $("#fb_target").fancybox({
+        openEffect: 'none',
+        closeEffect: 'none',
+        iframe : {
+            preload: false
+        }
+    });
+
+
     $('#calendar').fullCalendar({
         header: {
             left: 'prev,next today',
@@ -76,13 +93,15 @@ $(document).ready(function() {
                 scrollTime: '10:00:00'
             }
         },
-        events: '{% url "edit-diary-data" %}'
+        events: '{% url "edit-diary-data" %}',
+        eventClick: onEventClick,
     });
 });
 </script>
 {% endblock %}
 
 {% block body %}
+<a style="display: none;" class="fancybox" data-fancybox-type="iframe" id="fb_target" href="http://cubecinema.com/"></a>
 <!-- img src="{{ STATIC_URL }}diary/diary_edit_list_header.gif" alt="Cube Microplex" width="150px" -->
 <p id="controls"><a href="{% url "logout" %}">Log out</a></p>
 <div id='calendar'></div>
