@@ -253,6 +253,9 @@ class Event(models.Model):
     # a smattering of TLDs:
     _link_re_2 = re.compile(r'(\s)(www\.[\w.]+\.(com|org|net|uk|de|ly|us|tk)[^\t\n\r\f\v\. ]*)')
 
+    def all_showings_in_past(self):
+        return all(s.in_past() for s in self.showings.all())
+
     @property
     def copy_html(self):
         """If self.legacy_copy == True, then try to mangle self.copy into
