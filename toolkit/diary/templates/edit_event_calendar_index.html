@@ -55,22 +55,28 @@ Event diary
 
 <script type="text/javascript">
 $(document).ready(function() {
+    var calendar = $('#calendar');
+    var fb_target = $("#fb_target");
+
     function onEventClick(calEvent, jsEvent, view) {
-        $("#fb_target").attr('href', calEvent.url);
-        $("#fb_target").click();
+        fb_target.attr('href', calEvent.url);
+        fb_target.click();
         return false;
     }
 
-    $("#fb_target").fancybox({
+    fb_target.fancybox({
         openEffect: 'none',
         closeEffect: 'none',
+        afterClose: function() {
+            calendar.fullCalendar('refetchEvents');
+        },
         iframe : {
             preload: false
         }
     });
 
 
-    $('#calendar').fullCalendar({
+    calendar.fullCalendar({
         header: {
             left: 'prev,next today',
             center: 'title',

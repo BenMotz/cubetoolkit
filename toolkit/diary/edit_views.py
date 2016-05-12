@@ -48,7 +48,11 @@ def _return_to_editindex(request):
         # page.
         return HttpResponse("<!DOCTYPE html><html>"
                             "<head><title>-</title></head>"
-                            "<body onload='self.close(); opener.location.reload(true);'>Ok</body>"
+                            "<body onload='"
+                            "try{self.close();}catch(e){}"
+                            "try{parent.$.fancybox.close();}catch(e){}"
+                            "try{opener.location.reload(true);}catch(e){}"
+                            "'>Ok</body>"
                             "</html>")
     else:
         # Redirect to edit index
