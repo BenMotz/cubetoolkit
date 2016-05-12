@@ -51,6 +51,8 @@ Event diary
 $(document).ready(function() {
     var calendar = $('#calendar');
     var fb_target = $("#fb_target");
+    var currentDate = $.fullCalendar.moment('{{ display_month|date:"Y-m-d" }}');
+
 
     function onEventClick(calEvent, jsEvent, view) {
         fb_target.attr('href', calEvent.url);
@@ -95,6 +97,15 @@ $(document).ready(function() {
         },
         events: '{% url "edit-diary-data" %}',
         eventClick: onEventClick,
+        viewRender: function(view, element) {
+            var newDate = calendar.fullCalendar('getDate');
+            var newUrl = '{% url "diary-edit-calendar" %}/' + newDate.year() + '/' + (newDate.month() + 1) + '/';
+
+            if(!currentDate.isSame(newDate, 'month')) {
+                history.replaceState(null, document.title, newUrl);
+            }
+            currentDate = newDate;
+        }
     });
 });
 </script>
