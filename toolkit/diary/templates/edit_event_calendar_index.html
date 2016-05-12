@@ -53,6 +53,11 @@ $(document).ready(function() {
     var fb_target = $("#fb_target");
     var currentDate = $.fullCalendar.moment('{{ display_month|date:"Y-m-d" }}');
 
+    /* Dirty hack to ensure popups is true: */
+    $.getJSON('{% url "set_edit_preferences" %}', {
+        "daysahead" : "365",
+        "popups" : "true"
+    });
 
     function onEventClick(calEvent, jsEvent, view) {
         fb_target.attr('href', calEvent.url);
