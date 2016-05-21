@@ -29,6 +29,11 @@ Cube Programme{% if extra_title %}: {{ extra_title }}{% endif %}
         });
 
     });
+    // Belt and braces: do a final masonry layout after all images are
+    // definitely loaded:
+    $(window).load(function() {
+        $('.programme').masonry('layout');
+    });
 </script>
 <script type="text/javascript">
   $(document).ready(function() {
