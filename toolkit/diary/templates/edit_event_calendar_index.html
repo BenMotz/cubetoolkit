@@ -25,11 +25,10 @@ Event diary
      text-decoration: line-through;
   }
   #controls {
-      border: thick solid black;
       padding: 10px;
-      top: 0;
+      position: absolute;
       left: 10px;
-      width: 14em;
+      top: 10px;
   }
   #calendar {
         max-width: 1000px;
@@ -102,7 +101,8 @@ $(document).ready(function() {
         eventClick: onEventClick,
         viewRender: function(view, element) {
             var newDate = calendar.fullCalendar('getDate');
-            var newUrl = '{% url "diary-edit-calendar" %}/' + newDate.year() + '/' + (newDate.month() + 1) + '/';
+            var newUrl = '{% url "diary-edit-calendar" %}/' + newDate.year()
+                         + '/' + (newDate.month() + 1) + '/';
 
             if(!currentDate.isSame(newDate, 'month')) {
                 history.replaceState(null, document.title, newUrl);
@@ -116,8 +116,10 @@ $(document).ready(function() {
 
 {% block body %}
 <a style="display: none;" class="fancybox" data-fancybox-type="iframe" id="fb_target" href="http://cubecinema.com/"></a>
-<!-- img src="{{ STATIC_URL }}diary/diary_edit_list_header.gif" alt="Cube Microplex" width="150px" -->
-<p id="controls"><a href="{% url "logout" %}">Log out</a></p>
+<p id="controls">
+<a href="{% url "toolkit-index" %}">Toolkit home</a><br>
+<a href="{% url "logout" %}">Log out</a>
+</p>
 <div id='calendar'></div>
 {% endblock %}
 
