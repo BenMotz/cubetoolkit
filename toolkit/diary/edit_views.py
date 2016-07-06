@@ -378,22 +378,31 @@ def add_event(request):
             return render(request, 'form_new_event_and_showing.html', context)
 
     elif request.method == 'GET':
-        # GET: Show form blank, with date filled in from GET date parameter:
-        # Marshal date out of the GET request:
+        # GET: Show form blank, with date filled in from GET date and start
+        # parameters:
+        # Marshal date and start out of the GET request:
         default_date = django.utils.timezone.now().date() + datetime.timedelta(1)
         date = request.GET.get('date', default_date.strftime("%d-%m-%Y"))
         date = date.split("-")
-        if len(date) != 3:
-            return HttpResponse("Invalid start date", status=400, content_type="text/plain")
+
+        # Default start time is 8pm (shouldn't this be a setting?)
+        start = request.GET.get('start', "20:00")
+        start = start.split(":")
+
+        if len(start) != 2 or len(date) != 3:
+            return HttpResponse("Invalid start date or time", status=400,
+                                content_type="text/plain")
         try:
-            date[0] = int(date[0], 10)
-            date[1] = int(date[1], 10)
-            date[2] = int(date[2], 10)
+            date = [int(n, 10) for n in date]
+            start = [int(n, 10) for n in start]
             event_start = timezone.get_current_timezone().localize(
-                datetime.datetime(hour=20, minute=0, day=date[0], month=date[1], year=date[2])
+                datetime.datetime(hour=start[0], minute=start[1],
+                                  day=date[0], month=date[1], year=date[2])
             )
         except (ValueError, TypeError):
-            return HttpResponse("Illegal date", status=400, content_type="text/plain")
+            return HttpResponse("Illegal start or date", status=400,
+                                content_type="text/plain")
+
         # Create form, render template:
         form = diary_forms.NewEventForm(initial={'start': event_start})
         context = {'form': form}
