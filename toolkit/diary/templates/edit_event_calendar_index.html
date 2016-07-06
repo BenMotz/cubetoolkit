@@ -46,6 +46,7 @@ Event diary
 
 <script type="text/javascript">
 $(document).ready(function() {
+    var add_event_url = "{% url "add-event" %}";
     var calendar = $('#calendar');
     var fb_target = $("#fb_target");
     var currentDate = $.fullCalendar.moment('{{ display_month|date:"Y-m-d" }}');
@@ -60,6 +61,16 @@ $(document).ready(function() {
         fb_target.attr('href', calEvent.url);
         fb_target.click();
         return false;
+    }
+
+    function onDayClick(date) {
+        var url = add_event_url + "?date=" + date.format("D-M-YYYY");
+        if(date.hasTime()) {
+            // User clicked on a timeslot in week / day view
+            url += "&start=" + date.format("H:m");
+        };
+        fb_target.attr('href', url);
+        fb_target.click();
     }
 
     fb_target.fancybox({
@@ -99,6 +110,7 @@ $(document).ready(function() {
         },
         events: '{% url "edit-diary-data" %}',
         eventClick: onEventClick,
+        dayClick: onDayClick,
         viewRender: function(view, element) {
             var newDate = calendar.fullCalendar('getDate');
             var newUrl = '{% url "diary-edit-calendar" %}/' + newDate.year()
