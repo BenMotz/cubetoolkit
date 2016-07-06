@@ -40,8 +40,6 @@ Event diary
 {% endblock %}
 
 {% block script %}
-<!-- script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.min.js"></script -->
-
 <script src='{{ STATIC_URL }}diary/js/lib/fullcalendar/lib/jquery.min.js'></script>
 <script src='{{ STATIC_URL }}diary/js/lib/fullcalendar/lib/moment.min.js'></script>
 <script src='{{ STATIC_URL }}diary/js/lib/fullcalendar/fullcalendar.min.js'></script>
@@ -81,7 +79,7 @@ $(document).ready(function() {
         header: {
             left: 'prev,next today',
             center: 'title',
-            right: 'month,agendaWeek,agendaDay'
+            right: 'month,agendaWeek'
         },
         defaultDate: '{{ display_month|date:"Y-m-d" }}',
         editable: false,
