@@ -380,27 +380,30 @@ def add_event(request):
     elif request.method == 'GET':
         # GET: Show form blank, with date filled in from GET date and start
         # parameters:
-        # Marshal date and start out of the GET request:
+        # Marshal date and time out of the GET request:
         default_date = django.utils.timezone.now().date() + datetime.timedelta(1)
         date = request.GET.get('date', default_date.strftime("%d-%m-%Y"))
         date = date.split("-")
 
         # Default start time is 8pm (shouldn't this be a setting?)
-        start = request.GET.get('start', "20:00")
-        start = start.split(":")
+        time = request.GET.get('time', "20:00")
+        time = time.split(":")
+        duration = request.GET.get('duration', "1:00")
+        duration = duration.split(":")
 
-        if len(start) != 2 or len(date) != 3:
-            return HttpResponse("Invalid start date or time", status=400,
-                                content_type="text/plain")
+        if len(duration) != 2 or len(time) != 2 or len(date) != 3:
+            return HttpResponse("Invalid start date, time or duration",
+                status=400, content_type="text/plain")
         try:
             date = [int(n, 10) for n in date]
-            start = [int(n, 10) for n in start]
+            time = [int(n, 10) for n in time]
+            duration = [int(n, 10) for n in duration]
             event_start = timezone.get_current_timezone().localize(
-                datetime.datetime(hour=start[0], minute=start[1],
+                datetime.datetime(hour=time[0], minute=time[1],
                                   day=date[0], month=date[1], year=date[2])
             )
         except (ValueError, TypeError):
-            return HttpResponse("Illegal start or date", status=400,
+            return HttpResponse("Illegal time, date or duration", status=400,
                                 content_type="text/plain")
 
         # Create form, render template:

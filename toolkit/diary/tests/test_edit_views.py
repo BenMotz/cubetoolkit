@@ -610,7 +610,7 @@ class AddEventView(DiaryTestsMixin, TestCase):
     def test_get_add_event_form_specify_invalid_start(self):
         url = reverse("add-event")
         response = self.client.get(url, data={"date": "99-01-1950"})
-        self.assertContains(response, "Illegal start or date", status_code=400)
+        self.assertContains(response, "Illegal time or date", status_code=400)
 
     @patch('django.utils.timezone.now')
     def test_add_event(self, now_patch):

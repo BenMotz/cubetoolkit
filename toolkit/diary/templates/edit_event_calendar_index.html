@@ -67,7 +67,7 @@ $(document).ready(function() {
         var url = add_event_url + "?date=" + date.format("D-M-YYYY");
         if(date.hasTime()) {
             // User clicked on a timeslot in week / day view
-            url += "&start=" + date.format("H:m");
+            url += "&time=" + date.format("H:m");
         };
         fb_target.attr('href', url);
         fb_target.click();
