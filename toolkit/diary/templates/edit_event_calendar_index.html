@@ -49,7 +49,8 @@ $(document).ready(function() {
     var add_event_url = "{% url "add-event" %}";
     var calendar = $('#calendar');
     var fb_target = $("#fb_target");
-    var currentDate = $.fullCalendar.moment('{{ display_month|date:"Y-m-d" }}');
+    var currentDate = $.fullCalendar.moment('{{ display_time|date:"Y-m-d" }}');
+    var currentView = "{{ defaultView }}"
 
     /* Dirty hack to ensure popups is true: */
     $.getJSON('{% url "set_edit_preferences" %}', {
@@ -92,6 +93,28 @@ $(document).ready(function() {
         };
         fb_target.attr('href', url);
         fb_target.click();
+    }
+
+    function onViewRender(view, element) {
+        var newDate = calendar.fullCalendar('getDate');
+        if(view.name === 'month') {
+            var newUrl = '{% url "diary-edit-calendar" %}/' + newDate.year()
+                         + '/' + (newDate.month() + 1) + '/';
+
+            if(!currentDate.isSame(newDate, 'month') || (currentView != view.name)) {
+                history.replaceState(null, document.title, newUrl);
+            }
+        } else if(view.name === "agendaWeek") {
+            var newUrl = '{% url "diary-edit-calendar" %}/' + newDate.year()
+                         + '/' + (newDate.month() + 1)
+                         + '/' + newDate.date();
+
+            if(!currentDate.isSame(newDate, 'day') || (currentView != view.name)) {
+                history.replaceState(null, document.title, newUrl);
+            }
+        }
+        currentView = view.name;
+        currentDate = newDate;
     }
 
 
@@ -144,16 +167,7 @@ $(document).ready(function() {
         events: '{% url "edit-diary-data" %}',
         eventClick: onEventClick,
         dayClick: onDayClick,
-        viewRender: function(view, element) {
-            var newDate = calendar.fullCalendar('getDate');
-            var newUrl = '{% url "diary-edit-calendar" %}/' + newDate.year()
-                         + '/' + (newDate.month() + 1) + '/';
-
-            if(!currentDate.isSame(newDate, 'month')) {
-                history.replaceState(null, document.title, newUrl);
-            }
-            currentDate = newDate;
-        }
+        viewRender: onViewRender
     });
 });
 </script>
