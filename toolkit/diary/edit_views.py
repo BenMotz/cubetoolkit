@@ -235,16 +235,21 @@ def edit_diary_data(request):
 
 
 @permission_required('toolkit.read')
-def edit_diary_calendar(request, year=None, month=None):
-    if year and month:
-        display_month = datetime.date(int(year), int(month), 1)
+def edit_diary_calendar(request, year=None, month=None, day=None):
+    defaultView = "month"
+    if year and month and day:
+        display_time = datetime.date(int(year), int(month), int(day))
+        defaultView = "agendaWeek"
+    elif year and month:
+        display_time = datetime.date(int(year), int(month), 1)
     elif year and not month:
         raise Http404("Need year and month")
     else:
-        display_month = timezone.localtime(timezone.now()).date()
+        display_time = timezone.localtime(timezone.now()).date()
 
     context = {
-        'display_month': display_month,
+        'display_time': display_time,
+        'defaultView': defaultView,
     }
 
     return render(request, 'edit_event_calendar_index.html', context)

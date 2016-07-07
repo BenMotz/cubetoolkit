@@ -113,7 +113,9 @@ $(document).ready(function() {
             center: 'title',
             right: 'month,agendaWeek'
         },
-        defaultDate: '{{ display_month|date:"Y-m-d" }}',
+        allDaySlot: false,
+        defaultDate: '{{ display_time|date:"Y-m-d" }}',
+        defaultView: '{{ defaultView }}',
         editable: false,
         selectable: true,
         selectHelper: true,
