@@ -58,6 +58,12 @@ $(document).ready(function() {
         "popups" : "true"
     });
 
+    $('#new-booking-link').click(function(){
+        fb_target.attr('href', '{% url "add-event" %}');
+        fb_target.click();
+        return false;
+    });
+
     function onEventClick(calEvent, jsEvent, view) {
         fb_target.attr('href', calEvent.url);
         fb_target.click();
@@ -176,6 +182,8 @@ $(document).ready(function() {
 {% block body %}
 <a style="display: none;" class="fancybox" data-fancybox-type="iframe" id="fb_target" href="http://cubecinema.com/"></a>
 <p id="controls">
+<a href="{% url "add-event" %}" id="new-booking-link">New booking</a><br>
+<a href="{% url "default-edit" %}">Linear diary</a><br>
 <a href="{% url "toolkit-index" %}">Toolkit home</a><br>
 <a href="{% url "logout" %}">Log out</a>
 </p>
