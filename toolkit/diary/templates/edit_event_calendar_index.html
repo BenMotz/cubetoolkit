@@ -64,14 +64,36 @@ $(document).ready(function() {
     }
 
     function onDayClick(date) {
-        var url = add_event_url + "?date=" + date.format("D-M-YYYY");
+        if(date.isBefore(moment())) {
+            return;
+        }
         if(date.hasTime()) {
+            // User clicked on a timeslot in week / day view: this is handled
+            // by onSelect, so do nothing
+            return;
+        }
+        var url = add_event_url + "?date=" + date.format("D-M-YYYY");
+        fb_target.attr('href', url);
+        fb_target.click();
+    }
+
+    function onSelect(start, end) {
+        var url = add_event_url + "?date=" + start.format("D-M-YYYY");
+        // Don't allow new events in the past. This is also enforced
+        // server-side.
+        if(start.isBefore(moment())) {
+            calendar.fullCalendar('unselect');
+            return;
+        }
+        if(start.hasTime() && end.hasTime()) {
             // User clicked on a timeslot in week / day view
-            url += "&time=" + date.format("H:m");
+            url += "&time=" + start.format("H:m");
+            url += "&duration=" + (end.unix() - start.unix());
         };
         fb_target.attr('href', url);
         fb_target.click();
     }
+
 
     fb_target.fancybox({
         openEffect: 'none',
@@ -93,7 +115,16 @@ $(document).ready(function() {
         },
         defaultDate: '{{ display_month|date:"Y-m-d" }}',
         editable: false,
-        selectable: false,
+        selectable: true,
+        selectHelper: true,
+        // Force events to a single day. It is valid to have a duration > 24hr,
+        // but historically we've not done that to indicate multi-day events,
+        // so nothing else is expecting it.
+        selectConstraint: {
+            start: '0:00',
+            end: '23:59'
+        },
+        select: onSelect,
         eventLimit: true,
         timeFormat: 'H:mm',
         scrollTime: '18:00:00',
