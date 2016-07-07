@@ -388,16 +388,16 @@ def add_event(request):
         # Default start time is 8pm (shouldn't this be a setting?)
         time = request.GET.get('time', "20:00")
         time = time.split(":")
-        duration = request.GET.get('duration', "1:00")
-        duration = duration.split(":")
+        # Default duration is one hour:
+        duration = request.GET.get('duration', "3600")
 
-        if len(duration) != 2 or len(time) != 2 or len(date) != 3:
-            return HttpResponse("Invalid start date, time or duration",
+        if len(time) != 2 or len(date) != 3:
+            return HttpResponse("Invalid start date or time",
                 status=400, content_type="text/plain")
         try:
             date = [int(n, 10) for n in date]
             time = [int(n, 10) for n in time]
-            duration = [int(n, 10) for n in duration]
+            duration = datetime.timedelta(seconds=int(duration, 10))
             event_start = timezone.get_current_timezone().localize(
                 datetime.datetime(hour=time[0], minute=time[1],
                                   day=date[0], month=date[1], year=date[2])
@@ -407,7 +407,10 @@ def add_event(request):
                                 content_type="text/plain")
 
         # Create form, render template:
-        form = diary_forms.NewEventForm(initial={'start': event_start})
+        form = diary_forms.NewEventForm(initial={
+            'start': event_start,
+            'duration': duration,
+        })
         context = {'form': form}
         return render(request, 'form_new_event_and_showing.html', context)
 
