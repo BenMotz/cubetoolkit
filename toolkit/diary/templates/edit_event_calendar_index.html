@@ -127,6 +127,7 @@ $(document).ready(function() {
         openEffect: 'none',
         closeEffect: 'none',
         afterClose: function() {
+            calendar.fullCalendar('unselect');
             calendar.fullCalendar('refetchEvents');
         },
         iframe : {
