@@ -34,6 +34,20 @@ Event diary
         max-height: 500px;
         margin: auto;
   }
+  div.messages {
+      display: none;
+      position: fixed;
+      top: 10px;
+      left: 20%;
+      width: 60%;
+      border: thin solid black;
+      background: white;
+      z-index: 100;
+      padding: 10px;
+  }
+  .messages ul {
+      margin: 0;
+  }
 </style>
 {% endblock %}
 
@@ -45,11 +59,14 @@ Event diary
 
 <script type="text/javascript">
 $(document).ready(function() {
+    var FLASH_MESSAGE_DISPLAY_TIME = 3000;
+    var FLASH_MESSAGE_FADE_TIME = 1500;
     var add_event_url = "{% url "add-event" %}";
     var calendar = $('#calendar');
     var fb_target = $("#fb_target");
     var currentDate = $.fullCalendar.moment('{{ display_time|date:"Y-m-d" }}');
     var currentView = "{{ defaultView }}"
+    var clearMessageTimer = null;
 
     /* Dirty hack to ensure popups is true: */
     $.getJSON('{% url "set_edit_preferences" %}', {
@@ -67,6 +84,45 @@ $(document).ready(function() {
         fb_target.attr('href', calEvent.url);
         fb_target.click();
         return false;
+    }
+
+    function showMessages() {
+        // Get 'flash' messages, put thim in a div, show them for a few seconds
+        $.getJSON('{% url "get-messages" %}', function(data) {
+            var message_html = '';
+            var message_div = $("div.messages");
+
+            if(data.length === 0) {
+                return;
+            }
+
+            try {
+                for(var i = 0; i < data.length; i++) {
+                    message_html += '<li class="' + data[i].tags + '">'
+                                    + data[i].message + '</li>';
+                }
+            } catch (e) {
+                console.log("Failed processing messages: " + e
+                            + " (data: '" + data + '"');
+                return;
+            }
+            $(".messages ul").html(message_html);
+
+            message_div.show()
+
+            if(clearMessageTimer !== null) {
+                window.clearTimeout(clearMessageTimer);
+            }
+
+            clearMessageTimer = window.setTimeout(function() {
+                message_div.fadeOut(FLASH_MESSAGE_FADE_TIME);
+                clearMessageTimer = null;
+            }, FLASH_MESSAGE_DISPLAY_TIME);
+
+            message_div.off('click').click(function() {
+                message_div.hide();
+            });
+        });
     }
 
     function onDayClick(date) {
@@ -129,6 +185,7 @@ $(document).ready(function() {
         afterClose: function() {
             calendar.fullCalendar('unselect');
             calendar.fullCalendar('refetchEvents');
+            showMessages();
         },
         iframe : {
             preload: false
@@ -180,6 +237,7 @@ $(document).ready(function() {
 {% endblock %}
 
 {% block body %}
+<div class="messages"><ul></ul></div>
 <a style="display: none;" class="fancybox" data-fancybox-type="iframe" id="fb_target" href="http://cubecinema.com/"></a>
 <p id="controls">
 <a href="{% url "add-event" %}" id="new-booking-link">New booking</a><br>

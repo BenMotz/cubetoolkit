@@ -949,6 +949,19 @@ def edit_showing_rota_notes(request, showing_id):
     return HttpResponse(escape(response), content_type="text/plain")
 
 
+# Doesn't need permission check, as will only return messages for the current
+# user:
+def get_messages(request):
+    message_list = [{
+            'message': m.message,
+            'tags': m.tags,
+            'level': m.level
+        }  for m in messages.get_messages(request)]
+
+    return HttpResponse(json.dumps(message_list),
+                        content_type="application/json")
+
+
 @permission_required('toolkit.write')
 def view_force_error(request):
     raise AssertionError("Forced exception")
