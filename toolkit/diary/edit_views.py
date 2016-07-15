@@ -121,9 +121,9 @@ def edit_diary_list(request, year=None, day=None, month=None):
     # This is done so that if dates don't have ideas/showings they still get
     # shown in the list
     dates = OrderedDict()
-    ideas = {startdate: ''}  # Actually, I lied: start of visible list is not
-                             # neccesarily the 1st of the month, so make sure
-                             # that it gets an 'IDEAS' link shown
+    # Actually, I lied: start of visible list is not necessarily the 1st of the
+    # month, so make sure that it gets an 'IDEAS' link shown:
+    ideas = {startdate: ''}
     for days in xrange(days_ahead):
         # Iterate through every date in the visible range, creating a dict
         # entry for each
@@ -167,6 +167,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
     context['edit_prefs'] = edit_prefs.get_preferences(request.session)
     return render(request, 'edit_event_index.html', context)
 
+
 @permission_required('toolkit.read')
 def edit_diary_data(request):
     date_format = "%Y-%m-%d"
@@ -176,7 +177,6 @@ def edit_diary_data(request):
         end_raw = request.GET.get('end', None)
         start = datetime.datetime.strptime(start_raw, date_format)
         end = datetime.datetime.strptime(end_raw, date_format)
-        print start,end
     except ValueError:
         logger.error(
             u"Invalid value in date range, one of start '{0}' or end, '{1}"
@@ -398,7 +398,7 @@ def add_event(request):
 
         if len(time) != 2 or len(date) != 3:
             return HttpResponse("Invalid start date or time",
-                status=400, content_type="text/plain")
+                                status=400, content_type="text/plain")
         try:
             date = [int(n, 10) for n in date]
             time = [int(n, 10) for n in time]
@@ -956,7 +956,7 @@ def get_messages(request):
             'message': m.message,
             'tags': m.tags,
             'level': m.level
-        }  for m in messages.get_messages(request)]
+        } for m in messages.get_messages(request)]
 
     return HttpResponse(json.dumps(message_list),
                         content_type="application/json")
