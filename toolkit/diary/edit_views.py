@@ -583,15 +583,32 @@ def edit_ideas(request, year=None, month=None):
         form = diary_forms.DiaryIdeaForm(request.POST, instance=instance)
         if form.is_valid():
             form.save()
-            messages.add_message(request, messages.SUCCESS, u"Updated ideas for {0}/{1}".format(month, year))
-            return _return_to_editindex(request)
+            if request.POST.get('source') == 'inline':
+                return HttpResponse(escape(form.cleaned_data['ideas']), content_type="text/plain")
+            else:
+                messages.add_message(request, messages.SUCCESS, u"Updated ideas for {0}/{1}".format(month, year))
+                return _return_to_editindex(request)
     else:
         form = diary_forms.DiaryIdeaForm(instance=instance)
 
     context['form'] = form
     context['month'] = instance.month
 
-    return render(request, 'form_idea.html', context)
+    http_accept = request.META.get('HTTP_ACCEPT')
+    # This is technically incorrect, as they could be listed with q=0, but
+    # in practice it's goog enough:
+    if "application/json" in http_accept or "text/javascript" in http_accept:
+        if request.method == 'POST':
+            response = {}
+        else:
+            response = {
+                'month': instance.month.isoformat(),
+                'ideas': escape(instance.ideas)
+            }
+        return HttpResponse(json.dumps(response),
+                    content_type="application/json; charset=utf-8")
+    else:
+        return render(request, 'form_idea.html', context)
 
 
 @permission_required('toolkit.write')

@@ -28,6 +28,8 @@ Event diary
       position: absolute;
       left: 10px;
       top: 10px;
+      z-index: 50;
+      background: white;
   }
   #calendar {
         max-width: 1000px;
@@ -48,6 +50,9 @@ Event diary
   .messages ul {
       margin: 0;
   }
+  .idea {
+      white-space: pre-wrap;
+  }
 </style>
 {% endblock %}
 
@@ -56,6 +61,7 @@ Event diary
 <script src='{{ STATIC_URL }}diary/js/lib/fullcalendar/lib/moment.min.js'></script>
 <script src='{{ STATIC_URL }}diary/js/lib/fullcalendar/fullcalendar.min.js'></script>
 <script src='{{ STATIC_URL }}diary/js/lib/fancybox/jquery.fancybox.js'></script>
+<script src="{{ STATIC_URL }}js/lib/jquery.jeditable.mini.js"></script>
 
 <script type="text/javascript">
 $(document).ready(function() {
@@ -84,6 +90,48 @@ $(document).ready(function() {
         fb_target.attr('href', calEvent.url);
         fb_target.click();
         return false;
+    }
+
+    function showIdeas(intervalStart) {
+        var year = intervalStart.year();
+        var month = intervalStart.month() + 1;
+
+        $.getJSON('/diary/edit/ideas/' + year + '/' + month + '/',
+            function(data) {
+                // Data is available from the context, but pull it from the
+                // response anyway.
+                var monthMoment = moment(data.month, "YYYY-MM-DD");
+                var month = monthMoment.month() + 1;
+                var year = monthMoment.year();
+                var edit_control_id = 'ideas-' + (+year) + '-' + (+month);
+                var edit_control_html = '<p>Ideas for ' + year + '/'
+                    + month + ': <div class="idea" id="' + edit_control_id
+                    + '">' + data.ideas + '</div></p>';
+
+                $('#ideas').html(edit_control_html);
+
+                // This isn't currently enforced server-side!
+                if (!monthMoment.isBefore(moment(), 'month')) {
+                    $('#' + edit_control_id).editable(
+                        '/diary/edit/ideas/' + year + '/' + month + '/',
+                        {
+                            width: "5cm",
+                            name: 'ideas',
+                            placeholder: 'Click to add ideas',
+                            submit: "Save",
+                            type: 'textarea',
+                            rows: 5,
+                            width: "90%",
+                            submitdata: {
+                                csrfmiddlewaretoken: "{{ csrf_token }}",
+                                source: 'inline',
+                            }
+                        }
+                    );
+                }
+            }
+        );
+
     }
 
     function showMessages() {
@@ -176,8 +224,8 @@ $(document).ready(function() {
         }
         currentView = view.name;
         currentDate = newDate;
+        showIdeas(view.intervalStart);
     }
-
 
     fb_target.fancybox({
         openEffect: 'none',
@@ -246,5 +294,5 @@ $(document).ready(function() {
 <a href="{% url "logout" %}">Log out</a>
 </p>
 <div id='calendar'></div>
+<div id='ideas'></div>
 {% endblock %}
-
