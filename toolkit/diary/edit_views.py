@@ -594,7 +594,7 @@ def edit_ideas(request, year=None, month=None):
     context['form'] = form
     context['month'] = instance.month
 
-    http_accept = request.META.get('HTTP_ACCEPT')
+    http_accept = request.META.get('HTTP_ACCEPT', "")
     # This is technically incorrect, as they could be listed with q=0, but
     # in practice it's goog enough:
     if "application/json" in http_accept or "text/javascript" in http_accept:
