@@ -23,18 +23,39 @@ Event diary
   .s_cancelled div.fc-title {
      text-decoration: line-through;
   }
+  #flex-container {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      /* along the horizontal (flex) axis */
+      justify-content: center;
+      /* what to do on the current non flex (cross) axis) for each item */
+      align-items: stretch;
+      /* for each non-flex (cross) axis, what to do */
+      align-content: flex-start;
+  }
   #controls {
-      padding: 10px;
-      position: absolute;
-      left: 10px;
-      top: 10px;
-      z-index: 50;
+      display: flex;
+      flex-grow: 1;
       background: white;
+      /* border: thin solid black; */
+  }
+  #ideas-container {
+      display: flex;
+      flex-grow: 1;
+      flex-basis: 98%;
+      background: white;
+      /* border: thin solid black; */
+  }
+  #calendar-container {
+      display: flex;
+      flex-basis: 80%;
+      flex-grow: 1;
   }
   #calendar {
-        max-width: 1000px;
-        max-height: 500px;
-        margin: auto;
+      display: block;
+      margin: auto;
+      /* border: thin solid black; */
   }
   div.messages {
       display: none;
@@ -121,7 +142,7 @@ $(document).ready(function() {
                             submit: "Save",
                             type: 'textarea',
                             rows: 5,
-                            width: "90%",
+                            width: "auto",
                             submitdata: {
                                 csrfmiddlewaretoken: "{{ csrf_token }}",
                                 source: 'inline',
@@ -287,12 +308,20 @@ $(document).ready(function() {
 {% block body %}
 <div class="messages"><ul></ul></div>
 <a style="display: none;" class="fancybox" data-fancybox-type="iframe" id="fb_target" href="http://cubecinema.com/"></a>
-<p id="controls">
+<div id="flex-container">
+<div id="controls">
+<p>
 <a href="{% url "add-event" %}" id="new-booking-link">New booking</a><br>
 <a href="{% url "default-edit" %}">Linear diary</a><br>
 <a href="{% url "toolkit-index" %}">Toolkit home</a><br>
 <a href="{% url "logout" %}">Log out</a>
 </p>
+</div>
+<div id='calendar-container'>
 <div id='calendar'></div>
+</div>
+<div id='ideas-container'>
 <div id='ideas'></div>
+</div>
+</div>
 {% endblock %}
