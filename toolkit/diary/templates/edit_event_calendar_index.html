@@ -1,15 +1,14 @@
 {% extends "base.html" %}
-{% load hash_filter %}
 
 {% block title %}
 Event diary
 {% endblock %}
 
 {% block css %}
-<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
+<link rel="stylesheet" href="{{ STATIC_URL }}css/messages.css">
 <link rel='stylesheet' href='{{ STATIC_URL }}diary/js/lib/fullcalendar/fullcalendar.min.css' />
 <link rel="stylesheet" href="{{ STATIC_URL }}diary/js/lib/fancybox/jquery.fancybox.css" />
-<style type="text/css">
+<style>
   @import url('{{ STATIC_URL }}css/lib/smoothness/jquery-ui.css');
   .s_private {
       font-style: italic;
@@ -83,225 +82,20 @@ Event diary
 <script src='{{ STATIC_URL }}diary/js/lib/fullcalendar/fullcalendar.min.js'></script>
 <script src='{{ STATIC_URL }}diary/js/lib/fancybox/jquery.fancybox.js'></script>
 <script src="{{ STATIC_URL }}js/lib/jquery.jeditable.mini.js"></script>
+<script src="{{ STATIC_URL }}diary/js/calendar_index.js"></script>
 
 <script type="text/javascript">
-$(document).ready(function() {
-    var FLASH_MESSAGE_DISPLAY_TIME = 3000;
-    var FLASH_MESSAGE_FADE_TIME = 1500;
-    var add_event_url = "{% url "add-event" %}";
-    var calendar = $('#calendar');
-    var fb_target = $("#fb_target");
-    var currentDate = $.fullCalendar.moment('{{ display_time|date:"Y-m-d" }}');
-    var currentView = "{{ defaultView }}"
-    var clearMessageTimer = null;
-
-    /* Dirty hack to ensure popups is true: */
-    $.getJSON('{% url "set_edit_preferences" %}', {
-        "daysahead" : "365",
-        "popups" : "true"
-    });
-
-    $('#new-booking-link').click(function(){
-        fb_target.attr('href', '{% url "add-event" %}');
-        fb_target.click();
-        return false;
-    });
-
-    function onEventClick(calEvent, jsEvent, view) {
-        fb_target.attr('href', calEvent.url);
-        fb_target.click();
-        return false;
-    }
-
-    function showIdeas(intervalStart) {
-        var year = intervalStart.year();
-        var month = intervalStart.month() + 1;
-
-        $.getJSON('/diary/edit/ideas/' + year + '/' + month + '/',
-            function(data) {
-                // Data is available from the context, but pull it from the
-                // response anyway.
-                var monthMoment = moment(data.month, "YYYY-MM-DD");
-                var month = monthMoment.month() + 1;
-                var year = monthMoment.year();
-                var edit_control_id = 'ideas-' + (+year) + '-' + (+month);
-                var edit_control_html = '<p>Ideas for ' + year + '/'
-                    + month + ': <div class="idea" id="' + edit_control_id
-                    + '">' + data.ideas + '</div></p>';
-
-                $('#ideas').html(edit_control_html);
-
-                // This isn't currently enforced server-side!
-                if (!monthMoment.isBefore(moment(), 'month')) {
-                    $('#' + edit_control_id).editable(
-                        '/diary/edit/ideas/' + year + '/' + month + '/',
-                        {
-                            width: "5cm",
-                            name: 'ideas',
-                            placeholder: 'Click to add ideas',
-                            submit: "Save",
-                            type: 'textarea',
-                            rows: 5,
-                            width: "auto",
-                            submitdata: {
-                                csrfmiddlewaretoken: "{{ csrf_token }}",
-                                source: 'inline',
-                            }
-                        }
-                    );
-                }
-            }
-        );
-
-    }
-
-    function showMessages() {
-        // Get 'flash' messages, put thim in a div, show them for a few seconds
-        $.getJSON('{% url "get-messages" %}', function(data) {
-            var message_html = '';
-            var message_div = $("div.messages");
-
-            if(data.length === 0) {
-                return;
-            }
-
-            try {
-                for(var i = 0; i < data.length; i++) {
-                    message_html += '<li class="' + data[i].tags + '">'
-                                    + data[i].message + '</li>';
-                }
-            } catch (e) {
-                console.log("Failed processing messages: " + e
-                            + " (data: '" + data + '"');
-                return;
-            }
-            $(".messages ul").html(message_html);
-
-            message_div.show()
-
-            if(clearMessageTimer !== null) {
-                window.clearTimeout(clearMessageTimer);
-            }
-
-            clearMessageTimer = window.setTimeout(function() {
-                message_div.fadeOut(FLASH_MESSAGE_FADE_TIME);
-                clearMessageTimer = null;
-            }, FLASH_MESSAGE_DISPLAY_TIME);
-
-            message_div.off('click').click(function() {
-                message_div.hide();
-            });
-        });
-    }
-
-    function onDayClick(date) {
-        if(date.isBefore(moment())) {
-            return;
-        }
-        if(date.hasTime()) {
-            // User clicked on a timeslot in week / day view: this is handled
-            // by onSelect, so do nothing
-            return;
-        }
-        var url = add_event_url + "?date=" + date.format("D-M-YYYY");
-        fb_target.attr('href', url);
-        fb_target.click();
-    }
-
-    function onSelect(start, end) {
-        var url = add_event_url + "?date=" + start.format("D-M-YYYY");
-        // Don't allow new events in the past. This is also enforced
-        // server-side.
-        if(start.isBefore(moment())) {
-            calendar.fullCalendar('unselect');
-            return;
-        }
-        if(start.hasTime() && end.hasTime()) {
-            // User clicked on a timeslot in week / day view
-            url += "&time=" + start.format("H:m");
-            url += "&duration=" + (end.unix() - start.unix());
-        };
-        fb_target.attr('href', url);
-        fb_target.click();
-    }
-
-    function onViewRender(view, element) {
-        var newDate = calendar.fullCalendar('getDate');
-        if(view.name === 'month') {
-            var newUrl = '{% url "diary-edit-calendar" %}/' + newDate.year()
-                         + '/' + (newDate.month() + 1) + '/';
-
-            if(!currentDate.isSame(newDate, 'month') || (currentView != view.name)) {
-                history.replaceState(null, document.title, newUrl);
-            }
-        } else if(view.name === "agendaWeek") {
-            var newUrl = '{% url "diary-edit-calendar" %}/' + newDate.year()
-                         + '/' + (newDate.month() + 1)
-                         + '/' + newDate.date();
-
-            if(!currentDate.isSame(newDate, 'day') || (currentView != view.name)) {
-                history.replaceState(null, document.title, newUrl);
-            }
-        }
-        currentView = view.name;
-        currentDate = newDate;
-        showIdeas(view.intervalStart);
-    }
-
-    fb_target.fancybox({
-        openEffect: 'none',
-        closeEffect: 'none',
-        afterClose: function() {
-            calendar.fullCalendar('unselect');
-            calendar.fullCalendar('refetchEvents');
-            showMessages();
-        },
-        iframe : {
-            preload: false
-        }
-    });
-
-
-    calendar.fullCalendar({
-        header: {
-            left: 'prev,next today',
-            center: 'title',
-            right: 'month,agendaWeek'
-        },
-        allDaySlot: false,
-        defaultDate: '{{ display_time|date:"Y-m-d" }}',
-        defaultView: '{{ defaultView }}',
-        editable: false,
-        selectable: true,
-        selectHelper: true,
-        // Force events to a single day. It is valid to have a duration > 24hr,
-        // but historically we've not done that to indicate multi-day events,
-        // so nothing else is expecting it.
-        selectConstraint: {
-            start: '0:00',
-            end: '23:59'
-        },
-        select: onSelect,
-        eventLimit: true,
-        timeFormat: 'H:mm',
-        scrollTime: '18:00:00',
-        nowIndicator: true,
-        // The server will provide localised time. Don't mess with them:
-        timezone: false,
-        views: {
-            agenda: {
-                scrollTime: '10:00:00'
-            },
-            month: {
-                scrollTime: '10:00:00'
-            }
-        },
-        events: '{% url "edit-diary-data" %}',
-        eventClick: onEventClick,
-        dayClick: onDayClick,
-        viewRender: onViewRender
-    });
-});
+var urls = {
+    'add-event': '{% url "add-event" %}',
+    'get-messages': '{% url "get-messages" %}',
+    'diary-edit-calendar': '{% url "diary-edit-calendar" %}',
+    'edit-diary-data': '{% url "edit-diary-data" %}'
+};
+init_calendar_view(jQuery,
+                   '{{ csrf_token }}',
+                   '{{ defaultView }}',
+                   '{{ display_time|date:"Y-m-d" }}',
+                   urls);
 </script>
 {% endblock %}
 
