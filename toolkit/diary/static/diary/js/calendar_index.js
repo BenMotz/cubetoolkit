@@ -217,11 +217,6 @@ function init_calendar_view(jQuery, CSRF_TOKEN, defaultView, defaultDate, django
     }
 
     $(document).ready(function() {
-        /* Dirty hack to ensure popups is true: */
-        /*$.getJSON('{% url "set_edit_preferences" %}', {
-            "daysahead" : "365",
-            "popups" : "true"
-        }); */
         var fb_target;
 
         init_fancybox();

@@ -91,6 +91,10 @@ var urls = {
     'diary-edit-calendar': '{% url "diary-edit-calendar" %}',
     'edit-diary-data': '{% url "edit-diary-data" %}'
 };
+
+// Slightly dirty hack to ensure popups is true, so iframes close correctly
+$.getJSON('{% url "set_edit_preferences" %}', {"popups" : "true"});
+
 init_calendar_view(jQuery,
                    '{{ csrf_token }}',
                    '{{ defaultView }}',

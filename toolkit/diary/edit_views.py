@@ -49,8 +49,12 @@ def _return_to_editindex(request):
         return HttpResponse("<!DOCTYPE html><html>"
                             "<head><title>-</title></head>"
                             "<body onload='"
+                            # Close if in a popup window:
                             "try{self.close();}catch(e){}"
+                            # Close if in a fancybox:
                             "try{parent.$.fancybox.close();}catch(e){}"
+                            # If there's an opener, make it reload to show
+                            # edits:
                             "try{opener.location.reload(true);}catch(e){}"
                             "'>Ok</body>"
                             "</html>")
