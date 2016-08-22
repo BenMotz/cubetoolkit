@@ -602,13 +602,10 @@ def edit_ideas(request, year=None, month=None):
     # This is technically incorrect, as they could be listed with q=0, but
     # in practice it's goog enough:
     if "application/json" in http_accept or "text/javascript" in http_accept:
-        if request.method == 'POST':
-            response = {}
-        else:
-            response = {
-                'month': instance.month.isoformat(),
-                'ideas': escape(instance.ideas) if instance.ideas else None,
-            }
+        response = {
+            'month': instance.month.isoformat(),
+            'ideas': escape(instance.ideas) if instance.ideas else None,
+        }
         return HttpResponse(json.dumps(response),
                     content_type="application/json; charset=utf-8")
     else:

@@ -63,6 +63,8 @@ class ViewSecurity(DiaryTestsMixin, TestCase):
 
     only_read_required = {
         "default-edit": {},
+        "diary-edit-calendar": {},
+        "edit-diary-data": {},
         "year-edit": {"year": "2013"},
         "month-edit": {"year": "2013", "month": "1"},
         "day-edit": {"year": "2013", "month": "1", "day": "1"},
@@ -168,6 +170,12 @@ class EditDiaryViews(DiaryTestsMixin, TestCase):
         # self.assertIn(u'Event one title', response.content)
         # self.assertIn(u'<p>Event one copy</p>', response.content)
         self.assertEqual(response.status_code, 200)
+
+    def test_view_calendar(self):
+        url = reverse("diary-edit-calendar")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "edit_event_calendar_index.html")
 
     def test_view_tag_editor(self):
         url = reverse("edit_event_tags")
@@ -1116,6 +1124,27 @@ class EditIdeasViewTests(DiaryTestsMixin, TestCase):
         # With no content:
         self.assertIsNone(idea.ideas)
 
+    def test_get_json_no_existing_ideas(self):
+        # Confirm no ideas in the database for Jan 2012:
+        self.assertQuerysetEqual(DiaryIdea.objects.all().filter(month=date(2012, 1, 1)), [])
+
+        # Get the corresponding edit form:
+        url = reverse("edit-ideas", kwargs={"year": 2012, "month": 1})
+        response = self.client.get(url,
+                HTTP_ACCEPT="Accept: application/xml;q=0.9, */*;q=0.8, application/json")
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data, {
+            u"ideas": None,
+            u'month': u'2012-01-01',
+        })
+        self.assertTemplateNotUsed(response, "form_idea.html")
+
+        # There should now be a Jan 2012 entry in the DB:
+        idea = DiaryIdea.objects.get(month=date(2012, 1, 1))
+        # With no content:
+        self.assertIsNone(idea.ideas)
+
     def test_get_form_existing_ideas(self):
         # Ensure there's something in the DB for Jan 2012:
         idea, created = DiaryIdea.objects.get_or_create(month=date(2012, 1, 1))
@@ -1130,6 +1159,27 @@ class EditIdeasViewTests(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_idea.html")
 
         self.assertContains(response, u"An ide\u0113 f\u014d\u0159 some \u20acvent")
+
+    def test_get_json_existing_idea(self):
+        # Ensure there's something in the DB for Jan 2012:
+        idea, created = DiaryIdea.objects.get_or_create(month=date(2012, 1, 1))
+        self.assertTrue(created)  # Not strictly necessary
+        idea.ideas = u"An ide\u0113 f\u014d\u0159 some \u20acvent"
+        idea.save()
+
+        # Get the corresponding edit form:
+        url = reverse("edit-ideas", kwargs={"year": 2012, "month": 1})
+        response = self.client.get(url,
+                HTTP_ACCEPT="Accept: application/xml;q=0.9, */*;q=0.8, application/json")
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual(response["Content-Type"],
+            "application/json; charset=utf-8")
+        self.assertEqual(response_data, {
+            u"ideas": u"An ide\u0113 f\u014d\u0159 some \u20acvent",
+            u'month': u'2012-01-01',
+        })
+        self.assertTemplateNotUsed(response, "form_idea.html")
 
     def test_post_form_no_existing_idea(self):
         # Confirm no ideas in the database for Jan 2012:
@@ -1167,6 +1217,30 @@ class EditIdeasViewTests(DiaryTestsMixin, TestCase):
         self.assertEqual(idea.ideas, u"An ide\u0113 f\u014d\u0159 some \u20acvent")
 
         self.assert_return_to_index(response)
+
+    def test_post_inline_existing_idea(self):
+        # Ensure there's something in the DB for Jan 2012:
+        idea, created = DiaryIdea.objects.get_or_create(month=date(2012, 1, 1))
+        self.assertTrue(created)  # Not strictly necessary
+        idea.ideas = u"Any old junk, which shall be overwritten"
+        idea.save()
+
+        new_idea = u"An ide\u0113 f\u014d\u0159 some \u20acvent"
+
+        # Post an idea to the corresponding edit form:
+        url = reverse("edit-ideas", kwargs={"year": 2012, "month": 1})
+        response = self.client.post(url, data={
+            "ideas": new_idea,
+            "source": u"inline",
+        })
+
+        # Check that's made it into the database:
+        idea, created = DiaryIdea.objects.get_or_create(month=date(2012, 1, 1))
+        self.assertFalse(created)
+        self.assertEqual(idea.ideas, new_idea)
+
+        self.assertEqual(response["Content-Type"], "text/plain")
+        self.assertEqual(response.content, new_idea.encode("utf8"))
 
 
 class ViewEventFieldTests(DiaryTestsMixin, TestCase):
