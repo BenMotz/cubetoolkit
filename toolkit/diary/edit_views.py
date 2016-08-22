@@ -603,7 +603,7 @@ def edit_ideas(request, year=None, month=None):
         else:
             response = {
                 'month': instance.month.isoformat(),
-                'ideas': escape(instance.ideas)
+                'ideas': escape(instance.ideas) if instance.ideas else None,
             }
         return HttpResponse(json.dumps(response),
                     content_type="application/json; charset=utf-8")

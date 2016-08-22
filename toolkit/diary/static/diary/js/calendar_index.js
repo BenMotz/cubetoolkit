@@ -19,27 +19,24 @@ function init_calendar_view(jQuery, CSRF_TOKEN, defaultView, defaultDate, django
     }
 
     function showIdeas(intervalStart) {
-        var year = intervalStart.year();
-        var month = intervalStart.month() + 1;
-
-        $.getJSON('/diary/edit/ideas/' + year + '/' + month + '/',
+        $.getJSON('/diary/edit/ideas/' + intervalStart.format("YYYY/M/"),
             function(data) {
-                // Data is available from the context, but pull it from the
-                // response anyway.
+                // Data is available from intervalStart in the context, but
+                // pull it from the response anyway.
                 var monthMoment = moment(data.month, "YYYY-MM-DD");
-                var month = monthMoment.month() + 1;
-                var year = monthMoment.year();
-                var edit_control_id = 'ideas-' + (+year) + '-' + (+month);
-                var edit_control_html = '<p>Ideas for ' + year + '/'
-                    + month + ': <div class="idea" id="' + edit_control_id
-                    + '">' + data.ideas + '</div></p>';
+                var edit_control_id = 'ideas-' + monthMoment.format("YYYY-M");
+                var edit_control_html = '<p>Ideas for '
+                    + monthMoment.format("MMMM YYYY")
+                    + ': <div class="idea" id="' + edit_control_id + '">'
+                    + (data.ideas !== null ? data.ideas : '')
+                    + '</div></p>';
 
                 $('#ideas').html(edit_control_html);
 
                 // XXX: This isn't currently enforced server-side!
                 if (!monthMoment.isBefore(moment(), 'month')) {
                     $('#' + edit_control_id).editable(
-                        '/diary/edit/ideas/' + year + '/' + month + '/',
+                        "/diary/edit/ideas/" + monthMoment.format("YYYY/M/"),
                         {
                             width: "5cm",
                             name: 'ideas',
