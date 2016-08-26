@@ -130,7 +130,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
             ideas[day_in_range.date()] = ''
     # Now insert all the showings into the 'dates' dict
     for showing in showings:
-        dates[showing.start.date()].append(showing)
+        dates[timezone.localtime(showing.start).date()].append(showing)
     # Dates without a showing will still be in the dates dict, so will still
     # be shown
 
