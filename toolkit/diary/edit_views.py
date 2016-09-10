@@ -181,9 +181,9 @@ def edit_diary_data(request):
         end_raw = request.GET.get('end', None)
         start = datetime.datetime.strptime(start_raw, date_format)
         end = datetime.datetime.strptime(end_raw, date_format)
-    except ValueError:
+    except (ValueError, TypeError):
         logger.error(
-            u"Invalid value in date range, one of start '{0}' or end, '{1}"
+            u"Invalid value in date range, one of start '{0}' or end, '{1}'"
             .format(start_raw, end_raw)
         )
         raise Http404("Invalid request")
@@ -204,11 +204,10 @@ def edit_diary_data(request):
         # in the past, show the event information (which should have edit links
         # disabled, when I get around to it)
         if showing.start >= local_now:
-            url = reverse("edit-showing", kwargs={'showing_id': showing.pk}),
+            url = reverse("edit-showing", kwargs={'showing_id': showing.pk})
         else:
             url = reverse("edit-event-details-view",
                           kwargs={'pk': showing.event_id})
-
         styles = []
 
         if showing.cancelled:
@@ -241,15 +240,19 @@ def edit_diary_data(request):
 @permission_required('toolkit.read')
 def edit_diary_calendar(request, year=None, month=None, day=None):
     defaultView = "month"
-    if year and month and day:
-        display_time = datetime.date(int(year), int(month), int(day))
-        defaultView = "agendaWeek"
-    elif year and month:
-        display_time = datetime.date(int(year), int(month), 1)
-    elif year and not month:
-        raise Http404("Need year and month")
-    else:
-        display_time = timezone.localtime(timezone.now()).date()
+    try:
+        if year and month and day:
+            display_time = datetime.date(int(year), int(month), int(day))
+            defaultView = "agendaWeek"
+        elif year and month:
+            display_time = datetime.date(int(year), int(month), 1)
+        elif year and not month:
+            raise Http404("Need year and month")
+        else:
+            display_time = timezone.localtime(timezone.now()).date()
+    except ValueError as ve:
+        logger.error("Bad calendar date: %s" % ve)
+        raise Http404("Bad calendar date")
 
     context = {
         'display_time': display_time,
