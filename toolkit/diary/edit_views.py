@@ -214,7 +214,7 @@ def edit_diary_data(request):
             styles.append("s_cancelled")
         if showing.discounted:
             styles.append("s_discounted")
-        if showing.event.private:
+        if showing.event.private or showing.hide_in_programme:
             styles.append("s_private")
         if showing.event.outside_hire:
             styles.append("s_outside_hire")
