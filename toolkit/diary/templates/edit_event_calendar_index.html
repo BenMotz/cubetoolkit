@@ -13,8 +13,12 @@ Event diary
   .s_private {
       font-style: italic;
   }
-  .s_external {
+  .s_outside_hire {
       font-weight: bold;
+      font-family: sans-serif;
+  }
+  .fc-content {
+      /* font-family: sans-serif; */
   }
   .s_discounted div.fc-title::after {
       content: " TTT";
@@ -114,6 +118,14 @@ init_calendar_view(jQuery,
 <a href="{% url "default-edit" %}">Linear diary</a><br>
 <a href="{% url "toolkit-index" %}">Toolkit home</a><br>
 <a href="{% url "logout" %}">Log out</a>
+<br>
+<br>Key:<br>
+<span style="background-color: {{ settings.CALENDAR_CONFIRMED_IN_FUTURE_COLOUR }}">Confirmed</span><br>
+<span style="background-color: {{ settings.CALENDAR_UNCONFIRMED_COLOUR }}">Unconfirmed</span><br>
+<span style="background-color: {{ settings.CALENDAR_CONFIRMED_IN_PAST_COLOUR }}">Historic</span><br>
+<span class="s_private">Private/Hidden</span><br>
+<span class="s_outside_hire">Outside hires</span><br>
+<span style=" text-decoration: line-through;">Cancelled</span><br>
 </p>
 </div>
 <div id='calendar-container'>

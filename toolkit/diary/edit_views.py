@@ -219,9 +219,11 @@ def edit_diary_data(request):
         if showing.event.outside_hire:
             styles.append("s_outside_hire")
         if showing.confirmed:
-            color = "#FF9080" if showing.in_past() else "#C70040"
+            color = (settings.CALENDAR_CONFIRMED_IN_PAST_COLOUR
+                     if showing.in_past()
+                     else settings.CALENDAR_CONFIRMED_IN_FUTURE_COLOUR)
         else:
-            color = "#E0CFCF"
+            color = settings.CALENDAR_UNCONFIRMED_COLOUR
 
         results.append({
             'id': showing.pk,
@@ -257,6 +259,7 @@ def edit_diary_calendar(request, year=None, month=None, day=None):
     context = {
         'display_time': display_time,
         'defaultView': defaultView,
+        'settings': settings,
     }
 
     return render(request, 'edit_event_calendar_index.html', context)
