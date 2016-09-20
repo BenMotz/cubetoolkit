@@ -24,17 +24,20 @@ function init_calendar_view(jQuery, CSRF_TOKEN, defaultView, defaultDate, django
                 // Data is available from intervalStart in the context, but
                 // pull it from the response anyway.
                 var monthMoment = moment(data.month, "YYYY-MM-DD");
+                var historic = monthMoment.isBefore(moment(), 'month');
                 var edit_control_id = 'ideas-' + monthMoment.format("YYYY-M");
-                var edit_control_html = '<p>Ideas for '
+                var edit_control_html = '<h3>Ideas for '
                     + monthMoment.format("MMMM YYYY")
-                    + ': <div class="idea" id="' + edit_control_id + '">'
+                    + ':</h3> <div class="idea'
+                    + (historic ? '-historic' : '')
+                    + '" id="' + edit_control_id + '">'
                     + (data.ideas !== null ? data.ideas : '')
                     + '</div></p>';
 
                 $('#ideas').html(edit_control_html);
 
                 // XXX: This isn't currently enforced server-side!
-                if (!monthMoment.isBefore(moment(), 'month')) {
+                if (!historic) {
                     $('#' + edit_control_id).editable(
                         django_urls["edit-ideas"] + monthMoment.format("YYYY/M/"),
                         {
