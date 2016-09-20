@@ -19,7 +19,7 @@ function init_calendar_view(jQuery, CSRF_TOKEN, defaultView, defaultDate, django
     }
 
     function showIdeas(intervalStart) {
-        $.getJSON('/diary/edit/ideas/' + intervalStart.format("YYYY/M/"),
+        $.getJSON(django_urls["edit-ideas"] + intervalStart.format("YYYY/M/"),
             function(data) {
                 // Data is available from intervalStart in the context, but
                 // pull it from the response anyway.
@@ -36,7 +36,7 @@ function init_calendar_view(jQuery, CSRF_TOKEN, defaultView, defaultDate, django
                 // XXX: This isn't currently enforced server-side!
                 if (!monthMoment.isBefore(moment(), 'month')) {
                     $('#' + edit_control_id).editable(
-                        "/diary/edit/ideas/" + monthMoment.format("YYYY/M/"),
+                        django_urls["edit-ideas"] + monthMoment.format("YYYY/M/"),
                         {
                             width: "5cm",
                             name: 'ideas',

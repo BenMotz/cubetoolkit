@@ -89,7 +89,8 @@ var urls = {
     'add-event': '{% url "add-event" %}',
     'get-messages': '{% url "get-messages" %}',
     'diary-edit-calendar': '{% url "diary-edit-calendar" %}',
-    'edit-diary-data': '{% url "edit-diary-data" %}'
+    'edit-diary-data': '{% url "edit-diary-data" %}',
+    'edit-ideas': '{% url "edit-ideas" year=9999 month=0 %}'.replace("/9999/0", "")
 };
 
 // Slightly dirty hack to ensure popups is true, so iframes close correctly
