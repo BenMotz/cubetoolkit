@@ -1626,10 +1626,14 @@ class DiaryDataViewTests(DiaryTestsMixin, TestCase):
         UNCONFIRMED = "#E0CFCF"
 
         url = reverse("edit-diary-data")
-        response = self.client.get(url, data={
-            "start": "2013-02-15",
-            "end": "2013-09-13",
-        })
+        with self.settings(
+                CALENDAR_CONFIRMED_IN_PAST_COLOUR=CONFIRMED_IN_PAST,
+                CALENDAR_CONFIRMED_IN_FUTURE_COLOUR=CONFIRMED_IN_FUTURE,
+                CALENDAR_UNCONFIRMED_COLOUR=UNCONFIRMED):
+            response = self.client.get(url, data={
+                "start": "2013-02-15",
+                "end": "2013-09-13",
+            })
 
         self.assertEqual(response.status_code, 200)
 
@@ -1672,7 +1676,7 @@ class DiaryDataViewTests(DiaryTestsMixin, TestCase):
             },
             4: {
                 "id": 4,
-                "className": [],
+                "className": ['s_private'],
                 "color": CONFIRMED_IN_PAST,
                 "end": "2013-04-04T20:30:00+01:00",
                 "start": "2013-04-04T19:00:00+01:00",
@@ -1681,9 +1685,7 @@ class DiaryDataViewTests(DiaryTestsMixin, TestCase):
             },
             5: {
                 "id": 5,
-                "className": [
-                    "s_cancelled"
-                ],
+                "className": ["s_cancelled", "s_private"],
                 "color": CONFIRMED_IN_PAST,
                 "end": "2013-04-05T20:30:00+01:00",
                 "start": "2013-04-05T19:00:00+01:00",
@@ -1710,9 +1712,7 @@ class DiaryDataViewTests(DiaryTestsMixin, TestCase):
             },
             10: {
                 "id": 10,
-                "className": [
-                    "s_outside_hire"
-                ],
+                "className": ["s_private", "s_outside_hire"],
                 "color": CONFIRMED_IN_PAST,
                 "end": "2013-02-15T19:30:00+00:00",
                 "start": "2013-02-15T18:00:00+00:00",
