@@ -21,7 +21,5 @@ djcelery.setup_loader()
 # Point Django to settings file:
 os.environ['DJANGO_SETTINGS_MODULE'] = 'toolkit.settings'
 
-import django.core.handlers.wsgi
-application = django.core.handlers.wsgi.WSGIHandler()
-
-
+from django.core.wsgi import get_wsgi_application
+application = get_wsgi_application()
