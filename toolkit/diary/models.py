@@ -13,8 +13,6 @@ from django.utils.safestring import mark_safe
 from django.db.models.query import QuerySet
 from django.utils.text import slugify
 
-from south.modelsinspector import add_introspection_rules
-
 from toolkit.diary.validators import validate_in_future
 import toolkit.util.image as imagetools
 
@@ -28,11 +26,6 @@ class FutureDateTimeField(models.DateTimeField):
         'invalid': 'Date may not be in the past',
     }
     default_validators = [validate_in_future]
-
-# Having defined a custom field, need to tell South that it doesn't need to do
-# anything special when creating/applying database migrations:
-add_introspection_rules([], [r"^toolkit\.diary\.models\.FutureDateTimeField"])
-
 
 class Role(models.Model):
     name = models.CharField(max_length=64, unique=True)
