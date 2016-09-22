@@ -339,21 +339,6 @@ class ShowingQuerySet(QuerySet):
         return self.filter(confirmed=True)
 
 
-class ShowingManager(models.Manager):
-    """
-    Glue class to allow the ShowingQuerySet to be transparently used with the
-    Showing model
-    """
-    def get_query_set(self):
-        return ShowingQuerySet(self.model, using=self._db)
-
-    def __getattr__(self, name):
-        try:
-            return getattr(self.__class__, name)
-        except AttributeError:
-            return getattr(self.get_query_set(), name)
-
-
 class Showing(models.Model):
 
     event = models.ForeignKey('Event', related_name='showings')
@@ -383,7 +368,7 @@ class Showing(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     # Custom manager, with some extra methods:
-    objects = ShowingManager()
+    objects = ShowingQuerySet.as_manager()
 
     class Meta:
         db_table = 'Showings'
@@ -598,7 +583,8 @@ class RotaEntry(models.Model):
             logger.info(u"Cloning rota entry from existing rota entry with role_id {0}".format(template.role.pk))
 
 
-class PrintedProgrammeManager(models.Manager):
+#class PrintedProgrammeManager(models.Manager):
+class PrintedProgrammeQuerySet(QuerySet):
     def month_in_range(self, start, end):
         """Select printed programmes for months in given range"""
         # The idea being that even if 'start' is some day after the first of
@@ -615,7 +601,7 @@ class PrintedProgramme(models.Model):
     designer = models.CharField(max_length=256, null=True, blank=True)
     notes = models.TextField(max_length=8192, null=True, blank=True)
 
-    objects = PrintedProgrammeManager()
+    objects = PrintedProgrammeQuerySet.as_manager()
 
     class Meta:
         db_table = 'PrintedProgrammes'
