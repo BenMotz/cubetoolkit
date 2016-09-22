@@ -48,7 +48,15 @@ def _return_to_editindex(request):
         # page.
         return HttpResponse("<!DOCTYPE html><html>"
                             "<head><title>-</title></head>"
-                            "<body onload='self.close(); opener.location.reload(true);'>Ok</body>"
+                            "<body onload='"
+                            # Close if in a popup window:
+                            "try{self.close();}catch(e){}"
+                            # Close if in a fancybox:
+                            "try{parent.$.fancybox.close();}catch(e){}"
+                            # If there's an opener, make it reload to show
+                            # edits:
+                            "try{opener.location.reload(true);}catch(e){}"
+                            "'>Ok</body>"
                             "</html>")
     else:
         # Redirect to edit index
@@ -117,9 +125,9 @@ def edit_diary_list(request, year=None, day=None, month=None):
     # This is done so that if dates don't have ideas/showings they still get
     # shown in the list
     dates = OrderedDict()
-    ideas = {startdate: ''}  # Actually, I lied: start of visible list is not
-                             # neccesarily the 1st of the month, so make sure
-                             # that it gets an 'IDEAS' link shown
+    # Actually, I lied: start of visible list is not necessarily the 1st of the
+    # month, so make sure that it gets an 'IDEAS' link shown:
+    ideas = {startdate: ''}
     for days in xrange(days_ahead):
         # Iterate through every date in the visible range, creating a dict
         # entry for each
@@ -162,6 +170,99 @@ def edit_diary_list(request, year=None, day=None, month=None):
     context['end'] = enddatetime
     context['edit_prefs'] = edit_prefs.get_preferences(request.session)
     return render(request, 'edit_event_index.html', context)
+
+
+@permission_required('toolkit.read')
+def edit_diary_data(request):
+    date_format = "%Y-%m-%d"
+
+    try:
+        start_raw = request.GET.get('start', None)
+        end_raw = request.GET.get('end', None)
+        start = datetime.datetime.strptime(start_raw, date_format)
+        end = datetime.datetime.strptime(end_raw, date_format)
+    except (ValueError, TypeError):
+        logger.error(
+            u"Invalid value in date range, one of start '{0}' or end, '{1}'"
+            .format(start_raw, end_raw)
+        )
+        raise Http404("Invalid request")
+
+    current_tz = timezone.get_current_timezone()
+    start_in_tz = current_tz.localize(start)
+    end_in_tz = current_tz.localize(end)
+
+    showings = (Showing.objects.start_in_range(start_in_tz, end_in_tz)
+                               .order_by('start')
+                               .select_related())
+
+    local_now = timezone.localtime(timezone.now())
+
+    results = []
+    for showing in showings:
+        # For showings in the future, go to the edit showing page, for showings
+        # in the past, show the event information (which should have edit links
+        # disabled, when I get around to it)
+        if showing.start >= local_now:
+            url = reverse("edit-showing", kwargs={'showing_id': showing.pk})
+        else:
+            url = reverse("edit-event-details-view",
+                          kwargs={'pk': showing.event_id})
+        styles = []
+
+        if showing.cancelled:
+            styles.append("s_cancelled")
+        if showing.discounted:
+            styles.append("s_discounted")
+        if showing.event.private or showing.hide_in_programme:
+            styles.append("s_private")
+        if showing.event.outside_hire:
+            styles.append("s_outside_hire")
+        if showing.confirmed:
+            color = (settings.CALENDAR_CONFIRMED_IN_PAST_COLOUR
+                     if showing.in_past()
+                     else settings.CALENDAR_CONFIRMED_IN_FUTURE_COLOUR)
+        else:
+            color = settings.CALENDAR_UNCONFIRMED_COLOUR
+
+        results.append({
+            'id': showing.pk,
+            'title': showing.event.name,
+            'start': timezone.localtime(showing.start).isoformat(),
+            'end': timezone.localtime(showing.end_time).isoformat(),
+            'url': url,
+            'className': styles,
+            'color': color,
+        })
+
+    return HttpResponse(json.dumps(results),
+                        content_type="application/json; charset=utf-8")
+
+
+@permission_required('toolkit.read')
+def edit_diary_calendar(request, year=None, month=None, day=None):
+    defaultView = "month"
+    try:
+        if year and month and day:
+            display_time = datetime.date(int(year), int(month), int(day))
+            defaultView = "agendaWeek"
+        elif year and month:
+            display_time = datetime.date(int(year), int(month), 1)
+        elif year and not month:
+            raise Http404("Need year and month")
+        else:
+            display_time = timezone.localtime(timezone.now()).date()
+    except ValueError as ve:
+        logger.error("Bad calendar date: %s" % ve)
+        raise Http404("Bad calendar date")
+
+    context = {
+        'display_time': display_time,
+        'defaultView': defaultView,
+        'settings': settings,
+    }
+
+    return render(request, 'edit_event_calendar_index.html', context)
 
 
 @permission_required('toolkit.read')
@@ -292,24 +393,39 @@ def add_event(request):
             return render(request, 'form_new_event_and_showing.html', context)
 
     elif request.method == 'GET':
-        # GET: Show form blank, with date filled in from GET date parameter:
-        # Marshal date out of the GET request:
+        # GET: Show form blank, with date filled in from GET date and start
+        # parameters:
+        # Marshal date and time out of the GET request:
         default_date = django.utils.timezone.now().date() + datetime.timedelta(1)
         date = request.GET.get('date', default_date.strftime("%d-%m-%Y"))
         date = date.split("-")
-        if len(date) != 3:
-            return HttpResponse("Invalid start date", status=400, content_type="text/plain")
+
+        # Default start time is 8pm (shouldn't this be a setting?)
+        time = request.GET.get('time', "20:00")
+        time = time.split(":")
+        # Default duration is one hour:
+        duration = request.GET.get('duration', "3600")
+
+        if len(time) != 2 or len(date) != 3:
+            return HttpResponse("Invalid start date or time",
+                                status=400, content_type="text/plain")
         try:
-            date[0] = int(date[0], 10)
-            date[1] = int(date[1], 10)
-            date[2] = int(date[2], 10)
+            date = [int(n, 10) for n in date]
+            time = [int(n, 10) for n in time]
+            duration = datetime.timedelta(seconds=int(duration, 10))
             event_start = timezone.get_current_timezone().localize(
-                datetime.datetime(hour=20, minute=0, day=date[0], month=date[1], year=date[2])
+                datetime.datetime(hour=time[0], minute=time[1],
+                                  day=date[0], month=date[1], year=date[2])
             )
         except (ValueError, TypeError):
-            return HttpResponse("Illegal date", status=400, content_type="text/plain")
+            return HttpResponse("Illegal time, date or duration", status=400,
+                                content_type="text/plain")
+
         # Create form, render template:
-        form = diary_forms.NewEventForm(initial={'start': event_start})
+        form = diary_forms.NewEventForm(initial={
+            'start': event_start,
+            'duration': duration,
+        })
         context = {'form': form}
         return render(request, 'form_new_event_and_showing.html', context)
 
@@ -477,15 +593,29 @@ def edit_ideas(request, year=None, month=None):
         form = diary_forms.DiaryIdeaForm(request.POST, instance=instance)
         if form.is_valid():
             form.save()
-            messages.add_message(request, messages.SUCCESS, u"Updated ideas for {0}/{1}".format(month, year))
-            return _return_to_editindex(request)
+            if request.POST.get('source') == 'inline':
+                return HttpResponse(escape(form.cleaned_data['ideas']), content_type="text/plain")
+            else:
+                messages.add_message(request, messages.SUCCESS, u"Updated ideas for {0}/{1}".format(month, year))
+                return _return_to_editindex(request)
     else:
         form = diary_forms.DiaryIdeaForm(instance=instance)
 
     context['form'] = form
     context['month'] = instance.month
 
-    return render(request, 'form_idea.html', context)
+    http_accept = request.META.get('HTTP_ACCEPT', "")
+    # This is technically incorrect, as they could be listed with q=0, but
+    # in practice it's goog enough:
+    if "application/json" in http_accept or "text/javascript" in http_accept:
+        response = {
+            'month': instance.month.isoformat(),
+            'ideas': escape(instance.ideas) if instance.ideas else None,
+        }
+        return HttpResponse(json.dumps(response),
+                    content_type="application/json; charset=utf-8")
+    else:
+        return render(request, 'form_idea.html', context)
 
 
 @permission_required('toolkit.write')
@@ -841,6 +971,19 @@ def edit_showing_rota_notes(request, showing_id):
     response = escape(showing.rota_notes)
 
     return HttpResponse(escape(response), content_type="text/plain")
+
+
+# Doesn't need permission check, as will only return messages for the current
+# user:
+def get_messages(request):
+    message_list = [{
+            'message': m.message,
+            'tags': m.tags,
+            'level': m.level
+        } for m in messages.get_messages(request)]
+
+    return HttpResponse(json.dumps(message_list),
+                        content_type="application/json")
 
 
 @permission_required('toolkit.write')

@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+
+{% block title %}
+Event diary
+{% endblock %}
+
+{% block css %}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/messages.css">
+<link rel='stylesheet' href='{{ STATIC_URL }}diary/js/lib/fullcalendar/fullcalendar.min.css' />
+<link rel="stylesheet" href="{{ STATIC_URL }}diary/js/lib/fancybox/jquery.fancybox.css" />
+<style>
+  @import url('{{ STATIC_URL }}css/lib/smoothness/jquery-ui.css');
+  .s_private {
+      font-style: italic;
+  }
+  .s_outside_hire {
+      font-weight: bold;
+      font-family: sans-serif;
+  }
+  .fc-content {
+      /* font-family: sans-serif; */
+  }
+  .s_discounted div.fc-title::after {
+      content: " TTT";
+  }
+  .s_cancelled div.fc-title {
+     text-decoration: line-through;
+  }
+  #flex-container {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      /* along the horizontal (flex) axis */
+      justify-content: center;
+      /* what to do on the current non flex (cross) axis) for each item */
+      align-items: stretch;
+      /* for each non-flex (cross) axis, what to do */
+      align-content: flex-start;
+  }
+  #controls {
+      display: flex;
+      flex-grow: 1;
+      background: white;
+      /* border: thin solid black; */
+  }
+  #ideas-container {
+      display: flex;
+      flex-grow: 1;
+      flex-basis: 98%;
+      background: white;
+      /* border: thin solid black; */
+  }
+  #calendar-container {
+      display: flex;
+      flex-basis: 80%;
+      flex-grow: 1;
+  }
+  #calendar {
+      display: block;
+      margin: auto;
+      /* border: thin solid black; */
+  }
+  div.messages {
+      display: none;
+      position: fixed;
+      top: 10px;
+      left: 20%;
+      width: 60%;
+      border: thin solid black;
+      background: white;
+      z-index: 100;
+      padding: 10px;
+  }
+  .messages ul {
+      margin: 0;
+  }
+  .idea {
+      white-space: pre-wrap;
+      cursor: pointer;
+  }
+  .idea-historic {
+      white-space: pre-wrap;
+  }
+</style>
+{% endblock %}
+
+{% block script %}
+<script src='{{ STATIC_URL }}diary/js/lib/fullcalendar/lib/jquery.min.js'></script>
+<script src='{{ STATIC_URL }}diary/js/lib/fullcalendar/lib/moment.min.js'></script>
+<script src='{{ STATIC_URL }}diary/js/lib/fullcalendar/fullcalendar.min.js'></script>
+<script src='{{ STATIC_URL }}diary/js/lib/fancybox/jquery.fancybox.js'></script>
+<script src="{{ STATIC_URL }}js/lib/jquery.jeditable.mini.js"></script>
+<script src="{{ STATIC_URL }}diary/js/calendar_index.js"></script>
+
+<script type="text/javascript">
+var urls = {
+    'add-event': '{% url "add-event" %}',
+    'get-messages': '{% url "get-messages" %}',
+    'diary-edit-calendar': '{% url "diary-edit-calendar" %}',
+    'edit-diary-data': '{% url "edit-diary-data" %}',
+    'edit-ideas': '{% url "edit-ideas" year=9999 month=0 %}'.replace("/9999/0", "")
+};
+
+// Slightly dirty hack to ensure popups is true, so iframes close correctly
+$.getJSON('{% url "set_edit_preferences" %}', {"popups" : "true"});
+
+init_calendar_view(jQuery,
+                   '{{ csrf_token }}',
+                   '{{ defaultView }}',
+                   '{{ display_time|date:"Y-m-d" }}',
+                   urls);
+</script>
+{% endblock %}
+
+{% block body %}
+<div class="messages"><ul></ul></div>
+<a style="display: none;" class="fancybox" data-fancybox-type="iframe" id="fb_target" href="http://cubecinema.com/"></a>
+<div id="flex-container">
+<div id="controls">
+<p>
+<a href="{% url "add-event" %}" id="new-booking-link">New booking</a><br>
+<a href="{% url "default-edit" %}">Linear diary</a><br>
+<a href="{% url "toolkit-index" %}">Toolkit home</a><br>
+<a href="{% url "logout" %}">Log out</a>
+<br>
+<br>Key:<br>
+<span style="background-color: {{ settings.CALENDAR_CONFIRMED_IN_FUTURE_COLOUR }}">Confirmed</span><br>
+<span style="background-color: {{ settings.CALENDAR_UNCONFIRMED_COLOUR }}">Unconfirmed</span><br>
+<span style="background-color: {{ settings.CALENDAR_CONFIRMED_IN_PAST_COLOUR }}">Historic</span><br>
+<span class="s_private">Private/Hidden</span><br>
+<span class="s_outside_hire">Outside hires</span><br>
+<span style=" text-decoration: line-through;">Cancelled</span><br>
+</p>
+</div>
+<div id='calendar-container'>
+<div id='calendar'></div>
+</div>
+<div id='ideas-container'>
+<div id='ideas'></div>
+</div>
+</div>
+{% endblock %}

@@ -63,6 +63,8 @@ class ViewSecurity(DiaryTestsMixin, TestCase):
 
     only_read_required = {
         "default-edit": {},
+        "diary-edit-calendar": {},
+        "edit-diary-data": {},
         "year-edit": {"year": "2013"},
         "month-edit": {"year": "2013", "month": "1"},
         "day-edit": {"year": "2013", "month": "1", "day": "1"},
@@ -168,6 +170,12 @@ class EditDiaryViews(DiaryTestsMixin, TestCase):
         # self.assertIn(u'Event one title', response.content)
         # self.assertIn(u'<p>Event one copy</p>', response.content)
         self.assertEqual(response.status_code, 200)
+
+    def test_view_calendar(self):
+        url = reverse("diary-edit-calendar")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "edit_event_calendar_index.html")
 
     def test_view_tag_editor(self):
         url = reverse("edit_event_tags")
@@ -610,7 +618,7 @@ class AddEventView(DiaryTestsMixin, TestCase):
     def test_get_add_event_form_specify_invalid_start(self):
         url = reverse("add-event")
         response = self.client.get(url, data={"date": "99-01-1950"})
-        self.assertContains(response, "Illegal date", status_code=400)
+        self.assertContains(response, "Illegal time, date or duration", status_code=400)
 
     @patch('django.utils.timezone.now')
     def test_add_event(self, now_patch):
@@ -1116,6 +1124,27 @@ class EditIdeasViewTests(DiaryTestsMixin, TestCase):
         # With no content:
         self.assertIsNone(idea.ideas)
 
+    def test_get_json_no_existing_ideas(self):
+        # Confirm no ideas in the database for Jan 2012:
+        self.assertQuerysetEqual(DiaryIdea.objects.all().filter(month=date(2012, 1, 1)), [])
+
+        # Get the corresponding edit form:
+        url = reverse("edit-ideas", kwargs={"year": 2012, "month": 1})
+        response = self.client.get(url,
+                HTTP_ACCEPT="Accept: application/xml;q=0.9, */*;q=0.8, application/json")
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual(response_data, {
+            u"ideas": None,
+            u'month': u'2012-01-01',
+        })
+        self.assertTemplateNotUsed(response, "form_idea.html")
+
+        # There should now be a Jan 2012 entry in the DB:
+        idea = DiaryIdea.objects.get(month=date(2012, 1, 1))
+        # With no content:
+        self.assertIsNone(idea.ideas)
+
     def test_get_form_existing_ideas(self):
         # Ensure there's something in the DB for Jan 2012:
         idea, created = DiaryIdea.objects.get_or_create(month=date(2012, 1, 1))
@@ -1130,6 +1159,27 @@ class EditIdeasViewTests(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_idea.html")
 
         self.assertContains(response, u"An ide\u0113 f\u014d\u0159 some \u20acvent")
+
+    def test_get_json_existing_idea(self):
+        # Ensure there's something in the DB for Jan 2012:
+        idea, created = DiaryIdea.objects.get_or_create(month=date(2012, 1, 1))
+        self.assertTrue(created)  # Not strictly necessary
+        idea.ideas = u"An ide\u0113 f\u014d\u0159 some \u20acvent"
+        idea.save()
+
+        # Get the corresponding edit form:
+        url = reverse("edit-ideas", kwargs={"year": 2012, "month": 1})
+        response = self.client.get(url,
+                HTTP_ACCEPT="Accept: application/xml;q=0.9, */*;q=0.8, application/json")
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertEqual(response["Content-Type"],
+            "application/json; charset=utf-8")
+        self.assertEqual(response_data, {
+            u"ideas": u"An ide\u0113 f\u014d\u0159 some \u20acvent",
+            u'month': u'2012-01-01',
+        })
+        self.assertTemplateNotUsed(response, "form_idea.html")
 
     def test_post_form_no_existing_idea(self):
         # Confirm no ideas in the database for Jan 2012:
@@ -1167,6 +1217,30 @@ class EditIdeasViewTests(DiaryTestsMixin, TestCase):
         self.assertEqual(idea.ideas, u"An ide\u0113 f\u014d\u0159 some \u20acvent")
 
         self.assert_return_to_index(response)
+
+    def test_post_inline_existing_idea(self):
+        # Ensure there's something in the DB for Jan 2012:
+        idea, created = DiaryIdea.objects.get_or_create(month=date(2012, 1, 1))
+        self.assertTrue(created)  # Not strictly necessary
+        idea.ideas = u"Any old junk, which shall be overwritten"
+        idea.save()
+
+        new_idea = u"An ide\u0113 f\u014d\u0159 some \u20acvent"
+
+        # Post an idea to the corresponding edit form:
+        url = reverse("edit-ideas", kwargs={"year": 2012, "month": 1})
+        response = self.client.post(url, data={
+            "ideas": new_idea,
+            "source": u"inline",
+        })
+
+        # Check that's made it into the database:
+        idea, created = DiaryIdea.objects.get_or_create(month=date(2012, 1, 1))
+        self.assertFalse(created)
+        self.assertEqual(idea.ideas, new_idea)
+
+        self.assertEqual(response["Content-Type"], "text/plain")
+        self.assertEqual(response.content, new_idea.encode("utf8"))
 
 
 class ViewEventFieldTests(DiaryTestsMixin, TestCase):
@@ -1480,3 +1554,173 @@ class EditTagsViewTests(DiaryTestsMixin, TestCase):
         )
         final_tag_count = EventTag.objects.count()
         self.assertEqual(initial_tag_count, final_tag_count)
+
+
+class DiaryCalendarViewTests(DiaryTestsMixin, TestCase):
+    def setUp(self):
+        super(DiaryCalendarViewTests, self).setUp()
+        self.client.login(username="admin", password="T3stPassword!")
+
+    def test_view_default(self):
+        url = reverse("diary-edit-calendar")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'edit_event_calendar_index.html')
+
+    def test_view_year_month_day(self):
+        url = reverse("diary-edit-calendar") + "/2013/1/30/"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'edit_event_calendar_index.html')
+
+    def test_view_year_month(self):
+        url = reverse("diary-edit-calendar") + "/2013/1/"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'edit_event_calendar_index.html')
+
+    def test_view_year_bad_url(self):
+        url = reverse("diary-edit-calendar") + "/2013/0/"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+        url = reverse("diary-edit-calendar") + "/2013/13/"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+        url = reverse("diary-edit-calendar") + "/fruitbat"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_view_year(self):
+        url = reverse("diary-edit-calendar") + "/2013/"
+        response = self.client.get(url)
+        # Shouldn't work!
+        self.assertEqual(response.status_code, 404)
+
+class DiaryDataViewTests(DiaryTestsMixin, TestCase):
+    def setUp(self):
+        super(DiaryDataViewTests, self).setUp()
+        self.client.login(username="admin", password="T3stPassword!")
+
+    def test_missing_params(self):
+        url = reverse("edit-diary-data")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_invalid_end(self):
+        # Valid start, invalid end
+        url = reverse("edit-diary-data")
+        response = self.client.get(url, data={
+            "start": "2000-01-01",
+            "end": "0"
+        })
+        self.assertEqual(response.status_code, 404)
+
+    @patch('django.utils.timezone.now')
+    def test_valid_query(self, now_patch):
+        now_patch.return_value = self._fake_now
+
+        CONFIRMED_IN_PAST = "#FF9080"
+        CONFIRMED_IN_FUTURE = "#C70040"
+        UNCONFIRMED = "#E0CFCF"
+
+        url = reverse("edit-diary-data")
+        response = self.client.get(url, data={
+            "start": "2013-02-15",
+            "end": "2013-09-13",
+        })
+
+        self.assertEqual(response.status_code, 200)
+
+        data = json.loads(response.content)
+        data_by_showing = { int(i['id']): i for i in data }
+
+        expected_showings = {1,2,3,4,5,6,7,10}
+
+        self.assertEqual(set(data_by_showing.keys()), expected_showings)
+
+        expected_data = {
+            1: {
+                "id": 1,
+                "className": [],
+                "color": UNCONFIRMED,
+                "end": "2013-04-01T20:30:00+01:00",
+                "start": "2013-04-01T19:00:00+01:00",
+                "title": u"Event two title",
+                "url": "/diary/edit/event/id/2/view/"
+            },
+            2: {
+                "id": 2,
+                "className": [],
+                "color": CONFIRMED_IN_PAST,
+                "end": "2013-04-02T20:30:00+01:00",
+                "start": "2013-04-02T19:00:00+01:00",
+                "title": u"Event two title",
+                "url": "/diary/edit/event/id/2/view/"
+            },
+            3: {
+                "id": 3,
+                "className": [
+                    "s_cancelled"
+                ],
+                "color": CONFIRMED_IN_PAST,
+                "end": "2013-04-03T20:30:00+01:00",
+                "start": "2013-04-03T19:00:00+01:00",
+                "title": u"Event two title",
+                "url": "/diary/edit/event/id/2/view/"
+            },
+            4: {
+                "id": 4,
+                "className": [],
+                "color": CONFIRMED_IN_PAST,
+                "end": "2013-04-04T20:30:00+01:00",
+                "start": "2013-04-04T19:00:00+01:00",
+                "title": u"Event two title",
+                "url": "/diary/edit/event/id/2/view/"
+            },
+            5: {
+                "id": 5,
+                "className": [
+                    "s_cancelled"
+                ],
+                "color": CONFIRMED_IN_PAST,
+                "end": "2013-04-05T20:30:00+01:00",
+                "start": "2013-04-05T19:00:00+01:00",
+                "title": u"Event two title",
+                "url": "/diary/edit/event/id/2/view/"
+            },
+            6: {
+                "id": 6,
+                "className": [],
+                "color": CONFIRMED_IN_PAST,
+                "end": "2013-04-13T21:00:00+01:00",
+                "start": "2013-04-13T18:00:00+01:00",
+                "title": u"Event three title",
+                "url": "/diary/edit/event/id/3/view/"
+            },
+            7: {
+                "id": 7,
+                "className": [],
+                "color": CONFIRMED_IN_FUTURE,
+                "end": "2013-06-09T19:00:00+01:00",
+                "start": "2013-06-09T18:00:00+01:00",
+                "title": u"Event four titl\u0113",
+                "url": "/diary/edit/showing/id/7/"
+            },
+            10: {
+                "id": 10,
+                "className": [
+                    "s_outside_hire"
+                ],
+                "color": CONFIRMED_IN_PAST,
+                "end": "2013-02-15T19:30:00+00:00",
+                "start": "2013-02-15T18:00:00+00:00",
+                "title": u"Event one title",
+                "url": "/diary/edit/event/id/1/view/"
+            },
+        }
+
+        for sid in expected_showings:
+            s_data = data_by_showing[sid]
+            self.assertEqual(expected_data[sid], s_data)

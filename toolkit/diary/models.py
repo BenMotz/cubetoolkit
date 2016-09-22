@@ -253,6 +253,9 @@ class Event(models.Model):
     # a smattering of TLDs:
     _link_re_2 = re.compile(r'(\s)(www\.[\w.]+\.(com|org|net|uk|de|ly|us|tk)[^\t\n\r\f\v\. ]*)')
 
+    def all_showings_in_past(self):
+        return all(s.in_past() for s in self.showings.all())
+
     @property
     def copy_html(self):
         """If self.legacy_copy == True, then try to mangle self.copy into
@@ -461,6 +464,12 @@ class Showing(models.Model):
     def start_date(self):
         # Used by templates
         return self.start.date()
+
+    @property
+    def end_time(self):
+        # Used by templates
+        duration = self.event.duration
+        return self.start + datetime.timedelta(hours=duration.hour, minutes=duration.minute)
 
     def in_past(self):
         return self.start < django.utils.timezone.now()

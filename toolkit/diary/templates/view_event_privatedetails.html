@@ -53,7 +53,7 @@ Details for: {{ event.name }}
 <h3>CUBE events diary</h3>
 
 <div id="booking">
-    <h1>Details for {{ event.name }} [<a href="{% url "edit-event-details" event.pk %}">edit</a>]</h1>
+    <h1>Details for {{ event.name }} {% if not event.all_showings_in_past %}[<a href="{% url "edit-event-details" event.pk %}">edit</a>]{% endif %}</h1>
     <p class="d">
     <b>Pre-title:</b> {{event.pre_title }} <br>
     <b>Name:</b>{{ event.name }}<br>
@@ -64,7 +64,11 @@ Details for: {{ event.name }}
     {% endif %}</p>
     <p>
 {% for showing in event.showings.all %}
+    {% if showing.in_past %}
+    Booked for: <span title="Showing has started, can't edit">{{ showing.start|date:"H:i d/m/Y" }} (past)</span><br>
+    {% else %}
     Booked for: <a href="{% url "edit-showing" showing.pk %}">{{ showing.start|date:"H:i d/m/Y"  }}</a><br>
+    {% endif %}
 {% endfor %}
     </p>
     <p><b>Pricing:</b> {{ event.pricing }}
@@ -102,7 +106,7 @@ Details for: {{ event.name }}
 <p class="d"><b>Terms for "{{ event.name }}"</b></p>
 <p class="d pre">{{event.terms}}</p>
 
-<p><a href="{% url "edit-event-details" event.pk %}">[edit]</a></p>
+{% if not event.all_showings_in_past %}<p><a href="{% url "edit-event-details" event.pk %}">[edit]</a></p>{% endif %}
 </div>
 <!-- urgh -->
 <p id="cancel"><a href="{% url "cancel-edit" %}">Back</a></p>

@@ -69,6 +69,10 @@ VOLUNTEER_PORTRAIT_DIR = 'volunteers'
 # programmes can be uploaded
 DAWN_OF_TIME = 1998
 
+# Colours for the calendar view:
+CALENDAR_CONFIRMED_IN_PAST_COLOUR = "#99FF99"
+CALENDAR_CONFIRMED_IN_FUTURE_COLOUR = "#33CC33"
+CALENDAR_UNCONFIRMED_COLOUR = "#E0CFCF"
 ###############################################################################
 #
 # Below here are Django settings
