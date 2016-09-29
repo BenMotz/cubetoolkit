@@ -23,7 +23,7 @@ def staging():
     env.target = "staging"
     env.site_root = "/home/staging/site"
     env.user = "staging"
-    env.hosts = ["sparror.cubecinema.com"]
+    env.hosts = ["cubecinema.com"]
     env.settings = "staging_settings.py"
     # For running manage.py commands use this settings file; this is mostly
     # so that a different logfile can be set, as the deploy user may not have
@@ -36,7 +36,7 @@ def production():
     env.target = "production"
     env.site_root = "/home/toolkit/site"
     env.user = "toolkit"
-    env.hosts = ["sparror.cubecinema.com"]
+    env.hosts = ["cubecinema.com"]
     env.settings = "live_settings.py"
     # See note above:
     env.deploy_script_settings = "toolkit.deploy_settings"
