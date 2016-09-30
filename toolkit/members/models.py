@@ -26,32 +26,30 @@ class MemberManager(models.Manager):
     # A few hard-coded SQL queries to get some of the more complex statistics:
     def get_stat_popular_email_domains(self):
         # Get 10 most popular email domains
-        cursor = django.db.connection.cursor()
-        cursor.execute("SELECT "
-                       "   SUBSTRING_INDEX(`email`, '@', -1) AS domain, "
-                       "   COUNT(1) AS num "
-                       "FROM Members "
-                       "WHERE email != '' "
-                       "GROUP BY domain "
-                       "ORDER BY num DESC "
-                       "LIMIT 10")
-        email_stats = [row for row in cursor.fetchall()]
-        cursor.close()
+        with django.db.connection.cursor() as cursor:
+            cursor.execute("SELECT "
+                           "   SUBSTRING_INDEX(`email`, '@', -1) AS domain, "
+                           "   COUNT(1) AS num "
+                           "FROM Members "
+                           "WHERE email != '' "
+                           "GROUP BY domain "
+                           "ORDER BY num DESC "
+                           "LIMIT 10")
+            email_stats = [row for row in cursor.fetchall()]
         return email_stats
 
     def get_stat_popular_postcode_prefixes(self):
         # Get 10 most popular postcode prefixes
-        cursor = django.db.connection.cursor()
-        cursor.execute("SELECT "
-                       "    SUBSTRING_INDEX(`postcode`, ' ', 1) AS firstbit, "
-                       "     COUNT(1) AS num "
-                       "FROM Members "
-                       "WHERE postcode != '' "
-                       "GROUP BY firstbit "
-                       "ORDER BY num DESC "
-                       "LIMIT 10")
-        postcode_stats = [row for row in cursor.fetchall()]
-        cursor.close()
+        with django.db.connection.cursor() as cursor:
+            cursor.execute("SELECT "
+                           "    SUBSTRING_INDEX(`postcode`, ' ', 1) AS firstbit, "
+                           "     COUNT(1) AS num "
+                           "FROM Members "
+                           "WHERE postcode != '' "
+                           "GROUP BY firstbit "
+                           "ORDER BY num DESC "
+                           "LIMIT 10")
+            postcode_stats = [row for row in cursor.fetchall()]
         return postcode_stats
 
 

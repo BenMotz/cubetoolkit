@@ -13,8 +13,6 @@ from django.utils.safestring import mark_safe
 from django.db.models.query import QuerySet
 from django.utils.text import slugify
 
-from south.modelsinspector import add_introspection_rules
-
 from toolkit.diary.validators import validate_in_future
 import toolkit.util.image as imagetools
 
@@ -28,11 +26,6 @@ class FutureDateTimeField(models.DateTimeField):
         'invalid': 'Date may not be in the past',
     }
     default_validators = [validate_in_future]
-
-# Having defined a custom field, need to tell South that it doesn't need to do
-# anything special when creating/applying database migrations:
-add_introspection_rules([], [r"^toolkit\.diary\.models\.FutureDateTimeField"])
-
 
 class Role(models.Model):
     name = models.CharField(max_length=64, unique=True)
@@ -346,21 +339,6 @@ class ShowingQuerySet(QuerySet):
         return self.filter(confirmed=True)
 
 
-class ShowingManager(models.Manager):
-    """
-    Glue class to allow the ShowingQuerySet to be transparently used with the
-    Showing model
-    """
-    def get_query_set(self):
-        return ShowingQuerySet(self.model, using=self._db)
-
-    def __getattr__(self, name):
-        try:
-            return getattr(self.__class__, name)
-        except AttributeError:
-            return getattr(self.get_query_set(), name)
-
-
 class Showing(models.Model):
 
     event = models.ForeignKey('Event', related_name='showings')
@@ -390,7 +368,7 @@ class Showing(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     # Custom manager, with some extra methods:
-    objects = ShowingManager()
+    objects = ShowingQuerySet.as_manager()
 
     class Meta:
         db_table = 'Showings'
@@ -605,7 +583,8 @@ class RotaEntry(models.Model):
             logger.info(u"Cloning rota entry from existing rota entry with role_id {0}".format(template.role.pk))
 
 
-class PrintedProgrammeManager(models.Manager):
+#class PrintedProgrammeManager(models.Manager):
+class PrintedProgrammeQuerySet(QuerySet):
     def month_in_range(self, start, end):
         """Select printed programmes for months in given range"""
         # The idea being that even if 'start' is some day after the first of
@@ -622,7 +601,7 @@ class PrintedProgramme(models.Model):
     designer = models.CharField(max_length=256, null=True, blank=True)
     notes = models.TextField(max_length=8192, null=True, blank=True)
 
-    objects = PrintedProgrammeManager()
+    objects = PrintedProgrammeQuerySet.as_manager()
 
     class Meta:
         db_table = 'PrintedProgrammes'

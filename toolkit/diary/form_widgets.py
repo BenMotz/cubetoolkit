@@ -2,7 +2,7 @@ from django import forms
 # Widgety:
 from django.utils.safestring import mark_safe
 from django.utils.html import conditional_escape
-from django.forms.util import flatatt
+from django.forms.utils import flatatt
 from django.utils.encoding import force_unicode
 
 
