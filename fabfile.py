@@ -101,18 +101,8 @@ def deploy_media():
     local('rsync -av --delete media/ {0}@{1}:{2}/media'.format(env.user, env.hosts[0], env.site_root))
 
 
-def sync_database():
-    """Run basic database sync - won't touch tables that are being managed by south"""
-    _assert_target_set()
-
-    with cd(env.site_root):
-        utils.puts("Running syncdb")
-        run("venv/bin/python manage.py syncdb --noinput --settings={0}"
-            .format(env.deploy_script_settings))
-
-
 def run_migrations():
-    """Run south to make sure database schema is in sync with the application"""
+    """Run migrations to make sure database schema is in sync with the application"""
 
     _assert_target_set()
 
@@ -229,5 +219,4 @@ def deploy():
     install_requirements()
 
     deploy_static()
-    sync_database()
     run_migrations()
