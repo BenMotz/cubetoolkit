@@ -24,6 +24,7 @@ urlpatterns = patterns(
         write_decorator(generic_edit.UpdateView.as_view(
             model=IndexLink,
             template_name="index_generic_form.html",
+            fields=('text','link','category'),
             success_url=functional.lazy(reverse, str)("toolkit-index"),
         )),
         name='update-index-link'),
@@ -45,6 +46,7 @@ urlpatterns = patterns(
     url('^update/category/(?P<pk>\d+)$',
         write_decorator(generic_edit.UpdateView.as_view(
             model=IndexCategory,
+            fields=('name',),
             template_name="index_generic_form.html",
             success_url=functional.lazy(reverse, str)("toolkit-index"),
         )),
