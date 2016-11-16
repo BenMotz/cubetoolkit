@@ -1,11 +1,11 @@
 import logging
 import urlparse
 
-from django.template.base import Library
+from django import template
 from django.template.defaulttags import url, URLNode
 from django.core.urlresolvers import get_script_prefix
 
-register = Library()
+register = template.Library()
 logger = logging.getLogger(__name__)
 
 class NoPrefixURLNode(URLNode):
