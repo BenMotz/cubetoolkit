@@ -351,7 +351,7 @@ class ArchiveSearch(generic.list.ListView, generic.edit.FormMixin):
         return queryset
 
     def get(self, request):
-        self.form = self.get_form(self.form_class)
+        self.form = self.get_form()
 
         # Rely on functionality from the generic view...
         return super(ArchiveSearch, self).get(request)
