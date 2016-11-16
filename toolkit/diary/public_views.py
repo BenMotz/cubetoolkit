@@ -283,11 +283,7 @@ class ArchiveYear(generic.YearArchiveView):
 
     date_field = 'start'
     template_name = 'showing_archive_year.html'
-
-    def get_dated_queryset(self, *args, **kwargs):
-        kwargs['ordering'] = 'start'
-
-        return super(ArchiveYear, self).get_dated_queryset(*args, **kwargs)
+    ordering = 'start'
 
 
 class ArchiveMonth(generic.MonthArchiveView):
@@ -297,11 +293,7 @@ class ArchiveMonth(generic.MonthArchiveView):
     date_field = 'start'
     template_name = 'showing_archive_month.html'
     month_format = '%m'
-
-    def get_dated_queryset(self, *args, **kwargs):
-        kwargs['ordering'] = 'start'
-
-        return super(ArchiveMonth, self).get_dated_queryset(*args, **kwargs)
+    ordering = 'start'
 
 
 class ArchiveSearch(generic.list.ListView, generic.edit.FormMixin):
