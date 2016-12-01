@@ -199,7 +199,7 @@ class NewEventForm(forms.Form):
 
 
 class MailoutForm(forms.Form):
-    subject = forms.CharField(max_length=128, required=True)
+    subject = forms.CharField(max_length=128, required=True, label_suffix='')
     body = forms.CharField(required=True, widget=forms.Textarea(attrs={'wrap': 'soft', 'cols': 80}))
 
 

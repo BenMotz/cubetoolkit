@@ -29,8 +29,8 @@
 <p>Total of <b>{{ email_count }}</b> member emails to send from cube microplex</p>
 <form method="POST">
     {% csrf_token %}
-    <p><label for="id_subject">{{ form.subject.label }}</label> {{ form.subject.errors }} {{ form.subject }}</p>
-    <h3><label for="id_body">Body of email</label></h3>
+    <p>{{ form.subject.label_tag }} {{ form.subject.errors }} {{ form.subject }}</p>
+    <h3><label for="{{ form.body.id_for_label }}">Body of email</label></h3>
     {{ form.body.errors }}
     {{ form.body }}
     <p><input type="submit" value="Send Mailout"></p>
