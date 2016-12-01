@@ -82,8 +82,8 @@ $(document).ready(function() {
         <canvas id="canvas"></canvas>
         {{ vol_form.image_data }}
     </td></tr>
-    <tr><th><label for="id_vol-portrait">{{ vol_form.portrait.label }}:</label> </th><td> {{ vol_form.portrait.errors }}{{ vol_form.portrait }}</td></tr>
-    <tr><th><label for="id_vol-notes">{{ vol_form.notes.label }}:</label> </th><td> {{ vol_form.notes.errors }}{{ vol_form.notes }}</td></tr>
+    <tr><th>{{ vol_form.portrait.label_tag }}</th><td> {{ vol_form.portrait.errors }}{{ vol_form.portrait }}</td></tr>
+    <tr><th>{{ vol_form.notes.label_tag }}</th><td> {{ vol_form.notes.errors }}{{ vol_form.notes }}</td></tr>
 </table>
 </div>
 <div id="roles">
@@ -91,7 +91,7 @@ $(document).ready(function() {
     <ul>
     {% for c in vol_form.roles.field.queryset %}
     {% ifchanged %}</ul><h3>{{ c.standard|yesno:"Event roles,Other roles" }}</h3><ul>{% endifchanged %}
-    <li{% if c.standard %} class="standard_role"{% endif %}><label for="{{vol_form.roles.auto_id}}_{{ forloop.counter0 }}"><input id="{{vol_form.roles.auto_id}}_{{ forloop.counter0 }}" type="checkbox"  value={{c.id}} name="{{ vol_form.prefix }}-roles" {% if c.id in vol_form.roles.value %}checked {% endif %}/> {{ c }}</label></li> 
+    <li{% if c.standard %} class="standard_role"{% endif %}><label for="{{vol_form.roles.auto_id}}_{{ forloop.counter0 }}"><input id="{{vol_form.roles.auto_id}}_{{ forloop.counter0 }}" type="checkbox"  value={{c.id}} name="{{ vol_form.prefix }}-roles" {% if c.id in vol_form.roles.value %}checked {% endif %}/> {{ c }}</label></li>
     {% endfor %}
     </ul>
 </div>
