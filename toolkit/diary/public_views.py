@@ -3,7 +3,7 @@ import datetime
 import logging
 import calendar
 
-from toolkit.util.ordereddict import OrderedDict
+from collections import OrderedDict
 
 from django.db.models import Q
 from django.http import HttpResponse, Http404

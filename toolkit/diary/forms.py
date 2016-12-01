@@ -10,7 +10,7 @@ from toolkit.diary.form_widgets import (HtmlTextarea, JQueryDateTimePicker,
                                         ChosenSelectMultiple)
 
 import toolkit.diary.models
-from toolkit.util.ordereddict import OrderedDict
+from collections import OrderedDict
 
 from toolkit.diary.validators import validate_in_future
 

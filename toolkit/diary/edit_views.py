@@ -2,7 +2,7 @@ import json
 import datetime
 import logging
 
-from toolkit.util.ordereddict import OrderedDict
+from collections import OrderedDict
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
