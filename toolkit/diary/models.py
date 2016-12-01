@@ -27,11 +27,13 @@ class FutureDateTimeField(models.DateTimeField):
     }
     default_validators = [validate_in_future]
 
+
 class Role(models.Model):
     name = models.CharField(max_length=64, unique=True)
 
     standard = models.BooleanField(default=False,
-                                   help_text="Should this role be presented in the main list of roles for events")
+                                   help_text="Should this role be presented in"
+                                   " the main list of roles for events")
 
     # Allow role to be edited/deleted
     read_only = models.BooleanField(default=False)
@@ -56,7 +58,8 @@ class Role(models.Model):
             return
         elif self._original_read_only and not self.read_only:
             # TODO: Unit test!
-            logger.error(u"Tried to unprotect read-only role {0}".format(self.name))
+            logger.error(u"Tried to unprotect read-only role {0}"
+                         .format(self.name))
             return
         else:
             return super(Role, self).save(*args, **kwargs)
@@ -64,7 +67,8 @@ class Role(models.Model):
     def delete(self, *args, **kwargs):
         # Don't allow read_only roles to be deleted
         if self.pk and self.read_only:
-            logger.error(u"Tried to delete read-only role {0}".format(self.name))
+            logger.error(u"Tried to delete read-only role {0}"
+                         .format(self.name))
             return False
         else:
             return super(Role, self).delete(*args, **kwargs)
@@ -74,11 +78,14 @@ class MediaItem(models.Model):
     """Media (eg. video, audio, html fragment?). Currently to be assoicated
     with events, in future with other things?"""
 
-    media_file = models.ImageField(upload_to="diary", max_length=256, null=True, blank=True, verbose_name='Image file')
+    media_file = models.ImageField(
+        upload_to="diary", max_length=256, null=True, blank=True,
+        verbose_name='Image file')
     mimetype = models.CharField(max_length=64, editable=False)
 
     credit = models.CharField(max_length=256, null=True, blank=True,
-                              default="Internet scavenged", verbose_name='Image credit')
+                              default="Internet scavenged",
+                              verbose_name='Image credit')
     caption = models.CharField(max_length=256, null=True, blank=True)
 
     class Meta:
@@ -105,9 +112,11 @@ class MediaItem(models.Model):
             try:
                 self.mimetype = imagetools.get_mimetype(self.media_file.file)
             except IOError:
-                logger.error(u"Failed to determine mimetype of file {0}".format(self.media_file.name))
+                logger.error(u"Failed to determine mimetype of file {0}"
+                             .format(self.media_file.name))
                 self.mimetype = "application/octet-stream"
-            logger.debug(u"Mime type for {0} detected as {1}".format(self.media_file.name, self.mimetype))
+            logger.debug(u"Mime type for {0} detected as {1}"
+                         .format(self.media_file.name, self.mimetype))
 
 
 class EventTag(models.Model):
@@ -162,7 +171,8 @@ class Event(models.Model):
     legacy_id = models.CharField(max_length=256, null=True, editable=False)
 
     template = models.ForeignKey('EventTemplate', verbose_name='Event Type',
-                                 related_name='template', null=True, blank=True)
+                                 related_name='template',
+                                 null=True, blank=True)
     tags = models.ManyToManyField(EventTag, db_table='Event_Tags', blank=True)
 
     duration = models.TimeField(null=True)
@@ -185,10 +195,15 @@ class Event(models.Model):
     # Following flag is True when the event copy has been imported from the
     # "legacy" toolkit; the bizarre text wrapping will be fixed up before
     # display, regex will be applied to turn http://.* into links, etc.
-    legacy_copy = models.BooleanField(default=False, null=False, editable=False)
+    legacy_copy = models.BooleanField(
+        default=False, null=False, editable=False)
 
-    terms = models.TextField(max_length=4096, default=settings.DEFAULT_TERMS_TEXT, null=True, blank=True)
-    notes = models.TextField(max_length=4096, null=True, blank=True, verbose_name="Programmer's notes")
+    terms = models.TextField(
+        max_length=4096, default=settings.DEFAULT_TERMS_TEXT,
+        null=True, blank=True)
+    notes = models.TextField(
+        max_length=4096, null=True, blank=True,
+        verbose_name="Programmer's notes")
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -220,16 +235,18 @@ class Event(models.Model):
         if self.media.count() == 0:
             return
         media_item = self.media.all()[0]
-        logger.info(u"Removing media file {0} from event {1}".format(media_item, self.pk))
+        logger.info(u"Removing media file {0} from event {1}"
+                    .format(media_item, self.pk))
         self.media.remove(media_item)
-        ## If the media item isn't associated with any events, delete it:
-        ## ACTUALLY: let's keep it. Disk space is cheap, etc.
+        # # If the media item isn't associated with any events, delete it:
+        # # ACTUALLY: let's keep it. Disk space is cheap, etc.
         # if media_item.event_set.count() == 0:
         #    media_item.delete()
 
     def set_main_mediaitem(self, media_file):
         self.clear_main_mediaitem()
-        logger.info(u"Adding media file {0} to event {1}".format(media_file, self.pk))
+        logger.info(u"Adding media file {0} to event {1}"
+                    .format(media_file, self.pk))
         self.media.add(media_file)
 
     def get_main_mediaitem(self):
@@ -242,9 +259,10 @@ class Event(models.Model):
     _lotsofnewlines_re = re.compile(r'\n\n+')
     # Catch well-formatted links (ie. beginning http://)
     _link_re_1 = re.compile(r'(https?:\/\/\S{4,})')
-    # Optimistic stab at spotting other things that are probably links, based on
-    # a smattering of TLDs:
-    _link_re_2 = re.compile(r'(\s)(www\.[\w.]+\.(com|org|net|uk|de|ly|us|tk)[^\t\n\r\f\v\. ]*)')
+    # Optimistic stab at spotting other things that are probably links, based
+    # on a smattering of TLDs:
+    _link_re_2 = re.compile(
+        r'(\s)(www\.[\w.]+\.(com|org|net|uk|de|ly|us|tk)[^\t\n\r\f\v\. ]*)')
 
     def all_showings_in_past(self):
         return all(s.in_past() for s in self.showings.all())
@@ -253,8 +271,8 @@ class Event(models.Model):
     def copy_html(self):
         """If self.legacy_copy == True, then try to mangle self.copy into
         sane HTML fragment. Otherwise return self.copy
-        (Legacy cube copy has line breaks around the 70-80 character mark, and no
-        hyperlinks)"""
+        (Legacy cube copy has line breaks around the 70-80 character mark, and
+        no hyperlinks)"""
 
         if not self.legacy_copy:
             return mark_safe(self.copy)
@@ -264,7 +282,8 @@ class Event(models.Model):
             # Strip out carriage returns:
 
             result = result.strip().replace('\r', '')
-            # Strip out new lines when they occur after 70 other characters (try to fix wrapping)
+            # Strip out new lines when they occur after 70 other characters
+            # (try to fix wrapping)
             result = self._wrap_re.sub(r'\1 ', result)
             # Replace a sequence of 2+ new lines with a double line break;
             result = self._lotsofnewlines_re.sub(' <br><br>', result)
@@ -274,13 +293,15 @@ class Event(models.Model):
 
             # Attempt to magically convert any links to HTML markup:
             result = self._link_re_1.sub(r'<a href="\1">\1</a>', result)
-            result = self._link_re_2.sub(r'\1<a href="http://\2">\2</a>', result)
+            result = self._link_re_2.sub(r'\1<a href="http://\2">\2</a>',
+                                         result)
 
             return mark_safe(result)
 
     # This RE needs to be compiled so that the flags can be specified, as the
     # flags option to re.sub() wasn't added until python 2.7
-    _plaintext_re = re.compile(ur'\[(.*?)\]\((https?://.*?)\)', flags=re.DOTALL)
+    _plaintext_re = re.compile(ur'\[(.*?)\]\((https?://.*?)\)',
+                               flags=re.DOTALL)
 
     @property
     def copy_plaintext(self):
@@ -299,11 +320,13 @@ class Event(models.Model):
             html2text.BODY_WIDTH = 0
             # Don't try to substitute ASCII characters for unicode ones:
             html2text.UNICODE_SNOB = True
-            # **Bold** and _italics_ doesn't look great in members mailout, so don't do it
+            # **Bold** and _italics_ doesn't look great in members mailout, so
+            # don't do it
             html2text.IGNORE_EMPHASIS = True
 
-            # TODO Make email links render to orchestra@orchestra.cubecinema.com
-            # rather than [orchestra@orchestra.cubecinema.com](mailto:orchestra@orchestra.cubecinema.com)
+            # TODO Make email links render to
+            # dest@thing.cubecinema.com rather than
+            # [dest@thing.cubecinema.com](mailto:dest@thing.cubecinema.com)
 
             text = html2text.html2text(self.copy)
             # Convert links from markdown format to just the URL:
@@ -348,7 +371,8 @@ class Showing(models.Model):
     booked_by = models.CharField(max_length=64)
 
     extra_copy = models.TextField(max_length=4096, null=True, blank=True)
-    extra_copy_summary = models.TextField(max_length=4096, null=True, blank=True)
+    extra_copy_summary = models.TextField(max_length=4096, null=True,
+                                          blank=True)
 
     confirmed = models.BooleanField(default=False)
     hide_in_programme = models.BooleanField(default=False)
@@ -392,19 +416,26 @@ class Showing(models.Model):
         super(Showing, self).__init__(*args, **kwargs)
 
         if copy_from:
-            logger.info(u"Cloning showing from existing showing (id {0})".format(copy_from.pk))
+            logger.info(u"Cloning showing from existing showing (id {0})"
+                        .format(copy_from.pk))
             # Manually copy fields, rather than using things from copy library,
             # as don't want to copy the rota (as that would make db writes)
-            attributes_to_copy = ('event', 'start', 'booked_by', 'extra_copy', 'confirmed',
-                                  'hide_in_programme', 'cancelled', 'discounted')
+            attributes_to_copy = ('event', 'start', 'booked_by', 'extra_copy',
+                                  'confirmed', 'hide_in_programme',
+                                  'cancelled', 'discounted')
             for attribute in attributes_to_copy:
                 setattr(self, attribute, getattr(copy_from, attribute))
             if start_offset:
                 self.start += start_offset
 
     def __unicode__(self):
-        if self.start is not None and self.id is not None and self.event is not None:
-            return u"{0} - {1} ({2})".format(self.start.strftime("%H:%M %Z%z %d/%m/%y"), self.event.name, self.id)
+        if (self.start is not None and
+                self.id is not None and
+                self.event is not None):
+            return (u"{0} - {1} ({2})"
+                    .format(self.start.strftime("%H:%M %Z%z %d/%m/%y"),
+                            self.event.name,
+                            self.id))
         else:
             return "[uninitialised]"
 
@@ -422,8 +453,11 @@ class Showing(models.Model):
         force = kwargs.pop('force', False)
         if self.start is not None:
             if self.in_past() and not force:
-                logger.error(u"Tried to update showing {0} with start time {1} in the past".format(self.pk, self.start))
-                raise django.db.IntegrityError("Can't update showings that start in the past")
+                logger.error(u"Tried to update showing {0} with start time "
+                             "{1} in the past"
+                             .format(self.pk, self.start))
+                raise django.db.IntegrityError(
+                    "Can't update showings that start in the past")
         return super(Showing, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
@@ -432,8 +466,10 @@ class Showing(models.Model):
         # this, but this will stop the forms deleting records.
         if self.start is not None:
             if self.in_past():
-                logger.error(u"Tried to delete showing {0} with start time {1} in the past".format(self.pk, self.start))
-                raise django.db.IntegrityError("Can't delete showings that start in the past")
+                logger.error(u"Tried to delete showing {0} with start time "
+                             "{1} in the past".format(self.pk, self.start))
+                raise django.db.IntegrityError(
+                    "Can't delete showings that start in the past")
         return super(Showing, self).delete(*args, **kwargs)
 
     # Extra, custom methods:
@@ -447,14 +483,16 @@ class Showing(models.Model):
     def end_time(self):
         # Used by templates
         duration = self.event.duration
-        return self.start + datetime.timedelta(hours=duration.hour, minutes=duration.minute)
+        return self.start + datetime.timedelta(hours=duration.hour,
+                                               minutes=duration.minute)
 
     def in_past(self):
         return self.start < django.utils.timezone.now()
 
     def reset_rota_to_default(self):
-        """Clear any existing rota entries. If the associated event has an event
-        type defined then apply the default set of rota entries for that type"""
+        """Clear any existing rota entries. If the associated event has an
+        event type defined then apply the default set of rota entries for that
+        type"""
 
         # Delete all existing rota entries (if any)
         self.rotaentry_set.all().delete()
@@ -483,7 +521,8 @@ class Showing(models.Model):
         # Build map of rota entries by role id
         rota_entries_by_id = {}
         for rota_entry in self.rotaentry_set.select_related():
-            rota_entries_by_id.setdefault(rota_entry.role.pk, []).append(rota_entry)
+            rota_entries_by_id.setdefault(
+                    rota_entry.role.pk, []).append(rota_entry)
 
         for role_id, count in rota.iteritems():
             # Number of existing rota entries for this role_id.
@@ -492,17 +531,20 @@ class Showing(models.Model):
             existing_entries = rota_entries_by_id.pop(role_id, [])
             # delete highest ranked instances
             while count < len(existing_entries):
-                logger.info(u"Removing role {0} from showing {1}".format(role_id, self.pk))
+                logger.info(u"Removing role {0} from showing {1}"
+                            .format(role_id, self.pk))
                 highest_ranked = max(existing_entries, key=lambda re: re.rank)
                 highest_ranked.delete()
                 existing_entries.remove(highest_ranked)
             # add required entries
             while count > len(existing_entries):
-                logger.info(u"Adding role {0} to showing {1}".format(role_id, self.pk))
+                logger.info(u"Adding role {0} to showing {1}"
+                            .format(role_id, self.pk))
                 # add rotaentries
                 new_re = RotaEntry(role_id=role_id, showing=self)
                 if len(existing_entries) > 0:
-                    new_re.rank = 1 + max(existing_entries, key=lambda re: re.rank).rank
+                    new_re.rank = (
+                        1 + max(existing_entries, key=lambda re: re.rank).rank)
                 new_re.save()
                 existing_entries.append(new_re)
 
@@ -531,7 +573,8 @@ class EventTemplate(models.Model):
     # Default roles for this event
     roles = models.ManyToManyField(Role, db_table='EventTemplates_Roles')
     # Default tags for this event
-    tags = models.ManyToManyField(EventTag, db_table='EventTemplate_Tags', blank=True)
+    tags = models.ManyToManyField(
+        EventTag, db_table='EventTemplate_Tags', blank=True)
     # Default pricing for this event
     pricing = models.CharField(max_length=256, null=False, blank=True)
 
@@ -580,10 +623,10 @@ class RotaEntry(models.Model):
             self.role = template.role
             self.required = template.required
             self.rank = template.rank
-            logger.info(u"Cloning rota entry from existing rota entry with role_id {0}".format(template.role.pk))
+            logger.info(u"Cloning rota entry from existing rota entry with "
+                        "role_id {0}".format(template.role.pk))
 
 
-#class PrintedProgrammeManager(models.Manager):
 class PrintedProgrammeQuerySet(QuerySet):
     def month_in_range(self, start, end):
         """Select printed programmes for months in given range"""
@@ -597,7 +640,8 @@ class PrintedProgrammeQuerySet(QuerySet):
 class PrintedProgramme(models.Model):
     month = models.DateField(editable=False, unique=True)
     programme = models.FileField(upload_to="printedprogramme", max_length=256,
-                                 null=False, blank=False, verbose_name='Programme PDF')
+                                 null=False, blank=False,
+                                 verbose_name='Programme PDF')
     designer = models.CharField(max_length=256, null=True, blank=True)
     notes = models.TextField(max_length=8192, null=True, blank=True)
 
@@ -607,7 +651,8 @@ class PrintedProgramme(models.Model):
         db_table = 'PrintedProgrammes'
 
     def __unicode__(self):
-        return u"Printed programme for {0}/{1}".format(self.month.month, self.month.year)
+        return u"Printed programme for {0}/{1}".format(self.month.month,
+                                                       self.month.year)
 
     def save(self, *args, **kwargs):
         # Enforce month column always being a date for the first of the month:

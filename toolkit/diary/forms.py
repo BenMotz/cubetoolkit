@@ -80,7 +80,8 @@ class MediaItemForm(forms.ModelForm):
     class Meta(object):
         model = toolkit.diary.models.MediaItem
         widgets = {
-            'media_file': forms.ClearableFileInput(attrs={'accept': 'image/jpeg,image/gif,image/png'}),
+            'media_file': forms.ClearableFileInput(attrs={
+                    'accept': 'image/jpeg,image/gif,image/png'}),
         }
         exclude = ('mimetype', 'caption')
 
@@ -127,22 +128,27 @@ def rota_form_factory(showing):
     # count is 0)
     _role_ids = []
 
-    # Get all rota entries for showing, annotated with the maximum value of "rank" for the role
-    rota_entries = (toolkit.diary.models.Role
-                                        .objects.filter(rotaentry__showing_id=showing.pk)
-                                                .annotate(max_rank=django.db.models.Max('rotaentry__rank')))
+    # Get all rota entries for showing, annotated with the maximum value of
+    # "rank" for the role
+    rota_entries = (
+        toolkit.diary.models.Role
+                            .objects.filter(rotaentry__showing_id=showing.pk)
+                                    .annotate(max_rank=django.db.models.Max('rotaentry__rank')))
 
     # Build dict mapping role ID to max_rank
-    rota_entry_count_by_role = dict((role.pk, role.max_rank) for role in rota_entries)
+    rota_entry_count_by_role = dict(
+        (role.pk, role.max_rank) for role in rota_entries)
 
     for role in roles:
         _role_ids.append(role.pk)
         if role.standard:
             # For each "standard" role, add an Integer field;
             members[u"role_{0}".format(role.pk)] = (
-                forms.IntegerField(min_value=0, max_value=settings.MAX_COUNT_PER_ROLE, required=True, label=role.name,
-                                   initial=rota_entry_count_by_role.get(role.pk, 0),
-                                   widget=forms.TextInput(attrs={'class': 'rota_count'}))
+                forms.IntegerField(
+                    min_value=0, max_value=settings.MAX_COUNT_PER_ROLE,
+                    required=True, label=role.name,
+                    initial=rota_entry_count_by_role.get(role.pk, 0),
+                    widget=forms.TextInput(attrs={'class': 'rota_count'}))
             )
 
     # Add a MultipleChoiceField for all roles that aren't "standard"
@@ -180,17 +186,27 @@ def rota_form_factory(showing):
 class CloneShowingForm(forms.Form):
     # For cloning a showing, so only need very minimal extra details
 
-    clone_start = forms.DateTimeField(required=True, validators=[validate_in_future],
+    clone_start = forms.DateTimeField(required=True,
+                                      validators=[validate_in_future],
                                       widget=JQueryDateTimePicker())
     booked_by = forms.CharField(min_length=1, max_length=128, required=True)
 
 
 class NewEventForm(forms.Form):
-    start = forms.DateTimeField(required=True, validators=[validate_in_future], widget=JQueryDateTimePicker())
-    duration = forms.TimeField(required=True, initial=datetime.time(hour=1))
-    number_of_days = forms.IntegerField(min_value=1, max_value=31, required=True, initial=1)
-    event_name = forms.CharField(min_length=1, max_length=256, required=True)
-    event_template = forms.ModelChoiceField(queryset=toolkit.diary.models.EventTemplate.objects.all(), required=True)
+    start = forms.DateTimeField(
+        required=True,
+        validators=[validate_in_future],
+        widget=JQueryDateTimePicker())
+    duration = forms.TimeField(
+        required=True,
+        initial=datetime.time(hour=1))
+    number_of_days = forms.IntegerField(
+        min_value=1, max_value=31, required=True, initial=1)
+    event_name = forms.CharField(
+        min_length=1, max_length=256, required=True)
+    event_template = forms.ModelChoiceField(
+        queryset=toolkit.diary.models.EventTemplate.objects.all(),
+        required=True)
     booked_by = forms.CharField(min_length=1, max_length=64, required=True)
     private = forms.BooleanField(required=False)
     outside_hire = forms.BooleanField(required=False)
@@ -200,19 +216,23 @@ class NewEventForm(forms.Form):
 
 class MailoutForm(forms.Form):
     subject = forms.CharField(max_length=128, required=True, label_suffix='')
-    body = forms.CharField(required=True, widget=forms.Textarea(attrs={'wrap': 'soft', 'cols': 80}))
+    body = forms.CharField(
+            required=True,
+            widget=forms.Textarea(attrs={'wrap': 'soft', 'cols': 80}))
 
 
 class SearchForm(forms.Form):
     search_term = forms.CharField(label="Search for", required=False)
     start_date = forms.DateTimeField(label="Search from", required=False)
     end_date = forms.DateTimeField(label="Search to", required=False)
-    search_in_descriptions = forms.BooleanField(label="Also search event descriptions", required=False)
+    search_in_descriptions = forms.BooleanField(
+        label="Also search event descriptions", required=False)
 
     def clean(self):
         cleaned_data = super(SearchForm, self).clean()
 
-        # Check that either a search term or a searchh start or end date is supplied:
+        # Check that either a search term or a search start or end date is
+        # supplied:
         if (len(cleaned_data.get('search_term', '').strip()) == 0 and not
                 (cleaned_data.get('start_date') or cleaned_data.get('end_date'))):
             raise forms.ValidationError("Must give either a search term or a date range")
