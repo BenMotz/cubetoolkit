@@ -30,6 +30,9 @@ EMAIL_UNSUBSCRIBE_HOST = "localhost:8000"
 DEBUG = True
 TEMPLATE_DEBUG = True
 
+# Undefine ALLOWED_HOSTS to ensure default loopback addresses work:
+del ALLOWED_HOSTS
+
 # Django toolbar things:
 INTERNAL_IPS = ('127.0.0.1',)
 DEBUG_TOOLBAR_CONFIG = {'INTERCEPT_REDIRECTS': False, }
