@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 import django.utils.functional as functional
 import django.views.generic.edit as generic_edit
 from django.contrib.auth.decorators import permission_required
@@ -8,8 +8,7 @@ from toolkit.index.models import IndexLink, IndexCategory
 
 write_decorator = permission_required('toolkit.write')
 
-urlpatterns = patterns(
-    'toolkit.index.views',
+urlpatterns = [
     # Link edit:
     url('^create/link$',
         write_decorator(generic_edit.CreateView.as_view(
@@ -51,4 +50,4 @@ urlpatterns = patterns(
             success_url=functional.lazy(reverse, str)("toolkit-index"),
         )),
         name='update-index-category'),
-)
+]

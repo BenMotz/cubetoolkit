@@ -1,9 +1,7 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 from django.views.generic import TemplateView
 
-about_urls = patterns(
-    'toolkit.about.views',
-
+about_urls = [
     # About the Cube
     url(r'^$', TemplateView.as_view(template_name='template_about.html'),
         name="about"),
@@ -40,4 +38,4 @@ about_urls = patterns(
     # ReBox
     url(r'^rebox/$', TemplateView.as_view(template_name='template_rebox.html'),
         name="about-rebox"),
-)
+]
