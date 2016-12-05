@@ -1,6 +1,5 @@
 [IMPROVEMENT] -- Use Django 1.8 feature: Use image property of cleaned ImageField: https://docs.djangoproject.com/en/1.8/ref/forms/fields/#django.forms.ImageField
 [IMPROVEMENT] -- Use Django 1.8 feature?: Refresh model from DB: https://docs.djangoproject.com/en/1.8/ref/models/instances/#django.db.models.Model.refresh_from_db
-[IMPROVEMENT] -- Template settings: https://docs.djangoproject.com/en/1.8/releases/1.8/#template-related-settings
 
 [NEWFEATURE] -- Per-tag RSS
 [NEWFEATURE] -- 'subscribe me' UI for members lists
@@ -14,6 +13,7 @@
 [BUG] -- handle errors for saving Event details if image and image is missing
 [QUERY] -- Should cancelled events appear in the mailout by default?
 
+[DONE] -- Template settings: https://docs.djangoproject.com/en/1.8/releases/1.8/#template-related-settings
 [DONE] -- Ditch url patterns and view strings: https://docs.djangoproject.com/en/1.8/releases/1.8/#django-conf-urls-patterns
 [DONE] -- Use Django 1.8 feature: Field label_suffix: https://docs.djangoproject.com/en/1.8/ref/forms/fields/#django.forms.Field.label_suffix
 [DONE] -- Use Django 1.8 feature: ordering for ArchiveYear, etc: https://docs.djangoproject.com/en/1.8/ref/class-based-views/mixins-multiple-object/#django.views.generic.list.MultipleObjectMixin.ordering

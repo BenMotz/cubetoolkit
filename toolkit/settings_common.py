@@ -111,7 +111,6 @@ APPEND_SLASH = True
 # Django settings for cube project.
 ALLOWED_HOSTS = ['.cubecinema.com', ]
 DEBUG = False
-TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -203,34 +202,41 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    # Following introduced in Dango 1.7 (so don't enable it until an upgrade!)
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.contrib.messages.context_processors.messages',
-    'django.core.context_processors.static',
-    'django.contrib.auth.context_processors.auth',
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        # Look for template source files inside installed applications:
+        'APP_DIRS': True,
+        # Put strings here, like "/home/html/django_templates" or
+        # "C:/www/django/templates".  Always use forward slashes, even on
+        # Windows.
+        # Don't forget to use absolute paths, not relative paths.
+        'DIRS': (
+            os.path.join(BASE_DIR, 'templates'),
+        ),
+        'OPTIONS': {
+            'debug': DEBUG,
+            'context_processors': (
+                'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.static',
+                'django.contrib.auth.context_processors.auth',
+            ),
+            # May be worth enabling for improved performance?
+            #'loaders':
+            #    ('django.template.loaders.cached.Loader', (
+            #        'django.template.loaders.filesystem.Loader',
+            #        'django.template.loaders.app_directories.Loader',
+            #    )),
+        }
+    }
+]
 
 ROOT_URLCONF = 'toolkit.urls'
-
-TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-    os.path.join(BASE_DIR, 'templates'),
-)
-
-# May be worth enabling for improved performance?
-#TEMPLATE_LOADERS = (
-#    ('django.template.loaders.cached.Loader', (
-#        'django.template.loaders.filesystem.Loader',
-#        'django.template.loaders.app_directories.Loader',
-#    )),
-#)
 
 INSTALLED_APPS = (
     'toolkit.diary',
