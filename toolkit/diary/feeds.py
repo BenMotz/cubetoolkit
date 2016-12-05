@@ -8,11 +8,12 @@ from toolkit.diary.models import Showing
 
 
 class BasicWhatsOnFeed(Feed):
-    # Generate a, err, basic "What's on" feed. Defines various methods that hook
-    # into the django magic...
+    # Generate a, err, basic "What's on" feed. Defines various methods that
+    # hook into the django magic...
     DAYS_AHEAD = 7
     title = "Cube cinema forthcoming events"
-    description = "Events at the cube cinema over the next %d days. E&OE." % (DAYS_AHEAD, )
+    description = ("Events at the cube cinema over the next %d days. E&OE."
+                   % (DAYS_AHEAD, ))
     link = "/programme"
 
     def items(self):
@@ -29,9 +30,13 @@ class BasicWhatsOnFeed(Feed):
         return showing.event.name
 
     def item_description(self, showing):
-        description = showing.start.strftime("%d/%m/%Y %H:%M<br><br>") + showing.event.copy_html
+        description = (
+            showing.start.strftime("%d/%m/%Y %H:%M<br><br>") +
+            showing.event.copy_html)
         return description
 
     def item_link(self, showing):
-        # Add the showing ID at the end to ensure that this link is unique (cf. RSS spec)
-        return reverse("single-event-view", kwargs={'event_id': showing.event_id})
+        # Add the showing ID at the end to ensure that this link is unique (cf.
+        # RSS spec)
+        return reverse("single-event-view",
+                       kwargs={'event_id': showing.event_id})

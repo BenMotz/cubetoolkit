@@ -8,9 +8,11 @@ from django.core.urlresolvers import get_script_prefix
 register = template.Library()
 logger = logging.getLogger(__name__)
 
+
 class NoPrefixURLNode(URLNode):
     def __init__(self, url_node):
-        super(NoPrefixURLNode, self).__init__(url_node.view_name, url_node.args, url_node.kwargs, url_node.asvar)
+        super(NoPrefixURLNode, self).__init__(
+            url_node.view_name, url_node.args, url_node.kwargs, url_node.asvar)
 
     def render(self, context):
         text = super(NoPrefixURLNode, self).render(context)

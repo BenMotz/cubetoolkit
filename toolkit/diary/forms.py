@@ -47,14 +47,15 @@ class EventForm(forms.ModelForm):
                                 u"or '\u00A30 advance, \u00A30 on the door'"),
                 }),
             'film_information': forms.TextInput(attrs={
-                'placeholder': u"e.g. Dir: [director], 1990, USA, 120 mins, Cert: 15",
+                'placeholder': u"e.g. Dir: [director], 1990, USA, 120 mins, "
+                               u"Cert: 15",
                 }),
             'pre_title': forms.TextInput(attrs={
-                'placeholder': (u"Text displayed before / above the event name, "
-                                u" e.g. 'Cube Productions present'"),
+                'placeholder': (u"Text displayed before / above the event"
+                                u"name, e.g. 'Cube Productions present'"),
                 }),
             'post_title': forms.TextInput(attrs={
-                'placeholder': (u"Text displayed after / below the event name, "
+                'placeholder': (u"Text displayed after / below the event name,"
                                 u" e.g. 'with support from A Band'"),
                 }),
             'tags': ChosenSelectMultiple(width="70%"),
@@ -71,7 +72,8 @@ class EventForm(forms.ModelForm):
             raise forms.ValidationError(
                 u"Copy summary must be {0} characters or fewer (currently {1} "
                 u"characters)".format(
-                    settings.PROGRAMME_COPY_SUMMARY_MAX_CHARS, len(copy_summary)
+                    settings.PROGRAMME_COPY_SUMMARY_MAX_CHARS,
+                    len(copy_summary)
                 ))
         return copy_summary
 
@@ -92,7 +94,8 @@ class MediaItemForm(forms.ModelForm):
             max_MB = settings.PROGRAMME_MEDIA_MAX_SIZE_MB
             if size_MB > max_MB:
                 raise forms.ValidationError(
-                    u"Media file must be {0} MB or less (uploaded file is {1:.2f} MB)"
+                    u"Media file must be {0} MB or less "
+                    u"(uploaded file is {1:.2f} MB)"
                     .format(max_MB, size_MB))
         return media_file
 
@@ -133,7 +136,8 @@ def rota_form_factory(showing):
     rota_entries = (
         toolkit.diary.models.Role
                             .objects.filter(rotaentry__showing_id=showing.pk)
-                                    .annotate(max_rank=django.db.models.Max('rotaentry__rank')))
+                                    .annotate(max_rank=django.db.models.Max(
+                                        'rotaentry__rank')))
 
     # Build dict mapping role ID to max_rank
     rota_entry_count_by_role = dict(
@@ -158,7 +162,8 @@ def rota_form_factory(showing):
         required=False,
         # List of IDs which should be selected:
         initial=(entry.pk for entry in rota_entries),
-        help_text='Hold down "Control", or "Command" on a Mac, to select more than one.'
+        help_text='Hold down "Control", or "Command" on a Mac, to select more '
+                  'than one.'
     )
 
     def get_rota(self):
@@ -170,7 +175,8 @@ def rota_form_factory(showing):
         for field, value in self.cleaned_data.iteritems():
             if field == 'other_roles':
                 result.update(
-                    (int(key, 10), 1) for key in self.cleaned_data.get('other_roles', ())
+                    (int(key, 10), 1) for key in
+                    self.cleaned_data.get('other_roles', ())
                 )
             if field.startswith('role_'):
                 role_id = int(field.split('role_')[1], 10)
@@ -234,8 +240,10 @@ class SearchForm(forms.Form):
         # Check that either a search term or a search start or end date is
         # supplied:
         if (len(cleaned_data.get('search_term', '').strip()) == 0 and not
-                (cleaned_data.get('start_date') or cleaned_data.get('end_date'))):
-            raise forms.ValidationError("Must give either a search term or a date range")
+                (cleaned_data.get('start_date') or
+                 cleaned_data.get('end_date'))):
+            raise forms.ValidationError("Must give either a search term or a "
+                                        "date range")
 
         return cleaned_data
 
@@ -248,7 +256,8 @@ class NewPrintedProgrammeForm(forms.ModelForm):
 
     year = forms.ChoiceField(
         choices=[
-            (y, y) for y in xrange(settings.DAWN_OF_TIME, datetime.date.today().year + 2)
+            (y, y) for y in xrange(settings.DAWN_OF_TIME,
+                                   datetime.date.today().year + 2)
         ],
         initial=datetime.date.today().year
     )
@@ -272,7 +281,8 @@ class NewPrintedProgrammeForm(forms.ModelForm):
                 1
             )
         except (KeyError, ValueError, TypeError):
-            raise forms.ValidationError("Invalid/missing value for year and/or month")
+            raise forms.ValidationError("Invalid/missing value for year "
+                                        "and/or month")
 
         self.instance.month = programme_month
 

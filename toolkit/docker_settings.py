@@ -2,7 +2,7 @@ import os
 
 from toolkit.settings_common import *
 
-ALLOWED_HOSTS=["localhost"]
+ALLOWED_HOSTS = ["localhost"]
 
 DATABASES = {
     'default': {
@@ -32,4 +32,3 @@ ADMINS = (
 )
 
 SERVER_EMAIL = "toolkit_errors@cubecinema.com"
-

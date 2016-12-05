@@ -10,7 +10,8 @@ import django.template
 import django.db
 import django.utils.timezone as timezone
 from django.contrib.auth.decorators import permission_required
-from django.views.decorators.http import require_GET, require_POST, require_http_methods
+from django.views.decorators.http import (require_GET, require_POST,
+                                          require_http_methods)
 from django.conf import settings
 
 from toolkit.diary.models import Showing
@@ -59,7 +60,8 @@ def _render_mailout_body(days_ahead, copy_days_ahead):
 
 
 def _render_mailout_form(request, body_text, subject_text, context):
-    form = diary_forms.MailoutForm(initial={'subject': subject_text, 'body': body_text})
+    form = diary_forms.MailoutForm(initial={'subject': subject_text,
+                                            'body': body_text})
     email_count = (toolkit.members.models.Member.objects.mailout_recipients()
                                                         .count())
     context.update({
@@ -85,7 +87,8 @@ def mailout(request):
 
         try:
             days_ahead = int(request.GET.get('daysahead', days_ahead))
-            copy_days_ahead = int(request.GET.get('copydaysahead', copy_days_ahead))
+            copy_days_ahead = int(
+                    request.GET.get('copydaysahead', copy_days_ahead))
         except ValueError:
             pass
         body_text = _render_mailout_body(days_ahead, copy_days_ahead)
@@ -114,10 +117,11 @@ def exec_mailout(request):
             'status': 'error',
             'errors': dict(form.errors),
         }
-        return HttpResponse(json.dumps(response), content_type="application/json")
+        return HttpResponse(json.dumps(response),
+                            content_type="application/json")
 
-    result = toolkit.members.tasks.send_mailout.delay(form.cleaned_data['subject'],
-                                                      form.cleaned_data['body'])
+    result = toolkit.members.tasks.send_mailout.delay(
+        form.cleaned_data['subject'], form.cleaned_data['body'])
 
     response = HttpResponse(
         json.dumps({'status': 'ok', 'task_id': result.task_id, 'progress': 0}),
@@ -145,7 +149,8 @@ def mailout_progress(request):
             try:
                 progress = int(progress_parts[1])
             except ValueError:
-                logger.error("Invalid progress from async mailout task: {0}".format(state))
+                logger.error("Invalid progress from async mailout task: {0}"
+                             .format(state))
         elif state == "SUCCESS":
             progress = 100
             complete = True
@@ -167,7 +172,8 @@ def mailout_progress(request):
         elif state == "PENDING":
             progress = 0
         else:
-            logger.error(u"Invalid data from async mailout task: {0}".format(state))
+            logger.error(u"Invalid data from async mailout task: {0}"
+                         .format(state))
 
     return HttpResponse(
         json.dumps({

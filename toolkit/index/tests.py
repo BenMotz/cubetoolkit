@@ -22,7 +22,8 @@ class SecurityTests(TestCase):
         }
         for view_name, kwargs in views_to_test.iteritems():
             url = reverse(view_name, kwargs=kwargs)
-            expected_redirect = "{0}?next={1}".format(reverse("django.contrib.auth.views.login"), url)
+            expected_redirect = "{0}?next={1}".format(
+                reverse("django.contrib.auth.views.login"), url)
 
             # Test GET:
             response = self.client.get(url)
@@ -54,12 +55,14 @@ class TestViews(TestCase):
         l2.category = cat2
         l2.save()
 
-        l3 = IndexLink(text="THIRD LINK", link="http://cubecinema.com/blah-de-blah")
+        l3 = IndexLink(text="THIRD LINK",
+                       link="http://cubecinema.com/blah-de-blah")
         l3.category = cat2
         l3.save()
 
         # System user:
-        user_rw = auth_models.User.objects.create_user('admin', 'toolkit_admin@localhost', 'T3stPassword!')
+        user_rw = auth_models.User.objects.create_user(
+            'admin', 'toolkit_admin@localhost', 'T3stPassword!')
         # Create dummy ContentType:
         ct = contenttypes.models.ContentType.objects.get_or_create(
             model='',
@@ -75,7 +78,8 @@ class TestViews(TestCase):
         user_rw.user_permissions.add(write_permission)
 
         # And login:
-        self.assertTrue(self.client.login(username="admin", password="T3stPassword!"))
+        self.assertTrue(self.client.login(username="admin",
+                                          password="T3stPassword!"))
 
     def tearDown(self):
         self.client.logout()
@@ -117,7 +121,8 @@ class TestViews(TestCase):
         })
         self.assertEqual(response.status_code, 200)
         # For whatever reason, this doesn't work correctly:
-        # self.assertFormError(response, 'form', 'name', u'Name cannot be blank')
+        # self.assertFormError(response, 'form', 'name', u'Name cannot be
+        #                      blank')
         self.assertContains(response, u'Name cannot be blank')
 
         cat = IndexCategory.objects.get(id=1)
@@ -127,7 +132,8 @@ class TestViews(TestCase):
         url = reverse("update-index-category", kwargs={"pk": "1"})
         response = self.client.post(url)
         self.assertEqual(response.status_code, 200)
-        self.assertFormError(response, 'form', 'name', u'This field is required.')
+        self.assertFormError(
+            response, 'form', 'name', u'This field is required.')
 
         cat = IndexCategory.objects.get(id=1)
         self.assertEqual(cat.name, 'Category 1 Links!')

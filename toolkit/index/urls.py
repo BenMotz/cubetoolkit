@@ -23,7 +23,7 @@ urlpatterns = [
         write_decorator(generic_edit.UpdateView.as_view(
             model=IndexLink,
             template_name="index_generic_form.html",
-            fields=('text','link','category'),
+            fields=('text', 'link', 'category'),
             success_url=functional.lazy(reverse, str)("toolkit-index"),
         )),
         name='update-index-link'),

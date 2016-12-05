@@ -89,13 +89,17 @@ def edit_diary_list(request, year=None, day=None, month=None):
     query_days_ahead = request.GET.get('daysahead', None)
 
     if query_days_ahead:
-        edit_prefs.set_preference(request.session, 'daysahead', query_days_ahead)
+        edit_prefs.set_preference(request.session,
+                                  'daysahead', query_days_ahead)
         default_days_ahead = query_days_ahead
     else:
-        default_days_ahead = int(edit_prefs.get_preference(request.session, 'daysahead'))
+        default_days_ahead = int(
+            edit_prefs.get_preference(request.session, 'daysahead'))
 
     # utility function, shared with public diary view
-    startdatetime, days_ahead = get_date_range(year, month, day, query_days_ahead, default_days_ahead)
+    startdatetime, days_ahead = get_date_range(year, month, day,
+                                               query_days_ahead,
+                                               default_days_ahead)
     startdate = startdatetime.date()
     if startdatetime is None:
         raise Http404(days_ahead)
@@ -145,8 +149,10 @@ def edit_diary_list(request, year=None, day=None, month=None):
     # Now get all 'ideas' in date range. Fiddle the date range to be from the
     # start of the month in startdate, so the idea for that month gets
     # included:
-    idea_startdate = datetime.date(day=1, month=startdate.month, year=startdate.year)
-    idea_list = (DiaryIdea.objects.filter(month__range=[idea_startdate, enddatetime])
+    idea_startdate = datetime.date(
+            day=1, month=startdate.month, year=startdate.year)
+    idea_list = (DiaryIdea.objects.filter(month__range=[idea_startdate,
+                                                        enddatetime])
                                   .order_by('month').select_related())
     # Assemble into the idea dict, with keys that will match the keys in the
     # showings dict
@@ -296,13 +302,17 @@ def add_showing(request, event_id):
         copy_from_pk = int(copy_from, 10)
         source_showing = Showing.objects.get(pk=copy_from_pk)
         target_event_id = int(event_id, 10)
-    except (TypeError, ValueError, django.core.exceptions.ObjectDoesNotExist) as err:
-        logger.error(u"Failed getting object for showing clone operation: {0}".format(err))
+    except (TypeError,
+            ValueError,
+            django.core.exceptions.ObjectDoesNotExist) as err:
+        logger.error(u"Failed getting object for showing clone operation: {0}"
+                     .format(err))
         raise Http404("Requested source showing for clone not found")
 
     if source_showing.event_id != target_event_id:
         logger.error("Cloned showing event ID != URL event id")
-        raise Http404("Requested source showing not associated with given event id")
+        raise Http404("Requested source showing not associated with given "
+                      "event id")
 
     # Create form using submitted data:
     clone_showing_form = diary_forms.CloneShowingForm(request.POST)
@@ -319,7 +329,8 @@ def add_showing(request, event_id):
         new_showing.save()
         new_showing.clone_rota_from_showing(source_showing)
         messages.add_message(
-            request, messages.SUCCESS, u"Added showing on {0} for event '{1}'".format(
+            request, messages.SUCCESS, u"Added showing on {0} for event '{1}'"
+            .format(
                 new_showing.start.strftime("%d/%m/%y at %H:%M"),
                 new_showing.event.name
             )
@@ -370,19 +381,23 @@ def add_event(request):
             start = form.cleaned_data['start']
             for day_count in range(0, form.cleaned_data['number_of_days']):
                 day_offset = datetime.timedelta(days=day_count)
-                new_showing = Showing(event=new_event,
-                                      start=(start + day_offset),
-                                      discounted=form.cleaned_data['discounted'],
-                                      confirmed=form.cleaned_data['confirmed'],
-                                      booked_by=form.cleaned_data['booked_by'],
-                                      )
+                new_showing = Showing(
+                        event=new_event,
+                        start=(start + day_offset),
+                        discounted=form.cleaned_data['discounted'],
+                        confirmed=form.cleaned_data['confirmed'],
+                        booked_by=form.cleaned_data['booked_by'],
+                        )
                 new_showing.save()
                 # Set showing roles to those from its template:
                 new_showing.reset_rota_to_default()
 
             messages.add_message(
-                request, messages.SUCCESS, u"Added event '{0}' with showing on {1}".format(
-                    new_event.name, new_showing.start.strftime("%d/%m/%y at %H:%M")
+                request, messages.SUCCESS,
+                u"Added event '{0}' with showing on {1}"
+                .format(
+                    new_event.name,
+                    new_showing.start.strftime("%d/%m/%y at %H:%M")
                 )
             )
             return _return_to_editindex(request)
@@ -396,7 +411,8 @@ def add_event(request):
         # GET: Show form blank, with date filled in from GET date and start
         # parameters:
         # Marshal date and time out of the GET request:
-        default_date = django.utils.timezone.now().date() + datetime.timedelta(1)
+        default_date = (django.utils.timezone.now().date() +
+                        datetime.timedelta(1))
         date = request.GET.get('date', default_date.strftime("%d-%m-%Y"))
         date = date.split("-")
 
@@ -441,7 +457,8 @@ def edit_showing(request, showing_id=None):
         form = diary_forms.ShowingForm(request.POST, instance=showing)
         rota_form = RotaForm(request.POST)
         if showing.in_past():
-            messages.add_message(request, messages.ERROR, "Can't edit showings that are in the past")
+            messages.add_message(request, messages.ERROR,
+                                 "Can't edit showings that are in the past")
         elif form.is_valid() and rota_form.is_valid():
             # The rota form is separate; first save the updated showing
             modified_showing = form.save()
@@ -450,8 +467,10 @@ def edit_showing(request, showing_id=None):
             modified_showing.update_rota(rota)
 
             messages.add_message(
-                request, messages.SUCCESS, u"Updated showing for '{0}' at {1}".format(
-                    showing.event.name, showing.start.strftime("%H:%M on %d/%m/%y")
+                request, messages.SUCCESS, u"Updated showing for '{0}' at {1}"
+                .format(
+                    showing.event.name,
+                    showing.start.strftime("%H:%M on %d/%m/%y")
                 )
             )
 
@@ -535,12 +554,16 @@ class EditEventView(View):
         logger.info(u"Updating event {0}".format(event_id))
         # Create and populate forms:
         form = diary_forms.EventForm(request.POST, instance=event)
-        media_form = diary_forms.MediaItemForm(request.POST, request.FILES, instance=media_item)
+        media_form = diary_forms.MediaItemForm(request.POST,
+                                               request.FILES,
+                                               instance=media_item)
 
         # Validate
         if form.is_valid() and media_form.is_valid():
             self._save(event, media_item, form, media_form)
-            messages.add_message(request, messages.SUCCESS, u"Updated details for event '{0}'".format(event.name))
+            messages.add_message(request, messages.SUCCESS,
+                                 u"Updated details for event '{0}'"
+                                 .format(event.name))
             return _return_to_editindex(request)
 
         # Got here if there's a form validation error:
@@ -548,7 +571,8 @@ class EditEventView(View):
             'event': event,
             'form': form,
             'media_form': media_form,
-            'programme_copy_summary_max_chars': settings.PROGRAMME_COPY_SUMMARY_MAX_CHARS,
+            'programme_copy_summary_max_chars':
+                settings.PROGRAMME_COPY_SUMMARY_MAX_CHARS,
         }
         return render(request, 'form_event.html', context)
 
@@ -557,7 +581,8 @@ class EditEventView(View):
         # For now only support a single media item:
         media_item = event.get_main_mediaitem() or MediaItem()
 
-        # If the event has "legacy" (ie. non-html) copy then convert it to HTML;
+        # If the event has "legacy" (ie. non-html) copy then convert it to
+        # HTML;
         if event.legacy_copy:
             event.copy = event.copy_html
 
@@ -568,7 +593,8 @@ class EditEventView(View):
             'event': event,
             'form': form,
             'media_form': media_form,
-            'programme_copy_summary_max_chars': settings.PROGRAMME_COPY_SUMMARY_MAX_CHARS,
+            'programme_copy_summary_max_chars':
+                settings.PROGRAMME_COPY_SUMMARY_MAX_CHARS,
         }
 
         return render(request, 'form_event.html', context)
@@ -594,9 +620,12 @@ def edit_ideas(request, year=None, month=None):
         if form.is_valid():
             form.save()
             if request.POST.get('source') == 'inline':
-                return HttpResponse(escape(form.cleaned_data['ideas']), content_type="text/plain")
+                return HttpResponse(escape(form.cleaned_data['ideas']),
+                                    content_type="text/plain")
             else:
-                messages.add_message(request, messages.SUCCESS, u"Updated ideas for {0}/{1}".format(month, year))
+                messages.add_message(request, messages.SUCCESS,
+                                     u"Updated ideas for {0}/{1}"
+                                     .format(month, year))
                 return _return_to_editindex(request)
     else:
         form = diary_forms.DiaryIdeaForm(instance=instance)
@@ -613,7 +642,7 @@ def edit_ideas(request, year=None, month=None):
             'ideas': escape(instance.ideas) if instance.ideas else None,
         }
         return HttpResponse(json.dumps(response),
-                    content_type="application/json; charset=utf-8")
+                            content_type="application/json; charset=utf-8")
     else:
         return render(request, 'form_idea.html', context)
 
@@ -625,15 +654,19 @@ def delete_showing(request, showing_id):
 
     showing = Showing.objects.get(pk=showing_id)
     if showing.in_past():
-        logger.error(u"Attempted to delete showing id {0} that has already started/finished".format(showing_id))
-        messages.add_message(request, messages.ERROR, "Can't delete showings that are in the past")
+        logger.error(u"Attempted to delete showing id {0} that has already "
+                     u"started/finished".format(showing_id))
+        messages.add_message(request, messages.ERROR,
+                             "Can't delete showings that are in the past")
         return HttpResponseRedirect(
             reverse("edit-showing", kwargs={'showing_id': showing_id})
         )
     else:
-        logging.info(u"Deleting showing id {0} (for event id {1})".format(showing_id, showing.event_id))
+        logging.info(u"Deleting showing id {0} (for event id {1})"
+                     .format(showing_id, showing.event_id))
         messages.add_message(
-            request, messages.SUCCESS, u"Deleted showing for '{0}' on {1}".format(
+            request, messages.SUCCESS, u"Deleted showing for '{0}' on {1}"
+            .format(
                 showing.event.name, showing.start.strftime("%d/%m/%y")
             )
         )
@@ -662,7 +695,7 @@ def view_event_field(request, field, year, month, day):
                                .confirmed()
                                .start_in_range(start_date, end_date)
                                .order_by('start')
-                               # following prefetch is for the rota view
+                #              following prefetch is for the rota view
                                .prefetch_related('rotaentry_set__role')
                                .select_related())
 
@@ -707,7 +740,8 @@ def edit_event_templates(request):
             # Reset formset, so get another blank one at the
             # end, deleted ones disappera, etc.
             formset = event_template_formset()
-            messages.add_message(request, messages.SUCCESS, "Event templates updated")
+            messages.add_message(request, messages.SUCCESS,
+                                 "Event templates updated")
     else:
         formset = event_template_formset()
     context = {'formset': formset}
@@ -759,7 +793,8 @@ def edit_event_tags(request):
         try:
             tag = EventTag.objects.get(id=deleted_key)
         except EventTag.DoesNotExist:
-            err = "Tag with key {0} can't be deleted: not found".format(deleted_key)
+            err = "Tag with key {0} can't be deleted: not found".format(
+                    deleted_key)
             errors.setdefault('delete', []).append(err)
             logger.error(err)
         else:
@@ -821,8 +856,8 @@ def printed_programme_edit(request, operation):
                                         queryset=programme_queryset)
             edited_form = formset
         elif operation == "add":
-            new_programme_form = diary_forms.NewPrintedProgrammeForm(request.POST,
-                                                                     request.FILES)
+            new_programme_form = diary_forms.NewPrintedProgrammeForm(
+                request.POST, request.FILES)
             edited_form = new_programme_form
 
         if edited_form.is_valid():
@@ -873,7 +908,8 @@ def view_rota_vacancies(request):
 class EditRotaView(View):
     """Handle the "edit rota" page."""
 
-    # The following ensure that a user with the correct permission is logged in:
+    # The following ensure that a user with the correct permission is logged
+    # in:
     @method_decorator(permission_required('diary.change_rotaentry'))
     def dispatch(self, request, *args, **kwargs):
         return super(EditRotaView, self).dispatch(request, *args, **kwargs)
@@ -881,7 +917,8 @@ class EditRotaView(View):
     def get(self, request, year=None, day=None, month=None):
         # Fiddly way to set startdate to the start of the local day:
         # Get current UTC time and convert to local time:
-        now_local = django.utils.timezone.localtime(django.utils.timezone.now())
+        now_local = django.utils.timezone.localtime(
+                django.utils.timezone.now())
         # Create a new local time with hour/min/sec set to zero:
         current_tz = django.utils.timezone.get_current_timezone()
         today_local_date = current_tz.localize(datetime.datetime(
@@ -901,12 +938,13 @@ class EditRotaView(View):
                                    .confirmed()
                                    .start_in_range(start_date, end_date)
                                    .order_by('start')
-                                   # force sane number of queries:
+                    #              force sane number of queries:
                                    .prefetch_related('rotaentry_set__role')
                                    .select_related())
 
         # Used by per-showing rota notes click to edit control:
-        url_with_id = reverse('edit-showing-rota-notes', kwargs={'showing_id': 999})
+        url_with_id = reverse('edit-showing-rota-notes',
+                              kwargs={'showing_id': 999})
         showing_notes_url_prefix = url_with_id[:url_with_id.find("999")]
 
         context = {
@@ -925,7 +963,8 @@ class EditRotaView(View):
             entry_id = int(request.POST[u'id'])
         except (ValueError, KeyError):
             logger.error("Invalid entry_id")
-            return HttpResponse("Invalid entry id", status=400, content_type="text/plain")
+            return HttpResponse("Invalid entry id",
+                                status=400, content_type="text/plain")
         rota_entry = get_object_or_404(RotaEntry, pk=entry_id)
 
         # Check associated showing:
@@ -937,9 +976,11 @@ class EditRotaView(View):
         try:
             name = request.POST[u'value']
         except KeyError:
-            return HttpResponse("Invalid request", status=400, content_type="text/plain")
+            return HttpResponse("Invalid request",
+                                status=400, content_type="text/plain")
 
-        logger.info(u"Update role id {0} (#{1}) for showing {2} '{3}' -> '{4}' ({5})"
+        logger.info(u"Update role id {0} (#{1}) for showing "
+                    u"{2} '{3}' -> '{4}' ({5})"
                     .format(rota_entry.role_id, rota_entry.rank,
                             rota_entry.showing_id, rota_entry.name, name,
                             rota_entry.pk))
@@ -966,7 +1007,8 @@ def edit_showing_rota_notes(request, showing_id):
         form.save()
     else:
         logger.error("Rota notes edit form not valid!")
-        return HttpResponse("Unknown error", status=500, content_type="text/plain")
+        return HttpResponse("Unknown error",
+                            status=500, content_type="text/plain")
 
     response = escape(showing.rota_notes)
 

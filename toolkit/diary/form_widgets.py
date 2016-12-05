@@ -29,7 +29,8 @@ class ChosenSelectMultiple(forms.SelectMultiple):
 
     def render(self, name, value, attrs=None, choices=()):
         # Use the default rendering:
-        output = super(ChosenSelectMultiple, self).render(name, value, attrs=attrs, choices=choices)
+        output = super(ChosenSelectMultiple, self).render(
+            name, value, attrs=attrs, choices=choices)
 
         final_attrs = self.build_attrs(attrs, name=name)
 
@@ -100,7 +101,8 @@ class JQueryDateTimePicker(forms.DateTimeInput):
 
     class Media(object):
         css = {
-            'all': ('css/lib/smoothness/jquery-ui.css', 'css/lib/timepicker.css', ),
+            'all': ('css/lib/smoothness/jquery-ui.css',
+                    'css/lib/timepicker.css', ),
         }
         js = (
             'js/lib/jquery.min.js',
@@ -110,7 +112,8 @@ class JQueryDateTimePicker(forms.DateTimeInput):
 
     def render(self, name, value, attrs=None):
         # Use the default rendering (a textbox) :
-        output = super(JQueryDateTimePicker, self).render(name, value, attrs=attrs)
+        output = super(JQueryDateTimePicker, self).render(
+            name, value, attrs=attrs)
 
         final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
 

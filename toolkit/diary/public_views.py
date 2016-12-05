@@ -66,7 +66,8 @@ def _view_diary(request, startdate, enddate, tag=None, extra_title=None):
     return render(request, 'view_showing_index.html', context)
 
 
-def view_diary(request, year=None, month=None, day=None, req_days_ahead=None, event_type=None):
+def view_diary(request, year=None, month=None, day=None, req_days_ahead=None,
+               event_type=None):
     # Returns public diary view, starting at specified year/month/day, filtered
     # by event type.
     #
@@ -112,7 +113,8 @@ def view_diary_this_week(request):
     """
     startdate = _today_date_aware()
     enddate = startdate + datetime.timedelta(days=7)
-    return _view_diary(request, startdate, enddate, extra_title="What's on this week")
+    return _view_diary(request, startdate, enddate,
+                       extra_title="What's on this week")
 
 
 def view_diary_next_week(request):
@@ -123,7 +125,8 @@ def view_diary_next_week(request):
     # Next monday is (7 - today) days ahead, if Monday is 0
     startdate = today + datetime.timedelta(days=(7 - today.weekday()))
     enddate = startdate + datetime.timedelta(days=7)
-    return _view_diary(request, startdate, enddate, extra_title="What's on next week")
+    return _view_diary(request, startdate, enddate,
+                       extra_title="What's on next week")
 
 
 def view_diary_this_month(request):
@@ -142,7 +145,8 @@ def view_diary_this_month(request):
 
     enddate = today + datetime.timedelta(days=days_left)
 
-    return _view_diary(request, today, enddate, extra_title="What's on this month")
+    return _view_diary(request, today, enddate,
+                       extra_title="What's on this month")
 
 
 def view_diary_next_month(request):
@@ -156,11 +160,13 @@ def view_diary_next_month(request):
 
     startdate = today + datetime.timedelta(days=days_to_next_month)
 
-    days_in_next_month = calendar.monthrange(startdate.year, startdate.month)[1]
+    days_in_next_month = calendar.monthrange(startdate.year,
+                                             startdate.month)[1]
 
     enddate = startdate + datetime.timedelta(days=days_in_next_month)
 
-    return _view_diary(request, startdate, enddate, extra_title="What's on next month")
+    return _view_diary(request, startdate, enddate,
+                       extra_title="What's on next month")
 
 
 def view_diary_json(request, year, month, day):
@@ -211,13 +217,16 @@ def view_diary_json(request, year, month, day):
                     'upscale': True,
                 }).url
             except Exception:
-                logger.exception("Failed getting thumbnail for event {0}".format(event))
+                logger.exception("Failed getting thumbnail for event {0}"
+                                 .format(event))
 
         results.append({
-            'start': timezone.localtime(showing.start).strftime('%d/%m/%Y %H:%M'),
+            'start': timezone.localtime(showing.start).strftime(
+                     '%d/%m/%Y %H:%M'),
             'name': event.name,
             'copy': event.copy_html,
-            'link': reverse("single-event-view", kwargs={'event_id': showing.event_id}),
+            'link': reverse("single-event-view",
+                            kwargs={'event_id': showing.event_id}),
             'image': thumbnail,
             'tags': ", ".join(n[0] for n in event.tags.values_list('name')),
         })
@@ -243,9 +252,11 @@ def view_event(request, event_id=None, legacy_id=None, event_slug=None):
     context = {}
     try:
         if event_id:
-            event = Event.objects.filter(pk=event_id).prefetch_related('media')[0]
+            event = Event.objects.filter(pk=event_id).prefetch_related(
+                    'media')[0]
         else:
-            event = Event.objects.filter(legacy_id=legacy_id).prefetch_related('media')[0]
+            event = Event.objects.filter(legacy_id=legacy_id).prefetch_related(
+                    'media')[0]
     except IndexError:
         raise Http404("Event not found")
 
@@ -341,7 +352,8 @@ class ArchiveSearch(generic.list.ListView, generic.edit.FormMixin):
                 )
             else:
                 # Otherwise just the event name
-                queryset = queryset.filter(event__name__icontains=options['search_term'])
+                queryset = queryset.filter(
+                    event__name__icontains=options['search_term'])
         # Add extra filters if start/end date were specified:
         if options['start_date']:
             queryset = queryset.filter(start__gte=options['start_date'])

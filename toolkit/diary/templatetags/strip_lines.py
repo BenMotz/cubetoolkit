@@ -60,5 +60,6 @@ class BlankLineFilterNode(template.Node):
 
     def render(self, context):
         output = self.nodelist.render(context)
-        output = u"\n".join([line for line in output.split(u'\n') if line.strip() != ''])
+        output = u"\n".join(
+            [line for line in output.split(u'\n') if line.strip() != ''])
         return output

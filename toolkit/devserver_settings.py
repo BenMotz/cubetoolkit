@@ -9,7 +9,7 @@ DATABASES = {
         'PASSWORD': 'devserver_db_password',
         'HOST': '',  # Set to empty string for localhost.
         'PORT': '',  # Set to empty string for default.
-        'CONN_MAX_AGE': 10, # Allow DB connections to persist for 10 seconds
+        'CONN_MAX_AGE': 10,  # Allow DB connections to persist for 10 seconds
     }
 }
 

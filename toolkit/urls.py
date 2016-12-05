@@ -32,6 +32,8 @@ urlpatterns = [
 
     # Static content, only used when running in the development server
     # (django.views.static.serve only works when DEBUG=True)
-    url(r'^static/(.*)$', django.views.static.serve, {'document_root': django.conf.settings.STATIC_ROOT}),
-    url(r'^media/(.*)$', django.views.static.serve, {'document_root': django.conf.settings.MEDIA_ROOT}),
+    url(r'^static/(.*)$', django.views.static.serve,
+        {'document_root': django.conf.settings.STATIC_ROOT}),
+    url(r'^media/(.*)$', django.views.static.serve,
+        {'document_root': django.conf.settings.MEDIA_ROOT}),
 ]
