@@ -1,6 +1,7 @@
-from django.conf.urls import patterns, include, url
+from django.conf.urls import include, url
 import django.conf
 import django.views.generic as generic
+import django.views.static
 from django.contrib.auth.decorators import login_required
 
 import toolkit.members.urls
@@ -11,8 +12,7 @@ import toolkit.about.urls
 
 from toolkit.index.models import IndexLink
 
-urlpatterns = patterns(
-    '',
+urlpatterns = [
     url(r'^programme/', include(toolkit.diary.urls.programme_urls)),
     url(r'^diary/', include(toolkit.diary.urls.diary_urls)),
     url(r'^members/', include(toolkit.members.urls.member_urls)),
@@ -32,6 +32,8 @@ urlpatterns = patterns(
 
     # Static content, only used when running in the development server
     # (django.views.static.serve only works when DEBUG=True)
-    url(r'^static/(.*)$', 'django.views.static.serve', {'document_root': django.conf.settings.STATIC_ROOT}),
-    url(r'^media/(.*)$', 'django.views.static.serve', {'document_root': django.conf.settings.MEDIA_ROOT}),
-)
+    url(r'^static/(.*)$', django.views.static.serve,
+        {'document_root': django.conf.settings.STATIC_ROOT}),
+    url(r'^media/(.*)$', django.views.static.serve,
+        {'document_root': django.conf.settings.MEDIA_ROOT}),
+]

@@ -3,7 +3,8 @@ from django import template
 register = template.Library()
 
 # This was originally implemented using much simpler regexes, but they didn't
-# work right in Python 2.6. Stupid Python 2.6.
+# work right in Python 2.6. Stupid Python 2.6. No longer shackled to 2.6, so
+# could revisit this, but life's too short.
 
 
 @register.tag(name="filtermultipleblanklines")
@@ -59,5 +60,6 @@ class BlankLineFilterNode(template.Node):
 
     def render(self, context):
         output = self.nodelist.render(context)
-        output = u"\n".join([line for line in output.split(u'\n') if line.strip() != ''])
+        output = u"\n".join(
+            [line for line in output.split(u'\n') if line.strip() != ''])
         return output

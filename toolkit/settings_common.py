@@ -8,7 +8,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 # The following list of IP addresses is used to restrict access to some pages
 # (at time of writing, only the 'add a new member' page)
-CUBE_IP_ADDRESSES = tuple("10.1.1.%d" % n for n in xrange(33,255))
+CUBE_IP_ADDRESSES = tuple("10.1.1.%d" % n for n in xrange(33, 255))
 
 DEFAULT_TERMS_TEXT = """Contacts-
 Company-
@@ -48,7 +48,7 @@ EMAIL_PORT = 25
 # Default number of days ahead for which to include detailed copy in the
 # member's mailout
 MAILOUT_DETAILS_DAYS_AHEAD = 9
-# Default number of days ahead for which to include listings in the member'sm
+# Default number of days ahead for which to include listings in the member's
 # mailout
 MAILOUT_LISTINGS_DAYS_AHEAD = 14
 
@@ -111,7 +111,6 @@ APPEND_SLASH = True
 # Django settings for cube project.
 ALLOWED_HOSTS = ['.cubecinema.com', ]
 DEBUG = False
-TEMPLATE_DEBUG = DEBUG
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
@@ -155,19 +154,19 @@ USE_I18N = False  # True
 USE_L10N = True
 
 # Following are defined in settings_*.py
-## Absolute filesystem path to the directory that will hold user-uploaded files.
-## Example: "/home/media/media.lawrence.com/media/"
+# Absolute filesystem path to the directory that will hold user-uploaded files.
+# Example: "/home/media/media.lawrence.com/media/"
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 #
-## URL that handles the media served from MEDIA_ROOT. Make sure to use a
-## trailing slash.
-## Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
+# URL that handles the media served from MEDIA_ROOT. Make sure to use a
+# trailing slash.
+# Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
 MEDIA_URL = '/media/'
 #
-## Absolute path to the directory static files should be collected to.
-## Don't put anything in this directory yourself; store your static files
-## in apps' "static/" subdirectories and in STATICFILES_DIRS.
-## Example: "/home/media/media.lawrence.com/static/"
+# Absolute path to the directory static files should be collected to.
+# Don't put anything in this directory yourself; store your static files
+# in apps' "static/" subdirectories and in STATICFILES_DIRS.
+# Example: "/home/media/media.lawrence.com/static/"
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 # URL prefix for static files.
@@ -203,34 +202,41 @@ MIDDLEWARE_CLASSES = (
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    # Following introduced in Dango 1.7 (so don't enable it until an upgrade!)
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 )
 
-TEMPLATE_CONTEXT_PROCESSORS = (
-    'django.contrib.messages.context_processors.messages',
-    'django.core.context_processors.static',
-    'django.contrib.auth.context_processors.auth',
-)
+TEMPLATES = [
+    {
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        # Look for template source files inside installed applications:
+        'APP_DIRS': True,
+        # Put strings here, like "/home/html/django_templates" or
+        # "C:/www/django/templates".  Always use forward slashes, even on
+        # Windows.
+        # Don't forget to use absolute paths, not relative paths.
+        'DIRS': (
+            os.path.join(BASE_DIR, 'templates'),
+        ),
+        'OPTIONS': {
+            'debug': DEBUG,
+            'context_processors': (
+                'django.contrib.messages.context_processors.messages',
+                'django.template.context_processors.static',
+                'django.contrib.auth.context_processors.auth',
+            ),
+            # May be worth enabling for improved performance?
+            # 'loaders':
+            #    ('django.template.loaders.cached.Loader', (
+            #        'django.template.loaders.filesystem.Loader',
+            #        'django.template.loaders.app_directories.Loader',
+            #    )),
+        }
+    }
+]
 
 ROOT_URLCONF = 'toolkit.urls'
-
-TEMPLATE_DIRS = (
-    # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
-    # Always use forward slashes, even on Windows.
-    # Don't forget to use absolute paths, not relative paths.
-    os.path.join(BASE_DIR, 'templates'),
-)
-
-# May be worth enabling for improved performance?
-#TEMPLATE_LOADERS = (
-#    ('django.template.loaders.cached.Loader', (
-#        'django.template.loaders.filesystem.Loader',
-#        'django.template.loaders.app_directories.Loader',
-#    )),
-#)
 
 INSTALLED_APPS = (
     'toolkit.diary',
@@ -245,7 +251,8 @@ INSTALLED_APPS = (
     # Sessions framework: used to store preferences and login details
     'django.contrib.sessions',
     # 'django.contrib.sites',  # Not used
-    # Messages: Used to transfer informative text and notifications between pages
+    # Messages: Used to transfer informative text and notifications between
+    # pages
     'django.contrib.messages',
     'django.contrib.staticfiles',
 
@@ -268,7 +275,8 @@ LOGGING = {
             'format': '%(name)s %(levelname)s %(message)s',
         },
         'verbose': {
-            'format': '%(asctime)s %(module)s %(funcName)s %(levelname)s : %(message)s',
+            'format':
+            '%(asctime)s %(module)s %(funcName)s %(levelname)s : %(message)s',
         },
     },
     'filters': {

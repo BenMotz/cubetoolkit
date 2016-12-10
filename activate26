@@ -1,2 +1,0 @@
-source ./venv26/bin/activate
-export DJANGO_SETTINGS_MODULE=toolkit.devserver_settings

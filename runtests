@@ -1,11 +1,3 @@
 #!/usr/bin/env bash
-
-# If run from the p26runtests symlink then use the venv26 virtualenv:
-if [[ $0 == *p26runtests ]] ; then
-    echo "Running tests with python2.6"
-    source ./activate26
-else
-    source ./activate
-fi
-
+source ./activate
 ./manage.py test --settings=toolkit.test_settings $*

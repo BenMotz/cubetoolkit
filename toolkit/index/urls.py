@@ -1,4 +1,4 @@
-from django.conf.urls import patterns, url
+from django.conf.urls import url
 import django.utils.functional as functional
 import django.views.generic.edit as generic_edit
 from django.contrib.auth.decorators import permission_required
@@ -8,8 +8,7 @@ from toolkit.index.models import IndexLink, IndexCategory
 
 write_decorator = permission_required('toolkit.write')
 
-urlpatterns = patterns(
-    'toolkit.index.views',
+urlpatterns = [
     # Link edit:
     url('^create/link$',
         write_decorator(generic_edit.CreateView.as_view(
@@ -24,6 +23,7 @@ urlpatterns = patterns(
         write_decorator(generic_edit.UpdateView.as_view(
             model=IndexLink,
             template_name="index_generic_form.html",
+            fields=('text', 'link', 'category'),
             success_url=functional.lazy(reverse, str)("toolkit-index"),
         )),
         name='update-index-link'),
@@ -45,8 +45,9 @@ urlpatterns = patterns(
     url('^update/category/(?P<pk>\d+)$',
         write_decorator(generic_edit.UpdateView.as_view(
             model=IndexCategory,
+            fields=('name',),
             template_name="index_generic_form.html",
             success_url=functional.lazy(reverse, str)("toolkit-index"),
         )),
         name='update-index-category'),
-)
+]

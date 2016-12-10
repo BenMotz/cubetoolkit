@@ -103,7 +103,12 @@ def _check_access_permitted_for_member_key(permission, request, member_id):
     if not access_permitted:
         try:
             member = Member.objects.get(id=member_id)
-            member_key = request.REQUEST.get('k', None)
+            member_key = ''
+            if request.method == 'GET':
+                member_key = request.GET.get('k', None)
+            elif request.method == 'POST':
+                member_key = request.POST.get('k', None)
+
             if isinstance(member_key, basestring):
                 # Use compare_constant_time instead of == to avoid timing
                 # attacks (no, really - read up on it)

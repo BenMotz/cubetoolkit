@@ -9,7 +9,7 @@ DATABASES = {
         'PASSWORD': 'devserver_db_password',
         'HOST': '',  # Set to empty string for localhost.
         'PORT': '',  # Set to empty string for default.
-        'CONN_MAX_AGE': 10, # Allow DB connections to persist for 10 seconds
+        'CONN_MAX_AGE': 10,  # Allow DB connections to persist for 10 seconds
     }
 }
 
@@ -28,7 +28,10 @@ EMAIL_UNSUBSCRIBE_HOST = "localhost:8000"
 
 # Enable Debug mode, add in Django toolbar:
 DEBUG = True
-TEMPLATE_DEBUG = True
+TEMPLATES[0]['OPTIONS']['debug'] = True
+
+# Undefine ALLOWED_HOSTS to ensure default loopback addresses work:
+del ALLOWED_HOSTS
 
 # Django toolbar things:
 INTERNAL_IPS = ('127.0.0.1',)
