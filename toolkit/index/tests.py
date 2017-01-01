@@ -158,10 +158,8 @@ class TestViews(TestCase):
             'name': '   ',
         })
         self.assertEqual(response.status_code, 200)
-        # For whatever reason, this doesn't work correctly:
-        # self.assertFormError(response, 'form', 'name', u'Name cannot be
-        #                      blank')
-        self.assertContains(response, u'Name cannot be blank')
+        self.assertFormError(
+            response, 'form', 'name', u'This field is required.')
 
         cat = IndexCategory.objects.get(id=1)
         self.assertEqual(cat.name, 'Category 1 Links!')
