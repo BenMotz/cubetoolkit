@@ -10,7 +10,8 @@ class IndexLink(models.Model):
     text = models.CharField(max_length=1024, blank=True, null=False)
     link = models.URLField(max_length=1024, blank=False, null=False)
     category = models.ForeignKey('IndexCategory', verbose_name='Link category',
-                                 related_name='links', null=False, blank=False)
+                                 related_name='links', null=False, blank=False,
+                                 on_delete=models.CASCADE)
 
     class Meta:
         db_table = 'IndexLinks'

@@ -139,7 +139,8 @@ class Member(models.Model):
 
 class Volunteer(models.Model):
 
-    member = models.OneToOneField('Member', related_name='volunteer')
+    member = models.OneToOneField('Member', related_name='volunteer',
+        on_delete=models.CASCADE)
 
     notes = models.TextField(blank=True, null=True)
     active = models.BooleanField(default=True)

@@ -1,8 +1,4 @@
 [IMPROVEMENT] -- model field things?  https://docs.djangoproject.com/en/1.9/releases/1.9/#models
-[BUG] -- is this breaking unit tests? https://docs.djangoproject.com/en/1.9/releases/1.9/#http-redirects-no-longer-forced-to-absolute-uris
-[BUG] -- breaking tests? https://docs.djangoproject.com/en/1.9/releases/1.9/#template-tag-modules-are-imported-when-templates-are-configured
-[DEPRECATION] -- add on_delete to ForeignKey / OneToOneField: https://docs.djangoproject.com/en/1.9/releases/1.9/#foreignkey-and-onetoonefield-on-delete-argument
-
 
 [NEWFEATURE] -- Per-tag RSS
 [NEWFEATURE] -- 'subscribe me' UI for members lists
@@ -16,6 +12,9 @@
 [BUG] -- handle errors for saving Event details if image and image is missing
 [QUERY] -- Should cancelled events appear in the mailout by default?
 
+[DONE] -- add on_delete to ForeignKey / OneToOneField: https://docs.djangoproject.com/en/1.9/releases/1.9/#foreignkey-and-onetoonefield-on-delete-argument
+[NOTNEEDED] -- breaking tests? https://docs.djangoproject.com/en/1.9/releases/1.9/#template-tag-modules-are-imported-when-templates-are-configured
+[NOTNEEDED] -- is this breaking unit tests? https://docs.djangoproject.com/en/1.9/releases/1.9/#http-redirects-no-longer-forced-to-absolute-uris
 [FIXED] -- BaseCommand.requires_model_validation is removed in favor of requires_system_checks. Admin validators is replaced by admin checks.
 [DONE] -- use response.json() method in tests: https://docs.djangoproject.com/en/1.9/topics/testing/tools/#django.test.Response.json
 [NOTNEEDED] -- use method_decorator on CBVs? https://docs.djangoproject.com/en/1.9/ref/utils/#django.utils.decorators.method_decorator

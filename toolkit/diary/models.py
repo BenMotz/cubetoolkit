@@ -179,7 +179,8 @@ class Event(models.Model):
 
     template = models.ForeignKey('EventTemplate', verbose_name='Event Type',
                                  related_name='template',
-                                 null=True, blank=True)
+                                 null=True, blank=True,
+                                 on_delete=models.SET_NULL)
     tags = models.ManyToManyField(EventTag, db_table='Event_Tags', blank=True)
 
     duration = models.TimeField(null=True)
@@ -384,8 +385,10 @@ class ShowingQuerySet(QuerySet):
 @python_2_unicode_compatible
 class Showing(models.Model):
 
-    event = models.ForeignKey('Event', related_name='showings')
-    room = models.ForeignKey('Room', related_name='showings', null=True)
+    event = models.ForeignKey('Event', related_name='showings',
+                              on_delete=models.CASCADE)
+    room = models.ForeignKey('Room', related_name='showings', null=True,
+                              on_delete=models.SET_NULL)
 
     start = FutureDateTimeField(db_index=True)
 
@@ -612,8 +615,8 @@ class EventTemplate(models.Model):
 @python_2_unicode_compatible
 class RotaEntry(models.Model):
 
-    role = models.ForeignKey(Role)
-    showing = models.ForeignKey(Showing)
+    role = models.ForeignKey(Role, on_delete=models.CASCADE)
+    showing = models.ForeignKey(Showing, on_delete=models.CASCADE)
 
     required = models.BooleanField(default=True)
     rank = models.IntegerField(default=1)
