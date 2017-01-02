@@ -90,7 +90,7 @@ class Command(BaseCommand):
     help = 'Configure standard cube toolkit users'
 
     can_import_settings = True
-    requires_model_validation = True
+    requires_system_checks = True
 
     def handle(self, *args, **options):
         if len(args) != 0:
