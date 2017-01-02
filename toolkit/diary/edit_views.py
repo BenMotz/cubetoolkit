@@ -16,6 +16,7 @@ import django.db
 from django.db.models import Q
 import django.utils.timezone as timezone
 from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.decorators.http import require_POST, require_http_methods
 from django.utils.decorators import method_decorator
 from django.utils.html import escape
@@ -549,13 +550,11 @@ def edit_showing(request, showing_id=None):
     return render(request, 'form_showing.html', context)
 
 
-class EditEventView(View):
+class EditEventView(PermissionRequiredMixin, View):
     """Handle the "edit event" form."""
     # Quite complex, so a class based view
 
-    @method_decorator(permission_required('toolkit.write'))
-    def dispatch(self, request, *args, **kwargs):
-        return super(EditEventView, self).dispatch(request, *args, **kwargs)
+    permission_required = 'toolkit.write'
 
     def _save(self, event, media_item, form, media_form):
         # Some factored out code: method is passed valid event and media form,
@@ -956,14 +955,10 @@ def view_rota_vacancies(request):
     return render(request, u'view_rota_vacancies.html', context)
 
 
-class EditRotaView(View):
+class EditRotaView(PermissionRequiredMixin, View):
     """Handle the "edit rota" page."""
 
-    # The following ensure that a user with the correct permission is logged
-    # in:
-    @method_decorator(permission_required('diary.change_rotaentry'))
-    def dispatch(self, request, *args, **kwargs):
-        return super(EditRotaView, self).dispatch(request, *args, **kwargs)
+    permission_required = 'diary.change_rotaentry'
 
     def get(self, request, year=None, day=None, month=None):
         # Fiddly way to set startdate to the start of the local day:
