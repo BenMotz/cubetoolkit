@@ -27,4 +27,4 @@ django-overextends<0.5
 # library headers to be installed, which isn't desirable on deployment hosts.
 # Instead we ensure that the corresponding OS package is installed, and the
 # virtualenv is created with --system-site-packages
-# MySQL-python
+# mysqlclient
