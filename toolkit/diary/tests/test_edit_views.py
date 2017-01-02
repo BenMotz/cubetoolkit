@@ -1224,8 +1224,7 @@ class EditIdeasViewTests(DiaryTestsMixin, TestCase):
             url, HTTP_ACCEPT="Accept: application/xml;q=0.9, "
             "*/*;q=0.8, application/json")
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content.decode("utf-8"))
-        self.assertEqual(response_data, {
+        self.assertEqual(response.json(), {
             "ideas": None,
             'month': '2012-01-01',
         })
@@ -1266,7 +1265,7 @@ class EditIdeasViewTests(DiaryTestsMixin, TestCase):
             HTTP_ACCEPT="Accept: application/xml;q=0.9, */*;q=0.8, "
             "application/json")
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content.decode("utf-8"))
+        response_data = response.json()
         self.assertEqual(response["Content-Type"],
                          "application/json; charset=utf-8")
         self.assertEqual(response_data, {
@@ -1597,8 +1596,7 @@ class EditTagsViewTests(DiaryTestsMixin, TestCase):
             "new_tags[]": [],
         })
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content.decode("utf-8"))
-        self.assertEqual(response_data['failed'], False)
+        self.assertEqual(response.json()['failed'], False)
 
         final_tag_count = EventTag.objects.count()
         self.assertEqual(initial_tag_count, final_tag_count)
@@ -1610,8 +1608,7 @@ class EditTagsViewTests(DiaryTestsMixin, TestCase):
             "new_tags[]": [],
         })
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content.decode("utf-8"))
-        self.assertEqual(response_data['failed'], False)
+        self.assertEqual(response.json()['failed'], False)
 
         self.assertEqual(EventTag.objects.filter(id=1).count(), 0)
         self.assertEqual(EventTag.objects.filter(id=2).count(), 1)
@@ -1624,8 +1621,7 @@ class EditTagsViewTests(DiaryTestsMixin, TestCase):
             "new_tags[]": ["new_tag_one", "new_tag_TWO "],
         })
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content.decode("utf-8"))
-        self.assertEqual(response_data['failed'], False)
+        self.assertEqual(response.json()['failed'], False)
 
         nt1 = EventTag.objects.get(name="new_tag_one")
         nt2 = EventTag.objects.get(name="new_tag_two")
@@ -1642,7 +1638,7 @@ class EditTagsViewTests(DiaryTestsMixin, TestCase):
             "new_tags[]": [],
         })
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content.decode("utf-8"))
+        response_data = response.json()
         self.assertEqual(response_data['failed'], True)
         self.assertIn('delete', response_data['errors'])
 
@@ -1660,7 +1656,7 @@ class EditTagsViewTests(DiaryTestsMixin, TestCase):
             "new_tags[]": [existing_name],
         })
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content.decode("utf-8"))
+        response_data = response.json()
         self.assertEqual(response_data['failed'], True)
         self.assertEqual(
             response_data['errors'],
@@ -1777,7 +1773,7 @@ class DiaryDataViewTests(DiaryTestsMixin, TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-        data = json.loads(response.content.decode("utf-8"))
+        data = response.json()
         data_by_showing = {int(i['id']): i for i in data}
 
         expected_showings = {1, 2, 3, 4, 5, 6, 7, 10}
