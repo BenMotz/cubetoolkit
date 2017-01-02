@@ -1,5 +1,3 @@
-[IMPROVEMENT] -- model field things?  https://docs.djangoproject.com/en/1.9/releases/1.9/#models
-
 [NEWFEATURE] -- Per-tag RSS
 [NEWFEATURE] -- 'subscribe me' UI for members lists
 [NEWFEATURE] --  make old IDs work into the future
@@ -12,6 +10,7 @@
 [BUG] -- handle errors for saving Event details if image and image is missing
 [QUERY] -- Should cancelled events appear in the mailout by default?
 
+[NOTNEEDED] -- model field things?  https://docs.djangoproject.com/en/1.9/releases/1.9/#models
 [DONE] -- add on_delete to ForeignKey / OneToOneField: https://docs.djangoproject.com/en/1.9/releases/1.9/#foreignkey-and-onetoonefield-on-delete-argument
 [NOTNEEDED] -- breaking tests? https://docs.djangoproject.com/en/1.9/releases/1.9/#template-tag-modules-are-imported-when-templates-are-configured
 [NOTNEEDED] -- is this breaking unit tests? https://docs.djangoproject.com/en/1.9/releases/1.9/#http-redirects-no-longer-forced-to-absolute-uris
