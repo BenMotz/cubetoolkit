@@ -24,6 +24,10 @@ class MemberForm(forms.ModelForm):
 
 
 class MemberFormWithoutNotes(forms.ModelForm):
+    # Specify prefix to allow this to coexist in a single <form> alongside
+    # VolunteerForm
+    prefix = "mem"
+
     class Meta(object):
         model = toolkit.members.models.Member
         exclude = ('is_member', 'notes',)
@@ -34,6 +38,10 @@ class VolunteerForm(forms.ModelForm):
     # URI then this is saved as the volunteer portrait.
     image_data = forms.CharField(label="", required=False,
                                  widget=forms.HiddenInput)
+
+    # Specify prefix to allow this to coexist in a single <form> alongside
+    # MemberFormWithoutNotes
+    prefix = "vol"
 
     def __init__(self, *args, **kwargs):
         super(VolunteerForm, self).__init__(*args, **kwargs)
