@@ -117,7 +117,7 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
 <h4>Key:</h4>
 <p><span class="private">Private events are in italics</span><br>
 <span class="external">Outside hires are bolded</span><br>
-<span class="discounted">Discounted events (like TTT) are magenta</span><br>
+<span class="discounted">Discounted events (like cheap night) are magenta</span><br>
 <span class="cancelled">Cancelled events are red</span><br>
 <span class="daytime">Daytime (before 6pm) events have a light background</span></p>
 
@@ -158,7 +158,7 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
             {{ showing.event.pre_title|upper }} {{ showing.event.name|upper }} {{ showing.event.post_title|upper }}
             {% else %}
             {{ showing.event.name }}
-            {% endif %}{% if showing.discounted %}(TTT){% endif %}{% if showing.cancelled %}(CANCELLED){% endif %}
+            {% endif %}{% if showing.discounted %}*{% endif %}{% if showing.cancelled %}(CANCELLED){% endif %}
         </a>{% if showing.sold_out %}(marked SOLD OUT){% endif %}</td>
         </tr>
     {% empty %}

@@ -222,7 +222,7 @@ $(function(){
                         {{ showing.start|date:"D j F " }}//{{ showing.start|date:" H:i" }}
                         {% if showing.cancelled %}</span> (cancelled){% endif %}
                         {% if showing.sold_out %}</span> (SOLD OUT){% endif %}
-                        {% if showing.discounted %}<abbr class="discounted" title="Ticket Tout Tuesday">(TTT)</abbr>{% endif %}<br>
+                        {% if showing.discounted %}<abbr class="discounted" title="* cheap night">*</abbr>{% endif %}<br>
                         {% endfor %}
                     </p>
                     <p class="copy">{{ event.copy_summary|truncatewords:16 }} [<a class="more" href="{% url "single-event-view-with-slug" event_id=event.id event_slug=event_slug %}">more</a>]</p>
@@ -236,8 +236,10 @@ $(function(){
 
         {% ifchanged %}<p class="month">{{ showing.start|date:"F"|upper }}{% endifchanged %}{% ifchanged %}<span class="year">{{ showing.start|date:" Y" }}</span>{% endifchanged %}
         {% ifchanged %}<p class="day">{{ showing.start|date:"D"}} {{ showing.start|date:"d" }}{% else %}
-        <p class="sameday"> {% endifchanged %} <span class="time">{{showing.start|date:"H:i"}}</span> .... {% if showing.hide_in_programme or showing.event.private %}Closed for private event.{% else %}<a href="{% url "single-event-view" event_id=showing.event_id %}">{{ showing.event.pre_title|title }} {{ showing.event.name|capfirst }} {{ showing.event.post_title|title }}{% if showing.cancelled %} (CANCELLED){% endif %}{% if showing.sold_out %} (SOLD OUT){% endif %}{% if showing.discounted %} (TTT){% endif %}{% endif %}</a></p>
+        <p class="sameday"> {% endifchanged %} <span class="time">{{showing.start|date:"H:i"}}</span> .... {% if showing.hide_in_programme or showing.event.private %}Closed for private event.{% else %}<a href="{% url "single-event-view" event_id=showing.event_id %}">{{ showing.event.pre_title|title }} {{ showing.event.name|capfirst }} {{ showing.event.post_title|title }}{% if showing.cancelled %} (CANCELLED){% endif %}{% if showing.sold_out %} (SOLD OUT){% endif %}{% if showing.discounted %} *{% endif %}{% endif %}</a></p>
     {% endfor %}
+    <p>&nbsp;</p>
+    <p>* cheap night</p>
     </div><!-- end .list -->
     {% endblock %}
 </div> <!-- end .grid -->

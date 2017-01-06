@@ -11,9 +11,11 @@ http://www.cubecinema.com/programme/
  {{        showing.start|date:"F"|upper }}
 {%     endifchanged %}
 {%     ifchanged %}
-  {{ showing.start|date:"D"}} {{ showing.start|date:"d" }}{% else %}        {% endifchanged %} {{showing.start|date:"H:i"}} .... {% if showing.hide_in_programme or showing.event.private %}Closed for private event.{% else %}{{ showing.event.name|capfirst }}{% if showing.sold_out %} (Sold out!){% endif %}{% if showing.cancelled %} (CANCELLED){% endif %}{% if showing.discounted %} (TTT){% endif %}{% endif %}
+  {{ showing.start|date:"D"}} {{ showing.start|date:"d" }}{% else %}        {% endifchanged %} {{showing.start|date:"H:i"}} .... {% if showing.hide_in_programme or showing.event.private %}Closed for private event.{% else %}{{ showing.event.name|capfirst }}{% if showing.sold_out %} (Sold out!){% endif %}{% if showing.cancelled %} (CANCELLED){% endif %}{% if showing.discounted %} *{% endif %}{% endif %}
 {% endfor %}
 {% endfilterblanklines %}
+
+* cheap night
 
 For complete listings including all future events, please visit:
 http://www.cubecinema.com/programme/

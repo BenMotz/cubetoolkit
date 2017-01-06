@@ -183,7 +183,7 @@ Cube: {{ event.name }}
                     {% endif %}
                     {% if showing.cancelled %}</span> (cancelled){% endif %}
                     {% if showing.sold_out %}</span> (SOLD OUT){% endif %}
-                    {% if showing.discounted %}<abbr class="discounted" title="Ticket Tout Tuesday">(TTT)</abbr>{% endif %}<br>
+                    {% if showing.discounted %}<abbr class="discounted" title="* cheap night">*</abbr>{% endif %}<br>
                     {% endfor %}
                 </p>
                 {% if event.pricing %}
