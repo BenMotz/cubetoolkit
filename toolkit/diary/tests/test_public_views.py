@@ -290,7 +290,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertNotContains(response, u'Book tickets')
         self.assertNotContains(response, ticket_link)
 
-    # TODO: Cancelled/confirmed/visible/TTT
+    # TODO: Cancelled/confirmed/visible/cheap
 
 
 class UrlTests(DiaryTestsMixin, TestCase):
