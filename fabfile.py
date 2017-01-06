@@ -93,6 +93,18 @@ def deploy_static():
             .format(env.deploy_script_settings))
 
 
+def set_media_permissions():
+    """Set media directories to g+w"""
+    media_dirs = ["media/diary",
+                  "media/printedprogramme",
+                  "media/volunteers"]
+
+    with cd(env.site_root):
+        for media_dir in media_dirs:
+            path = os.path.join(env.site_root, media_dir)
+            run("chmod g+w {0}".format(path))
+
+
 def deploy_media():
     """Rsync all media content onto target"""
 
@@ -219,4 +231,5 @@ def deploy():
     install_requirements()
 
     deploy_static()
+    set_media_permissions()
     run_migrations()
