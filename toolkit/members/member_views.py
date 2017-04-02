@@ -229,6 +229,13 @@ def member_statistics(request):
         'm_postcode': Member.objects.filter(postcode__isnull=False)
                                     .exclude(postcode='')
                                     .count(),
+        # Members who aren't actually members, who don't get the mailout
+        'm_cruft': Member.objects.filter(email__isnull=False)
+                                 .exclude(email='')
+                                 .exclude(mailout_failed=True)
+                                 .exclude(mailout=True)
+                                 .exclude(is_member=True)
+                                 .count(),
     }
 
     return render(request, 'stats.html', context)
