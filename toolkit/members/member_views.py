@@ -193,6 +193,29 @@ def unsubscribe_member(request, member_id):
 
     return render(request, 'form_member_edit_subs.html', {'member': member, 'action': action})
 
+# This view can be accessed both by logged in users and
+# if the magic key associated with the member record is passed in in the request.
+# The difference with the above view is that this one does not ask for user confirmation.
+# The idea is that this view is called from a script to programmatically unsubcribe members
+# if their emails bounce (meeting certain bouncing criteria - e.g. not vacation responses )
+@require_http_methods(["GET"])
+def unsubscribe_member_right_now(request, member_id):
+
+    if not _check_access_permitted_for_member_key('toolkit.write', request, member_id):
+        return permission_required('toolkit.write')(unsubscribe_member)(request, member_id)
+
+    member = get_object_or_404(Member, id=member_id)
+
+    action = 'unsubscribe'
+    member.mailout = False
+    member.save()
+    logger.info(u"{0} member '{1}' (id: {2}) from mailing list"
+          .format(action, member.name, member.pk))
+    messages.add_message(request, messages.SUCCESS,
+                         u"Member {0} {1}d".format(member.number, action))
+
+    return render(request, 'form_member_edit_subs.html', {'member': member, 'action': action})
+
 
 @permission_required('toolkit.read')
 @require_safe

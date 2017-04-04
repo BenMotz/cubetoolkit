@@ -8,7 +8,7 @@ from toolkit.members.volunteer_views import (
 from toolkit.members.member_views import (
     add_member, search, view,
     edit_member, delete_member, member_statistics, member_homepages,
-    unsubscribe_member)
+    unsubscribe_member, unsubscribe_member_right_now)
 
 # Volunteers:
 volunteer_urls = [
@@ -62,4 +62,7 @@ member_urls = [
         name='edit-member'),
     url(r'^(?P<member_id>\d+)/unsubscribe/$', unsubscribe_member,
         name='unsubscribe-member'),
+    url(r'^(?P<member_id>\d+)/unsubscribe-now/$', unsubscribe_member_right_now,
+        name='unsubscribe-member-right-now'),
 ]
+
