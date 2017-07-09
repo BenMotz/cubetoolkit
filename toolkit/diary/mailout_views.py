@@ -46,7 +46,7 @@ def _render_mailout_body(days_ahead, copy_days_ahead):
             event_ids.add(s.event_id)
     try:
         first_event_date = showings[0].start.strftime('%A %d %B')
-    except:  # Corner case for no events
+    except IndexError:  # Corner case for no events
         first_event_date = ''
 
     # Render into mail template
