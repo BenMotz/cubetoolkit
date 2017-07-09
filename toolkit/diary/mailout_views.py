@@ -24,7 +24,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-def _render_mailout_body(days_ahead, copy_days_ahead):
+def _render_mailout_subject_and_body(days_ahead, copy_days_ahead):
     # Render default mail contents;
 
     # Read data
@@ -45,9 +45,13 @@ def _render_mailout_body(days_ahead, copy_days_ahead):
             showings_once_per_event.append(s)
             event_ids.add(s.event_id)
     try:
-        first_event_date = showings[0].start.strftime('%A %d %B')
+        # %-d strips the leading 0 from the day of the month - as per the
+        # python docs, this is platform specific to Linux / glibc. See
+        # strftime(3).
+        first_event_date = showings[0].start.strftime(' commencing %A %-d %B')
     except IndexError:  # Corner case for no events
         first_event_date = ''
+    subject_text = "CUBE Microplex forthcoming events%s" % first_event_date
 
     # Render into mail template
     mail_template = django.template.loader.get_template("mailout_body.txt")
@@ -60,7 +64,7 @@ def _render_mailout_body(days_ahead, copy_days_ahead):
         'copy_days_ahead': copy_days_ahead,
     }
 
-    return mail_template.render(django.template.Context(context)), first_event_date
+    return subject_text, mail_template.render(django.template.Context(context))
 
 
 def _render_mailout_form(request, body_text, subject_text, context):
@@ -95,8 +99,7 @@ def mailout(request):
                     request.GET.get('copydaysahead', copy_days_ahead))
         except ValueError:
             pass
-        body_text, first_event_day = _render_mailout_body(days_ahead, copy_days_ahead)
-        subject_text = "CUBE Microplex forthcoming events commencing %s" % first_event_day
+        subject_text, body_text = _render_mailout_subject_and_body(days_ahead, copy_days_ahead)
         context = {
             "days_ahead": days_ahead,
             "copy_days_ahead": copy_days_ahead

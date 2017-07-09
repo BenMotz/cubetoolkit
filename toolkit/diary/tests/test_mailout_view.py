@@ -21,6 +21,12 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         self.time_mock = self.time_patch.start()
         self.time_mock.return_value = self._fake_now
 
+
+        self.expected_mailout_subject = (
+            'type="text" value="CUBE Microplex forthcoming events'
+            ' commencing Sunday 9 June"'
+        )
+
         self.expected_mailout_header = (
             u"CUBE PROGRAMME OF EVENTS\n"
             u"\n"
@@ -68,6 +74,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_mailout.html")
         self.assertContains(response, self.expected_mailout_header)
         self.assertContains(response, self.expected_mailout_event)
+        self.assertContains(response, self.expected_mailout_subject)
 
     def test_get_form_custom_daysahead(self):
         url = reverse("members-mailout")
@@ -78,6 +85,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
 
         self.assertContains(response, self.expected_mailout_header)
         self.assertContains(response, self.expected_mailout_event)
+        self.assertContains(response, self.expected_mailout_subject)
 
     def test_get_form_invalid_daysahead(self):
         url = reverse("members-mailout")
@@ -88,6 +96,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
 
         self.assertContains(response, self.expected_mailout_header)
         self.assertContains(response, self.expected_mailout_event)
+        self.assertContains(response, self.expected_mailout_subject)
 
     def test_get_form_no_events(self):
         url = reverse("members-mailout")
@@ -99,6 +108,10 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         self.assertContains(response, self.expected_mailout_header)
         # NOT:
         self.assertNotContains(response, self.expected_mailout_event)
+
+        # Expected subject - no "commencing" string:
+        self.assertContains(response,
+            'type="text" value="CUBE Microplex forthcoming events"')
 
     def test_post_form(self):
         url = reverse("members-mailout")
