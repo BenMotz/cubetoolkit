@@ -99,7 +99,8 @@ def mailout(request):
                     request.GET.get('copydaysahead', copy_days_ahead))
         except ValueError:
             pass
-        subject_text, body_text = _render_mailout_subject_and_body(days_ahead, copy_days_ahead)
+        subject_text, body_text = _render_mailout_subject_and_body(
+                days_ahead, copy_days_ahead)
         context = {
             "days_ahead": days_ahead,
             "copy_days_ahead": copy_days_ahead

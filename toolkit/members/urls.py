@@ -65,4 +65,3 @@ member_urls = [
     url(r'^(?P<member_id>\d+)/unsubscribe-now/$', unsubscribe_member_right_now,
         name='unsubscribe-member-right-now'),
 ]
-
