@@ -32,13 +32,15 @@ class MemberFormWithoutNotes(forms.ModelForm):
 class VolunteerForm(forms.ModelForm):
     # Extra non-model field. If this is returned with a base64 encoded PNG data
     # URI then this is saved as the volunteer portrait.
-    image_data = forms.CharField(label="", required=False, widget=forms.HiddenInput)
+    image_data = forms.CharField(label="", required=False,
+                                 widget=forms.HiddenInput)
 
     def __init__(self, *args, **kwargs):
         super(VolunteerForm, self).__init__(*args, **kwargs)
 
         # Force ordering of roles list to be by "standard" role type, then name
-        self.fields['roles'].queryset = self.fields['roles'].queryset.order_by("-standard", "name")
+        self.fields['roles'].queryset = (
+            self.fields['roles'].queryset.order_by("-standard", "name"))
 
     class Meta(object):
         model = toolkit.members.models.Volunteer
@@ -77,8 +79,10 @@ class VolunteerForm(forms.ModelForm):
 
         if image_data_uri:
             image_data = self._parse_data_uri(image_data_uri)
-            image_file = SimpleUploadedFile("webcam_photo.png", image_data, "image/png")
+            image_file = SimpleUploadedFile("webcam_photo.png",
+                                            image_data, "image/png")
             # Use portrait field to validate the uploaded data:
-            cleaned_data['portrait'] = self.fields['portrait'].clean(image_file)
+            cleaned_data['portrait'] = (
+                self.fields['portrait'].clean(image_file))
 
         return cleaned_data

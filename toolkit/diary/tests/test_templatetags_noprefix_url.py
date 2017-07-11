@@ -6,6 +6,7 @@ from django.core.urlresolvers import get_script_prefix, set_script_prefix
 
 
 class TestNoPrefixURLTag(TestCase):
+
     def setUp(self):
         self._initial_prefix = get_script_prefix()
 
@@ -18,6 +19,8 @@ class TestNoPrefixURLTag(TestCase):
             set_script_prefix(prefix)
             out = Template(
                 "{% load noprefix_url %}"
-                "Chicken sandwich: {% noprefix_url 'day-view' '2015' '01' '01' %}"
+                "Chicken sandwich: "
+                "{% noprefix_url 'day-view' '2015' '01' '01' %}"
             ).render(Context())
-            self.assertEqual(out, "Chicken sandwich: /programme/view/2015/01/01")
+            self.assertEqual(
+                out, "Chicken sandwich: /programme/view/2015/01/01")

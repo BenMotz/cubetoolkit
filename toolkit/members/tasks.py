@@ -40,7 +40,8 @@ def _send_email(smtp_conn, destination, subject, body, mail_is_ascii):
                            [destination.encode("ascii")],
                            msg.as_string())
     except UnicodeError:
-        msg = "Non-ascii email address {0}".format(destination.encode("ascii", "replace"))
+        msg = "Non-ascii email address {0}".format(
+            destination.encode("ascii", "replace"))
         logger.error(msg)
         return msg
     except smtplib.SMTPServerDisconnected as ssd:
@@ -76,11 +77,12 @@ def send_mailout(subject, body):
 
     header_template = u"Dear {0},\n\n"
     signature_template = (
-        u"\n" +
-        u"\n" +
-        u"If you wish to be removed from our mailing list please use this link:\n" +
-        u"http://{0}{{0}}?k={{2}}\n" +
-        u"To edit details of your membership, please use this link:\n" +
+        u"\n"
+        u"\n"
+        u"If you wish to be removed from our mailing list please use this "
+        u"link:\n"
+        u"http://{0}{{0}}?k={{2}}\n"
+        u"To edit details of your membership, please use this link:\n"
         u"http://{0}{{1}}?k={{2}}\n"
     ).format(settings.EMAIL_UNSUBSCRIBE_HOST)
 
@@ -105,7 +107,9 @@ def send_mailout(subject, body):
 
     # Cache if body is 7 bit clean (will need to check each sender name, but
     # save a bit of time by not scanning everything)
-    body_is_ascii = string_is_ascii(body) and string_is_ascii(signature_template)
+    body_is_ascii = (
+        string_is_ascii(body) and
+        string_is_ascii(signature_template))
 
     err_list = []
 
@@ -131,7 +135,8 @@ def send_mailout(subject, body):
             mail_body = header + body + signature
             mail_is_ascii = body_is_ascii and string_is_ascii(header)
 
-            error = _send_email(smtp_conn, recipient.email, subject, mail_body, mail_is_ascii)
+            error = _send_email(smtp_conn, recipient.email,
+                                subject, mail_body, mail_is_ascii)
 
             if error:
                 err_list.append(error)
@@ -139,20 +144,24 @@ def send_mailout(subject, body):
             sent += 1
             if sent % one_percent == 0:
                 progress = int((100.0 * sent) / count) + 1
-                current_task.update_state(state='PROGRESS{0:03}'.format(progress),
-                                          meta={'sent': sent, 'total': count})
+                current_task.update_state(
+                    state='PROGRESS{0:03}'.format(progress),
+                    meta={'sent': sent, 'total': count})
         # All done? Send report:
-        report = "{0} copies of the following were sent out on cube members list\n".format(sent)
+        report = ("{0} copies of the following were sent out on cube members "
+                  "list\n".format(sent))
         if len(err_list) > 0:
             # Only send a max of 100 error messages!
-            report += "{0} errors:\n{1}".format(len(err_list), "\n".join(err_list[:100]))
+            report += "{0} errors:\n{1}".format(
+                len(err_list), "\n".join(err_list[:100]))
             if len(err_list) > 100:
                 report += "(Error list truncated at 100 entries)\n"
 
         report += "\n"
         report += body
 
-        _send_email(smtp_conn, unicode(settings.MAILOUT_DELIVERY_REPORT_TO), subject, report, body_is_ascii)
+        _send_email(smtp_conn, unicode(settings.MAILOUT_DELIVERY_REPORT_TO),
+                    subject, report, body_is_ascii)
 
     except Exception as exc:
         logger.exception("Mailout job failed, {0}".format(exc))

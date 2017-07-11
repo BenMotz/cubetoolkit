@@ -71,7 +71,8 @@ class FeedTests(DiaryTestsMixin, TestCase):
 
     @patch('django.utils.timezone.now')
     def test_feed_no_items(self, now_patch):
-        # Feed should only have 7 days in advance, this time will yield nothing:
+        # Feed should only have 7 days in advance, this time will yield
+        # nothing:
         now_patch.return_value = self._fake_now
         tree = self._get_etree()
         items = tree.find('channel').findall("item")

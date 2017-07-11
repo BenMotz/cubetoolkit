@@ -8,6 +8,7 @@ logger = logging.getLogger(__file__)
 
 register = Library()
 
+
 def thumbnail_url(source, alias):
     """
     Return the thumbnail url for a source file using an aliased set of
@@ -22,7 +23,8 @@ def thumbnail_url(source, alias):
     try:
         thumb = get_thumbnailer(source)[alias]
     except Exception:
-        logger.exception("Failed generating thumbnail for {0}, {1}".format(source, alias))
+        logger.exception("Failed generating thumbnail for {0}, {1}"
+                         .format(source, alias))
         return ''
     return thumb.url
 

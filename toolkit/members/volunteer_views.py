@@ -38,8 +38,10 @@ def view_volunteer_role_report(request):
     role_vol_map = {}
     # Query for active volunteers, sorted by name
     volunteer_query = (Role.objects.filter(volunteer__active=True)
-                                   .values_list('name', 'volunteer__id', 'volunteer__member__name')
-                                   .order_by('volunteer__member__name', 'name'))
+                                   .values_list('name', 'volunteer__id',
+                                                'volunteer__member__name')
+                                   .order_by('volunteer__member__name',
+                                             'name'))
 
     for role, vol_id, vol_name in volunteer_query:
         role_vol_map.setdefault(role, []).append(vol_name)
@@ -79,7 +81,8 @@ def select_volunteer(request, action, active=True):
     assert action in action_urls
     assert isinstance(active, bool)
 
-    volunteers = Volunteer.objects.filter(active=active).order_by('member__name').select_related()
+    volunteers = Volunteer.objects.filter(active=active).order_by(
+        'member__name').select_related()
 
     context = {
         'volunteers': volunteers,
@@ -104,10 +107,11 @@ def activate_volunteer(request, set_active=True):
     vol.active = set_active
     vol.save()
 
-    logger.info(u"Set volunteer.active to {0} for volunteer {1}".format(str(set_active), vol_pk))
-    messages.add_message(request, messages.SUCCESS, u"{0} volunteer {1}".format(
-        u"Unretired" if set_active else u"Retired",
-        vol.member.name))
+    logger.info(u"Set volunteer.active to {0} for volunteer {1}"
+                .format(str(set_active), vol_pk))
+    messages.add_message(request, messages.SUCCESS, u"{0} volunteer {1}"
+                         .format(u"Unretired" if set_active else u"Retired",
+                                 vol.member.name))
 
     return HttpResponseRedirect(reverse("view-volunteer-list"))
 
@@ -147,7 +151,8 @@ def edit_volunteer(request, volunteer_id, create_new=False):
             instance=member
         )
         if vol_form.is_valid() and mem_form.is_valid():
-            logger.info(u"Saving changes to volunteer '{0}' (id: {1})".format(volunteer.member.name, str(volunteer.pk)))
+            logger.info(u"Saving changes to volunteer '{0}' (id: {1})".format(
+                volunteer.member.name, str(volunteer.pk)))
             mem_form.save()
             volunteer.member = member
             vol_form.save()
@@ -162,7 +167,8 @@ def edit_volunteer(request, volunteer_id, create_new=False):
             return HttpResponseRedirect(reverse("view-volunteer-list"))
     else:
         vol_form = VolunteerForm(prefix="vol", instance=volunteer)
-        mem_form = MemberFormWithoutNotes(prefix="mem", instance=volunteer.member)
+        mem_form = MemberFormWithoutNotes(prefix="mem",
+                                          instance=volunteer.member)
 
     context = {
         'pagetitle': 'Add Volunteer' if create_new else 'Edit Volunteer',

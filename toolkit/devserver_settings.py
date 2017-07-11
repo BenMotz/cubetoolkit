@@ -1,3 +1,4 @@
+import warnings
 from toolkit.settings_common import *
 
 DATABASES = {
@@ -42,6 +43,5 @@ MIDDLEWARE_CLASSES.append('debug_toolbar.middleware.DebugToolbarMiddleware')
 INSTALLED_APPS = list(INSTALLED_APPS)
 INSTALLED_APPS.append('debug_toolbar')
 
-import warnings
 warnings.filterwarnings('error', r"DateTimeField received a naive datetime",
                         RuntimeWarning, r'django\.db\.models\.fields')

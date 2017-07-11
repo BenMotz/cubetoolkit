@@ -7,7 +7,8 @@ from django.core.urlresolvers import reverse
 from django.contrib.auth.decorators import permission_required
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
-from django.views.decorators.http import require_POST, require_safe, require_http_methods
+from django.views.decorators.http import (require_POST, require_safe,
+                                          require_http_methods)
 from django.conf import settings
 
 from toolkit.members.forms import NewMemberForm, MemberForm
@@ -39,7 +40,8 @@ def add_member(request):
             form.save()
             # Member added ok, new blank form:
             form = NewMemberForm()
-            messages.add_message(request, messages.SUCCESS, u"Added member: {0}".format(instance.number))
+            messages.add_message(request, messages.SUCCESS,
+                                 u"Added member: {0}".format(instance.number))
             return HttpResponseRedirect(reverse("add-member"))
     elif request.method == 'GET':
         # GET request; create form object with default values
@@ -58,9 +60,10 @@ def search(request):
     results = None
 
     if search_terms:
-        results = Member.objects.filter(Q(name__icontains=search_terms) |
-                                        Q(email__icontains=search_terms) |
-                                        Q(number=search_terms)).order_by('name')
+        results = Member.objects.filter(
+            Q(name__icontains=search_terms) |
+            Q(email__icontains=search_terms) |
+            Q(number=search_terms)).order_by('name')
         context = {
             'search_terms': search_terms,
             'members': results,
@@ -86,7 +89,8 @@ def delete_member(request, member_id):
     logger.info(u"Deleting member '{0}'".format(member.name))
     member.delete()  # This will delete associated volunteer record, if any
     messages.add_message(request, messages.SUCCESS,
-                         u"Deleted member: {0} ({1})".format(member.number, member.name))
+                         u"Deleted member: {0} ({1})".format(
+                             member.number, member.name))
 
     return HttpResponseRedirect(reverse("search-members"))
 
@@ -113,7 +117,8 @@ def _check_access_permitted_for_member_key(permission, request, member_id):
                 # Use compare_constant_time instead of == to avoid timing
                 # attacks (no, really - read up on it)
                 access_permitted = compare_constant_time(
-                    member.mailout_key.encode("ascii"), member_key.encode("ascii"))
+                    member.mailout_key.encode("ascii"),
+                    member_key.encode("ascii"))
                 # Keys should really both be ASCII, so this is very unlikely to
                 # raise an error unless someone intentionally feeds in
                 # junk
@@ -130,18 +135,22 @@ def _check_access_permitted_for_member_key(permission, request, member_id):
 @require_http_methods(["GET", "POST"])
 def edit_member(request, member_id):
 
-    if not _check_access_permitted_for_member_key('toolkit.write', request, member_id):
+    if not _check_access_permitted_for_member_key(
+            'toolkit.write', request, member_id):
         # Manually wrap this function in the standard 'permission_required'
         # decorator and call it to get the redirect to the login page:
-        return permission_required('toolkit.write')(edit_member)(request, member_id)
+        return permission_required('toolkit.write')(edit_member)(
+            request, member_id)
         # (To elaborate:
         #    permission_required('toolkit.write')
         # is the decorator used elsewhere. Writing:
         #    permission_required('toolkit.write')(edit_member)
         # returns the function with the decorator applied, then
-        #   permission_required('toolkit.write')(edit_member)(request, member_id)
-        # calls the wrapped function, passing in the arguments originaly supplied.
-        # Capice?
+        #
+        # permission_required('toolkit.write')(edit_member)(request, member_id)
+        #
+        # calls the wrapped function, passing in the arguments originaly
+        # supplied. Capice?
 
     member = get_object_or_404(Member, id=member_id)
 
@@ -150,9 +159,11 @@ def edit_member(request, member_id):
     if request.method == 'POST':
         form = MemberForm(request.POST, instance=member)
         if form.is_valid():
-            logger.info(u"Saving changes to member '{0}' (id: {1})".format(member.name, member.pk))
+            logger.info(u"Saving changes to member '{0}' (id: {1})".format(
+                member.name, member.pk))
             form.save()
-            messages.add_message(request, messages.SUCCESS, u"Member {0} updated".format(member.number))
+            messages.add_message(request, messages.SUCCESS,
+                                 u"Member {0} updated".format(member.number))
             if request.user.has_perm('toolkit.write'):
                 return HttpResponseRedirect(reverse("search-members"))
     else:
@@ -166,14 +177,17 @@ def edit_member(request, member_id):
 
 
 # This view (and edit_member above) can be accessed both by logged in users and
-# if the magic key associated with the member record is passed in in the request
+# if the magic key associated with the member record is passed in in the
+# request
 @require_http_methods(["GET", "POST"])
 def unsubscribe_member(request, member_id):
 
-    if not _check_access_permitted_for_member_key('toolkit.write', request, member_id):
+    if not _check_access_permitted_for_member_key('toolkit.write', request,
+                                                  member_id):
         # Manually wrap this function in the standard 'permission_required'
         # decorator and call it to get the redirect to the login page:
-        return permission_required('toolkit.write')(unsubscribe_member)(request, member_id)
+        return permission_required('toolkit.write')(unsubscribe_member)(
+            request, member_id)
 
     member = get_object_or_404(Member, id=member_id)
 
@@ -187,22 +201,29 @@ def unsubscribe_member(request, member_id):
             logger.info(u"{0} member '{1}' (id: {2}) from mailing list"
                         .format(action, member.name, member.pk))
             messages.add_message(request, messages.SUCCESS,
-                                 u"Member {0} {1}d".format(member.number, action))
+                                 u"Member {0} {1}d".format(
+                                     member.number, action))
 
     action = 'unsubscribe' if member.mailout else 'subscribe'
 
-    return render(request, 'form_member_edit_subs.html', {'member': member, 'action': action})
+    return render(request, 'form_member_edit_subs.html',
+                  {'member': member, 'action': action})
 
-# This view can be accessed both by logged in users and
-# if the magic key associated with the member record is passed in in the request.
-# The difference with the above view is that this one does not ask for user confirmation.
-# The idea is that this view is called from a script to programmatically unsubcribe members
-# if their emails bounce (meeting certain bouncing criteria - e.g. not vacation responses )
+# This view can be accessed both by logged in users and if the magic key
+# associated with the member record is passed in in the request.  The
+# difference with the above view is that this one does not ask for user
+# confirmation.  The idea is that this view is called from a script to
+# programmatically unsubcribe members if their emails bounce (meeting certain
+# bouncing criteria - e.g. not vacation responses )
+
+
 @require_http_methods(["GET"])
 def unsubscribe_member_right_now(request, member_id):
 
-    if not _check_access_permitted_for_member_key('toolkit.write', request, member_id):
-        return permission_required('toolkit.write')(unsubscribe_member)(request, member_id)
+    if not _check_access_permitted_for_member_key('toolkit.write', request,
+                                                  member_id):
+        return permission_required('toolkit.write')(unsubscribe_member)(
+            request, member_id)
 
     member = get_object_or_404(Member, id=member_id)
 
@@ -210,11 +231,12 @@ def unsubscribe_member_right_now(request, member_id):
     member.mailout = False
     member.save()
     logger.info(u"{0} member '{1}' (id: {2}) from mailing list"
-          .format(action, member.name, member.pk))
+                .format(action, member.name, member.pk))
     messages.add_message(request, messages.SUCCESS,
                          u"Member {0} {1}d".format(member.number, action))
 
-    return render(request, 'form_member_edit_subs.html', {'member': member, 'action': action})
+    return render(request, 'form_member_edit_subs.html',
+                  {'member': member, 'action': action})
 
 
 @permission_required('toolkit.read')
@@ -235,30 +257,34 @@ def member_statistics(request):
         # Total number of members:
         'm_count': Member.objects.count(),
         # Members with an email address that isn't null/blank:
-        'm_email_count': Member.objects.filter(email__isnull=False)
-                                       .exclude(email='')
-                                       .count(),
+        'm_email_count': Member.objects
+                               .filter(email__isnull=False)
+                               .exclude(email='')
+                               .count(),
         # Members with an email address that isn't null/blank, where mailout
         # hasn't failed & they haven't unsubscribed:
         'm_email_viable': Member.objects.mailout_recipients().count(),
         # Members with an email address that isn't null/blank, where mailout
         # hasn't failed & they have unsubscribed:
-        'm_email_unsub': Member.objects.filter(email__isnull=False)
-                                       .exclude(email='')
-                                       .exclude(mailout_failed=True)
-                                       .exclude(mailout=True)
-                                       .count(),
+        'm_email_unsub': Member.objects
+                               .filter(email__isnull=False)
+                               .exclude(email='')
+                               .exclude(mailout_failed=True)
+                               .exclude(mailout=True)
+                               .count(),
         # Members with a postcode that isn't null / blank
-        'm_postcode': Member.objects.filter(postcode__isnull=False)
-                                    .exclude(postcode='')
-                                    .count(),
+        'm_postcode': Member.objects
+                            .filter(postcode__isnull=False)
+                            .exclude(postcode='')
+                            .count(),
         # Members who aren't actually members, who don't get the mailout
-        'm_cruft': Member.objects.filter(email__isnull=False)
-                                 .exclude(email='')
-                                 .exclude(mailout_failed=True)
-                                 .exclude(mailout=True)
-                                 .exclude(is_member=True)
-                                 .count(),
+        'm_cruft': Member.objects
+                         .filter(email__isnull=False)
+                         .exclude(email='')
+                         .exclude(mailout_failed=True)
+                         .exclude(mailout=True)
+                         .exclude(is_member=True)
+                         .count(),
     }
 
     return render(request, 'stats.html', context)

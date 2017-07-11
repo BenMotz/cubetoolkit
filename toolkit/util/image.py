@@ -21,13 +21,15 @@ def get_mimetype(source_file):
         source_file.seek(0)
         mimetype = magic_wrapper.from_buffer(source_file.read(0xFFF))
     except IOError:
-        logger.exception(u"Failed to determine mimetype of file {0}".format(source_file.name))
+        logger.exception(u"Failed to determine mimetype of file {0}".format(
+            source_file.name))
     else:
         try:
             source_file.seek(0)
         except IOError:
             pass
 
-    logger.debug(u"Mime type for {0} detected as {1}".format(source_file.name, mimetype))
+    logger.debug(u"Mime type for {0} detected as {1}".format(
+        source_file.name, mimetype))
 
     return mimetype

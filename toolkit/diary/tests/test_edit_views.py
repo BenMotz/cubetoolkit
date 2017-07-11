@@ -87,8 +87,8 @@ class ViewSecurity(DiaryTestsMixin, TestCase):
     def _assert_need_login(self, views_to_test):
         for view_name, kwargs in views_to_test.iteritems():
             url = reverse(view_name, kwargs=kwargs)
-            expected_redirect = ("{0}?next={1}"
-                                 .format(reverse("django.contrib.auth.views.login"), url))
+            expected_redirect = ("{0}?next={1}".format(
+                reverse("django.contrib.auth.views.login"), url))
             # Test GET:
             response = self.client.get(url)
             self.assertRedirects(response, expected_redirect)
@@ -354,7 +354,8 @@ class AddShowingView(DiaryTestsMixin, TestCase):
             len(dst_rota)
         )
 
-        for src_entry, dst_entry in zip(source.rotaentry_set.all(), dest.rotaentry_set.all()):
+        for src_entry, dst_entry in zip(source.rotaentry_set.all(),
+                                        dest.rotaentry_set.all()):
             self.assertEqual(src_entry.role, dst_entry.role)
             self.assertEqual(src_entry.rank, dst_entry.rank)
 
@@ -384,24 +385,29 @@ class EditShowing(DiaryTestsMixin, TestCase):
         # "clone" part should have expected start time:
         self.assertContains(
             response,
-            u'<input id="id_clone_start" name="clone_start" type="text" value="10/06/2013 18:00" />'
+            u'<input id="id_clone_start" name="clone_start" type="text"'
+            u' value="10/06/2013 18:00" />'
         )
         # Edit should have existing values:
         self.assertContains(
             response,
-            u'<input id="id_start" name="start" type="text" value="09/06/2013 18:00" />'
+            u'<input id="id_start" name="start" type="text" '
+            u'value="09/06/2013 18:00" />'
         )
         self.assertContains(
             response,
-            u'<input id="id_booked_by" maxlength="64" name="booked_by" type="text" value="\u0102nother \u0170ser" />'
+            u'<input id="id_booked_by" maxlength="64" name="booked_by" '
+            u'type="text" value="\u0102nother \u0170ser" />'
         )
         self.assertContains(
             response,
-            u'<input checked="checked" id="id_confirmed" name="confirmed" type="checkbox" />'
+            u'<input checked="checked" id="id_confirmed" name="confirmed" '
+            u'type="checkbox" />'
         )
         self.assertContains(
             response,
-            u'<input id="id_hide_in_programme" name="hide_in_programme" type="checkbox" />'
+            u'<input id="id_hide_in_programme" name="hide_in_programme" '
+            u'type="checkbox" />'
         )
         self.assertContains(
             response,
@@ -418,7 +424,8 @@ class EditShowing(DiaryTestsMixin, TestCase):
         # Rota edit:
         self.assertContains(
             response,
-            u'<input class="rota_count" id="id_role_1" name="role_1" type="text" value="0" />'
+            u'<input class="rota_count" id="id_role_1" name="role_1" '
+            u'type="text" value="0" />'
         )
         self.assertContains(
             response,
@@ -450,7 +457,8 @@ class EditShowing(DiaryTestsMixin, TestCase):
 
         # Check showing was updated:
         showing = Showing.objects.get(id=7)
-        self.assertEqual(showing.start, pytz.utc.localize(datetime(2013, 8, 15, 18, 30)))
+        self.assertEqual(showing.start, pytz.utc.localize(
+            datetime(2013, 8, 15, 18, 30)))
         self.assertEqual(showing.booked_by, u"Yet \u0102nother \u0170ser")
         self.assertEqual(showing.confirmed, True)
         self.assertEqual(showing.hide_in_programme, True)
@@ -481,7 +489,8 @@ class EditShowing(DiaryTestsMixin, TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_showing.html")
-        self.assert_has_message(response, u"Can&#39;t edit showings that are in the past", "error")
+        self.assert_has_message(
+            response, u"Can&#39;t edit showings that are in the past", "error")
 
     @patch('django.utils.timezone.now')
     def tests_edit_showing_missing_data(self, now_patch):
@@ -497,8 +506,10 @@ class EditShowing(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_showing.html")
 
-        self.assertFormError(response, 'form', 'start', u'This field is required.')
-        self.assertFormError(response, 'form', 'booked_by', u'This field is required.')
+        self.assertFormError(response, 'form', 'start',
+                             u'This field is required.')
+        self.assertFormError(response, 'form', 'booked_by',
+                             u'This field is required.')
 
     @patch('django.utils.timezone.now')
     def tests_edit_showing_invalid_date_past(self, now_patch):
@@ -514,7 +525,8 @@ class EditShowing(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_showing.html")
 
-        self.assertFormError(response, 'form', 'start', u'Must be in the future')
+        self.assertFormError(response, 'form', 'start',
+                             u'Must be in the future')
 
     @patch('django.utils.timezone.now')
     def tests_edit_showing_invalid_date_malformed(self, now_patch):
@@ -530,7 +542,8 @@ class EditShowing(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_showing.html")
 
-        self.assertFormError(response, 'form', 'start', u'Enter a valid date/time.')
+        self.assertFormError(response, 'form', 'start',
+                             u'Enter a valid date/time.')
 
 
 class DeleteShowing(DiaryTestsMixin, TestCase):
@@ -546,7 +559,8 @@ class DeleteShowing(DiaryTestsMixin, TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 405)
 
-        Showing.objects.get(id=1)  # Will raise an exception if it doesn't exist
+        # Will raise an exception if it doesn't exist
+        Showing.objects.get(id=1)
 
     @patch('django.utils.timezone.now')
     def test_delete_showing_in_past(self, now_patch):
@@ -556,10 +570,12 @@ class DeleteShowing(DiaryTestsMixin, TestCase):
         response = self.client.post(url)
 
         # Should redirect to edit page:
-        self.assertRedirects(response, reverse("edit-showing", kwargs={"showing_id": 1}))
+        self.assertRedirects(response, reverse(
+            "edit-showing", kwargs={"showing_id": 1}))
 
         # Showing should still exist:
-        Showing.objects.get(id=1)  # Will raise an exception if it doesn't exist
+        # Will raise an exception if it doesn't exist
+        Showing.objects.get(id=1)
 
     @patch('django.utils.timezone.now')
     def test_delete_showing(self, now_patch):
@@ -594,7 +610,8 @@ class AddEventView(DiaryTestsMixin, TestCase):
         # Default start should be set one day in the future:
         self.assertContains(
             response,
-            ur'<input id="id_start" name="start" value="02/06/2013 20:00" type="text" />',
+            ur'<input id="id_start" name="start" value="02/06/2013 20:00" '
+            ur'type="text" />',
             html=True
         )
 
@@ -606,7 +623,8 @@ class AddEventView(DiaryTestsMixin, TestCase):
         # Default start should be set one day in the future:
         self.assertContains(
             response,
-            ur'<input id="id_start" name="start" value="01/01/1950 20:00" type="text" />',
+            ur'<input id="id_start" name="start" value="01/01/1950 20:00" '
+            ur'type="text" />',
             html=True
         )
 
@@ -618,7 +636,8 @@ class AddEventView(DiaryTestsMixin, TestCase):
     def test_get_add_event_form_specify_invalid_start(self):
         url = reverse("add-event")
         response = self.client.get(url, data={"date": "99-01-1950"})
-        self.assertContains(response, "Illegal time, date or duration", status_code=400)
+        self.assertContains(
+            response, "Illegal time, date or duration", status_code=400)
 
     @patch('django.utils.timezone.now')
     def test_add_event(self, now_patch):
@@ -652,9 +671,12 @@ class AddEventView(DiaryTestsMixin, TestCase):
         self.assertEqual(len(showings), 3)
         # Showings should have been added over 3 days. Time specified was BST,
         # so should be 7pm in UTC:
-        self.assertEqual(showings[0].start, pytz.utc.localize(datetime(2013, 6, 2, 19, 0)))
-        self.assertEqual(showings[1].start, pytz.utc.localize(datetime(2013, 6, 3, 19, 0)))
-        self.assertEqual(showings[2].start, pytz.utc.localize(datetime(2013, 6, 4, 19, 0)))
+        self.assertEqual(showings[0].start, pytz.utc.localize(
+            datetime(2013, 6, 2, 19, 0)))
+        self.assertEqual(showings[1].start, pytz.utc.localize(
+            datetime(2013, 6, 3, 19, 0)))
+        self.assertEqual(showings[2].start, pytz.utc.localize(
+            datetime(2013, 6, 4, 19, 0)))
 
         role_1 = Role.objects.get(id=1)
         for s in showings:
@@ -693,7 +715,8 @@ class AddEventView(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_new_event_and_showing.html")
 
         # Check error was as expected:
-        self.assertFormError(response, 'form', 'start', u'Must be in the future')
+        self.assertFormError(response, 'form', 'start',
+                             u'Must be in the future')
 
     @patch('django.utils.timezone.now')
     def test_add_event_missing_fields(self, now_patch):
@@ -723,12 +746,18 @@ class AddEventView(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_new_event_and_showing.html")
 
         # Check errors as expected:
-        self.assertFormError(response, 'form', 'start', u'This field is required.')
-        self.assertFormError(response, 'form', 'duration', u'This field is required.')
-        self.assertFormError(response, 'form', 'number_of_days', u'This field is required.')
-        self.assertFormError(response, 'form', 'event_name', u'This field is required.')
-        self.assertFormError(response, 'form', 'booked_by', u'This field is required.')
-        self.assertFormError(response, 'form', 'event_template', u'This field is required.')
+        self.assertFormError(response, 'form', 'start',
+                             u'This field is required.')
+        self.assertFormError(response, 'form', 'duration',
+                             u'This field is required.')
+        self.assertFormError(
+            response, 'form', 'number_of_days', u'This field is required.')
+        self.assertFormError(response, 'form', 'event_name',
+                             u'This field is required.')
+        self.assertFormError(response, 'form', 'booked_by',
+                             u'This field is required.')
+        self.assertFormError(
+            response, 'form', 'event_template', u'This field is required.')
 
 
 class EditEventView(DiaryTestsMixin, TestCase):
@@ -752,8 +781,14 @@ class EditEventView(DiaryTestsMixin, TestCase):
         self.assertContains(response, u"POSTTITLE One")
         self.assertContains(response, u"FILM_INFO_One")
         self.assertContains(response, u"01:30:00")
-        self.assertContains(response, u'<input id="id_outside_hire" checked="checked" name="outside_hire" type="checkbox" />', html=True)
-        self.assertContains(response, u'<input id="id_private" name="private" type="checkbox" />', html=True)
+        self.assertContains(response,
+                            u'<input id="id_outside_hire" checked="checked" '
+                            u'name="outside_hire" type="checkbox" />',
+                            html=True)
+        self.assertContains(response,
+                            u'<input id="id_private" name="private" '
+                            u'type="checkbox" />',
+                            html=True)
         # Blah. It's probably fine. Ahem.
 
     def test_get_edit_event_form_no_media_legacy_copy(self):
@@ -766,18 +801,30 @@ class EditEventView(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_event.html")
 
         self.assertContains(response, u"Event two title")
-        self.assertContains(response, u"Event <br>\n two <br>\n copy")  # newlines -> <br>
-        self.assertContains(response, u"Event two\n copy summary")  # not stripped
+        # newlines -> <br>
+        self.assertContains(response, u"Event <br>\n two <br>\n copy")
+        self.assertContains(response,
+                            u"Event two\n copy summary")  # not stripped
         self.assertContains(response, u"01:30:00")
-        self.assertContains(response, u'<input id="id_outside_hire" name="outside_hire" type="checkbox" />', html=True)
-        self.assertContains(response, u'<input id="id_private" name="private" type="checkbox" />', html=True)
+        self.assertContains(response,
+                            u'<input id="id_outside_hire" name="outside_hire" '
+                            u'type="checkbox" />',
+                            html=True)
+        self.assertContains(response,
+                            u'<input id="id_private" name="private" '
+                            u'type="checkbox" />',
+                            html=True)
         # It's probably still fine. Cough.
 
     @override_settings(MEDIA_ROOT="/tmp")
     def test_get_edit_event_form_media_item(self):
-        with tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-", suffix=".jpg") as temp_jpg:
+        with tempfile.NamedTemporaryFile(dir="/tmp",
+                                         prefix="toolkit-test-",
+                                         suffix=".jpg") as temp_jpg:
             # Add MediaItem to event 1:
-            media_item = MediaItem(media_file=temp_jpg.name, mimetype="image/jpeg", caption="Image Caption!", credit="Image Credit!")
+            media_item = MediaItem(
+                media_file=temp_jpg.name, mimetype="image/jpeg",
+                caption="Image Caption!", credit="Image Credit!")
             media_item.save()
             event = Event.objects.get(id=1)
             event.media.add(media_item)
@@ -810,8 +857,10 @@ class EditEventView(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_event.html")
 
-        self.assertFormError(response, 'form', 'name', u'This field is required.')
-        self.assertFormError(response, 'form', 'duration', u'This field is required.')
+        self.assertFormError(response, 'form', 'name',
+                             u'This field is required.')
+        self.assertFormError(response, 'form', 'duration',
+                             u'This field is required.')
 
     def test_post_edit_event_no_media_minimal_data(self):
         url = reverse("edit-event-details", kwargs={"event_id": 2})
@@ -883,7 +932,8 @@ class EditEventView(DiaryTestsMixin, TestCase):
 
         url = reverse("edit-event-details", kwargs={"event_id": 2})
 
-        with tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-", suffix=".jpg") as temp_jpg:
+        with tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-",
+                                         suffix=".jpg") as temp_jpg:
             response = self.client.post(url, data={
                 'name': u'New \u20acvent Name',
                 'duration': u'00:10:00',
@@ -892,7 +942,8 @@ class EditEventView(DiaryTestsMixin, TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_event.html")
-        self.assertFormError(response, 'media_form', 'media_file', u'The submitted file is empty.')
+        self.assertFormError(response, 'media_form',
+                             'media_file', u'The submitted file is empty.')
 
         self.assertFalse(get_mimetype_patch.called)
 
@@ -903,7 +954,8 @@ class EditEventView(DiaryTestsMixin, TestCase):
 
         url = reverse("edit-event-details", kwargs={"event_id": 2})
 
-        with tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-", suffix=".jpg") as temp_jpg:
+        with tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-",
+                                         suffix=".jpg") as temp_jpg:
             temp_jpg.write("Not an empty jpeg")
             temp_jpg.seek(0)
             response = self.client.post(url, data={
@@ -926,7 +978,8 @@ class EditEventView(DiaryTestsMixin, TestCase):
 
         url = reverse("edit-event-details", kwargs={"event_id": 2})
 
-        with tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-", suffix=".jpg") as temp_jpg:
+        with tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-",
+                                         suffix=".jpg") as temp_jpg:
             # used for assertion:
             temp_file_name = os.path.basename(temp_jpg.name)
             temp_jpg.write(TINY_VALID_JPEG)
@@ -953,7 +1006,8 @@ class EditEventView(DiaryTestsMixin, TestCase):
     def test_post_edit_event_add_media_png(self):
         url = reverse("edit-event-details", kwargs={"event_id": 2})
 
-        with tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-", suffix=".png") as temp_png:
+        with tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-",
+                                         suffix=".png") as temp_png:
             # used for assertion:
             temp_file_name = os.path.basename(temp_png.name)
 
@@ -979,10 +1033,12 @@ class EditEventView(DiaryTestsMixin, TestCase):
 
     @override_settings(MEDIA_ROOT="/tmp")
     def test_post_edit_event_clear_media(self):
-        with tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-", suffix=".jpg") as temp_jpg:
+        with tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-",
+                                         suffix=".jpg") as temp_jpg:
             # Add MediaItem to event 1:
             media_item = MediaItem(
-                media_file=temp_jpg.name, mimetype="image/jpeg", caption="Image Caption!", credit="Image Credit!")
+                media_file=temp_jpg.name, mimetype="image/jpeg",
+                caption="Image Caption!", credit="Image Credit!")
             media_item.save()
             event = Event.objects.get(id=2)
             event.media.add(media_item)
@@ -1006,7 +1062,8 @@ class EditEventView(DiaryTestsMixin, TestCase):
     def test_post_edit_event_add_media_too_big(self):
         url = reverse("edit-event-details", kwargs={"event_id": 2})
 
-        with tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-", suffix=".jpg") as temp_jpg:
+        with tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-",
+                                         suffix=".jpg") as temp_jpg:
             # Write 1 MB + 1 byte, consisting of valid JPEG data followed by
             # nulls:
             temp_jpg.write(TINY_VALID_JPEG)
@@ -1039,7 +1096,8 @@ class EditEventView(DiaryTestsMixin, TestCase):
     def test_post_edit_event_add_media_max_size(self):
         url = reverse("edit-event-details", kwargs={"event_id": 2})
 
-        with tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-", suffix=".jpg") as temp_jpg:
+        with tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-",
+                                         suffix=".jpg") as temp_jpg:
             # Write 1 MB, consisting of valid JPEG data followed by
             # nulls:
             temp_jpg.write(TINY_VALID_JPEG)
@@ -1077,7 +1135,8 @@ class EditEventView(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_event.html")
         self.assertFormError(
             response, 'form', u'copy_summary',
-            u'Copy summary must be 50 characters or fewer (currently 51 characters)')
+            u'Copy summary must be 50 characters or fewer '
+            u'(currently 51 characters)')
 
         event = Event.objects.get(id=2)
         self.assertEqual(event.copy_summary, original_summary)
@@ -1111,7 +1170,8 @@ class EditIdeasViewTests(DiaryTestsMixin, TestCase):
 
     def test_get_form_no_existing_ideas(self):
         # Confirm no ideas in the database for Jan 2012:
-        self.assertQuerysetEqual(DiaryIdea.objects.all().filter(month=date(2012, 1, 1)), [])
+        self.assertQuerysetEqual(
+            DiaryIdea.objects.all().filter(month=date(2012, 1, 1)), [])
 
         # Get the corresponding edit form:
         url = reverse("edit-ideas", kwargs={"year": 2012, "month": 1})
@@ -1126,12 +1186,14 @@ class EditIdeasViewTests(DiaryTestsMixin, TestCase):
 
     def test_get_json_no_existing_ideas(self):
         # Confirm no ideas in the database for Jan 2012:
-        self.assertQuerysetEqual(DiaryIdea.objects.all().filter(month=date(2012, 1, 1)), [])
+        self.assertQuerysetEqual(
+            DiaryIdea.objects.all().filter(month=date(2012, 1, 1)), [])
 
         # Get the corresponding edit form:
         url = reverse("edit-ideas", kwargs={"year": 2012, "month": 1})
-        response = self.client.get(url,
-                HTTP_ACCEPT="Accept: application/xml;q=0.9, */*;q=0.8, application/json")
+        response = self.client.get(
+            url, HTTP_ACCEPT="Accept: application/xml;q=0.9, "
+            "*/*;q=0.8, application/json")
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content)
         self.assertEqual(response_data, {
@@ -1158,7 +1220,8 @@ class EditIdeasViewTests(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_idea.html")
 
-        self.assertContains(response, u"An ide\u0113 f\u014d\u0159 some \u20acvent")
+        self.assertContains(
+            response, u"An ide\u0113 f\u014d\u0159 some \u20acvent")
 
     def test_get_json_existing_idea(self):
         # Ensure there's something in the DB for Jan 2012:
@@ -1169,12 +1232,14 @@ class EditIdeasViewTests(DiaryTestsMixin, TestCase):
 
         # Get the corresponding edit form:
         url = reverse("edit-ideas", kwargs={"year": 2012, "month": 1})
-        response = self.client.get(url,
-                HTTP_ACCEPT="Accept: application/xml;q=0.9, */*;q=0.8, application/json")
+        response = self.client.get(
+            url,
+            HTTP_ACCEPT="Accept: application/xml;q=0.9, */*;q=0.8, "
+            "application/json")
         self.assertEqual(response.status_code, 200)
         response_data = json.loads(response.content)
         self.assertEqual(response["Content-Type"],
-            "application/json; charset=utf-8")
+                         "application/json; charset=utf-8")
         self.assertEqual(response_data, {
             u"ideas": u"An ide\u0113 f\u014d\u0159 some \u20acvent",
             u'month': u'2012-01-01',
@@ -1183,7 +1248,8 @@ class EditIdeasViewTests(DiaryTestsMixin, TestCase):
 
     def test_post_form_no_existing_idea(self):
         # Confirm no ideas in the database for Jan 2012:
-        self.assertQuerysetEqual(DiaryIdea.objects.all().filter(month=date(2012, 1, 1)), [])
+        self.assertQuerysetEqual(
+            DiaryIdea.objects.all().filter(month=date(2012, 1, 1)), [])
 
         # Post an idea to the corresponding edit form:
         url = reverse("edit-ideas", kwargs={"year": 2012, "month": 1})
@@ -1194,7 +1260,8 @@ class EditIdeasViewTests(DiaryTestsMixin, TestCase):
         # Check that's made it into the database:
         idea, created = DiaryIdea.objects.get_or_create(month=date(2012, 1, 1))
         self.assertFalse(created)
-        self.assertEqual(idea.ideas, u"An ide\u0113 f\u014d\u0159 some \u20acvent")
+        self.assertEqual(
+            idea.ideas, u"An ide\u0113 f\u014d\u0159 some \u20acvent")
 
         self.assert_return_to_index(response)
 
@@ -1214,7 +1281,8 @@ class EditIdeasViewTests(DiaryTestsMixin, TestCase):
         # Check that's made it into the database:
         idea, created = DiaryIdea.objects.get_or_create(month=date(2012, 1, 1))
         self.assertFalse(created)
-        self.assertEqual(idea.ideas, u"An ide\u0113 f\u014d\u0159 some \u20acvent")
+        self.assertEqual(
+            idea.ideas, u"An ide\u0113 f\u014d\u0159 some \u20acvent")
 
         self.assert_return_to_index(response)
 
@@ -1275,9 +1343,12 @@ class ViewEventFieldTests(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "view_copy.html")
 
         self.assertNotContains(response, u"EVENT THREE TITLE")
-        self.assertContains(response, u"Sun 09 18:00 .... Event four titl\u0113")
-        self.assertContains(response, u"<p>EVENT FOUR TITL\u0112</p>", html=True)
-        self.assertContains(response, u"<p>Event four C\u014dpy</p>", html=True)
+        self.assertContains(
+            response, u"Sun 09 18:00 .... Event four titl\u0113")
+        self.assertContains(
+            response, u"<p>EVENT FOUR TITL\u0112</p>", html=True)
+        self.assertContains(
+            response, u"<p>Event four C\u014dpy</p>", html=True)
 
     def test_view_event_field_copy_summary(self):
         url = reverse("view_event_field", kwargs={"field": "copy_summary"})
@@ -1286,9 +1357,16 @@ class ViewEventFieldTests(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "view_copy_summary.html")
 
         self.assertNotContains(response, u"EVENT THREE TITLE")
-        self.assertContains(response, u'Sun 09 18:00 .... Pretitle four Event four titl\u0113 Posttitle four')
-        self.assertContains(response, u'<p class="title">Event four titl\u0113</p>', html=True)
-        self.assertContains(response, u'<p class="copy_summary">\u010copy four summary</p>', html=True)
+        self.assertContains(response,
+                            u'Sun 09 18:00 .... Pretitle four Event four '
+                            u'titl\u0113 Posttitle four')
+        self.assertContains(response,
+                            u'<p class="title">Event four titl\u0113</p>',
+                            html=True)
+        self.assertContains(response,
+                            u'<p class="copy_summary">\u010copy four '
+                            u'summary</p>',
+                            html=True)
 
         self.assertContains(response, u"\u00a3milliion per thing")
         self.assertContains(response, u"Pretitle four")
@@ -1301,7 +1379,8 @@ class ViewEventFieldTests(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "view_terms.html")
 
-        self.assertContains(response, u"Sun 09 18:00 .... Event four titl\u0113")
+        self.assertContains(
+            response, u"Sun 09 18:00 .... Event four titl\u0113")
         self.assertContains(response, u"Cube event / Public event / Confirmed")
         self.assertContains(response, u"Terminal price: \u00a31 / \u20ac3")
 
@@ -1369,7 +1448,8 @@ class PreferencesTests(DiaryTestsMixin, TestCase):
         self.client.login(username="admin", password="T3stPassword!")
 
     def _get_edit_prefs(self, response):
-        match = re.search(ur"var\s+edit_prefs\s*=\s*({.*?});", str(response), re.DOTALL)
+        match = re.search(
+            ur"var\s+edit_prefs\s*=\s*({.*?});", str(response), re.DOTALL)
         return json.loads(match.group(1))
 
     def test_set_pref(self):
@@ -1404,19 +1484,22 @@ class PreferencesTests(DiaryTestsMixin, TestCase):
         session_mock = {}
         toolkit.diary.edit_prefs.set_preference(session_mock, 'daysahead', 30)
 
-        retrieved_pref = toolkit.diary.edit_prefs.get_preference(session_mock, 'daysahead')
+        retrieved_pref = toolkit.diary.edit_prefs.get_preference(
+            session_mock, 'daysahead')
         self.assertEqual(retrieved_pref, '30')
 
     def test_set_get_single_missing_pref(self):
         session_mock = {}
-        retrieved_pref = toolkit.diary.edit_prefs.get_preference(session_mock, 'daysahead')
+        retrieved_pref = toolkit.diary.edit_prefs.get_preference(
+            session_mock, 'daysahead')
         self.assertEqual(retrieved_pref, '365')
 
     def test_set_get_single_bad_pref(self):
         session_mock = {'spangles': 'foo'}
         # Shouldn't return the value, as it's not a known pref, even tho it's
         # in the session:
-        retrieved_pref = toolkit.diary.edit_prefs.get_preference(session_mock, 'spangles')
+        retrieved_pref = toolkit.diary.edit_prefs.get_preference(
+            session_mock, 'spangles')
         self.assertEqual(retrieved_pref, None)
 
     def test_bad_value(self):
@@ -1461,6 +1544,7 @@ class PreferencesTests(DiaryTestsMixin, TestCase):
 
 
 class EditTagsViewTests(DiaryTestsMixin, TestCase):
+
     def setUp(self):
         super(EditTagsViewTests, self).setUp()
         self.client.login(username="admin", password="T3stPassword!")
@@ -1557,6 +1641,7 @@ class EditTagsViewTests(DiaryTestsMixin, TestCase):
 
 
 class DiaryCalendarViewTests(DiaryTestsMixin, TestCase):
+
     def setUp(self):
         super(DiaryCalendarViewTests, self).setUp()
         self.client.login(username="admin", password="T3stPassword!")
@@ -1598,7 +1683,9 @@ class DiaryCalendarViewTests(DiaryTestsMixin, TestCase):
         # Shouldn't work!
         self.assertEqual(response.status_code, 404)
 
+
 class DiaryDataViewTests(DiaryTestsMixin, TestCase):
+
     def setUp(self):
         super(DiaryDataViewTests, self).setUp()
         self.client.login(username="admin", password="T3stPassword!")
@@ -1638,9 +1725,9 @@ class DiaryDataViewTests(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
 
         data = json.loads(response.content)
-        data_by_showing = { int(i['id']): i for i in data }
+        data_by_showing = {int(i['id']): i for i in data}
 
-        expected_showings = {1,2,3,4,5,6,7,10}
+        expected_showings = {1, 2, 3, 4, 5, 6, 7, 10}
 
         self.assertEqual(set(data_by_showing.keys()), expected_showings)
 

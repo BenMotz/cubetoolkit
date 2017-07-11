@@ -40,12 +40,14 @@ class DiaryTestsMixin(object):
 
     def _setup_test_data(self):
 
-        self._fake_now = pytz.timezone("Europe/London").localize(datetime(2013, 6, 1, 11, 00))
+        self._fake_now = pytz.timezone(
+            "Europe/London").localize(datetime(2013, 6, 1, 11, 00))
 
         # Roles:
         r1 = Role(name=u"Role 1 (standard)", read_only=False, standard=True)
         r1.save()
-        r2 = Role(name=u"Role 2 (nonstandard)", read_only=False, standard=False)
+        r2 = Role(name=u"Role 2 (nonstandard)",
+                  read_only=False, standard=False)
         r2.save()
         r3 = Role(name=u"Role 3", read_only=False, standard=False)
         r3.save()
@@ -56,33 +58,32 @@ class DiaryTestsMixin(object):
         t2 = EventTag(name=u"tag two", slug=u"tag-two", read_only=False)
         t2.save()
         # 'ag-three' is what slugify() gives for that name:
-        t3 = EventTag(name=u"\u0167ag \u0165hre\u0119", slug=u"ag-three", read_only=False)
+        t3 = EventTag(name=u"\u0167ag \u0165hre\u0119",
+                      slug=u"ag-three", read_only=False)
         t3.save()
 
-        """
-        Event  outside_hire   private   Tags
-        ---------------------------------------
-        e1     True           False
-        e2     False          False
-        e3     False          False    t2
-        e4     False          False    t2
-        e5     False          True
-        e6     True           True     t3
+        # Event  outside_hire   private   Tags
+        # ---------------------------------------
+        # e1     True           False
+        # e2     False          False
+        # e3     False          False    t2
+        # e4     False          False    t2
+        # e5     False          True
+        # e6     True           True     t3
 
-        Showing  Event  Date    Confirmed  Hidden  Cancelled  Discount|E: outside  private
-        --------------------------------------------------------------|-------------------
-        e2s1       e2    1/4/13   F          F       F          F     |   F        F
-        e2s2       e2    2/4/13   T          F       F          F     |   F        F
-        e2s3       e2    3/4/13   T          F       T          F     |   F        F
-        e2s4       e2    4/4/13   T          T       F          F     |   F        F
-        e2s5       e2    5/4/13   T          T       T          F     |   F        F
+        # Showing Event  Date    Confirmed  Hiddn  Cnclld  Dscnt|E: oside pvate
+        # ------------------------------------------------------|--------------
+        # e2s1    e2    1/4/13   F          F      F      F     |   F      F
+        # e2s2    e2    2/4/13   T          F      F      F     |   F      F
+        # e2s3    e2    3/4/13   T          F      T      F     |   F      F
+        # e2s4    e2    4/4/13   T          T      F      F     |   F      F
+        # e2s5    e2    5/4/13   T          T      T      F     |   F      F
 
-        s2       e3    13/4/13  T          F       F          F       |   F        F
-        s3       e4    9/6/13   T          F       F          F       |   F        F
-        s4       e4    14/9/13  F          F       F          F       |   F        F
-        s5       e5    14/2/13  T          F       F          F       |   F        T
-        s6       e1    15/2/13  T          T       F          F       |   F        F
-        """
+        # s2      e3    13/4/13  T          F      F      F     |   F      F
+        # s3      e4    9/6/13   T          F      F      F     |   F      F
+        # s4      e4    14/9/13  F          F      F      F     |   F      F
+        # s5      e5    14/2/13  T          F      F      F     |   F      T
+        # s6      e1    15/2/13  T          T      F      F     |   F      F
 
         # Events:
         e1 = Event(
@@ -100,7 +101,8 @@ class DiaryTestsMixin(object):
 
         self.e2 = Event(
             name="Event two title",
-            copy="Event\n two\n copy",  # newlines will be stripped at legacy conversion
+            # newlines will be stripped at legacy conversion:
+            copy="Event\n two\n copy",
             pricing="Pricing TWO",
             copy_summary="Event two\n copy summary",
             duration="01:30:00",
@@ -167,33 +169,44 @@ class DiaryTestsMixin(object):
 
         # Showings:
         self.e2s1 = Showing(  # pk :1
-            start=pytz.timezone("Europe/London").localize(datetime(2013, 4, 1, 19, 00)),
+            start=pytz.timezone(
+                "Europe/London").localize(datetime(2013, 4, 1, 19, 00)),
             event=self.e2, booked_by="User",
-            confirmed=False, hide_in_programme=False, cancelled=False, discounted=False)
+            confirmed=False, hide_in_programme=False,
+            cancelled=False, discounted=False)
         self.e2s1.save(force=True)
         self.e2s2 = Showing(  # pk :2
-            start=pytz.timezone("Europe/London").localize(datetime(2013, 4, 2, 19, 00)),
+            start=pytz.timezone(
+                "Europe/London").localize(datetime(2013, 4, 2, 19, 00)),
             event=self.e2, booked_by="User",
-            confirmed=True, hide_in_programme=False, cancelled=False, discounted=False)
+            confirmed=True, hide_in_programme=False,
+            cancelled=False, discounted=False)
         self.e2s2.save(force=True)
         e2s3 = Showing(  # pk :3
-            start=pytz.timezone("Europe/London").localize(datetime(2013, 4, 3, 19, 00)),
+            start=pytz.timezone(
+                "Europe/London").localize(datetime(2013, 4, 3, 19, 00)),
             event=self.e2, booked_by="User",
-            confirmed=True, hide_in_programme=False, cancelled=True, discounted=False)
+            confirmed=True, hide_in_programme=False,
+            cancelled=True, discounted=False)
         e2s3.save(force=True)
         e2s4 = Showing(  # pk :4
-            start=pytz.timezone("Europe/London").localize(datetime(2013, 4, 4, 19, 00)),
+            start=pytz.timezone(
+                "Europe/London").localize(datetime(2013, 4, 4, 19, 00)),
             event=self.e2, booked_by="User",
-            confirmed=True, hide_in_programme=True, cancelled=False, discounted=False)
+            confirmed=True, hide_in_programme=True,
+            cancelled=False, discounted=False)
         e2s4.save(force=True)
         e2s5 = Showing(  # pk :5
-            start=pytz.timezone("Europe/London").localize(datetime(2013, 4, 5, 19, 00)),
+            start=pytz.timezone(
+                "Europe/London").localize(datetime(2013, 4, 5, 19, 00)),
             event=self.e2, booked_by="User",
-            confirmed=True, hide_in_programme=True, cancelled=True, discounted=False)
+            confirmed=True, hide_in_programme=True,
+            cancelled=True, discounted=False)
         e2s5.save(force=True)
 
         s2 = Showing(
-            start=pytz.timezone("Europe/London").localize(datetime(2013, 4, 13, 18, 00)),
+            start=pytz.timezone(
+                "Europe/London").localize(datetime(2013, 4, 13, 18, 00)),
             event=e3,
             booked_by="User Two",
             confirmed=True
@@ -203,7 +216,8 @@ class DiaryTestsMixin(object):
         # When the clock is patched to claim that it's 1/6/2013, this showing
         # will be in the future:
         self.e4s3 = Showing(
-            start=pytz.timezone("Europe/London").localize(datetime(2013, 6, 9, 18, 00)),
+            start=pytz.timezone(
+                "Europe/London").localize(datetime(2013, 6, 9, 18, 00)),
             event=e4,
             booked_by=u"\u0102nother \u0170ser",
             confirmed=True,
@@ -212,7 +226,8 @@ class DiaryTestsMixin(object):
         self.e4s3.save(force=True)  # Force start date in the past
 
         s4 = Showing(
-            start=pytz.timezone("Europe/London").localize(datetime(2013, 9, 14, 18, 00)),
+            start=pytz.timezone(
+                "Europe/London").localize(datetime(2013, 9, 14, 18, 00)),
             event=e4,
             booked_by="User Two",
             hide_in_programme=True,
@@ -221,7 +236,8 @@ class DiaryTestsMixin(object):
         s4.save(force=True)  # Force start date in the past
 
         s5 = Showing(
-            start=pytz.timezone("Europe/London").localize(datetime(2013, 2, 14, 18, 00)),
+            start=pytz.timezone(
+                "Europe/London").localize(datetime(2013, 2, 14, 18, 00)),
             event=e5,
             booked_by="Yet another user",
             confirmed=True,
@@ -229,7 +245,8 @@ class DiaryTestsMixin(object):
         s5.save(force=True)
 
         s6 = Showing(
-            start=pytz.timezone("Europe/London").localize(datetime(2013, 2, 15, 18, 00)),
+            start=pytz.timezone(
+                "Europe/London").localize(datetime(2013, 2, 15, 18, 00)),
             event=e1,
             booked_by="Blah blah",
             confirmed=True,
@@ -289,15 +306,16 @@ class DiaryTestsMixin(object):
         m2.save()
         m3 = Member(name="Volunteer One", email="volon@cube.test", number="3",
                     phone="0800 000 000", address="1 Road", posttown="Town",
-                    postcode="BS6 123", country="UK", website="http://foo.test/")
+                    postcode="BS6 123", country="UK",
+                    website="http://foo.test/")
         m3.save()
         m4 = Member(name="Volunteer Two", email="", number="4",
-                    phone="", altphone="", address="", posttown="", postcode="",
-                    country="", website="http://foo.test/")
+                    phone="", altphone="", address="", posttown="",
+                    postcode="", country="", website="http://foo.test/")
         m4.save()
-        m5 = Member(name="Volunteer Three", email="volthree@foo.test", number="4",
-                    phone="", altphone="", address="", posttown="", postcode="",
-                    country="", website="")
+        m5 = Member(name="Volunteer Three", email="volthree@foo.test",
+                    number="4", phone="", altphone="", address="", posttown="",
+                    postcode="", country="", website="")
         m5.save()
 
         # Volunteers:
@@ -316,13 +334,17 @@ class DiaryTestsMixin(object):
 
     def _setup_test_users(self):
         # Read/write user:
-        user_rw = auth_models.User.objects.create_user('admin', 'toolkit_admin@localhost', 'T3stPassword!')
+        user_rw = auth_models.User.objects.create_user(
+            'admin', 'toolkit_admin@localhost', 'T3stPassword!')
         # read only user:
-        user_r = auth_models.User.objects.create_user('read_only', 'toolkit_admin@localhost', 'T3stPassword!1')
+        user_r = auth_models.User.objects.create_user(
+            'read_only', 'toolkit_admin@localhost', 'T3stPassword!1')
         # no permission user:
-        auth_models.User.objects.create_user('no_perm', 'toolkit_admin@localhost', 'T3stPassword!2')
+        auth_models.User.objects.create_user(
+            'no_perm', 'toolkit_admin@localhost', 'T3stPassword!2')
         # rota edit only user:
-        user_rota = auth_models.User.objects.create_user('rota_editor', 'toolkit_admin@localhost', 'T3stPassword!3')
+        user_rota = auth_models.User.objects.create_user(
+            'rota_editor', 'toolkit_admin@localhost', 'T3stPassword!3')
 
         # Create dummy ContentType:
         ct = contenttypes.models.ContentType.objects.get_or_create(

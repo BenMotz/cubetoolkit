@@ -17,6 +17,7 @@ from .common import DiaryTestsMixin
 
 
 class AddPrintedProgrammeTests(DiaryTestsMixin, TestCase):
+
     def setUp(self):
         super(AddPrintedProgrammeTests, self).setUp()
         self.client.login(username="admin", password="T3stPassword!")
@@ -51,14 +52,16 @@ class AddPrintedProgrammeTests(DiaryTestsMixin, TestCase):
         })
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_printedprogramme_archive.html")
-        self.assertFormError(response, 'new_programme_form', 'programme', u'This field is required.')
+        self.assertFormError(response, 'new_programme_form',
+                             'programme', u'This field is required.')
         self.assertEqual(PrintedProgramme.objects.count(), 0)
 
     def test_add_progamme_invalid_file_empty(self):
         url = reverse("add-printed-programme")
 
         with tempfile.NamedTemporaryFile(
-                dir="/tmp", prefix="toolkit-test-programme-", suffix=".pdf") as temp_pdf:
+                dir="/tmp", prefix="toolkit-test-programme-",
+                suffix=".pdf") as temp_pdf:
             response = self.client.post(url, data={
                 "month": "1",
                 "year": "2010",
@@ -68,7 +71,8 @@ class AddPrintedProgrammeTests(DiaryTestsMixin, TestCase):
             })
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_printedprogramme_archive.html")
-        self.assertFormError(response, 'new_programme_form', 'programme', u'The submitted file is empty.')
+        self.assertFormError(response, 'new_programme_form',
+                             'programme', u'The submitted file is empty.')
         self.assertEqual(PrintedProgramme.objects.count(), 0)
 
     def test_add_progamme_invalid_duplicate_month(self):
@@ -81,7 +85,8 @@ class AddPrintedProgrammeTests(DiaryTestsMixin, TestCase):
         url = reverse("add-printed-programme")
 
         with tempfile.NamedTemporaryFile(
-                dir="/tmp", prefix="toolkit-test-programme-", suffix=".pdf") as temp_pdf:
+                dir="/tmp", prefix="toolkit-test-programme-",
+                suffix=".pdf") as temp_pdf:
             self._write_pdf_magic(temp_pdf)
             response = self.client.post(url, data={
                 "month": "1",
@@ -106,7 +111,8 @@ class AddPrintedProgrammeTests(DiaryTestsMixin, TestCase):
         url = reverse("add-printed-programme")
 
         with tempfile.NamedTemporaryFile(
-                dir="/tmp", prefix="toolkit-test-programme-", suffix=".pdf") as temp_pdf:
+                dir="/tmp", prefix="toolkit-test-programme-",
+                suffix=".pdf") as temp_pdf:
             self._write_pdf_magic(temp_pdf)
             response = self.client.post(url, data={
                 "month": "4",
@@ -136,6 +142,7 @@ class AddPrintedProgrammeTests(DiaryTestsMixin, TestCase):
 
 
 class EditPrintedProgrammeTests(DiaryTestsMixin, TestCase):
+
     def setUp(self):
         super(EditPrintedProgrammeTests, self).setUp()
         self.client.login(username="admin", password="T3stPassword!")

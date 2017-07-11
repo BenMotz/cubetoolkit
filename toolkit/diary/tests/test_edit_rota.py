@@ -13,10 +13,12 @@ from .common import DiaryTestsMixin
 
 class EditRotaViewGet(DiaryTestsMixin, TestCase):
     """Test that rota edit view loads"""
+
     def setUp(self):
         super(EditRotaViewGet, self).setUp()
         self.assertTrue(
-            self.client.login(username="rota_editor", password="T3stPassword!3")
+            self.client.login(username="rota_editor",
+                              password="T3stPassword!3")
         )
 
     def tearDown(self):
@@ -34,12 +36,14 @@ class EditRotaViewGet(DiaryTestsMixin, TestCase):
         # Check date range:
         self.assertContains(
             response,
-            ur'<input type="text" name="from_date" value="1-06-2013" id="id_from_date" />',
+            ur'<input type="text" name="from_date" value="1-06-2013" '
+            ur'id="id_from_date" />',
             html=True
         )
         self.assertContains(
             response,
-            ur'<input type="text" name="to_date" value="1-07-2013" id="id_to_date" />',
+            ur'<input type="text" name="to_date" value="1-07-2013" '
+            ur'id="id_to_date" />',
             html=True
         )
 
@@ -71,12 +75,14 @@ class EditRotaViewGet(DiaryTestsMixin, TestCase):
         # Check date range:
         self.assertContains(
             response,
-            ur'<input type="text" name="from_date" value="11-06-2013" id="id_from_date" />',
+            ur'<input type="text" name="from_date" value="11-06-2013" '
+            ur'id="id_from_date" />',
             html=True
         )
         self.assertContains(
             response,
-            ur'<input type="text" name="to_date" value="21-06-2013" id="id_to_date" />',
+            ur'<input type="text" name="to_date" value="21-06-2013" '
+            ur'id="id_to_date" />',
             html=True
         )
 
@@ -87,10 +93,12 @@ class EditRotaViewGet(DiaryTestsMixin, TestCase):
 
 class EditRotaViewPost(DiaryTestsMixin, TestCase):
     """Test of rota edit posting"""
+
     def setUp(self):
         super(EditRotaViewPost, self).setUp()
         self.assertTrue(
-            self.client.login(username="rota_editor", password="T3stPassword!3")
+            self.client.login(username="rota_editor",
+                              password="T3stPassword!3")
         )
 
     def tearDown(self):
@@ -221,10 +229,12 @@ class EditRotaViewPost(DiaryTestsMixin, TestCase):
 
 class EditRotaNotes(DiaryTestsMixin, TestCase):
     """Test of editing per-showing rota notes"""
+
     def setUp(self):
         super(EditRotaNotes, self).setUp()
         self.assertTrue(
-            self.client.login(username="rota_editor", password="T3stPassword!3")
+            self.client.login(username="rota_editor",
+                              password="T3stPassword!3")
         )
 
     def tearDown(self):

@@ -21,7 +21,6 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         self.time_mock = self.time_patch.start()
         self.time_mock.return_value = self._fake_now
 
-
         self.expected_mailout_subject = (
             'type="text" value="CUBE Microplex forthcoming events'
             ' commencing Sunday 9 June"'
@@ -42,13 +41,15 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             u"2013\n"
             u" JUNE\n"
             u"  Sun 09 18:00 .... Event four titl\u0113\n"
-            "\n"
-            "* cheap night\n"
-            "\n"
-            "For complete listings including all future events, please visit:\n"
-            "http://www.cubecinema.com/programme/\n"
             u"\n"
-            u"----------------------------------------------------------------------------\n"
+            u"* cheap night\n"
+            u"\n"
+            u"For complete listings including all future events, please visit:"
+            u"\n"
+            u"http://www.cubecinema.com/programme/\n"
+            u"\n"
+            u"----------------------------------------------------------------"
+            u"------------\n"
             u"\n"
             u"Pretitle four:\n"
             u"EVENT FOUR TITL\u0112\n"
@@ -111,7 +112,8 @@ class MailoutTests(DiaryTestsMixin, TestCase):
 
         # Expected subject - no "commencing" string:
         self.assertContains(response,
-            'type="text" value="CUBE Microplex forthcoming events"')
+                            'type="text" '
+                            'value="CUBE Microplex forthcoming events"')
 
     def test_post_form(self):
         url = reverse("members-mailout")
@@ -130,8 +132,10 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_mailout.html")
 
-        self.assertFormError(response, 'form', 'subject', u'This field is required.')
-        self.assertFormError(response, 'form', 'body', u'This field is required.')
+        self.assertFormError(response, 'form', 'subject',
+                             u'This field is required.')
+        self.assertFormError(response, 'form', 'body',
+                             u'This field is required.')
 
     def test_invalid_method(self):
         url = reverse("members-mailout")
@@ -242,7 +246,8 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         }, response_data)
 
     @patch("celery.result.AsyncResult")
-    def test_exec_view_get_progress_failure_no_result(self, async_result_patch):
+    def test_exec_view_get_progress_failure_no_result(self,
+                                                      async_result_patch):
         async_result_patch.return_value.state = u"FAILURE"
         async_result_patch.return_value.task_id = u"dummy-task-id"
         async_result_patch.return_value.result = None
@@ -282,7 +287,8 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         }, response_data)
 
     @patch("celery.result.AsyncResult")
-    def test_exec_view_get_progress_complete_bad_result(self, async_result_patch):
+    def test_exec_view_get_progress_complete_bad_result(self,
+                                                        async_result_patch):
         async_result_patch.return_value.state = u"SUCCESS"
         async_result_patch.return_value.task_id = u"dummy-task-id"
         async_result_patch.return_value.result = "Nu?"

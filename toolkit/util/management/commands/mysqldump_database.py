@@ -25,8 +25,9 @@ class Command(BaseCommand):
 
         db_settings = settings.DATABASES['default']
         if db_settings['ENGINE'] != 'django.db.backends.mysql':
-            raise CommandError("Application does not use a mysql database (very"
-                               " sensible) - it uses {0}".format(db_settings['engine']))
+            raise CommandError(
+                "Application does not use a mysql database (very sensible) - "
+                "it uses {0}".format(db_settings['engine']))
 
         with open(filename, "w") as out_file:
             print "Dumping to '{0}'".format(filename)

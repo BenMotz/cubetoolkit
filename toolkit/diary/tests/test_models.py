@@ -89,7 +89,8 @@ class EventModelNonLegacyCopy(TestCase):
             u"<p>And another! <a href='https://example.com/bar/'>link!</a>"
             u" and some equivalent things; &pound; &#163; \u00a3<br></p>"
         )
-        self.event = Event(name="Test event", legacy_copy=False, copy=self.sample_copy)
+        self.event = Event(name="Test event",
+                           legacy_copy=False, copy=self.sample_copy)
         self.event.save()
 
     def test_simple(self):
@@ -120,7 +121,8 @@ class EventModelLegacyCopy(TestCase):
             u" and some equivalent things; &pound; &#163; \u00a3..."
             u" and <this> \"'<troublemaker>'\""
         )
-        self.event = Event(name="Test event", legacy_copy=True, copy=self.sample_copy)
+        self.event = Event(name="Test event",
+                           legacy_copy=True, copy=self.sample_copy)
         self.event.save()
 
     def test_simple(self):
@@ -131,7 +133,8 @@ class EventModelLegacyCopy(TestCase):
     def test_html_copy(self):
         expected = (
             u"Simple &amp; tidy legacy \u00a9\u014dpy <br><br>"
-            u'With an unardorned link: <a href="http://example.com/foo/">http://example.com/foo/</a>'
+            u'With an unardorned link: '
+            u'<a href="http://example.com/foo/">http://example.com/foo/</a>'
             u' <a href="https://example.com/foo/">https://example.com/foo/</a>'
             u" and some equivalent things; &pound; &#163; \u00a3..."
             u" and <this> \"'<troublemaker>'\""
@@ -173,6 +176,7 @@ class PrintedProgrammeModelTests(TestCase):
 
 
 class EventPricingFromTemplate(DiaryTestsMixin, TestCase):
+
     def test_set_pricing_from_template(self):
         # No pricing specified when creating the event, and pricing specified
         # in the template:
@@ -232,6 +236,7 @@ class EventPricingFromTemplate(DiaryTestsMixin, TestCase):
 
 
 class EventTagsFromTemplate(DiaryTestsMixin, TestCase):
+
     def test_set_one_tag_from_template(self):
         new_event = Event(
             name=u"Event Title",
@@ -261,7 +266,8 @@ class EventTagsFromTemplate(DiaryTestsMixin, TestCase):
         self.assertEqual(new_event.tags.count(), 2)
         self.assertEqual(new_event.tags.all()[0].name, u"tag one")
         self.assertEqual(new_event.tags.all()[0].slug, u"tag-one")
-        self.assertEqual(new_event.tags.all()[1].name, u"\u0167ag \u0165hre\u0119")
+        self.assertEqual(new_event.tags.all()[
+                         1].name, u"\u0167ag \u0165hre\u0119")
         self.assertEqual(new_event.tags.all()[1].slug, u"ag-three")
 
     def test_set_no_tags_from_template(self):
@@ -292,6 +298,7 @@ class EventTagsFromTemplate(DiaryTestsMixin, TestCase):
 
 
 class EventTagTests(TestCase):
+
     def test_can_delete_not_readonly(self):
         tag = EventTag(name=u"test", slug=u"test", read_only=False)
         tag.save()

@@ -12,7 +12,7 @@ def _get_password(use):
 
     while check_password != password:
         password = getpass.getpass("Please enter password for {0}: "
-                             .format(use))
+                                   .format(use))
         check_password = getpass.getpass("Please re-enter for confirmation: ")
         if check_password != password:
             print "Passwords don't match; please try again..."

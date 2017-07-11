@@ -37,7 +37,7 @@ def get_volunteer_objects(volunteers):
     errors = []
 
     for vol_rec in volunteers:
-        src_name = vol_rec[0] +" " + vol_rec[1]
+        src_name = vol_rec[0] + " " + vol_rec[1]
         src_email = vol_rec[2]
 
         vol = try_get_volunteer_by_name(src_name)
@@ -76,4 +76,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

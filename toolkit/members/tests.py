@@ -24,9 +24,9 @@ import toolkit.members.member_views as member_views
 import toolkit.members.tasks
 
 TINY_VALID_BASE64_PNG = (
-    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAARnQU1BAACx"
-    "jwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAMSURBVBhXY/j//z8ABf4C/qc1gYQAAAAASUVO"
-    "RK5CYII=")
+    "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAIAAACQd1PeAAAAAXNSR0IArs4c6QAAAARnQU1BA"
+    "ACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAMSURBVBhXY/j//z8ABf4C/qc1gYQAAA"
+    "AASUVORK5CYII=")
 
 
 class MembersTestsMixin(object):
@@ -47,30 +47,39 @@ class MembersTestsMixin(object):
         r3.save()
 
         # Members:
-        self.mem_1 = Member(name=u"Member On\u0205", email="one@example.com", number="1", postcode="BS1 1AA")
+        self.mem_1 = Member(name=u"Member On\u0205",
+                            email="one@example.com", number="1",
+                            postcode="BS1 1AA")
         self.mem_1.save()
-        self.mem_2 = Member(name=u"Tw\u020d Member", email="two@example.com", number="02", postcode="")
+        self.mem_2 = Member(name=u"Tw\u020d Member",
+                            email="two@example.com", number="02",
+                            postcode="")
         self.mem_2.save()
-        self.mem_3 = Member(name=u"Some Third Chap", email="two@member.test", number="000", postcode="NORAD")
+        self.mem_3 = Member(name=u"Some Third Chap",
+                            email="two@member.test", number="000",
+                            postcode="NORAD")
         self.mem_3.save()
-        self.mem_4 = Member(name="Volunteer One", email="volon@cube.test", number="3",
-                            phone="0800 000 000", address="1 Road", posttown="Town of towns", postcode="BS6 123",
+        self.mem_4 = Member(name="Volunteer One", email="volon@cube.test",
+                            number="3", phone="0800 000 000", address="1 Road",
+                            posttown="Town of towns", postcode="BS6 123",
                             country="UKountry", website="http://1.foo.test/")
         self.mem_4.save()
         self.mem_5 = Member(name="Volunteer Two", email="", number="4",
-                            phone="", altphone="", address="", posttown="", postcode="", country="",
+                            phone="", altphone="", address="", posttown="",
+                            postcode="", country="",
                             website="http://two.foo.test/")
         self.mem_5.save()
-        self.mem_6 = Member(name="Volunteer Three", email="volthree@foo.test", number="4",
-                            phone="", altphone="", address="", posttown="", postcode="", country="",
-                            website="")
+        self.mem_6 = Member(name="Volunteer Three", email="volthree@foo.test",
+                            number="4", phone="", altphone="", address="",
+                            posttown="", postcode="", country="", website="")
         self.mem_6.save()
-        self.mem_7 = Member(name="Volunteer Four", email="four4@foo.test", number="o4",
-                            phone="", altphone="", address="", posttown="", postcode="", country="",
-                            website="")
+        self.mem_7 = Member(name="Volunteer Four", email="four4@foo.test",
+                            number="o4", phone="", altphone="", address="",
+                            posttown="", postcode="", country="", website="")
         self.mem_7.save()
         self.mem_8 = Member(name=u"Number Eight, No mailout please",
-                            email="bart@bart.test", number="010", mailout=False)
+                            email="bart@bart.test", number="010",
+                            mailout=False)
         self.mem_8.save()
         self.mem_8 = Member(name=u"Number Nine, mailout failed",
                             email="frobney@squoo.test", number="010",
@@ -94,18 +103,23 @@ class MembersTestsMixin(object):
         self.vol_3.roles = [r3]
         self.vol_3.save()
 
-        self.vol_4 = Volunteer(member=self.mem_7, active=False, notes=u"Subliminal, superluminous")
+        self.vol_4 = Volunteer(
+            member=self.mem_7, active=False,
+            notes=u"Subliminal, superluminous")
         self.vol_4.save()
         self.vol_4.roles = [r3]
         self.vol_4.save()
 
     def _setup_test_users(self):
         # Read/write user:
-        user_rw = auth_models.User.objects.create_user('admin', 'toolkit_admin@localhost', 'T3stPassword!')
+        user_rw = auth_models.User.objects.create_user(
+            'admin', 'toolkit_admin@localhost', 'T3stPassword!')
         # read only user:
-        user_r = auth_models.User.objects.create_user('read_only', 'toolkit_admin@localhost', 'T3stPassword!1')
+        user_r = auth_models.User.objects.create_user(
+            'read_only', 'toolkit_admin@localhost', 'T3stPassword!1')
         # no permission user:
-        auth_models.User.objects.create_user('no_perm', 'toolkit_admin@localhost', 'T3stPassword!2')
+        auth_models.User.objects.create_user(
+            'no_perm', 'toolkit_admin@localhost', 'T3stPassword!2')
         # Create dummy ContentType:
         ct = contenttypes.models.ContentType.objects.get_or_create(
             model='',
@@ -162,8 +176,8 @@ class SecurityTests(MembersTestsMixin, TestCase):
         """Assert that given URLs 302 redirect to the login page"""
         for view_name, kwargs in views_to_test.iteritems():
             url = reverse(view_name, kwargs=kwargs)
-            expected_redirect = ("{0}?next={1}"
-                                 .format(reverse("django.contrib.auth.views.login"), url))
+            expected_redirect = ("{0}?next={1}".format(
+                reverse("django.contrib.auth.views.login"), url))
             # Test GET:
             response = self.client.get(url)
             self.assertRedirects(response, expected_redirect)
@@ -217,7 +231,8 @@ class SecurityTests(MembersTestsMixin, TestCase):
         # First try without a key:
         for view_name in views_to_test:
             url = reverse(view_name, kwargs={'member_id': member.id})
-            expected_redirect = "{0}?next={1}".format(reverse("django.contrib.auth.views.login"), url)
+            expected_redirect = "{0}?next={1}".format(
+                reverse("django.contrib.auth.views.login"), url)
 
             # Test GET:
             response = self.client.get(url)
@@ -279,6 +294,7 @@ class AddMemberIPAuth(TestCase):
 
 
 class TestMemberModelManager(MembersTestsMixin, TestCase):
+
     def test_email_recipients(self):
         recipients = Member.objects.mailout_recipients()
         self.assertEqual(recipients.count(), 6)
@@ -289,8 +305,10 @@ class TestMemberModelManager(MembersTestsMixin, TestCase):
 
 
 class TestMemberModel(TestCase):
+
     def setUp(self):
-        member_one = Member(name="Member One", number="1", email="one@example.com")
+        member_one = Member(name="Member One", number="1",
+                            email="one@example.com")
         member_one.save()
 
     def test_membership_number_no_existing(self):
@@ -343,7 +361,8 @@ class TestVolunteerEditViews(MembersTestsMixin, TestCase):
     def setUp(self):
         super(TestVolunteerEditViews, self).setUp()
 
-        self.assertTrue(self.client.login(username="admin", password="T3stPassword!"))
+        self.assertTrue(self.client.login(
+            username="admin", password="T3stPassword!"))
 
     def tearDown(self):
         self.client.logout()
@@ -383,7 +402,8 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
     def setUp(self):
         super(TestAddMemberView, self).setUp()
 
-        self.assertTrue(self.client.login(username="admin", password="T3stPassword!"))
+        self.assertTrue(self.client.login(
+            username="admin", password="T3stPassword!"))
 
     def tearDown(self):
         self.client.logout()
@@ -412,11 +432,13 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_new_member.html")
 
         member = Member.objects.get(name=new_name)
-        self.assertEqual(member.email, u"blah.blah-blah@hard-to-tell-if-genuine.uk")
+        self.assertEqual(
+            member.email, u"blah.blah-blah@hard-to-tell-if-genuine.uk")
         self.assertEqual(member.postcode, u"SW1A 1AA")
         self.assertEqual(member.mailout, True)
 
-        self.assertContains(response, u"Added member: {0}".format(member.number))
+        self.assertContains(
+            response, u"Added member: {0}".format(member.number))
 
     def test_post_minimal_submission(self):
         new_name = u"Another New \u20acejit"
@@ -436,7 +458,8 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
         self.assertEqual(member.postcode, u"")
         self.assertEqual(member.is_member, False)
 
-        self.assertContains(response, u"Added member: {0}".format(member.number))
+        self.assertContains(
+            response, u"Added member: {0}".format(member.number))
 
     def test_post_form_invalid_data_missing(self):
         url = reverse("add-member")
@@ -447,7 +470,8 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_new_member.html")
 
-        self.assertFormError(response, 'form', 'name', u'This field is required.')
+        self.assertFormError(response, 'form', 'name',
+                             u'This field is required.')
 
         self.assertEqual(count_before, Member.objects.count())
 
@@ -462,7 +486,8 @@ class TestSearchMemberView(MembersTestsMixin, TestCase):
     def setUp(self):
         super(TestSearchMemberView, self).setUp()
 
-        self.assertTrue(self.client.login(username="admin", password="T3stPassword!"))
+        self.assertTrue(self.client.login(
+            username="admin", password="T3stPassword!"))
 
     def tearDown(self):
         self.client.logout()
@@ -484,28 +509,45 @@ class TestSearchMemberView(MembersTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "search_members_results.html")
 
-        self.assertContains(response, u"<td><a href='/members/1'>Member On\u0205</a></td>", html=True)
-        self.assertContains(response, u'<a href="mailto:one@example.com">one@example.com</a>', html=True)
+        self.assertContains(
+            response, u"<td><a href='/members/1'>Member On\u0205</a></td>",
+            html=True)
+        self.assertContains(
+            response, u'<a href="mailto:one@example.com">one@example.com</a>',
+            html=True)
         self.assertContains(response, u"<td>BS1 1AA</td>", html=True)
 
-        self.assertContains(response, u"<td><a href='/members/2'>Tw\u020d Member</a></td>", html=True)
-        self.assertContains(response, u'<a href="mailto:two@example.com">two@example.com</a>', html=True)
+        self.assertContains(
+            response, u"<td><a href='/members/2'>Tw\u020d Member</a></td>",
+            html=True)
+        self.assertContains(
+            response, u'<a href="mailto:two@example.com">two@example.com</a>',
+            html=True)
 
-        self.assertContains(response, u"<td><a href='/members/3'>Some Third Chap</a></td>", html=True)
-        self.assertContains(response, u'<td><a href="mailto:two@member.test">two@member.test</a></td>', html=True)
+        self.assertContains(
+            response, u"<td><a href='/members/3'>Some Third Chap</a></td>",
+            html=True)
+        self.assertContains(
+            response,
+            u'<td><a href="mailto:two@member.test">two@member.test</a></td>',
+            html=True)
         self.assertContains(response, u"<td>NORAD</td>", html=True)
 
         # Should have Edit / Delete buttons:
-        self.assertContains(response, u'<input type="submit" value="Edit">', html=True)
-        self.assertContains(response, u'<input type="submit" value="Delete">', html=True)
+        self.assertContains(
+            response, u'<input type="submit" value="Edit">', html=True)
+        self.assertContains(
+            response, u'<input type="submit" value="Delete">', html=True)
 
         expected_edit_form = ('<form method="get" action="{0}">'
                               '<input type="submit" value="Edit"></form>'
-                              .format(reverse("edit-member", kwargs={"member_id": 3})))
+                              .format(reverse(
+                                  "edit-member", kwargs={"member_id": 3})))
 
         expected_delete_form = ('<form class="delete" method="post" '
                                 'action="{0}">'
-                                .format(reverse("delete-member", kwargs={"member_id": 3})))
+                                .format(reverse(
+                                    "delete-member", kwargs={"member_id": 3})))
         self.assertContains(response, expected_edit_form)
         self.assertContains(response, expected_delete_form)
 
@@ -523,7 +565,8 @@ class TestDeleteMemberView(MembersTestsMixin, TestCase):
     def setUp(self):
         super(TestDeleteMemberView, self).setUp()
 
-        self.assertTrue(self.client.login(username="admin", password="T3stPassword!"))
+        self.assertTrue(self.client.login(
+            username="admin", password="T3stPassword!"))
 
     def tearDown(self):
         self.client.logout()
@@ -706,7 +749,8 @@ class TestEditMemberViewNotLoggedIn(MembersTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_member.html")
 
-        self.assertFormError(response, 'form', 'email', u'Enter a valid email address.')
+        self.assertFormError(response, 'form', 'email',
+                             u'Enter a valid email address.')
 
         member = Member.objects.get(pk=2)
         self.assertNotEqual(member.name, new_name)
@@ -725,7 +769,8 @@ class TestEditMemberViewNotLoggedIn(MembersTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_member.html")
 
         # Only mandatory field is "name":
-        self.assertFormError(response, 'form', 'name', u'This field is required.')
+        self.assertFormError(response, 'form', 'name',
+                             u'This field is required.')
 
         member = Member.objects.get(pk=2)
         self.assertEqual(start_name, member.name)
@@ -757,7 +802,8 @@ class TestEditMemberViewLoggedIn(MembersTestsMixin, TestCase):
 
     def setUp(self):
         super(TestEditMemberViewLoggedIn, self).setUp()
-        self.assertTrue(self.client.login(username="admin", password="T3stPassword!"))
+        self.assertTrue(self.client.login(
+            username="admin", password="T3stPassword!"))
 
     def tearDown(self):
         self.client.logout()
@@ -785,7 +831,8 @@ class TestEditMemberViewLoggedIn(MembersTestsMixin, TestCase):
         member_mailout_key = member.mailout_key
 
         url = reverse("edit-member", kwargs={"member_id": 2})
-        response = self.client.post(url, data={'name': new_name, }, follow=True)
+        response = self.client.post(
+            url, data={'name': new_name, }, follow=True)
 
         member = Member.objects.get(pk=2)
         # New name set:
@@ -808,7 +855,8 @@ class TestEditMemberViewLoggedIn(MembersTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_member.html")
 
         # Only mandatory field is "name":
-        self.assertFormError(response, 'form', 'name', u'This field is required.')
+        self.assertFormError(response, 'form', 'name',
+                             u'This field is required.')
 
         member = Member.objects.get(pk=2)
         self.assertEqual(start_name, member.name)
@@ -975,7 +1023,8 @@ class TestMemberMiscViews(MembersTestsMixin, TestCase):
     def setUp(self):
         super(TestMemberMiscViews, self).setUp()
 
-        self.assertTrue(self.client.login(username="admin", password="T3stPassword!"))
+        self.assertTrue(self.client.login(
+            username="admin", password="T3stPassword!"))
 
     def tearDown(self):
         self.client.logout()
@@ -996,12 +1045,16 @@ class TestMemberMiscViews(MembersTestsMixin, TestCase):
         response = self.client.get(url)
         self.assertTemplateUsed(response, "homepages.html")
 
-        self.assertContains(response,
-                            u'<a href="http://1.foo.test/" rel="nofollow">http://1.foo.test/</a>',
-                            html=True)
-        self.assertContains(response,
-                            u'<a href="http://two.foo.test/" rel="nofollow">http://two.foo.test/</a>',
-                            html=True)
+        self.assertContains(
+            response,
+            u'<a href="http://1.foo.test/" '
+            u'rel="nofollow">http://1.foo.test/</a>',
+            html=True)
+        self.assertContains(
+            response,
+            u'<a href="http://two.foo.test/" '
+            u'rel="nofollow">http://two.foo.test/</a>',
+            html=True)
 
     def test_post_homepages(self):
         url = reverse("member-homepages")
@@ -1013,7 +1066,8 @@ class TestActivateDeactivateVolunteer(MembersTestsMixin, TestCase):
 
     def setUp(self):
         super(TestActivateDeactivateVolunteer, self).setUp()
-        self.assertTrue(self.client.login(username="admin", password="T3stPassword!"))
+        self.assertTrue(self.client.login(
+            username="admin", password="T3stPassword!"))
 
     def test_load_select_form_retire(self):
         url = reverse("retire-select-volunteer")
@@ -1047,7 +1101,8 @@ class TestActivateDeactivateVolunteer(MembersTestsMixin, TestCase):
         self.assertTrue(vol.active)
 
         url = reverse("inactivate-volunteer")
-        response = self.client.post(url, data={u"volunteer": u"2"}, follow=True)
+        response = self.client.post(
+            url, data={u"volunteer": u"2"}, follow=True)
 
         self.assertRedirects(response, reverse("view-volunteer-list"))
 
@@ -1071,7 +1126,8 @@ class TestActivateDeactivateVolunteer(MembersTestsMixin, TestCase):
         self.assertFalse(vol.active)
 
         url = reverse("activate-volunteer")
-        response = self.client.post(url, data={u"volunteer": u"4"}, follow=True)
+        response = self.client.post(
+            url, data={u"volunteer": u"4"}, follow=True)
 
         self.assertRedirects(response, reverse("view-volunteer-list"))
 
@@ -1092,9 +1148,11 @@ class TestActivateDeactivateVolunteer(MembersTestsMixin, TestCase):
 
 
 class TestVolunteerEdit(MembersTestsMixin, TestCase):
+
     def setUp(self):
         super(TestVolunteerEdit, self).setUp()
-        self.assertTrue(self.client.login(username="admin", password="T3stPassword!"))
+        self.assertTrue(self.client.login(
+            username="admin", password="T3stPassword!"))
         self.files_in_use = []
 
     def tearDown(self):
@@ -1120,7 +1178,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertContains(response, "UKountry")
         self.assertContains(response, "http://1.foo.test/")
 
-        self.assertContains(response, "<title>Edit Volunteer Volunteer One</title>")
+        self.assertContains(
+            response, "<title>Edit Volunteer Volunteer One</title>")
         self.assertContains(response,
                             '<a href="/tmp/path/to/portrait">',
                             html=False)
@@ -1131,12 +1190,15 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
 
         self.assertTemplateUsed(response, "form_volunteer.html")
 
-        self.assertContains(response, "<title>Add Volunteer</title>", html=True)
+        self.assertContains(
+            response, "<title>Add Volunteer</title>", html=True)
         # Should have default mugshot:
-        self.assertContains(response,
-                            '<img id="photo" alt="No photo yet" src="{0}" border="0" width="75">'
-                            .format(settings.DEFAULT_MUGSHOT),
-                            html=True)
+        self.assertContains(
+            response,
+            '<img id="photo" alt="No photo yet" '
+            'src="{0}" border="0" width="75">'
+            .format(settings.DEFAULT_MUGSHOT),
+            html=True)
 
     def test_get_form_edit_invalid_vol(self):
         url = reverse("edit-volunteer", kwargs={"volunteer_id": 10001})
@@ -1155,7 +1217,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
 
         self.assertContains(
             response,
-            u'<li class="success">Created volunteer &#39;New Volunteer, called \u0187hri\u01a8topher&#39;</li>',
+            u'<li class="success">Created volunteer &#39;New Volunteer, '
+            u'called \u0187hri\u01a8topher&#39;</li>',
             html=True
         )
 
@@ -1164,7 +1227,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertEqual(Member.objects.count(), init_mem_count + 1)
 
         # New things:
-        new_member = Member.objects.get(name=u"New Volunteer, called \u0187hri\u01a8topher")
+        new_member = Member.objects.get(
+            name=u"New Volunteer, called \u0187hri\u01a8topher")
         # Implicitly check Volunteer record exists:
         self.assertTrue(new_member.volunteer.active)
 
@@ -1193,7 +1257,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
 
         self.assertContains(
             response,
-            u'<li class="success">Created volunteer &#39;Another New Volunteer&#39;</li>',
+            u'<li class="success">Created volunteer &#39;Another New '
+            u'Volunteer&#39;</li>',
             html=True
         )
 
@@ -1204,7 +1269,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         # New things:
         new_member = Member.objects.get(name=u"Another New Volunteer")
         self.assertEqual(new_member.email, 'snoo@whatver.com')
-        self.assertEqual(new_member.address, "somewhere over the rainbow, I guess")
+        self.assertEqual(new_member.address,
+                         "somewhere over the rainbow, I guess")
         self.assertEqual(new_member.posttown, "Town Town Town!")
         self.assertEqual(new_member.postcode, "< Sixteen chars?")
         self.assertEqual(new_member.country, "Suriname")
@@ -1218,7 +1284,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertEqual(new_member.notes, None)
 
         self.assertTrue(new_member.volunteer.active)
-        self.assertEqual(new_member.volunteer.notes, "plays the balalaika really badly")
+        self.assertEqual(new_member.volunteer.notes,
+                         "plays the balalaika really badly")
 
         roles = new_member.volunteer.roles.all()
 
@@ -1233,7 +1300,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_volunteer.html")
 
         # The only mandatory field (!)
-        self.assertFormError(response, 'mem_form', 'name', u'This field is required.')
+        self.assertFormError(response, 'mem_form', 'name',
+                             u'This field is required.')
 
     def test_post_edit_vol_minimal_data(self):
         init_vol_count = Volunteer.objects.count()
@@ -1247,7 +1315,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
 
         self.assertContains(
             response,
-            u'<li class="success">Updated volunteer &#39;Renam\u018fd Vol&#39;</li>',
+            u'<li class="success">Updated volunteer &#39;Renam\u018fd '
+            u'Vol&#39;</li>',
             html=True
         )
 
@@ -1308,7 +1377,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
 
         self.assertContains(
             response,
-            u'<li class="success">Updated volunteer &#39;Renam\u018fd Vol&#39;</li>',
+            u'<li class="success">Updated volunteer &#39;Renam\u018fd '
+            u'Vol&#39;</li>',
             html=True
         )
 
@@ -1336,7 +1406,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertEqual(member.notes, None)
 
         self.assertTrue(member.volunteer.active)
-        self.assertEqual(member.volunteer.notes, "plays the balalaika really badly")
+        self.assertEqual(member.volunteer.notes,
+                         "plays the balalaika really badly")
 
         roles = member.volunteer.roles.all()
 
@@ -1351,7 +1422,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_volunteer.html")
 
         # The only mandatory field (!)
-        self.assertFormError(response, 'mem_form', 'name', u'This field is required.')
+        self.assertFormError(response, 'mem_form', 'name',
+                             u'This field is required.')
 
     def test_post_update_vol_invalid_vol_id(self):
         url = reverse("edit-volunteer", kwargs={"volunteer_id": 10001})
@@ -1361,7 +1433,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
     @override_settings(MEDIA_ROOT="/tmp")
     def test_post_update_vol_clear_portrait(self):
 
-        temp_jpg = tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-", suffix=".jpg", delete=False)
+        temp_jpg = tempfile.NamedTemporaryFile(
+            dir="/tmp", prefix="toolkit-test-", suffix=".jpg", delete=False)
 
         # Ensure files get cleaned up:
         self.files_in_use.append(temp_jpg.name)
@@ -1393,9 +1466,11 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
 
     @override_settings(MEDIA_ROOT="/tmp")
     def test_post_update_vol_change_portrait_success(self):
-        temp_old_jpg = tempfile.NamedTemporaryFile(dir="/tmp", prefix="toolkit-test-", suffix=".jpg", delete=False)
+        temp_old_jpg = tempfile.NamedTemporaryFile(
+            dir="/tmp", prefix="toolkit-test-", suffix=".jpg", delete=False)
 
-        expected_upload_path = os.path.join('/tmp', settings.VOLUNTEER_PORTRAIT_DIR, "image_bluesq.jpg")
+        expected_upload_path = os.path.join(
+            '/tmp', settings.VOLUNTEER_PORTRAIT_DIR, "image_bluesq.jpg")
 
         # Ensure files get cleaned up:
         self.files_in_use.append(temp_old_jpg.name)
@@ -1411,7 +1486,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertTrue(os.path.isfile(temp_old_jpg.name))
 
         # Get new image to send:
-        new_jpg_filename = os.path.join(os.path.dirname(os.path.realpath(__file__)), "test_data", "image_bluesq.jpg")
+        new_jpg_filename = os.path.join(os.path.dirname(
+            os.path.realpath(__file__)), "test_data", "image_bluesq.jpg")
 
         with open(new_jpg_filename, "rb") as new_jpg_file:
             # Post an edit to update the image:
@@ -1427,7 +1503,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertEqual(vol.member.name, u'Pictureless Person')
 
         # Portrait path should be:
-        self.assertEqual(vol.portrait.name, os.path.join(settings.VOLUNTEER_PORTRAIT_DIR, "image_bluesq.jpg"))
+        self.assertEqual(vol.portrait.name, os.path.join(
+            settings.VOLUNTEER_PORTRAIT_DIR, "image_bluesq.jpg"))
         # And should have 'uploaded' file to:
         self.assertTrue(os.path.isfile(expected_upload_path))
 
@@ -1439,7 +1516,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
 
     @override_settings(MEDIA_ROOT="/tmp")
     def test_post_update_vol_set_portrait_data_uri(self):
-        expected_upload_path = os.path.join(settings.VOLUNTEER_PORTRAIT_DIR, "webcam_photo.png")
+        expected_upload_path = os.path.join(
+            settings.VOLUNTEER_PORTRAIT_DIR, "webcam_photo.png")
         expected_upload_location = os.path.join('/tmp', expected_upload_path)
 
         # Ensure files get cleaned up:
@@ -1453,7 +1531,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         url = reverse("edit-volunteer", kwargs={"volunteer_id": 1})
         response = self.client.post(url, data={
             u'mem-name': u'Pictureless Person',
-            u'vol-image_data': "data:image/png;base64,%s" % TINY_VALID_BASE64_PNG
+            u'vol-image_data': ("data:image/png;base64,%s"
+                                % TINY_VALID_BASE64_PNG)
         })
 
         self.assertRedirects(response, reverse("view-volunteer-list"))
@@ -1467,7 +1546,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertTrue(os.path.isfile(expected_upload_location))
         # And contents:
         with open(expected_upload_location, "rb") as imgf:
-            self.assertEqual(imgf.read(), binascii.a2b_base64(TINY_VALID_BASE64_PNG))
+            self.assertEqual(
+                imgf.read(), binascii.a2b_base64(TINY_VALID_BASE64_PNG))
 
         # XXX do this properly!
         shutil.rmtree(os.path.join('/tmp', settings.VOLUNTEER_PORTRAIT_DIR))
@@ -1480,7 +1560,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         url = reverse("edit-volunteer", kwargs={"volunteer_id": 1})
         response = self.client.post(url, data={
             u'mem-name': u'Pictureless Person',
-            u'vol-image_data': "data:image/jpeg;base64,%s" % TINY_VALID_BASE64_PNG
+            u'vol-image_data': ("data:image/jpeg;base64,%s"
+                                % TINY_VALID_BASE64_PNG)
         })
 
         self.assertTemplateUsed(response, "form_volunteer.html")
@@ -1517,11 +1598,14 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
 
 
 class TestMemberMailoutTask(MembersTestsMixin, TestCase):
+
     def setUp(self):
         super(TestMemberMailoutTask, self).setUp()
-        self.assertTrue(self.client.login(username="admin", password="T3stPassword!"))
+        self.assertTrue(self.client.login(
+            username="admin", password="T3stPassword!"))
 
-    def _assert_mail_as_expected(self, msgstr, is_utf8, from_addr, dest_addr, body_contains, expected_subject):
+    def _assert_mail_as_expected(self, msgstr, is_utf8, from_addr, dest_addr,
+                                 body_contains, expected_subject):
         message = email.parser.Parser().parsestr(msgstr)
 
         self.assertEqual(message.get_content_type(), 'text/plain')
@@ -1539,10 +1623,12 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         subject = email.header.decode_header(message['Subject'])
 
         self.assertIn(body_contains, body)
-        subject = subject[0][0].decode(subject[0][1]) if subject[0][1] else subject[0][0]
+        subject = subject[0][0].decode(subject[0][1]) if subject[
+            0][1] else subject[0][0]
         self.assertEqual(subject, expected_subject)
 
-    def _assert_mail_sent(self, result, current_task_mock, smtplib_mock, subject, body, is_utf8):
+    def _assert_mail_sent(self, result, current_task_mock, smtplib_mock,
+                          subject, body, is_utf8):
         current_task_mock.update_state.assert_has_calls([
             call(state='PROGRESS017', meta={'total': 6, 'sent': 1}),
             call(state='PROGRESS034', meta={'total': 6, 'sent': 2}),
@@ -1562,8 +1648,10 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
 
         # Validate summary:
         summary_mail_call = conn.sendmail.call_args_list[6]
-        self.assertEqual(summary_mail_call[0][0], settings.MAILOUT_FROM_ADDRESS)
-        self.assertEqual(summary_mail_call[0][1], [settings.MAILOUT_DELIVERY_REPORT_TO])
+        self.assertEqual(summary_mail_call[0][
+                         0], settings.MAILOUT_FROM_ADDRESS)
+        self.assertEqual(summary_mail_call[0][1], [
+                         settings.MAILOUT_DELIVERY_REPORT_TO])
         # Check mail twice, to check for each bit of expected text in the body;
         # The mail count:
         self._assert_mail_as_expected(
@@ -1598,7 +1686,8 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         subject = u"The Subject \u2603!"
         body = u"The Body!\nThat will be \u20ac1, please\nTa \u2603!"
         result = toolkit.members.tasks.send_mailout(subject, body)
-        self._assert_mail_sent(result, current_task_mock, smtplib_mock, subject, body, True)
+        self._assert_mail_sent(result, current_task_mock,
+                               smtplib_mock, subject, body, True)
 
     @patch("smtplib.SMTP")
     @patch("toolkit.members.tasks.current_task")
@@ -1607,7 +1696,8 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         subject = u"The Subject!"
         body = u"The Body!\nThat will be $1, please\nTa!"
         result = toolkit.members.tasks.send_mailout(subject, body)
-        self._assert_mail_sent(result, current_task_mock, smtplib_mock, subject, body, False)
+        self._assert_mail_sent(result, current_task_mock,
+                               smtplib_mock, subject, body, False)
 
     @patch("smtplib.SMTP")
     @patch("toolkit.members.tasks.current_task")
@@ -1616,7 +1706,8 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         subject = u"The \xa31 Subject!"
         body = u"The Body!\nThat will be $1, please\nTa!"
         result = toolkit.members.tasks.send_mailout(subject, body)
-        self._assert_mail_sent(result, current_task_mock, smtplib_mock, subject, body, False)
+        self._assert_mail_sent(result, current_task_mock,
+                               smtplib_mock, subject, body, False)
 
     @patch("smtplib.SMTP")
     @patch("toolkit.members.tasks.current_task")
@@ -1628,13 +1719,16 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
             u"The \xa31 Subject!", u"The Body!\nThat will be $1, please\nTa!"
         )
 
-        self.assertEqual(result, (True, 0, "Failed to connect to SMTP server: ('Blah', 101)"))
+        self.assertEqual(
+            result,
+            (True, 0, "Failed to connect to SMTP server: ('Blah', 101)"))
 
     @patch("smtplib.SMTP")
     @patch("toolkit.members.tasks.current_task")
     @override_settings(EMAIL_HOST="smtp.test", EMAIL_PORT=8281)
     def test_send_fail(self, current_task_mock, smtplib_mock):
-        smtplib_mock.return_value.sendmail.side_effect = smtplib.SMTPException("Something failed", 101)
+        smtplib_mock.return_value.sendmail.side_effect = smtplib.SMTPException(
+            "Something failed", 101)
 
         result = toolkit.members.tasks.send_mailout(
             u"The \xa31 Subject!", u"The Body!\nThat will be $1, please\nTa!"
@@ -1647,13 +1741,15 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
     @patch("toolkit.members.tasks.current_task")
     @override_settings(EMAIL_HOST="smtp.test", EMAIL_PORT=8281)
     def test_send_fail_disconnected(self, current_task_mock, smtplib_mock):
-        smtplib_mock.return_value.sendmail.side_effect = smtplib.SMTPServerDisconnected("Something failed", 101)
+        smtplib_mock.return_value.sendmail.side_effect = \
+                smtplib.SMTPServerDisconnected("Something failed", 101)
 
         result = toolkit.members.tasks.send_mailout(
             u"The \xa31 Subject!", u"The Body!\nThat will be $1, please\nTa!"
         )
 
-        self.assertEqual(result, (True, 0, "Mailout job died: ('Something failed', 101)"))
+        self.assertEqual(
+            result, (True, 0, "Mailout job died: ('Something failed', 101)"))
 
     @patch("smtplib.SMTP")
     @patch("toolkit.members.tasks.current_task")

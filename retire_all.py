@@ -6,4 +6,3 @@ for volunteer in active_vols:
     print volunteer.member.name
     volunteer.active = False
     volunteer.save()
-
