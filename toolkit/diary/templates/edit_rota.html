@@ -13,30 +13,6 @@ CUBE role rota
     h1 { font-size: 16pt; }
     h2 { font-size: 14pt; }
 
-    table {
-        width: 90%;
-    }
-
-    .cell_date {
-        text-align: right;
-    }
-    .title_row {
-        font-weight: bold;
-        color: blue;
-    }
-    .right {
-        text-align: right;
-    }
-    td.rota_box {
-        width: 22%;
-        height: 0.65cm;
-        border-style: solid;
-        border-width: 0px;
-        border-color: gray;
-    }
-    td.role_box {
-        font-weight: bold;
-    }
     .na {
         color: lightgray;
         cursor: pointer;
@@ -44,11 +20,11 @@ CUBE role rota
     .rota_name {
         cursor: pointer;
     }
-    .title_row a, .title_row a:visited{
+    .showing_title a, .title_row a:visited{
         color: blue;
         text-decoration: none;
     }
-    .title_row a:hover {
+    .showing_title a:hover {
         text-decoration: underline;
     }
     .showing_rota_notes, .past_showing_rota_notes {
@@ -58,6 +34,7 @@ CUBE role rota
         font-family: monospace;
         white-space: pre-wrap;
         padding: 0.4em 1em;
+        margin-left: 3em;
         overflow: auto;
     }
     .showing_rota_notes span {
@@ -65,6 +42,25 @@ CUBE role rota
     }
     .past_showing, .past_showing a, .past_showing a:visited {
        color: darkgray;
+    }
+    ul.rota li{
+      list-style-type: none;
+    }
+    .rota_role {
+      display: inline-block;
+      width: 50%;
+      font-weight: bold;
+      height: 0.65cm;
+    }
+    @media screen and (min-width: 640px) {
+        ul.rota {
+            column-count: 2;
+        }
+    }
+    @media screen and (min-width: 800px) {
+        .rota_role {
+          width: 30%;
+        }
     }
 </style>
 {% endblock %}
@@ -86,56 +82,33 @@ edit_rota(
 
 {% block body %}
 <form id='daterange'>
-<p align='center'><label for="id_from_date">{{ event_field|capfirst }} from </label><input type="text" name="from_date" value="{{ start_date|date:'j-m-Y'}}" id="id_from_date" />
+<p align='center'><label for="id_from_date">Rota from </label><input type="text" name="from_date" value="{{ start_date|date:'j-m-Y'}}" id="id_from_date" />
 <label for="id_to_date"> to </label><input type="text" name="to_date" value="{{ end_date|date:'j-m-Y'}}" id="id_to_date" />
 </p>
 </form>
 
-<table border="0" cellspacing="0">
 {% with placeholder_text="<span class='na'>Click to edit</span>" %}
 {% for showing in showings %}
-    {% ifchanged %}<tr><td colspan="5"><h2>{{ showing.start|date:"F Y" }}</h2></td></tr>{% endifchanged %}
-    <tr class="title_row{% if showing.in_past %} past_showing{% endif %}">
-        <td class="cell_date">{{ showing.start|date:"D j H:i"}}</td>
-        <td class="event_name" colspan="4"><a href="{% noprefix_url "single-showing-view" showing.pk %}">{{ showing.event.name.upper }}</a></td>
-    </tr>
+    {% ifchanged %}<h2>{{ showing.start|date:"F Y" }}</h2>{% endifchanged %}
+    <h3 class="showing_title{% if showing.in_past %} past_showing{% endif %}">
+        {{ showing.start|date:"D j H:i"}}
+        <a href="{% noprefix_url "single-showing-view" showing.pk %}">{{ showing.event.name.upper }}</a>
+    </h3>
+    <ul class="rota">
     {% for rota_entry in showing.rotaentry_set.all %}
-        {% if forloop.counter|divisibleby:2 %}
-            <td class="role_box rota_box">
-            {{ rota_entry.role.name }}-{{ rota_entry.rank }}</td>
-            <td class="rota_box">
-                {% if showing.in_past %}
-                    {{ rota_entry.name }}
-                {% else %}
-                    <span class="rota_name" id="{{ rota_entry.pk }}">{{ rota_entry.name|default:placeholder_text }}</span>
-                {% endif %}
-            </td>
-            </tr>
+        <li>
+        <span class="rota_role">{{ rota_entry.role.name }}-{{ rota_entry.rank }}</span>
+        &nbsp;
+        {% if showing.in_past %}
+            {{ rota_entry.name }}
         {% else %}
-            <tr>
-            <td></td>
-            <td class="role_box rota_box">
-                {{ rota_entry.role.name }}-{{ rota_entry.rank }}
-            </td>
-            <td class="rota_box">
-                {% if showing.in_past %}
-                    {{ rota_entry.name }}
-                {% else %}
-                    <span class="rota_name" id="{{ rota_entry.pk }}">{{ rota_entry.name|default:placeholder_text }}</span>
-                {% endif %}
-            </td>
-            {% if forloop.last %}
-                <td colspan="2"></td></tr>
-            {% endif %}
+            <span class="rota_name" id="{{ rota_entry.pk }}">{{ rota_entry.name|default:placeholder_text }}</span>
         {% endif %}
+        </li>
     {% endfor %}
-    <tr>
-        <td></td><td class="{% if showing.in_past %}past_{% endif %}showing_rota_notes" colspan="4"><span id="showing_rota_notes_{{ showing.pk }}">{{ showing.rota_notes }}</span></td>
-    </tr>
+    </ul>
+    <p class="{% if showing.in_past %}past_{% endif %}showing_rota_notes"><span id="showing_rota_notes_{{ showing.pk }}">{{ showing.rota_notes }}</span></p>
 {% endfor %}
 {% endwith %}
-
-</table>
-
 {% endblock %}
 
