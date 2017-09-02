@@ -1,5 +1,5 @@
 ﻿/**
- * @license Copyright (c) 2003-2014, CKSource - Frederico Knabben. All rights reserved.
+ * @license Copyright (c) 2003-2017, CKSource - Frederico Knabben. All rights reserved.
  * For licensing, see LICENSE.md or http://ckeditor.com/license
  */
 
@@ -13,10 +13,10 @@
  * (1) http://ckeditor.com/builder
  *     Visit online builder to build CKEditor from scratch.
  *
- * (2) http://ckeditor.com/builder/32265728a3562ff737fb50034b61ab39
+ * (2) http://ckeditor.com/builder/4eb43ff54c854f5b778b8e8ced16c665
  *     Visit online builder to build CKEditor, starting with the same setup as before.
  *
- * (3) http://ckeditor.com/builder/download/32265728a3562ff737fb50034b61ab39
+ * (3) http://ckeditor.com/builder/download/4eb43ff54c854f5b778b8e8ced16c665
  *     Straight download link to the latest version of CKEditor (Optimized) with the same setup as before.
  *
  * NOTE:
@@ -28,19 +28,26 @@ var CKBUILDER_CONFIG = {
 	skin: 'moono',
 	preset: 'basic',
 	ignore: [
-		'.bender',
 		'.DS_Store',
-		'.gitignore',
+		'.bender',
+		'.editorconfig',
 		'.gitattributes',
+		'.gitignore',
 		'.idea',
+		'.jscsrc',
+		'.jshintignore',
+		'.jshintrc',
 		'.mailmap',
-		'bender.js',
+		'.travis.yml',
 		'bender-err.log',
 		'bender-out.log',
+		'bender.ci.js',
+		'bender.js',
 		'dev',
+		'gruntfile.js',
+		'less',
 		'node_modules',
 		'package.json',
-		'README.md',
 		'tests'
 	],
 	plugins : {
