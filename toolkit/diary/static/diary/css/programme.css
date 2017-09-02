@@ -698,7 +698,7 @@ span.tags .tag_nanoplex { color: #CA678D; }
 span.tags .tag_animation { color: #FFAA00; }
 
 /* Hide film format tags: */
-.tag_dcp, .tag_dvd, .tag_dcp, .tag_ttt, .tag_cheapnight { display: none; }
+.tag_dcp, .tag_dvd, .tag_dcp, .tag_ttt, .tag_cheapnight, .tag_usb { display: none; }
 
 
 
