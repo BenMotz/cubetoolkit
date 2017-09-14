@@ -8,6 +8,11 @@ CUBE role rota
 {{ block.super }}
 <style type="text/css">
     body {font-family:Arial,Helvetica,sans-serif; }
+
+    .rota-wrapper{
+        max-width: 1080px;
+    }
+
     h1, h2 { margin: 1mm; }
     h1 { font-size: 16pt; }
     h2 { font-size: 14pt; }
@@ -56,6 +61,7 @@ CUBE role rota
 
 {% block body %}
 {{ block.super }}
+<div class="rota-wrapper">
 <h1>Rota from {{ start_date|date:"D d/m/y" }} to {{ end_date|date:"D d/m/y" }}</h1>
 <table>
     <tbody>
@@ -79,6 +85,6 @@ CUBE role rota
 {% endfor %}
     </tbody>
 </table>
-
+</div>
 {% endblock %}
 
