@@ -50,7 +50,7 @@ function edit_rota(jQuery, rota_edit_base_url, edit_rota_notes_url_prefix, CSRF_
 
     function configureRotaNameEditInPlaceControls() {
         $('.rota_name').editable('', {
-            width: "5cm",
+            width: "25%",
             placeholder: '<span class="na">Click to edit</span>',
             submit: "Save",
             submitdata: {
