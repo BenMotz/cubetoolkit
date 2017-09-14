@@ -13,6 +13,11 @@ CUBE role rota
 <style type="text/css">
     @import url('{{ STATIC_URL }}css/lib/smoothness/jquery-ui.css');
     body { font-family:Arial,Helvetica,sans-serif; }
+
+    .rota-wrapper{
+        max-width: 1280px;
+    }
+
     h1, h2 { margin: 1mm; }
     h1 { font-size: 16pt; }
     h2 { font-size: 14pt; }
@@ -88,34 +93,36 @@ edit_rota(
 {% endblock %}
 
 {% block body %}
-<form id='daterange'>
-<p align='center'><label for="id_from_date">Rota from </label><input type="text" name="from_date" value="{{ start_date|date:'j-m-Y'}}" id="id_from_date" />
-<label for="id_to_date"> to </label><input type="text" name="to_date" value="{{ end_date|date:'j-m-Y'}}" id="id_to_date" />
-</p>
-</form>
+<div class="rota-wrapper">
+    <form id='daterange'>
+    <p align='center'><label for="id_from_date">Rota from </label><input type="text" name="from_date" value="{{ start_date|date:'j-m-Y'}}" id="id_from_date" />
+    <label for="id_to_date"> to </label><input type="text" name="to_date" value="{{ end_date|date:'j-m-Y'}}" id="id_to_date" />
+    </p>
+    </form>
 
-{% with placeholder_text="<span class='na'>Click to edit</span>" %}
-{% for showing in showings %}
-    {% ifchanged %}<h2>{{ showing.start|date:"F Y" }}</h2>{% endifchanged %}
-    <h3 class="showing_title{% if showing.in_past %} past_showing{% endif %}">
-        {{ showing.start|date:"D j H:i"}}
-        <a href="{% noprefix_url "single-showing-view" showing.pk %}">{{ showing.event.name.upper }}</a>
-    </h3>
-    <ul class="rota">
-    {% for rota_entry in showing.rotaentry_set.all %}
-        <li>
-        <span class="rota_role">{{ rota_entry.role.name }}-{{ rota_entry.rank }}</span>
-        &nbsp;
-        {% if showing.in_past %}
-            {{ rota_entry.name }}
-        {% else %}
-            <span class="rota_name" id="{{ rota_entry.pk }}">{{ rota_entry.name|default:placeholder_text }}</span>
-        {% endif %}
-        </li>
+    {% with placeholder_text="<span class='na'>Click to edit</span>" %}
+    {% for showing in showings %}
+        {% ifchanged %}<h2>{{ showing.start|date:"F Y" }}</h2>{% endifchanged %}
+        <h3 class="showing_title{% if showing.in_past %} past_showing{% endif %}">
+            {{ showing.start|date:"D j H:i"}}
+            <a href="{% noprefix_url "single-showing-view" showing.pk %}">{{ showing.event.name.upper }}</a>
+        </h3>
+        <ul class="rota">
+        {% for rota_entry in showing.rotaentry_set.all %}
+            <li>
+            <span class="rota_role">{{ rota_entry.role.name }}-{{ rota_entry.rank }}</span>
+            &nbsp;
+            {% if showing.in_past %}
+                {{ rota_entry.name }}
+            {% else %}
+                <span class="rota_name" id="{{ rota_entry.pk }}">{{ rota_entry.name|default:placeholder_text }}</span>
+            {% endif %}
+            </li>
+        {% endfor %}
+        </ul>
+        <p class="{% if showing.in_past %}past_{% endif %}showing_rota_notes"><span id="showing_rota_notes_{{ showing.pk }}">{{ showing.rota_notes }}</span></p>
     {% endfor %}
-    </ul>
-    <p class="{% if showing.in_past %}past_{% endif %}showing_rota_notes"><span id="showing_rota_notes_{{ showing.pk }}">{{ showing.rota_notes }}</span></p>
-{% endfor %}
-{% endwith %}
+    {% endwith %}
+    </div>
 {% endblock %}
 
