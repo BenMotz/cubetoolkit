@@ -75,13 +75,12 @@ class ViewSecurity(DiaryTestsMixin, TestCase):
         "set_edit_preferences": {},
 
         "edit-printed-programmes": {},
-
-        "view-rota-vacancies": {},
     }
 
     rota_edit_required = {
         "rota-edit": {},
         "edit-showing-rota-notes": {"showing_id": "1"},
+        "view-rota-vacancies": {},
     }
 
     def _assert_need_login(self, views_to_test):
