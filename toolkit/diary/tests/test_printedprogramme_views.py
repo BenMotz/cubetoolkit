@@ -1,11 +1,8 @@
 from __future__ import absolute_import
 import os.path
 
-import pytz
 from datetime import date
 import tempfile
-
-from mock import patch
 
 from django.test import TestCase
 from django.core.urlresolvers import reverse

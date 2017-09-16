@@ -136,7 +136,7 @@ class DiaryTestsMixin(object):
             copy_summary=u"\u010copy four summary",
             terms=u"Terminal price: \u00a31 / \u20ac3",
             duration="01:00:00",
-            notes="\u0147otes on event fou\u0159",
+            notes=u"\u0147otes on event fou\u0159",
         )
         e4.save()
         e4.tags = [t2, ]
@@ -148,7 +148,7 @@ class DiaryTestsMixin(object):
             copy_summary=u"\u010copy five summary",
             terms=u"More terms; price: \u00a32 / \u20ac5",
             duration="10:00:00",
-            notes="\u0147otes on event five",
+            notes=u"\u0147otes on event five",
             private=True
         )
         e5.save()
@@ -159,7 +159,7 @@ class DiaryTestsMixin(object):
             copy_summary=u"OUTSIDE PRIVATE \u010copy six summary",
             terms=u"Ever More terms; price: \u00a32 / \u20ac5",
             duration="4:00:00",
-            notes="\u0147otes on private/outwide event six",
+            notes=u"\u0147otes on private/outwide event six",
             outside_hire=True,
             private=True
         )
