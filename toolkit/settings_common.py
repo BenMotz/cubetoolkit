@@ -104,6 +104,8 @@ THUMBNAIL_ALIASES = {
     },
 }
 
+WAGTAIL_SITE_NAME = 'Your Example $ite'
+
 # Custom tweaks:
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
 APPEND_SLASH = True
@@ -205,6 +207,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'wagtail.wagtailcore.middleware.SiteMiddleware',
+    'wagtail.wagtailredirects.middleware.RedirectMiddleware',
 )
 
 TEMPLATES = [
@@ -222,6 +226,8 @@ TEMPLATES = [
         'OPTIONS': {
             'debug': DEBUG,
             'context_processors': (
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.static',
                 'django.contrib.auth.context_processors.auth',
@@ -265,6 +271,22 @@ INSTALLED_APPS = (
     'djcelery',
     # DB-backed message queue (app just provides migrations),
     'kombu.transport.django',
+
+    # Wagtail + support:
+    'wagtail.wagtailforms',
+    'wagtail.wagtailredirects',
+    'wagtail.wagtailembeds',
+    'wagtail.wagtailsites',
+    'wagtail.wagtailusers',
+    'wagtail.wagtailsnippets',
+    'wagtail.wagtaildocs',
+    'wagtail.wagtailimages',
+    'wagtail.wagtailsearch',
+    'wagtail.wagtailadmin',
+    'wagtail.wagtailcore',
+
+    'modelcluster',
+    'taggit',
 )
 
 # Common logging config. Different settings files can tweak this.

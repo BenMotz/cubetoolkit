@@ -4,6 +4,10 @@ import django.views.generic as generic
 import django.views.static
 from django.contrib.auth.decorators import login_required
 
+from wagtail.wagtailadmin import urls as wagtailadmin_urls
+from wagtail.wagtaildocs import urls as wagtaildocs_urls
+from wagtail.wagtailcore import urls as wagtail_urls
+
 import toolkit.members.urls
 import toolkit.toolkit_auth.urls
 import toolkit.index.urls
@@ -36,4 +40,8 @@ urlpatterns = [
         {'document_root': django.conf.settings.STATIC_ROOT}),
     url(r'^media/(.*)$', django.views.static.serve,
         {'document_root': django.conf.settings.MEDIA_ROOT}),
+
+    url(r'^cms/', include(wagtailadmin_urls)),
+    url(r'^documents/', include(wagtaildocs_urls)),
+    url(r'^pages/', include(wagtail_urls)),
 ]
