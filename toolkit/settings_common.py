@@ -263,6 +263,8 @@ INSTALLED_APPS = (
 
     # Django-celery
     'djcelery',
+    # DB-backed message queue (app just provides migrations),
+    'kombu.transport.django',
 )
 
 # Common logging config. Different settings files can tweak this.
