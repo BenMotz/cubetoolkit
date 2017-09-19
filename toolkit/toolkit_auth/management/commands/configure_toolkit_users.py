@@ -68,10 +68,21 @@ def _configure_users():
         content_type=diary_content_type
     )
 
+    # wagtail admin permission:
+    wagtail_content_type = contenttypes.models.ContentType.objects.get(
+        model='admin',
+        app_label='wagtailadmin'
+    )
+    wagtail_admin_permission = auth_models.Permission.objects.get(
+        codename='access_admin',
+        content_type=wagtail_content_type
+    )
+
     # Configure "admin" user with the read and write permissions:
     _create_or_update_user(
         "admin", 'toolkit_admin@localhost',
-        [write_permission, read_permission, edit_rota_permission])
+        [write_permission, read_permission, edit_rota_permission,
+         wagtail_admin_permission])
 
     # Read only (and write to the rota) user:
     _create_or_update_user(
