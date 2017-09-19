@@ -15,11 +15,11 @@ RUN apt-get update && \
 
 WORKDIR "/site"
 
-COPY requirements_python_only.txt "/site/"
+COPY requirements.txt "/site/"
 
 RUN virtualenv venv --system-site-packages &&\
     . venv/bin/activate &&\
-    pip install -r requirements_python_only.txt
+    pip install -r requirements.txt
 
 COPY "." "/site/"
 

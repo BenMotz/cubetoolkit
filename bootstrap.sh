@@ -7,7 +7,7 @@ set -e
 VENV_PATH=./venv
 VIRTUALENV_OPTIONS="--system-site-packages"
 # Requirements to run the django app:
-REQUIREMENTS_FILE=requirements_python_only.txt
+REQUIREMENTS_FILE=requirements.txt
 # Requirements to develop/test/deploy:
 REQUIREMENTS_DEV=requirements_development.txt
 

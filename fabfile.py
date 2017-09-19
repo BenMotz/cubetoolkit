@@ -6,8 +6,7 @@ from fabric import utils
 from fabric.contrib import console
 
 VIRTUALENV = "venv"
-REQUIREMENTS_PYTHON_ONLY = "requirements_python_only.txt"
-REQUIREMENTS_C_COMPONENT = "requirements_c_components.txt"
+REQUIREMENTS_FILE = "requirements.txt"
 
 # This is deleted whenever code is deployed
 CODE_DIRS = ["toolkit", "easy_thumbnails"]
@@ -128,7 +127,7 @@ def install_requirements(upgrade=False):
     """ Install requirements in remote virtualenv """
     # Update the packages installed in the environment:
     venv_path = os.path.join(env.site_root, VIRTUALENV)
-    req_file = os.path.join(env.site_root, REQUIREMENTS_PYTHON_ONLY)
+    req_file = os.path.join(env.site_root, REQUIREMENTS_FILE)
     upgrade_flag = "--upgrade" if upgrade else ""
     with cd(env.site_root):
         run("{venv_path}/bin/pip install {upgrade} --requirement {req_file}".format(
