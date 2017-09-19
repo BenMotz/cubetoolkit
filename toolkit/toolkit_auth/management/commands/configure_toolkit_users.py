@@ -20,7 +20,7 @@ def _get_password(use):
     return password
 
 
-def _create_or_update_user(name, email, permissions):
+def _create_or_update_user(name, email, permissions, is_superuser=False):
     if not auth_models.User.objects.filter(username=name).exists():
         password = _get_password(name)
         user = auth_models.User.objects.create_user(name, email, password)
@@ -34,6 +34,9 @@ def _create_or_update_user(name, email, permissions):
     # Set to requested:
     for permission in permissions:
         user.user_permissions.add(permission)
+
+    user.is_superuser = is_superuser
+    user.save()
 
 
 def _configure_users():
@@ -68,21 +71,12 @@ def _configure_users():
         content_type=diary_content_type
     )
 
-    # wagtail admin permission:
-    wagtail_content_type = contenttypes.models.ContentType.objects.get(
-        model='admin',
-        app_label='wagtailadmin'
-    )
-    wagtail_admin_permission = auth_models.Permission.objects.get(
-        codename='access_admin',
-        content_type=wagtail_content_type
-    )
-
     # Configure "admin" user with the read and write permissions:
     _create_or_update_user(
         "admin", 'toolkit_admin@localhost',
-        [write_permission, read_permission, edit_rota_permission,
-         wagtail_admin_permission])
+        [write_permission, read_permission, edit_rota_permission],
+        # Mark admin as superuser, to get wagtail superuser control:
+        is_superuser=True)
 
     # Read only (and write to the rota) user:
     _create_or_update_user(
