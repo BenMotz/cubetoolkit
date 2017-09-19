@@ -32,14 +32,16 @@ it's unlikely to be a problem.
 This specifically excludes the following files:
 /toolkit/members/static/members/cube_microplex_logo.gif
 /toolkit/members/static/members/default_mugshot.gif
-and all the .gif and .png files in the directory:
+all the .gif and .png files in the directory:
 /toolkit/diary/static/diary/
+and all images in:
+/toolkit/about/static/about/cube-images/
 These images are copyright Cube Cinema Ltd, which has not given me permission
-to distribute them. Make of that what you will.
+to distribute them, and certainly hasn't given you permission.
 
 This repository also includes code from other authors that may be under
 other licenses, as indicated. Specifically the contents of the following
 directories:
-/easy_thumbnails/
 toolkit/static_common/js/lib/
 toolkit/static_common/css/lib/
+toolkit/diary/static/diary/js/lib/
