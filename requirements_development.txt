@@ -1,3 +1,4 @@
+# Required for deploying:
 fabric
+# Improve the Django interactive shell:
 ipython
-

@@ -1,4 +1,0 @@
-# These should (!) have stable APIs, so let upgrades happen
-MySQL-python
-# Not sure about:
-PIL
