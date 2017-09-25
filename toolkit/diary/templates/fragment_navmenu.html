@@ -1,3 +1,4 @@
+{% load wagtailcore_tags %}
 <ul>
     <li><a href="//www.cubecinema.com/">Home</a></li>
     <li><a href="{% url "default-view" %}">Programme</a>
@@ -55,4 +56,13 @@
             <li><a href="{% url "about-hire" %}">Hire</a></li>
         </ul>
     </li>
+    {% for top_level_child in request.site.root_page.get_children.live.in_menu %}
+    <li><a href="{% pageurl top_level_child %}">{{ top_level_child.title }}</a>
+        <ul class="sub-menu">
+            {% for child in top_level_child.get_children.live.in_menu %}
+            <li><a href="{% pageurl child %}">{{ child.title }}</a></li>
+            {% endfor %}
+        </ul>
+    </li>
+    {% endfor %}
 </ul>
