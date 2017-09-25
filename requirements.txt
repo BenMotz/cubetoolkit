@@ -15,7 +15,7 @@ six
 # For generating non-html copy for mailout etc:
 html2text==3.200.3
 # CMS:
-wagtail==1.12
+wagtail<1.13
 
 # The MySQL-python library requires a C build chain (gcc, etc.) and the mysql
 # library headers to be installed, which isn't desirable on deployment hosts.
