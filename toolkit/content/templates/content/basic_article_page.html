@@ -1,0 +1,29 @@
+{% extends "base_about.html" %}
+
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block body_class %}template-blogpage{% endblock %}
+
+{% block title %}
+{{ page.title }}
+{% endblock %}
+
+{% block body %}
+{{ block.super }}
+<div class="programme">
+    <div class="grid-sizer"></div>
+    <div class="gutter-sizer"></div>
+    <div class="grid-item grid-item--width2 event-image">
+        <div class="event_image">
+            {% image page.image original %}
+        </div>
+    </div>
+    <div class="grid-item grid-item--width3">
+        <h3>{{ page.title }}</h3>
+        <br>
+        <div class="copy">
+            {{ page.body|richtext }}
+        </div><!-- end .copy -->
+    </div><!-- end .grid-item -->
+</div><!-- end .programme -->
+{% endblock %}
