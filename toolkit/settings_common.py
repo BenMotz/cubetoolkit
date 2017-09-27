@@ -73,6 +73,25 @@ DAWN_OF_TIME = 1998
 CALENDAR_CONFIRMED_IN_PAST_COLOUR = "#99FF99"
 CALENDAR_CONFIRMED_IN_FUTURE_COLOUR = "#33CC33"
 CALENDAR_UNCONFIRMED_COLOUR = "#E0CFCF"
+
+###############################################################################
+#
+# Wagtail settings
+
+WAGTAIL_SITE_NAME = 'The Cube Microplex'
+
+# Don't show fields to change user passwords (for other users, in admin)
+WAGTAILUSERS_PASSWORD_ENABLED = False
+
+# Don't allow user to change their own password
+WAGTAIL_PASSWORD_MANAGEMENT_ENABLED = False
+
+# Disable password reset function
+WAGTAIL_PASSWORD_RESET_ENABLED = False
+
+# Don't automatically check for (and notify) new Wagtail versions:
+WAGTAIL_ENABLE_UPDATE_CHECK = False
+
 ###############################################################################
 #
 # Below here are Django settings
@@ -103,8 +122,6 @@ THUMBNAIL_ALIASES = {
         }
     },
 }
-
-WAGTAIL_SITE_NAME = 'Your Example $ite'
 
 # Custom tweaks:
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
