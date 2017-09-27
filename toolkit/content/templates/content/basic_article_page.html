@@ -13,11 +13,13 @@
 <div class="programme">
     <div class="grid-sizer"></div>
     <div class="gutter-sizer"></div>
+    {% if page.image_alignment == "L" %}
     <div class="grid-item grid-item--width2 event-image">
         <div class="event_image">
             {% image page.image original %}
         </div>
     </div>
+    {% endif %}
     <div class="grid-item grid-item--width3">
         <h3>{{ page.title }}</h3>
         <br>
@@ -25,5 +27,12 @@
             {{ page.body|richtext }}
         </div><!-- end .copy -->
     </div><!-- end .grid-item -->
+    {% if page.image_alignment == "R" %}
+    <div class="grid-item grid-item--width2 event-image">
+        <div class="event_image">
+            {% image page.image original %}
+        </div>
+    </div>
+    {% endif %}
 </div><!-- end .programme -->
 {% endblock %}

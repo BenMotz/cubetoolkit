@@ -8,14 +8,25 @@ from modelcluster.fields import ParentalKey
 
 
 class BasicArticlePage(Page):
+    LEFT = "L"
+    RIGHT = "R"
+
+    IMAGE_ALIGNMENTS = (
+        (LEFT, 'Left'),
+        (RIGHT, 'Right'),
+    )
+
     body = RichTextField(blank=False)
     image = models.ForeignKey(
             'wagtailimages.Image', on_delete=models.SET_NULL, related_name='+',
             null=True, blank=True
     )
+    image_alignment = models.CharField(
+        max_length=3, choices=IMAGE_ALIGNMENTS, default=LEFT)
 
     content_panels = Page.content_panels + [
-            FieldPanel('body', classname='full'),
+            FieldPanel('body'),
+            FieldPanel('image_alignment'),
             ImageChooserPanel('image'),
     ]
 
