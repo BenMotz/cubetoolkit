@@ -29,6 +29,8 @@ class BasicArticlePage(Page):
             FieldPanel('image_alignment'),
             ImageChooserPanel('image'),
     ]
+    settings_panels = None
+
 
 class ImageGalleryPage(Page):
     intro_text = RichTextField(blank=True)
@@ -40,6 +42,7 @@ class ImageGalleryPage(Page):
             InlinePanel('gallery_images'),
             FieldPanel('footer_text'),
     ]
+    settings_panels = None
 
 
 class ImageGalleryImage(Orderable):
