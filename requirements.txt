@@ -16,6 +16,9 @@ six
 html2text==3.200.3
 # CMS:
 wagtail<1.13
+# Needed for Django < 1.9 to allow circular template refs, for customising
+# wagtail admin:
+django-overextends<0.5
 
 # The MySQL-python library requires a C build chain (gcc, etc.) and the mysql
 # library headers to be installed, which isn't desirable on deployment hosts.
