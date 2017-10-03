@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% load hash_filter %}
+{% load hash_filter tz %}
 
 {% block title %}
 Editing {{ event_list_name }}
@@ -148,12 +148,13 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
             {# Subsequent showings for this day #}
             <td>&nbsp;</td>
         {% endif %}
+        {% with showing.start|localtime as start_localtime %}
         <td>
-        <a href="{% url "edit-showing" showing_id=showing.pk %}" {% if showing.start.hour <= 17 %}class="daytime"{% endif %}>{{ showing.start|date:"H:i" }}</a>
+            <a href="{% url "edit-showing" showing_id=showing.pk %}" {% if start_localtime.hour <= 17 %}class="daytime"{% endif %}>{{ showing.start|date:"H:i" }}</a>
         </td>
         <td class="table_gap">&nbsp;</td>
         <td>{{ showing.booked_by }} <a href="{% url "edit-event-details-view" pk=showing.event.pk %}"
-                class="{% if showing.cancelled %}cancelled{% endif %}{% if showing.discounted %} discounted{% endif %}{% if showing.event.private %} private{% endif %}{% if showing.event.outside_hire %} external{% endif %}{% if showing.start.hour <= 17 %} daytime{% endif %}">
+                class="{% if showing.cancelled %}cancelled{% endif %}{% if showing.discounted %} discounted{% endif %}{% if showing.event.private %} private{% endif %}{% if showing.event.outside_hire %} external{% endif %}{% if start_localtime.hour <= 17 %} daytime{% endif %}">
             {% if showing.confirmed %}
             {{ showing.event.pre_title|upper }} {{ showing.event.name|upper }} {{ showing.event.post_title|upper }}
             {% else %}
@@ -161,6 +162,7 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
             {% endif %}{% if showing.discounted %}*{% endif %}{% if showing.cancelled %}(CANCELLED){% endif %}
         </a>{% if showing.sold_out %}(marked SOLD OUT){% endif %}</td>
         </tr>
+        {% endwith %}
     {% empty %}
         {# No showings on this day, but show the day anyway (with a link to add an event) #}
         <tr><td><a href="{% url "add-event" %}?date={{day|date:"j-m-Y"}}">{{ day|date:"D j"}}</a></td><td colspan="3"></td></tr>
