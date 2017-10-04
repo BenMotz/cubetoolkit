@@ -10,10 +10,12 @@ from modelcluster.fields import ParentalKey
 
 class BasicArticlePage(Page):
     LEFT = "L"
+    CENTRE = "C"
     RIGHT = "R"
 
     IMAGE_ALIGNMENTS = (
         (LEFT, 'Left'),
+        (CENTRE, 'Centre'),
         (RIGHT, 'Right'),
     )
 

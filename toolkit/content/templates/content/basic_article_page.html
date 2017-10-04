@@ -13,26 +13,50 @@
 <div class="programme">
     <div class="grid-sizer"></div>
     <div class="gutter-sizer"></div>
-    {% if page.image_alignment == "L" %}
-    <div class="grid-item grid-item--width2 event-image">
+
+    {% if page.image_alignment == "C" %}
+
+    <div class="grid-item grid-item--width">
+        &nbsp;
+    </div>
+    <div class="grid-item grid-item--width4">
         <div class="event_image">
             {% image page.image original %}
         </div>
-    </div>
-    {% endif %}
-    <div class="grid-item grid-item--width3">
+        <br>
         <h3>{{ page.title }}</h3>
         <br>
         <div class="copy">
             {{ page.body|richtext }}
-        </div><!-- end .copy -->
-    </div><!-- end .grid-item -->
-    {% if page.image_alignment == "R" %}
-    <div class="grid-item grid-item--width2 event-image">
-        <div class="event_image">
-            {% image page.image original %}
         </div>
     </div>
+
+    {% else %}
+
+        {% if page.image_alignment == "L" %}
+        <div class="grid-item grid-item--width2 event-image">
+            <div class="event_image">
+                {% image page.image original %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="grid-item grid-item--width3">
+            <h3>{{ page.title }}</h3>
+            <br>
+            <div class="copy">
+                {{ page.body|richtext }}
+            </div>
+        </div>
+
+        {% if page.image_alignment == "R" %}
+        <div class="grid-item grid-item--width2 event-image">
+            <div class="event_image">
+                {% image page.image original %}
+            </div>
+        </div>
+        {% endif %}
     {% endif %}
-</div><!-- end .programme -->
+
+</div>
 {% endblock %}
