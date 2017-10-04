@@ -5,7 +5,7 @@
 {% block body_class %}template-blogpage{% endblock %}
 
 {% block title %}
-{{ page.title }}
+Cube Microplex: {{ page.seo_title|default:page.title }}
 {% endblock %}
 
 {% block body %}
