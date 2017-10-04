@@ -177,7 +177,7 @@ class SecurityTests(MembersTestsMixin, TestCase):
         for view_name, kwargs in views_to_test.iteritems():
             url = reverse(view_name, kwargs=kwargs)
             expected_redirect = ("{0}?next={1}".format(
-                reverse("django.contrib.auth.views.login"), url))
+                reverse("login"), url))
             # Test GET:
             response = self.client.get(url)
             self.assertRedirects(response, expected_redirect)
@@ -232,7 +232,7 @@ class SecurityTests(MembersTestsMixin, TestCase):
         for view_name in views_to_test:
             url = reverse(view_name, kwargs={'member_id': member.id})
             expected_redirect = "{0}?next={1}".format(
-                reverse("django.contrib.auth.views.login"), url)
+                reverse("login"), url)
 
             # Test GET:
             response = self.client.get(url)
@@ -272,7 +272,7 @@ class AddMemberIPAuth(TestCase):
 
         expected_redirect = (
             "{0}?next={1}"
-            .format(reverse("django.contrib.auth.views.login"), self.url)
+            .format(reverse("login"), self.url)
         )
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response['Location'], expected_redirect)
