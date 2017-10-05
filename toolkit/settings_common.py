@@ -291,7 +291,6 @@ INSTALLED_APPS = (
     'kombu.transport.django',
 
     # Wagtail + support:
-    'wagtail.wagtailforms',
     'wagtail.wagtailredirects',
     'wagtail.wagtailembeds',
     'wagtail.wagtailsites',
@@ -302,6 +301,7 @@ INSTALLED_APPS = (
     'wagtail.wagtailsearch',
     'wagtail.wagtailadmin',
     'wagtail.wagtailcore',
+    'wagtail.wagtailforms',
 
     'modelcluster',
     'taggit',
