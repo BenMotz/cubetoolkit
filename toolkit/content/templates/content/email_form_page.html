@@ -1,0 +1,31 @@
+{% extends "base_wagtail.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block body %}
+{{ block.super }}
+<div class="programme">
+    <div class="grid-sizer"></div>
+    <div class="gutter-sizer"></div>
+
+
+    <div class="grid-item grid-item--width2 event-image">
+        <div class="event_image">
+            {% image page.image original %}
+        </div>
+    </div>
+
+    <div class="grid-item grid-item--width3">
+        <h3>{{ page.title }}</h3>
+        <br>
+        <div class="copy">
+            {{ page.intro|richtext }}
+            <form action="{% pageurl page %}" method="POST">
+                {% csrf_token %}
+                {{ form.as_p }}
+                <input type="submit">
+            </form>
+        </div>
+    </div>
+
+</div>
+{% endblock %}

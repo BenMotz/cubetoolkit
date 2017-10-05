@@ -1,0 +1,26 @@
+{% extends "base_wagtail.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block body %}
+{{ block.super }}
+<div class="programme">
+    <div class="grid-sizer"></div>
+    <div class="gutter-sizer"></div>
+
+
+    <div class="grid-item grid-item--width2 event-image">
+        <div class="event_image">
+            {% image page.image original %}
+        </div>
+    </div>
+
+    <div class="grid-item grid-item--width3">
+        <h3>{{ page.title }}</h3>
+        <br>
+        <div class="copy">
+            {{ page.thank_you_text|richtext }}
+        </div>
+    </div>
+
+</div>
+{% endblock %}
