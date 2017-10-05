@@ -2,7 +2,7 @@
 {% load thumbnail_l %}
 
 {% block title %}
-Cube Programme{% if extra_title %}: {{ extra_title }}{% endif %}
+{{ venue.name }} Programme{% if extra_title %}: {{ extra_title }}{% endif %}
 {% endblock %}
 
 {% block css %}
@@ -123,7 +123,7 @@ $(function(){
         <a href="#nav-mobile" id="mobile-menu-btn"><i class="fa fa-bars"></i><span>Menu</span></a>
       </div> !--><!-- end #mobile-wrap -->
       <div id="site-title" class="clearfix">
-          <h1><a href="{% url "default-view" %}" title= "Cube Programme">Cube Programme</a></h1>
+          <h1><a href="{% url "default-view" %}" title= "{{ venue.name }} Programme">{{ venue.name }} Programme</a></h1>
       </div><!-- end #site-title -->
 
       <div class="site-description">
@@ -170,7 +170,7 @@ $(function(){
           <a href="#nav-mobile" data-toggle=".grid" id="mobile-menu-btn"><i class="fa fa-bars"></i><span>Menu</span></a>
         </div><!-- end #mobile-wrap -->
         <div id="site-title" class="clearfix">
-            <h1><a href="{% url "default-view" %}" title= "Cube Programme">Cube Programme</a></h1>
+            <h1><a href="{% url "default-view" %}" title= "{{ venue.name }} Programme">{{ venue.name }} Programme</a></h1>
         </div><!-- end #site-title -->
 
         <div class="site-description">

@@ -6,6 +6,27 @@ import django.core.urlresolvers
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
+
+if False:
+    VENUE = {'name': 'Cube',
+             'twitter': 'https://twitter.com/cubecinema',
+             'facebook': 'https://www.facebook.com/cubecinema/',
+             'instagram': 'https://www.instagram.com/cubemicroplex/',
+             'flickr': 'https://secure.flickr.com/groups/cubemicroplex/',
+             'vimeo': 'https://vimeo.com/cubemicroplex/',
+             'youtube': 'https://www.youtube.com/user/cubelog',
+             }
+
+else:
+    VENUE = {'name': 'Star and Shadow',
+             'twitter': 'https://twitter.com/StarAndShadow',
+             'facebook': 'https://www.facebook.com/StarAndShadow',
+             'instagram': 'https://www.instagram.com/starandshadowcinema/',
+             'flickr': '',
+             'vimeo': '',
+             'youtube': 'https://www.youtube.com/channel/UCJxp1CvJlDsWBEJrguvhoLw/',
+             }
+
 # The following list of IP addresses is used to restrict access to some pages
 # (at time of writing, only the 'add a new member' page)
 CUBE_IP_ADDRESSES = tuple("10.1.1.%d" % n for n in xrange(33, 255))
