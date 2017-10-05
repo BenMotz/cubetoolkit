@@ -1,13 +1,32 @@
 {% extends "base_wagtail.html" %}
 {% load wagtailcore_tags wagtailimages_tags %}
 
+{% block css %}
+{{ block.super }}
+<style>
+th {
+    font-weight: normal;
+    text-align: left;
+    width: 16em;
+}
+input[type=text], input[type=email], textarea {
+    width: 100%;
+}
+tr ul {
+    padding-left: 0;
+}
+tr li {
+    list-style-type: none;
+    display: inline-block;
+}
+</style>
+{% endblock %}
+
 {% block body %}
 {{ block.super }}
 <div class="programme">
     <div class="grid-sizer"></div>
     <div class="gutter-sizer"></div>
-
-
     <div class="grid-item grid-item--width2 event-image">
         <div class="event_image">
             {% image page.image original %}
@@ -21,11 +40,15 @@
             {{ page.intro|richtext }}
             <form action="{% pageurl page %}" method="POST">
                 {% csrf_token %}
-                {{ form.as_p }}
-                <input type="submit">
+                <table>
+                {{ form.as_table }}
+                <tr>
+                    <td></td>
+                    <td><input value="Submit" type="submit"/></td>
+                </tr>
+                </table>
             </form>
         </div>
     </div>
-
 </div>
 {% endblock %}
