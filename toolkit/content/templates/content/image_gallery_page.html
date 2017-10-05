@@ -1,12 +1,5 @@
-{% extends "base_content.html" %}
-
+{% extends "base_wagtail.html" %}
 {% load wagtailcore_tags wagtailimages_tags %}
-
-{% block body_class %}template-blogpage{% endblock %}
-
-{% block title %}
-Cube Microplex: {{ page.seo_title|default:page.title }}
-{% endblock %}
 
 {% block body %}
 {{ block.super }}
