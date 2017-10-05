@@ -1,13 +1,14 @@
 from django.db import models
 from django.http import Http404
 
-from wagtail.wagtailcore.fields import RichTextField
+from wagtail.wagtailcore.fields import RichTextField, StreamField
 from wagtail.wagtailcore.models import Page, Orderable
 from wagtail.wagtailadmin.edit_handlers import (
-    FieldPanel, InlinePanel, MultiFieldPanel, FieldRowPanel)
+    FieldPanel, InlinePanel, MultiFieldPanel, FieldRowPanel, StreamFieldPanel)
 from wagtail.wagtailimages.edit_handlers import ImageChooserPanel
 from wagtail.wagtailforms.models import AbstractEmailForm, AbstractFormField
 from wagtail.wagtailforms.edit_handlers import FormSubmissionsPanel
+from wagtail.wagtailcore import blocks
 from modelcluster.fields import ParentalKey
 
 
@@ -36,6 +37,25 @@ class BasicArticlePage(Page):
             ImageChooserPanel('image'),
     ]
     settings_panels = None
+
+
+class WidthBlock(blocks.StructBlock):
+    width = blocks.IntegerBlock(
+        min_value=1, max_value=5,
+        help_text="How many grid columns to occupy in rendered template")
+    content = blocks.StreamBlock([
+        ('rich_text', blocks.RichTextBlock()),
+        ('raw_html', blocks.RawHTMLBlock()),
+        ], min_num=1, max_num=1)
+
+
+class ComplexArticlePage(Page):
+    content = StreamField([
+        ('content_block', WidthBlock()),
+    ])
+    content_panels = Page.content_panels + [
+        StreamFieldPanel('content'),
+    ]
 
 
 class ImageGalleryPage(Page):

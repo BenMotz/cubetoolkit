@@ -1,0 +1,16 @@
+{% extends "base_wagtail.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block body %}
+{{ block.super }}
+<div class="programme copy">
+    <div class="grid-sizer"></div>
+    <div class="gutter-sizer"></div>
+    {% for block in page.content %}
+    <div class="grid-item grid-item--width{{ block.value.width }}">
+        {% include_block block.value.content %}
+    </div>
+    {% endfor %}
+
+</div>
+{% endblock %}
