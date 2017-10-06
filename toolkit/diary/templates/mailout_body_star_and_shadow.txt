@@ -1,0 +1,51 @@
+{% load showing_date_format %}{% load strip_lines %}{# This is a bit gnarly in places, because newlines are significant... #}STAR AND SHADOW PROGRAMME OF EVENTS
+
+https://starandshadow.org.uk/
+
+{% filterblanklines %}
+{% for showing in showings %}
+{%     ifchanged %}
+{{         showing.start|date:"Y" }}
+{%     endifchanged %}
+{%     ifchanged %}
+ {{        showing.start|date:"F"|upper }}
+{%     endifchanged %}
+{%     ifchanged %}
+  {{ showing.start|date:"D"}} {{ showing.start|date:"d" }}{% else %}        {% endifchanged %} {{showing.start|date:"H:i"}} .... {% if showing.hide_in_programme or showing.event.private %}Closed for private event.{% else %}{{ showing.event.name|capfirst }}{% if showing.sold_out %} (Sold out!){% endif %}{% if showing.cancelled %} (CANCELLED){% endif %}{% if showing.discounted %} *{% endif %}{% endif %}
+{% endfor %}
+{% endfilterblanklines %}
+
+* cheap night
+
+For complete listings including all future events, please visit:
+https://starandshadow.org.uk/
+{% filtermultipleblanklines %}
+{% for showing in showings_details %}{% ifchanged %}----------------------------------------------------------------------------
+
+{% if showing.event.pre_title %}{{ showing.event.pre_title }}:
+{% endif %}{{ showing.event.name|upper }}
+ {{ showing.event.post_title }}
+{% if showing.event.film_information %}{{ showing.event.film_information }} {% endif %}
+
+{{ showing.event.showings.public|showingdates }}
+{% if showing.event.pricing %}Tickets: {{ showing.event.pricing }}{% endif %}
+{% if showing.event.ticket_link %}Advance tickets: {{ showing.event.ticket_link }}{% endif %}
+
+{{ showing.event.copy_plaintext }}
+{% endifchanged %}
+{% endfor %}
+
+--
+{% endfiltermultipleblanklines %}
+For complete and up to date listings, please visit:
+https://starandshadow.org.uk/
+
+The Star and Shadow Cinema
+is located at:
+Warwick Street
+Newcastle Upon Tyne
+NE2 1BB
+
+https://starandshadow.org.uk/
+
+tel: 07938 257 663

@@ -9,6 +9,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 if False:
     VENUE = {'name': 'Cube',
+             'mailout_txt': 'mailout_body.txt',
              'twitter': 'https://twitter.com/cubecinema',
              'facebook': 'https://www.facebook.com/cubecinema/',
              'instagram': 'https://www.instagram.com/cubemicroplex/',
@@ -19,7 +20,9 @@ if False:
              }
 
 else:
+    # 'programme_url': 'https://starandshadow.org.uk/',
     VENUE = {'name': 'Star and Shadow',
+             'mailout_txt': 'mailout_body_star_and_shadow.txt',
              'twitter': 'https://twitter.com/StarAndShadow',
              'facebook': 'https://www.facebook.com/StarAndShadow',
              'instagram': 'https://www.instagram.com/starandshadowcinema/',
