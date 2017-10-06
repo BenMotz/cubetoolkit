@@ -94,6 +94,25 @@ DAWN_OF_TIME = 1998
 CALENDAR_CONFIRMED_IN_PAST_COLOUR = "#99FF99"
 CALENDAR_CONFIRMED_IN_FUTURE_COLOUR = "#33CC33"
 CALENDAR_UNCONFIRMED_COLOUR = "#E0CFCF"
+
+###############################################################################
+#
+# Wagtail settings
+
+WAGTAIL_SITE_NAME = 'The Cube Microplex'
+
+# Don't show fields to change user passwords (for other users, in admin)
+WAGTAILUSERS_PASSWORD_ENABLED = False
+
+# Don't allow user to change their own password
+WAGTAIL_PASSWORD_MANAGEMENT_ENABLED = False
+
+# Disable password reset function
+WAGTAIL_PASSWORD_RESET_ENABLED = False
+
+# Don't automatically check for (and notify) new Wagtail versions:
+WAGTAIL_ENABLE_UPDATE_CHECK = False
+
 ###############################################################################
 #
 # Below here are Django settings
@@ -226,6 +245,8 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'wagtail.wagtailcore.middleware.SiteMiddleware',
+    'wagtail.wagtailredirects.middleware.RedirectMiddleware',
 )
 
 TEMPLATES = [
@@ -243,6 +264,8 @@ TEMPLATES = [
         'OPTIONS': {
             'debug': DEBUG,
             'context_processors': (
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.static',
                 'django.contrib.auth.context_processors.auth',
@@ -266,6 +289,7 @@ INSTALLED_APPS = (
     'toolkit.index',
     'toolkit.about',
     'toolkit.util',
+    'toolkit.content',
     'easy_thumbnails',
     'django.contrib.auth',
     'django.contrib.contenttypes',  # Needed by auth framework
@@ -286,6 +310,25 @@ INSTALLED_APPS = (
     'djcelery',
     # DB-backed message queue (app just provides migrations),
     'kombu.transport.django',
+
+    # Wagtail + support:
+    'wagtail.wagtailforms',
+    'wagtail.wagtailredirects',
+    'wagtail.wagtailembeds',
+    'wagtail.wagtailsites',
+    'wagtail.wagtailusers',
+    'wagtail.wagtailsnippets',
+    'wagtail.wagtaildocs',
+    'wagtail.wagtailimages',
+    'wagtail.wagtailsearch',
+    'wagtail.wagtailadmin',
+    'wagtail.wagtailcore',
+
+    'modelcluster',
+    'taggit',
+    # Remove at Django 1.9+ (required for circular template refs when
+    # customising wagtail admin)
+    'overextends',
 )
 
 # Common logging config. Different settings files can tweak this.
