@@ -6,21 +6,21 @@
 
 <h2>Statistics of members.</h2>
 <h3>Top email domains.</h3>
-<table>
+<table class="table">
     <th align=left>Rank</th><th align=left>Domain</th><th align=left>Members</th>
     {% for row in email_stats %}
     <tr><td>{{ forloop.counter }}</td><td><a href="http://{{ row.0 }}/">{{ row.0 }}</a></td><td>{{ row.1 }}</td></tr>
     {% endfor %}
 </table>
 <h3>Top postcode zones.</h3>
-<table>
+<table class="table">
     <th align=left>Rank</th><th align=left>Postcode</th><th align=left>Members</th>
     {% for row in postcode_stats %}
     <tr><td>{{ forloop.counter }}</td><td>{{ row.0 }}</td><td>{{ row.1 }}</td></tr>
     {% endfor %}
-</table>
+</table class=".table">
 <h3>Member Totals.</h3>
-<table>
+<table class="table">
     <tr><td>Total members</td><td>{{ m_count }}</td></tr>
     <tr><td>Members with email</td><td>{{ m_email_count }} ({{ m_email_viable}} viable; {{ m_email_unsub }} unsubscribed)</td></tr>
     <tr><td>Members with postcode</td><td>{{ m_postcode }}</td></tr>

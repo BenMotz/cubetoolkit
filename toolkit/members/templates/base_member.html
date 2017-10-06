@@ -6,7 +6,9 @@
 {% endblock %}
 
 {% block header %}
+{% if user.is_authenticated %}
 {{ block.super }}
+{% endif %}
 <h3>{{ VENUE.longname }} members database</h3>
 {% include "messages.html" %}
 
@@ -15,12 +17,11 @@
 {% block footer %}
 {% if user.is_authenticated %}
 <p>
+<p>
 <a href="{% url "add-member" %}">Add member</a> |
 <a href="{% url "search-members" %}">Search / Edit / Delete</a> |
-<a href="{% url "member-statistics" %}">Statistics</a> |
-<a href="{% url "toolkit-index" %}">Toolkit home</a> |
-<a href="{% url "logout" %}">Log out</a>
+<a href="{% url "member-statistics" %}">Statistics</a>
 </p>
-{% endif %}
 {{ block.super }}
+{% endif %}
 {% endblock %}

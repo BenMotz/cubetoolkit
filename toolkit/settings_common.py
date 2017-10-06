@@ -18,7 +18,7 @@ VENUE = {
     'flickr': 'https://secure.flickr.com/groups/cubemicroplex/',
     'vimeo': 'https://vimeo.com/cubemicroplex/',
     'youtube': 'https://www.youtube.com/user/cubelog',
-    'internal_header_img': 'diary_edit_list_header.gif',
+    'internal_header_img': 'content/logo.gif',
     'wagtale_admin_img': '/static/content/logo.gif',
     'font_h2': '',
     # This is used as the hostname for unsubscribe links in emails

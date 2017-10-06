@@ -25,7 +25,6 @@ Editing {{ event_list_name }}
   .daytime {
     background-color: #FFFF99;
   }
-  h3 { font-family: Arial; }
 
   table { border-collapse: collapse; }
   tr:nth-child(odd) td {
@@ -47,6 +46,7 @@ Editing {{ event_list_name }}
       padding: 10px;
       float: right;
       position: absolute;
+      top: 5rem;
       right: 10px;
   }
   .ideas {
@@ -113,7 +113,7 @@ function prefs_updated(data) {
 
 {% block body %}
 <h3>{{ VENUE.name }} events diary</h3>
-<p id="controls"><a href="{% url "logout" %}">Log out</a><br>
+<p id="controls">
 Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">this window</a></p>
 
 <p><a name="top"></a></p>
