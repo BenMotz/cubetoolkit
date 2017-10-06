@@ -13,16 +13,6 @@
 {{ block.super }}
 <style type="text/css">
     @import url('{{ STATIC_URL }}css/lib/smoothness/jquery-ui.css');
-    body { font-family:Arial,Helvetica,sans-serif; }
-
-    .rota-wrapper{
-        max-width: 1280px;
-    }
-
-    h1, h2 { margin: 1mm; }
-    h1 { font-size: 16pt; }
-    h2 { font-size: 14pt; }
-
     .na {
         color: lightgray;
         cursor: pointer;
@@ -41,6 +31,7 @@
         border-top: thin dashed lightgray;
         border-bottom: thin solid lightgray;
         width: 90%;
+        font-size: 90%;
         font-family: monospace;
         white-space: pre-wrap;
         padding: 0.4em 1em;
@@ -61,6 +52,7 @@
       width: 50%;
       font-weight: bold;
       height: 0.65cm;
+      font-size: 90%;
     }
     .rota_name form {
         display: inline;
@@ -76,7 +68,7 @@
     }
     @media screen and (min-width: 800px) {
         .rota_role {
-          width: 30%;
+          width: 35%;
         }
     }
 </style>

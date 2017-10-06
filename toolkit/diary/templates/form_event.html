@@ -7,8 +7,6 @@ Event Details for {{ event.name }}
 <style>
     h3 { font-family: Arial; }
     div#title {
-        margin: 0 16px ;
-        width: 95%;
         background-color: #d0d0d0;
     }
     div#title h1 {
@@ -22,18 +20,21 @@ Event Details for {{ event.name }}
         padding: 5px;
     }
     div#forms {
-        margin: 0 16px;
-        width: 95%;
+        font-size: 11pt;
     }
     div#forms p {
         margin: 0;
         padding: 5px;
+        overflow: auto;
     }
     div#forms p:nth-child(odd) {
         background-color: #d0d0d0;
     }
     div#forms p:nth-child(even) {
         background-color: #c0c0c0;
+    }
+    div#forms p:nth-child(3) {
+        overflow: visible;
     }
     /* Hide 'Hold down "Control" etc.' text that Django is incapable of
     turning hiding pre 1.6 */
@@ -49,11 +50,11 @@ Event Details for {{ event.name }}
         width: 15%;
     }
     div#forms textarea, form input[type=text], form input[type=url] {
-        width: 75%;
+        width: 80%;
         display: block;
     }
     span#image_edit {
-        width: 75%;
+        width: 80%;
         display: block;
         padding-left: 15.5%;
     }
@@ -71,7 +72,7 @@ Event Details for {{ event.name }}
     textarea#id_copy {
       border: thin solid black;
       padding: 5px;
-      width: 75%;
+      width: 80%;
       height: 280px;
       font-family: Verdana;
       font-size: 11px;
