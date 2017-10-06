@@ -3,8 +3,11 @@ from django.http import Http404
 
 from wagtail.wagtailcore.fields import RichTextField
 from wagtail.wagtailcore.models import Page, Orderable
-from wagtail.wagtailadmin.edit_handlers import FieldPanel, InlinePanel, MultiFieldPanel
+from wagtail.wagtailadmin.edit_handlers import (
+    FieldPanel, InlinePanel, MultiFieldPanel, FieldRowPanel)
 from wagtail.wagtailimages.edit_handlers import ImageChooserPanel
+from wagtail.wagtailforms.models import AbstractEmailForm, AbstractFormField
+from wagtail.wagtailforms.edit_handlers import FormSubmissionsPanel
 from modelcluster.fields import ParentalKey
 
 
@@ -87,4 +90,33 @@ class SectionLink(Orderable):
     panels = [
         FieldPanel('link'),
         FieldPanel('text'),
+    ]
+
+
+class FormField(AbstractFormField):
+    page = ParentalKey('EmailFormPage', related_name='form_fields')
+
+
+class EmailFormPage(AbstractEmailForm):
+    intro = RichTextField(blank=True)
+    thank_you_text = RichTextField(blank=True)
+
+    image = models.ForeignKey(
+            'wagtailimages.Image', on_delete=models.SET_NULL, related_name='+',
+            null=True, blank=True
+    )
+
+    content_panels = AbstractEmailForm.content_panels + [
+        FormSubmissionsPanel(),
+        FieldPanel('intro'),
+        InlinePanel('form_fields', label="Form fields"),
+        FieldPanel('thank_you_text'),
+        ImageChooserPanel('image'),
+        MultiFieldPanel([
+            FieldRowPanel([
+                FieldPanel('from_address', classname="col6"),
+                FieldPanel('to_address', classname="col6"),
+            ]),
+            FieldPanel('subject'),
+        ], "Email"),
     ]

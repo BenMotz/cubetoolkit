@@ -243,6 +243,7 @@ STATICFILES_FINDERS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'django.middleware.security.SecurityMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -253,6 +254,11 @@ MIDDLEWARE_CLASSES = (
     'wagtail.wagtailcore.middleware.SiteMiddleware',
     'wagtail.wagtailredirects.middleware.RedirectMiddleware',
 )
+
+SECURE_CONTENT_TYPE_NOSNIFF = True
+SECURE_BROWSER_XSS_FILTER = True
+X_FRAME_OPTIONS = 'DENY'
+CSRF_COOKIE_HTTPONLY = True
 
 TEMPLATES = [
     {
@@ -317,7 +323,6 @@ INSTALLED_APPS = (
     'kombu.transport.django',
 
     # Wagtail + support:
-    'wagtail.wagtailforms',
     'wagtail.wagtailredirects',
     'wagtail.wagtailembeds',
     'wagtail.wagtailsites',
@@ -328,6 +333,7 @@ INSTALLED_APPS = (
     'wagtail.wagtailsearch',
     'wagtail.wagtailadmin',
     'wagtail.wagtailcore',
+    'wagtail.wagtailforms',
 
     'modelcluster',
     'taggit',
