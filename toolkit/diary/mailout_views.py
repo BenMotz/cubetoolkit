@@ -102,6 +102,7 @@ def mailout(request):
         subject_text, body_text = _render_mailout_subject_and_body(
                 days_ahead, copy_days_ahead)
         context = {
+            'venue': settings.VENUE,
             "days_ahead": days_ahead,
             "copy_days_ahead": copy_days_ahead
         }

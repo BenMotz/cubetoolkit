@@ -14,11 +14,12 @@
 </style>
 {% endblock %}
 
-{% block title %}Cube volunteers{% endblock %}
+{% block title %}{{ venue.name }} volunteers{% endblock %}
 
 {% block body %}
 
-<h3>Role summary:</h3>
+<img src="{{ STATIC_URL }}/diary/{{ venue.internal_header_img }}" alt="{{ venue.name }} logo">
+<h3>{{ venue.name }} Volunteers Role Summary</h3>
 <table>
 {% for role, names in role_vol_map %}
 {% cycle '<tr>' '' '' ''%}

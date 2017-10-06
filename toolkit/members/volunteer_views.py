@@ -25,6 +25,7 @@ def view_volunteer_list(request):
                   .select_related()
                   .prefetch_related('roles'))
     context = {
+        'venue': settings.VENUE,
         'volunteers': volunteers,
         'default_mugshot': settings.DEFAULT_MUGSHOT,
     }
@@ -55,6 +56,7 @@ def view_volunteer_role_report(request):
     # dict, but that's fine)
 
     context = {
+        'venue': settings.VENUE,
         'role_vol_map': role_vol_map,
     }
     return render(request, 'volunteer_role_report.html', context)

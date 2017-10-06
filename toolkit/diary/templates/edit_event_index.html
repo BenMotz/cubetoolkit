@@ -108,8 +108,8 @@ function prefs_updated(data) {
 {% endblock %}
 
 {% block body %}
-<img src="{{ STATIC_URL }}diary/diary_edit_list_header.gif" alt="Cube Microplex" width="150px">
-<h3>CUBE events diary</h3>
+<img src="{{ STATIC_URL }}diary/{{ venue.internal_header_img }}" alt="{{ venue.name }}" width="150px">
+<h3>{{ venue.name }} events diary</h3>
 <p id="controls"><a href="{% url "logout" %}">Log out</a><br>
 Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">this window</a></p>
 

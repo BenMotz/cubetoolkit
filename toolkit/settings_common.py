@@ -15,6 +15,7 @@ if False:
              'flickr': 'https://secure.flickr.com/groups/cubemicroplex/',
              'vimeo': 'https://vimeo.com/cubemicroplex/',
              'youtube': 'https://www.youtube.com/user/cubelog',
+             'internal_header_img': 'diary_edit_list_header.gif'
              }
 
 else:
@@ -25,6 +26,7 @@ else:
              'flickr': '',
              'vimeo': '',
              'youtube': 'https://www.youtube.com/channel/UCJxp1CvJlDsWBEJrguvhoLw/',
+             'internal_header_img': 'star_and_shadow_bricks.jpg'
              }
 
 # The following list of IP addresses is used to restrict access to some pages

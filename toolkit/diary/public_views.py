@@ -13,7 +13,6 @@ from django.conf import settings
 from django.utils.safestring import mark_for_escaping
 import django.utils.timezone as timezone
 import django.views.generic as generic
-from django.conf import settings
 
 from easy_thumbnails.files import get_thumbnailer
 

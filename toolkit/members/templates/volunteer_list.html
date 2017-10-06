@@ -14,13 +14,13 @@
 </style>
 {% endblock %}
 
-{% block title %}Cube volunteers{% endblock %}
+{% block title %}{{ venue.name }} Volunteers{% endblock %}
 
 {% block body %}
 {# {% for v, n in roles.iteritems %} <p><b>{{ v }}</b><br> {{ n }} </p> {% endfor %} #}
-<img src="{{ STATIC_URL }}members/cube_microplex_logo.gif" alt="Cube Microplex logo" width="200"><p><h2>Cube volunteers report.</h2>
+<img src="{{ STATIC_URL }}/diary/{{ venue.internal_header_img }}" alt="{{ venue.name }} logo"><p><h2>{{ venue.name }} Volunteers Report</h2>
 {% include "messages.html" %}
-Total cube volunteers: {{ volunteers|length }}<p>
+Total number of {{ venue.name }} volunteers: {{ volunteers|length }}<p>
 Report generated: {% now "d/m/Y" %}<p>
 <a href="{% url "add-volunteer" %}" title="add new volunteer">[add volunteer]</a>
 <a href="{% url "retire-select-volunteer" %}" title="retire volunteer">[retire volunteer]</a>

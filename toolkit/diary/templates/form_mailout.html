@@ -17,12 +17,12 @@
 {% endblock %}
 
 {% block title %}
-Member's mailout
+{{venue.name }} Member's Mailout
 {% endblock %}
 
 {% block body %}
-<p><img alt="Cube Microplex" src="{{ STATIC_URL }}members/cube_microplex_logo.gif" width="200"></p>
-<h3>Cube member's mailout.</h3>
+<p><img alt="{{venue.name }}" src="{{ STATIC_URL }}diary/{{ venue.internal_header_img }}"</p>
+<h3>{{venue.name }} Member's Mailout</h3>
 <form method="GET">
     <p><label for="id_daysahead">Days of listings: </label>
     <input type="number" id="id_daysahead" name="daysahead" min="0" value="{{ days_ahead }}">
