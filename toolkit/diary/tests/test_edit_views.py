@@ -1528,7 +1528,7 @@ class PreferencesTests(DiaryTestsMixin, TestCase):
 
         response = self.client.get(url)
         edit_prefs = self._get_edit_prefs(response)
-        self.assertEqual(edit_prefs.keys(), ["daysahead", "popups"])
+        self.assertEqual(set(edit_prefs.keys()), {"daysahead", "popups"})
 
     def test_redirect_change(self):
         url = reverse("cancel-edit")
