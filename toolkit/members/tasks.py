@@ -3,6 +3,8 @@ from email import charset
 from email.mime.text import MIMEText
 from email.header import Header
 
+import six
+
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
@@ -70,7 +72,7 @@ def send_mailout_report(smtp_conn, report_to, sent, err_list,
         report += "\n"
         report += body
 
-        _send_email(smtp_conn, unicode(report_to),
+        _send_email(smtp_conn, six.text_type(report_to),
                     subject, report, body_is_ascii)
 
 
