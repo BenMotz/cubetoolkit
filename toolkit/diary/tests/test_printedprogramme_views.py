@@ -29,7 +29,7 @@ class AddPrintedProgrammeTests(DiaryTestsMixin, TestCase):
             pass
 
     def _write_pdf_magic(self, temp_pdf):
-        temp_pdf.write('%PDF-1.3\r%\xe2\xe3\xcf\xd3\r\n')
+        temp_pdf.write(b'%PDF-1.3\r%\xe2\xe3\xcf\xd3\r\n')
         temp_pdf.seek(0)
 
     def test_view_loads(self):

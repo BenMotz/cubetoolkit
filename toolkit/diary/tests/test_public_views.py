@@ -176,7 +176,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode("utf-8"))
         # Eh (shrug)
         self.assertEqual(data, [{
                          u"name": u"Event three title",
@@ -374,7 +374,7 @@ class UrlTests(DiaryTestsMixin, TestCase):
             '/diary/edit/2012/12/30/': {'year': '2012', 'month': '12',
                                         'day': '30'},
         }
-        for query, response in calls_to_test.tems():
+        for query, response in calls_to_test.items():
             match = resolve(query)
             self.assertEqual(match.func.__name__, "edit_diary_list")
             for k, v in response.items():
