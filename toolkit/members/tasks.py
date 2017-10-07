@@ -1,7 +1,7 @@
 import smtplib
 from email import charset
 from email.mime.text import MIMEText
-from email.Header import Header
+from email.header import Header
 
 from django.conf import settings
 from django.core.urlresolvers import reverse
