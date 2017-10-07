@@ -10,6 +10,7 @@
             <li><a href="{% url "default-view" %}"><span>All</span></a></li>
         </ul>
     </li>
+    {% if not WAGTAIL_CONTENT_IN_MENU %}
     <li><a href="#">Projects</a>
         <ul class="sub-menu">
             <li><a href="{% url "about-rebox" %}">Rebox</a></li>
@@ -56,6 +57,7 @@
             <li><a href="{% url "about-hire" %}">Hire</a></li>
         </ul>
     </li>
+    {% else %}
     {% for top_level_child in request.site.root_page.get_children.live.in_menu %}
     {# Don't actually link to the top_level_child content (as there isn't any!) #}
     <li><a href="#">{{ top_level_child.seo_title|default:top_level_child.title }}</a>
@@ -70,4 +72,5 @@
         </ul>
     </li>
     {% endfor %}
+    {% endif %}
 </ul>

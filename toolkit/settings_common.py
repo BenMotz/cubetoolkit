@@ -78,6 +78,9 @@ CALENDAR_UNCONFIRMED_COLOUR = "#E0CFCF"
 #
 # Wagtail settings
 
+# Enable / disable CMS content visibility in the site menu:
+WAGTAIL_CONTENT_IN_MENU = True
+
 WAGTAIL_SITE_NAME = 'The Cube Microplex'
 
 # Don't show fields to change user passwords (for other users, in admin)
@@ -248,6 +251,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.static',
                 'django.contrib.auth.context_processors.auth',
+                'toolkit.content.context_processors.wagtail_content_in_menu',
             ),
             # May be worth enabling for improved performance?
             # 'loaders':
