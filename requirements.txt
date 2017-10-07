@@ -11,7 +11,7 @@ python-dateutil
 mock
 fixtures<4
 pytz
-# for easy_thumbnails:
+# For general python 3 compatiblity:
 six
 # For generating non-html copy for mailout etc:
 html2text==3.200.3

@@ -56,7 +56,7 @@ class SecurityTests(MembersTestsMixin, TestCase):
 
     def _assert_need_login(self, views_to_test):
         """Assert that given URLs 302 redirect to the login page"""
-        for view_name, kwargs in views_to_test.iteritems():
+        for view_name, kwargs in views_to_test.items():
             url = reverse(view_name, kwargs=kwargs)
             expected_redirect = ("{0}?next={1}".format(
                 reverse("login"), url))

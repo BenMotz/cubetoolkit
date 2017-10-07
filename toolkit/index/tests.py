@@ -20,7 +20,7 @@ class SecurityTests(TestCase):
             'create-index-category': {},
             'update-index-category': {'pk': '1'},
         }
-        for view_name, kwargs in views_to_test.iteritems():
+        for view_name, kwargs in views_to_test.items():
             url = reverse(view_name, kwargs=kwargs)
             expected_redirect = "{0}?next={1}".format(
                 reverse("login"), url)

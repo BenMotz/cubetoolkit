@@ -19,6 +19,7 @@ from django.contrib.auth.decorators import permission_required
 from django.views.decorators.http import require_POST, require_http_methods
 from django.utils.decorators import method_decorator
 from django.utils.html import escape
+import six
 
 from toolkit.diary.models import (Showing, Event, DiaryIdea, MediaItem,
                                   EventTemplate, EventTag, Role, RotaEntry,
@@ -778,7 +779,7 @@ def edit_event_tags(request):
             tag_form.save()
         else:
             errors[new_tag] = [
-                u",".join(msg) for msg in tag_form.errors.itervalues()
+                u",".join(msg) for msg in six.itervalues(tag_form.errors)
             ]
 
     if errors:

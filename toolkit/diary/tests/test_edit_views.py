@@ -12,6 +12,7 @@ from mock import patch
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
+import six
 
 from toolkit.diary.models import (Showing, Event, Role, DiaryIdea,
                                   EventTemplate, MediaItem, EventTag)
@@ -85,7 +86,7 @@ class ViewSecurity(DiaryTestsMixin, TestCase):
     }
 
     def _assert_need_login(self, views_to_test):
-        for view_name, kwargs in views_to_test.iteritems():
+        for view_name, kwargs in six.iteritems(views_to_test):
             url = reverse(view_name, kwargs=kwargs)
             expected_redirect = ("{0}?next={1}".format(
                 reverse("login"), url))

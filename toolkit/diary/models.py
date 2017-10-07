@@ -12,6 +12,7 @@ import django.core.exceptions
 from django.utils.safestring import mark_safe
 from django.db.models.query import QuerySet
 from django.utils.text import slugify
+import six
 
 from toolkit.diary.validators import validate_in_future
 import toolkit.util.image as imagetools
@@ -524,7 +525,7 @@ class Showing(models.Model):
             rota_entries_by_id.setdefault(
                     rota_entry.role.pk, []).append(rota_entry)
 
-        for role_id, count in rota.iteritems():
+        for role_id, count in six.iteritems(rota):
             # Number of existing rota entries for this role_id.
             # Remove from dict, so anything left in the dict at the end
             # is an error...
