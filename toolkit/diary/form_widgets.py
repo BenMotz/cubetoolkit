@@ -3,7 +3,7 @@ from django import forms
 from django.utils.safestring import mark_safe
 from django.utils.html import conditional_escape
 from django.forms.utils import flatatt
-from django.utils.encoding import force_unicode
+from django.utils.encoding import force_text
 
 
 class ChosenSelectMultiple(forms.SelectMultiple):
@@ -73,7 +73,7 @@ class HtmlTextarea(forms.Textarea):
             u"<div class='ckeditor_django_wrapper'>",
             u'<textarea{0}>{1}</textarea>'.format(
                 flatatt(final_attrs),
-                conditional_escape(force_unicode(value))
+                conditional_escape(force_text(value))
             ),
             u"</div>",
             u"<script type='text/javascript'>",
