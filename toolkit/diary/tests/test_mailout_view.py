@@ -156,7 +156,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-        response = json.loads(response.content)
+        response = json.loads(response.content.decode("utf-8"))
         self.assertEqual(response, {
             u"status": u"error",
             u"errors": {
@@ -176,7 +176,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         })
 
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode("utf-8"))
 
         self.assertEqual(response_data, {
             u"status": u"ok",
@@ -198,7 +198,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         response = self.client.get(url, data={u"task_id": u"dummy-task-id"})
 
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode("utf-8"))
         self.assertEqual({
             u'complete': False,
             u'error': None,
@@ -217,7 +217,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         response = self.client.get(url, data={u"task_id": u"dummy-task-id"})
 
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode("utf-8"))
         self.assertEqual({
             u'complete': False,
             u'error': None,
@@ -237,7 +237,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         response = self.client.get(url, data={u"task_id": u"dummy-task-id"})
 
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode("utf-8"))
         self.assertEqual({
             u'complete': True,
             u'error': True,
@@ -258,7 +258,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         response = self.client.get(url, data={u"task_id": u"dummy-task-id"})
 
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode("utf-8"))
         self.assertEqual({
             u'complete': True,
             u'error': True,
@@ -278,7 +278,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         response = self.client.get(url, data={u"task_id": u"dummy-task-id"})
 
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode("utf-8"))
         self.assertEqual({
             u'complete': True,
             u'error': False,
@@ -299,7 +299,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         response = self.client.get(url, data={u"task_id": u"dummy-task-id"})
 
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode("utf-8"))
         self.assertEqual({
             u'complete': True,
             u'error': True,
@@ -319,7 +319,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         response = self.client.get(url, data={u"task_id": u"dummy-task-id"})
 
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode("utf-8"))
         self.assertEqual({
             u'complete': True,
             u'error': True,
@@ -338,7 +338,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         response = self.client.get(url, data={u"task_id": u"dummy-task-id"})
 
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode("utf-8"))
         self.assertEqual({
             u'complete': False,
             u'error': None,
@@ -357,7 +357,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         response = self.client.get(url, data={u"task_id": u"dummy-task-id"})
 
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content)
+        response_data = json.loads(response.content.decode("utf-8"))
         self.assertEqual({
             u'complete': False,
             u'error': None,
