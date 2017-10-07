@@ -3,8 +3,6 @@ from email import charset
 from email.mime.text import MIMEText
 from email.header import Header
 
-import six
-
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
@@ -29,12 +27,8 @@ def _send_email(smtp_conn, destination, subject, body, mail_is_ascii):
 
     # Assume 'From' is always ASCII(!)
     msg['From'] = settings.MAILOUT_FROM_ADDRESS
-    # This will try encoding in ascii, then iso-8859-1 then fallback to UTF-8
-    # if that fails. (This is desirable as iso-8859-1 is more readable without
-    # decoding, plus more compact)
-    # ('To' can contain non-ascii in name part, i.e. "name <address>")
-    msg['To'] = Header(destination, "iso-8859-1")
-    msg['Subject'] = Header(subject, "iso-8859-1")
+    msg['To'] = Header(destination)
+    msg['Subject'] = Header(subject)
 
     try:
         # Enforce ascii destination email address:
@@ -72,7 +66,7 @@ def send_mailout_report(smtp_conn, report_to, sent, err_list,
         report += "\n"
         report += body
 
-        _send_email(smtp_conn, six.text_type(report_to),
+        _send_email(smtp_conn, report_to,
                     subject, report, body_is_ascii)
 
 
@@ -163,8 +157,8 @@ def send_mailout_to(subject, body, recipients, task=None, report_to=None):
                 subject, body, body_is_ascii)
 
     except Exception as exc:
-        logger.exception("Mailout job failed, {0}".format(exc))
-        return (True, sent, "Mailout job died: {0}".format(exc))
+        logger.exception("Mailout job failed, '{0}'".format(exc))
+        return (True, sent, "Mailout job died: '{0}'".format(exc))
     finally:
         try:
             smtp_conn.quit()

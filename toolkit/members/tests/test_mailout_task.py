@@ -2,6 +2,7 @@ import smtplib
 import email.parser
 import email.header
 
+import six
 from mock import patch, call
 
 from django.conf import settings
@@ -34,7 +35,10 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         self.assertEqual(message['From'], from_addr)
         self.assertEqual(message['To'], dest_addr)
 
-        body = message.get_payload().decode("utf-8")
+        body = message.get_payload()
+        if six.PY2:
+            # message.get_payload has apparently changed in py3:
+            body = body.decode("utf-8")
         subject = email.header.decode_header(message['Subject'])
 
         self.assertIn(body_contains, body)
@@ -63,10 +67,10 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
 
         # Validate summary:
         summary_mail_call = conn.sendmail.call_args_list[6]
-        self.assertEqual(summary_mail_call[0][
-                         0], settings.MAILOUT_FROM_ADDRESS)
-        self.assertEqual(summary_mail_call[0][1], [
-                         settings.MAILOUT_DELIVERY_REPORT_TO])
+        self.assertEqual(summary_mail_call[0][0],
+            settings.MAILOUT_FROM_ADDRESS)
+        self.assertEqual(summary_mail_call[0][1],
+            [settings.MAILOUT_DELIVERY_REPORT_TO.encode("ascii")])
         # Check mail twice, to check for each bit of expected text in the body;
         # The mail count:
         self._assert_mail_as_expected(
@@ -150,21 +154,21 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         )
 
         # Overall, operation succeeded:
-        self.assertEqual(result, (False, 6, "Ok"))
+        self.assertEqual((False, 6, "Ok"), result)
 
     @patch("smtplib.SMTP")
     @patch("toolkit.members.tasks.current_task")
     @override_settings(EMAIL_HOST="smtp.test", EMAIL_PORT=8281)
     def test_send_fail_disconnected(self, current_task_mock, smtplib_mock):
         smtplib_mock.return_value.sendmail.side_effect = \
-                smtplib.SMTPServerDisconnected("Something failed", 101)
+                smtplib.SMTPServerDisconnected("Something failed")
 
         result = toolkit.members.tasks.send_mailout(
             u"The \xa31 Subject!", u"The Body!\nThat will be $1, please\nTa!"
         )
 
         self.assertEqual(
-            result, (True, 0, "Mailout job died: ('Something failed', 101)"))
+            result, (True, 0, "Mailout job died: 'Something failed'"))
 
     @patch("smtplib.SMTP")
     @patch("toolkit.members.tasks.current_task")
@@ -178,7 +182,7 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         )
 
         # Overall, operation succeeded:
-        self.assertEqual(result, (True, 0, "Mailout job died: something"))
+        self.assertEqual(result, (True, 0, "Mailout job died: 'something'"))
 
     @patch("smtplib.SMTP")
     @patch("toolkit.members.tasks.current_task")
