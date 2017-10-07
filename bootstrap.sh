@@ -10,8 +10,40 @@ VIRTUALENV_OPTIONS="--system-site-packages"
 REQUIREMENTS_FILE=requirements.txt
 # Requirements to develop/test/deploy:
 REQUIREMENTS_DEV=requirements_development.txt
+# Default to python 2:
+PYTHON_INTERPRETER=/usr/bin/python
 
-virtualenv $VENV_PATH $VIRTUALENV_OPTIONS
+usage() {
+    echo "Usage: $0 [-h] [-3]"
+    echo "Use -3 to setup for python 3"
+    exit 0;
+}
+
+while getopts "h3" opt; do
+    case "${opt}" in
+        h)
+            usage
+            ;;
+        3)
+            PYTHON_INTERPRETER=/usr/bin/python3
+            ;;
+        *)
+            usage
+            ;;
+    esac
+done
+
+if [[ ! -e ${PYTHON_INTERPRETER} && -x ${PYTHON_INTERPRETER} ]]; then
+    echo "Python executable '${PYTHON_INTERPRETER}' not found"
+    exit 1
+fi
+
+if [[ -e ${VENV_PATH} ]]; then
+    echo "Virtualenv '${VENV_PATH}' already exists"
+    exit 1
+fi
+
+virtualenv -p ${PYTHON_INTERPRETER} $VENV_PATH $VIRTUALENV_OPTIONS
 
 source $VENV_PATH/bin/activate
 
