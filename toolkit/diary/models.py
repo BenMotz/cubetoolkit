@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import re
 import logging
 
@@ -55,11 +56,11 @@ class Role(models.Model):
 
     def save(self, *args, **kwargs):
         if self._original_read_only and self._original_name != self.name:
-            logger.error(u"Tried to edit read-only role {0}".format(self.name))
+            logger.error("Tried to edit read-only role {0}".format(self.name))
             return
         elif self._original_read_only and not self.read_only:
             # TODO: Unit test!
-            logger.error(u"Tried to unprotect read-only role {0}"
+            logger.error("Tried to unprotect read-only role {0}"
                          .format(self.name))
             return
         else:
@@ -68,7 +69,7 @@ class Role(models.Model):
     def delete(self, *args, **kwargs):
         # Don't allow read_only roles to be deleted
         if self.pk and self.read_only:
-            logger.error(u"Tried to delete read-only role {0}"
+            logger.error("Tried to delete read-only role {0}"
                          .format(self.name))
             return False
         else:
@@ -93,7 +94,7 @@ class MediaItem(models.Model):
         db_table = 'MediaItems'
 
     def __unicode__(self):
-        return u"{0}: {1}".format(self.pk, self.media_file)
+        return "{0}: {1}".format(self.pk, self.media_file)
 
     # Overloaded Django ORM method:
 
@@ -113,10 +114,10 @@ class MediaItem(models.Model):
             try:
                 self.mimetype = imagetools.get_mimetype(self.media_file.file)
             except IOError:
-                logger.error(u"Failed to determine mimetype of file {0}"
+                logger.error("Failed to determine mimetype of file {0}"
                              .format(self.media_file.name))
                 self.mimetype = "application/octet-stream"
-            logger.debug(u"Mime type for {0} detected as {1}"
+            logger.debug("Mime type for {0} detected as {1}"
                          .format(self.media_file.name, self.mimetype))
 
 
@@ -219,7 +220,7 @@ class Event(models.Model):
             self.pricing = kwargs['template'].pricing
 
     def __unicode__(self):
-        return u"{0} ({1})".format(self.name, self.id)
+        return "{0} ({1})".format(self.name, self.id)
 
     def reset_tags_to_default(self):
         if self.template:
@@ -236,7 +237,7 @@ class Event(models.Model):
         if self.media.count() == 0:
             return
         media_item = self.media.all()[0]
-        logger.info(u"Removing media file {0} from event {1}"
+        logger.info("Removing media file {0} from event {1}"
                     .format(media_item, self.pk))
         self.media.remove(media_item)
         # # If the media item isn't associated with any events, delete it:
@@ -246,7 +247,7 @@ class Event(models.Model):
 
     def set_main_mediaitem(self, media_file):
         self.clear_main_mediaitem()
-        logger.info(u"Adding media file {0} to event {1}"
+        logger.info("Adding media file {0} to event {1}"
                     .format(media_file, self.pk))
         self.media.add(media_file)
 
@@ -301,7 +302,7 @@ class Event(models.Model):
 
     # This RE needs to be compiled so that the flags can be specified, as the
     # flags option to re.sub() wasn't added until python 2.7
-    _plaintext_re = re.compile(ur'\[(.*?)\]\((https?://.*?)\)',
+    _plaintext_re = re.compile(r'\[(.*?)\]\((https?://.*?)\)',
                                flags=re.DOTALL)
 
     @property
@@ -331,7 +332,7 @@ class Event(models.Model):
 
             text = html2text.html2text(self.copy)
             # Convert links from markdown format to just the URL:
-            text = self._plaintext_re.sub(ur'\1: \2', text)
+            text = self._plaintext_re.sub(r'\1: \2', text)
 
         return mark_safe(text)
 
@@ -417,7 +418,7 @@ class Showing(models.Model):
         super(Showing, self).__init__(*args, **kwargs)
 
         if copy_from:
-            logger.info(u"Cloning showing from existing showing (id {0})"
+            logger.info("Cloning showing from existing showing (id {0})"
                         .format(copy_from.pk))
             # Manually copy fields, rather than using things from copy library,
             # as don't want to copy the rota (as that would make db writes)
@@ -433,7 +434,7 @@ class Showing(models.Model):
         if (self.start is not None and
                 self.id is not None and
                 self.event is not None):
-            return (u"{0} - {1} ({2})"
+            return ("{0} - {1} ({2})"
                     .format(self.start.strftime("%H:%M %Z%z %d/%m/%y"),
                             self.event.name,
                             self.id))
@@ -454,7 +455,7 @@ class Showing(models.Model):
         force = kwargs.pop('force', False)
         if self.start is not None:
             if self.in_past() and not force:
-                logger.error(u"Tried to update showing {0} with start time "
+                logger.error("Tried to update showing {0} with start time "
                              "{1} in the past"
                              .format(self.pk, self.start))
                 raise django.db.IntegrityError(
@@ -467,7 +468,7 @@ class Showing(models.Model):
         # this, but this will stop the forms deleting records.
         if self.start is not None:
             if self.in_past():
-                logger.error(u"Tried to delete showing {0} with start time "
+                logger.error("Tried to delete showing {0} with start time "
                              "{1} in the past".format(self.pk, self.start))
                 raise django.db.IntegrityError(
                     "Can't delete showings that start in the past")
@@ -532,14 +533,14 @@ class Showing(models.Model):
             existing_entries = rota_entries_by_id.pop(role_id, [])
             # delete highest ranked instances
             while count < len(existing_entries):
-                logger.info(u"Removing role {0} from showing {1}"
+                logger.info("Removing role {0} from showing {1}"
                             .format(role_id, self.pk))
                 highest_ranked = max(existing_entries, key=lambda re: re.rank)
                 highest_ranked.delete()
                 existing_entries.remove(highest_ranked)
             # add required entries
             while count > len(existing_entries):
-                logger.info(u"Adding role {0} to showing {1}"
+                logger.info("Adding role {0} to showing {1}"
                             .format(role_id, self.pk))
                 # add rotaentries
                 new_re = RotaEntry(role_id=role_id, showing=self)
@@ -561,7 +562,7 @@ class DiaryIdea(models.Model):
         db_table = 'DiaryIdeas'
 
     def __unicode__(self):
-        return u"{0}/{1}".format(self.month.month, self.month.year)
+        return "{0}/{1}".format(self.month.month, self.month.year)
 
 
 class EventTemplate(models.Model):
@@ -605,7 +606,7 @@ class RotaEntry(models.Model):
         ordering = ['role', 'rank']
 
     def __unicode__(self):
-        return u"{0} {1}".format(unicode(self.role), self.rank)
+        return "{0} {1}".format(str(self.role), self.rank)
 
     def __init__(self, *args, **kwargs):
         # Allow a template keyword arg to be supplied. If it is, copy rota
@@ -624,7 +625,7 @@ class RotaEntry(models.Model):
             self.role = template.role
             self.required = template.required
             self.rank = template.rank
-            logger.info(u"Cloning rota entry from existing rota entry with "
+            logger.info("Cloning rota entry from existing rota entry with "
                         "role_id {0}".format(template.role.pk))
 
 
@@ -652,8 +653,8 @@ class PrintedProgramme(models.Model):
         db_table = 'PrintedProgrammes'
 
     def __unicode__(self):
-        return u"Printed programme for {0}/{1}".format(self.month.month,
-                                                       self.month.year)
+        return "Printed programme for {0}/{1}".format(self.month.month,
+                                                      self.month.year)
 
     def save(self, *args, **kwargs):
         # Enforce month column always being a date for the first of the month:
