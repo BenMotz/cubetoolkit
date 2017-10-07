@@ -271,7 +271,7 @@ class NewPrintedProgrammeForm(forms.ModelForm):
         initial=datetime.date.today().year
     )
     month = forms.ChoiceField(
-        choices=(zip(range(13), calendar.month_name)[1:]),
+        choices=(list(zip(range(13), calendar.month_name))[1:]),
         initial=datetime.date.today().month
     )
 
