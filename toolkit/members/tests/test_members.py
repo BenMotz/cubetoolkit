@@ -1,12 +1,12 @@
 from __future__ import print_function
 import shutil
-import urllib
 import os.path
 import tempfile
 import binascii
 
 from mock import patch
 
+from six.moves import urllib
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.test.client import RequestFactory
@@ -489,7 +489,7 @@ class TestEditMemberViewNotLoggedIn(MembersTestsMixin, TestCase):
         expected_redirect = (
             reverse("login") +
             "?next=" +
-            urllib.quote(url + extra_parameters)
+            urllib.parse.quote(url + extra_parameters)
         )
         self.assertRedirects(response, expected_redirect)
 
@@ -758,7 +758,7 @@ class TestUnsubscribeMemberView(MembersTestsMixin, TestCase):
         expected_redirect = (
             reverse("login") +
             "?next=" +
-            urllib.quote(url + extra_parameters)
+            urllib.parse.quote(url + extra_parameters)
         )
         self.assertRedirects(response, expected_redirect)
 
