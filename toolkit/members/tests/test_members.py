@@ -1,3 +1,4 @@
+from __future__ import print_function
 import shutil
 import urllib
 import os.path
@@ -1042,7 +1043,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
                 if os.path.exists(filename):
                     os.unlink(filename)
             except OSError as ose:
-                print "Couldn't delete file!", ose
+                print("Couldn't delete file!", ose)
 
     def test_get_form_edit(self):
         url = reverse("edit-volunteer", kwargs={"volunteer_id": self.vol_1.id})

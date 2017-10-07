@@ -1,3 +1,4 @@
+from __future__ import print_function
 import getpass
 import django.contrib.auth.models as auth_models
 import django.contrib.contenttypes as contenttypes
@@ -6,7 +7,7 @@ from django.core.management.base import BaseCommand, CommandError
 
 
 def _get_password(use):
-    print "*" * 80
+    print("*" * 80)
     password = ""
     check_password = None
 
@@ -15,7 +16,7 @@ def _get_password(use):
                                    .format(use))
         check_password = getpass.getpass("Please re-enter for confirmation: ")
         if check_password != password:
-            print "Passwords don't match; please try again..."
+            print("Passwords don't match; please try again...")
 
     return password
 
@@ -25,7 +26,7 @@ def _create_or_update_user(name, email, permissions, is_superuser=False):
         password = _get_password(name)
         user = auth_models.User.objects.create_user(name, email, password)
     else:
-        print "User '{0}' exists: not changing password".format(name)
+        print("User '{0}' exists: not changing password".format(name))
         user = auth_models.User.objects.get(username=name)
 
     # Remove all permissions:
