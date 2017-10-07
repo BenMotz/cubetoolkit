@@ -115,7 +115,7 @@ def _check_access_permitted_for_member_key(permission, request, member_id):
                 member_key = request.POST.get('k', None)
 
             assert not isinstance(member_key, six.binary_type)
-            if isinstance(member_key, str):
+            if isinstance(member_key, six.text_type):
                 # Use compare_constant_time instead of == to avoid timing
                 # attacks (no, really - read up on it)
                 access_permitted = compare_constant_time(
