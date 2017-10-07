@@ -17,7 +17,7 @@
 {% block title %}Cube volunteers{% endblock %}
 
 {% block body %}
-{# {% for v, n in roles.iteritems %} <p><b>{{ v }}</b><br> {{ n }} </p> {% endfor %} #}
+{# {% for v, n in roles.items %} <p><b>{{ v }}</b><br> {{ n }} </p> {% endfor %} #}
 <img src="{{ STATIC_URL }}members/cube_microplex_logo.gif" alt="Cube Microplex logo" width="200"><p><h2>Cube volunteers report.</h2>
 {% include "messages.html" %}
 Total cube volunteers: {{ volunteers|length }}<p>

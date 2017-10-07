@@ -56,7 +56,7 @@ Editing {{ event_list_name }}
 <script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
 <script type="text/javascript">
-var edit_prefs = { {% for p,v in edit_prefs.iteritems %}
+var edit_prefs = { {% for p,v in edit_prefs.items %}
     "{{ p }}" : "{{ v }}"{% if not forloop.last %},{% endif %}
 {% endfor %}};
 $(document).ready(function() {

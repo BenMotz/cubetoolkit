@@ -51,7 +51,7 @@ Cube Programme{% if extra_title %}: {{ extra_title }}{% endif %}
 <div class="programme">
     <div class="showing-sizer"></div>
     <div class="gutter-sizer"></div>
-{% for event, showings in events.iteritems %}
+{% for event, showings in events.items %}
     <div class="showing" id="event_{{ event.id }}">
         <div class="event_image">
         {% with media_item=event.media.all.0 event_slug=event.name|slugify %}{% if media_item %}<a href="{% url "single-event-view-with-slug" event_id=event.id event_slug=event_slug %}"><img src="{{ media_item.media_file|thumbnail_url:'indexview' }}" alt="Picture for event {{ event.name }}"></a>{% endif %}
