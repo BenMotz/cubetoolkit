@@ -2,7 +2,7 @@ import re
 import logging
 
 import html2text
-import HTMLParser
+from six.moves import html_parser
 import datetime
 
 from django.db import models
@@ -311,7 +311,7 @@ class Event(models.Model):
         if self.legacy_copy:
             # Don't do a general HTML conversion, but convert any entities to
             # unicode:
-            text = HTMLParser.HTMLParser().unescape(self.copy)
+            text = html_parser.HTMLParser().unescape(self.copy)
         else:
             # Use html2text library to do a quick and happy conversion to
             # plain text; http://www.aaronsw.com/2002/html2text/

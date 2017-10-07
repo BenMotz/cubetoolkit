@@ -1,6 +1,6 @@
 import logging
-import urlparse
 
+import six.moves.urllib as urllib
 from django import template
 from django.template.defaulttags import url, URLNode
 from django.core.urlresolvers import get_script_prefix
@@ -18,14 +18,14 @@ class NoPrefixURLNode(URLNode):
         text = super(NoPrefixURLNode, self).render(context)
         prefix = get_script_prefix()
 
-        parts = urlparse.urlsplit(text)
+        parts = urllib.parse.urlsplit(text)
 
         if not parts.path.startswith(prefix):
             logger.error("Path %s doesn't start with prefix %s", text, prefix)
 
         new_parts = list(parts)
         new_parts[2] = parts.path[len(prefix) - 1:]
-        return urlparse.urlunsplit(new_parts)
+        return urllib.parse.urlunsplit(new_parts)
 
 
 @register.tag
