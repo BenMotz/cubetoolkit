@@ -6,6 +6,7 @@ import os.path
 import pytz
 from datetime import datetime, date, time
 import tempfile
+import six.moves
 
 from mock import patch
 
@@ -1071,7 +1072,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
             temp_jpg.write('\0' * (1024 - len(TINY_VALID_JPEG)))
 
             one_k_data = "\0" * 1024
-            for _ in xrange(1023):
+            for _ in six.moves.range(1023):
                 temp_jpg.write(one_k_data)
             # the extra byte!
             temp_jpg.write('\0')
@@ -1105,7 +1106,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
             temp_jpg.write('\0' * (1024 - len(TINY_VALID_JPEG)))
 
             one_k_data = "\0" * 1024
-            for _ in xrange(1023):
+            for _ in six.moves.range(1023):
                 temp_jpg.write(one_k_data)
             temp_jpg.seek(0)
 

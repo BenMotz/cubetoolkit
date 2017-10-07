@@ -1,6 +1,7 @@
 import sys
 import os
 
+import six.moves
 import django.core.urlresolvers
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -8,7 +9,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 # The following list of IP addresses is used to restrict access to some pages
 # (at time of writing, only the 'add a new member' page)
-CUBE_IP_ADDRESSES = tuple("10.1.1.%d" % n for n in xrange(33, 255))
+CUBE_IP_ADDRESSES = tuple("10.1.1.%d" % n for n in six.moves.range(33, 255))
 
 DEFAULT_TERMS_TEXT = """Contacts-
 Company-

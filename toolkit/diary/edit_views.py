@@ -133,7 +133,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
     # Actually, I lied: start of visible list is not necessarily the 1st of the
     # month, so make sure that it gets an 'IDEAS' link shown:
     ideas = {startdate: ''}
-    for days in xrange(days_ahead):
+    for days in six.moves.range(days_ahead):
         # Iterate through every date in the visible range, creating a dict
         # entry for each
         day_in_range = startdatetime + datetime.timedelta(days=days)
