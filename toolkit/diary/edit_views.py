@@ -711,6 +711,7 @@ def view_event_field(request, field, year, month, day):
         )
 
     context = {
+        'venue': settings.VENUE,
         'start_date': start_date,
         'end_date': end_date,
         'days_ahead': days_ahead,
