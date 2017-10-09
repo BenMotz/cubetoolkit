@@ -48,6 +48,7 @@ class SecurityTests(MembersTestsMixin, TestCase):
         'view-volunteer-role-report': {},
         'unretire-select-volunteer': {},
         'retire-select-volunteer': {},
+        'view-volunteer-role-report': {},
         # Member urls:
         'search-members': {},
         'view-member': {'member_id': 1},
@@ -236,6 +237,36 @@ class TestMemberModel(TestCase):
 
         old_member = Member.objects.get(id=1)
         self.assertEqual(old_member.number, "Orange squash")
+
+
+class TestVolunteerListViews(MembersTestsMixin, TestCase):
+    def setUp(self):
+        super(TestVolunteerListViews, self).setUp()
+        self.assertTrue(self.client.login(
+            username="admin", password="T3stPassword!"))
+
+    def test_list_page_loads(self):
+        url = reverse("view-volunteer-list")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertContains(response, "Volunteer One")
+        self.assertContains(response, "Volunteer Two")
+        self.assertContains(response, "Volunteer Three")
+
+        self.assertTemplateUsed(response, "volunteer_list.html")
+
+    def test_role_report_loads(self):
+        url = reverse("view-volunteer-role-report")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+
+        self.assertContains(response, "Volunteer One")
+        self.assertContains(response, "Volunteer Three")
+        # No role assigned:
+        self.assertNotContains(response, "Volunteer Two")
+
+        self.assertTemplateUsed(response, "volunteer_role_report.html")
 
 
 class TestVolunteerEditViews(MembersTestsMixin, TestCase):

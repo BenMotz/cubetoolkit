@@ -49,7 +49,7 @@ def view_volunteer_role_report(request):
 
     # Now sort role_vol_map by role name:
     role_vol_map = sorted(
-        six.iteritems(role_vol_map.iteritems),
+        six.iteritems(role_vol_map),
         key=lambda role_name_tuple: role_name_tuple[0]
     )
     # (now got a list  of (role, (name1, name2, ...)) tuples, rather than a
