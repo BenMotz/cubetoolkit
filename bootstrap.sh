@@ -14,18 +14,21 @@ REQUIREMENTS_DEV=requirements_development.txt
 PYTHON_INTERPRETER=/usr/bin/python
 
 usage() {
-    echo "Usage: $0 [-h] [-3]"
+    echo "Usage: $0 [-h] [-3] [-p path]"
     echo "Use -3 to setup for python 3"
     exit 0;
 }
 
-while getopts "h3" opt; do
+while getopts "h3p:" opt; do
     case "${opt}" in
         h)
             usage
             ;;
         3)
             PYTHON_INTERPRETER=/usr/bin/python3
+            ;;
+        p)
+            VENV_PATH=${OPTARG}
             ;;
         *)
             usage
