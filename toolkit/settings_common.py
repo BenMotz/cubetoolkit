@@ -6,9 +6,11 @@ import django.core.urlresolvers
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-
-if False:
+# TODO implement longname
+if True:
     VENUE = {'name': 'Cube',
+	         'longname': 'Cube Microplex',
+			 'cinemaname': 'Cube Cinema',
              'mailout_txt': 'mailout_body.txt',
              'twitter': 'https://twitter.com/cubecinema',
              'facebook': 'https://www.facebook.com/cubecinema/',
@@ -22,6 +24,8 @@ if False:
 else:
     # 'programme_url': 'https://starandshadow.org.uk/',
     VENUE = {'name': 'Star and Shadow',
+	         'longname': 'Star and Shadow',
+			 'cinemaname': 'Star and Shadow Cinema',
              'mailout_txt': 'mailout_body_star_and_shadow.txt',
              'twitter': 'https://twitter.com/StarAndShadow',
              'facebook': 'https://www.facebook.com/StarAndShadow',

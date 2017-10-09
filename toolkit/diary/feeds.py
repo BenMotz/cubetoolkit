@@ -14,7 +14,7 @@ class BasicWhatsOnFeed(Feed):
     DAYS_AHEAD = 7
     title = "%s cinema forthcoming events" % settings.VENUE['name']
     description = ("Events at the %s cinema over the next %d days. E&OE."
-                   % (settings.VENUE['name'], DAYS_AHEAD))
+                   % (settings.VENUE['cinemaname'], DAYS_AHEAD))
     link = "/programme"
 
     def items(self):
