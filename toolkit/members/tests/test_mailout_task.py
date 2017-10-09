@@ -13,6 +13,7 @@ import toolkit.members.tasks
 from toolkit.members.models import Member
 from .common import MembersTestsMixin
 
+
 class TestMemberMailoutTask(MembersTestsMixin, TestCase):
 
     def setUp(self):
@@ -22,6 +23,8 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
 
     def _assert_mail_as_expected(self, msgstr, is_utf8, from_addr, dest_addr,
                                  body_contains, expected_subject):
+        if six.PY3:
+            msgstr = msgstr.decode("utf-8")
         message = email.parser.Parser().parsestr(msgstr)
 
         self.assertEqual(message.get_content_type(), 'text/plain')
@@ -70,7 +73,7 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         self.assertEqual(summary_mail_call[0][0],
             settings.MAILOUT_FROM_ADDRESS)
         self.assertEqual(summary_mail_call[0][1],
-            [settings.MAILOUT_DELIVERY_REPORT_TO.encode("ascii")])
+            [settings.MAILOUT_DELIVERY_REPORT_TO])
         # Check mail twice, to check for each bit of expected text in the body;
         # The mail count:
         self._assert_mail_as_expected(

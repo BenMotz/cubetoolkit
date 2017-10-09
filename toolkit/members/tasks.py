@@ -3,6 +3,7 @@ from email import charset
 from email.mime.text import MIMEText
 from email.header import Header
 
+import six
 from django.conf import settings
 from django.core.urlresolvers import reverse
 
@@ -32,9 +33,15 @@ def _send_email(smtp_conn, destination, subject, body, mail_is_ascii):
 
     try:
         # Enforce ascii destination email address:
-        smtp_conn.sendmail(settings.MAILOUT_FROM_ADDRESS,
-                           [destination.encode("ascii")],
-                           msg.as_string())
+        if six.PY2:
+            smtp_conn.sendmail(settings.MAILOUT_FROM_ADDRESS,
+                               [destination.encode("ascii")],
+                               msg.as_string())
+        else:
+            smtp_conn.sendmail(settings.MAILOUT_FROM_ADDRESS,
+                               [destination],
+                               msg.as_string().encode("utf-8"))
+
     except UnicodeError:
         msg = "Non-ascii email address {0}".format(
             destination.encode("ascii", "replace"))
