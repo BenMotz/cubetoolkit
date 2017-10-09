@@ -1,7 +1,10 @@
+from __future__ import unicode_literals
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.utils.encoding import python_2_unicode_compatible
 
 
+@python_2_unicode_compatible
 class IndexLink(models.Model):
 
     text = models.CharField(max_length=1024, blank=True, null=False)
@@ -19,10 +22,11 @@ class IndexLink(models.Model):
         if self.text:
             self.text = self.text.strip()
 
-    def __unicode__(self):
+    def __str__(self):
         return self.text if self.text else self.link
 
 
+@python_2_unicode_compatible
 class IndexCategory(models.Model):
 
     name = models.CharField(max_length=1024, blank=False, null=False)
@@ -36,5 +40,5 @@ class IndexCategory(models.Model):
             if len(self.name) == 0:
                 raise ValidationError("Name cannot be blank")
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name

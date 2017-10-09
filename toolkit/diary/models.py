@@ -11,6 +11,7 @@ from django.conf import settings
 import django.utils.timezone
 import django.core.exceptions
 from django.utils.safestring import mark_safe
+from django.utils.encoding import python_2_unicode_compatible
 from django.db.models.query import QuerySet
 from django.utils.text import slugify
 import six
@@ -30,6 +31,7 @@ class FutureDateTimeField(models.DateTimeField):
     default_validators = [validate_in_future]
 
 
+@python_2_unicode_compatible
 class Role(models.Model):
     name = models.CharField(max_length=64, unique=True)
 
@@ -44,7 +46,7 @@ class Role(models.Model):
         db_table = 'Roles'
         ordering = ['name']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def __init__(self, *args, **kwargs):
@@ -76,6 +78,7 @@ class Role(models.Model):
             return super(Role, self).delete(*args, **kwargs)
 
 
+@python_2_unicode_compatible
 class MediaItem(models.Model):
     """Media (eg. video, audio, html fragment?). Currently to be assoicated
     with events, in future with other things?"""
@@ -93,7 +96,7 @@ class MediaItem(models.Model):
     class Meta:
         db_table = 'MediaItems'
 
-    def __unicode__(self):
+    def __str__(self):
         return "{0}: {1}".format(self.pk, self.media_file)
 
     # Overloaded Django ORM method:
@@ -121,6 +124,7 @@ class MediaItem(models.Model):
                          .format(self.media_file.name, self.mimetype))
 
 
+@python_2_unicode_compatible
 class EventTag(models.Model):
     name = models.CharField(max_length=32, unique=True)
     slug = models.SlugField(max_length=50, unique=True)
@@ -136,7 +140,7 @@ class EventTag(models.Model):
         # been set after load
         self._read_only_at_load = self.read_only
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def clean(self):
@@ -159,6 +163,7 @@ class EventTag(models.Model):
             return super(EventTag, self).delete(*args, **kwargs)
 
 
+@python_2_unicode_compatible
 class Event(models.Model):
 
     name = models.CharField(max_length=256, blank=False)
@@ -219,7 +224,7 @@ class Event(models.Model):
         if 'template' in kwargs and not self.pricing:
             self.pricing = kwargs['template'].pricing
 
-    def __unicode__(self):
+    def __str__(self):
         return "{0} ({1})".format(self.name, self.id)
 
     def reset_tags_to_default(self):
@@ -364,6 +369,7 @@ class ShowingQuerySet(QuerySet):
         return self.filter(confirmed=True)
 
 
+@python_2_unicode_compatible
 class Showing(models.Model):
 
     event = models.ForeignKey('Event', related_name='showings')
@@ -430,7 +436,7 @@ class Showing(models.Model):
             if start_offset:
                 self.start += start_offset
 
-    def __unicode__(self):
+    def __str__(self):
         if (self.start is not None and
                 self.id is not None and
                 self.event is not None):
@@ -551,6 +557,7 @@ class Showing(models.Model):
                 existing_entries.append(new_re)
 
 
+@python_2_unicode_compatible
 class DiaryIdea(models.Model):
     month = models.DateField(editable=False)
     ideas = models.TextField(max_length=16384, null=True, blank=True)
@@ -561,10 +568,11 @@ class DiaryIdea(models.Model):
     class Meta:
         db_table = 'DiaryIdeas'
 
-    def __unicode__(self):
+    def __str__(self):
         return "{0}/{1}".format(self.month.month, self.month.year)
 
 
+@python_2_unicode_compatible
 class EventTemplate(models.Model):
 
     name = models.CharField(max_length=32)
@@ -584,10 +592,11 @@ class EventTemplate(models.Model):
         db_table = 'EventTemplates'
         ordering = ['name']
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
+@python_2_unicode_compatible
 class RotaEntry(models.Model):
 
     role = models.ForeignKey(Role)
@@ -605,7 +614,7 @@ class RotaEntry(models.Model):
         db_table = 'RotaEntries'
         ordering = ['role', 'rank']
 
-    def __unicode__(self):
+    def __str__(self):
         return "{0} {1}".format(str(self.role), self.rank)
 
     def __init__(self, *args, **kwargs):
@@ -639,6 +648,7 @@ class PrintedProgrammeQuerySet(QuerySet):
         return self.filter(month__range=[start_date, end])
 
 
+@python_2_unicode_compatible
 class PrintedProgramme(models.Model):
     month = models.DateField(editable=False, unique=True)
     programme = models.FileField(upload_to="printedprogramme", max_length=256,
@@ -652,7 +662,7 @@ class PrintedProgramme(models.Model):
     class Meta:
         db_table = 'PrintedProgrammes'
 
-    def __unicode__(self):
+    def __str__(self):
         return "Printed programme for {0}/{1}".format(self.month.month,
                                                       self.month.year)
 
