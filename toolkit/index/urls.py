@@ -13,6 +13,7 @@ urlpatterns = [
     url(r'^create/link$',
         write_decorator(generic_edit.CreateView.as_view(
             model=IndexLink,
+            fields=('text', 'link', 'category'),
             template_name="index_generic_form.html",
             # Need to use 'lazy', as 'reverse' won't work until urlpatterns
             # (this data structure) has been defined.
@@ -38,6 +39,7 @@ urlpatterns = [
     url(r'^create/category$',
         write_decorator(generic_edit.CreateView.as_view(
             model=IndexCategory,
+            fields=('name',),
             template_name="index_generic_form.html",
             success_url=functional.lazy(reverse, str)("toolkit-index"),
         )),
