@@ -112,7 +112,7 @@ init_calendar_view(jQuery,
                    '{{ display_time|date:"Y-m-d" }}',
                    urls,
                    [{% for room in rooms %}
-                       { id: {{ room.id }}, title: '{{ room.name }}'}{% if not forloop.last %},{% endif %}{% endfor %}
+                       { "id": {{ room.id }}, "title": "{{ room.name }}"}{% if not forloop.last %},{% endif %}{% endfor %}
                    ]);
 </script>
 {% endblock %}

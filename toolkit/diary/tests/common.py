@@ -5,7 +5,7 @@ import django.contrib.auth.models as auth_models
 import django.contrib.contenttypes as contenttypes
 
 from toolkit.diary.models import (Showing, Event, Role, EventTag, DiaryIdea,
-                                  EventTemplate, RotaEntry)
+                                  EventTemplate, RotaEntry, Room)
 from toolkit.members.models import Member, Volunteer
 
 
@@ -61,6 +61,10 @@ class DiaryTestsMixin(object):
         t3 = EventTag(name=u"\u0167ag \u0165hre\u0119",
                       slug=u"ag-three", read_only=False)
         t3.save()
+
+        Room(name="Room one").save()
+        self.room_2 = Room(name="Room two")
+        self.room_2.save()
 
         # Event  outside_hire   private   Tags
         # ---------------------------------------
