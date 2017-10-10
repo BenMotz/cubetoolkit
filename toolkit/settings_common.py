@@ -6,7 +6,7 @@ import django.core.urlresolvers
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-if False:
+if True:
     VENUE = {'name': 'Cube',
              'longname': 'Cube Microplex',
              'cinemaname': 'Cube Cinema',
@@ -108,6 +108,9 @@ CALENDAR_UNCONFIRMED_COLOUR = "#E0CFCF"
 ###############################################################################
 #
 # Wagtail settings
+
+# Enable / disable CMS content visibility in the site menu:
+WAGTAIL_CONTENT_IN_MENU = True
 
 WAGTAIL_SITE_NAME = 'The Cube Microplex'
 
@@ -285,6 +288,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.static',
                 'django.contrib.auth.context_processors.auth',
+                'toolkit.content.context_processors.wagtail_content_in_menu',
             ),
             # May be worth enabling for improved performance?
             # 'loaders':

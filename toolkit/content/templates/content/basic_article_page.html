@@ -7,7 +7,21 @@
     <div class="grid-sizer"></div>
     <div class="gutter-sizer"></div>
 
-    {% if page.image_alignment == "C" %}
+    {% if not page.image %}
+    {# No image defined #}
+
+    <div class="grid-item grid-item--width event-image">
+        &nbsp;
+    </div>
+    <div class="grid-item grid-item--width3">
+        <h3>{{ page.title }}</h3>
+        <br>
+        <div class="copy">
+            {{ page.body|richtext }}
+        </div>
+    </div>
+
+    {% elif page.image_alignment == "C" %}
 
     <div class="grid-item grid-item--width">
         &nbsp;

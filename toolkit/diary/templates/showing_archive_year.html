@@ -4,7 +4,7 @@ Cube Programme Archival listings for {{ year|date:"Y" }}
 {% endblock %}
 
 {% block archive_body %}
-<h1>Cube programme archive: {{ year|date:"Y" }}</h1>
+<h3>Cube programme archive: {{ year|date:"Y" }}</h3>
     <form action="{% url "archive-search" %}">
         <input id="archive_search_input" type="text" name="search_term" placeholder="Search {{ year|date:"Y" }}"/>
         <input type="submit" value="Search" />

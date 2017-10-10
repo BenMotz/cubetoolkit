@@ -96,7 +96,10 @@ def set_media_permissions():
     """Set media directories to g+w"""
     media_dirs = ["media/diary",
                   "media/printedprogramme",
-                  "media/volunteers"]
+                  "media/volunteers",
+                  "media/images",
+                  "media/original_images",
+                  "media/documents"]
 
     with cd(env.site_root):
         for media_dir in media_dirs:
