@@ -186,10 +186,10 @@ def edit_diary_data(request):
     try:
         start_raw = request.GET.get('start', None)
         end_raw = request.GET.get('end', None)
-        start_raw_datepart = start_raw.partition('T')[0]
-        end_raw_datepart = end_raw.partition('T')[0]
-        start = datetime.datetime.strptime(start_raw_datepart, date_format)
-        end = datetime.datetime.strptime(end_raw_datepart, date_format)
+        start_raw = start_raw.partition('T')[0] if start_raw else None
+        end_raw = end_raw.partition('T')[0] if end_raw else None
+        start = datetime.datetime.strptime(start_raw, date_format)
+        end = datetime.datetime.strptime(end_raw, date_format)
     except (ValueError, TypeError):
         logger.error(
             u"Invalid value in date range, one of start '{0}' or end, '{1}'"
@@ -234,7 +234,7 @@ def edit_diary_data(request):
         else:
             color = settings.CALENDAR_UNCONFIRMED_COLOUR
 
-        results.append({
+        showing_data = {
             'id': showing.pk,
             'title': showing.event.name,
             'start': timezone.localtime(showing.start).isoformat(),
@@ -242,8 +242,12 @@ def edit_diary_data(request):
             'url': url,
             'className': styles,
             'color': color,
-            'resourceId': showing.room_id,
-        })
+        }
+
+        if settings.MULTIROOM_ENABLED:
+            showing_data['resourceId'] = showing.room_id
+
+        results.append(showing_data)
 
     return HttpResponse(json.dumps(results),
                         content_type="application/json; charset=utf-8")

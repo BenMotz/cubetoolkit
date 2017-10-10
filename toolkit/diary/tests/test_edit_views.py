@@ -636,7 +636,7 @@ class AddEventView(DiaryTestsMixin, TestCase):
         url = reverse("add-event")
         response = self.client.get(url, data={"date": "99-01-1950"})
         self.assertContains(
-            response, "Illegal time, date or duration", status_code=400)
+            response, "Illegal time, date, duration or room", status_code=400)
 
     @patch('django.utils.timezone.now')
     def test_add_event(self, now_patch):
