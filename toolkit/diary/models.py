@@ -433,7 +433,7 @@ class Showing(models.Model):
             # as don't want to copy the rota (as that would make db writes)
             attributes_to_copy = ('event', 'start', 'booked_by', 'extra_copy',
                                   'confirmed', 'hide_in_programme',
-                                  'cancelled', 'discounted')
+                                  'cancelled', 'discounted', 'room')
             for attribute in attributes_to_copy:
                 setattr(self, attribute, getattr(copy_from, attribute))
             if start_offset:

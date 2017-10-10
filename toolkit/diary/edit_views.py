@@ -22,7 +22,7 @@ from django.utils.html import escape
 
 from toolkit.diary.models import (Showing, Event, DiaryIdea, MediaItem,
                                   EventTemplate, EventTag, Role, RotaEntry,
-                                  PrintedProgramme)
+                                  PrintedProgramme, Room)
 import toolkit.diary.forms as diary_forms
 import toolkit.diary.edit_prefs as edit_prefs
 import toolkit.members.tasks
@@ -175,6 +175,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
     context['start'] = startdatetime
     context['end'] = enddatetime
     context['edit_prefs'] = edit_prefs.get_preferences(request.session)
+    context['rooms'] = Room.objects.all() if settings.MULTIROOM_ENABLED else ()
     return render(request, 'edit_event_index.html', context)
 
 
@@ -388,6 +389,8 @@ def add_event(request):
                         confirmed=form.cleaned_data['confirmed'],
                         booked_by=form.cleaned_data['booked_by'],
                         )
+                if settings.MULTIROOM_ENABLED:
+                    new_showing.room = form.cleaned_data['room']
                 new_showing.save()
                 # Set showing roles to those from its template:
                 new_showing.reset_rota_to_default()

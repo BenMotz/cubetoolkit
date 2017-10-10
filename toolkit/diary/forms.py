@@ -103,8 +103,14 @@ class MediaItemForm(forms.ModelForm):
 class ShowingForm(forms.ModelForm):
     class Meta(object):
         model = toolkit.diary.models.Showing
-        fields = ('start', 'booked_by', 'confirmed', 'hide_in_programme',
-                  'cancelled', 'sold_out', 'discounted', )
+        if settings.MULTIROOM_ENABLED:
+            fields = ('room', 'start', 'booked_by', 'confirmed',
+                      'hide_in_programme', 'cancelled', 'sold_out',
+                      'discounted', )
+        else:
+            fields = ('start', 'booked_by', 'confirmed',
+                      'hide_in_programme', 'cancelled', 'sold_out',
+                      'discounted', )
 
         widgets = {
             'start': JQueryDateTimePicker(),
@@ -199,6 +205,12 @@ class CloneShowingForm(forms.Form):
 
 
 class NewEventForm(forms.Form):
+
+    if settings.MULTIROOM_ENABLED:
+        room = forms.ModelChoiceField(
+            queryset=toolkit.diary.models.Room.objects.all(),
+            required=True)
+
     start = forms.DateTimeField(
         required=True,
         validators=[validate_in_future],
