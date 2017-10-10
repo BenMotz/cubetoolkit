@@ -186,8 +186,10 @@ def edit_diary_data(request):
     try:
         start_raw = request.GET.get('start', None)
         end_raw = request.GET.get('end', None)
-        start = datetime.datetime.strptime(start_raw, date_format)
-        end = datetime.datetime.strptime(end_raw, date_format)
+        start_raw_datepart = start_raw.partition('T')[0]
+        end_raw_datepart = end_raw.partition('T')[0]
+        start = datetime.datetime.strptime(start_raw_datepart, date_format)
+        end = datetime.datetime.strptime(end_raw_datepart, date_format)
     except (ValueError, TypeError):
         logger.error(
             u"Invalid value in date range, one of start '{0}' or end, '{1}'"
@@ -240,6 +242,7 @@ def edit_diary_data(request):
             'url': url,
             'className': styles,
             'color': color,
+            'resourceId': showing.room_id,
         })
 
     return HttpResponse(json.dumps(results),
@@ -267,6 +270,7 @@ def edit_diary_calendar(request, year=None, month=None, day=None):
         'display_time': display_time,
         'defaultView': defaultView,
         'settings': settings,
+        'rooms': Room.objects.all() if settings.MULTIROOM_ENABLED else [],
     }
 
     return render(request, 'edit_event_calendar_index.html', context)
@@ -425,6 +429,8 @@ def add_event(request):
         # Default duration is one hour:
         duration = request.GET.get('duration', "3600")
 
+        room = request.GET.get('room', None)
+
         if len(time) != 2 or len(date) != 3:
             return HttpResponse("Invalid start date or time",
                                 status=400, content_type="text/plain")
@@ -436,14 +442,17 @@ def add_event(request):
                 datetime.datetime(hour=time[0], minute=time[1],
                                   day=date[0], month=date[1], year=date[2])
             )
-        except (ValueError, TypeError):
-            return HttpResponse("Illegal time, date or duration", status=400,
-                                content_type="text/plain")
+            if settings.MULTIROOM_ENABLED and room:
+                room = Room.objects.get(id=room)
+        except (ValueError, TypeError, Room.DoesNotExist):
+            return HttpResponse("Illegal time, date, duration or room",
+                                status=400, content_type="text/plain")
 
         # Create form, render template:
         form = diary_forms.NewEventForm(initial={
             'start': event_start,
             'duration': duration,
+            'room': room,
         })
         context = {'form': form}
         return render(request, 'form_new_event_and_showing.html', context)
