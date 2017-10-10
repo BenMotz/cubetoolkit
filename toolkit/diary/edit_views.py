@@ -569,6 +569,7 @@ class EditEventView(View):
 
         # Got here if there's a form validation error:
         context = {
+            'venue': settings.VENUE,
             'event': event,
             'form': form,
             'media_form': media_form,

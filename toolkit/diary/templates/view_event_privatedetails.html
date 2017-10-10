@@ -49,8 +49,8 @@ Details for: {{ event.name }}
 {% endblock %}
 
 {% block body %}
-<img src="{{ STATIC_URL }}diary/diary_edit_list_header.gif" alt="Cube Microplex" width="150px">
-<h3>CUBE events diary</h3>
+<img src="{{ STATIC_URL }}diary/{{ VENUE_HEADER_IMG }}" alt="{{ VENUE_LONGNAME }}">
+<h3>{{ VENUE_LONGNAME }} events diary</h3>
 
 <div id="booking">
     <h1>Details for {{ event.name }} {% if not event.all_showings_in_past %}[<a href="{% url "edit-event-details" event.pk %}">edit</a>]{% endif %}</h1>

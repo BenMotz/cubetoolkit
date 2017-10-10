@@ -2,7 +2,7 @@
 {% block title %}Change mailing list subscription{% endblock %}
 
 {% block body %}
-<h3>Edit Cube mailing list subscription</h3>
+<h3>Edit {{ VENUE_LONGNAME }} mailing list subscription</h3>
 {% include "messages.html" %}
 <form action="{% url "unsubscribe-member" member_id=member.id%}" method="POST">
 {% csrf_token %}

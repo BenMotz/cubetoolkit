@@ -4,10 +4,10 @@ from toolkit.settings_common import *
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'toolkit',
-        'USER': 'toolkit',
+        'NAME': 'starshadow',
+        'USER': 'starshadow',
         # Substitute password for your local test database here:
-        'PASSWORD': 'devserver_db_password',
+        'PASSWORD': 'ye2EUsSUCYY8ALx7',
         'HOST': '',  # Set to empty string for localhost.
         'PORT': '',  # Set to empty string for default.
         'CONN_MAX_AGE': 10,  # Allow DB connections to persist for 10 seconds
@@ -15,7 +15,7 @@ DATABASES = {
 }
 
 # Different to the key used in production!
-SECRET_KEY = '*@t05l5a7+uos5*9=c7ph1t#s(l*tlcdx(n(isztw^4w2c&mu-'
+SECRET_KEY = 'Na)YjC_f9JYj$NcfF`*Y),E$^~2Cj~"6qx.},E-R96Lc*4a/s8"Z_]xXwKh#=2X'
 
 LOGGING['handlers']['file']['filename'] = 'django_test.log'
 
@@ -32,10 +32,11 @@ DEBUG = True
 TEMPLATES[0]['OPTIONS']['debug'] = True
 
 # Undefine ALLOWED_HOSTS to ensure default loopback addresses work:
-del ALLOWED_HOSTS
+#del ALLOWED_HOSTS
+ALLOWED_HOSTS = ('127.0.0.1','arnold.local', 'arnold')
 
 # Django toolbar things:
-INTERNAL_IPS = ('127.0.0.1',)
+INTERNAL_IPS = ('127.0.0.1', 'albert.local', '192.168.1.102')
 DEBUG_TOOLBAR_CONFIG = {'INTERCEPT_REDIRECTS': False, }
 
 MIDDLEWARE_CLASSES = list(MIDDLEWARE_CLASSES)

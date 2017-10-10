@@ -148,8 +148,8 @@ def send_mailout(subject, body):
                     state='PROGRESS{0:03}'.format(progress),
                     meta={'sent': sent, 'total': count})
         # All done? Send report:
-        report = ("{0} copies of the following were sent out on cube members "
-                  "list\n".format(sent))
+        report = ("%d copies of the following were sent out on %s members "
+                  "list\n" % (sent, settings.VENUE['name']))
         if len(err_list) > 0:
             # Only send a max of 100 error messages!
             report += "{0} errors:\n{1}".format(

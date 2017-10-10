@@ -1659,7 +1659,8 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
             is_utf8,
             settings.MAILOUT_FROM_ADDRESS,
             settings.MAILOUT_DELIVERY_REPORT_TO,
-            u"6 copies of the following were sent out on cube members list",
+            (u"6 copies of the following were sent out on %s members list"
+                % settings.VENUE['name']),
             subject
         )
         # And the actual body text:
