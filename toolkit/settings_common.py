@@ -6,11 +6,10 @@ import django.core.urlresolvers
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-# TODO implement longname
-if True:
+if False:
     VENUE = {'name': 'Cube',
-	         'longname': 'Cube Microplex',
-			 'cinemaname': 'Cube Cinema',
+             'longname': 'Cube Microplex',
+             'cinemaname': 'Cube Cinema',
              'mailout_txt': 'mailout_body.txt',
              'twitter': 'https://twitter.com/cubecinema',
              'facebook': 'https://www.facebook.com/cubecinema/',
@@ -18,14 +17,15 @@ if True:
              'flickr': 'https://secure.flickr.com/groups/cubemicroplex/',
              'vimeo': 'https://vimeo.com/cubemicroplex/',
              'youtube': 'https://www.youtube.com/user/cubelog',
-             'internal_header_img': 'diary_edit_list_header.gif'
+             'internal_header_img': 'diary_edit_list_header.gif',
+             'font_h2': '',
              }
 
 else:
     # 'programme_url': 'https://starandshadow.org.uk/',
     VENUE = {'name': 'Star and Shadow',
-	         'longname': 'Star and Shadow',
-			 'cinemaname': 'Star and Shadow Cinema',
+             'longname': 'Star and Shadow',
+             'cinemaname': 'Star and Shadow Cinema',
              'mailout_txt': 'mailout_body_star_and_shadow.txt',
              'twitter': 'https://twitter.com/StarAndShadow',
              'facebook': 'https://www.facebook.com/StarAndShadow',
@@ -33,7 +33,8 @@ else:
              'flickr': '',
              'vimeo': '',
              'youtube': 'https://www.youtube.com/channel/UCJxp1CvJlDsWBEJrguvhoLw/',
-             'internal_header_img': 'star_and_shadow_bricks.jpg'
+             'internal_header_img': 'star_and_shadow_bricks.jpg',
+             'font_h2': 'https://fonts.googleapis.com/css?family=Lato'
              }
 
 # The following list of IP addresses is used to restrict access to some pages
