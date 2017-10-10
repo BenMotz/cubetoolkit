@@ -3,6 +3,7 @@ import re
 import json
 import os.path
 
+import six
 import pytz
 from datetime import datetime, date, time
 import tempfile
@@ -435,8 +436,13 @@ class EditShowing(DiaryTestsMixin, TestCase):
             u'<option value="3">'
         )
 
+    @override_settings(MULTIROOM_ENABLED=False)
     @patch('django.utils.timezone.now')
     def tests_edit_showing(self, now_patch):
+        # Reload the forms module, to force handling of the MULTIROOM_ENABLED
+        # conditional in the form definition (if required)
+        six.moves.reload_module(toolkit.diary.forms)
+
         now_patch.return_value = self._fake_now
 
         url = reverse("edit-showing", kwargs={"showing_id": 7})
@@ -598,6 +604,11 @@ class AddEventView(DiaryTestsMixin, TestCase):
         # Log in:
         self.client.login(username="admin", password="T3stPassword!")
 
+    def tearDown(self):
+        # Reload the forms module, to revert any forced handling of the
+        # MULTIROOM_ENABLED conditional
+        six.moves.reload_module(toolkit.diary.forms)
+
     @patch('django.utils.timezone.now')
     def test_get_add_event_form_default_start(self, now_patch):
         now_patch.return_value = self._fake_now
@@ -638,8 +649,12 @@ class AddEventView(DiaryTestsMixin, TestCase):
         self.assertContains(
             response, "Illegal time, date, duration or room", status_code=400)
 
+    @override_settings(MULTIROOM_ENABLED=False)
     @patch('django.utils.timezone.now')
     def test_add_event(self, now_patch):
+        # Reload the forms module, to force handling of the MULTIROOM_ENABLED
+        # conditional in the form definition (if required)
+        six.moves.reload_module(toolkit.diary.forms)
         now_patch.return_value = self._fake_now
 
         url = reverse("add-event")
@@ -1703,6 +1718,7 @@ class DiaryDataViewTests(DiaryTestsMixin, TestCase):
         })
         self.assertEqual(response.status_code, 404)
 
+    @override_settings(MULTIROOM_ENABLED=False)
     @patch('django.utils.timezone.now')
     def test_valid_query(self, now_patch):
         now_patch.return_value = self._fake_now
