@@ -270,7 +270,6 @@ INSTALLED_APPS = (
     'toolkit.members',
     'toolkit.toolkit_auth',
     'toolkit.index',
-    'toolkit.about',
     'toolkit.util',
     'toolkit.content',
     'easy_thumbnails',

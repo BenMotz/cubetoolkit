@@ -12,7 +12,6 @@ import toolkit.members.urls
 import toolkit.toolkit_auth.urls
 import toolkit.index.urls
 import toolkit.diary.urls
-import toolkit.about.urls
 
 from toolkit.index.models import IndexLink
 
@@ -23,7 +22,6 @@ urlpatterns = [
     url(r'^volunteers/', include(toolkit.members.urls.volunteer_urls)),
     url(r'^auth/', include(toolkit.toolkit_auth.urls.urlpatterns)),
     url(r'^index/', include(toolkit.index.urls.urlpatterns)),
-    url(r'^about/', include(toolkit.about.urls.about_urls)),
 
     # Main index page: requires logging in, even though some other parts
     # (eg diary index) don't.
