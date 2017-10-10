@@ -1,0 +1,69 @@
+{% extends "base_wagtail.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block body %}
+{{ block.super }}
+<div class="programme">
+    <div class="grid-sizer"></div>
+    <div class="gutter-sizer"></div>
+
+    {% if not page.image %}
+    {# No image defined #}
+
+    <div class="grid-item grid-item--width event-image">
+        &nbsp;
+    </div>
+    <div class="grid-item grid-item--width3">
+        <h3>{{ page.title }}</h3>
+        <br>
+        <div class="copy">
+            {{ page.body|richtext }}
+        </div>
+    </div>
+
+    {% elif page.image_alignment == "C" %}
+
+    <div class="grid-item grid-item--width">
+        &nbsp;
+    </div>
+    <div class="grid-item grid-item--width4">
+        <div class="event_image">
+            {% image page.image original %}
+        </div>
+        <br>
+        <h3>{{ page.title }}</h3>
+        <br>
+        <div class="copy">
+            {{ page.body|richtext }}
+        </div>
+    </div>
+
+    {% else %}
+
+        {% if page.image_alignment == "L" %}
+        <div class="grid-item grid-item--width2 event-image">
+            <div class="event_image">
+                {% image page.image original %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="grid-item grid-item--width3">
+            <h3>{{ page.title }}</h3>
+            <br>
+            <div class="copy">
+                {{ page.body|richtext }}
+            </div>
+        </div>
+
+        {% if page.image_alignment == "R" %}
+        <div class="grid-item grid-item--width2 event-image">
+            <div class="event_image">
+                {% image page.image original %}
+            </div>
+        </div>
+        {% endif %}
+    {% endif %}
+
+</div>
+{% endblock %}

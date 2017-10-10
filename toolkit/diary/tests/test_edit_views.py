@@ -87,7 +87,7 @@ class ViewSecurity(DiaryTestsMixin, TestCase):
         for view_name, kwargs in views_to_test.iteritems():
             url = reverse(view_name, kwargs=kwargs)
             expected_redirect = ("{0}?next={1}".format(
-                reverse("django.contrib.auth.views.login"), url))
+                reverse("login"), url))
             # Test GET:
             response = self.client.get(url)
             self.assertRedirects(response, expected_redirect)

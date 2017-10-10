@@ -1,0 +1,28 @@
+{% extends "base_wagtail.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block body %}
+{{ block.super }}
+<div class="programme">
+    <div class="grid-sizer"></div>
+    <div class="gutter-sizer"></div>
+    <div class="grid-item grid-item--width5">
+        <h3>{{ page.title }}</h3>
+        <br>
+        <div class="copy">
+            {{ page.intro_text|richtext }}
+        </div><!-- end .copy -->
+    </div><!-- end .grid-item -->
+    {% for gallery_item in page.gallery_images.all %}
+    {% image gallery_item.image original as tmp_image %}
+    <div class="grid-item grid-item--width2 event-image">
+        <div class="event_image">
+            <a href="{{ tmp_image.url }}">{% image gallery_item.image original %}</a>
+          <div class="copy">
+              <p><a href="{{ tmp_image.url }}">{{ gallery_item.caption }}</a></p>
+          </div><!-- end .copy -->
+        </div><!-- end .event_image -->
+    </div><!-- end .grid-item -->
+    {% endfor %}
+</div><!-- end .programme -->
+{% endblock %}

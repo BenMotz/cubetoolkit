@@ -91,8 +91,11 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "view_showing_index.html")
         self.assertContains(response,
-                            "<h4 class=\"site-description\">folm events - "
-                            "couldn't find anything tagged folm</h4>",
+                            '<h4 class="site-description">folm events</h4>',
+                            html=True)
+        self.assertContains(response,
+                            '<h4 class="site-description"> - couldn\'t find '
+                            'anything tagged folm </h4>',
                             html=True)
 
     def test_view_by_date_nothing_found(self):
