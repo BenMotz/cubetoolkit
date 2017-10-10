@@ -33,7 +33,7 @@
           <div id="site-title" class="clearfix">
               {% capture navmenu-title %}
               {% block navmenu-title %}
-              <h1><a href="{% url "default-view" %}" title= "Cube Microplex">Cube Microplex</a></h1>
+              <h1><a href="{% url "default-view" %}" title="{{ venue.longname }} Programme">{{ venue.longname }} Programme</a></h1>
               {% endblock navmenu-title %}
               {% endcapture %}
           </div><!-- end #site-title -->

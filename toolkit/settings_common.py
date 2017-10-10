@@ -289,6 +289,7 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.contrib.auth.context_processors.auth',
                 'toolkit.content.context_processors.wagtail_content_in_menu',
+                'toolkit.util.context_processors.venue_longname',
             ),
             # May be worth enabling for improved performance?
             # 'loaders':
