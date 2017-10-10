@@ -335,6 +335,16 @@ class Event(models.Model):
         return mark_safe(text)
 
 
+class Room(models.Model):
+    name = models.CharField(max_length=64)
+
+    class Meta:
+        db_table = 'Rooms'
+
+    def __unicode__(self):
+        return self.name
+
+
 class ShowingQuerySet(QuerySet):
     """
     This class provides some custom methods to make searching and selecting
@@ -365,6 +375,7 @@ class ShowingQuerySet(QuerySet):
 class Showing(models.Model):
 
     event = models.ForeignKey('Event', related_name='showings')
+    room = models.ForeignKey('Room', related_name='showings', null=True)
 
     start = FutureDateTimeField(db_index=True)
 
