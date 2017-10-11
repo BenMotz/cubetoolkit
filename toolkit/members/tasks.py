@@ -55,15 +55,29 @@ def _send_email(smtp_conn, destination, subject, body, mail_is_ascii):
     return error
 
 
-@task()
-def send_mailout(subject, body):
+def send_mailout_report(smtp_conn, report_to, sent, err_list,
+        subject, body, body_is_ascii):
+        # All done? Send report:
+        report = ("{0} copies of the following were sent out on cube members "
+                  "list\n".format(sent))
+        if len(err_list) > 0:
+            # Only send a max of 100 error messages!
+            report += "{0} errors:\n{1}".format(
+                len(err_list), "\n".join(err_list[:100]))
+            if len(err_list) > 100:
+                report += "(Error list truncated at 100 entries)\n"
+
+        report += "\n"
+        report += body
+
+        _send_email(smtp_conn, unicode(report_to),
+                    subject, report, body_is_ascii)
+
+
+def send_mailout_to(subject, body, recipients, task=None, report_to=None):
     """
-    Sends email with supplied subject/body to all members who have an email
-    address, and who have mailout==True and mailout_failed=False.
-
+    Sends email with supplied subject/body to supplied set of recipients.
     Requires subject and body to be unicode.
-
-    Also sends an email to settings.MAILOUT_DELIVERY_REPORT_TO when done.
 
     returns a tuple:
     (error, sent_count, error_message)
@@ -86,14 +100,9 @@ def send_mailout(subject, body):
         u"http://{0}{{1}}?k={{2}}\n"
     ).format(settings.EMAIL_UNSUBSCRIBE_HOST)
 
-    recipients = Member.objects.mailout_recipients()
     count = recipients.count()
     sent = 0
     one_percent = count // 100 or 1
-
-    if count == 0:
-        logger.error("No recipients found")
-        return (True, 0, 'No recipients found')
 
     logger.info("Sending mailout to {0} recipients".format(count))
 
@@ -113,7 +122,6 @@ def send_mailout(subject, body):
 
     err_list = []
 
-    # XXX XXX XXX
     # Uncomment the following line if you want to disable mailout for testing
     # return (True, 0, 'DISABLED UNTIL READY')
 
@@ -142,26 +150,15 @@ def send_mailout(subject, body):
                 err_list.append(error)
 
             sent += 1
-            if sent % one_percent == 0:
+            if task and sent % one_percent == 0:
                 progress = int((100.0 * sent) / count) + 1
-                current_task.update_state(
+                task.update_state(
                     state='PROGRESS{0:03}'.format(progress),
                     meta={'sent': sent, 'total': count})
-        # All done? Send report:
-        report = ("{0} copies of the following were sent out on cube members "
-                  "list\n".format(sent))
-        if len(err_list) > 0:
-            # Only send a max of 100 error messages!
-            report += "{0} errors:\n{1}".format(
-                len(err_list), "\n".join(err_list[:100]))
-            if len(err_list) > 100:
-                report += "(Error list truncated at 100 entries)\n"
 
-        report += "\n"
-        report += body
-
-        _send_email(smtp_conn, unicode(settings.MAILOUT_DELIVERY_REPORT_TO),
-                    subject, report, body_is_ascii)
+        if report_to:
+            send_mailout_report(smtp_conn, report_to, sent, err_list,
+                subject, body, body_is_ascii)
 
     except Exception as exc:
         logger.exception("Mailout job failed, {0}".format(exc))
@@ -173,3 +170,29 @@ def send_mailout(subject, body):
             logger.error("SMTP Quit failed: {0}".format(smtpe))
 
     return (False, sent, 'Ok')
+
+
+@task()
+def send_mailout(subject, body):
+    """
+    Sends email with supplied subject/body to all members who have an email
+    address, and who have mailout==True and mailout_failed=False.
+
+    Requires subject and body to be unicode.
+
+    Also sends an email to settings.MAILOUT_DELIVERY_REPORT_TO when done.
+
+    returns a tuple:
+    (error, sent_count, error_message)
+    where error is True if an error occurred.
+    """
+
+    recipients = Member.objects.mailout_recipients()
+    count = recipients.count()
+
+    if count == 0:
+        logger.error("No recipients found")
+        return (True, 0, 'No recipients found')
+
+    return send_mailout_to(subject, body, recipients, task=current_task,
+        report_to=settings.MAILOUT_DELIVERY_REPORT_TO)
