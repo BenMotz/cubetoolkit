@@ -15,6 +15,7 @@ from django.views.decorators.http import (require_GET, require_POST,
 from django.conf import settings
 
 from toolkit.diary.models import Showing
+from toolkit.members.models import Member
 import toolkit.diary.forms as diary_forms
 import toolkit.members.tasks
 
@@ -133,6 +134,42 @@ def exec_mailout(request):
 
     response = HttpResponse(
         json.dumps({'status': 'ok', 'task_id': result.task_id, 'progress': 0}),
+        content_type="application/json"
+    )
+
+    return response
+
+
+@permission_required('toolkit.write')
+@require_POST
+def mailout_test_send(request):
+    form = diary_forms.MailoutTestForm(request.POST)
+    if not form.is_valid():
+        response = {
+            'status': 'error',
+            'errors': ", ".join(
+                "%s: %s" % (k, v) for (k, v) in form.errors.items())
+        }
+    else:
+        members = Member.objects.filter(
+            email=form.cleaned_data['address'])[:1]
+        if members.count() == 0:
+            response = {
+                'status': 'error',
+                'errors': 'No member found with given email address',
+            }
+        else:
+            error, _, error_message = toolkit.members.tasks.send_mailout_to(
+                form.cleaned_data['subject'],
+                form.cleaned_data['body'],
+                members)
+            response = {
+                'status': 'ok' if not error else 'error',
+                'errors': error_message,
+            }
+
+    response = HttpResponse(
+        json.dumps(response),
         content_type="application/json"
     )
 

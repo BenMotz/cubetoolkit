@@ -2,11 +2,13 @@ from __future__ import absolute_import
 import json
 
 from mock import patch
+import fixtures
 
 from django.test import TestCase
 from django.core.urlresolvers import reverse
 
-from .common import DiaryTestsMixin
+from toolkit.members.models import Member
+from .common import DiaryTestsMixin, ToolkitUsersFixture
 
 
 class MailoutTests(DiaryTestsMixin, TestCase):
@@ -364,3 +366,93 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             u'progress': 0,
             u'task_id': u'dummy-task-id'
         }, response_data)
+
+
+class MailoutTestSendViewTests(TestCase, fixtures.TestWithFixtures):
+    def setUp(self):
+        self.useFixture(ToolkitUsersFixture())
+
+        self.url = reverse("mailout-test-send")
+
+        self.member = Member(name="Member One", email="one@example.com",
+                             number="1", postcode="BS1 1AA")
+        self.member.save()
+        # Log in:
+        self.client.login(username="admin", password="T3stPassword!")
+
+        self.send_patch = patch("toolkit.members.tasks.send_mailout_to")
+        self.send_mock = self.send_patch.start()
+
+    def tearDown(self):
+        self.send_patch.stop()
+
+    def test_no_get(self):
+        response = self.client.get(self.url)
+        # 405 Method Not Allowed
+        self.assertEqual(response.status_code, 405)
+
+    def test_success(self):
+        self.send_mock.return_value = (False, 1, None)
+        response = self.client.post(self.url, data={
+            'subject': u"Yet another member's mailout",
+            'body': u"Let the bodies hit the floor\netc.",
+            'address': u"one@example.com",
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content, {
+            'status': 'ok',
+            'errors': None,
+        })
+
+    def test_success_with_message(self):
+        self.send_mock.return_value = (False, 1, "Message of success")
+        response = self.client.post(self.url, data={
+            'subject': u"Yet another member's mailout",
+            'body': u"Let the bodies hit the floor\netc.",
+            'address': u"one@example.com",
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content, {
+            'status': 'ok',
+            'errors': "Message of success",
+        })
+
+    def test_failed_send(self):
+        self.send_mock.return_value = (True, None, u"Failed for some reason")
+        response = self.client.post(self.url, data={
+            'subject': u"Yet another member's mailout",
+            'body': u"Let the bodies hit the floor\netc.",
+            'address': u"one@example.com",
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content, {
+            'status': 'error',
+            'errors': 'Failed for some reason',
+        })
+
+    def test_no_member(self):
+        self.send_mock.return_value = (False, None, None)
+        response = self.client.post(self.url, data={
+            'subject': u"Yet another member's mailout",
+            'body': u"Let the bodies hit the floor\netc.",
+            'address': u"two@example.com",
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content, {
+            'status': 'error',
+            'errors': 'No member found with given email address',
+        })
+
+    def test_bad_email(self):
+        self.send_mock.return_value = (False, None, None)
+        response = self.client.post(self.url, data={
+            'subject': u"Yet another member's mailout",
+            'body': u"Let the bodies hit the floor\netc.",
+            'address': u"dodgy",
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content, {
+            'status': 'error',
+            'errors':  u'address: <ul class="errorlist"><li>'
+                       u'Enter a valid email address.</li></ul>'
+        })

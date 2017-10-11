@@ -57,6 +57,7 @@ class ViewSecurity(DiaryTestsMixin, TestCase):
         "members-mailout": {},
         "exec-mailout": {},
         "mailout-progress": {},
+        "mailout-test-send": {},
 
         "add-printed-programme": {},
     }

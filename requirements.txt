@@ -9,6 +9,7 @@ python-magic>=0.4.0
 # These should (!) have stable APIs, so let upgrades happen
 python-dateutil
 mock
+fixtures<4
 pytz
 # for easy_thumbnails:
 six

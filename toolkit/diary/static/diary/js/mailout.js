@@ -8,6 +8,7 @@ var mailoutController = function (options) {
     var mail_body;
     var progressURL;
     var execURL;
+    var testURL;
     var progressBar;
     var csrftoken;
     var jQuery;
@@ -30,6 +31,7 @@ var mailoutController = function (options) {
 
         progressURL = options.progressURL;
         execURL = options.execURL;
+        testURL = options.testURL;
         progressBarId = options.progressBarId;
         jQuery = options.jQuery;
 
@@ -115,26 +117,73 @@ var mailoutController = function (options) {
         set_state(S_ABORTED);
     }
 
+    function test_send() {
+        var email = jQuery('#id_test_email').val();
+        var email_regex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+        if(email === "") {
+            return;
+        }
+        if(!email_regex.test(email)) {
+            alert("Invalid looking email: '" + email + "'");
+            return;
+        }
+
+        jQuery('#test').html("Sending one copy to '" + email + "'");
+
+        var data = 'csrfmiddlewaretoken=' + encodeURIComponent(csrftoken) +
+               '&address=' + encodeURIComponent(email) +
+               '&subject=' +  encodeURIComponent(mail_subject) +
+               '&body=' + encodeURIComponent(mail_body);
+
+        send_xhr = jQuery.ajax(testURL, {
+            'type': 'POST',
+            'cache': false,
+            'data': data,
+            'dataType': 'json',
+            'error': function (jqXHR, textStatus, errorThrown) {
+                jQuery('#test').html("Failed sending one copy to '" + email  +
+                    "': " + textStatus + " " + errorThrown);
+            },
+            'success': function(data) {
+                if(data.status === 'ok') {
+                    jQuery('#test').html("Sent one copy to '" + email + "'");
+                } else {
+                    jQuery('#test').html("Failed sending one copy to '" +
+                        email + "': " + data.errors);
+                }
+            },
+        });
+    }
+
     function set_state(state) {
         switch (state) {
         case S_READY:
             update_progress(0);
-            jQuery('#status').html('Please read through and check the text below, then click <span id="send">Send</span> when you\'re sure...');
+            jQuery('#status').html('Please read through and check the text ' +
+                'below, then click <span id="send">Send</span> when ' +
+                'you\'re sure...');
             jQuery('#send').button().click(start_send);
+            jQuery('#test_send').button().click(test_send);
             break;
         case S_SENDING:
-            jQuery('#status').html('Sending. If you change your mind then <span id="cancel">Cancel</span>');
+            jQuery('#status').html('Sending. If you change your mind then ' +
+                '<span id="cancel">Cancel</span>');
             jQuery('#cancel').button().click(cancel_send);
+            jQuery('#test_send').button("disable");
             break;
         case S_ABORTED:
             jQuery('#status').html('Sending aborted not yet implemented!');
+            jQuery('#test_send').button("disable");
             break;
         case S_COMPLETE:
             update_progress(100);
             jQuery('#status').html('Success! <span id="sent_stats"></span>');
+            jQuery('#test_send').button("disable");
             break;
         case S_ERROR:
-            jQuery('#status').html('An error occurred: <span id="error_msg">(unknown)</span>');
+            jQuery('#status').html('An error occurred: <span id="error_msg">' +
+                '(unknown)</span>');
+            jQuery('#test_send').button("disable");
             break;
         }
     }

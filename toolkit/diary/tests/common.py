@@ -1,5 +1,6 @@
 import pytz
 from datetime import datetime, date
+import fixtures
 
 import django.contrib.auth.models as auth_models
 import django.contrib.contenttypes as contenttypes
@@ -9,13 +10,11 @@ from toolkit.diary.models import (Showing, Event, Role, EventTag, DiaryIdea,
 from toolkit.members.models import Member, Volunteer
 
 
-class DiaryTestsMixin(object):
+class DiaryTestsMixin(fixtures.TestWithFixtures):
 
     def setUp(self):
         self._setup_test_data()
-        self._setup_test_users()
-
-        return super(DiaryTestsMixin, self).setUp()
+        self.useFixture(ToolkitUsersFixture())
 
     # Useful method:
     def assert_return_to_index(self, response):
@@ -332,7 +331,9 @@ class DiaryTestsMixin(object):
         v3.roles = [r3]
         v3.save()
 
-    def _setup_test_users(self):
+
+class ToolkitUsersFixture(fixtures.Fixture):
+    def _setUp(self):
         # Read/write user:
         user_rw = auth_models.User.objects.create_user(
             'admin', 'toolkit_admin@localhost', 'T3stPassword!')
