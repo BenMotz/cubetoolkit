@@ -69,7 +69,7 @@ $(document).ready(function() {
 
 {% block body %}
 {{ block.super }}
-<img src="{{ STATIC_URL }}diary/{{ venue.internal_header_img }}" alt="{{ VENUE.name }} logo">
+<img src="{{ STATIC_URL }}diary/{{ VENUE.internal_header_img }}" alt="{{ VENUE.name }} logo">
 <h3>{{ VENUE.name }} programme of events - copy summary report</h3>
 <p>[<a href="#" id="hide_index">Hide index</a>]</p>
 <div class="index">

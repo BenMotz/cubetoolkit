@@ -42,7 +42,7 @@ $(document).ready(function() {
 
 {% block body %}
 {{ block.super }}
-<img src="{{ STATIC_URL }}diary/{{ venue.internal_header_img }}" alt="{{ VENUE.name }}">
+<img src="{{ STATIC_URL }}diary/{{ VENUE.internal_header_img }}" alt="{{ VENUE.name }}">
 <h3>{{ VENUE.name }} programme of events - copy report</h3>
 <div class="index">
 <p class="pad">{{ VENUE.name }}</p>
