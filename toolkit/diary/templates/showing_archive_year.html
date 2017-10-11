@@ -1,10 +1,10 @@
 {% extends "showing_archive_base.html" %}
 {% block title %}
-{{ VENUE_LONGNAME }} Programme Archival listings for {{ year|date:"Y" }}
+{{ VENUE.longname }} Programme Archival listings for {{ year|date:"Y" }}
 {% endblock %}
 
 {% block archive_body %}
-<h3>{{ VENUE_LONGNAME }} programme archive: {{ year|date:"Y" }}</h3>
+<h3>{{ VENUE.longname }} programme archive: {{ year|date:"Y" }}</h3>
     <form action="{% url "archive-search" %}">
         <input id="archive_search_input" type="text" name="search_term" placeholder="Search {{ year|date:"Y" }}"/>
         <input type="submit" value="Search" />

@@ -6,7 +6,7 @@
 {% endblock %}
 
 {% block title %}
-{{ VENUE_LONGNAME }} role rota
+{{ VENUE.longname }} role rota
 {% endblock %}
 
 {% block css %}
@@ -99,7 +99,7 @@ edit_rota(
 {% block body %}
 <div class="rota-wrapper">
     <form id='daterange'>
-    <p align='center'><label for="id_from_date">{{ VENUE_LONGNAME }} Rota from </label><input type="text" name="from_date" value="{{ start_date|date:'j-m-Y'}}" id="id_from_date" />
+    <p align='center'><label for="id_from_date">{{ VENUE.longname }} Rota from </label><input type="text" name="from_date" value="{{ start_date|date:'j-m-Y'}}" id="id_from_date" />
     <label for="id_to_date"> to </label><input type="text" name="to_date" value="{{ end_date|date:'j-m-Y'}}" id="id_to_date" />
     </p>
     </form>

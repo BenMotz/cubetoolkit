@@ -1,10 +1,10 @@
 {% extends "showing_archive_base.html" %}
 {% block title %}
-{{ VENUE_LONGNAME }} Programme Archive
+{{ VENUE.longname }} Programme Archive
 {% endblock %}
 
 {% block archive_body %}
-<h3>{{ VENUE_LONGNAME }} programme archive</h3>
+<h3>{{ VENUE.longname }} programme archive</h3>
     <form action="{% url "archive-search" %}"><input id="archive_search_input" type="text" name="search_term" placeholder="Search"/> <input type="submit" value="Search" /></form>
 <ul>
     {% for date in date_list.reverse %}

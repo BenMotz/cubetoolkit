@@ -6,8 +6,9 @@
 {% endblock %}
 
 {% block header %}
-<p><img alt="{{ VENUE_HEADER_IMG }} Logo" src="{{ STATIC_URL }}diary/{{ VENUE_HEADER_IMG }}"></p>
-<h3>{{ VENUE_LONGNAME }} members database</h3>
+<p><img src="{{ STATIC_URL }}diary/{{ VENUE.internal_header_img }}" alt="{{ VENUE.longname }}" 
+    width="{{ VENUE.internal_header_img_width }}px"></p>
+<h3>{{ VENUE.longname }} members database</h3>
 {% include "messages.html" %}
 
 {% endblock %}
