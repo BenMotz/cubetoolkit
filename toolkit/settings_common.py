@@ -19,8 +19,19 @@ if True:
              'youtube': 'https://www.youtube.com/user/cubelog',
              'internal_header_img': 'diary_edit_list_header.gif',
              'internal_header_img_width': 200,
+             'wagtale_admin_img': '/static/content/logo.gif',
              'font_h2': '',
+             # This is used as the hostname for unsubscribe links in emails
+             # i.e. emails will have links added to
+             # http://[this]/members/100/unsubscribe)
+             'email_unsubscribe_host': 'cubecinema.com',
+             # Default address to which reports of a successful mailout
+             # delivery are sent:
+             'mailout_delivery_report_to': u'cubeadmin@cubecinema.com',
+             # "From" address for mailout
+             'mailout_from_address': u'mailout@cubecinema.com'
              }
+    WAGTAIL_SITE_NAME = 'The Cube Microplex'
 
 else:
     # 'programme_url': 'https://starandshadow.org.uk/',
@@ -36,8 +47,19 @@ else:
              'youtube': 'https://www.youtube.com/channel/UCJxp1CvJlDsWBEJrguvhoLw/',
              'internal_header_img': 'star_and_shadow_bricks.jpg',
              'internal_header_img_width': 329,
-             'font_h2': 'https://fonts.googleapis.com/css?family=Lato'
+             'wagtale_admin_img': '/static/content/star_and_shadow_100_82.png',
+             'font_h2': 'https://fonts.googleapis.com/css?family=Lato',
+             # This is used as the hostname for unsubscribe links in emails
+             # i.e. emails will have links added to
+             # http://[this]/members/100/unsubscribe)
+             'email_unsubscribe_host': 'starandshadow.org.uk',
+             # Default address to which reports of a successful mailout
+             # delivery are sent:
+             'mailout_delivery_report_to': u'admin@starandshadow.org.uk',
+             # "From" address for mailout
+             'mailout_from_address': u'mailout@starandshadow.org.uk'
              }
+    WAGTAIL_SITE_NAME = 'The Star and Shadow'
 
 # The following list of IP addresses is used to restrict access to some pages
 # (at time of writing, only the 'add a new member' page)
@@ -69,14 +91,12 @@ PROGRAMME_MEDIA_MAX_SIZE_MB = 5  # Megabytes (i.e. * 1024 * 1024 bytes)
 
 DEFAULT_MUGSHOT = "/static/members/default_mugshot.gif"
 
-# This is used as the hostname for unsubscribe links in emails (i.e. emails
-# will have links added to http://[this]/members/100/unsubscribe)
-EMAIL_UNSUBSCRIBE_HOST = "cubecinema.com"
 
 # SMTP host/port settings. For complete list of relevant settings see:
 # https://docs.djangoproject.com/en/1.5/ref/settings/#email-backend
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 25
+# TODO add username and password
 
 # Default number of days ahead for which to include detailed copy in the
 # member's mailout
@@ -84,11 +104,6 @@ MAILOUT_DETAILS_DAYS_AHEAD = 9
 # Default number of days ahead for which to include listings in the member's
 # mailout
 MAILOUT_LISTINGS_DAYS_AHEAD = 14
-
-# Default address to which reports of a successful mailout delivery are sent:
-MAILOUT_DELIVERY_REPORT_TO = u"cubeadmin@cubecinema.com"
-# "From" address for mailout
-MAILOUT_FROM_ADDRESS = u"mailout@cubecinema.com"
 
 # The maximum number of each type of role that can be assigned to a showing
 # (so, for example, can't have more than this number of bar staff)
@@ -113,8 +128,6 @@ CALENDAR_UNCONFIRMED_COLOUR = "#E0CFCF"
 
 # Enable / disable CMS content visibility in the site menu:
 WAGTAIL_CONTENT_IN_MENU = True
-
-WAGTAIL_SITE_NAME = 'The Cube Microplex'
 
 # Don't show fields to change user passwords (for other users, in admin)
 WAGTAILUSERS_PASSWORD_ENABLED = False

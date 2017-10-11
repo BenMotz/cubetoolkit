@@ -26,7 +26,7 @@ def _send_email(smtp_conn, destination, subject, body, mail_is_ascii):
     msg = MIMEText(body.encode(body_charset, "replace"), "plain", body_charset)
 
     # Assume 'From' is always ASCII(!)
-    msg['From'] = settings.MAILOUT_FROM_ADDRESS
+    msg['From'] = settings.VENUE['mailout_from_address']
     # This will try encoding in ascii, then iso-8859-1 then fallback to UTF-8
     # if that fails. (This is desirable as iso-8859-1 is more readable without
     # decoding, plus more compact)
@@ -36,7 +36,7 @@ def _send_email(smtp_conn, destination, subject, body, mail_is_ascii):
 
     try:
         # Enforce ascii destination email address:
-        smtp_conn.sendmail(settings.MAILOUT_FROM_ADDRESS,
+        smtp_conn.sendmail(settings.VENUE['mailout_from_address'],
                            [destination.encode("ascii")],
                            msg.as_string())
     except UnicodeError:
@@ -63,7 +63,8 @@ def send_mailout(subject, body):
 
     Requires subject and body to be unicode.
 
-    Also sends an email to settings.MAILOUT_DELIVERY_REPORT_TO when done.
+    Also sends an email to settings.VENUE['mailout_delivery_report_to'] when
+    done.
 
     returns a tuple:
     (error, sent_count, error_message)
@@ -84,7 +85,7 @@ def send_mailout(subject, body):
         u"http://{0}{{0}}?k={{2}}\n"
         u"To edit details of your membership, please use this link:\n"
         u"http://{0}{{1}}?k={{2}}\n"
-    ).format(settings.EMAIL_UNSUBSCRIBE_HOST)
+    ).format(settings.VENUE['email_unsubscribe_host'])
 
     recipients = Member.objects.mailout_recipients()
     count = recipients.count()
@@ -160,7 +161,8 @@ def send_mailout(subject, body):
         report += "\n"
         report += body
 
-        _send_email(smtp_conn, unicode(settings.MAILOUT_DELIVERY_REPORT_TO),
+        _send_email(smtp_conn, unicode(
+                    settings.VENUE['mailout_delivery_report_to']),
                     subject, report, body_is_ascii)
 
     except Exception as exc:

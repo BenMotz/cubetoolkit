@@ -1649,16 +1649,16 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         # Validate summary:
         summary_mail_call = conn.sendmail.call_args_list[6]
         self.assertEqual(summary_mail_call[0][
-                         0], settings.MAILOUT_FROM_ADDRESS)
+                         0], settings.VENUE['mailout_from_address'])
         self.assertEqual(summary_mail_call[0][1], [
-                         settings.MAILOUT_DELIVERY_REPORT_TO])
+                         settings.VENUE['mailout_delivery_report_to']])
         # Check mail twice, to check for each bit of expected text in the body;
         # The mail count:
         self._assert_mail_as_expected(
             summary_mail_call[0][2],
             is_utf8,
-            settings.MAILOUT_FROM_ADDRESS,
-            settings.MAILOUT_DELIVERY_REPORT_TO,
+            settings.VENUE['mailout_from_address'],
+            settings.VENUE['mailout_delivery_report_to'],
             (u"6 copies of the following were sent out on %s members list"
                 % settings.VENUE['name']),
             subject
@@ -1667,8 +1667,8 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         self._assert_mail_as_expected(
             summary_mail_call[0][2],
             is_utf8,
-            settings.MAILOUT_FROM_ADDRESS,
-            settings.MAILOUT_DELIVERY_REPORT_TO,
+            settings.VENUE['mailout_from_address'],
+            settings.VENUE['mailout_delivery_report_to'],
             body,
             subject
         )
