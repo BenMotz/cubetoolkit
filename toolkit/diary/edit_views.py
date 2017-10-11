@@ -569,7 +569,6 @@ class EditEventView(View):
 
         # Got here if there's a form validation error:
         context = {
-            'venue': settings.VENUE,
             'event': event,
             'form': form,
             'media_form': media_form,
@@ -712,7 +711,6 @@ def view_event_field(request, field, year, month, day):
         )
 
     context = {
-        'venue': settings.VENUE,
         'start_date': start_date,
         'end_date': end_date,
         'days_ahead': days_ahead,

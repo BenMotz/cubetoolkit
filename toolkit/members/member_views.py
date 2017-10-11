@@ -48,7 +48,6 @@ def add_member(request):
         form = NewMemberForm()
 
     context = {
-        'venue': settings.VENUE,
         'form': form,
     }
     return render(request, 'form_new_member.html', context)
@@ -66,13 +65,12 @@ def search(request):
             Q(email__icontains=search_terms) |
             Q(number=search_terms)).order_by('name')
         context = {
-            'venue': settings.VENUE,
             'search_terms': search_terms,
             'members': results,
         }
         return render(request, 'search_members_results.html', context)
 
-    context = {'venue': settings.VENUE}
+    context = {}
     return render(request, 'search_members.html', context)
 
 
@@ -172,7 +170,6 @@ def edit_member(request, member_id):
         form = MemberForm(instance=member)
 
     context = {
-        'venue': settings.VENUE,
         'member': member,
         'form': form,
     }
@@ -255,7 +252,6 @@ def member_statistics(request):
     # Some of the simpler stats are done using the django ORM
     context = {
         # Results of complex queries:
-        'venue': settings.VENUE,
         'email_stats': email_stats,
         'postcode_stats': postcode_stats,
         # Total number of members:

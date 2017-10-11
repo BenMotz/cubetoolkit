@@ -58,7 +58,6 @@ def _render_mailout_subject_and_body(days_ahead, copy_days_ahead):
     mail_template = django.template.loader.get_template(settings.VENUE['mailout_txt'])
 
     context = {
-        'venue': settings.VENUE,
         'start_date': start_date,
         'end_date': end_date,
         'showings': showings,
@@ -104,7 +103,6 @@ def mailout(request):
         subject_text, body_text = _render_mailout_subject_and_body(
                 days_ahead, copy_days_ahead)
         context = {
-            'venue': settings.VENUE,
             "days_ahead": days_ahead,
             "copy_days_ahead": copy_days_ahead
         }

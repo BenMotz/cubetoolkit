@@ -46,7 +46,6 @@ def _view_diary(request, startdate, enddate, tag=None, extra_title=None):
         events.setdefault(showing.event, list()).append(showing)
 
     context = {
-        'venue': settings.VENUE,
         'start': startdate,
         'end': enddate,
         # Make sure user input is escaped:
@@ -269,7 +268,6 @@ def view_event(request, event_id=None, legacy_id=None, event_slug=None):
         raise Http404("Event not found")
 
     context = {
-        'venue': settings.VENUE,
         'event': event,
         'showings': showings,
         'current_year': timezone.now().year,

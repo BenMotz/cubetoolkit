@@ -1,7 +1,7 @@
 {% extends "base_view_eventfield.html" %}
 
 {% block title %}
-{{ venue.name }} programme of events - copy report
+{{ VENUE.name }} programme of events - copy report
 {% endblock %}
 
 {% block css %}
@@ -42,10 +42,10 @@ $(document).ready(function() {
 
 {% block body %}
 {{ block.super }}
-<img src="{{ STATIC_URL }}diary/{{ venue.internal_header_img }}" alt="{{ venue.name }}">
-<h3>{{ venue.name }} programme of events - copy report</h3>
+<img src="{{ STATIC_URL }}diary/{{ venue.internal_header_img }}" alt="{{ VENUE.name }}">
+<h3>{{ VENUE.name }} programme of events - copy report</h3>
 <div class="index">
-<p class="pad">{{ venue.name }}</p>
+<p class="pad">{{ VENUE.name }}</p>
 
 <p class="pad">Programme of events.</p>
 

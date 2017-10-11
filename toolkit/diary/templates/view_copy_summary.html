@@ -2,7 +2,7 @@
 {% load showing_date_format %}
 
 {% block title %}
-{{ venue.name }} programme of events - copy summary report
+{{ VENUE.name }} programme of events - copy summary report
 {% endblock %}
 
 {% block css %}
@@ -69,8 +69,8 @@ $(document).ready(function() {
 
 {% block body %}
 {{ block.super }}
-<img src="{{ STATIC_URL }}diary/{{ venue.internal_header_img }}" alt="{{ venue.name }} logo">
-<h3>{{ venue.name }} programme of events - copy summary report</h3>
+<img src="{{ STATIC_URL }}diary/{{ venue.internal_header_img }}" alt="{{ VENUE.name }} logo">
+<h3>{{ VENUE.name }} programme of events - copy summary report</h3>
 <p>[<a href="#" id="hide_index">Hide index</a>]</p>
 <div class="index">
 {% for showing in showings %}

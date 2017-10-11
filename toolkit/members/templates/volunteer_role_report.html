@@ -14,12 +14,12 @@
 </style>
 {% endblock %}
 
-{% block title %}{{ venue.name }} volunteers{% endblock %}
+{% block title %}{{ VENUE.name }} volunteers{% endblock %}
 
 {% block body %}
 
-<img src="{{ STATIC_URL }}/diary/{{ venue.internal_header_img }}" alt="{{ venue.name }} logo">
-<h3>{{ venue.name }} Volunteers Role Summary</h3>
+<img src="{{ STATIC_URL }}/diary/{{ venue.internal_header_img }}" alt="{{ VENUE.name }} logo">
+<h3>{{ VENUE.name }} Volunteers Role Summary</h3>
 <table>
 {% for role, names in role_vol_map %}
 {% cycle '<tr>' '' '' ''%}

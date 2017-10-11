@@ -2,7 +2,7 @@
 {% load thumbnail_l %}
 
 {% block title %}
-{{ venue.name }} Programme{% if extra_title %}: {{ extra_title }}{% endif %}
+{{ VENUE.name }} Programme{% if extra_title %}: {{ extra_title }}{% endif %}
 {% endblock %}
 
 {% block css %}
@@ -11,7 +11,7 @@
 {% endblock %}
 
 {% block navmenu-title %}
-<h1><a href="{% url "default-view" %}" title= "{{ venue.name }} Programme">{{ venue.name }} Programme</a></h1>
+<h1><a href="{% url "default-view" %}" title= "{{ VENUE.name }} Programme">{{ VENUE.name }} Programme</a></h1>
 {% endblock %}
 
 {% block site-description %}

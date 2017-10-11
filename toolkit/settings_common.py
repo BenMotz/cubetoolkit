@@ -18,6 +18,7 @@ if True:
              'vimeo': 'https://vimeo.com/cubemicroplex/',
              'youtube': 'https://www.youtube.com/user/cubelog',
              'internal_header_img': 'diary_edit_list_header.gif',
+             'internal_header_img_width': 200,
              'font_h2': '',
              }
 
@@ -34,6 +35,7 @@ else:
              'vimeo': '',
              'youtube': 'https://www.youtube.com/channel/UCJxp1CvJlDsWBEJrguvhoLw/',
              'internal_header_img': 'star_and_shadow_bricks.jpg',
+             'internal_header_img_width': 329,
              'font_h2': 'https://fonts.googleapis.com/css?family=Lato'
              }
 
@@ -289,8 +291,7 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.contrib.auth.context_processors.auth',
                 'toolkit.content.context_processors.wagtail_content_in_menu',
-                'toolkit.util.context_processors.venue_longname',
-                'toolkit.util.context_processors.venue_int_header_img',
+                'toolkit.util.context_processors.venue',
             ),
             # May be worth enabling for improved performance?
             # 'loaders':
