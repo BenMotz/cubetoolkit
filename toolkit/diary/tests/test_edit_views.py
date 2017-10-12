@@ -1690,7 +1690,7 @@ class DiaryCalendarViewTests(DiaryTestsMixin, TestCase):
 
     def _get_room_list(self, response):
         match = re.search(
-            ur"init_calendar_view\((?:.*?,){5}\s*(?P<room_list>\[.*?\])\);",
+            r"init_calendar_view\((?:.*?,){5}\s*(?P<room_list>\[.*?\])\);",
             response.content.decode("utf-8"), re.DOTALL)
         return match.group("room_list")
 
