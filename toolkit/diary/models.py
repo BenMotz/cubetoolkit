@@ -342,6 +342,7 @@ class Event(models.Model):
         return mark_safe(text)
 
 
+@python_2_unicode_compatible
 class Room(models.Model):
     name = models.CharField(max_length=64)
 #    colour = models.CharField(max_length=9, default="#33CC33")
@@ -349,7 +350,7 @@ class Room(models.Model):
     class Meta:
         db_table = 'Rooms'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
 
