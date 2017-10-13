@@ -399,7 +399,7 @@ class MailoutTestSendViewTests(TestCase, fixtures.TestWithFixtures):
             'address': u"one@example.com",
         })
         self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(response.content, {
+        self.assertJSONEqual(response.content.decode("utf-8"), {
             'status': 'ok',
             'errors': None,
         })
@@ -412,7 +412,7 @@ class MailoutTestSendViewTests(TestCase, fixtures.TestWithFixtures):
             'address': u"one@example.com",
         })
         self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(response.content, {
+        self.assertJSONEqual(response.content.decode("utf-8"), {
             'status': 'ok',
             'errors': "Message of success",
         })
@@ -425,7 +425,7 @@ class MailoutTestSendViewTests(TestCase, fixtures.TestWithFixtures):
             'address': u"one@example.com",
         })
         self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(response.content, {
+        self.assertJSONEqual(response.content.decode("utf-8"), {
             'status': 'error',
             'errors': 'Failed for some reason',
         })
@@ -438,7 +438,7 @@ class MailoutTestSendViewTests(TestCase, fixtures.TestWithFixtures):
             'address': u"two@example.com",
         })
         self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(response.content, {
+        self.assertJSONEqual(response.content.decode("utf-8"), {
             'status': 'error',
             'errors': 'No member found with given email address',
         })
@@ -451,7 +451,7 @@ class MailoutTestSendViewTests(TestCase, fixtures.TestWithFixtures):
             'address': u"dodgy",
         })
         self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(response.content, {
+        self.assertJSONEqual(response.content.decode("utf-8"), {
             'status': 'error',
             'errors':  u'address: <ul class="errorlist"><li>'
                        u'Enter a valid email address.</li></ul>'
