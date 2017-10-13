@@ -342,6 +342,17 @@ class Event(models.Model):
         return mark_safe(text)
 
 
+class Room(models.Model):
+    name = models.CharField(max_length=64)
+#    colour = models.CharField(max_length=9, default="#33CC33")
+
+    class Meta:
+        db_table = 'Rooms'
+
+    def __unicode__(self):
+        return self.name
+
+
 class ShowingQuerySet(QuerySet):
     """
     This class provides some custom methods to make searching and selecting
@@ -373,6 +384,7 @@ class ShowingQuerySet(QuerySet):
 class Showing(models.Model):
 
     event = models.ForeignKey('Event', related_name='showings')
+    room = models.ForeignKey('Room', related_name='showings', null=True)
 
     start = FutureDateTimeField(db_index=True)
 
@@ -430,7 +442,7 @@ class Showing(models.Model):
             # as don't want to copy the rota (as that would make db writes)
             attributes_to_copy = ('event', 'start', 'booked_by', 'extra_copy',
                                   'confirmed', 'hide_in_programme',
-                                  'cancelled', 'discounted')
+                                  'cancelled', 'discounted', 'room')
             for attribute in attributes_to_copy:
                 setattr(self, attribute, getattr(copy_from, attribute))
             if start_offset:

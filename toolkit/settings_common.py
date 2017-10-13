@@ -76,6 +76,10 @@ CALENDAR_CONFIRMED_IN_FUTURE_COLOUR = "#33CC33"
 CALENDAR_UNCONFIRMED_COLOUR = "#E0CFCF"
 
 ###############################################################################
+
+MULTIROOM_ENABLED = False
+
+###############################################################################
 #
 # Wagtail settings
 
@@ -249,6 +253,7 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.static',
                 'django.contrib.auth.context_processors.auth',
+                'toolkit.diary.context_processors.diary_settings',
             ),
             # May be worth enabling for improved performance?
             # 'loaders':

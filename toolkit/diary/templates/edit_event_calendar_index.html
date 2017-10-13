@@ -7,6 +7,7 @@ Event diary
 {% block css %}
 <link rel="stylesheet" href="{{ STATIC_URL }}css/messages.css">
 <link rel='stylesheet' href='{{ STATIC_URL }}diary/js/lib/fullcalendar/fullcalendar.min.css' />
+<link rel='stylesheet' href='{{ STATIC_URL }}diary/js/lib/fullcalendar-scheduler/scheduler.min.css' />
 <link rel="stylesheet" href="{{ STATIC_URL }}diary/js/lib/fancybox/jquery.fancybox.css" />
 <style>
   @import url('{{ STATIC_URL }}css/lib/smoothness/jquery-ui.css');
@@ -88,6 +89,7 @@ Event diary
 <script src='{{ STATIC_URL }}diary/js/lib/fullcalendar/lib/jquery.min.js'></script>
 <script src='{{ STATIC_URL }}diary/js/lib/fullcalendar/lib/moment.min.js'></script>
 <script src='{{ STATIC_URL }}diary/js/lib/fullcalendar/fullcalendar.min.js'></script>
+<script src='{{ STATIC_URL }}diary/js/lib/fullcalendar-scheduler/scheduler.min.js'></script>
 <script src='{{ STATIC_URL }}diary/js/lib/fancybox/jquery.fancybox.js'></script>
 <script src="{{ STATIC_URL }}js/lib/jquery.jeditable.mini.js"></script>
 <script src="{{ STATIC_URL }}diary/js/calendar_index.js"></script>
@@ -108,7 +110,10 @@ init_calendar_view(jQuery,
                    '{{ csrf_token }}',
                    '{{ defaultView }}',
                    '{{ display_time|date:"Y-m-d" }}',
-                   urls);
+                   urls,
+                   [{% for room in rooms %}
+                       { "id": {{ room.id }}, "title": "{{ room.name }}"}{% if not forloop.last %},{% endif %}{% endfor %}
+                   ]);
 </script>
 {% endblock %}
 

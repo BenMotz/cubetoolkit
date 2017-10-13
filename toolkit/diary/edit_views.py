@@ -23,7 +23,7 @@ import six
 
 from toolkit.diary.models import (Showing, Event, DiaryIdea, MediaItem,
                                   EventTemplate, EventTag, Role, RotaEntry,
-                                  PrintedProgramme)
+                                  PrintedProgramme, Room)
 import toolkit.diary.forms as diary_forms
 import toolkit.diary.edit_prefs as edit_prefs
 import toolkit.members.tasks
@@ -176,6 +176,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
     context['start'] = startdatetime
     context['end'] = enddatetime
     context['edit_prefs'] = edit_prefs.get_preferences(request.session)
+    context['rooms'] = Room.objects.all() if settings.MULTIROOM_ENABLED else ()
     return render(request, 'edit_event_index.html', context)
 
 
@@ -186,6 +187,8 @@ def edit_diary_data(request):
     try:
         start_raw = request.GET.get('start', None)
         end_raw = request.GET.get('end', None)
+        start_raw = start_raw.partition('T')[0] if start_raw else None
+        end_raw = end_raw.partition('T')[0] if end_raw else None
         start = datetime.datetime.strptime(start_raw, date_format)
         end = datetime.datetime.strptime(end_raw, date_format)
     except (ValueError, TypeError):
@@ -232,7 +235,7 @@ def edit_diary_data(request):
         else:
             color = settings.CALENDAR_UNCONFIRMED_COLOUR
 
-        results.append({
+        showing_data = {
             'id': showing.pk,
             'title': showing.event.name,
             'start': timezone.localtime(showing.start).isoformat(),
@@ -240,7 +243,12 @@ def edit_diary_data(request):
             'url': url,
             'className': styles,
             'color': color,
-        })
+        }
+
+        if settings.MULTIROOM_ENABLED:
+            showing_data['resourceId'] = showing.room_id
+
+        results.append(showing_data)
 
     return HttpResponse(json.dumps(results),
                         content_type="application/json; charset=utf-8")
@@ -267,6 +275,7 @@ def edit_diary_calendar(request, year=None, month=None, day=None):
         'display_time': display_time,
         'defaultView': defaultView,
         'settings': settings,
+        'rooms': Room.objects.all() if settings.MULTIROOM_ENABLED else [],
     }
 
     return render(request, 'edit_event_calendar_index.html', context)
@@ -389,6 +398,8 @@ def add_event(request):
                         confirmed=form.cleaned_data['confirmed'],
                         booked_by=form.cleaned_data['booked_by'],
                         )
+                if settings.MULTIROOM_ENABLED:
+                    new_showing.room = form.cleaned_data['room']
                 new_showing.save()
                 # Set showing roles to those from its template:
                 new_showing.reset_rota_to_default()
@@ -423,6 +434,8 @@ def add_event(request):
         # Default duration is one hour:
         duration = request.GET.get('duration', "3600")
 
+        room = request.GET.get('room', None)
+
         if len(time) != 2 or len(date) != 3:
             return HttpResponse("Invalid start date or time",
                                 status=400, content_type="text/plain")
@@ -434,14 +447,17 @@ def add_event(request):
                 datetime.datetime(hour=time[0], minute=time[1],
                                   day=date[0], month=date[1], year=date[2])
             )
-        except (ValueError, TypeError):
-            return HttpResponse("Illegal time, date or duration", status=400,
-                                content_type="text/plain")
+            if settings.MULTIROOM_ENABLED and room:
+                room = Room.objects.get(id=room)
+        except (ValueError, TypeError, Room.DoesNotExist):
+            return HttpResponse("Illegal time, date, duration or room",
+                                status=400, content_type="text/plain")
 
         # Create form, render template:
         form = diary_forms.NewEventForm(initial={
             'start': event_start,
             'duration': duration,
+            'room': room,
         })
         context = {'form': form}
         return render(request, 'form_new_event_and_showing.html', context)

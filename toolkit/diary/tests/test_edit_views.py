@@ -3,6 +3,7 @@ import re
 import json
 import os.path
 
+import six
 import pytz
 from datetime import datetime, date, time
 import tempfile
@@ -438,8 +439,12 @@ class EditShowing(DiaryTestsMixin, TestCase):
             '<option value="3">'
         )
 
-    @patch('django.utils.timezone.now')
-    def tests_edit_showing(self, now_patch):
+    def _test_edit_showing_common(self, now_patch, multiroom_enabled):
+        # Common code from the following two tests
+        # Reload the forms module, to force handling of the MULTIROOM_ENABLED
+        # conditional in the form definition (if required)
+        six.moves.reload_module(toolkit.diary.forms)
+
         now_patch.return_value = self._fake_now
 
         url = reverse("edit-showing", kwargs={"showing_id": 7})
@@ -452,6 +457,9 @@ class EditShowing(DiaryTestsMixin, TestCase):
             "discounted": "on",
             "role_1": "3",
             "other_roles": "3",
+            # data should be ignored if multiroom_enabled == False, but not
+            # cause an error
+            "room": "2",
         })
 
         self.assertEqual(response.status_code, 200)
@@ -466,6 +474,7 @@ class EditShowing(DiaryTestsMixin, TestCase):
         self.assertEqual(showing.hide_in_programme, True)
         self.assertEqual(showing.cancelled, True)
         self.assertEqual(showing.discounted, True)
+        self.assertEqual(showing.room_id, 2 if multiroom_enabled else None)
         # Check rota is as expected:
         rota = list(showing.rotaentry_set.all())
         self.assertEqual(len(rota), 4)
@@ -477,6 +486,16 @@ class EditShowing(DiaryTestsMixin, TestCase):
         self.assertEqual(rota[2].rank, 3)
         self.assertEqual(rota[3].role_id, 3)
         self.assertEqual(rota[3].rank, 1)
+
+    @override_settings(MULTIROOM_ENABLED=False)
+    @patch('django.utils.timezone.now')
+    def tests_edit_showing(self, now_patch):
+        self._test_edit_showing_common(now_patch, False)
+
+    @override_settings(MULTIROOM_ENABLED=True)
+    @patch('django.utils.timezone.now')
+    def tests_edit_showing_multiroom_enabled(self, now_patch):
+        self._test_edit_showing_common(now_patch, True)
 
     @patch('django.utils.timezone.now')
     def tests_edit_showing_in_past(self, now_patch):
@@ -601,6 +620,11 @@ class AddEventView(DiaryTestsMixin, TestCase):
         # Log in:
         self.client.login(username="admin", password="T3stPassword!")
 
+    def tearDown(self):
+        # Reload the forms module, to revert any forced handling of the
+        # MULTIROOM_ENABLED conditional
+        six.moves.reload_module(toolkit.diary.forms)
+
     @patch('django.utils.timezone.now')
     def test_get_add_event_form_default_start(self, now_patch):
         now_patch.return_value = self._fake_now
@@ -639,10 +663,13 @@ class AddEventView(DiaryTestsMixin, TestCase):
         url = reverse("add-event")
         response = self.client.get(url, data={"date": "99-01-1950"})
         self.assertContains(
-            response, "Illegal time, date or duration", status_code=400)
+            response, "Illegal time, date, duration or room", status_code=400)
 
-    @patch('django.utils.timezone.now')
-    def test_add_event(self, now_patch):
+    # Common code for the following two tests::w
+    def _test_add_event_common(self, now_patch, multiroom_enabled):
+        # Reload the forms module, to force handling of the MULTIROOM_ENABLED
+        # conditional in the form definition (if required)
+        six.moves.reload_module(toolkit.diary.forms)
         now_patch.return_value = self._fake_now
 
         url = reverse("add-event")
@@ -657,6 +684,7 @@ class AddEventView(DiaryTestsMixin, TestCase):
             "outside_hire": "",
             "confirmed": "on",
             "discounted": "on",
+            "room": "2",
         })
         # Request succeeded?
         self.assertEqual(response.status_code, 200)
@@ -688,6 +716,17 @@ class AddEventView(DiaryTestsMixin, TestCase):
             self.assertEqual(s.cancelled, False)
             self.assertEqual(s.discounted, True)
             self.assertEqual(list(s.roles.all()), [role_1, ])
+            self.assertEqual(s.room_id, 2 if multiroom_enabled else None)
+
+    @override_settings(MULTIROOM_ENABLED=False)
+    @patch('django.utils.timezone.now')
+    def test_add_event(self, now_patch):
+        self._test_add_event_common(now_patch, False)
+
+    @override_settings(MULTIROOM_ENABLED=True)
+    @patch('django.utils.timezone.now')
+    def test_add_event_multiroom_enabled(self, now_patch):
+        self._test_add_event_common(now_patch, True)
 
     @patch('django.utils.timezone.now')
     def test_add_event_in_past(self, now_patch):
@@ -1649,11 +1688,31 @@ class DiaryCalendarViewTests(DiaryTestsMixin, TestCase):
         super(DiaryCalendarViewTests, self).setUp()
         self.client.login(username="admin", password="T3stPassword!")
 
+    def _get_room_list(self, response):
+        match = re.search(
+            ur"init_calendar_view\((?:.*?,){5}\s*(?P<room_list>\[.*?\])\);",
+            response.content.decode("utf-8"), re.DOTALL)
+        return match.group("room_list")
+
+    @override_settings(MULTIROOM_ENABLED=False)
     def test_view_default(self):
         url = reverse("diary-edit-calendar")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, 'edit_event_calendar_index.html')
+
+        self.assertJSONEqual(self._get_room_list(response), [])
+
+    @override_settings(MULTIROOM_ENABLED=True)
+    def test_view_default_multiroom_enabled(self):
+        url = reverse("diary-edit-calendar")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'edit_event_calendar_index.html')
+
+        self.assertJSONEqual(self._get_room_list(response), [
+            {u'id': 1, u'title': u'Room one'},
+            {u'id': 2, u'title': u'Room two'}])
 
     def test_view_year_month_day(self):
         url = reverse("diary-edit-calendar") + "/2013/1/30/"
@@ -1707,9 +1766,15 @@ class DiaryDataViewTests(DiaryTestsMixin, TestCase):
         })
         self.assertEqual(response.status_code, 404)
 
-    @patch('django.utils.timezone.now')
-    def test_valid_query(self, now_patch):
+    # Common code for following two tests
+    def _common_test_valid_query(self, now_patch, multiroom_enabled):
         now_patch.return_value = self._fake_now
+
+        # Always set a room, even if multiroom disabled - the retrieved data
+        # shouldn't show this if multiroom is disabled:
+        showing = Showing.objects.get(id=2)
+        showing.room_id = self.room_2.id
+        showing.save(force=True)
 
         CONFIRMED_IN_PAST = "#FF9080"
         CONFIRMED_IN_FUTURE = "#C70040"
@@ -1811,6 +1876,23 @@ class DiaryDataViewTests(DiaryTestsMixin, TestCase):
             },
         }
 
+        if multiroom_enabled:
+            for showing_id in expected_data:
+                # Showing 2 room is set above
+                expected_data[showing_id]['resourceId'] = (
+                        2 if showing_id == 2 else None)
+
+
         for sid in expected_showings:
             s_data = data_by_showing[sid]
             self.assertEqual(expected_data[sid], s_data)
+
+    @override_settings(MULTIROOM_ENABLED=False)
+    @patch('django.utils.timezone.now')
+    def test_valid_query(self, now_patch):
+        self._common_test_valid_query(now_patch, False)
+
+    @override_settings(MULTIROOM_ENABLED=True)
+    @patch('django.utils.timezone.now')
+    def test_valid_query_multiroom_enabled(self, now_patch):
+        self._common_test_valid_query(now_patch, True)
