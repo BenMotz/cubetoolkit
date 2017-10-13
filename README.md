@@ -8,7 +8,7 @@ This is the code that powers parts of the Cube Microplex, a volunteer run
 thing in Bristol, UK: http://www.cubecinema.com/
 
 It's a Django (i.e. Python) application that (currently) provides an event
-diary and membership database.
+diary, membership database, and CMS (using Wagtail).
 
 It was initially written to closely emulate a set of Perl CGI scripts, which
 is why the UI is the way it is.
@@ -30,18 +30,19 @@ If you want to use this code under some other FLOSS license then do ask, as
 it's unlikely to be a problem.
 
 This specifically excludes the following files:
-/toolkit/members/static/members/cube_microplex_logo.gif
-/toolkit/members/static/members/default_mugshot.gif
-all the .gif and .png files in the directory:
-/toolkit/diary/static/diary/
-and all images in:
-/toolkit/about/static/about/cube-images/
+
+*  /toolkit/members/static/members/cube_microplex_logo.gif
+*  /toolkit/members/static/members/default_mugshot.gif
+*  /toolkit/diary/static/diary/diary_edit_list_header.gif
+*  toolkit/content/static/content/logo.gif
+
 These images are copyright Cube Cinema Ltd, which has not given me permission
 to distribute them, and certainly hasn't given you permission.
 
 This repository also includes code from other authors that may be under
 other licenses, as indicated. Specifically the contents of the following
 directories:
-toolkit/static_common/js/lib/
-toolkit/static_common/css/lib/
-toolkit/diary/static/diary/js/lib/
+
+* toolkit/static_common/js/lib/
+* toolkit/static_common/css/lib/
+* toolkit/diary/static/diary/js/lib/

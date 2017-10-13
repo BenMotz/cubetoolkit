@@ -9,13 +9,16 @@ python-magic>=0.4.0
 # These should (!) have stable APIs, so let upgrades happen
 python-dateutil
 mock
+fixtures<4
 pytz
-# for easy_thumbnails:
+# For general python 3 compatiblity:
 six
 # For generating non-html copy for mailout etc:
 html2text==3.200.3
 # CMS:
 wagtail<1.13
+# Pin to version before Django 1.8 support was droppped:
+djangorestframework<3.7
 # Needed for Django < 1.9 to allow circular template refs, for customising
 # wagtail admin:
 django-overextends<0.5

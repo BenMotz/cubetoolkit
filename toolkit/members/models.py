@@ -1,3 +1,4 @@
+from __future__ import unicode_literals
 import os.path
 import logging
 import binascii
@@ -5,6 +6,7 @@ import binascii
 import django.db  # Used for raw query for stats
 from django.conf import settings
 from django.db import models
+from django.utils.encoding import python_2_unicode_compatible
 
 from toolkit.diary.models import Role
 from toolkit.util import generate_random_string
@@ -53,6 +55,7 @@ class MemberManager(models.Manager):
         return postcode_stats
 
 
+@python_2_unicode_compatible
 class Member(models.Model):
 
     # This is the primary key used in the old perl/bdb system, used as the
@@ -91,7 +94,7 @@ class Member(models.Model):
     class Meta:
         db_table = 'Members'
 
-    def __unicode__(self):
+    def __str__(self):
         return self.name
 
     def save(self, *args, **kwargs):

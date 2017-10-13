@@ -1,4 +1,4 @@
-function init_calendar_view(jQuery, CSRF_TOKEN, defaultView, defaultDate, django_urls) {
+function init_calendar_view(jQuery, CSRF_TOKEN, defaultView, defaultDate, django_urls, resources) {
     "use strict";
     var $ = jQuery;
 
@@ -10,6 +10,8 @@ function init_calendar_view(jQuery, CSRF_TOKEN, defaultView, defaultDate, django
     var currentDate = $.fullCalendar.moment(defaultDate);
 
     var clearMessageTimer = null;
+
+    var resources_enabled = resources.length > 0 ? true : false;
 
     function onEventClick(calEvent, jsEvent, view) {
         var fb_target = $("#fb_target");
@@ -99,7 +101,7 @@ function init_calendar_view(jQuery, CSRF_TOKEN, defaultView, defaultDate, django
         });
     }
 
-    function onDayClick(date) {
+    function onDayClick(date, jsEvent, view, resource) {
         var url = django_urls["add-event"] + "?date=" + date.format("D-M-YYYY");
         var fb_target = $("#fb_target");
         if(date.isBefore(moment())) {
@@ -110,11 +112,15 @@ function init_calendar_view(jQuery, CSRF_TOKEN, defaultView, defaultDate, django
             // by onSelect, so do nothing
             return;
         }
+        if(resources_enabled && resource !== null && typeof resource === 'object'
+            && resource.hasOwnProperty("id")) {
+            url += "&room=" + resource.id;
+        }
         fb_target.attr('href', url);
         fb_target.click();
     }
 
-    function onSelect(start, end) {
+    function onSelect(start, end, jsEvent, view, resource) {
         var url = django_urls["add-event"] + "?date=" + start.format("D-M-YYYY");
         var calendar = $('#calendar');
         var fb_target = $("#fb_target");
@@ -129,6 +135,10 @@ function init_calendar_view(jQuery, CSRF_TOKEN, defaultView, defaultDate, django
             url += "&time=" + start.format("H:m");
             url += "&duration=" + (end.unix() - start.unix());
         };
+        if(resources_enabled && resource !== null && typeof resource === 'object'
+            && resource.hasOwnProperty("id")) {
+            url += "&room=" + resource.id;
+        }
         fb_target.attr('href', url);
         fb_target.click();
     }
@@ -136,14 +146,14 @@ function init_calendar_view(jQuery, CSRF_TOKEN, defaultView, defaultDate, django
     function onViewRender(view, element) {
         var calendar = $('#calendar');
         var newDate = calendar.fullCalendar('getDate');
-        if(view.name === 'month') {
+        if(view.name === 'month' || view.name === 'timelineMonth') {
             var newUrl = django_urls['diary-edit-calendar'] + '/' + newDate.year()
                          + '/' + (newDate.month() + 1) + '/';
 
             if(!currentDate.isSame(newDate, 'month') || (currentView != view.name)) {
                 history.replaceState(null, document.title, newUrl);
             }
-        } else if(view.name === "agendaWeek") {
+        } else if(view.name === "agendaWeek" || view.name === "agendaThreeDay") {
             var newUrl = django_urls['diary-edit-calendar'] + '/' + newDate.year()
                          + '/' + (newDate.month() + 1)
                          + '/' + newDate.date();
@@ -178,11 +188,14 @@ function init_calendar_view(jQuery, CSRF_TOKEN, defaultView, defaultDate, django
         var calendar = $('#calendar');
         currentDate = $.fullCalendar.moment(defaultDate);
 
-        calendar.fullCalendar({
+        var calendar_options = {
             header: {
                 left: 'prev,next today',
                 center: 'title',
-                right: 'month,agendaWeek'
+                right:
+                    (resources_enabled ?
+                        'agendaThreeDay,agendaWeek,month,timelineMonth'
+                        : 'agendaWeek,month')
             },
             allDaySlot: false,
             defaultDate: defaultDate,
@@ -205,18 +218,32 @@ function init_calendar_view(jQuery, CSRF_TOKEN, defaultView, defaultDate, django
             // The server will provide localised time. Don't mess with them:
             timezone: false,
             views: {
-                agenda: {
+                agendaThreeDay: {
+                    type: 'agenda',
+                    duration: { days: 3 },
+                    groupByResource: true,
+                    groupByDateAndResource: true,
                     scrollTime: '10:00:00'
                 },
                 month: {
                     scrollTime: '10:00:00'
+                },
+                timelineMonth: {
+                    buttonText: 'month timeline',
                 }
             },
             events: django_urls["edit-diary-data"],
             eventClick: onEventClick,
             dayClick: onDayClick,
-            viewRender: onViewRender
-        });
+            viewRender: onViewRender,
+            schedulerLicenseKey: 'GPL-My-Project-Is-Open-Source',
+            resourceAreaWidth: "15%"
+        };
+        if(resources.length) {
+            calendar_options.resources = resources;
+        }
+
+        calendar.fullCalendar(calendar_options);
     }
 
     $(document).ready(function() {

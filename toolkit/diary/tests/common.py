@@ -1,21 +1,20 @@
 import pytz
 from datetime import datetime, date
+import fixtures
 
 import django.contrib.auth.models as auth_models
 import django.contrib.contenttypes as contenttypes
 
 from toolkit.diary.models import (Showing, Event, Role, EventTag, DiaryIdea,
-                                  EventTemplate, RotaEntry)
+                                  EventTemplate, RotaEntry, Room)
 from toolkit.members.models import Member, Volunteer
 
 
-class DiaryTestsMixin(object):
+class DiaryTestsMixin(fixtures.TestWithFixtures):
 
     def setUp(self):
         self._setup_test_data()
-        self._setup_test_users()
-
-        return super(DiaryTestsMixin, self).setUp()
+        self.useFixture(ToolkitUsersFixture())
 
     # Useful method:
     def assert_return_to_index(self, response):
@@ -61,6 +60,10 @@ class DiaryTestsMixin(object):
         t3 = EventTag(name=u"\u0167ag \u0165hre\u0119",
                       slug=u"ag-three", read_only=False)
         t3.save()
+
+        Room(name="Room one").save()
+        self.room_2 = Room(name="Room two")
+        self.room_2.save()
 
         # Event  outside_hire   private   Tags
         # ---------------------------------------
@@ -332,7 +335,9 @@ class DiaryTestsMixin(object):
         v3.roles = [r3]
         v3.save()
 
-    def _setup_test_users(self):
+
+class ToolkitUsersFixture(fixtures.Fixture):
+    def _setUp(self):
         # Read/write user:
         user_rw = auth_models.User.objects.create_user(
             'admin', 'toolkit_admin@localhost', 'T3stPassword!')

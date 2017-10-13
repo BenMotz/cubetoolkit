@@ -1,3 +1,4 @@
+from __future__ import print_function
 import os.path
 import subprocess
 
@@ -30,7 +31,7 @@ class Command(BaseCommand):
                 "it uses {0}".format(db_settings['engine']))
 
         with open(filename, "w") as out_file:
-            print "Dumping to '{0}'".format(filename)
+            print("Dumping to '{0}'".format(filename))
             returncode = subprocess.call([
                 MYSQLDUMP_BINARY,
                 "--single-transaction",  # So LOCK TABLES isn't needed
@@ -42,7 +43,7 @@ class Command(BaseCommand):
         if returncode != 0:
             raise CommandError("Failed (code {0})".format(returncode))
 
-        print "Done"
+        print("Done")
 
     def handle(self, *args, **options):
         if len(args) > 1:

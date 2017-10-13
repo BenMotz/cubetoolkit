@@ -4,6 +4,7 @@ import calendar
 from django import forms
 import django.db.models
 from django.conf import settings
+import six
 
 # Custom form widgets:
 from toolkit.diary.form_widgets import (HtmlTextarea, JQueryDateTimePicker,
@@ -104,8 +105,14 @@ class MediaItemForm(forms.ModelForm):
 class ShowingForm(forms.ModelForm):
     class Meta(object):
         model = toolkit.diary.models.Showing
-        fields = ('start', 'booked_by', 'confirmed', 'hide_in_programme',
-                  'cancelled', 'sold_out', 'discounted', )
+        if settings.MULTIROOM_ENABLED:
+            fields = ('room', 'start', 'booked_by', 'confirmed',
+                      'hide_in_programme', 'cancelled', 'sold_out',
+                      'discounted', )
+        else:
+            fields = ('start', 'booked_by', 'confirmed',
+                      'hide_in_programme', 'cancelled', 'sold_out',
+                      'discounted', )
 
         widgets = {
             'start': JQueryDateTimePicker(),
@@ -173,7 +180,7 @@ def rota_form_factory(showing):
 
         # Create empty results dict
         result = dict.fromkeys(self._role_ids, 0)
-        for field, value in self.cleaned_data.iteritems():
+        for field, value in six.iteritems(self.cleaned_data):
             if field == 'other_roles':
                 result.update(
                     (int(key, 10), 1) for key in
@@ -200,6 +207,12 @@ class CloneShowingForm(forms.Form):
 
 
 class NewEventForm(forms.Form):
+
+    if settings.MULTIROOM_ENABLED:
+        room = forms.ModelChoiceField(
+            queryset=toolkit.diary.models.Room.objects.all(),
+            required=True)
+
     start = forms.DateTimeField(
         required=True,
         validators=[validate_in_future],
@@ -223,6 +236,14 @@ class NewEventForm(forms.Form):
 
 class MailoutForm(forms.Form):
     subject = forms.CharField(max_length=128, required=True, label_suffix='')
+    body = forms.CharField(
+            required=True,
+            widget=forms.Textarea(attrs={'wrap': 'soft', 'cols': 80}))
+
+
+class MailoutTestForm(forms.Form):
+    address = forms.EmailField(required=True)
+    subject = forms.CharField(max_length=128, required=True)
     body = forms.CharField(
             required=True,
             widget=forms.Textarea(attrs={'wrap': 'soft', 'cols': 80}))
@@ -257,13 +278,13 @@ class NewPrintedProgrammeForm(forms.ModelForm):
 
     year = forms.ChoiceField(
         choices=[
-            (y, y) for y in xrange(settings.DAWN_OF_TIME,
+            (y, y) for y in six.moves.range(settings.DAWN_OF_TIME,
                                    datetime.date.today().year + 2)
         ],
         initial=datetime.date.today().year
     )
     month = forms.ChoiceField(
-        choices=(zip(range(13), calendar.month_name)[1:]),
+        choices=(list(zip(range(13), calendar.month_name))[1:]),
         initial=datetime.date.today().month
     )
 

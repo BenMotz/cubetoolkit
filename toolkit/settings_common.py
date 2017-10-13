@@ -1,6 +1,7 @@
 import sys
 import os
 
+import six.moves
 import django.core.urlresolvers
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -63,7 +64,7 @@ else:
 
 # The following list of IP addresses is used to restrict access to some pages
 # (at time of writing, only the 'add a new member' page)
-CUBE_IP_ADDRESSES = tuple("10.1.1.%d" % n for n in xrange(33, 255))
+CUBE_IP_ADDRESSES = tuple("10.1.1.%d" % n for n in six.moves.range(33, 255))
 
 DEFAULT_TERMS_TEXT = """Contacts-
 Company-
@@ -123,11 +124,12 @@ CALENDAR_CONFIRMED_IN_FUTURE_COLOUR = "#33CC33"
 CALENDAR_UNCONFIRMED_COLOUR = "#E0CFCF"
 
 ###############################################################################
+
+MULTIROOM_ENABLED = False
+
+###############################################################################
 #
 # Wagtail settings
-
-# Enable / disable CMS content visibility in the site menu:
-WAGTAIL_CONTENT_IN_MENU = True
 
 # Don't show fields to change user passwords (for other users, in admin)
 WAGTAILUSERS_PASSWORD_ENABLED = False
@@ -303,8 +305,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.static',
                 'django.contrib.auth.context_processors.auth',
-                'toolkit.content.context_processors.wagtail_content_in_menu',
                 'toolkit.util.context_processors.venue',
+                'toolkit.diary.context_processors.diary_settings',
             ),
             # May be worth enabling for improved performance?
             # 'loaders':
@@ -323,7 +325,6 @@ INSTALLED_APPS = (
     'toolkit.members',
     'toolkit.toolkit_auth',
     'toolkit.index',
-    'toolkit.about',
     'toolkit.util',
     'toolkit.content',
     'easy_thumbnails',

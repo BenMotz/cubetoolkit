@@ -173,25 +173,25 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='eventtemplate',
             name='roles',
-            field=models.ManyToManyField(to='diary.Role', db_table=b'EventTemplates_Roles'),
+            field=models.ManyToManyField(to='diary.Role', db_table='EventTemplates_Roles'),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='eventtemplate',
             name='tags',
-            field=models.ManyToManyField(to='diary.EventTag', db_table=b'EventTemplate_Tags', blank=True),
+            field=models.ManyToManyField(to='diary.EventTag', db_table='EventTemplate_Tags', blank=True),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='event',
             name='media',
-            field=models.ManyToManyField(to='diary.MediaItem', db_table=b'Event_MediaItems'),
+            field=models.ManyToManyField(to='diary.MediaItem', db_table='Event_MediaItems'),
             preserve_default=True,
         ),
         migrations.AddField(
             model_name='event',
             name='tags',
-            field=models.ManyToManyField(to='diary.EventTag', db_table=b'Event_Tags', blank=True),
+            field=models.ManyToManyField(to='diary.EventTag', db_table='Event_Tags', blank=True),
             preserve_default=True,
         ),
         migrations.AddField(

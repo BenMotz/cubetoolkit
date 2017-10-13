@@ -49,7 +49,7 @@ class Migration(migrations.Migration):
                 ('created_at', models.DateTimeField(auto_now_add=True)),
                 ('updated_at', models.DateTimeField(auto_now=True)),
                 ('member', models.OneToOneField(related_name='volunteer', to='members.Member')),
-                ('roles', models.ManyToManyField(to='diary.Role', db_table=b'Volunteer_Roles', blank=True)),
+                ('roles', models.ManyToManyField(to='diary.Role', db_table='Volunteer_Roles', blank=True)),
             ],
             options={
                 'db_table': 'Volunteers',

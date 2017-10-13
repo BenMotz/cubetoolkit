@@ -1,6 +1,7 @@
 import logging
 
 from django.conf import settings
+import six
 
 logger = logging.getLogger(__name__)
 
@@ -14,7 +15,7 @@ KNOWN_PREFS = {
 def get_preferences(session):
     edit_prefs = dict(
         (pref, session.get('editpref_' + pref, default))
-        for pref, default in KNOWN_PREFS.iteritems()
+        for pref, default in six.iteritems(KNOWN_PREFS)
     )
     return edit_prefs
 
@@ -27,7 +28,7 @@ def get_preference(session, name):
 
 
 def set_preferences(session, prefs_requested):
-    for name, value in prefs_requested.iteritems():
+    for name, value in six.iteritems(prefs_requested):
         set_preference(session, name, value)
 
 

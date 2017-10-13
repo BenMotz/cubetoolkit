@@ -66,9 +66,9 @@ Details for: {{ event.name }}
     <p>
 {% for showing in event.showings.all %}
     {% if showing.in_past %}
-    Booked for: <span title="Showing has started, can't edit">{{ showing.start|date:"H:i d/m/Y" }} (past)</span><br>
+    Booked for: <span title="Showing has started, can't edit">{{ showing.start|date:"H:i d/m/Y" }} {% if MULTIROOM_ENABLED %}in {{ showing.room }}{% endif %}(past)</span><br>
     {% else %}
-    Booked for: <a href="{% url "edit-showing" showing.pk %}">{{ showing.start|date:"H:i d/m/Y"  }}</a><br>
+    Booked for: <a href="{% url "edit-showing" showing.pk %}">{{ showing.start|date:"H:i d/m/Y"  }} {% if MULTIROOM_ENABLED %}in {{ showing.room }}{% endif %}</a><br>
     {% endif %}
 {% endfor %}
     </p>

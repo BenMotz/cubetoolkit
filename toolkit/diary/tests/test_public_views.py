@@ -176,7 +176,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        data = json.loads(response.content)
+        data = json.loads(response.content.decode("utf-8"))
         # Eh (shrug)
         self.assertEqual(data, [{
                          u"name": u"Event three title",
@@ -340,10 +340,10 @@ class UrlTests(DiaryTestsMixin, TestCase):
             '/programme/view/123/': {'event_type': '123'},
             '/programme/view/12345/': {'event_type': '12345'},
         }
-        for query, response in calls_to_test.iteritems():
+        for query, response in calls_to_test.items():
             match = resolve(query)
             self.assertEqual(match.func.__name__, "view_diary")
-            for k, v in response.iteritems():
+            for k, v in response.items():
                 self.assertEqual(match.kwargs[k], v)
 
     def test_diary_invalid_urls(self):
@@ -374,10 +374,10 @@ class UrlTests(DiaryTestsMixin, TestCase):
             '/diary/edit/2012/12/30/': {'year': '2012', 'month': '12',
                                         'day': '30'},
         }
-        for query, response in calls_to_test.iteritems():
+        for query, response in calls_to_test.items():
             match = resolve(query)
             self.assertEqual(match.func.__name__, "edit_diary_list")
-            for k, v in response.iteritems():
+            for k, v in response.items():
                 self.assertEqual(match.kwargs[k], v)
 
     def test_diary_rota_urls(self):
@@ -398,8 +398,8 @@ class UrlTests(DiaryTestsMixin, TestCase):
                                       'month': '12', 'day': ''},
         }
         # (rota URLS must have at least year/month, not just a year!)
-        for query, response in calls_to_test.iteritems():
+        for query, response in calls_to_test.items():
             match = resolve(query)
             self.assertEqual(match.func.__name__, "view_event_field")
-            for k, v in response.iteritems():
+            for k, v in response.items():
                 self.assertEqual(match.kwargs[k], v)

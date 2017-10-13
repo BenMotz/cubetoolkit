@@ -16,7 +16,8 @@ from toolkit.diary.public_views import (
     view_diary_this_week, view_diary_next_week, view_diary_this_month,
     view_diary_next_month, view_showing, view_event, view_diary_json)
 
-from toolkit.diary.mailout_views import mailout, exec_mailout, mailout_progress
+from toolkit.diary.mailout_views import (
+    mailout, exec_mailout, mailout_progress, mailout_test_send)
 
 
 programme_urls = [
@@ -165,4 +166,5 @@ diary_urls += [
     url("^mailout/$", mailout, name="members-mailout"),
     url("^mailout/send$", exec_mailout, name="exec-mailout"),
     url("^mailout/send/progress$", mailout_progress, name="mailout-progress"),
+    url("^mailout/test$", mailout_test_send, name="mailout-test-send"),
 ]

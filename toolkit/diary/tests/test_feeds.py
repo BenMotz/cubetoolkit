@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 import datetime
-from urlparse import urlparse
+import six.moves.urllib as urllib
 import xml.etree.ElementTree as ElementTree
 
 from mock import patch
@@ -41,7 +41,7 @@ class FeedTests(DiaryTestsMixin, TestCase):
     def test_feed_link(self):
         tree = self._get_etree()
         link_text = tree.find('channel').find('link').text
-        link_parts = urlparse(link_text)
+        link_parts = urllib.parse.urlparse(link_text)
         self.assertEqual(link_parts.path, "/programme")
 
     @patch('django.utils.timezone.now')
@@ -62,7 +62,7 @@ class FeedTests(DiaryTestsMixin, TestCase):
             item.find('description').text,
             u"09/06/2013 17:00<br><br>Event four C\u014dpy"
         )
-        item_link_path = urlparse(item.find('link').text).path
+        item_link_path = urllib.parse.urlparse(item.find('link').text).path
         self.assertEqual(item_link_path,
                          reverse("single-event-view",
                                  kwargs={'event_id': showing.event_id}))

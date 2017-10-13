@@ -10,6 +10,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.views.decorators.http import (require_POST, require_safe,
                                           require_http_methods)
 from django.conf import settings
+import six
 
 from toolkit.members.forms import NewMemberForm, MemberForm
 from toolkit.members.models import Member
@@ -113,7 +114,8 @@ def _check_access_permitted_for_member_key(permission, request, member_id):
             elif request.method == 'POST':
                 member_key = request.POST.get('k', None)
 
-            if isinstance(member_key, basestring):
+            assert not isinstance(member_key, six.binary_type)
+            if isinstance(member_key, six.text_type):
                 # Use compare_constant_time instead of == to avoid timing
                 # attacks (no, really - read up on it)
                 access_permitted = compare_constant_time(

@@ -1,4 +1,4 @@
-from __future__ import absolute_import
+from __future__ import absolute_import, unicode_literals
 from datetime import timedelta
 
 from mock import patch
@@ -36,21 +36,21 @@ class EditRotaViewGet(DiaryTestsMixin, TestCase):
         # Check date range:
         self.assertContains(
             response,
-            ur'<input type="text" name="from_date" value="1-06-2013" '
-            ur'id="id_from_date" />',
+            r'<input type="text" name="from_date" value="1-06-2013" '
+            r'id="id_from_date" />',
             html=True
         )
         self.assertContains(
             response,
-            ur'<input type="text" name="to_date" value="1-07-2013" '
-            ur'id="id_to_date" />',
+            r'<input type="text" name="to_date" value="1-07-2013" '
+            r'id="id_to_date" />',
             html=True
         )
 
         # Check event listed:
         self.assertContains(
             response,
-            u'<a href="/programme/showing/id/7/">EVENT FOUR TITL\u0112</a>',
+            '<a href="/programme/showing/id/7/">EVENT FOUR TITL\u0112</a>',
             html=True
         )
 
@@ -75,19 +75,19 @@ class EditRotaViewGet(DiaryTestsMixin, TestCase):
         # Check date range:
         self.assertContains(
             response,
-            ur'<input type="text" name="from_date" value="11-06-2013" '
-            ur'id="id_from_date" />',
+            r'<input type="text" name="from_date" value="11-06-2013" '
+            r'id="id_from_date" />',
             html=True
         )
         self.assertContains(
             response,
-            ur'<input type="text" name="to_date" value="21-06-2013" '
-            ur'id="id_to_date" />',
+            r'<input type="text" name="to_date" value="21-06-2013" '
+            r'id="id_to_date" />',
             html=True
         )
 
         # Check event not listed:
-        self.assertNotContains(response, u'EVENT FOUR TITL\u0112')
+        self.assertNotContains(response, 'EVENT FOUR TITL\u0112')
         self.assertNotContains(response, "Some notes about the Rota!")
 
 
@@ -117,11 +117,11 @@ class EditRotaViewPost(DiaryTestsMixin, TestCase):
         self.assertEqual(rota_entry.name, "")
 
         # New content
-        entry = u"\u01aeesty McTestingt\u01d2n III"
+        entry = "\u01aeesty McTestingt\u01d2n III"
 
         response = self.client.post(url, data={
-            u'id': rota_entry.pk,
-            u'value': entry
+            'id': rota_entry.pk,
+            'value': entry
         })
 
         self.assertEqual(response.status_code, 200)
@@ -141,18 +141,18 @@ class EditRotaViewPost(DiaryTestsMixin, TestCase):
         rota_entries = self.e4s3.rotaentry_set.all()
         self.assertEqual(len(rota_entries), 1)
         rota_entry = self.e4s3.rotaentry_set.all()[0]
-        rota_entry.name = u"Not going to work!"
+        rota_entry.name = "Not going to work!"
         rota_entry.save()
 
         # New content
 
         response = self.client.post(url, data={
-            u'id': rota_entry.pk,
-            u'value': u""
+            'id': rota_entry.pk,
+            'value': ""
         })
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.content, "")
+        self.assertEqual(response.content, b"")
 
         # Check edit happened:
         rota_entry = RotaEntry.objects.get(pk=rota_entry.pk)
@@ -172,29 +172,29 @@ class EditRotaViewPost(DiaryTestsMixin, TestCase):
         now_patch.return_value = self.e4s3.start + timedelta(seconds=1)
 
         response = self.client.post(url, data={
-            u'id': rota_entry.pk,
-            u'value': u"Spang",
+            'id': rota_entry.pk,
+            'value': "Spang",
         })
 
         self.assertEqual(response.status_code, 403)
-        self.assertEqual(response.content,
-                         u"Can't change rota for showings in the past")
+        self.assertEqual(response.content.decode("utf-8"),
+                         "Can't change rota for showings in the past")
 
         # Check edit didn't happen:
         rota_entry = RotaEntry.objects.get(pk=rota_entry.pk)
-        self.assertEqual(rota_entry.name, u"")
+        self.assertEqual(rota_entry.name, "")
 
     def test_missing_name_and_id(self):
         url = reverse("rota-edit")
         response = self.client.post(url, data={})
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.content, "Invalid entry id")
+        self.assertEqual(response.content.decode("utf-8"), "Invalid entry id")
 
     def test_missing_id(self):
         url = reverse("rota-edit")
-        response = self.client.post(url, data={u'name': u"Whoops"})
+        response = self.client.post(url, data={'name': "Whoops"})
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.content, "Invalid entry id")
+        self.assertEqual(response.content.decode("utf-8"), "Invalid entry id")
 
     @patch('django.utils.timezone.now')
     def test_missing_name(self, now_patch):
@@ -204,27 +204,27 @@ class EditRotaViewPost(DiaryTestsMixin, TestCase):
 
         rota_entry = self.e4s3.rotaentry_set.all()[0]
 
-        response = self.client.post(url, data={u'id': rota_entry.pk})
+        response = self.client.post(url, data={'id': rota_entry.pk})
 
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.content, "Invalid request")
+        self.assertEqual(response.content.decode("utf-8"), "Invalid request")
 
     def test_unknown_id(self):
         url = reverse("rota-edit")
         response = self.client.post(url, data={
-            u'id': "1001",
-            u'value': u"Foo!"
+            'id': "1001",
+            'value': "Foo!"
         })
         self.assertEqual(response.status_code, 404)
 
     def test_invalid_id(self):
         url = reverse("rota-edit")
         response = self.client.post(url, data={
-            u'id': "spanner",
-            u'value': u"Foo!"
+            'id': "spanner",
+            'value': "Foo!"
         })
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.content, "Invalid entry id")
+        self.assertEqual(response.content.decode("utf-8"), "Invalid entry id")
 
 
 class EditRotaNotes(DiaryTestsMixin, TestCase):
@@ -245,7 +245,7 @@ class EditRotaNotes(DiaryTestsMixin, TestCase):
         now_patch.return_value = self._fake_now
 
         url = reverse("edit-showing-rota-notes",
-                      kwargs={u"showing_id": self.e4s3.pk})
+                      kwargs={"showing_id": self.e4s3.pk})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 405)
 
@@ -253,10 +253,10 @@ class EditRotaNotes(DiaryTestsMixin, TestCase):
     def test_post(self, now_patch):
         now_patch.return_value = self._fake_now
 
-        new_notes = u"Line 1\nLine 2\n ...etc. (\u01d4\u01cbcode!)"
+        new_notes = "Line 1\nLine 2\n ...etc. (\u01d4\u01cbcode!)"
 
         url = reverse("edit-showing-rota-notes",
-                      kwargs={u"showing_id": self.e4s3.pk})
+                      kwargs={"showing_id": self.e4s3.pk})
 
         response = self.client.post(url, data={
             "rota_notes": new_notes,
@@ -273,14 +273,14 @@ class EditRotaNotes(DiaryTestsMixin, TestCase):
         original_notes = self.e4s3.rota_notes
 
         url = reverse("edit-showing-rota-notes",
-                      kwargs={u"showing_id": self.e4s3.pk})
+                      kwargs={"showing_id": self.e4s3.pk})
 
         response = self.client.post(url, data={
             "rota_notes": "Nope",
         })
         self.assertEqual(response.status_code, 403)
-        self.assertEqual(response.content,
-                         u"Can't change rota for showings in the past")
+        self.assertEqual(response.content.decode("utf-8"),
+                         "Can't change rota for showings in the past")
 
         showing = Showing.objects.get(pk=self.e4s3.pk)
         self.assertEqual(showing.rota_notes, original_notes)
@@ -290,25 +290,25 @@ class EditRotaNotes(DiaryTestsMixin, TestCase):
         now_patch.return_value = self._fake_now
 
         url = reverse("edit-showing-rota-notes",
-                      kwargs={u"showing_id": self.e4s3.pk})
+                      kwargs={"showing_id": self.e4s3.pk})
 
         response = self.client.post(url, data={
-            u'rota_notes': u""
+            'rota_notes': ""
         })
         self.assertEqual(response.status_code, 200)
 
         showing = Showing.objects.get(pk=self.e4s3.pk)
-        self.assertEqual(showing.rota_notes, u"")
+        self.assertEqual(showing.rota_notes, "")
 
     @patch('django.utils.timezone.now')
     def test_post_clear_notes_no_data(self, now_patch):
         now_patch.return_value = self._fake_now
 
         url = reverse("edit-showing-rota-notes",
-                      kwargs={u"showing_id": self.e4s3.pk})
+                      kwargs={"showing_id": self.e4s3.pk})
 
         response = self.client.post(url, data={})
         self.assertEqual(response.status_code, 200)
 
         showing = Showing.objects.get(pk=self.e4s3.pk)
-        self.assertEqual(showing.rota_notes, u"")
+        self.assertEqual(showing.rota_notes, "")
