@@ -299,6 +299,5 @@ def member_homepages(request):
                              .order_by('number')
                              .values('name', 'website'))
     return render(request, 'homepages.html', {
-            'venue': settings.VENUE,
             'members': members}
     )
