@@ -313,9 +313,6 @@ INSTALLED_APPS = (
 
     'modelcluster',
     'taggit',
-    # Remove at Django 1.9+ (required for circular template refs when
-    # customising wagtail admin)
-    'overextends',
 )
 
 # Common logging config. Different settings files can tweak this.
