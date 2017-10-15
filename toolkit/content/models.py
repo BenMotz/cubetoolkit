@@ -9,6 +9,7 @@ from wagtail.wagtailimages.edit_handlers import ImageChooserPanel
 from wagtail.wagtailforms.models import AbstractEmailForm, AbstractFormField
 from wagtail.wagtailforms.edit_handlers import FormSubmissionsPanel
 from wagtail.wagtailcore import blocks
+from wagtail.wagtailimages import blocks as image_blocks
 from modelcluster.fields import ParentalKey
 
 
@@ -46,6 +47,7 @@ class WidthBlock(blocks.StructBlock):
     content = blocks.StreamBlock([
         ('rich_text', blocks.RichTextBlock()),
         ('raw_html', blocks.RawHTMLBlock()),
+        ('image', image_blocks.ImageChooserBlock()),
         ], min_num=1, max_num=1)
 
 

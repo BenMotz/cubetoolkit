@@ -18,7 +18,7 @@ class Migration(migrations.Migration):
             name='ComplexArticlePage',
             fields=[
                 ('page_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='wagtailcore.Page')),
-                ('content', wagtail.wagtailcore.fields.StreamField([(b'content_block', wagtail.wagtailcore.blocks.StructBlock([(b'width', wagtail.wagtailcore.blocks.IntegerBlock(help_text=b'How many grid columns to occupy in rendered template', max_value=5, min_value=1)), (b'content', wagtail.wagtailcore.blocks.StreamBlock([(b'rich_text', wagtail.wagtailcore.blocks.RichTextBlock()), (b'raw_html', wagtail.wagtailcore.blocks.RawHTMLBlock())], min_num=1, max_num=1))]))])),
+                ('content', wagtail.wagtailcore.fields.StreamField([(b'content_block', wagtail.wagtailcore.blocks.StructBlock([(b'width', wagtail.wagtailcore.blocks.IntegerBlock(help_text=b'How many grid columns to occupy in rendered template', max_value=5, min_value=1)), (b'content', wagtail.wagtailcore.blocks.StreamBlock([(b'rich_text', wagtail.wagtailcore.blocks.RichTextBlock()), (b'raw_html', wagtail.wagtailcore.blocks.RawHTMLBlock()), (b'image', wagtail.wagtailimages.blocks.ImageChooserBlock())], min_num=1, max_num=1))]))])),
             ],
             options={
                 'abstract': False,
