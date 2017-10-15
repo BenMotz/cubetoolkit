@@ -440,11 +440,6 @@ class EditShowing(DiaryTestsMixin, TestCase):
         )
 
     def _test_edit_showing_common(self, now_patch, multiroom_enabled):
-        # Common code from the following two tests
-        # Reload the forms module, to force handling of the MULTIROOM_ENABLED
-        # conditional in the form definition (if required)
-        six.moves.reload_module(toolkit.diary.forms)
-
         now_patch.return_value = self._fake_now
 
         url = reverse("edit-showing", kwargs={"showing_id": 7})
@@ -620,11 +615,6 @@ class AddEventView(DiaryTestsMixin, TestCase):
         # Log in:
         self.client.login(username="admin", password="T3stPassword!")
 
-    def tearDown(self):
-        # Reload the forms module, to revert any forced handling of the
-        # MULTIROOM_ENABLED conditional
-        six.moves.reload_module(toolkit.diary.forms)
-
     @patch('django.utils.timezone.now')
     def test_get_add_event_form_default_start(self, now_patch):
         now_patch.return_value = self._fake_now
@@ -667,9 +657,6 @@ class AddEventView(DiaryTestsMixin, TestCase):
 
     # Common code for the following two tests::w
     def _test_add_event_common(self, now_patch, multiroom_enabled):
-        # Reload the forms module, to force handling of the MULTIROOM_ENABLED
-        # conditional in the form definition (if required)
-        six.moves.reload_module(toolkit.diary.forms)
         now_patch.return_value = self._fake_now
 
         url = reverse("add-event")
