@@ -5,7 +5,6 @@ import fixtures
 import django.contrib.auth.models as auth_models
 import django.contrib.contenttypes as contenttypes
 
-
 from toolkit.diary.models import (Showing, Event, Role, EventTag, DiaryIdea,
                                   EventTemplate, RotaEntry, Room)
 from toolkit.members.models import Member, Volunteer

@@ -71,9 +71,9 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         # Validate summary:
         summary_mail_call = conn.sendmail.call_args_list[6]
         self.assertEqual(summary_mail_call[0][0],
-            settings.MAILOUT_FROM_ADDRESS)
+                         settings.MAILOUT_FROM_ADDRESS)
         self.assertEqual(summary_mail_call[0][1],
-            [settings.MAILOUT_DELIVERY_REPORT_TO])
+                         [settings.MAILOUT_DELIVERY_REPORT_TO])
         # Check mail twice, to check for each bit of expected text in the body;
         # The mail count:
         self._assert_mail_as_expected(

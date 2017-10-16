@@ -5,6 +5,7 @@ import django.contrib.auth.models as auth_models
 from toolkit.members.models import Member, Volunteer
 from toolkit.diary.models import Role
 
+
 class MembersTestsMixin(object):
 
     def setUp(self):
@@ -118,5 +119,3 @@ class MembersTestsMixin(object):
         user_rw.user_permissions.add(read_permission)
         # read only:
         user_r.user_permissions.add(read_permission)
-
-

@@ -280,7 +280,7 @@ class NewPrintedProgrammeForm(forms.ModelForm):
     year = forms.ChoiceField(
         choices=[
             (y, y) for y in six.moves.range(settings.DAWN_OF_TIME,
-                                   datetime.date.today().year + 2)
+                                            datetime.date.today().year + 2)
         ],
         initial=datetime.date.today().year
     )
