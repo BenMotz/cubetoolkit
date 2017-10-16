@@ -13,6 +13,8 @@ if True:
     VENUE = {'name': 'Cube',
              'longname': 'Cube Microplex',
              'cinemaname': 'Cube Cinema',
+             'piwik_id': 3,
+             # TODO remove programme_categories
              'programme_categories': ['film', 'music', 'performance', 'comedy'],
              'mailout_txt': 'mailout_body.txt',
              'twitter': 'https://twitter.com/cubecinema',
@@ -44,6 +46,7 @@ else:
     VENUE = {'name': 'Star and Shadow',
              'longname': 'Star and Shadow',
              'cinemaname': 'Star and Shadow Cinema',
+             'piwik_id': 29,
              'programme_categories': ['film', 'cleaning', 'party'],
              'mailout_txt': 'mailout_body_star_and_shadow.txt',
              'twitter': 'https://twitter.com/StarAndShadow',
