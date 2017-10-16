@@ -1,0 +1,31 @@
+ urlpatterns = [
+     url(r'^programme/', include(toolkit.diary.urls.programme_urls)),
+-    url(r'^diary/', include(toolkit.diary.urls.diary_urls)),
++    url(r'^toolkit/diary/', include(toolkit.diary.urls.diary_urls)),
+     url(r'^members/', include(toolkit.members.urls.member_urls)),
+-    url(r'^volunteers/', include(toolkit.members.urls.volunteer_urls)),
+-    url(r'^auth/', include(toolkit.toolkit_auth.urls.urlpatterns)),
+-    url(r'^index/', include(toolkit.index.urls.urlpatterns)),
++    url(r'^toolkit/volunteers/', include(toolkit.members.urls.volunteer_urls)),
++    url(r'^toolkit/auth/', include(toolkit.toolkit_auth.urls.urlpatterns)),
++    url(r'^toolkit/index/', include(toolkit.index.urls.urlpatterns)),
+
+     # Main index page: requires logging in, even though some other parts
+     # (eg diary index) don't.
+-    url(r'^$', login_required(
++    url(r'^toolkit/$', login_required(
+         generic.list.ListView.as_view(
+             model=IndexLink,
+             template_name='toolkit_index.html')
+@@ -39,7 +39,9 @@ urlpatterns = [
+     url(r'^media/(.*)$', django.views.static.serve,
+         {'document_root': django.conf.settings.MEDIA_ROOT}),
+
+-    url(r'^cms/', include(wagtailadmin_urls)),
++    url(r'^toolkit/cms/', include(wagtailadmin_urls)),
+     url(r'^documents/', include(wagtaildocs_urls)),
+-    url(r'^pages/', include(wagtail_urls)),
++    # For anything not caught by a more specific rule above, hand over to
++    # Wagtail's serving mechanism
++    url(r'', include(wagtail_urls)),
+ ]
