@@ -8,9 +8,12 @@ import django.core.urlresolvers
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
 if True:
+    ROOT_URLCONF = 'toolkit.urls'
+    MULTIROOM_ENABLED = False
     VENUE = {'name': 'Cube',
              'longname': 'Cube Microplex',
              'cinemaname': 'Cube Cinema',
+             'programme_categories': ['film', 'music', 'performance', 'comedy'],
              'mailout_txt': 'mailout_body.txt',
              'twitter': 'https://twitter.com/cubecinema',
              'facebook': 'https://www.facebook.com/cubecinema/',
@@ -35,10 +38,13 @@ if True:
     WAGTAIL_SITE_NAME = 'The Cube Microplex'
 
 else:
+    ROOT_URLCONF = 'toolkit.urls_flat'
+    MULTIROOM_ENABLED = True
     # 'programme_url': 'https://starandshadow.org.uk/',
     VENUE = {'name': 'Star and Shadow',
              'longname': 'Star and Shadow',
              'cinemaname': 'Star and Shadow Cinema',
+             'programme_categories': ['film', 'cleaning', 'party'],
              'mailout_txt': 'mailout_body_star_and_shadow.txt',
              'twitter': 'https://twitter.com/StarAndShadow',
              'facebook': 'https://www.facebook.com/StarAndShadow',
@@ -122,10 +128,6 @@ DAWN_OF_TIME = 1998
 CALENDAR_CONFIRMED_IN_PAST_COLOUR = "#99FF99"
 CALENDAR_CONFIRMED_IN_FUTURE_COLOUR = "#33CC33"
 CALENDAR_UNCONFIRMED_COLOUR = "#E0CFCF"
-
-###############################################################################
-
-MULTIROOM_ENABLED = False
 
 ###############################################################################
 #
@@ -318,7 +320,6 @@ TEMPLATES = [
     }
 ]
 
-ROOT_URLCONF = 'toolkit.urls'
 
 INSTALLED_APPS = (
     'toolkit.diary',

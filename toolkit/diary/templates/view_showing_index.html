@@ -16,7 +16,7 @@
 
 {% block site-description %}
 {% if event_type %}
-<h4 class="site-description">{{ event_type }} events</h4>
+<h4 class="site-description">{{ event_type|title }} events</h4>
 {% endif %}
 {% if showings|length == 0 %}
     <h4 class="site-description">
