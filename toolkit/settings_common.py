@@ -7,7 +7,7 @@ import django.core.urlresolvers
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-if True:
+if False:
     ROOT_URLCONF = 'toolkit.urls'
     MULTIROOM_ENABLED = False
     VENUE = {'name': 'Cube',
@@ -384,7 +384,8 @@ LOGGING = {
         },
         'verbose': {
             'format':
-            '%(asctime)s %(module)s %(funcName)s %(levelname)s : %(message)s',
+            '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s',
+            'datefmt': "%d/%b/%Y %H:%M:%S"
         },
     },
     'filters': {
