@@ -5,6 +5,7 @@ import fixtures
 import django.contrib.auth.models as auth_models
 import django.contrib.contenttypes as contenttypes
 
+
 from toolkit.diary.models import (Showing, Event, Role, EventTag, DiaryIdea,
                                   EventTemplate, RotaEntry, Room)
 from toolkit.members.models import Member, Volunteer
@@ -61,8 +62,8 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
                       slug=u"ag-three", read_only=False)
         t3.save()
 
-        Room(name="Room one").save()
-        self.room_2 = Room(name="Room two")
+        Room(name="Room one", colour="#Ff0000").save()
+        self.room_2 = Room(name="Room two", colour="#00abcd")
         self.room_2.save()
 
         # Event  outside_hire   private   Tags

@@ -1,4 +1,6 @@
+import colorsys
 import logging
+import re
 
 import magic
 
@@ -33,3 +35,29 @@ def get_mimetype(source_file):
         source_file.name, mimetype))
 
     return mimetype
+
+
+_cached_adjustments = {}
+
+
+def adjust_colour(colour, lighter_fraction, grayer_fraction):
+    result = _cached_adjustments.get(
+        (colour, lighter_fraction, grayer_fraction), None)
+    if result:
+        return result
+
+    match = re.match(
+        r"^#([A-Fa-f0-9]{2})([A-Fa-f0-9]{2})([A-Fa-f0-9]{2})$",
+        colour
+    )
+    r, g, b = (int(v, 16) for v in match.groups())
+    h, l, s = colorsys.rgb_to_hls(r / 255.0, g / 255.0, b / 255.0)
+    l = lighter_fraction * (1.0 - l) + l
+    s *= grayer_fraction
+    r, g, b = colorsys.hls_to_rgb(h, l, s)
+    result = "#%02X%02X%02X" % (
+        int(r * 0xff), int(g * 0xff), int(b * 0xff)
+    )
+
+    _cached_adjustments[(colour, lighter_fraction, grayer_fraction)] = result
+    return result
