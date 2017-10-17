@@ -3,10 +3,9 @@
     <li><a href="//www.cubecinema.com/">Home</a></li>
     <li><a href="{% url "default-view" %}">Programme</a>
         <ul class="sub-menu">
-            <li><a href="{% url "type-view" "film" %}"><span>Film</span></a></li>
-            <li><a href="{% url "type-view" "music" %}">Music</a></li>
-            <li><a href="{% url "type-view" "performance" %}">Performance</a></li>
-            <li><a href="{% url "type-view" "comedy" %}">Comedy</a></li>
+            {% for tag in promoted_tags %}
+            <li><a href="{% url "type-view" tag.slug %}"><span>{{ tag.name|title }}</span></a></li>
+            {% endfor %}
             <li><a href="{% url "default-view" %}"><span>All</span></a></li>
         </ul>
     </li>
