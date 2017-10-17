@@ -7,7 +7,7 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('diary', '0004_eventtag_promoted'),
+        ('diary', '0003_room_colour'),
     ]
 
     operations = [
@@ -17,7 +17,12 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='eventtag',
+            name='promoted',
+            field=models.BooleanField(default=False),
+        ),
+        migrations.AddField(
+            model_name='eventtag',
             name='sort_order',
-            field=models.IntegerField(null=True, editable=False, blank=True),
+            field=models.IntegerField(null=True, blank=True),
         ),
     ]
