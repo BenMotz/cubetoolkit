@@ -2,7 +2,7 @@
 {% load hash_filter %}
 
 {% block title %}
-Editing Event roles
+Editing Event Tags
 {% endblock %}
 
 {% block css %}
@@ -105,28 +105,39 @@ $(document).ready(function() {
     updateOrdering();
 });
 
-function updateSortable() {
-    /* Ensure that 'promoted' style is only applied to items where the box is
-     * checked
+function processInputFields(fn) {
+    /* call supplied function with all input tags (other than those in the
+     * "new tag" form).
      */
-    var list_items = document.getElementById("sortable").getElementsByTagName("li");
+    var list_items = document.getElementById("sortable")
+                             .getElementsByTagName("li");
     var i, j;
     var input_fields;
     for(i = 0; i < list_items.length; i++) {
         if(!list_items[i].classList.contains("new_tag")) {
             input_fields = list_items[i].getElementsByTagName("input");
             for(j = 0; j < input_fields.length; j++) {
-                var input = input_fields[j];
-                if(input.name.endsWith("-promoted")) {
-                    if(input.checked) {
-                        list_items[i].classList.add("promoted");
-                    } else {
-                        list_items[i].classList.remove("promoted");
-                    }
-                }
+                /* Pass current <input>, current <li> and index in form list */
+                fn(input_fields[j], list_items[i], i);
             }
         }
     }
+}
+
+function updateSortable() {
+    /* Ensure that 'promoted' style is only applied to items where the box is
+     * checked
+     */
+    processInputFields(function(input, parent_list_item) {
+        if(input.name.endsWith("-promoted")) {
+            if(input.checked) {
+                parent_list_item.classList.add("promoted");
+            } else {
+                parent_list_item.classList.remove("promoted");
+            }
+        }
+    });
+
     $("#sortable").sortable("refresh");
 }
 
@@ -135,29 +146,21 @@ function updateOrdering() {
      * the "new" form. (Even on items that aren't promoted... which I think
      * is intentional.)
      */
-    var list_items = document.getElementById("sortable").getElementsByTagName("li");
-    var i, j;
-    var input_fields;
-    for(i = 0; i < list_items.length; i++) {
-        if(!list_items[i].classList.contains("new_tag")) {
-            input_fields = list_items[i].getElementsByTagName("input");
-            for(j = 0; j < input_fields.length; j++) {
-                var input = input_fields[j];
-                if(input.name.endsWith("sort_order")) {
-                    input.value = i;
-                }
-            }
+    processInputFields(function(input, parent_list_item, index) {
+        if(input.name.endsWith("sort_order")) {
+            input.value = index;
         }
-    }
+    });
 }
 </script>
 {% endblock %}
 
 {% block body %}
 <div class="header">
-<h1>Roles</h1>
+<h1>Event Tags</h1>
 <p class="warn">Deleting tags cannot be undone, please take care</p>
-<p>Add new tags at the end of the list</p>
+<p>Add new tags at the end of the list. Drag and drop "in menu" tags to set the
+order they appear in the site navigation menu.</p>
 {% include "messages.html" %}
 </div>
 <form method="post">
