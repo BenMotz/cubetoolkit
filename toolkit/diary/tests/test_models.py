@@ -326,10 +326,12 @@ class EventTagTests(TestCase):
         pk = tag.pk
         # Try to edit:
         tag.name = "crispin"
+        tag.sort_order = 0xBAD
         tag.save()
 
         tag = EventTag.objects.get(id=pk)
         self.assertEqual(tag.name, "crispin")
+        self.assertEqual(tag.sort_order, 0xBAD)
 
     def test_can_change_to_readonly(self):
         tag = EventTag(name=u"test", slug=u"test", read_only=False)
@@ -367,13 +369,15 @@ class EventTagTests(TestCase):
 
     def test_can_edit_readonly_promotion(self):
         tag = EventTag(
-            name=u"test", slug=u"test", read_only=True, promoted=False)
+            name=u"test", slug=u"test", read_only=True,
+            sort_order=1, promoted=False)
         tag.save()
         pk = tag.pk
         # Try to edit:
         tag.name = "crispin"
         tag.promoted = True
         tag.read_only = False
+        tag.sort_order = 0xF00BA
         self.assertFalse(tag.save())
 
         tag = EventTag.objects.get(id=pk)
@@ -381,8 +385,9 @@ class EventTagTests(TestCase):
         self.assertEqual(tag.name, "test")
         self.assertEqual(tag.slug, "test")
         self.assertEqual(tag.read_only, True)
-        # Promoted value should:
+        # Promoted and sort values should:
         self.assertEqual(tag.promoted, True)
+        self.assertEqual(tag.sort_order, 0xF00BA)
 
     def test_clean_case(self):
         tag = EventTag(name=u"BIGlettersHERE")

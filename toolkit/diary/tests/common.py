@@ -54,11 +54,13 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
         # Tags:
         t1 = EventTag(name=u"tag one", slug=u"tag-one", read_only=False)
         t1.save()
-        t2 = EventTag(name=u"tag two", slug=u"tag-two", read_only=False)
+        t2 = EventTag(name=u"tag two", slug=u"tag-two",
+                      promoted=True, sort_order=2, read_only=False)
         t2.save()
         # 'ag-three' is what slugify() gives for that name:
         t3 = EventTag(name=u"\u0167ag \u0165hre\u0119",
-                      slug=u"ag-three", read_only=False)
+                      slug=u"ag-three", sort_order=1, promoted=True,
+                      read_only=False)
         t3.save()
 
         Room(name="Room one", colour="#Ff0000").save()
