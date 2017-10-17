@@ -59,7 +59,7 @@ def _send_email(smtp_conn, destination, subject, body, mail_is_ascii):
 
 
 def send_mailout_report(smtp_conn, report_to, sent, err_list,
-        subject, body, body_is_ascii):
+                        subject, body, body_is_ascii):
         # All done? Send report:
         report = ("%d copies of the following were sent out on %s members "
                   "list\n" % (sent, settings.VENUE['name']))
@@ -161,7 +161,7 @@ def send_mailout_to(subject, body, recipients, task=None, report_to=None):
 
         if report_to:
             send_mailout_report(smtp_conn, report_to, sent, err_list,
-                subject, body, body_is_ascii)
+                                subject, body, body_is_ascii)
 
     except Exception as exc:
         logger.exception("Mailout job failed, '{0}'".format(exc))

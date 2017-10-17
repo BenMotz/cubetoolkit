@@ -345,7 +345,7 @@ class Event(models.Model):
 @python_2_unicode_compatible
 class Room(models.Model):
     name = models.CharField(max_length=64)
-#    colour = models.CharField(max_length=9, default="#33CC33")
+    colour = models.CharField(max_length=9, default="#33CC33")
 
     class Meta:
         db_table = 'Rooms'

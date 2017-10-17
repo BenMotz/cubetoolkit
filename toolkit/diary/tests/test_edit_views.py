@@ -18,6 +18,7 @@ import six
 
 from toolkit.diary.models import (Showing, Event, Role, DiaryIdea,
                                   EventTemplate, MediaItem, EventTag)
+from toolkit.util.image import adjust_colour
 import toolkit.diary.edit_prefs
 
 from .common import DiaryTestsMixin
@@ -440,11 +441,6 @@ class EditShowing(DiaryTestsMixin, TestCase):
         )
 
     def _test_edit_showing_common(self, now_patch, multiroom_enabled):
-        # Common code from the following two tests
-        # Reload the forms module, to force handling of the MULTIROOM_ENABLED
-        # conditional in the form definition (if required)
-        six.moves.reload_module(toolkit.diary.forms)
-
         now_patch.return_value = self._fake_now
 
         url = reverse("edit-showing", kwargs={"showing_id": 7})
@@ -620,11 +616,6 @@ class AddEventView(DiaryTestsMixin, TestCase):
         # Log in:
         self.client.login(username="admin", password="T3stPassword!")
 
-    def tearDown(self):
-        # Reload the forms module, to revert any forced handling of the
-        # MULTIROOM_ENABLED conditional
-        six.moves.reload_module(toolkit.diary.forms)
-
     @patch('django.utils.timezone.now')
     def test_get_add_event_form_default_start(self, now_patch):
         now_patch.return_value = self._fake_now
@@ -667,9 +658,6 @@ class AddEventView(DiaryTestsMixin, TestCase):
 
     # Common code for the following two tests::w
     def _test_add_event_common(self, now_patch, multiroom_enabled):
-        # Reload the forms module, to force handling of the MULTIROOM_ENABLED
-        # conditional in the form definition (if required)
-        six.moves.reload_module(toolkit.diary.forms)
         now_patch.return_value = self._fake_now
 
         url = reverse("add-event")
@@ -1711,8 +1699,8 @@ class DiaryCalendarViewTests(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, 'edit_event_calendar_index.html')
 
         self.assertJSONEqual(self._get_room_list(response), [
-            {u'id': 1, u'title': u'Room one'},
-            {u'id': 2, u'title': u'Room two'}])
+            {u'id': 1, u'title': u'Room one', u'eventColor': '#Ff0000'},
+            {u'id': 2, u'title': u'Room two', u'eventColor': '#00abcd'}])
 
     def test_view_year_month_day(self):
         url = reverse("diary-edit-calendar") + "/2013/1/30/"
@@ -1776,15 +1764,12 @@ class DiaryDataViewTests(DiaryTestsMixin, TestCase):
         showing.room_id = self.room_2.id
         showing.save(force=True)
 
-        CONFIRMED_IN_PAST = "#FF9080"
-        CONFIRMED_IN_FUTURE = "#C70040"
-        UNCONFIRMED = "#E0CFCF"
+        CONFIRMED_IN_FUTURE = "#cc3333"
+        CONFIRMED_IN_PAST = adjust_colour(CONFIRMED_IN_FUTURE, 0.75, 1.0)
+        UNCONFIRMED = adjust_colour(CONFIRMED_IN_FUTURE, 0.9, 0.9)
 
         url = reverse("edit-diary-data")
-        with self.settings(
-                CALENDAR_CONFIRMED_IN_PAST_COLOUR=CONFIRMED_IN_PAST,
-                CALENDAR_CONFIRMED_IN_FUTURE_COLOUR=CONFIRMED_IN_FUTURE,
-                CALENDAR_UNCONFIRMED_COLOUR=UNCONFIRMED):
+        with self.settings(CALENDAR_DEFAULT_COLOUR=CONFIRMED_IN_FUTURE):
             response = self.client.get(url, data={
                 "start": "2013-02-15",
                 "end": "2013-09-13",
@@ -1881,7 +1866,9 @@ class DiaryDataViewTests(DiaryTestsMixin, TestCase):
                 # Showing 2 room is set above
                 expected_data[showing_id]['resourceId'] = (
                         2 if showing_id == 2 else None)
-
+            # This is the colour on room 2 (#00abcd) after 'confirmed/past'
+            # adjustment:
+            expected_data[2]["color"] = '#B2F2FF'
 
         for sid in expected_showings:
             s_data = data_by_showing[sid]

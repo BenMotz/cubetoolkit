@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load hash_filter %}
 
 {% block title %}
 {{ VENUE.longname }} Event Diary
@@ -111,8 +112,8 @@ init_calendar_view(jQuery,
                    '{{ defaultView }}',
                    '{{ display_time|date:"Y-m-d" }}',
                    urls,
-                   [{% for room in rooms %}
-                       { "id": {{ room.id }}, "title": "{{ room.name }}"}{% if not forloop.last %},{% endif %}{% endfor %}
+                   [{% for room in rooms_and_colours %}
+                       { "id": {{ room.id }}, "title": "{{ room.name }}", "eventColor": "{{ room.colour }}"}{% if not forloop.last %},{% endif %}{% endfor %}
                    ]);
 </script>
 {% endblock %}
@@ -129,9 +130,18 @@ init_calendar_view(jQuery,
 <a href="{% url "logout" %}">Log out</a>
 <br>
 <br>Key:<br>
-<span style="background-color: {{ settings.CALENDAR_CONFIRMED_IN_FUTURE_COLOUR }}">Confirmed</span><br>
-<span style="background-color: {{ settings.CALENDAR_UNCONFIRMED_COLOUR }}">Unconfirmed</span><br>
-<span style="background-color: {{ settings.CALENDAR_CONFIRMED_IN_PAST_COLOUR }}">Historic</span><br>
+{% if MULTIROOM_ENABLED %}
+  {% for room, colours in rooms_and_colours.items %}
+    <span style="background-color: {{ room.colour }}">{{ room }}</span><br>
+    <span style="background-color: {{ colours|lookup:"unconfirmed" }}">{{ room }} unconfirmed</span><br>
+    <span style="background-color: {{ colours|lookup:"confirmed_past" }}">{{ room }} historic</span><br>
+  {% endfor %}
+  <span style="background-color: {{ settings.CALENDAR_DEFAULT_COLOUR }}">No room allocated</span><br>
+{% else %}
+  <span style="background-color: {{ settings.CALENDAR_DEFAULT_COLOUR }}">Confirmed</span><br>
+  <span style="background-color: {{ default_unconfirmed }}">Unconfirmed</span><br>
+  <span style="background-color: {{ default_confirmed_past }}">Historic</span><br>
+{% endif %}
 <span class="s_private">Private/Hidden</span><br>
 <span class="s_outside_hire">Outside hires</span><br>
 <span style=" text-decoration: line-through;">Cancelled</span><br>

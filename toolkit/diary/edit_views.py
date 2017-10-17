@@ -27,6 +27,7 @@ from toolkit.diary.models import (Showing, Event, DiaryIdea, MediaItem,
 import toolkit.diary.forms as diary_forms
 import toolkit.diary.edit_prefs as edit_prefs
 import toolkit.members.tasks
+from toolkit.util.image import adjust_colour
 
 # Shared utility method:
 from toolkit.diary.daterange import get_date_range
@@ -180,6 +181,22 @@ def edit_diary_list(request, year=None, day=None, month=None):
     return render(request, 'edit_event_index.html', context)
 
 
+def _adjust_colour_historic(colour):
+    return adjust_colour(
+        colour,
+        settings.CALENDAR_HISTORIC_LIGHTER,
+        settings.CALENDAR_HISTORIC_SHADIER
+    )
+
+
+def _adjust_colour_unconfirmed(colour):
+    return adjust_colour(
+        colour,
+        settings.CALENDAR_UNCONFIRMED_LIGHTER,
+        settings.CALENDAR_UNCONFIRMED_SHADIER
+    )
+
+
 @permission_required('toolkit.read')
 def edit_diary_data(request):
     date_format = "%Y-%m-%d"
@@ -220,6 +237,12 @@ def edit_diary_data(request):
                           kwargs={'pk': showing.event_id})
         styles = []
 
+        # Initially set colour to "confirmed" colour for the room:
+        if settings.MULTIROOM_ENABLED and showing.room:
+            colour = showing.room.colour
+        else:
+            colour = settings.CALENDAR_DEFAULT_COLOUR
+
         if showing.cancelled:
             styles.append("s_cancelled")
         if showing.discounted:
@@ -229,11 +252,10 @@ def edit_diary_data(request):
         if showing.event.outside_hire:
             styles.append("s_outside_hire")
         if showing.confirmed:
-            color = (settings.CALENDAR_CONFIRMED_IN_PAST_COLOUR
-                     if showing.in_past()
-                     else settings.CALENDAR_CONFIRMED_IN_FUTURE_COLOUR)
+            if showing.in_past():
+                colour = _adjust_colour_historic(colour)
         else:
-            color = settings.CALENDAR_UNCONFIRMED_COLOUR
+            colour = _adjust_colour_unconfirmed(colour)
 
         showing_data = {
             'id': showing.pk,
@@ -242,7 +264,7 @@ def edit_diary_data(request):
             'end': timezone.localtime(showing.end_time).isoformat(),
             'url': url,
             'className': styles,
-            'color': color,
+            'color': colour,
         }
 
         if settings.MULTIROOM_ENABLED:
@@ -271,11 +293,23 @@ def edit_diary_calendar(request, year=None, month=None, day=None):
         logger.error("Bad calendar date: %s" % ve)
         raise Http404("Bad calendar date")
 
+    rooms_and_colours = OrderedDict()
+    for room in Room.objects.all():
+        rooms_and_colours[room] = {
+            "unconfirmed": _adjust_colour_unconfirmed(room.colour),
+            "confirmed_past": _adjust_colour_historic(room.colour)
+        }
+
     context = {
         'display_time': display_time,
         'defaultView': defaultView,
         'settings': settings,
-        'rooms': Room.objects.all() if settings.MULTIROOM_ENABLED else [],
+        'rooms_and_colours':
+            rooms_and_colours if settings.MULTIROOM_ENABLED else {},
+        'default_unconfirmed':
+            _adjust_colour_unconfirmed(settings.CALENDAR_DEFAULT_COLOUR),
+        'default_confirmed_past':
+            _adjust_colour_historic(settings.CALENDAR_DEFAULT_COLOUR),
     }
 
     return render(request, 'edit_event_calendar_index.html', context)
