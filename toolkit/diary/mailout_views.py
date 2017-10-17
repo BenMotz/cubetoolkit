@@ -57,7 +57,7 @@ def _render_mailout_subject_and_body(days_ahead, copy_days_ahead):
                     settings.VENUE['longname'], first_event_date)
 
     # Render into mail template
-    mail_template = django.template.loader.get_template(settings.VENUE['mailout_txt'])
+    mail_template = django.template.loader.get_template("mailout_body.txt")
 
     context = {
         'start_date': start_date,

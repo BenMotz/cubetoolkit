@@ -7,69 +7,31 @@ import django.core.urlresolvers
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
-if False:
-    ROOT_URLCONF = 'toolkit.urls'
-    MULTIROOM_ENABLED = False
-    VENUE = {'name': 'Cube',
-             'longname': 'Cube Microplex',
-             'cinemaname': 'Cube Cinema',
-             'piwik_id': 3,
-             # TODO remove programme_categories
-             'programme_categories': ['film', 'music', 'performance', 'comedy'],
-             'mailout_txt': 'mailout_body.txt',
-             'twitter': 'https://twitter.com/cubecinema',
-             'facebook': 'https://www.facebook.com/cubecinema/',
-             'instagram': 'https://www.instagram.com/cubemicroplex/',
-             'flickr': 'https://secure.flickr.com/groups/cubemicroplex/',
-             'vimeo': 'https://vimeo.com/cubemicroplex/',
-             'youtube': 'https://www.youtube.com/user/cubelog',
-             'internal_header_img': 'diary_edit_list_header.gif',
-             'internal_header_img_width': 200,
-             'wagtale_admin_img': '/static/content/logo.gif',
-             'font_h2': '',
-             # This is used as the hostname for unsubscribe links in emails
-             # i.e. emails will have links added to
-             # http://[this]/members/100/unsubscribe)
-             'email_unsubscribe_host': 'cubecinema.com',
-             # Default address to which reports of a successful mailout
-             # delivery are sent:
-             'mailout_delivery_report_to': u'cubeadmin@cubecinema.com',
-             # "From" address for mailout
-             'mailout_from_address': u'mailout@cubecinema.com'
-             }
-    WAGTAIL_SITE_NAME = 'The Cube Microplex'
-
-else:
-    ROOT_URLCONF = 'toolkit.urls_flat'
-    MULTIROOM_ENABLED = True
-    # 'programme_url': 'https://starandshadow.org.uk/',
-    VENUE = {'name': 'Star and Shadow',
-             'longname': 'Star and Shadow',
-             'cinemaname': 'Star and Shadow Cinema',
-             'piwik_id': 29,
-             'programme_categories': ['film', 'cleaning', 'party'],
-             'mailout_txt': 'mailout_body_star_and_shadow.txt',
-             'twitter': 'https://twitter.com/StarAndShadow',
-             'facebook': 'https://www.facebook.com/StarAndShadow',
-             'instagram': 'https://www.instagram.com/starandshadowcinema/',
-             'flickr': '',
-             'vimeo': '',
-             'youtube': 'https://www.youtube.com/channel/UCJxp1CvJlDsWBEJrguvhoLw/',
-             'internal_header_img': 'star_and_shadow_bricks.jpg',
-             'internal_header_img_width': 329,
-             'wagtale_admin_img': '/static/content/star_and_shadow_100_82.png',
-             'font_h2': 'https://fonts.googleapis.com/css?family=Lato',
-             # This is used as the hostname for unsubscribe links in emails
-             # i.e. emails will have links added to
-             # http://[this]/members/100/unsubscribe)
-             'email_unsubscribe_host': 'starandshadow.org.uk',
-             # Default address to which reports of a successful mailout
-             # delivery are sent:
-             'mailout_delivery_report_to': u'admin@starandshadow.org.uk',
-             # "From" address for mailout
-             'mailout_from_address': u'mailout@starandshadow.org.uk'
-             }
-    WAGTAIL_SITE_NAME = 'The Star and Shadow'
+VENUE = {
+    'name': 'Cube',
+    'longname': 'Cube Microplex',
+    'cinemaname': 'Cube Cinema',
+    'piwik_id': 3,
+    'twitter': 'https://twitter.com/cubecinema',
+    'facebook': 'https://www.facebook.com/cubecinema/',
+    'instagram': 'https://www.instagram.com/cubemicroplex/',
+    'flickr': 'https://secure.flickr.com/groups/cubemicroplex/',
+    'vimeo': 'https://vimeo.com/cubemicroplex/',
+    'youtube': 'https://www.youtube.com/user/cubelog',
+    'internal_header_img': 'diary_edit_list_header.gif',
+    'internal_header_img_width': 200,
+    'wagtale_admin_img': '/static/content/logo.gif',
+    'font_h2': '',
+    # This is used as the hostname for unsubscribe links in emails
+    # i.e. emails will have links added to
+    # http://[this]/members/100/unsubscribe)
+    'email_unsubscribe_host': 'cubecinema.com',
+    # Default address to which reports of a successful mailout
+    # delivery are sent:
+    'mailout_delivery_report_to': u'cubeadmin@cubecinema.com',
+    # "From" address for mailout
+    'mailout_from_address': u'mailout@cubecinema.com'
+ }
 
 # The following list of IP addresses is used to restrict access to some pages
 # (at time of writing, only the 'add a new member' page)
@@ -100,7 +62,6 @@ PROGRAMME_COPY_SUMMARY_MAX_CHARS = 450
 PROGRAMME_MEDIA_MAX_SIZE_MB = 5  # Megabytes (i.e. * 1024 * 1024 bytes)
 
 DEFAULT_MUGSHOT = "/static/members/default_mugshot.gif"
-
 
 # SMTP host/port settings. For complete list of relevant settings see:
 # https://docs.djangoproject.com/en/1.5/ref/settings/#email-backend
@@ -136,8 +97,14 @@ CALENDAR_HISTORIC_LIGHTER = 0.75
 CALENDAR_HISTORIC_SHADIER = 1.0
 
 ###############################################################################
+
+MULTIROOM_ENABLED = False
+
+###############################################################################
 #
 # Wagtail settings
+
+WAGTAIL_SITE_NAME = 'The Cube Microplex'
 
 # Don't show fields to change user passwords (for other users, in admin)
 WAGTAILUSERS_PASSWORD_ENABLED = False
@@ -289,9 +256,15 @@ MIDDLEWARE_CLASSES = (
 )
 
 SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Generates some errors in Chrome?
 SECURE_BROWSER_XSS_FILTER = True
-# X_FRAME_OPTIONS = 'DENY'    # Setting DENY stops calendar popup working
-CSRF_COOKIE_HTTPONLY = False  # Setting True breaks members mailout
+
+# Setting DENY breaks iframes in the calendar view:
+# X_FRAME_OPTIONS = 'DENY'
+
+# Setting True breaks members mailout, as JS relies on loading the cookie
+# CSRF_COOKIE_HTTPONLY = True
 
 TEMPLATES = [
     {
@@ -328,6 +301,7 @@ TEMPLATES = [
     }
 ]
 
+ROOT_URLCONF = 'toolkit.urls'
 
 INSTALLED_APPS = (
     'toolkit.diary',
