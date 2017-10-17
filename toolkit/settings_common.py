@@ -287,7 +287,6 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 'django.contrib.auth.context_processors.auth',
                 'toolkit.util.context_processors.venue',
-                'toolkit.util.context_processors.event_tags',
                 'toolkit.diary.context_processors.diary_settings',
                 'toolkit.diary.context_processors.promoted_tags',
             ),
