@@ -3,10 +3,10 @@
     <li><a href="/">Home</a></li>
     <li><a href="{% url "default-view" %}">Programme</a>
         <ul class="sub-menu">
-            <li><a href="{% url "default-view" %}">All</a></li>
-            {% for tag in EVENT_TAGS %}
-                <li><a href="{% url "type-view" tag %}">{{ tag|title }}</a></li>
+            {% for tag in promoted_tags %}
+            <li><a href="{% url "type-view" tag.slug %}"><span>{{ tag.name|title }}</span></a></li>
             {% endfor %}
+            <li><a href="{% url "default-view" %}"><span>All</span></a></li>
         </ul>
     </li>
     {% for top_level_child in request.site.root_page.get_children.live.in_menu %}

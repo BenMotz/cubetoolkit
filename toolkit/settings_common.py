@@ -316,6 +316,7 @@ TEMPLATES = [
                 'toolkit.util.context_processors.venue',
                 'toolkit.util.context_processors.event_tags',
                 'toolkit.diary.context_processors.diary_settings',
+                'toolkit.diary.context_processors.promoted_tags',
             ),
             # May be worth enabling for improved performance?
             # 'loaders':

@@ -1,143 +1,205 @@
 {% extends "base.html" %}
+{% load hash_filter %}
 
 {% block title %}
-Editing Event types
+Editing Event Tags
 {% endblock %}
 
 {% block css %}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}diary/css/edit_form.css">
 <style type="text/css">
-  @import url('{{ STATIC_URL }}css/lib/smoothness/jquery-ui.css');
   body {
       font-family: sans-serif;
-      font-size: 1em;
-  }
-  li {
-      list-style-type: none;
-      margin: 0.4em;
-      padding: 0.6em;
-      width: 12em;
-      background: lightblue;
-      display: inline-block;
-      line-height: 1;
-      border-radius: 0.3em;
-  }
-  .unsaved {
-      background: pink;
-  }
-  .read_only {
+      font-size: 9pt;
       background: lightgray;
   }
-  span#save {
-      margin: 10pt;
-      padding: 5pt;
+  form {
+      border: thin dotted gray;
+      padding: 5px;
+      margin: 2%;
+      width: 400px;
+      background: white;
   }
-  .del {
+  .header {
+      background: white;
+      margin: 2% 2% 5px 2%;
+      padding: 5px 10px 5px 10px;
+  }
+  .warn {
       color: red;
   }
-  .deleted {
-      color: red;
-      text-decoration: line-through;
+  select {
+      width: 330px;
   }
-  #additem {
-      width: 20em;
-   }
+  #sortable {
+      list-style-type: none;
+      padding-left: 0;
+  }
+
+  #sortable li {
+      margin: 0 5px 5px 5px;
+      padding: 3px;
+      width: 90%;
+  }
+
+  #sortable li.promoted {
+      background: #f9f9f9;
+      border: thin solid black;
+  }
+
+  span.drag-handle {
+    width: 10px;
+    height: 20px;
+    display: inline-block;
+    overflow: hidden;
+    line-height: 5px;
+    padding: 3px 4px;
+    vertical-align: middle;
+    margin-top: -.7em;
+    margin-right: .3em;
+    font-size: 12px;
+    font-family: sans-serif;
+    letter-spacing: 2px;
+    color: #cccccc;
+    text-shadow: 1px 0 1px black;
+  }
+
+  .promoted span.drag-handle {
+    content: '....';
+    cursor: move;
+  }
+  .promoted span.drag-handle::after {
+    content: '.. .. .. ..';
+  }
+
+  span.tag-name {
+      font-weight: bold;
+  }
+  span.tag-options {
+      display: inline-block;
+      float: right;
+  }
+  span.tag-delete {
+      color: red;
+  }
+
 </style>
 {% endblock %}
 
 {% block script %}
-<!-- Screw progressive enhancement -->
+{{ block.super }}
 <script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.ui.touch-punch.min.js"></script>
 <script type="text/javascript">
-var tags = { {% for tag in tags %}
-    '{{ tag.pk }}' : '{{ tag.name }}', {% endfor %}
-}
-var tags_to_delete = [];
-var next_key = -1;
-
-function process_response(data) {
-    var errors = data.errors;
-    var message = "Operation failed\n";
-
-    if (data.failed === true) {
-        // For now, an ugly alert...
-        for (error_name in errors) {
-            if (errors.hasOwnProperty(error_name)) {
-                message += error_name + ": " + errors[error_name] + "\n";
-            }
-        }
-        alert(message);
-    }
-    // And force the page to reload
-    window.location.reload(true);
-}
-
-function submit() {
-    var tag_id, tag_data, new_tags = [];
-
-    if(tags_to_delete.length > 0) {
-        if(!confirm('You are about to delete one or more tags, which will untag all events that use that tag. This cannot be undone!')) {
-            return;
-        }
-    }
-    $('#save').button('disable').text('Saving...');
-    for (tag_id in tags) {
-        if (tags.hasOwnProperty(tag_id) && tag_id < 0) {
-            new_tags.push(tags[tag_id]);
-        }
-    }
-
-    tag_data = {
-        'csrfmiddlewaretoken' : '{{ csrf_token }}',
-        'new_tags' : new_tags,
-        'deleted_tags': tags_to_delete
-    };
-    $.post('', tag_data, process_response, 'json');
-
-}
-function add_tag() {
-    var inputfield = document.getElementById('new_tag');
-    var new_tag = $.trim(inputfield.value);
-    if(new_tag == '') {
-        return;
-    }
-    $('#additem').before('<li class="unsaved" id="tag_' + next_key + '" >' + new_tag + ' <a id="delete_' + next_key + '" href="#" class="del">X</a></li>');
-    $('#delete_' + next_key).click(delete_tag);
-    tags['' + next_key] = inputfield.value;
-    inputfield.value = "";
-    next_key -= 1;
-}
-
-function delete_tag(e) {
-    var key = e.target.id.split('_')[1];
-    if(key > 0) {
-        tags_to_delete.push(key);
-    }
-    $('#tag_' + key).addClass("deleted").addClass("unsaved");
-    $('#tag_' + key + " a").remove();
-    tags[key] = '';
-}
+"use strict";
 
 $(document).ready(function() {
-        $('#save').button().click(submit);
-        $('#add_button').click(add_tag);
-        $('.del').click(delete_tag);
+    $("#sortable").sortable({
+        "items": "li.promoted",
+        "update": updateOrdering
+    });
+    $("#sortable").disableSelection();
+    $("#sortable li input[type='checkbox']").change(updateSortable);
+    updateSortable();
+    updateOrdering();
 });
+
+function processInputFields(fn) {
+    /* call supplied function with all input tags (other than those in the
+     * "new tag" form).
+     */
+    var list_items = document.getElementById("sortable")
+                             .getElementsByTagName("li");
+    var i, j;
+    var input_fields;
+    for(i = 0; i < list_items.length; i++) {
+        if(!list_items[i].classList.contains("new_tag")) {
+            input_fields = list_items[i].getElementsByTagName("input");
+            for(j = 0; j < input_fields.length; j++) {
+                /* Pass current <input>, current <li> and index in form list */
+                fn(input_fields[j], list_items[i], i);
+            }
+        }
+    }
+}
+
+function updateSortable() {
+    /* Ensure that 'promoted' style is only applied to items where the box is
+     * checked
+     */
+    processInputFields(function(input, parent_list_item) {
+        if(input.name.endsWith("-promoted")) {
+            if(input.checked) {
+                parent_list_item.classList.add("promoted");
+            } else {
+                parent_list_item.classList.remove("promoted");
+            }
+        }
+    });
+
+    $("#sortable").sortable("refresh");
+}
+
+function updateOrdering() {
+    /* Update the (hidden) sort_order field, on all items except for
+     * the "new" form. (Even on items that aren't promoted... which I think
+     * is intentional.)
+     */
+    processInputFields(function(input, parent_list_item, index) {
+        if(input.name.endsWith("sort_order")) {
+            input.value = index;
+        }
+    });
+}
 </script>
 {% endblock %}
 
 {% block body %}
-<h1>Event tags</h1>
-<p>Key: <span class="read_only">Read only</span> <span class="unsaved">Unsaved</span></p>
-<ul>
-    {% for tag in tags %}
-    {% if tag.read_only %}<li class="read_only" id='tag_{{tag.pk}}'>{{tag.name}}</li>
-    {% else %}
-    <li id='tag_{{tag.pk}}'>{{tag.name}} <a id="delete_{{tag.pk}}" href="#" class="del">X</a></li>
-    {% endif %}
-    {% endfor %}
-    <li id="additem"><input id="new_tag" type="text" placeholder="New tag..." /> <a id="add_button" href="#">Add</a></li>
-</ul>
-<p><button id="save">Save changes</button></p>
-{% endblock %}
+<div class="header">
+<h1>Event Tags</h1>
+<p class="warn">Deleting tags cannot be undone, please take care</p>
+<p>Add new tags at the end of the list. Drag and drop "in menu" tags to set the
+order they appear in the site navigation menu.</p>
+{% include "messages.html" %}
+</div>
+<form method="post">
+{{ formset.management_form }}
+{% csrf_token %}
+<input type="submit" value="Save all changes" />
 
+<ul id="sortable">
+
+{% for form in formset %}
+    <li class="{% if form.instance.promoted and form.id.value %}promoted{% endif %}{% if not form.id.value %} new_tag{% endif %}">
+        {% if form.id.value %}<span class="drag-handle"></span>{% endif %}
+        {% if form.errors %}
+            <span class="form_errors">
+                Error: {{ form.name.errors.as_text }} | {{ form.standard.errors.as_text }} | {{ form.DELETE.errors.as_text }}
+            </span>
+            {{ form.errors }}
+        {% endif %}
+        {% if not form.id.value %}New Tag:<br>{% endif %}
+        {% if form.id.value %}
+            <span class="tag-name">{{ form.name.as_hidden }}{{ form.name.value }}</span>
+        {% else %}
+            {{ form.name }}
+        {% endif %}
+        {# Model on the back end enforces the read_only flag, so no integrity/security worries about the hidden field... #}
+        <span class="tag-options">
+            {% if form.instance.read_only or not form.id.value%}
+                {{ form.id }}
+            {% else %}
+                <span class="tag-delete">{{ form.DELETE.label_tag }} {{ form.DELETE }}{{ form.id }}</span>
+            {% endif %}
+            <label for="{{ form.promoted.id_for_label }}">In menu</label>: {{ form.promoted }}
+        </span>
+        {{ form.sort_order.as_hidden }}
+    </li>
+{% endfor %}
+</ul>
+<input type="submit" value="Save all changes" />
+</form>
+
+{% endblock %}

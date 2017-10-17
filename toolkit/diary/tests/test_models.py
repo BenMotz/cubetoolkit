@@ -7,7 +7,8 @@ from django.test import TestCase
 
 import django.db
 from django.core.exceptions import ValidationError
-from toolkit.diary.models import Showing, Event, PrintedProgramme, EventTag
+from toolkit.diary.models import (Showing, Event, PrintedProgramme, EventTag,
+                                  Role)
 
 from .common import DiaryTestsMixin
 
@@ -325,10 +326,12 @@ class EventTagTests(TestCase):
         pk = tag.pk
         # Try to edit:
         tag.name = "crispin"
+        tag.sort_order = 0xBAD
         tag.save()
 
         tag = EventTag.objects.get(id=pk)
         self.assertEqual(tag.name, "crispin")
+        self.assertEqual(tag.sort_order, 0xBAD)
 
     def test_can_change_to_readonly(self):
         tag = EventTag(name=u"test", slug=u"test", read_only=False)
@@ -347,16 +350,44 @@ class EventTagTests(TestCase):
         tag.name = "crispin"
         self.assertFalse(tag.save())
 
-    def test_cant_edit_readonly(self):
+    def test_cant_edit_most_of_readonly(self):
         tag = EventTag(name=u"test", slug=u"test", read_only=True)
         tag.save()
         pk = tag.pk
         # Try to edit:
         tag.name = "crispin"
+        tag.slug = "bert"
+        tag.read_only = False
         self.assertFalse(tag.save())
 
         tag = EventTag.objects.get(id=pk)
+        # Things shouldn't change:
         self.assertEqual(tag.name, "test")
+        self.assertEqual(tag.slug, "test")
+        self.assertEqual(tag.promoted, False)
+        self.assertEqual(tag.read_only, True)
+
+    def test_can_edit_readonly_promotion(self):
+        tag = EventTag(
+            name=u"test", slug=u"test", read_only=True,
+            sort_order=1, promoted=False)
+        tag.save()
+        pk = tag.pk
+        # Try to edit:
+        tag.name = "crispin"
+        tag.promoted = True
+        tag.read_only = False
+        tag.sort_order = 0xF00BA
+        self.assertFalse(tag.save())
+
+        tag = EventTag.objects.get(id=pk)
+        # Most things shouldn't change:
+        self.assertEqual(tag.name, "test")
+        self.assertEqual(tag.slug, "test")
+        self.assertEqual(tag.read_only, True)
+        # Promoted and sort values should:
+        self.assertEqual(tag.promoted, True)
+        self.assertEqual(tag.sort_order, 0xF00BA)
 
     def test_clean_case(self):
         tag = EventTag(name=u"BIGlettersHERE")
@@ -395,3 +426,122 @@ class EventTagTests(TestCase):
 
         t2 = EventTag(name=u"jim!", slug=u"jim")
         self.assertRaises(django.db.IntegrityError, t2.save)
+
+
+class RoleTests(TestCase):
+
+    def test_can_delete_not_readonly(self):
+        role = Role(name=u"Role One")
+        role.save()
+        pk = role.pk
+
+        role.delete()
+
+        self.assertEqual(Role.objects.filter(id=pk).count(), 0)
+
+    def test_cant_delete_readonly(self):
+        role = Role(name=u"Role One", read_only=True)
+        role.save()
+        pk = role.pk
+
+        role.delete()
+        self.assertEqual(Role.objects.filter(id=pk).count(), 1)
+
+        role_re = Role.objects.get(id=pk)
+        self.assertEqual(role_re.name, u"Role One")
+
+    def test_can_edit_not_readonly(self):
+        role = Role(name=u"Role One")
+        role.save()
+        pk = role.pk
+
+        # Try to edit:
+        role.name = u"Some other thing"
+        role.save()
+
+        role = Role.objects.get(id=pk)
+        self.assertEqual(role.name, u"Some other thing")
+
+    def test_can_change_to_readonly(self):
+        role = Role(name=u"Role One", read_only=False)
+        role.save()
+        pk = role.pk
+
+        role = Role.objects.get(id=pk)
+        self.assertFalse(role.read_only)
+
+        role.read_only = True
+        role.save()
+
+        role = Role.objects.get(id=pk)
+        self.assertTrue(role.read_only)
+
+        role.name = u"Whatever"
+        self.assertFalse(role.save())
+
+    def test_cannot_change_from_readonly(self):
+        role = Role(name=u"Role One", read_only=True, standard=False)
+        role.save()
+        pk = role.pk
+
+        role = Role.objects.get(id=pk)
+        role.read_only = False
+        role.standard = True
+        role.save()
+
+        role = Role.objects.get(id=pk)
+        self.assertEqual(role.name, u"Role One")
+        self.assertEqual(role.read_only, True)
+        # Can only chang role.standard if nothing else is fiddled with
+        # (i.e. atomic?)
+        self.assertEqual(role.standard, False)
+
+    def test_cannot_change_name_when_readonly(self):
+        role = Role(name=u"Role One", read_only=True, standard=False)
+        role.save()
+        pk = role.pk
+
+        role = Role.objects.get(id=pk)
+        role.name = u"Rick"
+        role.save()
+
+        role = Role.objects.get(id=pk)
+        self.assertEqual(role.name, u"Role One")
+        self.assertEqual(role.read_only, True)
+        self.assertEqual(role.standard, False)
+
+    def test_can_change_standard_when_readonly(self):
+        role = Role(name=u"Role One", read_only=True, standard=False)
+        role.save()
+        pk = role.pk
+
+        role = Role.objects.get(id=pk)
+        role.standard = True
+        role.save()
+
+        role = Role.objects.get(id=pk)
+        self.assertEqual(role.name, u"Role One")
+        self.assertEqual(role.read_only, True)
+        self.assertEqual(role.standard, True)
+
+    def test_cant_edit_readonly_name(self):
+        role = Role(name=u"Role One", read_only=True)
+        role.save()
+        pk = role.pk
+        # Try to edit:
+        role.name = u"Not a womble"
+        self.assertFalse(role.save())
+
+        role = Role.objects.get(id=pk)
+        self.assertEqual(role.name, u"Role One")
+
+    def test_reject_blank(self):
+        role = Role(name=u"")
+        self.assertRaises(ValidationError, role.full_clean)
+
+    def test_must_be_unique(self):
+        r1 = Role(name=u"Roller")
+        r1.save()
+
+        r2 = Role(name=u"Roller")
+        self.assertRaises(django.db.IntegrityError, r2.save)
