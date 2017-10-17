@@ -804,7 +804,7 @@ def edit_event_templates(request):
 def edit_event_tags(request):
     event_tag_formset = modelformset_factory(
         EventTag,
-        fields=('name', 'promoted'),
+        fields=('name', 'promoted', 'sort_order'),
         can_delete=True)
 
     if request.method == 'POST':

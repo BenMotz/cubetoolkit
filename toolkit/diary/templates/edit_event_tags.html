@@ -19,7 +19,6 @@ Editing Event roles
       padding: 5px;
       margin: 2%;
       width: 400px;
-      display: inline-block;
       background: white;
   }
   .header {
@@ -30,30 +29,128 @@ Editing Event roles
   .warn {
       color: red;
   }
-  .new_role input {
-  }
   select {
       width: 330px;
+  }
+  #sortable {
+      list-style-type: none;
+      padding-left: 0;
+  }
 
+  #sortable li {
+      margin: 0 5px 5px 5px;
+      padding: 3px;
+      width: 90%;
   }
-  tr.form_errors {
+
+  #sortable li.promoted {
+      background: #f9f9f9;
+      border: thin solid black;
+  }
+
+  span.drag-handle {
+    width: 10px;
+    height: 20px;
+    display: inline-block;
+    overflow: hidden;
+    line-height: 5px;
+    padding: 3px 4px;
+    vertical-align: middle;
+    margin-top: -.7em;
+    margin-right: .3em;
+    font-size: 12px;
+    font-family: sans-serif;
+    letter-spacing: 2px;
+    color: #cccccc;
+    text-shadow: 1px 0 1px black;
+  }
+
+  .promoted span.drag-handle {
+    content: '....';
+    cursor: move;
+  }
+  .promoted span.drag-handle::after {
+    content: '.. .. .. ..';
+  }
+
+  span.tag-name {
+      font-weight: bold;
+  }
+  span.tag-options {
+      display: inline-block;
+      float: right;
+  }
+  span.tag-delete {
       color: red;
-      border-top: thin solid black;
-  }
-  tr.form_errors + tr {
-      color: red;
-      background-color: red;
-  }
-  .form_errors td {
-      border-top: thin solid black;
-  }
-  td, th {
-      padding-left: 0.5em;
-      padding-right: 0.5em;
-      border-right: thin dotted black;
   }
 
 </style>
+{% endblock %}
+
+{% block script %}
+{{ block.super }}
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
+<script type="text/javascript">
+"use strict";
+
+$(document).ready(function() {
+    $("#sortable").sortable({
+        "items": "li.promoted",
+        "update": updateOrdering
+    });
+    $("#sortable").disableSelection();
+    $("#sortable li input[type='checkbox']").change(updateSortable);
+    updateSortable();
+    updateOrdering();
+});
+
+function updateSortable() {
+    /* Ensure that 'promoted' style is only applied to items where the box is
+     * checked
+     */
+    var list_items = document.getElementById("sortable").getElementsByTagName("li");
+    var i, j;
+    var input_fields;
+    for(i = 0; i < list_items.length; i++) {
+        if(!list_items[i].classList.contains("new_tag")) {
+            input_fields = list_items[i].getElementsByTagName("input");
+            for(j = 0; j < input_fields.length; j++) {
+                var input = input_fields[j];
+                if(input.name.endsWith("-promoted")) {
+                    if(input.checked) {
+                        list_items[i].classList.add("promoted");
+                    } else {
+                        list_items[i].classList.remove("promoted");
+                    }
+                }
+            }
+        }
+    }
+    $("#sortable").sortable("refresh");
+}
+
+function updateOrdering() {
+    /* Update the (hidden) sort_order field, on all items except for
+     * the "new" form. (Even on items that aren't promoted... which I think
+     * is intentional.)
+     */
+    var list_items = document.getElementById("sortable").getElementsByTagName("li");
+    var i, j;
+    var input_fields;
+    for(i = 0; i < list_items.length; i++) {
+        if(!list_items[i].classList.contains("new_tag")) {
+            input_fields = list_items[i].getElementsByTagName("input");
+            for(j = 0; j < input_fields.length; j++) {
+                var input = input_fields[j];
+                if(input.name.endsWith("sort_order")) {
+                    input.value = i;
+                }
+            }
+        }
+    }
+}
+</script>
 {% endblock %}
 
 {% block body %}
@@ -63,38 +160,41 @@ Editing Event roles
 <p>Add new tags at the end of the list</p>
 {% include "messages.html" %}
 </div>
-
 <form method="post">
 {{ formset.management_form }}
 {% csrf_token %}
-<input type="submit" value="Save all changes"></input>
-<table>
-    <tr>
-        <th>Tag</th>
-        <th>Include in site menu</th>
-        <th>Delete</th>
-    </tr>
-{% for form in formset %}
-{% if form.errors %}
-<tr class="form_errors"><td>Error: {{ form.name.errors.as_text }}</td><td>{{ form.standard.errors.as_text }}</td><td>{{ form.DELETE.errors.as_text }}</tr></tr>
-{% endif %}
-<tr{% if not form.id.value %} class="new_role"{% endif %}>
-{% if form.id.value %}
-    <td>{{ form.name.as_hidden }}{{ form.name.value }}</td>
-{% else %}
-    <td>{{ form.name }}</td>
-{% endif %}
-    {# Model on the back end enforces the read_only flag, so no integrity/security worries about the hidden field... #}
-    <td>{{ form.promoted }}</td>
-{% if form.instance.read_only %}
-    <td>{{ form.id }}</td>
-{% else %}
-    <td>{{ form.DELETE }}{{ form.id }}</td>
-{% endif %}
+<input type="submit" value="Save all changes" />
 
-</tr>
+<ul id="sortable">
+
+{% for form in formset %}
+    <li class="{% if form.instance.promoted and form.id.value %}promoted{% endif %}{% if not form.id.value %} new_tag{% endif %}">
+        {% if form.id.value %}<span class="drag-handle"></span>{% endif %}
+        {% if form.errors %}
+            <span class="form_errors">
+                Error: {{ form.name.errors.as_text }} | {{ form.standard.errors.as_text }} | {{ form.DELETE.errors.as_text }}
+            </span>
+            {{ form.errors }}
+        {% endif %}
+        {% if not form.id.value %}New Tag:<br>{% endif %}
+        {% if form.id.value %}
+            <span class="tag-name">{{ form.name.as_hidden }}{{ form.name.value }}</span>
+        {% else %}
+            {{ form.name }}
+        {% endif %}
+        {# Model on the back end enforces the read_only flag, so no integrity/security worries about the hidden field... #}
+        <span class="tag-options">
+            {% if form.instance.read_only or not form.id.value%}
+                {{ form.id }}
+            {% else %}
+                <span class="tag-delete">{{ form.DELETE.label_tag }} {{ form.DELETE }}{{ form.id }}</span>
+            {% endif %}
+            <label for="{{ form.promoted.id_for_label }}">In menu</label>: {{ form.promoted }}
+        </span>
+        {{ form.sort_order.as_hidden }}
+    </li>
 {% endfor %}
-</table>
+</ul>
 <input type="submit" value="Save all changes" />
 </form>
 
