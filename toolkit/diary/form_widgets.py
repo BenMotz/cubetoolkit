@@ -27,10 +27,10 @@ class ChosenSelectMultiple(forms.SelectMultiple):
         self.width = kwargs.pop('width', None)
         super(ChosenSelectMultiple, self).__init__(*args, **kwargs)
 
-    def render(self, name, value, attrs=None, choices=()):
+    def render(self, name, value, attrs=None):
         # Use the default rendering:
         output = super(ChosenSelectMultiple, self).render(
-            name, value, attrs=attrs, choices=choices)
+            name, value, attrs=attrs)
 
         final_attrs = self.build_attrs(attrs, name=name)
 

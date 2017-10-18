@@ -866,9 +866,17 @@ def printed_programme_edit(request, operation):
             edited_form = new_programme_form
 
         if edited_form.is_valid():
-            edited_form.save()
-            logger.info("Printed programme archive updated")
-            return HttpResponseRedirect(reverse("edit-printed-programmes"))
+            try:
+                # Without a transaction an IntegrityError will leave a broken
+                # transaction
+                with django.db.transaction.atomic():
+                    edited_form.save()
+            except django.db.IntegrityError:
+                edited_form.add_error('form_month',
+                    'Printed programme with this month/year already exists.')
+            else:
+                logger.info("Printed programme archive updated")
+                return HttpResponseRedirect(reverse("edit-printed-programmes"))
 
     context = {
         'formset': formset,

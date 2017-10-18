@@ -390,18 +390,18 @@ class EditShowing(DiaryTestsMixin, TestCase):
         self.assertContains(
             response,
             '<input id="id_clone_start" name="clone_start" type="text"'
-            ' value="10/06/2013 18:00" />'
+            ' value="10/06/2013 18:00" required />'
         )
         # Edit should have existing values:
         self.assertContains(
             response,
             '<input id="id_start" name="start" type="text" '
-            'value="09/06/2013 18:00" />'
+            'value="09/06/2013 18:00" required />'
         )
         self.assertContains(
             response,
             '<input id="id_booked_by" maxlength="64" name="booked_by" '
-            'type="text" value="\u0102nother \u0170ser" />'
+            'type="text" value="\u0102nother \u0170ser" required />'
         )
         self.assertContains(
             response,
@@ -429,7 +429,7 @@ class EditShowing(DiaryTestsMixin, TestCase):
         self.assertContains(
             response,
             '<input class="rota_count" id="id_role_1" name="role_1" '
-            'type="text" value="0" />'
+            'type="text" value="0" required />'
         )
         self.assertContains(
             response,
@@ -628,7 +628,7 @@ class AddEventView(DiaryTestsMixin, TestCase):
         self.assertContains(
             response,
             r'<input id="id_start" name="start" value="02/06/2013 20:00" '
-            r'type="text" />',
+            r'type="text" required />',
             html=True
         )
 
@@ -641,7 +641,7 @@ class AddEventView(DiaryTestsMixin, TestCase):
         self.assertContains(
             response,
             r'<input id="id_start" name="start" value="01/01/1950 20:00" '
-            r'type="text" />',
+            r'type="text" required />',
             html=True
         )
 
@@ -894,6 +894,20 @@ class EditEventView(DiaryTestsMixin, TestCase):
     def test_post_edit_event_no_media_minimal_data(self):
         url = reverse("edit-event-details", kwargs={"event_id": 2})
 
+        event = Event.objects.get(id=2)
+        event.pre_title = 'pre_title'
+        event.post_title = 'post_title'
+        event.pricing = 'pricing'
+        event.film_information = 'film_info'
+        event.duration = time(0,20)
+        event.copy = 'copy'
+        event.copy_summary = 'copy_summary'
+        event.terms = 'terms'
+        event.notes = 'notes'
+        event.outside_hire = True
+        event.private = True
+        event.save()
+
         # Submit the minimum amount of data to validate:
         response = self.client.post(url, data={
             'name': 'New \u20acvent Name',
@@ -910,7 +924,11 @@ class EditEventView(DiaryTestsMixin, TestCase):
         self.assertEqual(event.duration, time(0, 10))
         self.assertEqual(event.copy, '')
         self.assertEqual(event.copy_summary, '')
-        self.assertEqual(event.terms, '')
+        # XXX: If there's a default set on the model field then (as of Django
+        # 1.10) the old value is used. This is probably a bug :(
+        # (cf. django commit 3507d4e773a for #27186, change in
+        # master/django/forms/models.py around line 32)
+        self.assertEqual(event.terms, 'terms')
         self.assertEqual(event.notes, '')
         self.assertEqual(event.media.count(), 0)
         self.assertEqual(event.outside_hire, False)

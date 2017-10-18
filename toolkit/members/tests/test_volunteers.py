@@ -193,6 +193,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
             except OSError as ose:
                 print("Couldn't delete file!", ose)
 
+    @override_settings(MEDIA_URL="/")
     def test_get_form_edit(self):
         url = reverse("edit-volunteer", kwargs={"volunteer_id": self.vol_1.id})
         response = self.client.get(url)

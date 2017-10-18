@@ -41,7 +41,7 @@ class AddPrintedProgrammeTests(DiaryTestsMixin, TestCase):
         url = reverse("add-printed-programme")
 
         response = self.client.post(url, data={
-            "month": "1",
+            "form_month": "1",
             "year": "2010",
             "designer": u"Designer name",
             "notes": u"Blah blah notes",
@@ -60,7 +60,7 @@ class AddPrintedProgrammeTests(DiaryTestsMixin, TestCase):
                 dir="/tmp", prefix="toolkit-test-programme-",
                 suffix=".pdf") as temp_pdf:
             response = self.client.post(url, data={
-                "month": "1",
+                "form_month": "1",
                 "year": "2010",
                 "designer": u"Designer name",
                 "notes": u"Blah blah notes",
@@ -86,7 +86,7 @@ class AddPrintedProgrammeTests(DiaryTestsMixin, TestCase):
                 suffix=".pdf") as temp_pdf:
             self._write_pdf_magic(temp_pdf)
             response = self.client.post(url, data={
-                "month": "1",
+                "form_month": "1",
                 "year": "1999",
                 "designer": u"Designer name",
                 "notes": u"Blah blah notes",
@@ -95,8 +95,8 @@ class AddPrintedProgrammeTests(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_printedprogramme_archive.html")
         self.assertFormError(
-            response, 'new_programme_form', 'month',
-            u'Printed programme with this Month already exists.'
+            response, 'new_programme_form', 'form_month',
+            u'Printed programme with this month/year already exists.'
         )
         # No more objects should have been added:
         self.assertEqual(PrintedProgramme.objects.count(), 1)
@@ -112,7 +112,7 @@ class AddPrintedProgrammeTests(DiaryTestsMixin, TestCase):
                 suffix=".pdf") as temp_pdf:
             self._write_pdf_magic(temp_pdf)
             response = self.client.post(url, data={
-                "month": "4",
+                "form_month": "4",
                 "year": "2010",
                 "designer": u"Designer nam\u0119",
                 "notes": u"Blah blah no\u0167es",
