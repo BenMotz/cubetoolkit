@@ -1,3 +1,8 @@
+[IMPROVEMENT] Use prefetch_related_objects? https://docs.djangoproject.com/en/1.10/ref/models/querysets/#django.db.models.prefetch_related_objects
+[IMPROVEMENT] Use Trunc for date range searches: https://docs.djangoproject.com/en/1.10/ref/models/database-functions/#django.db.models.functions.datetime.Trunc
+[IMPROVEMENT] Use  HttpRequest.content_type - https://docs.djangoproject.com/en/1.10/ref/request-response/#django.http.HttpRequest.content_type
+[BUG] Reconfigure logging of test server to go (back to) STDERR - https://docs.djangoproject.com/en/1.10/releases/1.10/#runserver-output-goes-through-logging
+
 [NEWFEATURE] -- Per-tag RSS
 [NEWFEATURE] -- 'subscribe me' UI for members lists
 [NEWFEATURE] --  make old IDs work into the future
