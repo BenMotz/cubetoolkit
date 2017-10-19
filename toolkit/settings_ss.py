@@ -16,7 +16,6 @@ VENUE = {
     'vimeo': '',
     'youtube': 'https://www.youtube.com/channel/UCJxp1CvJlDsWBEJrguvhoLw/',
     'internal_header_img': 'star_and_shadow_bricks.jpg',
-    'internal_header_img_width': 329,
     'wagtale_admin_img': '/static/content/star_and_shadow_100_82.png',
     'font_h2': 'https://fonts.googleapis.com/css?family=Lato',
     # This is used as the hostname for unsubscribe links in emails

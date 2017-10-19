@@ -19,7 +19,7 @@
 
 {% block body %}
 {# {% for v, n in roles.items %} <p><b>{{ v }}</b><br> {{ n }} </p> {% endfor %} #}
-<img src="{{ STATIC_URL }}/diary/{{ VENUE.internal_header_img }}" alt="{{ VENUE.name }} logo"><p><h2>{{ VENUE.name }} Volunteers Report</h2>
+<h2>{{ VENUE.name }} Volunteers Report</h2>
 {% include "messages.html" %}
 Total number of {{ VENUE.name }} volunteers: {{ volunteers|length }}<p>
 Report generated: {% now "d/m/Y" %}<p>

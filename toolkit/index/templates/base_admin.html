@@ -1,13 +1,6 @@
 {% extends "base.html" %}
 
-{% block css %}
-<link href='http://fonts.googleapis.com/css?family=Roboto+Mono:400,100,100italic,300,300italic,500' rel='stylesheet' type='text/css'>
-<!--[if lte IE 8]>
-    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto+Mono:400" />
-    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto+Mono:100" />
-    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto+Mono:100italic" />
-    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto+Mono:300" />
-    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto+Mono:300italic" />
-    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto+Mono:500" />
-<![endif]-->
+
+{% block header %}
+<p><img alt="{{ VENUE.name }}" src="{{ STATIC_URL }}diary/{{ VENUE.internal_header_img }}"</p>
 {% endblock %}
