@@ -1,10 +1,10 @@
 {% extends "showing_archive_base.html" %}
 {% block title %}
-Cube Programme Archival listings for {{ month|date:"F Y" }}
+{{ VENUE.longname }} Archival listings for {{ month|date:"F Y" }}
 {% endblock %}
 
 {% block archive_body %}
-<h3>Cube programme archive: {{ month|date:"F Y" }}</h3>
+<h3>{{ VENUE.longname }} archive: {{ month|date:"F Y" }}</h3>
     <form action="{% url "archive-search" %}">
         <input id="archive_search_input" type="text" name="search_term" placeholder="Search within {{ month|date:"F Y" }}"/>
         <input type="submit" value="Search" />

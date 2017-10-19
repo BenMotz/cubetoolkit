@@ -1,7 +1,7 @@
 {% extends "base.html" %}
 
 {% block title %}
-Cube Toolkit
+{{ VENUE.longname }} Toolkit
 {% endblock %}
 
 {% block css %}
@@ -17,7 +17,8 @@ Cube Toolkit
 {% endblock %}
 
 {% block body %}
-<h1>Cube toolkit</h1>
+<p><img alt="{{ VENUE.name }}" src="{{ STATIC_URL }}diary/{{ VENUE.internal_header_img }}"</p>
+<h1>{{ VENUE.longname }} Toolkit</h1>
 
 <h2>Programming</h2>
 <ul>

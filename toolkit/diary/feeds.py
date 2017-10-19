@@ -3,6 +3,7 @@ import datetime
 from django.contrib.syndication.views import Feed
 from django.core.urlresolvers import reverse
 import django.utils.timezone as timezone
+from django.conf import settings
 
 from toolkit.diary.models import Showing
 
@@ -11,9 +12,9 @@ class BasicWhatsOnFeed(Feed):
     # Generate a, err, basic "What's on" feed. Defines various methods that
     # hook into the django magic...
     DAYS_AHEAD = 7
-    title = "Cube cinema forthcoming events"
-    description = ("Events at the cube cinema over the next %d days. E&OE."
-                   % (DAYS_AHEAD, ))
+    title = "%s cinema forthcoming events" % settings.VENUE['name']
+    description = ("Events at the %s cinema over the next %d days. E&OE."
+                   % (settings.VENUE['cinemaname'], DAYS_AHEAD))
     link = "/programme"
 
     def items(self):

@@ -73,8 +73,9 @@ $(document).ready(function() {
 {% endblock %}
 
 {% block body %}
-<img src="{{ STATIC_URL }}diary/diary_edit_list_header.gif" alt="Cube Microplex" width="150px">
-<h3>CUBE events diary</h3>
+<img src="{{ STATIC_URL }}diary/{{ VENUE.internal_header_img }}" alt="{{ VENUE.name }}"
+"width={{ VENUE.internal_header_img_width }}px">
+<h3>{{ VENUE.name }} events diary</h3>
 {% if messages %}
 <ul class="messages">
     {% for message in messages %}

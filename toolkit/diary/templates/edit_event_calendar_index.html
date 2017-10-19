@@ -2,7 +2,7 @@
 {% load hash_filter %}
 
 {% block title %}
-Event diary
+{{ VENUE.longname }} Event Diary
 {% endblock %}
 
 {% block css %}
@@ -120,7 +120,7 @@ init_calendar_view(jQuery,
 
 {% block body %}
 <div class="messages"><ul></ul></div>
-<a style="display: none;" class="fancybox" data-fancybox-type="iframe" id="fb_target" href="http://cubecinema.com/"></a>
+<a style="display: none;" class="fancybox" data-fancybox-type="iframe" id="fb_target" href="/"></a>
 <div id="flex-container">
 <div id="controls">
 <p>

@@ -24,7 +24,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         self.time_mock.return_value = self._fake_now
 
         self.expected_mailout_subject = (
-            'type="text" value="CUBE Microplex forthcoming events'
+            'type="text" value="Cube Microplex forthcoming events'
             ' commencing Sunday 9 June"'
         )
 
@@ -115,7 +115,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         # Expected subject - no "commencing" string:
         self.assertContains(response,
                             'type="text" '
-                            'value="CUBE Microplex forthcoming events"')
+                            'value="Cube Microplex forthcoming events"')
 
     def test_post_form(self):
         url = reverse("members-mailout")

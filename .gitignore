@@ -2,6 +2,7 @@
 *.log
 venv
 venv26
+media
 site_transfer.tgz
 toolkit/settings.py
 ./static

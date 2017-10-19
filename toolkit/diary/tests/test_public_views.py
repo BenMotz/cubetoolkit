@@ -91,7 +91,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "view_showing_index.html")
         self.assertContains(response,
-                            '<h4 class="site-description">folm events</h4>',
+                            '<h4 class="site-description">Folm events</h4>',
                             html=True)
         self.assertContains(response,
                             '<h4 class="site-description"> - couldn\'t find '
