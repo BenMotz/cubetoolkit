@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base_admin.html" %}
 {% load hash_filter %}
 
 {% block title %}
@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block css %}
+{{ block.super }}
 <link rel="stylesheet" href="{{ STATIC_URL }}css/messages.css">
 <link rel='stylesheet' href='{{ STATIC_URL }}diary/js/lib/fullcalendar/fullcalendar.min.css' />
 <link rel='stylesheet' href='{{ STATIC_URL }}diary/js/lib/fullcalendar-scheduler/scheduler.min.css' />
@@ -87,6 +88,7 @@
 {% endblock %}
 
 {% block script %}
+{{ block.super }}
 <script src='{{ STATIC_URL }}diary/js/lib/fullcalendar/lib/jquery.min.js'></script>
 <script src='{{ STATIC_URL }}diary/js/lib/fullcalendar/lib/moment.min.js'></script>
 <script src='{{ STATIC_URL }}diary/js/lib/fullcalendar/fullcalendar.min.js'></script>

@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base_admin.html" %}
 {% load noprefix_url %}
 
 {% block title %}
@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block css %}
+{{ block.super }}
 <style type="text/css">
     body { font-family:Arial,Helvetica,sans-serif; }
     h1, h2 { margin: 1mm; }

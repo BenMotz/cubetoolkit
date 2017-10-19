@@ -1,6 +1,7 @@
-{% extends "base.html" %}
+{% extends "base_admin.html" %}
 
 {% block css %}
+{{ block.super }}
 <style type="text/css">
     @import url('{{ STATIC_URL }}css/lib/smoothness/jquery-ui.css');
     a#{{ event_field }}_link {
@@ -11,6 +12,7 @@
 </style>
 {% endblock %}
 {% block script %}
+{{ block.super }}
 <script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
 <script type="text/javascript">

@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base_admin.html' %}
 
 {% block css %}
 {{ block.super }}
@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block header %}
+{{ block.super }}
 <p><img src="{{ STATIC_URL }}diary/{{ VENUE.internal_header_img }}" alt="{{ VENUE.longname }}"
     width="{{ VENUE.internal_header_img_width }}px"></p>
 <h3>{{ VENUE.longname }} members database</h3>
@@ -23,4 +24,5 @@
 <a href="{% url "logout" %}">Log out</a>
 </p>
 {% endif %}
+{{ block.super }}
 {% endblock %}

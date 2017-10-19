@@ -1,10 +1,11 @@
-{% extends "base.html" %}
+{% extends "base_admin.html" %}
 
 {% block title %}
 Editing Event roles
 {% endblock %}
 
 {% block css %}
+{{ block.super }}
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}diary/css/edit_form.css">
 <style type="text/css">

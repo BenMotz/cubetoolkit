@@ -4,6 +4,7 @@
 {% endblock %}
 
 {% block css %}
+{{ block.super }}
 <style>
     .member {
         padding-left: 50px;
@@ -15,6 +16,7 @@
 {% endblock %}
 
 {% block script %}
+{{ block.super }}
 <script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
 <script>
 $(document).ready(function() {

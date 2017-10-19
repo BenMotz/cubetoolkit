@@ -1,9 +1,10 @@
-{% extends 'base.html' %}
+{% extends 'base_admin.html' %}
 {% load thumbnail_l %}
 
 {% block title %}{{ pagetitle }} {{ volunteer.member.name }}{% endblock %}
 
 {% block css %}
+{{ block.super }}
 <style>
 th {
     vertical-align: top;
@@ -41,6 +42,7 @@ canvas {
 {% endblock %}
 
 {% block script %}
+{{ block.super }}
 <script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
 <script type="text/javascript" src="{{ STATIC_URL }}members/js/webcam.js"></script>
 <script type="text/javascript">
