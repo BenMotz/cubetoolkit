@@ -23,8 +23,8 @@ VENUE = {
     'font_h2': '',
     # This is used as the hostname for unsubscribe links in emails
     # i.e. emails will have links added to
-    # http://[this]/members/100/unsubscribe)
-    'email_unsubscribe_host': 'cubecinema.com',
+    # this]/members/100/unsubscribe)
+    'email_unsubscribe_host': 'http://cubecinema.com',
     # Default address to which reports of a successful mailout
     # delivery are sent:
     'mailout_delivery_report_to': u'cubeadmin@cubecinema.com',

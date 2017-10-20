@@ -15,13 +15,13 @@ VENUE = {
     'flickr': '',
     'vimeo': '',
     'youtube': 'https://www.youtube.com/channel/UCJxp1CvJlDsWBEJrguvhoLw/',
-    'internal_header_img': 'diary/star_and_shadow_bricks.jpg',
+    'internal_header_img': 'content/star_and_shadow_100_82.png',
     'wagtale_admin_img': '/static/content/star_and_shadow_100_82.png',
     'font_h2': 'https://fonts.googleapis.com/css?family=Lato',
     # This is used as the hostname for unsubscribe links in emails
     # i.e. emails will have links added to
-    # http://[this]/members/100/unsubscribe)
-    'email_unsubscribe_host': 'starandshadow.org.uk',
+    # [this]/members/100/unsubscribe)
+    'email_unsubscribe_host': 'https://starandshadow.org.uk',
     # Default address to which reports of a successful mailout
     # delivery are sent:
     'mailout_delivery_report_to': u'admin@starandshadow.org.uk',
@@ -45,15 +45,11 @@ DAWN_OF_TIME = 1998
 # Below here are Django settings
 #
 
-# Django settings for cube project.
-ALLOWED_HOSTS = ['.cubecinema.com', ]
-
 ADMINS = (
-    # ('Your Name', 'your_email@example.com'),
+    # ('Your Name', 'your_email@example.com')
 )
 
 TEMPLATES[0]['DIRS'] = (
     os.path.join(BASE_DIR, 'star_and_shadow_templates'),
     os.path.join(BASE_DIR, 'templates'),
 )
-

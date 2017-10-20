@@ -98,9 +98,9 @@ def send_mailout_to(subject, body, recipients, task=None, report_to=None):
         u"\n"
         u"If you wish to be removed from our mailing list please use this "
         u"link:\n"
-        u"http://{0}{{0}}?k={{2}}\n"
+        u"{0}{{0}}?k={{2}}\n"
         u"To edit details of your membership, please use this link:\n"
-        u"http://{0}{{1}}?k={{2}}\n"
+        u"{0}{{1}}?k={{2}}\n"
     ).format(settings.VENUE['email_unsubscribe_host'])
 
     count = recipients.count()

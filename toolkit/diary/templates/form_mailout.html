@@ -29,7 +29,7 @@
     <input type="number" id="id_copydaysahead" name="copydaysahead" min="0" value="{{ copy_days_ahead }}">
     <input type="submit" value="Regenerate mailout (lose any edits)"></p>
 </form>
-<p>Total of <b>{{ email_count }}</b> member emails to send from cube microplex</p>
+<p>Total of <b>{{ email_count }}</b> member emails to send from {{ VENUE.name }}</p>
 <form method="POST">
     {% csrf_token %}
     <p>{{ form.subject.label_tag }} {{ form.subject.errors }} {{ form.subject }}</p>
