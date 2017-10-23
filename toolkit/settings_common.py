@@ -20,6 +20,7 @@ VENUE = {
     'youtube': 'https://www.youtube.com/user/cubelog',
     'internal_header_img': 'content/logo.gif',
     'wagtale_admin_img': '/static/content/logo.gif',
+    'favicon': '/static/favicon/favicon_cube.ico',
     'font_h2': '',
     # This is used as the hostname for unsubscribe links in emails
     # i.e. emails will have links added to

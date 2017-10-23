@@ -1,8 +1,10 @@
+{% load staticfiles %}
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <title>{% block title %}{% endblock %}</title>
+<link rel="shortcut icon" href="{{ VENUE.favicon }}">
 {% block meta %}{% endblock %}
 {% block css %}{% endblock %}
 {% block script %}{% endblock %}
@@ -13,4 +15,3 @@
 {% block footer %}{% endblock %}
 </body>
 </html>
-

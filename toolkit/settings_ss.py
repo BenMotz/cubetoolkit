@@ -17,6 +17,7 @@ VENUE = {
     'youtube': 'https://www.youtube.com/channel/UCJxp1CvJlDsWBEJrguvhoLw/',
     'internal_header_img': 'content/star_and_shadow_100_82.png',
     'wagtale_admin_img': '/static/content/star_and_shadow_100_82.png',
+    'favicon': '/static/favicon/favicon_ss.ico',
     'font_h2': 'https://fonts.googleapis.com/css?family=Lato',
     # This is used as the hostname for unsubscribe links in emails
     # i.e. emails will have links added to
