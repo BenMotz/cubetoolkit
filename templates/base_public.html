@@ -23,6 +23,11 @@
     <script src="{{ STATIC_URL }}js/lib/imagesloaded.pkgd.min.js" ></script>
     <script src="{{ STATIC_URL }}js/lib/jquery.touchSwipe.min.js"></script>
     <script src="{{ STATIC_URL }}js/site-common.js"></script>
+    {% block script-page-setup %}
+    <script>
+    setup_page(false);
+    </script>
+    {% endblock script-page-setup %}
 {% endblock script %}
 
 {% block header %}
