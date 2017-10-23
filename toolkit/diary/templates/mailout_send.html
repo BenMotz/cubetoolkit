@@ -10,9 +10,10 @@ Mailout dispatch
     @import url('{{ STATIC_URL }}css/lib/smoothness/jquery-ui.css');
     p.mail {
         border: thin solid black;
-        background: #cccccc;
-        padding: 2px;
-        margin: 0 20px;
+        background: #dddddd;
+        padding: 0.5em;
+        overflow: auto;
+        font-size: 10pt;
     }
     p#subject {
         font-family: monospace;
@@ -22,12 +23,8 @@ Mailout dispatch
         font-family: monospace;
         white-space: pre-wrap;
     }
-    body {
-        font-family: sans-serif;
-    }
     p.label {
-        font-size: 8pt;
-        margin: 15px 5px 0 5px;
+        margin-bottom: 0;
     }
 </style>
 {% endblock %}
