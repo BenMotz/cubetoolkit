@@ -11,21 +11,26 @@ Editing {{ event_list_name }}
 <style type="text/css">
   @import url('{{ STATIC_URL }}css/lib/smoothness/jquery-ui.css');
   .private {
-  font-style: italic;
+      font-style: italic;
   }
   .external {
-  font-weight: bold;
+      font-weight: bold;
   }
   .discounted {
-    color: #a000FF;
+      color: #a000FF;
   }
   .cancelled {
-    color: red;
+      color: red;
+  }
+  .unconfirmed {
+      text-decoration: underline wavy black;
   }
   .daytime {
-    background-color: #FFFF99;
+      background-color: #FFFF99;
   }
-
+  a {
+      color: #2a00ff;
+  }
   table { border-collapse: collapse; }
   tr:nth-child(odd) td {
       background-color: #d0d0d0;
@@ -118,9 +123,12 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
 
 <p><a name="top"></a></p>
 <h4>Key:</h4>
-<p><span class="private">Private events are in italics</span><br>
+<p>
+<span class="unconfirmed">unconfirmed are lower case and wiggly underlined</span><br>
+<span class="confirmed">CONFIRMED ARE UPPER CASE</span><br>
+<span class="private">Private events are in italics</span><br>
 <span class="external">Outside hires are bolded</span><br>
-<span class="discounted">Discounted events (like cheap night) are magenta</span><br>
+<span class="discounted">Discounted events (like cheap night) are magenta and have an *</span><br>
 <span class="cancelled">Cancelled events are red</span><br>
 <span class="daytime">Daytime (before 6pm) events have a light background</span></p>
 
@@ -168,7 +176,12 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
         {% for room in rooms %}
         {% if showing.room == room %}
             <td>{{ showing.booked_by }} <a href="{% url "edit-event-details-view" pk=showing.event.pk %}"
-                    class="{% if showing.cancelled %}cancelled{% endif %}{% if showing.discounted %} discounted{% endif %}{% if showing.event.private %} private{% endif %}{% if showing.event.outside_hire %} external{% endif %}{% if start_localtime.hour <= 17 %} daytime{% endif %}">
+                    class="{{ showing.cancelled|yesno:"cancelled," }}
+                           {{ showing.discounted|yesno:"discounted," }}
+                           {{ showing.event.private|yesno:"private," }}
+                           {{ showing.event.outside_hire|yesno:"external," }}
+                           {{ showing.confirmed|yesno:"confirmed,unconfirmed" }}
+                           {% if start_localtime.hour <= 17 %}daytime{% endif %}">
                 {% if showing.confirmed %}
                 {{ showing.event.pre_title|upper }} {{ showing.event.name|upper }} {{ showing.event.post_title|upper }}
                 {% else %}
@@ -181,7 +194,12 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
         {% empty %}
             {# If room mode is disabled. This is a nasty copy/paste from above. #}
             <td>{{ showing.booked_by }} <a href="{% url "edit-event-details-view" pk=showing.event.pk %}"
-                    class="{% if showing.cancelled %}cancelled{% endif %}{% if showing.discounted %} discounted{% endif %}{% if showing.event.private %} private{% endif %}{% if showing.event.outside_hire %} external{% endif %}{% if start_localtime.hour <= 17 %} daytime{% endif %}">
+                    class="{{ showing.cancelled|yesno:"cancelled," }}
+                           {{ showing.discounted|yesno:"discounted," }}
+                           {{ showing.event.private|yesno:"private," }}
+                           {{ showing.event.outside_hire|yesno:"external," }}
+                           {{ showing.confirmed|yesno:"confirmed,unconfirmed" }}
+                           {% if start_localtime.hour <= 17 %}daytime{% endif %}">
                 {% if showing.confirmed %}
                 {{ showing.event.pre_title|upper }} {{ showing.event.name|upper }} {{ showing.event.post_title|upper }}
                 {% else %}
