@@ -46,10 +46,9 @@ $(document).ready(function() {
 </form>
 <table class="table">
 <tr>
-<th>Member #</th><th>Name</th><th>Email</th>
-<th></th>
-<th></th>
-<th>Homepage</th><th>Postcode</th><th>Last updated</th><th>Mailout?</th></tr>
+<th>Member #</th><th>Name</th>
+<th></th><th></th>
+<th>Email</th><th>Homepage</th><th>Postcode</th><th>Last updated</th><th>Mailout?</th></tr>
 {% for member in members %}
 <tr>
 <td>{{ member.number }}</td>
