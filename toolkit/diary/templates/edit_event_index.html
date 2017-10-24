@@ -55,15 +55,17 @@ Editing {{ event_list_name }}
   }
   .ideas {
       white-space: pre-line;
+      cursor: pointer;
   }
 </style>
 {% endblock %}
 
 {% block script %}
 {{ block.super }}
-<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
-<script type="text/javascript">
+<script src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
+<script src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
+<script src="{{ STATIC_URL }}js/lib/jquery.jeditable.mini.js"></script>
+<script>
 var edit_prefs = { {% for p,v in edit_prefs.items %}
     "{{ p }}" : "{{ v }}"{% if not forloop.last %},{% endif %}
 {% endfor %}};
@@ -76,6 +78,36 @@ $(document).ready(function() {
         });
 
         prefs_updated(edit_prefs);
+
+        // Idea in-place edits
+        var idea_url = '{% url "edit-ideas" year=9999 month=0 %}'.replace("/9999/0", "");
+        $('.idea-edit').each(function() {
+            var element = $(this);
+            var date_re = /idea-edit-(\d+)-(\d+)/;
+            var date_match = date_re.exec(element.attr('id'));
+            var year, month;
+            if (date_match) {
+                year = date_match[1];
+                month = date_match[2];
+                element.editable(
+                    idea_url + year + "/" + month + "/",
+                    {
+                        width: "5cm",
+                        name: 'ideas',
+                        placeholder: 'Click to add ideas',
+                        submit: "Save",
+                        type: 'textarea',
+                        rows: 5,
+                        width: "auto",
+                        submitdata: {
+                            csrfmiddlewaretoken: "{{ csrf_token }}",
+                            source: 'inline',
+                        }
+                    }
+                );
+            }
+
+        });
 });
 function dateRangeSelected(dateText, inst) {
     var enddate = $.datepicker.parseDate('dd-mm-yy', dateText);
@@ -165,7 +197,7 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
     {% if day in ideas %}
         <tr>
             <td><a href="{% url "edit-ideas" year=day.year month=day.month %}">IDEAS</a></td>
-            <td colspan="{{ extra_columns }}" class="ideas">{{ ideas|lookup:day }}</td>
+            <td colspan="{{ extra_columns }}" class="ideas"><div class="idea-edit" id="idea-edit-{{day.year}}-{{day.month}}">{{ ideas|lookup:day }}</div></td>
         </tr>
     {% endif %}
 
