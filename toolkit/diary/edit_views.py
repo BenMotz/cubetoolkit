@@ -189,14 +189,6 @@ def _adjust_colour_historic(colour):
     )
 
 
-def _adjust_colour_unconfirmed(colour):
-    return adjust_colour(
-        colour,
-        settings.CALENDAR_UNCONFIRMED_LIGHTER,
-        settings.CALENDAR_UNCONFIRMED_SHADIER
-    )
-
-
 @permission_required('toolkit.read')
 def edit_diary_data(request):
     date_format = "%Y-%m-%d"
@@ -251,11 +243,13 @@ def edit_diary_data(request):
             styles.append("s_private")
         if showing.event.outside_hire:
             styles.append("s_outside_hire")
+        if showing.in_past():
+            colour = _adjust_colour_historic(colour)
+            styles.append("s_historic")
         if showing.confirmed:
-            if showing.in_past():
-                colour = _adjust_colour_historic(colour)
+            styles.append("s_confirmed")
         else:
-            colour = _adjust_colour_unconfirmed(colour)
+            styles.append("s_unconfirmed")
 
         showing_data = {
             'id': showing.pk,
@@ -296,7 +290,6 @@ def edit_diary_calendar(request, year=None, month=None, day=None):
     rooms_and_colours = OrderedDict()
     for room in Room.objects.all():
         rooms_and_colours[room] = {
-            "unconfirmed": _adjust_colour_unconfirmed(room.colour),
             "confirmed_past": _adjust_colour_historic(room.colour)
         }
 
@@ -306,8 +299,6 @@ def edit_diary_calendar(request, year=None, month=None, day=None):
         'settings': settings,
         'rooms_and_colours':
             rooms_and_colours if settings.MULTIROOM_ENABLED else {},
-        'default_unconfirmed':
-            _adjust_colour_unconfirmed(settings.CALENDAR_DEFAULT_COLOUR),
         'default_confirmed_past':
             _adjust_colour_historic(settings.CALENDAR_DEFAULT_COLOUR),
     }

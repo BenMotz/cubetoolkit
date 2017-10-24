@@ -29,6 +29,16 @@
   .s_cancelled div.fc-title {
      text-decoration: line-through;
   }
+  .s_unconfirmed {
+      background-image: repeating-linear-gradient(45deg, lightgray, lightgray 15px, transparent 15px, transparent 30px);
+      color: white;
+  }
+  .s_confirmed {
+      color: white;
+  }
+  .s_historic {
+      color: darkgray;
+  }
   #flex-container {
       display: flex;
       flex-direction: row;
@@ -131,14 +141,14 @@ init_calendar_view(jQuery,
 <br>Key:<br>
 {% if MULTIROOM_ENABLED %}
   {% for room, colours in rooms_and_colours.items %}
-    <span style="background-color: {{ room.colour }}">{{ room }}</span><br>
-    <span style="background-color: {{ colours|lookup:"unconfirmed" }}">{{ room }} unconfirmed</span><br>
+    <span class="s_confirmed" style="background-color: {{ room.colour }}">{{ room }}</span><br>
+    <span class="s_unconfirmed" style="background-color: {{ room.colour }}">{{ room }} unconfirmed</span><br>
     <span style="background-color: {{ colours|lookup:"confirmed_past" }}">{{ room }} historic</span><br>
   {% endfor %}
   <span style="background-color: {{ settings.CALENDAR_DEFAULT_COLOUR }}">No room allocated</span><br>
 {% else %}
-  <span style="background-color: {{ settings.CALENDAR_DEFAULT_COLOUR }}">Confirmed</span><br>
-  <span style="background-color: {{ default_unconfirmed }}">Unconfirmed</span><br>
+  <span class="s_confirmed" style="background-color: {{ settings.CALENDAR_DEFAULT_COLOUR }}">Confirmed</span><br>
+  <span class="s_unconfirmed" style="background-color: {{ settings.CALENDAR_DEFAULT_COLOUR }}">Unconfirmed</span><br>
   <span style="background-color: {{ default_confirmed_past }}">Historic</span><br>
 {% endif %}
 <span class="s_private">Private/Hidden</span><br>

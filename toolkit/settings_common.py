@@ -91,8 +91,6 @@ DAWN_OF_TIME = 1998
 # Colour used for the calendar view if multiroom isn't enabled:
 CALENDAR_DEFAULT_COLOUR = "#33CC33"
 # Parameters to tweak colour by:
-CALENDAR_UNCONFIRMED_LIGHTER = 0.9
-CALENDAR_UNCONFIRMED_SHADIER = 0.9
 CALENDAR_HISTORIC_LIGHTER = 0.75
 CALENDAR_HISTORIC_SHADIER = 1.0
 
