@@ -323,8 +323,10 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertContains(
             response,
             u'<ul class="sub-menu">'
-            u'<li><a href="/programme/view/ag-three/"><span>\u0166ag \u0164hre\u0119</span></a></li> '
-            u'<li><a href="/programme/view/tag-two/"><span>Tag Two</span></a></li>'
+            u'<li><a href="/programme/view/ag-three/">'
+            u'<span>\u0166ag \u0164hre\u0119</span></a></li> '
+            u'<li><a href="/programme/view/tag-two/">'
+            u'<span>Tag Two</span></a></li>'
             u'<li><a href="/programme/"><span>All</span></a></li>'
             u'</ul>',
             html=True)

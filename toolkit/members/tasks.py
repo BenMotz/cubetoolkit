@@ -198,5 +198,6 @@ def send_mailout(subject, body):
         logger.error("No recipients found")
         return (True, 0, 'No recipients found')
 
-    return send_mailout_to(subject, body, recipients, task=current_task,
+    return send_mailout_to(
+        subject, body, recipients, task=current_task,
         report_to=settings.VENUE['mailout_delivery_report_to'])

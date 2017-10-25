@@ -395,7 +395,7 @@ class Showing(models.Model):
     event = models.ForeignKey('Event', related_name='showings',
                               on_delete=models.CASCADE)
     room = models.ForeignKey('Room', related_name='showings', null=True,
-                              on_delete=models.SET_NULL)
+                             on_delete=models.SET_NULL)
 
     start = FutureDateTimeField(db_index=True)
 

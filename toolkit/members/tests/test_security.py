@@ -29,7 +29,6 @@ class SecurityTests(MembersTestsMixin, TestCase):
         'view-volunteer-role-report': {},
         'unretire-select-volunteer': {},
         'retire-select-volunteer': {},
-        'view-volunteer-role-report': {},
         # Member urls:
         'search-members': {},
         'view-member': {'member_id': 1},
