@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+{% block css %}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/login.css"> 
+{% endblock %}
 {% load url from future %}
 {% block title %}
 Login required
@@ -9,7 +12,7 @@ Login required
 <h1>Login required</h1>
 {{ form.name_of_field.errors }}
 {% if message %} <p id="message">{{ message }}</p>{% endif %}
-<form action="{% url 'login' %}" method="post">
+<form class="login-form"  action="{% url 'login' %}" method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="Continue" />
