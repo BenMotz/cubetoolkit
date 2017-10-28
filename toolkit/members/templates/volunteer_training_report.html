@@ -1,0 +1,31 @@
+{% extends 'base_admin.html' %}
+{% block css %}
+{{ block.super }}
+{% endblock %}
+
+{% block title %}{{ VENUE.name }} volunteer training repor{% endblock %}
+
+{% block body %}
+
+<h1>{{ VENUE.name }} Volunteer Training</h1>
+
+<p><strong>Note:</strong> volunteers are only listed if they have a training
+record <em>and</em> they have a role selected in their profile.</p>
+<p>(This means that out of date training is only flagged if a volunteer is
+still active in that role)</p>
+
+{% for role, volunteers in report_data %}
+  <h2>{{ role }}</h2>
+  <ul>
+      {% for volunteer, report in volunteers %}
+      <li>
+        <a href="{% url "edit-volunteer" volunteer_id=volunteer.id %}#training-record">
+          {{ volunteer.member.name }}
+        </a>
+        &mdash; last trained {{ report.training_date|date:"d/m/Y" }}
+      </li>
+      {% endfor %}
+  </ul>
+{% endfor %}
+
+{% endblock %}
