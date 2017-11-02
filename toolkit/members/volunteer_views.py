@@ -281,7 +281,7 @@ def view_volunteer_training_records(request):
     return render(request, 'volunteer_training_report.html', context)
 
 
-#permission_required('toolkit.read')
+@permission_required('toolkit.read')
 def add_volunteer_training_group_record(request):
     if request.method == 'POST':
         form = GroupTrainingForm(request.POST)
