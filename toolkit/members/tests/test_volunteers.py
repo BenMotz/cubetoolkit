@@ -637,12 +637,6 @@ class TestAddTraining(MembersTestsMixin, TestCase):
     def tearDown(self):
         self.client.logout()
 
-    def _assert_response_json_equal(self, response, expected):
-        self.assertEqual(response['Content-Type'], "application/json")
-        self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(response.content, json.dumps(expected))
-
-
     def test_add_training(self):
         url = reverse("add-volunteer-training-record",
             kwargs={"volunteer_id": 1})
@@ -662,13 +656,14 @@ class TestAddTraining(MembersTestsMixin, TestCase):
             'training-notes':  notes
         })
 
-        self._assert_response_json_equal(response, {
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {
             "succeeded": True,
             "id": 1,
             "role": str(role),
             "training_date": "2015-02-01",
             "trainer": trainer,
-            "notes": notes
+            "notes": notes.strip()
         })
 
         vol = Volunteer.objects.get(id=1)
@@ -676,7 +671,7 @@ class TestAddTraining(MembersTestsMixin, TestCase):
         record = vol.training_records.all()[0]
         self.assertEqual(record.role, role)
         self.assertEqual(record.trainer, trainer)
-        self.assertEqual(record.notes, notes)
+        self.assertEqual(record.notes, notes.strip())
         self.assertEqual(record.training_date,
             datetime.date(day=1, month=2, year=2015))
         self.assertTrue(role in vol.roles.all())
@@ -685,7 +680,8 @@ class TestAddTraining(MembersTestsMixin, TestCase):
         url = reverse("add-volunteer-training-record",
             kwargs={"volunteer_id": 1})
         response = self.client.post(url, data={})
-        self._assert_response_json_equal(response, {
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {
             "succeeded": False,
             "errors": {
                 u'role': [u'This field is required.'],
@@ -707,7 +703,8 @@ class TestAddTraining(MembersTestsMixin, TestCase):
             'training-initial-training_date': "2015-03-01",
             'training-notes':  None
         })
-        self._assert_response_json_equal(response, {
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {
             "succeeded": False,
             "errors": "volunteer is not active"
         })
@@ -807,7 +804,7 @@ class TestAddGroupTraining(MembersTestsMixin, TestCase):
             recs = vol.training_records.all()
             self.assertEqual(len(recs), 1)
             self.assertEqual(recs[0].role, role)
-            self.assertEqual(recs[0].notes, notes)
+            self.assertEqual(recs[0].notes, notes.strip())
             self.assertEqual(recs[0].trainer, trainer)
             self.assertEqual(recs[0].training_date, training_date)
 
