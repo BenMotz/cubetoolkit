@@ -871,11 +871,64 @@ class TestViewVolunteerTraining(MembersTestsMixin, TestCase):
     def test_content(self):
         url = reverse("view-volunteer-training-report")
 
+        volunteers = Volunteer.objects.filter(active=True)[:3]
+        self.assertEqual(len(volunteers), 3)
+
+        role = Role.objects.get(id=1)
+        training_date = datetime.date(day=4, month=5, year=2016)
+
+        for vol in volunteers:
+            self.assertTrue(vol.active)
+            vol.roles.add(role)
+            record = TrainingRecord(volunteer=vol, role=role,
+                trainer="trainer", training_date=training_date)
+            record.save()
+
+        # Add a second, older record, that should not take precedence, for
+        # vol[0]
+        newer_date = training_date - datetime.timedelta(days=1)
+        new_record = TrainingRecord(volunteer=volunteers[0], role=role,
+            trainer="trainer", training_date=newer_date)
+        new_record.save()
+
+        # Add a third old record, that should also not take
+        # precedence, for vol[0] (to force coverage of one of the
+        # conditionals in the view...)
+        newer_date = training_date - datetime.timedelta(days=1)
+        new_record = TrainingRecord(volunteer=volunteers[0], role=role,
+            trainer="trainer", training_date=newer_date)
+        new_record.save()
+
+        # Make vol[1] inactive
+        volunteers[1].active = False
+        volunteers[1].save()
+
+        # Make vol[2] not have the role:
+        volunteers[2].roles.remove(role)
+
+        # ...so should just have one training record:
         response = self.client.get(url)
-
         self.assertEqual(response.status_code, 200)
-
         self.assertTemplateUsed(response, "volunteer_training_report.html")
+        self.assertContains(response, """
+            <div class="role_info" id="id_role_info_1">
+              <h2>Role 1 (standard)</h2>
+              <ul>
+
+                  <li class="training_record" data-training-time="1462316400">
+                    <a href="/volunteers/1/edit#training-record">
+                      Volunteer One
+                    </a>
+                    &mdash; last trained 04/05/2016
+                  </li>
+
+              </ul>
+            </div>""", html=True)
+        self.assertNotContains(response, "Role 2")
+        self.assertNotContains(response, "Volunteer Two")
+        self.assertNotContains(response, "Volunteer Three")
+        self.assertNotContains(response, "Volunteer Four")
+
 
     def test_no_post(self):
         url = reverse("view-volunteer-training-report")
