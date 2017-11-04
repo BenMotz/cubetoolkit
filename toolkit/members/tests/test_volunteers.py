@@ -3,13 +3,16 @@ import shutil
 import os.path
 import tempfile
 import binascii
+import datetime
+import json
 
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.core.urlresolvers import reverse
 from django.conf import settings
 
-from toolkit.members.models import Member, Volunteer
+from toolkit.members.models import Member, Volunteer, TrainingRecord
+from toolkit.diary.models import Role
 
 from .common import MembersTestsMixin
 
@@ -623,3 +626,258 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         vol = Volunteer.objects.get(id=1)
         self.assertNotEqual(vol.member.name, u'Pictureless Person')
         self.assertEqual(vol.portrait.name, initial_portrait)
+
+
+class TestAddTraining(MembersTestsMixin, TestCase):
+    def setUp(self):
+        super(TestAddTraining, self).setUp()
+        self.assertTrue(self.client.login(
+            username="admin", password="T3stPassword!"))
+
+    def tearDown(self):
+        self.client.logout()
+
+    def _assert_response_json_equal(self, response, expected):
+        self.assertEqual(response['Content-Type'], "application/json")
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content, json.dumps(expected))
+
+
+    def test_add_training(self):
+        url = reverse("add-volunteer-training-record",
+            kwargs={"volunteer_id": 1})
+        role = Role.objects.get(id=2)
+        vol = Volunteer.objects.get(id=1)
+
+        self.assertFalse(role in vol.roles.all())
+
+        trainer = u"Friendly Trainer \u0187hri\u01a8topher"
+        notes = u" No notes\nare noted... here. "
+
+        response = self.client.post(url, data={
+            'training-role': role.id,
+            'training-trainer': trainer,
+            'training-training_date': "1/2/2015",
+            'training-initial-training_date': "2015-03-01",
+            'training-notes':  notes
+        })
+
+        self._assert_response_json_equal(response, {
+            "succeeded": True,
+            "id": 1,
+            "role": str(role),
+            "training_date": "2015-02-01",
+            "trainer": trainer,
+            "notes": notes
+        })
+
+        vol = Volunteer.objects.get(id=1)
+        self.assertEqual(len(vol.training_records.all()), 1)
+        record = vol.training_records.all()[0]
+        self.assertEqual(record.role, role)
+        self.assertEqual(record.trainer, trainer)
+        self.assertEqual(record.notes, notes)
+        self.assertEqual(record.training_date,
+            datetime.date(day=1, month=2, year=2015))
+        self.assertTrue(role in vol.roles.all())
+
+    def test_add_training_missing_data(self):
+        url = reverse("add-volunteer-training-record",
+            kwargs={"volunteer_id": 1})
+        response = self.client.post(url, data={})
+        self._assert_response_json_equal(response, {
+            "succeeded": False,
+            "errors": {
+                u'role': [u'This field is required.'],
+                u'trainer': [u'This field is required.'],
+                u'training_date': [u'This field is required.'],
+            }
+        })
+        vol = Volunteer.objects.get(id=1)
+        self.assertEqual(len(vol.training_records.all()), 0)
+
+    def test_add_training_inactive_volunteer(self):
+        vol = Volunteer.objects.filter(active=False)[0]
+        url = reverse("add-volunteer-training-record",
+            kwargs={"volunteer_id": vol.id})
+        response = self.client.post(url, data={
+            'training-role': 1,
+            'training-trainer': "Trainer",
+            'training-training_date': "1/2/2015",
+            'training-initial-training_date': "2015-03-01",
+            'training-notes':  None
+        })
+        self._assert_response_json_equal(response, {
+            "succeeded": False,
+            "errors": "volunteer is not active"
+        })
+        self.assertEqual(len(vol.training_records.all()), 0)
+
+
+class TestDeleteTraining(MembersTestsMixin, TestCase):
+    def setUp(self):
+        super(TestDeleteTraining, self).setUp()
+        self.assertTrue(self.client.login(
+            username="admin", password="T3stPassword!"))
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_delete_training_record(self):
+        vol = Volunteer.objects.get(id=1)
+        role = Role.objects.get(id=1)
+
+        record = TrainingRecord(
+            volunteer=vol,
+            role=role,
+            trainer="Trainer",
+            training_date=datetime.date(day=29, month=2, year=2012),
+        )
+        record.save()
+
+        url = reverse("delete-volunteer-training-record",
+            kwargs={"training_record_id": record.id})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response['Content-Type'], "text/plain")
+        self.assertEqual(response.content, b"OK")
+
+        self.assertEqual(len(TrainingRecord.objects.all()), 0)
+
+    def test_delete_training_record_inactive_vol(self):
+        vol = Volunteer.objects.get(id=1)
+        role = Role.objects.get(id=1)
+
+        record = TrainingRecord(
+            volunteer=vol,
+            role=role,
+            trainer="Trainer",
+            training_date=datetime.date(day=29, month=2, year=2012),
+        )
+        record.save()
+
+        vol.active = False
+        vol.save()
+
+        url = reverse("delete-volunteer-training-record",
+            kwargs={"training_record_id": record.id})
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 403)
+
+        self.assertEqual(len(TrainingRecord.objects.all()), 1)
+
+
+class TestAddGroupTraining(MembersTestsMixin, TestCase):
+    def setUp(self):
+        super(TestAddGroupTraining, self).setUp()
+        self.assertTrue(self.client.login(
+            username="admin", password="T3stPassword!"))
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_get_form(self):
+        url = reverse("add-volunteer-training-group-record")
+        response = self.client.get(url)
+        self.assertTemplateUsed(response, "form_group_training.html")
+
+    def test_add_group_record(self):
+        url = reverse("add-volunteer-training-group-record")
+
+        role = Role.objects.get(id=1)
+        trainer = u"Trainer \u0187hri\u01a8topher"
+        notes = u" Some not\u018fs\nwere noted here. "
+        training_date = datetime.date(day=4, month=5, year=2016)
+
+        volunteers = Volunteer.objects.filter(active=True)[:3]
+        self.assertEqual(len(volunteers), 3)
+
+        response = self.client.post(url, data={
+            "role": role.id,
+            "trainer": trainer,
+            "training_date": "4/5/2016",
+            "notes": notes,
+            "volunteers": [v.member.id for v in volunteers]
+        })
+        self.assertRedirects(response, url)
+
+        volunteers = Volunteer.objects.filter(active=True)[:3]
+        for vol in volunteers:
+            self.assertTrue(role in vol.roles.all())
+            recs = vol.training_records.all()
+            self.assertEqual(len(recs), 1)
+            self.assertEqual(recs[0].role, role)
+            self.assertEqual(recs[0].notes, notes)
+            self.assertEqual(recs[0].trainer, trainer)
+            self.assertEqual(recs[0].training_date, training_date)
+
+    def test_add_group_inactive_volunteer(self):
+        url = reverse("add-volunteer-training-group-record")
+
+        role = Role.objects.get(id=1)
+
+        volunteers = Volunteer.objects.filter(active=True)[:3]
+        self.assertEqual(len(volunteers), 3)
+        volunteers[1].active = False
+        volunteers[1].save()
+
+        response = self.client.post(url, data={
+            "role": role.id,
+            "trainer": "trainer",
+            "training_date": "4/5/2016",
+            "notes": "",
+            "volunteers": [v.member.id for v in volunteers]
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_group_training.html")
+
+        # It's not the ideal error message, I grant you:
+        self.assertFormError(
+            response, 'form', 'volunteers',
+            u'Select a valid choice. %d is not one of the available choices.'
+            % (volunteers[1].member.id))
+
+
+    def test_add_group_record_missing_data(self):
+        url = reverse("add-volunteer-training-group-record")
+
+        self.assertEqual(len(TrainingRecord.objects.all()), 0)
+
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_group_training.html")
+
+        self.assertFormError(response, 'form', 'role',
+                             u'This field is required.')
+        self.assertFormError(response, 'form', 'training_date',
+                             u'This field is required.')
+        self.assertFormError(response, 'form', 'trainer',
+                             u'This field is required.')
+        self.assertFormError(response, 'form', 'volunteers',
+                             u'This field is required.')
+
+
+class TestViewVolunteerTraining(MembersTestsMixin, TestCase):
+    def setUp(self):
+        super(TestViewVolunteerTraining, self).setUp()
+        self.assertTrue(self.client.login(
+            username="admin", password="T3stPassword!"))
+
+    def tearDown(self):
+        self.client.logout()
+
+    def test_content(self):
+        url = reverse("view-volunteer-training-report")
+
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+
+        self.assertTemplateUsed(response, "volunteer_training_report.html")
+
+    def test_no_post(self):
+        url = reverse("view-volunteer-training-report")
+        response = self.client.post(url)
+        self.assertEqual(response.status_code, 405)

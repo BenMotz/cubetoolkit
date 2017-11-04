@@ -17,6 +17,9 @@ class SecurityTests(MembersTestsMixin, TestCase):
         'edit-volunteer': {'volunteer_id': 1},
         'activate-volunteer': {},
         'inactivate-volunteer': {},
+        'add-volunteer-training-group-record': {},
+        'add-volunteer-training-record': {'volunteer_id': 1},
+        'delete-volunteer-training-record': {'training_record_id': 1},
         # Member urls:
         'add-member': {},
         'edit-member': {'member_id': 1},
@@ -29,6 +32,7 @@ class SecurityTests(MembersTestsMixin, TestCase):
         'view-volunteer-role-report': {},
         'unretire-select-volunteer': {},
         'retire-select-volunteer': {},
+        'view-volunteer-training-report': {},
         # Member urls:
         'search-members': {},
         'view-member': {'member_id': 1},

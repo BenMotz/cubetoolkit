@@ -174,11 +174,11 @@ def edit_volunteer(request, volunteer_id, create_new=False):
         vol_form = VolunteerForm(prefix="vol", instance=volunteer)
         mem_form = MemberFormWithoutNotes(prefix="mem",
                                           instance=volunteer.member)
-        if new_training_record:
-            training_record_form = TrainingRecordForm(
-               prefix="training", instance=new_training_record)
-        else:
-            training_record_form = None
+    if new_training_record:
+        training_record_form = TrainingRecordForm(
+           prefix="training", instance=new_training_record)
+    else:
+        training_record_form = None
 
     context = {
         'pagetitle': 'Add Volunteer' if create_new else 'Edit Volunteer',
@@ -268,11 +268,11 @@ def view_volunteer_training_records(request):
         [
             (role, sorted(
                     [(vol, record) for vol, record in vol_map.items()],
-                    key=lambda (v, r): v.member.name
+                    key=lambda v_r: v_r[0].member.name
                    )
             ) for role, vol_map in role_map.items()
         ],
-        key=lambda (r, l): r.name
+        key=lambda r_l: r_l[0].name
     )
 
     context = {
@@ -281,7 +281,7 @@ def view_volunteer_training_records(request):
     return render(request, 'volunteer_training_report.html', context)
 
 
-@permission_required('toolkit.read')
+@permission_required('toolkit.write')
 def add_volunteer_training_group_record(request):
     if request.method == 'POST':
         form = GroupTrainingForm(request.POST)
@@ -292,6 +292,7 @@ def add_volunteer_training_group_record(request):
             logger.info(
                 "Bulk add training records for role '%s', trainer '%s', "
                 " members '%s'" % (role, trainer, members))
+
             for member in members:
                 volunteer = member.volunteer
                 record = TrainingRecord(
@@ -309,7 +310,7 @@ def add_volunteer_training_group_record(request):
                                  form.cleaned_data['role']))
             return HttpResponseRedirect(
                 reverse('add-volunteer-training-group-record'))
-    elif request.method == 'GET':
+    else:  # i.e. request.method == 'GET':
         form = GroupTrainingForm()
 
     context = {
