@@ -326,10 +326,12 @@ class EventTagTests(TestCase):
         pk = tag.pk
         # Try to edit:
         tag.name = "crispin"
+        tag.sort_order = 0xBAD
         tag.save()
 
         tag = EventTag.objects.get(id=pk)
         self.assertEqual(tag.name, "crispin")
+        self.assertEqual(tag.sort_order, 0xBAD)
 
     def test_can_change_to_readonly(self):
         tag = EventTag(name=u"test", slug=u"test", read_only=False)
@@ -348,16 +350,44 @@ class EventTagTests(TestCase):
         tag.name = "crispin"
         self.assertFalse(tag.save())
 
-    def test_cant_edit_readonly(self):
+    def test_cant_edit_most_of_readonly(self):
         tag = EventTag(name=u"test", slug=u"test", read_only=True)
         tag.save()
         pk = tag.pk
         # Try to edit:
         tag.name = "crispin"
+        tag.slug = "bert"
+        tag.read_only = False
         self.assertFalse(tag.save())
 
         tag = EventTag.objects.get(id=pk)
+        # Things shouldn't change:
         self.assertEqual(tag.name, "test")
+        self.assertEqual(tag.slug, "test")
+        self.assertEqual(tag.promoted, False)
+        self.assertEqual(tag.read_only, True)
+
+    def test_can_edit_readonly_promotion(self):
+        tag = EventTag(
+            name=u"test", slug=u"test", read_only=True,
+            sort_order=1, promoted=False)
+        tag.save()
+        pk = tag.pk
+        # Try to edit:
+        tag.name = "crispin"
+        tag.promoted = True
+        tag.read_only = False
+        tag.sort_order = 0xF00BA
+        self.assertFalse(tag.save())
+
+        tag = EventTag.objects.get(id=pk)
+        # Most things shouldn't change:
+        self.assertEqual(tag.name, "test")
+        self.assertEqual(tag.slug, "test")
+        self.assertEqual(tag.read_only, True)
+        # Promoted and sort values should:
+        self.assertEqual(tag.promoted, True)
+        self.assertEqual(tag.sort_order, 0xF00BA)
 
     def test_clean_case(self):
         tag = EventTag(name=u"BIGlettersHERE")

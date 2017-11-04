@@ -2,7 +2,7 @@
 {% load showing_date_format %}
 
 {% block title %}
-CUBE programme of events - copy summary report
+{{ VENUE.name }} programme of events - copy summary report
 {% endblock %}
 
 {% block css %}
@@ -11,11 +11,6 @@ CUBE programme of events - copy summary report
     body {
         font-size: 100%;
     }
-    p {
-        font-family: monospace;
-        padding: 0.8em;
-        margin: 0;
-    }
     h2 {
         font-size: 1.1em;
         font-weight: bold;
@@ -23,10 +18,16 @@ CUBE programme of events - copy summary report
         margin: 0;
     }
     div.index p {
+        font-family: monospace;
         white-space: pre;
-        padding: 0.2em 0;
+        padding: 0.1em 0;
+        margin: 0;
     }
-
+    .copy p {
+        font-family: monospace;
+        padding: 0.8em;
+        margin: 0;
+    }
     p.title {
         text-decoration: underline;
         padding: 0.1em;
@@ -69,7 +70,7 @@ $(document).ready(function() {
 
 {% block body %}
 {{ block.super }}
-<h3>CUBE programme of events - copy summary report</h3>
+<h3>{{ VENUE.name }} programme of events - copy summary report</h3>
 <p>[<a href="#" id="hide_index">Hide index</a>]</p>
 <div class="index">
 {% for showing in showings %}

@@ -1,7 +1,8 @@
-{% extends 'base.html' %}
+{% extends 'base_admin.html' %}
 {% load thumbnail_l %}
 {% load hash_filter %}
 {% block css %}
+{{ block.super }}
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
 <style>
     em {
@@ -14,13 +15,13 @@
 </style>
 {% endblock %}
 
-{% block title %}Cube volunteers{% endblock %}
+{% block title %}{{ VENUE.name }} Volunteers{% endblock %}
 
 {% block body %}
 {# {% for v, n in roles.items %} <p><b>{{ v }}</b><br> {{ n }} </p> {% endfor %} #}
-<img src="{{ STATIC_URL }}members/cube_microplex_logo.gif" alt="Cube Microplex logo" width="200"><p><h2>Cube volunteers report.</h2>
+<h2>{{ VENUE.name }} Volunteers Report</h2>
 {% include "messages.html" %}
-Total cube volunteers: {{ volunteers|length }}<p>
+Total number of {{ VENUE.name }} volunteers: {{ volunteers|length }}<p>
 Report generated: {% now "d/m/Y" %}<p>
 <a href="{% url "add-volunteer" %}" title="add new volunteer">[add volunteer]</a>
 <a href="{% url "retire-select-volunteer" %}" title="retire volunteer">[retire volunteer]</a>

@@ -7,6 +7,32 @@ import django.core.urlresolvers
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
 
+VENUE = {
+    'name': 'Cube',
+    'longname': 'Cube Microplex',
+    'cinemaname': 'Cube Cinema',
+    'piwik_id': 3,
+    'twitter': 'https://twitter.com/cubecinema',
+    'facebook': 'https://www.facebook.com/cubecinema/',
+    'instagram': 'https://www.instagram.com/cubemicroplex/',
+    'flickr': 'https://secure.flickr.com/groups/cubemicroplex/',
+    'vimeo': 'https://vimeo.com/cubemicroplex/',
+    'youtube': 'https://www.youtube.com/user/cubelog',
+    'internal_header_img': 'content/logo.gif',
+    'wagtale_admin_img': '/static/content/logo.gif',
+    'favicon': '/static/favicon/favicon_cube.ico',
+    'font_h2': '',
+    # This is used as the hostname for unsubscribe links in emails
+    # i.e. emails will have links added to
+    # this]/members/100/unsubscribe)
+    'email_unsubscribe_host': 'http://cubecinema.com',
+    # Default address to which reports of a successful mailout
+    # delivery are sent:
+    'mailout_delivery_report_to': u'cubeadmin@cubecinema.com',
+    # "From" address for mailout
+    'mailout_from_address': u'mailout@cubecinema.com'
+ }
+
 # The following list of IP addresses is used to restrict access to some pages
 # (at time of writing, only the 'add a new member' page)
 CUBE_IP_ADDRESSES = tuple("10.1.1.%d" % n for n in six.moves.range(33, 255))
@@ -37,14 +63,11 @@ PROGRAMME_MEDIA_MAX_SIZE_MB = 5  # Megabytes (i.e. * 1024 * 1024 bytes)
 
 DEFAULT_MUGSHOT = "/static/members/default_mugshot.gif"
 
-# This is used as the hostname for unsubscribe links in emails (i.e. emails
-# will have links added to http://[this]/members/100/unsubscribe)
-EMAIL_UNSUBSCRIBE_HOST = "cubecinema.com"
-
 # SMTP host/port settings. For complete list of relevant settings see:
 # https://docs.djangoproject.com/en/1.5/ref/settings/#email-backend
 EMAIL_HOST = 'localhost'
 EMAIL_PORT = 25
+# TODO add username and password
 
 # Default number of days ahead for which to include detailed copy in the
 # member's mailout
@@ -52,11 +75,6 @@ MAILOUT_DETAILS_DAYS_AHEAD = 9
 # Default number of days ahead for which to include listings in the member's
 # mailout
 MAILOUT_LISTINGS_DAYS_AHEAD = 14
-
-# Default address to which reports of a successful mailout delivery are sent:
-MAILOUT_DELIVERY_REPORT_TO = u"cubeadmin@cubecinema.com"
-# "From" address for mailout
-MAILOUT_FROM_ADDRESS = u"mailout@cubecinema.com"
 
 # The maximum number of each type of role that can be assigned to a showing
 # (so, for example, can't have more than this number of bar staff)
@@ -73,8 +91,6 @@ DAWN_OF_TIME = 1998
 # Colour used for the calendar view if multiroom isn't enabled:
 CALENDAR_DEFAULT_COLOUR = "#33CC33"
 # Parameters to tweak colour by:
-CALENDAR_UNCONFIRMED_LIGHTER = 0.9
-CALENDAR_UNCONFIRMED_SHADIER = 0.9
 CALENDAR_HISTORIC_LIGHTER = 0.75
 CALENDAR_HISTORIC_SHADIER = 1.0
 
@@ -225,6 +241,7 @@ STATICFILES_FINDERS = (
 )
 
 MIDDLEWARE_CLASSES = (
+    'django.middleware.security.SecurityMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -235,6 +252,17 @@ MIDDLEWARE_CLASSES = (
     'wagtail.wagtailcore.middleware.SiteMiddleware',
     'wagtail.wagtailredirects.middleware.RedirectMiddleware',
 )
+
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
+# Generates some errors in Chrome?
+SECURE_BROWSER_XSS_FILTER = True
+
+# Setting DENY breaks iframes in the calendar view:
+# X_FRAME_OPTIONS = 'DENY'
+
+# Setting True breaks members mailout, as JS relies on loading the cookie
+# CSRF_COOKIE_HTTPONLY = True
 
 TEMPLATES = [
     {
@@ -256,7 +284,9 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'django.template.context_processors.static',
                 'django.contrib.auth.context_processors.auth',
+                'toolkit.util.context_processors.venue',
                 'toolkit.diary.context_processors.diary_settings',
+                'toolkit.diary.context_processors.promoted_tags',
             ),
             # May be worth enabling for improved performance?
             # 'loaders':
@@ -326,7 +356,8 @@ LOGGING = {
         },
         'verbose': {
             'format':
-            '%(asctime)s %(module)s %(funcName)s %(levelname)s : %(message)s',
+            '[%(asctime)s] %(levelname)s [%(name)s:%(lineno)s] %(message)s',
+            'datefmt': "%d/%b/%Y %H:%M:%S"
         },
     },
     'filters': {

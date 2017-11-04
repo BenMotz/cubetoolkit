@@ -1,7 +1,6 @@
-{% extends 'base.html' %}
-{% load thumbnail_l %}
-{% load hash_filter %}
+{% extends 'base_admin.html' %}
 {% block css %}
+{{ block.super }}
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
 <style>
     em {
@@ -14,11 +13,11 @@
 </style>
 {% endblock %}
 
-{% block title %}Cube volunteers{% endblock %}
+{% block title %}{{ VENUE.name }} volunteers{% endblock %}
 
 {% block body %}
 
-<h3>Role summary:</h3>
+<h3>{{ VENUE.name }} Volunteers Role Summary</h3>
 <table>
 {% for role, names in role_vol_map %}
 {% cycle '<tr>' '' '' ''%}

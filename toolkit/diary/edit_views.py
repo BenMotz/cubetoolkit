@@ -190,14 +190,6 @@ def _adjust_colour_historic(colour):
     )
 
 
-def _adjust_colour_unconfirmed(colour):
-    return adjust_colour(
-        colour,
-        settings.CALENDAR_UNCONFIRMED_LIGHTER,
-        settings.CALENDAR_UNCONFIRMED_SHADIER
-    )
-
-
 @permission_required('toolkit.read')
 def edit_diary_data(request):
     date_format = "%Y-%m-%d"
@@ -252,11 +244,13 @@ def edit_diary_data(request):
             styles.append("s_private")
         if showing.event.outside_hire:
             styles.append("s_outside_hire")
+        if showing.in_past():
+            colour = _adjust_colour_historic(colour)
+            styles.append("s_historic")
         if showing.confirmed:
-            if showing.in_past():
-                colour = _adjust_colour_historic(colour)
+            styles.append("s_confirmed")
         else:
-            colour = _adjust_colour_unconfirmed(colour)
+            styles.append("s_unconfirmed")
 
         showing_data = {
             'id': showing.pk,
@@ -297,7 +291,6 @@ def edit_diary_calendar(request, year=None, month=None, day=None):
     rooms_and_colours = OrderedDict()
     for room in Room.objects.all():
         rooms_and_colours[room] = {
-            "unconfirmed": _adjust_colour_unconfirmed(room.colour),
             "confirmed_past": _adjust_colour_historic(room.colour)
         }
 
@@ -307,8 +300,6 @@ def edit_diary_calendar(request, year=None, month=None, day=None):
         'settings': settings,
         'rooms_and_colours':
             rooms_and_colours if settings.MULTIROOM_ENABLED else {},
-        'default_unconfirmed':
-            _adjust_colour_unconfirmed(settings.CALENDAR_DEFAULT_COLOUR),
         'default_confirmed_past':
             _adjust_colour_historic(settings.CALENDAR_DEFAULT_COLOUR),
     }
@@ -788,7 +779,7 @@ def edit_event_templates(request):
             logger.info("Event templates updated")
             formset.save()
             # Reset formset, so get another blank one at the
-            # end, deleted ones disappera, etc.
+            # end, deleted ones disappear, etc.
             formset = event_template_formset()
             messages.add_message(request, messages.SUCCESS,
                                  "Event templates updated")
@@ -801,60 +792,25 @@ def edit_event_templates(request):
 
 @permission_required('toolkit.write')
 def edit_event_tags(request):
-    # View for editing event tags.
-    # GET: Reads tags and renders the (JavaScript based) template
-    # POST: Process list of tags. Expected to be submitted via AJAX, retuns
-    # json.
-    tags = EventTag.objects.all()
+    event_tag_formset = modelformset_factory(
+        EventTag,
+        fields=('name', 'promoted', 'sort_order'),
+        can_delete=True)
 
-    if request.method != 'POST':
-        context = {'tags': tags}
-        return render(request, 'edit_event_tags.html', context)
-
-    errors = {}
-
-    # Retrieve posted data:
-    new_tag_names = request.POST.getlist('new_tags[]', [])
-    deleted_tag_keys = request.POST.getlist('deleted_tags[]', [])
-    # Ensure keys are all integers
-    deleted_tag_keys = [int(k) for k in deleted_tag_keys]
-
-    # process new tags:
-    for new_tag in new_tag_names:
-        tag_form = diary_forms.TagForm({'name': new_tag, 'readonly': False})
-        if tag_form.is_valid():
-            logger.info(u"Creating new tag {0}".format(
-                tag_form.cleaned_data['name']))
-            tag_form.save()
-        else:
-            errors[new_tag] = [
-                u",".join(msg) for msg in six.itervalues(tag_form.errors)
-            ]
-
-    if errors:
-        # Bail out before deleting anything
-        return HttpResponse(
-            json.dumps({'failed': True, 'errors': errors}),
-            content_type="application/json"
-        )
-
-    # process deleted tags
-    for deleted_key in deleted_tag_keys:
-        try:
-            tag = EventTag.objects.get(id=deleted_key)
-        except EventTag.DoesNotExist:
-            err = "Tag with key {0} can't be deleted: not found".format(
-                    deleted_key)
-            errors.setdefault('delete', []).append(err)
-            logger.error(err)
-        else:
-            logger.info(u"Deleting tag {0} (key {1})".format(tag.name, tag.pk))
-            tag.delete()
-
-    return HttpResponse(
-        json.dumps({'failed': bool(errors), 'errors': errors}),
-        content_type="application/json"
-    )
+    if request.method == 'POST':
+        formset = event_tag_formset(request.POST)
+        if formset.is_valid():
+            logger.info("Event tags updated")
+            formset.save()
+            # Reset formset, so get another blank one at the
+            # end, deleted ones disappear, etc.
+            formset = event_tag_formset()
+            messages.add_message(request, messages.SUCCESS,
+                                 "Event tags updated")
+    else:
+        formset = event_tag_formset()
+    context = {'formset': formset}
+    return render(request, 'edit_event_tags.html', context)
 
 
 @permission_required('toolkit.write')

@@ -1,11 +1,12 @@
-{% extends "base.html" %}
+{% extends "base_admin.html" %}
 {% load hash_filter %}
 
 {% block title %}
-Event diary
+{{ VENUE.longname }} Event Diary
 {% endblock %}
 
 {% block css %}
+{{ block.super }}
 <link rel="stylesheet" href="{{ STATIC_URL }}css/messages.css">
 <link rel='stylesheet' href='{{ STATIC_URL }}diary/js/lib/fullcalendar/fullcalendar.min.css' />
 <link rel='stylesheet' href='{{ STATIC_URL }}diary/js/lib/fullcalendar-scheduler/scheduler.min.css' />
@@ -27,6 +28,16 @@ Event diary
   }
   .s_cancelled div.fc-title {
      text-decoration: line-through;
+  }
+  .s_unconfirmed {
+      background-image: repeating-linear-gradient(45deg, lightgray, lightgray 15px, transparent 15px, transparent 30px);
+      color: white;
+  }
+  .s_confirmed {
+      color: white;
+  }
+  .s_historic {
+      color: darkgray;
   }
   #flex-container {
       display: flex;
@@ -87,6 +98,7 @@ Event diary
 {% endblock %}
 
 {% block script %}
+{{ block.super }}
 <script src='{{ STATIC_URL }}diary/js/lib/fullcalendar/lib/jquery.min.js'></script>
 <script src='{{ STATIC_URL }}diary/js/lib/fullcalendar/lib/moment.min.js'></script>
 <script src='{{ STATIC_URL }}diary/js/lib/fullcalendar/fullcalendar.min.js'></script>
@@ -120,26 +132,23 @@ init_calendar_view(jQuery,
 
 {% block body %}
 <div class="messages"><ul></ul></div>
-<a style="display: none;" class="fancybox" data-fancybox-type="iframe" id="fb_target" href="http://cubecinema.com/"></a>
+<a style="display: none;" class="fancybox" data-fancybox-type="iframe" id="fb_target" href="/"></a>
 <div id="flex-container">
 <div id="controls">
 <p>
 <a href="{% url "add-event" %}" id="new-booking-link">New booking</a><br>
-<a href="{% url "default-edit" %}">Linear diary</a><br>
-<a href="{% url "toolkit-index" %}">Toolkit home</a><br>
-<a href="{% url "logout" %}">Log out</a>
 <br>
 <br>Key:<br>
 {% if MULTIROOM_ENABLED %}
   {% for room, colours in rooms_and_colours.items %}
-    <span style="background-color: {{ room.colour }}">{{ room }}</span><br>
-    <span style="background-color: {{ colours|lookup:"unconfirmed" }}">{{ room }} unconfirmed</span><br>
+    <span class="s_confirmed" style="background-color: {{ room.colour }}">{{ room }}</span><br>
+    <span class="s_unconfirmed" style="background-color: {{ room.colour }}">{{ room }} unconfirmed</span><br>
     <span style="background-color: {{ colours|lookup:"confirmed_past" }}">{{ room }} historic</span><br>
   {% endfor %}
   <span style="background-color: {{ settings.CALENDAR_DEFAULT_COLOUR }}">No room allocated</span><br>
 {% else %}
-  <span style="background-color: {{ settings.CALENDAR_DEFAULT_COLOUR }}">Confirmed</span><br>
-  <span style="background-color: {{ default_unconfirmed }}">Unconfirmed</span><br>
+  <span class="s_confirmed" style="background-color: {{ settings.CALENDAR_DEFAULT_COLOUR }}">Confirmed</span><br>
+  <span class="s_unconfirmed" style="background-color: {{ settings.CALENDAR_DEFAULT_COLOUR }}">Unconfirmed</span><br>
   <span style="background-color: {{ default_confirmed_past }}">Historic</span><br>
 {% endif %}
 <span class="s_private">Private/Hidden</span><br>

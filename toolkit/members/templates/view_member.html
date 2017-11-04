@@ -1,9 +1,10 @@
 {% extends 'base_member.html' %}
 {% block title %}
-Cube Member: {{ member.name }}
+{{ VENUE.longname }}: {{ member.name }}
 {% endblock %}
 
 {% block css %}
+{{ block.super }}
 <style>
     .member {
         padding-left: 50px;
@@ -15,6 +16,7 @@ Cube Member: {{ member.name }}
 {% endblock %}
 
 {% block script %}
+{{ block.super }}
 <script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
 <script>
 $(document).ready(function() {

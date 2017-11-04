@@ -1,16 +1,18 @@
 import logging
 
-from django.http import HttpResponseRedirect
+from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.core.urlresolvers import reverse
 from django.conf import settings
 from django.contrib.auth.decorators import permission_required
 from django.contrib import messages
 from django.views.decorators.http import require_POST, require_safe
+from django.db.models import F
 import six
 
-from toolkit.members.forms import VolunteerForm, MemberFormWithoutNotes
-from toolkit.members.models import Member, Volunteer
+from toolkit.members.forms import (VolunteerForm, MemberFormWithoutNotes,
+    TrainingRecordForm, GroupTrainingForm)
+from toolkit.members.models import Member, Volunteer, TrainingRecord
 from toolkit.diary.models import Role
 
 logger = logging.getLogger(__name__)
@@ -129,11 +131,13 @@ def edit_volunteer(request, volunteer_id, create_new=False):
         # Called from "edit" url
         volunteer = get_object_or_404(Volunteer, id=volunteer_id)
         member = volunteer.member
+        new_training_record = TrainingRecord(volunteer=volunteer)
     else:
         # Called from "add" url
         volunteer = Volunteer()
         member = Member()
         volunteer.member = Member()
+        new_training_record = None
 
     # Now, if the view was loaded with "GET" then display the edit form, and
     # if it was called with POST then read the updated volunteer data from the
@@ -168,11 +172,146 @@ def edit_volunteer(request, volunteer_id, create_new=False):
         vol_form = VolunteerForm(instance=volunteer)
         mem_form = MemberFormWithoutNotes(instance=volunteer.member)
 
+    if new_training_record:
+        training_record_form = TrainingRecordForm(
+           prefix="training", instance=new_training_record)
+    else:
+        training_record_form = None
+
     context = {
         'pagetitle': 'Add Volunteer' if create_new else 'Edit Volunteer',
         'default_mugshot': settings.DEFAULT_MUGSHOT,
         'volunteer': volunteer,
         'vol_form': vol_form,
         'mem_form': mem_form,
+        'training_record_form': training_record_form,
     }
     return render(request, 'form_volunteer.html', context)
+
+
+@permission_required('toolkit.write')
+@require_POST
+def add_volunteer_training_record(request, volunteer_id):
+    volunteer = get_object_or_404(Volunteer, id=volunteer_id)
+    new_record = TrainingRecord(volunteer=volunteer)
+
+    record_form = TrainingRecordForm(
+        request.POST,
+        instance=new_record,
+        prefix="training",
+    )
+
+    if not volunteer.active:
+        response = {
+            'succeeded': False,
+            'errors': 'volunteer is not active'
+        }
+        return JsonResponse(response)
+    elif record_form.is_valid():
+        record_form.save()
+        logger.info(u"Added training record {0} for volunteer '{0}'".format(
+            new_record.id, volunteer.member.name))
+        # Now make sure the volunteer has that role selected:
+        volunteer.roles.add(new_record.role)
+
+        response = {
+            'succeeded': True,
+            'id': new_record.id,
+            'role': str(new_record.role),
+            'training_date': new_record.training_date,
+            'trainer': new_record.trainer,
+            'notes': new_record.notes,
+        }
+        return JsonResponse(response)
+    else:
+        response = {
+            'succeeded': False,
+            'errors': record_form.errors
+        }
+        return JsonResponse(response)
+
+
+@permission_required('toolkit.write')
+@require_POST
+def delete_volunteer_training_record(request, training_record_id):
+    record = get_object_or_404(TrainingRecord, id=training_record_id)
+
+    if not record.volunteer.active:
+        logger.error(u"Tried to delete training record for inactive volunteer")
+        return HttpResponse("Can't delete record for inactive volunteer",
+            status=403, content_type="text/plain")
+
+    logger.info(u"Deleting training_record '{0}' for volunteer '{1}'"
+        .format(record.id, record.volunteer.member.name))
+    record.delete()
+    return HttpResponse("OK", content_type="text/plain")
+
+
+@permission_required('toolkit.read')
+@require_safe
+def view_volunteer_training_records(request):
+    records = (TrainingRecord.objects.filter(volunteer__active=True)
+        .filter(volunteer__roles=F('role'))
+        .select_related()
+        )
+    role_map = {}
+    for record in records:
+        vol_map = role_map.setdefault(record.role, {})
+        current = vol_map.get(record.volunteer, None)
+        if not current or record.training_date > current.training_date:
+            vol_map[record.volunteer] = record
+    # Now sort by role ID / volunteer Name, using an obnoxiously complicated
+    # comprehension (sorry):
+    role_map_list = sorted(
+        [
+            (role, sorted(
+                    [(vol, record) for vol, record in vol_map.items()],
+                    key=lambda v_r: v_r[0].member.name
+                   )
+            ) for role, vol_map in role_map.items()
+        ],
+        key=lambda r_l: r_l[0].name
+    )
+
+    context = {
+        'report_data': role_map_list,
+    }
+    return render(request, 'volunteer_training_report.html', context)
+
+
+@permission_required('toolkit.write')
+def add_volunteer_training_group_record(request):
+    if request.method == 'POST':
+        form = GroupTrainingForm(request.POST)
+        if form.is_valid():
+            role = form.cleaned_data['role']
+            trainer = form.cleaned_data['trainer']
+            members = form.cleaned_data['volunteers']
+            logger.info(
+                "Bulk add training records for role '%s', trainer '%s', "
+                " members '%s'" % (role, trainer, members))
+
+            for member in members:
+                volunteer = member.volunteer
+                record = TrainingRecord(
+                    role=role,
+                    trainer=trainer,
+                    training_date=form.cleaned_data['training_date'],
+                    notes=form.cleaned_data['notes'],
+                    volunteer=volunteer
+                )
+                record.save()
+                volunteer.roles.add(role)
+            messages.add_message(request, messages.SUCCESS,
+                                 u"Added %d training records for %s" %
+                                 (len(form.cleaned_data['volunteers']),
+                                 form.cleaned_data['role']))
+            return HttpResponseRedirect(
+                reverse('add-volunteer-training-group-record'))
+    else:  # i.e. request.method == 'GET':
+        form = GroupTrainingForm()
+
+    context = {
+        'form': form,
+    }
+    return render(request, 'form_group_training.html', context)

@@ -1,4 +1,4 @@
-{% extends 'base.html' %}
+{% extends 'base_admin.html' %}
 
 {% block css %}
 {{ block.super }}
@@ -6,8 +6,10 @@
 {% endblock %}
 
 {% block header %}
-<p><img alt="Cube Logo" src="{{ STATIC_URL }}members/cube_microplex_logo.gif" width="400"></p>
-<h3>Cube member's database.</h3>
+{% if user.is_authenticated %}
+{{ block.super }}
+{% endif %}
+<h3>{{ VENUE.longname }} members database</h3>
 {% include "messages.html" %}
 
 {% endblock %}
@@ -15,11 +17,11 @@
 {% block footer %}
 {% if user.is_authenticated %}
 <p>
+<p>
 <a href="{% url "add-member" %}">Add member</a> |
 <a href="{% url "search-members" %}">Search / Edit / Delete</a> |
-<a href="{% url "member-statistics" %}">Statistics</a> |
-<a href="{% url "toolkit-index" %}">Toolkit home</a> |
-<a href="{% url "logout" %}">Log out</a>
+<a href="{% url "member-statistics" %}">Statistics</a>
 </p>
+{{ block.super }}
 {% endif %}
 {% endblock %}

@@ -2,7 +2,7 @@
 {% load thumbnail_l %}
 
 {% block title %}
-Cube Programme{% if extra_title %}: {{ extra_title }}{% endif %}
+{{ VENUE.name }} Programme{% if extra_title %}: {{ extra_title }}{% endif %}
 {% endblock %}
 
 {% block css %}
@@ -10,13 +10,19 @@ Cube Programme{% if extra_title %}: {{ extra_title }}{% endif %}
     <link rel="stylesheet" href="{{ STATIC_URL }}diary/css/programme.css" type="text/css">
 {% endblock %}
 
+{% block script-page-setup %}
+<script>
+setup_page(true);
+</script>
+{% endblock script-page-setup %}
+
 {% block navmenu-title %}
-<h1><a href="{% url "default-view" %}" title= "Cube Programme">Cube Programme</a></h1>
+<h1><a href="{% url "default-view" %}" title= "{{ VENUE.name }} Programme">{{ VENUE.name }} Programme</a></h1>
 {% endblock %}
 
 {% block site-description %}
 {% if event_type %}
-<h4 class="site-description">{{ event_type }} events</h4>
+<h4 class="site-description">{{ event_type|title }} events</h4>
 {% endif %}
 {% if showings|length == 0 %}
     <h4 class="site-description">

@@ -1,10 +1,11 @@
-{% extends "base.html" %}
+{% extends "base_admin.html" %}
 
 {% block title %}
-Cube Toolkit
+{{ VENUE.longname }} Toolkit
 {% endblock %}
 
 {% block css %}
+{{ block.super }}
 <style>
     .index-edit {
         color: #a3a3a3;
@@ -17,7 +18,7 @@ Cube Toolkit
 {% endblock %}
 
 {% block body %}
-<h1>Cube toolkit</h1>
+<h1>{{ VENUE.longname }} Toolkit</h1>
 
 <h2>Programming</h2>
 <ul>
@@ -45,6 +46,8 @@ Cube Toolkit
 <ul>
     <li><a href="{% url "view-volunteer-list" %}">Volunteers profiles</a></li>
     <li><a href="{% url "view-volunteer-role-report" %}">Volunteer role report</a></li>
+    <li><a href="{% url "add-volunteer-training-group-record" %}">Add volunteer training records</a></li>
+    <li><a href="{% url "view-volunteer-training-report" %}">Volunteer training report</a></li>
 </ul>
 <h2>Members</h2>
 <ul>

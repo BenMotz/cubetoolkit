@@ -27,18 +27,18 @@ def _send_email(smtp_conn, destination, subject, body, mail_is_ascii):
     msg = MIMEText(body.encode(body_charset, "replace"), "plain", body_charset)
 
     # Assume 'From' is always ASCII(!)
-    msg['From'] = settings.MAILOUT_FROM_ADDRESS
+    msg['From'] = settings.VENUE['mailout_from_address']
     msg['To'] = Header(destination)
     msg['Subject'] = Header(subject)
 
     try:
         # Enforce ascii destination email address:
         if six.PY2:
-            smtp_conn.sendmail(settings.MAILOUT_FROM_ADDRESS,
+            smtp_conn.sendmail(settings.VENUE['mailout_from_address'],
                                [destination.encode("ascii")],
                                msg.as_string())
         else:
-            smtp_conn.sendmail(settings.MAILOUT_FROM_ADDRESS,
+            smtp_conn.sendmail(settings.VENUE['mailout_from_address'],
                                [destination],
                                msg.as_string().encode("utf-8"))
 
@@ -61,8 +61,8 @@ def _send_email(smtp_conn, destination, subject, body, mail_is_ascii):
 def send_mailout_report(smtp_conn, report_to, sent, err_list,
                         subject, body, body_is_ascii):
         # All done? Send report:
-        report = ("{0} copies of the following were sent out on cube members "
-                  "list\n".format(sent))
+        report = ("%d copies of the following were sent out on %s members "
+                  "list\n" % (sent, settings.VENUE['name']))
         if len(err_list) > 0:
             # Only send a max of 100 error messages!
             report += "{0} errors:\n{1}".format(
@@ -98,10 +98,10 @@ def send_mailout_to(subject, body, recipients, task=None, report_to=None):
         u"\n"
         u"If you wish to be removed from our mailing list please use this "
         u"link:\n"
-        u"http://{0}{{0}}?k={{2}}\n"
+        u"{0}{{0}}?k={{2}}\n"
         u"To edit details of your membership, please use this link:\n"
-        u"http://{0}{{1}}?k={{2}}\n"
-    ).format(settings.EMAIL_UNSUBSCRIBE_HOST)
+        u"{0}{{1}}?k={{2}}\n"
+    ).format(settings.VENUE['email_unsubscribe_host'])
 
     count = recipients.count()
     sent = 0
@@ -183,7 +183,8 @@ def send_mailout(subject, body):
 
     Requires subject and body to be unicode.
 
-    Also sends an email to settings.MAILOUT_DELIVERY_REPORT_TO when done.
+    Also sends an email to settings.VENUE['mailout_delivery_report_to'] when
+    done.
 
     returns a tuple:
     (error, sent_count, error_message)
@@ -197,5 +198,6 @@ def send_mailout(subject, body):
         logger.error("No recipients found")
         return (True, 0, 'No recipients found')
 
-    return send_mailout_to(subject, body, recipients, task=current_task,
-                           report_to=settings.MAILOUT_DELIVERY_REPORT_TO)
+    return send_mailout_to(
+        subject, body, recipients, task=current_task,
+        report_to=settings.VENUE['mailout_delivery_report_to'])

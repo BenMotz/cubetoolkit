@@ -1,12 +1,12 @@
 {% extends 'base.html' %}
 {% block title %}
-Cube members' homepages
+{{ VENUE.name }} members' homepages
 {% endblock %}
 
 {% block body %}
-<img src="{{ STATIC_URL }}members/cube_microplex_logo.gif" width="200">
+<img src="{{ STATIC_URL }}diary/{{ VENUE.internal_header_img }}">
 <p>
-<h2>Cube members' homepages</h2>
+<h2>{{ VENUE.name }} members' homepages</h2>
 <table>
 {% for member in members %}
 <tr><td>{{ member.name }}</td><td>{{ member.website|urlize }}</td></tr>

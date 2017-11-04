@@ -1,0 +1,12 @@
+@media screen and (max-width: 500px) {
+    #id_username, #id_password {
+        width: 100%;
+        max-width: 500px;
+        font-size: 32px;
+    }
+
+    .login-form p {
+        font-size: 32px;
+        line-height: 1.48;
+    }
+}

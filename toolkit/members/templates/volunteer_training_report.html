@@ -1,0 +1,99 @@
+{% extends 'base_admin.html' %}
+
+
+{% block title %}{{ VENUE.name }} volunteer training repor{% endblock %}
+
+{% block css %}
+{{ block.super }}
+<link href="/static/css/lib/chosen.min.css" type="text/css" media="all" rel="stylesheet" />
+<style>
+.outdated {
+    color: red;
+    list-style-type: disclosure-closed;
+}
+</style>
+{% endblock css %}
+
+{% block script %}
+{{ block.super }}
+<script src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
+<script src="{{ STATIC_URL}}js/lib/chosen.jquery.js"></script>
+<script>
+function update_role_display() {
+    var selected = $('#id_role_select').val();
+    $('.role_info').hide();
+    if(selected !== null) {
+        for(var i = 0; i < selected.length; i++) {
+            $('#id_role_info_' + selected[i]).show();
+        }
+    }
+    return true;
+}
+
+function update_outdated_highlights() {
+    var max_age_months = +$('#id_age_highlight').val();
+    var max_age_date = new Date();
+
+    max_age_date.setMonth(max_age_date.getMonth() - max_age_months);
+
+    var max_age_s_since_epoch = max_age_date.getTime() / 1000;
+
+    var records = $('.training_record');
+    for(var i = 0; i < records.length; i++) {
+        if(records[i].dataset.trainingTime < max_age_s_since_epoch) {
+            records[i].classList.add("outdated");
+        } else {
+            records[i].classList.remove("outdated");
+        }
+    }
+}
+
+$(document).ready(function() {
+    update_role_display();
+    update_outdated_highlights();
+
+    $('#id_role_select').chosen(
+        {
+            width: '50%',
+    }).change(update_role_display);
+    $('#id_age_highlight').change(update_outdated_highlights);
+});
+</script>
+{% endblock script %}
+
+{% block body %}
+
+<h1>{{ VENUE.name }} Volunteer Training</h1>
+
+<p><strong>Note:</strong> volunteers are only listed if they have a training
+record <em>and</em> they have a role selected in their profile.<br />
+(This means that out of date training is only flagged if a volunteer is
+still active in that role)</p>
+
+<p><span class="outdated">Higlight</span> training that is more than
+<input id="id_age_highlight" type="number" value="12" min="0" style="width: 4em;">
+months in the past.</p>
+
+<p>Roles to display: <select multiple="multiple" id="id_role_select">
+{% for role, _ in report_data %}
+<option value="{{ role.id }}" {% if 'Fire' in role.name %}selected{% endif %}>{{ role.name }}</option>
+{% endfor %}
+</select></p>
+
+{% for role, volunteers in report_data %}
+<div class="role_info" id="id_role_info_{{ role.id }}">
+  <h2>{{ role }}</h2>
+  <ul>
+      {% for volunteer, report in volunteers %}
+      <li class="training_record" data-training-time="{{ report.training_date|date:"U" }}">
+        <a href="{% url "edit-volunteer" volunteer_id=volunteer.id %}#training-record">
+          {{ volunteer.member.name }}
+        </a>
+        &mdash; last trained {{ report.training_date|date:"d/m/Y" }}
+      </li>
+      {% endfor %}
+  </ul>
+</div>
+{% endfor %}
+
+{% endblock %}

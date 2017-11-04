@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block css %}
+<link href='http://fonts.googleapis.com/css?family=Roboto+Mono:400,100,100italic,300,300italic,500' rel='stylesheet' type='text/css'>
+<!--[if lte IE 8]>
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto+Mono:400" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto+Mono:100" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto+Mono:100italic" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto+Mono:300" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto+Mono:300italic" />
+    <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto+Mono:500" />
+<![endif]-->
+<link rel="stylesheet" href="{{ STATIC_URL }}css/lib/bootstrap.min.css">
+<style>
+body {
+  padding: 4rem 1.4rem;
+}
+</style>
+{% endblock %}
+
+{% block script %}
+    <script src="{{ STATIC_URL }}/js/lib/bootstrap/vendor/jquery-slim.min.js"></script>
+    <script src="{{ STATIC_URL }}/js/lib/bootstrap/vendor/popper.min.js"></script>
+    <script src="{{ STATIC_URL }}/js/lib/bootstrap/bootstrap.min.js"></script>
+    <script src="{{ STATIC_URL }}/js/lib/bootstrap/ie10-viewport-bug-workaround.js"></script>
+{% endblock %}
+
+{% block meta %}
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+{% endblock %}
+
+{% block header %}
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-top">
+      <img alt="{{ VENUE.name }}" src="{{ STATIC_URL }}/{{ VENUE.internal_header_img }}" height="40px">
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarsExampleDefault" aria-controls="navbarsExampleDefault" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+
+      <div class="collapse navbar-collapse" id="navbarsExampleDefault">
+        <ul class="navbar-nav mr-auto">
+          <li class="nav-item active">
+            <a class="nav-link" href="{% url "toolkit-index" %}">Home <span class="sr-only">(current)</span></a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="{% url "default-edit" %}" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Diary</a>
+            <div class="dropdown-menu" aria-labelledby="dropdown01">
+              <a class="dropdown-item" href="{% url "default-edit" %}">Edit</a>
+              <a class="dropdown-item" href="{% url "diary-edit-calendar" %}">Calendar</a>
+            </div>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url "default-view" %}">Public Programme</a>
+          </li>
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="{% url "rota-edit" %}" id="dropdown01" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Rota</a>
+            <div class="dropdown-menu" aria-labelledby="dropdown01">
+              <a class="dropdown-item" href="{% url "rota-edit" %}">Edit</a>
+              <a class="dropdown-item" href="{% url "view-rota-vacancies" %}">Upcoming vacancies</a>
+            </div>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url "add-member" %}">Member Database</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="{% url "logout" %}">Log out</a>
+          </li>
+        </ul>
+      </div>
+    </nav>
+
+    <div class="container">
+        <div class="admin-template">
+{% endblock %}
+
+{% block body %}
+
+{% endblock %}
+
+{% block footer %}
+        </div><!-- /.admin-template -->
+    </div><!-- /.container -->
+{% endblock %}

@@ -1760,12 +1760,11 @@ class DiaryDataViewTests(DiaryTestsMixin, TestCase):
         showing.room_id = self.room_2.id
         showing.save(force=True)
 
-        CONFIRMED_IN_FUTURE = "#cc3333"
-        CONFIRMED_IN_PAST = adjust_colour(CONFIRMED_IN_FUTURE, 0.75, 1.0)
-        UNCONFIRMED = adjust_colour(CONFIRMED_IN_FUTURE, 0.9, 0.9)
+        FUTURE_COLOUR = "#cc3333"
+        PAST_COLOUR = adjust_colour(FUTURE_COLOUR, 0.75, 1.0)
 
         url = reverse("edit-diary-data")
-        with self.settings(CALENDAR_DEFAULT_COLOUR=CONFIRMED_IN_FUTURE):
+        with self.settings(CALENDAR_DEFAULT_COLOUR=FUTURE_COLOUR):
             response = self.client.get(url, data={
                 "start": "2013-02-15",
                 "end": "2013-09-13",
@@ -1783,8 +1782,8 @@ class DiaryDataViewTests(DiaryTestsMixin, TestCase):
         expected_data = {
             1: {
                 "id": 1,
-                "className": [],
-                "color": UNCONFIRMED,
+                "className": ['s_historic', 's_unconfirmed'],
+                "color": PAST_COLOUR,
                 "end": "2013-04-01T20:30:00+01:00",
                 "start": "2013-04-01T19:00:00+01:00",
                 "title": "Event two title",
@@ -1792,8 +1791,8 @@ class DiaryDataViewTests(DiaryTestsMixin, TestCase):
             },
             2: {
                 "id": 2,
-                "className": [],
-                "color": CONFIRMED_IN_PAST,
+                "className": [u's_historic', u's_confirmed'],
+                "color": PAST_COLOUR,
                 "end": "2013-04-02T20:30:00+01:00",
                 "start": "2013-04-02T19:00:00+01:00",
                 "title": "Event two title",
@@ -1801,10 +1800,8 @@ class DiaryDataViewTests(DiaryTestsMixin, TestCase):
             },
             3: {
                 "id": 3,
-                "className": [
-                    "s_cancelled"
-                ],
-                "color": CONFIRMED_IN_PAST,
+                "className": ["s_cancelled", "s_historic", "s_confirmed"],
+                "color": PAST_COLOUR,
                 "end": "2013-04-03T20:30:00+01:00",
                 "start": "2013-04-03T19:00:00+01:00",
                 "title": "Event two title",
@@ -1812,8 +1809,8 @@ class DiaryDataViewTests(DiaryTestsMixin, TestCase):
             },
             4: {
                 "id": 4,
-                "className": ['s_private'],
-                "color": CONFIRMED_IN_PAST,
+                "className": ['s_private', 's_historic', 's_confirmed'],
+                "color": PAST_COLOUR,
                 "end": "2013-04-04T20:30:00+01:00",
                 "start": "2013-04-04T19:00:00+01:00",
                 "title": "Event two title",
@@ -1821,8 +1818,9 @@ class DiaryDataViewTests(DiaryTestsMixin, TestCase):
             },
             5: {
                 "id": 5,
-                "className": ["s_cancelled", "s_private"],
-                "color": CONFIRMED_IN_PAST,
+                "className": ["s_cancelled", "s_private", "s_historic",
+                              "s_confirmed"],
+                "color": PAST_COLOUR,
                 "end": "2013-04-05T20:30:00+01:00",
                 "start": "2013-04-05T19:00:00+01:00",
                 "title": "Event two title",
@@ -1830,8 +1828,8 @@ class DiaryDataViewTests(DiaryTestsMixin, TestCase):
             },
             6: {
                 "id": 6,
-                "className": [],
-                "color": CONFIRMED_IN_PAST,
+                "className": [u's_historic', u's_confirmed'],
+                "color": PAST_COLOUR,
                 "end": "2013-04-13T21:00:00+01:00",
                 "start": "2013-04-13T18:00:00+01:00",
                 "title": "Event three title",
@@ -1839,8 +1837,8 @@ class DiaryDataViewTests(DiaryTestsMixin, TestCase):
             },
             7: {
                 "id": 7,
-                "className": [],
-                "color": CONFIRMED_IN_FUTURE,
+                "className": [u's_confirmed'],
+                "color": FUTURE_COLOUR,
                 "end": "2013-06-09T19:00:00+01:00",
                 "start": "2013-06-09T18:00:00+01:00",
                 "title": "Event four titl\u0113",
@@ -1848,8 +1846,9 @@ class DiaryDataViewTests(DiaryTestsMixin, TestCase):
             },
             10: {
                 "id": 10,
-                "className": ["s_private", "s_outside_hire"],
-                "color": CONFIRMED_IN_PAST,
+                "className": ["s_private", "s_outside_hire",
+                              "s_historic", "s_confirmed"],
+                "color": PAST_COLOUR,
                 "end": "2013-02-15T19:30:00+00:00",
                 "start": "2013-02-15T18:00:00+00:00",
                 "title": "Event one title",

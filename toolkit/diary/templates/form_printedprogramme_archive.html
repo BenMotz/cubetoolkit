@@ -1,10 +1,11 @@
-{% extends "base.html" %}
+{% extends "base_admin.html" %}
 
 {% block title %}
 Cube Programmes
 {% endblock %}
 
 {% block css %}
+{{ block.super }}
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
 <style type="text/css">
   body { font-family: sans-serif;}

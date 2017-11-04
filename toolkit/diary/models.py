@@ -129,16 +129,21 @@ class EventTag(models.Model):
     name = models.CharField(max_length=32, unique=True)
     slug = models.SlugField(max_length=50, unique=True)  # allow_unicode=True?
     read_only = models.BooleanField(default=False, editable=False)
+    promoted = models.BooleanField(default=False)
+    sort_order = models.IntegerField(null=True, blank=True, editable=True)
 
     class Meta:
         db_table = 'EventTags'
-        ordering = ['name']
+        ordering = ['sort_order', 'name']
 
     def __init__(self, *args, **kwargs):
         super(EventTag, self).__init__(*args, **kwargs)
         # Store original value of read_only, so we can tell when the flag has
-        # been set after load
+        # been set after load, and name/slug so we can enforce they haven't
+        # changed:
         self._read_only_at_load = self.read_only
+        self._name_at_load = self.name
+        self._slug_at_load = self.slug
 
     def __str__(self):
         return self.name
@@ -152,9 +157,11 @@ class EventTag(models.Model):
     # Overloaded Django ORM methods:
     def save(self, *args, **kwargs):
         if self.pk and self._read_only_at_load:
-            return False
-        else:
-            return super(EventTag, self).save(*args, **kwargs)
+            # Allow "promoted" and "sort_order" to be changed:
+            self.read_only = self._read_only_at_load
+            self.name = self._name_at_load
+            self.slug = self._slug_at_load
+        return super(EventTag, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         if self.pk and self.read_only:
@@ -388,7 +395,7 @@ class Showing(models.Model):
     event = models.ForeignKey('Event', related_name='showings',
                               on_delete=models.CASCADE)
     room = models.ForeignKey('Room', related_name='showings', null=True,
-                              on_delete=models.SET_NULL)
+                             on_delete=models.SET_NULL)
 
     start = FutureDateTimeField(db_index=True)
 

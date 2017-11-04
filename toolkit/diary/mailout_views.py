@@ -53,7 +53,8 @@ def _render_mailout_subject_and_body(days_ahead, copy_days_ahead):
         first_event_date = showings[0].start.strftime(' commencing %A %-d %B')
     except IndexError:  # Corner case for no events
         first_event_date = ''
-    subject_text = "CUBE Microplex forthcoming events%s" % first_event_date
+    subject_text = "%s forthcoming events%s" % (
+                    settings.VENUE['longname'], first_event_date)
 
     # Render into mail template
     mail_template = django.template.loader.get_template("mailout_body.txt")

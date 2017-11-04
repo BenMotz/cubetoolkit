@@ -1,0 +1,45 @@
+{% extends 'base_admin.html' %}
+
+{% block css %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}diary/css/edit_form.css">
+<style>
+    /* Slightly OTT way to stop bootstrap's fetish box-sizing from breaking
+       the chosen layout. There's probably a better way to do this: */
+    * {
+        box-sizing: content-box;
+    }
+    select, textarea, input[type="text"] {
+        width: 100%;
+    }
+    td {
+        padding: 2px 10px;
+    }
+</style>
+{% endblock %}
+
+{% block script %}
+{{ block.super }}
+{{ form.media }}
+{% endblock %}
+
+{% block title %}{{ VENUE.name }} add group training record{% endblock %}
+
+{% block body %}
+
+<h1>{{ VENUE.name }} Record Volunteer Group Training</h1>
+{% include "messages.html" %}
+
+<p>This will also mark the selected volunteers as working in the selected role
+</p>
+
+<form action="" method="POST">
+{% csrf_token %}
+<table>
+    {{ form.as_table }}
+    <tr><td colspan = "2"><input type="submit" value="Add"></input></td></tr>
+</table>
+</form>
+
+{% endblock %}

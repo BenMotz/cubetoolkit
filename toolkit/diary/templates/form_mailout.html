@@ -4,10 +4,13 @@
 <style type="text/css">
     textarea {
         height: 120ex;
+        font-family: monospace;
+        resize: both;
     }
     form input[type=text] {
         width: 90ex;
         display: block;
+        font-family: monospace;
     }
     form input[type=number] {
         width: 4em;
@@ -17,12 +20,11 @@
 {% endblock %}
 
 {% block title %}
-Member's mailout
+{{VENUE.name }} Member's Mailout
 {% endblock %}
 
 {% block body %}
-<p><img alt="Cube Microplex" src="{{ STATIC_URL }}members/cube_microplex_logo.gif" width="200"></p>
-<h3>Cube member's mailout.</h3>
+<h3>{{VENUE.name }} Member's Mailout</h3>
 <form method="GET">
     <p><label for="id_daysahead">Days of listings: </label>
     <input type="number" id="id_daysahead" name="daysahead" min="0" value="{{ days_ahead }}">
@@ -30,7 +32,7 @@ Member's mailout
     <input type="number" id="id_copydaysahead" name="copydaysahead" min="0" value="{{ copy_days_ahead }}">
     <input type="submit" value="Regenerate mailout (lose any edits)"></p>
 </form>
-<p>Total of <b>{{ email_count }}</b> member emails to send from cube microplex</p>
+<p>Total of <b>{{ email_count }}</b> member emails to send from {{ VENUE.name }}</p>
 <form method="POST">
     {% csrf_token %}
     <p>{{ form.subject.label_tag }} {{ form.subject.errors }} {{ form.subject }}</p>

@@ -52,9 +52,9 @@ def adjust_colour(colour, lighter_fraction, grayer_fraction):
     )
     r, g, b = (int(v, 16) for v in match.groups())
     h, l, s = colorsys.rgb_to_hls(r / 255.0, g / 255.0, b / 255.0)
-    l = lighter_fraction * (1.0 - l) + l
+    new_l = lighter_fraction * (1.0 - l) + l
     s *= grayer_fraction
-    r, g, b = colorsys.hls_to_rgb(h, l, s)
+    r, g, b = colorsys.hls_to_rgb(h, new_l, s)
     result = "#%02X%02X%02X" % (
         int(r * 0xff), int(g * 0xff), int(b * 0xff)
     )

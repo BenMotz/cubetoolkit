@@ -3,7 +3,9 @@ from django.conf.urls import url
 from toolkit.members.volunteer_views import (
     view_volunteer_list,
     view_volunteer_role_report, edit_volunteer, select_volunteer,
-    activate_volunteer)
+    activate_volunteer, add_volunteer_training_record,
+    add_volunteer_training_group_record, view_volunteer_training_records,
+    delete_volunteer_training_record)
 
 from toolkit.members.member_views import (
     add_member, search, view,
@@ -16,10 +18,20 @@ volunteer_urls = [
     url(r'^add/$', edit_volunteer,
         name='add-volunteer',
         kwargs={'volunteer_id': None, 'create_new': True}),
+    url(r'^add-training/(?P<volunteer_id>\d+)/$',
+        add_volunteer_training_record, name='add-volunteer-training-record'),
+    url(r'^delete-training/(?P<training_record_id>\d+)/$',
+        delete_volunteer_training_record,
+        name='delete-volunteer-training-record'),
+    url(r'^add-training-group/$',
+        add_volunteer_training_group_record,
+        name='add-volunteer-training-group-record'),
     url(r'^view/$', view_volunteer_list,
         name='view-volunteer-list'),
     url(r'^view/rolereport/$', view_volunteer_role_report,
         name='view-volunteer-role-report'),
+    url(r'^view/trainingreport/$', view_volunteer_training_records,
+        name='view-volunteer-training-report'),
     url(r'^retire/select$', select_volunteer,
         name='retire-select-volunteer',
         kwargs={'action': 'retire'}),

@@ -1,9 +1,9 @@
 <div class="social-media">
     <p>Social:</p>
-    <a href="https://twitter.com/cubecinema" title="Twitter"><i class="fa fa-twitter"></i></a>
-    <a href="https://www.facebook.com/cubecinema/" title="Facebook"><i class="fa fa-facebook-official"></i></a>
-    <a href="https://www.instagram.com/cubemicroplex/" title="Instagram"><i class="fa fa-instagram"></i></a>
-    <a href="https://secure.flickr.com/groups/cubemicroplex/" title="Flickr"><i class="fa fa-flickr"></i></a>
-    <a href="https://vimeo.com/cubemicroplex/" title="Vimeo"><i class="fa fa-vimeo-square"></i></a>
-    <a href="https://www.youtube.com/user/cubelog" title="Youtube"><i class="fa fa-youtube"></i></a>
+    {% if VENUE.twitter %}<a href="{{ VENUE.twitter }}" title="Twitter"><i class="fa fa-twitter"></i></a>{% endif %}
+    {% if VENUE.facebook %}<a href="{{ VENUE.facebook }}" title="Facebook"><i class="fa fa-facebook-official"></i></a>{% endif %}
+    {% if VENUE.instagram %}<a href="{{ VENUE.instagram }}" title="Instagram"><i class="fa fa-instagram"></i></a>{% endif %}
+    {% if VENUE.flickr %}<a href="{{ VENUE.flickr }}" title="Flickr"><i class="fa fa-flickr"></i></a>{% endif %}
+    {% if VENUE.vimeo %}<a href="{{ VENUE.vimeo }}" title="Vimeo"><i class="fa fa-vimeo-square"></i></a>{% endif %}
+    {% if VENUE.youtube %}<a href="{{ VENUE.youtube }}" title="Youtube"><i class="fa fa-youtube"></i></a>{% endif %}
 </div><!-- end .social-media -->

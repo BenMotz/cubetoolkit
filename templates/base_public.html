@@ -2,7 +2,7 @@
 {% load repeat %}
 
 {% block css %}
-<link href='http://fonts.googleapis.com/css?family=Roboto+Mono:400,100,100italic,300,300italic,500' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Roboto+Mono:400,100,100italic,300,300italic,500' rel='stylesheet' type='text/css'>
 <!--[if lte IE 8]>
     <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto+Mono:400" /> 
     <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto+Mono:100" /> 
@@ -23,6 +23,11 @@
     <script src="{{ STATIC_URL }}js/lib/imagesloaded.pkgd.min.js" ></script>
     <script src="{{ STATIC_URL }}js/lib/jquery.touchSwipe.min.js"></script>
     <script src="{{ STATIC_URL }}js/site-common.js"></script>
+    {% block script-page-setup %}
+    <script>
+    setup_page(false);
+    </script>
+    {% endblock script-page-setup %}
 {% endblock script %}
 
 {% block header %}
@@ -33,7 +38,7 @@
           <div id="site-title" class="clearfix">
               {% capture navmenu-title %}
               {% block navmenu-title %}
-              <h1><a href="{% url "default-view" %}" title= "Cube Microplex">Cube Microplex</a></h1>
+              <h1><a href="{% url "default-view" %}" title="{{ VENUE.longname }} Programme">{{ VENUE.longname }} Programme</a></h1>
               {% endblock navmenu-title %}
               {% endcapture %}
           </div><!-- end #site-title -->
@@ -78,18 +83,18 @@
 <!-- Piwik -->
 <script type="text/javascript">
   var _paq = _paq || [];
-  _paq.push(["setDomains", ["*.cubecinema.com"]]);
+  /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
   _paq.push(['trackPageView']);
   _paq.push(['enableLinkTracking']);
   (function() {
     var u="//stats2.xtreamlab.net/";
     _paq.push(['setTrackerUrl', u+'piwik.php']);
-    _paq.push(['setSiteId', 3]);
+    _paq.push(['setSiteId', '{{ VENUE.piwik_id }}']);
     var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
     g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
   })();
 </script>
-<noscript><p><img src="//stats2.xtreamlab.net/piwik.php?idsite=3" style="border:0;" alt="" /></p></noscript>
+<noscript><p><img src="//stats2.xtreamlab.net/piwik.php?idsite={{ VENUE.piwik_id }}&rec=1" style="border:0;" alt="" /></p></noscript>
 <!-- End Piwik Code -->
 
 {{ block.super }}

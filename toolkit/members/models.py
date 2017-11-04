@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 import os.path
 import logging
 import binascii
+import datetime
 
 import django.db  # Used for raw query for stats
 from django.conf import settings
@@ -190,3 +191,18 @@ class Volunteer(models.Model):
                 self.portrait.file.name if self.portrait else None)
         except (IOError, OSError, ValueError):
             self.__original_portrait = None
+
+
+class TrainingRecord(models.Model):
+    class Meta:
+        db_table = 'TrainingRecords'
+        ordering = ['role', 'training_date', 'volunteer']
+
+    volunteer = models.ForeignKey(Volunteer, related_name='training_records',
+                                  on_delete=models.CASCADE)
+    role = models.ForeignKey(Role, related_name='training_records',
+                             on_delete=models.CASCADE,)
+    # Default to when the record is created:
+    training_date = models.DateField(default=datetime.date.today)
+    trainer = models.CharField(max_length=128)
+    notes = models.TextField(blank=True)

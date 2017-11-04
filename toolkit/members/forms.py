@@ -1,9 +1,12 @@
 import logging
 import binascii
+import datetime
 
 from django import forms
 from django.core.files.uploadedfile import SimpleUploadedFile
-import toolkit.members.models
+from toolkit.members.models import Member
+import toolkit.diary.models
+from toolkit.diary.form_widgets import ChosenSelectMultiple
 
 logger = logging.getLogger(__name__)
 
@@ -94,3 +97,27 @@ class VolunteerForm(forms.ModelForm):
                 self.fields['portrait'].clean(image_file))
 
         return cleaned_data
+
+
+class TrainingRecordForm(forms.ModelForm):
+    class Meta(object):
+        model = toolkit.members.models.TrainingRecord
+        fields = ('role', 'trainer', 'training_date', 'notes')
+
+
+class GroupTrainingForm(forms.Form):
+    role = forms.ModelChoiceField(
+        queryset=toolkit.diary.models.Role.objects.all(),
+        required=True)
+    training_date = forms.DateField(
+        required=True, initial=datetime.date.today)
+    trainer = forms.CharField(
+        min_length=2, max_length=128, required=True)
+    volunteers = forms.ModelMultipleChoiceField(
+        queryset=Member.objects.filter(volunteer__active=True)
+        .order_by('name'),
+        widget=ChosenSelectMultiple(width="100%"),
+        required=True)
+    notes = forms.CharField(widget=forms.Textarea, required=False,
+        help_text="(will be added to all selected volunteer's training "
+        "records)")

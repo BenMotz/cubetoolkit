@@ -1,10 +1,11 @@
-{% extends "base.html" %}
+{% extends "base_admin.html" %}
 
 {% block title %}
-Cube Toolkit: Create/edit item
+{{ VENUE.longname }} Toolkit: Create/edit item
 {% endblock %}
 
 {% block css %}
+{{ block.super }}
 <style>
 input[type="text"] {
     width: 90%;

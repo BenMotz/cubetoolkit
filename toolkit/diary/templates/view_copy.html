@@ -1,7 +1,7 @@
 {% extends "base_view_eventfield.html" %}
 
 {% block title %}
-CUBE programme of events - copy report
+{{ VENUE.name }} programme of events - copy report
 {% endblock %}
 
 {% block css %}
@@ -42,10 +42,9 @@ $(document).ready(function() {
 
 {% block body %}
 {{ block.super }}
-<img src="{{ STATIC_URL }}diary/diary_edit_list_header.gif" alt="Cube Microplex" width="150px">
-<h3>CUBE programme of events - copy report</h3>
+<h3>{{ VENUE.name }} programme of events - copy report</h3>
 <div class="index">
-<p class="pad">CUBE MICROPLEX</p>
+<p class="pad">{{ VENUE.name }}</p>
 
 <p class="pad">Programme of events.</p>
 

@@ -1,6 +1,6 @@
 {% extends "showing_archive_base.html" %}
 {% block title %}
-Cube Programme Archive: Search{% if search_term %} for "{{ search_term }}"{% endif %}
+{{ VENUE.longname }} Archive: Search{% if search_term %} for "{{ search_term }}"{% endif %}
 {% endblock %}
 
 {% block script %}
@@ -14,7 +14,7 @@ $(document).ready(function() {
 </script>
 {% endblock %}
 {% block archive_body %}
-<h3>Cube programme archive: Search {% if search_term %}results for "{{ search_term }}"{% endif %}</h3>
+<h3>{{ VENUE.longname }} programme archive: Search {% if search_term %}results for "{{ search_term }}"{% endif %}</h3>
 
 <form class="search_form" action="{% url "archive-search" %}">
 <ul>

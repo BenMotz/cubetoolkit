@@ -1,15 +1,14 @@
-{% extends "base.html" %}
+{% extends "base_admin.html" %}
 
 {% block title %}
 Editing Event types
 {% endblock %}
 
 {% block css %}
+{{ block.super }}
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
 <style type="text/css">
   body {
-      font-family: sans-serif;
-      font-size: 9pt;
       background: lightgray;
   }
   .template_form {
@@ -36,7 +35,6 @@ Editing Event types
   }
   select {
       width: 330px;
-
   }
   .errorlist li {
       color: red;

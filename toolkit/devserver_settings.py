@@ -25,14 +25,14 @@ LOGGING['root'] = {
     'level': 'DEBUG',
 }
 
-EMAIL_UNSUBSCRIBE_HOST = "localhost:8000"
+# Override setting in settings_common
+VENUE['email_unsubcribe_host'] = "localhost:8000"
 
 # Enable Debug mode, add in Django toolbar:
 DEBUG = True
 TEMPLATES[0]['OPTIONS']['debug'] = True
 
-# Undefine ALLOWED_HOSTS to ensure default loopback addresses work:
-del ALLOWED_HOSTS
+ALLOWED_HOSTS = ('127.0.0.1',)
 
 # Django toolbar things:
 INTERNAL_IPS = ('127.0.0.1',)

@@ -28,4 +28,5 @@ def thumbnail_url(source, alias):
         return ''
     return thumb.url
 
+
 register.filter(thumbnail_url)

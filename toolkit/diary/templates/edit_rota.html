@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "base_admin.html" %}
 {% load noprefix_url %}
 
 {% block meta %}
@@ -6,22 +6,13 @@
 {% endblock %}
 
 {% block title %}
-CUBE role rota
+{{ VENUE.longname }} role rota
 {% endblock %}
 
 {% block css %}
+{{ block.super }}
 <style type="text/css">
     @import url('{{ STATIC_URL }}css/lib/smoothness/jquery-ui.css');
-    body { font-family:Arial,Helvetica,sans-serif; }
-
-    .rota-wrapper{
-        max-width: 1280px;
-    }
-
-    h1, h2 { margin: 1mm; }
-    h1 { font-size: 16pt; }
-    h2 { font-size: 14pt; }
-
     .na {
         color: lightgray;
         cursor: pointer;
@@ -40,6 +31,7 @@ CUBE role rota
         border-top: thin dashed lightgray;
         border-bottom: thin solid lightgray;
         width: 90%;
+        font-size: 90%;
         font-family: monospace;
         white-space: pre-wrap;
         padding: 0.4em 1em;
@@ -60,6 +52,7 @@ CUBE role rota
       width: 50%;
       font-weight: bold;
       height: 0.65cm;
+      font-size: 90%;
     }
     .rota_name form {
         display: inline;
@@ -75,13 +68,14 @@ CUBE role rota
     }
     @media screen and (min-width: 800px) {
         .rota_role {
-          width: 30%;
+          width: 35%;
         }
     }
 </style>
 {% endblock %}
 
 {% block script %}
+{{ block.super }}
 <script src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
 <script src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
 <script src="{{ STATIC_URL }}js/lib/jquery.jeditable.mini.js"></script>
@@ -99,7 +93,7 @@ edit_rota(
 {% block body %}
 <div class="rota-wrapper">
     <form id='daterange'>
-    <p align='center'><label for="id_from_date">Rota from </label><input type="text" name="from_date" value="{{ start_date|date:'j-m-Y'}}" id="id_from_date" />
+    <p align='center'><label for="id_from_date">{{ VENUE.longname }} Rota from </label><input type="text" name="from_date" value="{{ start_date|date:'j-m-Y'}}" id="id_from_date" />
     <label for="id_to_date"> to </label><input type="text" name="to_date" value="{{ end_date|date:'j-m-Y'}}" id="id_to_date" />
     </p>
     </form>

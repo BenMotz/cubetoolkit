@@ -1,7 +1,7 @@
 {% extends "base_view_eventfield.html" %}
 
 {% block title %}
-CUBE programme of events - terms report
+{{ VENUE.name }} programme of events - terms report
 {% endblock %}
 
 {% block css %}
@@ -38,8 +38,7 @@ $(document).ready(function() {
 
 {% block body %}
 {{ block.super }}
-<img src="{{ STATIC_URL }}diary/diary_edit_list_header.gif" alt="Cube Microplex" width="150px">
-<h3>CUBE programme of events - terms report</h3>
+<h3>{{ VENUE.name }} programme of events - terms report</h3>
 <form id="form_search">
     <input type="text" name="search" {% if search %}value="{{ search }}"{% endif %}>
     <input type="submit" value="Search">

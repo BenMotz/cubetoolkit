@@ -72,7 +72,7 @@ def search(request):
         return render(request, 'search_members_results.html', context)
 
     context = {}
-    return render(request, 'search_members.html', {})
+    return render(request, 'search_members.html', context)
 
 
 @permission_required('toolkit.read')
@@ -298,4 +298,6 @@ def member_homepages(request):
                              .exclude(website='')
                              .order_by('number')
                              .values('name', 'website'))
-    return render(request, 'homepages.html', {'members': members})
+    return render(request, 'homepages.html', {
+            'members': members}
+    )

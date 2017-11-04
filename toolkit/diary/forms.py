@@ -52,8 +52,9 @@ class EventForm(forms.ModelForm):
                                u"Cert: 15",
                 }),
             'pre_title': forms.TextInput(attrs={
-                'placeholder': (u"Text displayed before / above the event"
-                                u"name, e.g. 'Cube Productions present'"),
+                'placeholder': ((u"Text displayed before / above the event"
+                                u"name, e.g. '%s presents'") %
+                                settings.VENUE['name']),
                 }),
             'post_title': forms.TextInput(attrs={
                 'placeholder': (u"Text displayed after / below the event name,"
@@ -310,9 +311,3 @@ class NewPrintedProgrammeForm(forms.ModelForm):
         self.instance.month = programme_month
 
         return cleaned_data
-
-
-class TagForm(forms.ModelForm):
-    class Meta(object):
-        model = toolkit.diary.models.EventTag
-        fields = ('name',)

@@ -90,7 +90,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "view_showing_index.html")
         self.assertContains(response,
-                            '<h4 class="site-description">folm events</h4>',
+                            '<h4 class="site-description">Folm events</h4>',
                             html=True)
         self.assertContains(response,
                             '<h4 class="site-description"> - couldn\'t find '
@@ -311,6 +311,23 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertNotContains(response, u'Book tickets')
         self.assertNotContains(response, ticket_link)
 
+    def test_expected_tags_in_navmenu(self):
+        url = reverse("default-view")
+        response = self.client.get(url)
+        self.assertTemplateUsed(response, "view_showing_index.html")
+        self.assertEqual(response.status_code, 200)
+        # Note that tags are title-cased in response, and ordering is
+        # significant!
+        self.assertContains(
+            response,
+            u'<ul class="sub-menu">'
+            u'<li><a href="/programme/view/ag-three/">'
+            u'<span>\u0166ag \u0164hre\u0119</span></a></li> '
+            u'<li><a href="/programme/view/tag-two/">'
+            u'<span>Tag Two</span></a></li>'
+            u'<li><a href="/programme/"><span>All</span></a></li>'
+            u'</ul>',
+            html=True)
     # TODO: Cancelled/confirmed/visible/cheap
 
 
