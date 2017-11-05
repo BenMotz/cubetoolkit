@@ -3,7 +3,7 @@ import logging
 import six.moves.urllib as urllib
 from django import template
 from django.template.defaulttags import url, URLNode
-from django.core.urlresolvers import get_script_prefix
+from django.urls import get_script_prefix
 
 register = template.Library()
 logger = logging.getLogger(__name__)

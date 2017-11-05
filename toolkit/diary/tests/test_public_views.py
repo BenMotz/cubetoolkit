@@ -5,7 +5,7 @@ from datetime import datetime, timedelta
 from mock import patch
 
 from django.test import TestCase
-from django.core.urlresolvers import reverse, resolve
+from django.urls import reverse, resolve
 import django.http
 
 from .common import DiaryTestsMixin

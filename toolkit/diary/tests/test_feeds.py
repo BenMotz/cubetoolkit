@@ -7,7 +7,7 @@ import xml.etree.ElementTree as ElementTree
 from mock import patch
 
 from django.test import TestCase
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from .common import DiaryTestsMixin
 

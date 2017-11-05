@@ -4,7 +4,7 @@ from mock import patch
 import fixtures
 
 from django.test import TestCase
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from toolkit.members.models import Member
 from .common import DiaryTestsMixin, ToolkitUsersFixture

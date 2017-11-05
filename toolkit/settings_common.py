@@ -2,7 +2,7 @@ import sys
 import os
 
 import six.moves
-import django.core.urlresolvers
+import django.urls
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -160,7 +160,7 @@ ADMINS = (
 )
 
 # Authorisation related settings:
-LOGIN_URL = django.core.urlresolvers.reverse_lazy('login')
+LOGIN_URL = django.urls.reverse_lazy('login')
 
 PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',

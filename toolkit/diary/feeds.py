@@ -1,7 +1,7 @@
 import datetime
 
 from django.contrib.syndication.views import Feed
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 import django.utils.timezone as timezone
 from django.conf import settings
 

@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 from django.test import TestCase
 from django.template import Context, Template
-from django.core.urlresolvers import get_script_prefix, set_script_prefix
+from django.urls import get_script_prefix, set_script_prefix
 
 
 class TestNoPrefixURLTag(TestCase):

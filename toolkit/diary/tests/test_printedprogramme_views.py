@@ -5,7 +5,7 @@ from datetime import date
 import tempfile
 
 from django.test import TestCase
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test.utils import override_settings
 
 from toolkit.diary.models import PrintedProgramme

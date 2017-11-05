@@ -13,11 +13,11 @@ from mock import patch
 
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 import six
 
 from toolkit.diary.models import (Showing, Event, Role, DiaryIdea,
-                                  EventTemplate, MediaItem, EventTag)
+                                  EventTemplate, MediaItem)
 from toolkit.util.image import adjust_colour
 import toolkit.diary.edit_prefs
 

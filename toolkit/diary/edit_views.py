@@ -6,7 +6,7 @@ from collections import OrderedDict
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.conf import settings
 from django.forms.models import modelformset_factory
 from django.contrib import messages
@@ -18,7 +18,6 @@ import django.utils.timezone as timezone
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.decorators.http import require_POST, require_http_methods
-from django.utils.decorators import method_decorator
 from django.utils.html import escape
 import six
 
