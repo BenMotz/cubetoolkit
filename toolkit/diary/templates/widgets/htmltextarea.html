@@ -1,0 +1,6 @@
+<div class='ckeditor_django_wrapper'>
+<textarea name="{{ widget.name }}"{% include "django/forms/widgets/attrs.html" %}>{% if widget.value %}{{ widget.value }}{% endif %}</textarea>
+</div>
+<script type='text/javascript'>
+CKEDITOR.replace('{{ widget.attrs.id }}');
+</script>
