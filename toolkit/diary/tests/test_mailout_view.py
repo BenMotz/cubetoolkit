@@ -23,8 +23,9 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         self.time_mock.return_value = self._fake_now
 
         self.expected_mailout_subject = (
-            'type="text" value="Cube Microplex forthcoming events'
-            ' commencing Sunday 9 June"'
+            '<input type="text" name="subject" value='
+            '"Cube Microplex forthcoming events commencing Sunday 9 June"'
+            ' required id="id_subject" maxlength="128" />'
         )
 
         self.expected_mailout_header = (
@@ -76,7 +77,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_mailout.html")
         self.assertContains(response, self.expected_mailout_header)
         self.assertContains(response, self.expected_mailout_event)
-        self.assertContains(response, self.expected_mailout_subject)
+        self.assertContains(response, self.expected_mailout_subject, html=True)
 
     def test_get_form_custom_daysahead(self):
         url = reverse("members-mailout")
@@ -87,7 +88,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
 
         self.assertContains(response, self.expected_mailout_header)
         self.assertContains(response, self.expected_mailout_event)
-        self.assertContains(response, self.expected_mailout_subject)
+        self.assertContains(response, self.expected_mailout_subject, html=True)
 
     def test_get_form_invalid_daysahead(self):
         url = reverse("members-mailout")
@@ -98,7 +99,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
 
         self.assertContains(response, self.expected_mailout_header)
         self.assertContains(response, self.expected_mailout_event)
-        self.assertContains(response, self.expected_mailout_subject)
+        self.assertContains(response, self.expected_mailout_subject, html=True)
 
     def test_get_form_no_events(self):
         url = reverse("members-mailout")
@@ -112,9 +113,8 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         self.assertNotContains(response, self.expected_mailout_event)
 
         # Expected subject - no "commencing" string:
-        self.assertContains(response,
-                            'type="text" '
-                            'value="Cube Microplex forthcoming events"')
+        self.assertContains(response, self.expected_mailout_subject.replace(
+            " commencing Sunday 9 June", ""), html=True)
 
     def test_post_form(self):
         url = reverse("members-mailout")
