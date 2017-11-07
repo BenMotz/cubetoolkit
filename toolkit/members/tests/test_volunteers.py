@@ -312,7 +312,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertTrue(new_member.mailout_failed)
         self.assertTrue(new_member.is_member)
         # Member notes aren't included on the form:
-        self.assertEqual(new_member.notes, None)
+        self.assertEqual(new_member.notes, '')
 
         self.assertTrue(new_member.volunteer.active)
         self.assertEqual(new_member.volunteer.notes,
@@ -373,7 +373,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertFalse(member.mailout_failed)
         self.assertTrue(member.is_member)
         # Member notes aren't included on the form:
-        self.assertEqual(member.notes, None)
+        self.assertEqual(member.notes, '')
 
         self.assertTrue(member.volunteer.active)
         self.assertEqual(member.volunteer.notes, "")
@@ -434,7 +434,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertTrue(member.mailout_failed)
         self.assertTrue(member.is_member)
         # Member notes aren't included on the form:
-        self.assertEqual(member.notes, None)
+        self.assertEqual(member.notes, '')
 
         self.assertTrue(member.volunteer.active)
         self.assertEqual(member.volunteer.notes,

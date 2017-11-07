@@ -1045,7 +1045,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
         media_item = event.media.all()[0]
         self.assertEqual(media_item.mimetype, "image/jpeg")
         self.assertEqual(media_item.credit, 'All new image credit!')
-        self.assertEqual(media_item.caption, None)
+        self.assertEqual(media_item.caption, '')
         self.assertEqual(media_item.media_file.name,
                          os.path.join("diary", temp_file_name))
 
@@ -1074,7 +1074,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
         media_item = event.media.all()[0]
         self.assertEqual(media_item.mimetype, "image/png")
         self.assertEqual(media_item.credit, 'All new image credit!')
-        self.assertEqual(media_item.caption, None)
+        self.assertEqual(media_item.caption, '')
         self.assertEqual(media_item.media_file.name,
                          os.path.join("diary", temp_file_name))
 
