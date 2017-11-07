@@ -382,44 +382,43 @@ class EditShowing(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_showing.html")
 
-        # (In the following, can't use "HTML" matching (which doesn't mind if
-        # the text isn't exact, so long as it's equivalent) as the output isn't
-        # currently valid HTML. Whoops.)
-
         # "clone" part should have expected start time:
         self.assertContains(
             response,
             '<input id="id_clone_start" name="clone_start" type="text"'
-            ' value="10/06/2013 18:00" required />'
+            ' value="10/06/2013 18:00" required />', html=True
         )
         # Edit should have existing values:
         self.assertContains(
             response,
             '<input id="id_start" name="start" type="text" '
-            'value="09/06/2013 18:00" required />'
+            'value="09/06/2013 18:00" required />', html=True
         )
         self.assertContains(
             response,
             '<input id="id_booked_by" maxlength="64" name="booked_by" '
-            'type="text" value="\u0102nother \u0170ser" required />'
+            'type="text" value="\u0102nother \u0170ser" required />',
+            html=True
         )
         self.assertContains(
             response,
             '<input checked="checked" id="id_confirmed" name="confirmed" '
-            'type="checkbox" />'
+            'type="checkbox" />', html=True
         )
         self.assertContains(
             response,
             '<input id="id_hide_in_programme" name="hide_in_programme" '
-            'type="checkbox" />'
+            'type="checkbox" />', html=True
         )
         self.assertContains(
             response,
-            '<input id="id_cancelled" name="cancelled" type="checkbox" />'
+            '<input id="id_cancelled" name="cancelled" type="checkbox" />',
+            html=True
         )
         self.assertContains(
             response,
-            '<input id="id_discounted" name="discounted" type="checkbox" />'
+            '<input id="id_discounted" name="discounted" type="checkbox" />',
+            html=True
         )
 
         # Shouldn't contain excluded fields:
@@ -429,15 +428,16 @@ class EditShowing(DiaryTestsMixin, TestCase):
         self.assertContains(
             response,
             '<input class="rota_count" id="id_role_1" name="role_1" '
-            'type="text" value="0" required />'
+            'type="text" value="0" required />', html=True
         )
         self.assertContains(
             response,
             '<option value="2" selected="selected">'
+            'Role 2 (nonstandard)</option>', html=True
         )
         self.assertContains(
             response,
-            '<option value="3">'
+            '<option value="3">Role 3</option>', html=True
         )
 
     def _test_edit_showing_common(self, now_patch, multiroom_enabled):
