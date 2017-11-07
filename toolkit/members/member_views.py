@@ -3,7 +3,7 @@ import logging
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
 from django.db.models import Q
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.contrib.auth.decorators import permission_required
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist

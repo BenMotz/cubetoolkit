@@ -2,7 +2,7 @@ import logging
 
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.conf import settings
 from django.contrib.auth.decorators import permission_required
 from django.contrib import messages
@@ -147,12 +147,10 @@ def edit_volunteer(request, volunteer_id, create_new=False):
         vol_form = VolunteerForm(
             request.POST,
             request.FILES,
-            prefix="vol",
             instance=volunteer
         )
         mem_form = MemberFormWithoutNotes(
             request.POST,
-            prefix="mem",
             instance=member
         )
         if vol_form.is_valid() and mem_form.is_valid():
@@ -171,9 +169,9 @@ def edit_volunteer(request, volunteer_id, create_new=False):
             # Go to the volunteer list view:
             return HttpResponseRedirect(reverse("view-volunteer-list"))
     else:
-        vol_form = VolunteerForm(prefix="vol", instance=volunteer)
-        mem_form = MemberFormWithoutNotes(prefix="mem",
-                                          instance=volunteer.member)
+        vol_form = VolunteerForm(instance=volunteer)
+        mem_form = MemberFormWithoutNotes(instance=volunteer.member)
+
     if new_training_record:
         training_record_form = TrainingRecordForm(
            prefix="training", instance=new_training_record)

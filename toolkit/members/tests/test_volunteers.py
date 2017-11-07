@@ -4,11 +4,10 @@ import os.path
 import tempfile
 import binascii
 import datetime
-import json
 
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.conf import settings
 
 from toolkit.members.models import Member, Volunteer, TrainingRecord
@@ -194,6 +193,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
             except OSError as ose:
                 print("Couldn't delete file!", ose)
 
+    @override_settings(MEDIA_URL="/")
     def test_get_form_edit(self):
         url = reverse("edit-volunteer", kwargs={"volunteer_id": self.vol_1.id})
         response = self.client.get(url)
@@ -312,7 +312,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertTrue(new_member.mailout_failed)
         self.assertTrue(new_member.is_member)
         # Member notes aren't included on the form:
-        self.assertEqual(new_member.notes, None)
+        self.assertEqual(new_member.notes, '')
 
         self.assertTrue(new_member.volunteer.active)
         self.assertEqual(new_member.volunteer.notes,
@@ -373,7 +373,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertFalse(member.mailout_failed)
         self.assertTrue(member.is_member)
         # Member notes aren't included on the form:
-        self.assertEqual(member.notes, None)
+        self.assertEqual(member.notes, '')
 
         self.assertTrue(member.volunteer.active)
         self.assertEqual(member.volunteer.notes, "")
@@ -434,7 +434,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertTrue(member.mailout_failed)
         self.assertTrue(member.is_member)
         # Member notes aren't included on the form:
-        self.assertEqual(member.notes, None)
+        self.assertEqual(member.notes, '')
 
         self.assertTrue(member.volunteer.active)
         self.assertEqual(member.volunteer.notes,
@@ -637,12 +637,6 @@ class TestAddTraining(MembersTestsMixin, TestCase):
     def tearDown(self):
         self.client.logout()
 
-    def _assert_response_json_equal(self, response, expected):
-        self.assertEqual(response['Content-Type'], "application/json")
-        self.assertEqual(response.status_code, 200)
-        self.assertJSONEqual(response.content, json.dumps(expected))
-
-
     def test_add_training(self):
         url = reverse("add-volunteer-training-record",
             kwargs={"volunteer_id": 1})
@@ -662,13 +656,14 @@ class TestAddTraining(MembersTestsMixin, TestCase):
             'training-notes':  notes
         })
 
-        self._assert_response_json_equal(response, {
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {
             "succeeded": True,
             "id": 1,
             "role": str(role),
             "training_date": "2015-02-01",
             "trainer": trainer,
-            "notes": notes
+            "notes": notes.strip()
         })
 
         vol = Volunteer.objects.get(id=1)
@@ -676,7 +671,7 @@ class TestAddTraining(MembersTestsMixin, TestCase):
         record = vol.training_records.all()[0]
         self.assertEqual(record.role, role)
         self.assertEqual(record.trainer, trainer)
-        self.assertEqual(record.notes, notes)
+        self.assertEqual(record.notes, notes.strip())
         self.assertEqual(record.training_date,
             datetime.date(day=1, month=2, year=2015))
         self.assertTrue(role in vol.roles.all())
@@ -685,7 +680,8 @@ class TestAddTraining(MembersTestsMixin, TestCase):
         url = reverse("add-volunteer-training-record",
             kwargs={"volunteer_id": 1})
         response = self.client.post(url, data={})
-        self._assert_response_json_equal(response, {
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {
             "succeeded": False,
             "errors": {
                 u'role': [u'This field is required.'],
@@ -707,7 +703,8 @@ class TestAddTraining(MembersTestsMixin, TestCase):
             'training-initial-training_date': "2015-03-01",
             'training-notes':  None
         })
-        self._assert_response_json_equal(response, {
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {
             "succeeded": False,
             "errors": "volunteer is not active"
         })
@@ -807,7 +804,7 @@ class TestAddGroupTraining(MembersTestsMixin, TestCase):
             recs = vol.training_records.all()
             self.assertEqual(len(recs), 1)
             self.assertEqual(recs[0].role, role)
-            self.assertEqual(recs[0].notes, notes)
+            self.assertEqual(recs[0].notes, notes.strip())
             self.assertEqual(recs[0].trainer, trainer)
             self.assertEqual(recs[0].training_date, training_date)
 

@@ -1,11 +1,10 @@
 from __future__ import absolute_import
-import json
 
 from mock import patch
 import fixtures
 
 from django.test import TestCase
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from toolkit.members.models import Member
 from .common import DiaryTestsMixin, ToolkitUsersFixture
@@ -24,8 +23,9 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         self.time_mock.return_value = self._fake_now
 
         self.expected_mailout_subject = (
-            'type="text" value="Cube Microplex forthcoming events'
-            ' commencing Sunday 9 June"'
+            '<input type="text" name="subject" value='
+            '"Cube Microplex forthcoming events commencing Sunday 9 June"'
+            ' required id="id_subject" maxlength="128" />'
         )
 
         self.expected_mailout_header = (
@@ -77,7 +77,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_mailout.html")
         self.assertContains(response, self.expected_mailout_header)
         self.assertContains(response, self.expected_mailout_event)
-        self.assertContains(response, self.expected_mailout_subject)
+        self.assertContains(response, self.expected_mailout_subject, html=True)
 
     def test_get_form_custom_daysahead(self):
         url = reverse("members-mailout")
@@ -88,7 +88,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
 
         self.assertContains(response, self.expected_mailout_header)
         self.assertContains(response, self.expected_mailout_event)
-        self.assertContains(response, self.expected_mailout_subject)
+        self.assertContains(response, self.expected_mailout_subject, html=True)
 
     def test_get_form_invalid_daysahead(self):
         url = reverse("members-mailout")
@@ -99,7 +99,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
 
         self.assertContains(response, self.expected_mailout_header)
         self.assertContains(response, self.expected_mailout_event)
-        self.assertContains(response, self.expected_mailout_subject)
+        self.assertContains(response, self.expected_mailout_subject, html=True)
 
     def test_get_form_no_events(self):
         url = reverse("members-mailout")
@@ -113,9 +113,8 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         self.assertNotContains(response, self.expected_mailout_event)
 
         # Expected subject - no "commencing" string:
-        self.assertContains(response,
-                            'type="text" '
-                            'value="Cube Microplex forthcoming events"')
+        self.assertContains(response, self.expected_mailout_subject.replace(
+            " commencing Sunday 9 June", ""), html=True)
 
     def test_post_form(self):
         url = reverse("members-mailout")
@@ -156,8 +155,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-        response = json.loads(response.content.decode("utf-8"))
-        self.assertEqual(response, {
+        self.assertEqual(response.json(), {
             u"status": u"error",
             u"errors": {
                 u"body": [u"This field is required."],
@@ -176,9 +174,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         })
 
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content.decode("utf-8"))
-
-        self.assertEqual(response_data, {
+        self.assertEqual(response.json(), {
             u"status": u"ok",
             u"progress": 0,
             u"task_id": u"dummy-task-id"
@@ -198,7 +194,6 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         response = self.client.get(url, data={u"task_id": u"dummy-task-id"})
 
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content.decode("utf-8"))
         self.assertEqual({
             u'complete': False,
             u'error': None,
@@ -206,7 +201,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             u'sent_count': None,
             u'progress': 10,
             u'task_id': u'dummy-task-id'
-        }, response_data)
+        }, response.json())
 
     @patch("celery.result.AsyncResult")
     def test_exec_view_get_progress_pending(self, async_result_patch):
@@ -217,7 +212,6 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         response = self.client.get(url, data={u"task_id": u"dummy-task-id"})
 
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content.decode("utf-8"))
         self.assertEqual({
             u'complete': False,
             u'error': None,
@@ -225,7 +219,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             u'sent_count': None,
             u'progress': 0,
             u'task_id': u'dummy-task-id'
-        }, response_data)
+        }, response.json())
 
     @patch("celery.result.AsyncResult")
     def test_exec_view_get_progress_failure(self, async_result_patch):
@@ -237,7 +231,6 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         response = self.client.get(url, data={u"task_id": u"dummy-task-id"})
 
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content.decode("utf-8"))
         self.assertEqual({
             u'complete': True,
             u'error': True,
@@ -245,7 +238,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             u'sent_count': None,
             u'progress': 0,
             u'task_id': u'dummy-task-id'
-        }, response_data)
+        }, response.json())
 
     @patch("celery.result.AsyncResult")
     def test_exec_view_get_progress_failure_no_result(self,
@@ -258,7 +251,6 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         response = self.client.get(url, data={u"task_id": u"dummy-task-id"})
 
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content.decode("utf-8"))
         self.assertEqual({
             u'complete': True,
             u'error': True,
@@ -266,7 +258,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             u'sent_count': None,
             u'progress': 0,
             u'task_id': u'dummy-task-id'
-        }, response_data)
+        }, response.json())
 
     @patch("celery.result.AsyncResult")
     def test_exec_view_get_progress_complete(self, async_result_patch):
@@ -278,7 +270,6 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         response = self.client.get(url, data={u"task_id": u"dummy-task-id"})
 
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content.decode("utf-8"))
         self.assertEqual({
             u'complete': True,
             u'error': False,
@@ -286,7 +277,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             u'sent_count': 321,
             u'progress': 100,
             u'task_id': u'dummy-task-id'
-        }, response_data)
+        }, response.json())
 
     @patch("celery.result.AsyncResult")
     def test_exec_view_get_progress_complete_bad_result(self,
@@ -299,7 +290,6 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         response = self.client.get(url, data={u"task_id": u"dummy-task-id"})
 
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content.decode("utf-8"))
         self.assertEqual({
             u'complete': True,
             u'error': True,
@@ -307,7 +297,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             u'sent_count': 0,
             u'progress': 100,
             u'task_id': u'dummy-task-id'
-        }, response_data)
+        }, response.json())
 
     @patch("celery.result.AsyncResult")
     def test_exec_view_get_progress_complete_error(self, async_result_patch):
@@ -319,7 +309,6 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         response = self.client.get(url, data={u"task_id": u"dummy-task-id"})
 
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content.decode("utf-8"))
         self.assertEqual({
             u'complete': True,
             u'error': True,
@@ -327,7 +316,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             u'sent_count': 322,
             u'progress': 100,
             u'task_id': u'dummy-task-id'
-        }, response_data)
+        }, response.json())
 
     @patch("celery.result.AsyncResult")
     def test_exec_view_get_bad_celery_progress_data(self, async_result_patch):
@@ -338,7 +327,6 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         response = self.client.get(url, data={u"task_id": u"dummy-task-id"})
 
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content.decode("utf-8"))
         self.assertEqual({
             u'complete': False,
             u'error': None,
@@ -346,7 +334,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             u'sent_count': None,
             u'progress': 0,
             u'task_id': u'dummy-task-id'
-        }, response_data)
+        }, response.json())
 
     @patch("celery.result.AsyncResult")
     def test_exec_view_get_bad_celery_data(self, async_result_patch):
@@ -357,7 +345,6 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         response = self.client.get(url, data={u"task_id": u"dummy-task-id"})
 
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content.decode("utf-8"))
         self.assertEqual({
             u'complete': False,
             u'error': None,
@@ -365,7 +352,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             u'sent_count': None,
             u'progress': 0,
             u'task_id': u'dummy-task-id'
-        }, response_data)
+        }, response.json())
 
 
 class MailoutTestSendViewTests(TestCase, fixtures.TestWithFixtures):

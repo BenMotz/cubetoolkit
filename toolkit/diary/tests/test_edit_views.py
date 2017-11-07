@@ -13,7 +13,7 @@ from mock import patch
 
 from django.test import TestCase
 from django.test.utils import override_settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 import six
 
 from toolkit.diary.models import (Showing, Event, Role, DiaryIdea,
@@ -382,44 +382,43 @@ class EditShowing(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_showing.html")
 
-        # (In the following, can't use "HTML" matching (which doesn't mind if
-        # the text isn't exact, so long as it's equivalent) as the output isn't
-        # currently valid HTML. Whoops.)
-
         # "clone" part should have expected start time:
         self.assertContains(
             response,
             '<input id="id_clone_start" name="clone_start" type="text"'
-            ' value="10/06/2013 18:00" />'
+            ' value="10/06/2013 18:00" required />', html=True
         )
         # Edit should have existing values:
         self.assertContains(
             response,
             '<input id="id_start" name="start" type="text" '
-            'value="09/06/2013 18:00" />'
+            'value="09/06/2013 18:00" required />', html=True
         )
         self.assertContains(
             response,
             '<input id="id_booked_by" maxlength="64" name="booked_by" '
-            'type="text" value="\u0102nother \u0170ser" />'
+            'type="text" value="\u0102nother \u0170ser" required />',
+            html=True
         )
         self.assertContains(
             response,
             '<input checked="checked" id="id_confirmed" name="confirmed" '
-            'type="checkbox" />'
+            'type="checkbox" />', html=True
         )
         self.assertContains(
             response,
             '<input id="id_hide_in_programme" name="hide_in_programme" '
-            'type="checkbox" />'
+            'type="checkbox" />', html=True
         )
         self.assertContains(
             response,
-            '<input id="id_cancelled" name="cancelled" type="checkbox" />'
+            '<input id="id_cancelled" name="cancelled" type="checkbox" />',
+            html=True
         )
         self.assertContains(
             response,
-            '<input id="id_discounted" name="discounted" type="checkbox" />'
+            '<input id="id_discounted" name="discounted" type="checkbox" />',
+            html=True
         )
 
         # Shouldn't contain excluded fields:
@@ -429,15 +428,16 @@ class EditShowing(DiaryTestsMixin, TestCase):
         self.assertContains(
             response,
             '<input class="rota_count" id="id_role_1" name="role_1" '
-            'type="text" value="0" />'
+            'type="text" value="0" required />', html=True
         )
         self.assertContains(
             response,
             '<option value="2" selected="selected">'
+            'Role 2 (nonstandard)</option>', html=True
         )
         self.assertContains(
             response,
-            '<option value="3">'
+            '<option value="3">Role 3</option>', html=True
         )
 
     def _test_edit_showing_common(self, now_patch, multiroom_enabled):
@@ -628,7 +628,7 @@ class AddEventView(DiaryTestsMixin, TestCase):
         self.assertContains(
             response,
             r'<input id="id_start" name="start" value="02/06/2013 20:00" '
-            r'type="text" />',
+            r'type="text" required />',
             html=True
         )
 
@@ -641,7 +641,7 @@ class AddEventView(DiaryTestsMixin, TestCase):
         self.assertContains(
             response,
             r'<input id="id_start" name="start" value="01/01/1950 20:00" '
-            r'type="text" />',
+            r'type="text" required />',
             html=True
         )
 
@@ -894,6 +894,20 @@ class EditEventView(DiaryTestsMixin, TestCase):
     def test_post_edit_event_no_media_minimal_data(self):
         url = reverse("edit-event-details", kwargs={"event_id": 2})
 
+        event = Event.objects.get(id=2)
+        event.pre_title = 'pre_title'
+        event.post_title = 'post_title'
+        event.pricing = 'pricing'
+        event.film_information = 'film_info'
+        event.duration = time(0,20)
+        event.copy = 'copy'
+        event.copy_summary = 'copy_summary'
+        event.terms = 'terms'
+        event.notes = 'notes'
+        event.outside_hire = True
+        event.private = True
+        event.save()
+
         # Submit the minimum amount of data to validate:
         response = self.client.post(url, data={
             'name': 'New \u20acvent Name',
@@ -910,7 +924,11 @@ class EditEventView(DiaryTestsMixin, TestCase):
         self.assertEqual(event.duration, time(0, 10))
         self.assertEqual(event.copy, '')
         self.assertEqual(event.copy_summary, '')
-        self.assertEqual(event.terms, '')
+        # XXX: If there's a default set on the model field then (as of Django
+        # 1.10) the old value is used. This is probably a bug :(
+        # (cf. django commit 3507d4e773a for #27186, change in
+        # master/django/forms/models.py around line 32)
+        self.assertEqual(event.terms, 'terms')
         self.assertEqual(event.notes, '')
         self.assertEqual(event.media.count(), 0)
         self.assertEqual(event.outside_hire, False)
@@ -1027,7 +1045,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
         media_item = event.media.all()[0]
         self.assertEqual(media_item.mimetype, "image/jpeg")
         self.assertEqual(media_item.credit, 'All new image credit!')
-        self.assertEqual(media_item.caption, None)
+        self.assertEqual(media_item.caption, '')
         self.assertEqual(media_item.media_file.name,
                          os.path.join("diary", temp_file_name))
 
@@ -1056,7 +1074,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
         media_item = event.media.all()[0]
         self.assertEqual(media_item.mimetype, "image/png")
         self.assertEqual(media_item.credit, 'All new image credit!')
-        self.assertEqual(media_item.caption, None)
+        self.assertEqual(media_item.caption, '')
         self.assertEqual(media_item.media_file.name,
                          os.path.join("diary", temp_file_name))
 
@@ -1224,8 +1242,7 @@ class EditIdeasViewTests(DiaryTestsMixin, TestCase):
             url, HTTP_ACCEPT="Accept: application/xml;q=0.9, "
             "*/*;q=0.8, application/json")
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content.decode("utf-8"))
-        self.assertEqual(response_data, {
+        self.assertEqual(response.json(), {
             "ideas": None,
             'month': '2012-01-01',
         })
@@ -1266,7 +1283,7 @@ class EditIdeasViewTests(DiaryTestsMixin, TestCase):
             HTTP_ACCEPT="Accept: application/xml;q=0.9, */*;q=0.8, "
             "application/json")
         self.assertEqual(response.status_code, 200)
-        response_data = json.loads(response.content.decode("utf-8"))
+        response_data = response.json()
         self.assertEqual(response["Content-Type"],
                          "application/json; charset=utf-8")
         self.assertEqual(response_data, {
@@ -1695,7 +1712,7 @@ class DiaryDataViewTests(DiaryTestsMixin, TestCase):
 
         self.assertEqual(response.status_code, 200)
 
-        data = json.loads(response.content.decode("utf-8"))
+        data = response.json()
         data_by_showing = {int(i['id']): i for i in data}
 
         expected_showings = {1, 2, 3, 4, 5, 6, 7, 10}

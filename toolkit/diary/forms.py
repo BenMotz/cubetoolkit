@@ -169,7 +169,7 @@ def rota_form_factory(showing):
         # Don't have to have anything selected:
         required=False,
         # List of IDs which should be selected:
-        initial=(entry.pk for entry in rota_entries),
+        initial=[entry.pk for entry in rota_entries if not entry.standard],
         help_text='Hold down "Control", or "Command" on a Mac, to select more '
                   'than one.'
     )
@@ -285,14 +285,17 @@ class NewPrintedProgrammeForm(forms.ModelForm):
         ],
         initial=datetime.date.today().year
     )
-    month = forms.ChoiceField(
+    # Use 'form_month' to avoid conflicting with 'month' field on the
+    # underlying model -- see comment above.
+    form_month = forms.ChoiceField(
+        label="Month",
         choices=(list(zip(range(13), calendar.month_name))[1:]),
         initial=datetime.date.today().month
     )
 
     class Meta(object):
         model = toolkit.diary.models.PrintedProgramme
-        fields = ('month', 'programme', 'designer', 'notes')
+        fields = ('form_month', 'year', 'programme', 'designer', 'notes')
 
     def clean(self):
         cleaned_data = super(NewPrintedProgrammeForm, self).clean()
@@ -301,7 +304,7 @@ class NewPrintedProgrammeForm(forms.ModelForm):
         try:
             programme_month = datetime.date(
                 int(cleaned_data['year']),
-                int(cleaned_data['month']),
+                int(cleaned_data['form_month']),
                 1
             )
         except (KeyError, ValueError, TypeError):

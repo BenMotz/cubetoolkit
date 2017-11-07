@@ -1,12 +1,11 @@
 from __future__ import absolute_import
-import json
 import pytz
 from datetime import datetime, timedelta
 
 from mock import patch
 
 from django.test import TestCase
-from django.core.urlresolvers import reverse, resolve
+from django.urls import reverse, resolve
 import django.http
 
 from .common import DiaryTestsMixin
@@ -176,9 +175,8 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
-        data = json.loads(response.content.decode("utf-8"))
         # Eh (shrug)
-        self.assertEqual(data, [{
+        self.assertEqual(response.json(), [{
                          u"name": u"Event three title",
                          u"tags": u"tag two",
                          u"image": None,

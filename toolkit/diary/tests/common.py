@@ -128,7 +128,7 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
             notes="Notes",
         )
         e3.save()
-        e3.tags = [t2, ]
+        e3.tags.set([t2, ])
         e3.save()
 
         e4 = Event(
@@ -144,7 +144,7 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
             notes=u"\u0147otes on event fou\u0159",
         )
         e4.save()
-        e4.tags = [t2, ]
+        e4.tags.set([t2, ])
         e4.save()
 
         e5 = Event(
@@ -169,7 +169,7 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
             private=True
         )
         e6.save()
-        e6.tags = [t3, ]
+        e6.tags.set([t3, ])
         e6.save()
 
         # Showings:
@@ -286,16 +286,16 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
         # One role, one tag, pricing
         self.tmpl1 = EventTemplate(name="Template 1")
         self.tmpl1.save()
-        self.tmpl1.roles = [r1]
-        self.tmpl1.tags = [t1]
+        self.tmpl1.roles.set([r1])
+        self.tmpl1.tags.set([t1])
         self.tmpl1.pricing = u"Entry: \u00a35 / \u20ac10"
         self.tmpl1.save()
 
         # Two roles, two tags
         self.tmpl2 = EventTemplate(name="Template 2")
         self.tmpl2.save()
-        self.tmpl2.roles = [r1, r2]
-        self.tmpl2.tags = [t1, t3]
+        self.tmpl2.roles.set([r1, r2])
+        self.tmpl2.tags.set([t1, t3])
         self.tmpl2.save()
 
         # No roles, no tags, no pricing
@@ -326,7 +326,7 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
         # Volunteers:
         v1 = Volunteer(member=m3)
         v1.save()
-        v1.roles = [r1, r3]
+        v1.roles.set([r1, r3])
         v1.save()
 
         v2 = Volunteer(member=m4)
@@ -334,7 +334,7 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
 
         v3 = Volunteer(member=m5)
         v3.save()
-        v3.roles = [r3]
+        v3.roles.set([r3])
         v3.save()
 
 

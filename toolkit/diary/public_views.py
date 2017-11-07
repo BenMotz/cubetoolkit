@@ -8,9 +8,9 @@ from collections import OrderedDict
 from django.db.models import Q
 from django.http import HttpResponse, Http404
 from django.shortcuts import render
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.conf import settings
-from django.utils.safestring import mark_for_escaping
+from django.utils.html import conditional_escape
 import django.utils.timezone as timezone
 import django.views.generic as generic
 
@@ -49,7 +49,7 @@ def _view_diary(request, startdate, enddate, tag=None, extra_title=None):
         'start': startdate,
         'end': enddate,
         # Make sure user input is escaped:
-        'event_type': mark_for_escaping(tag) if tag else None,
+        'event_type': conditional_escape(tag) if tag else None,
         # Set page title:
         'extra_title': extra_title,
         # Set of Showing objects for date range

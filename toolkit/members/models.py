@@ -65,17 +65,17 @@ class Member(models.Model):
     number = models.CharField(max_length=10, editable=False)
 
     name = models.CharField(max_length=64)
-    email = models.EmailField(max_length=64, blank=True, null=True)
+    email = models.EmailField(max_length=64, blank=True)
 
-    address = models.CharField(max_length=128, blank=True, null=True)
-    posttown = models.CharField(max_length=64, blank=True, null=True)
-    postcode = models.CharField(max_length=16, blank=True, null=True)
-    country = models.CharField(max_length=32, blank=True, null=True)
+    address = models.CharField(max_length=128, blank=True)
+    posttown = models.CharField(max_length=64, blank=True)
+    postcode = models.CharField(max_length=16, blank=True)
+    country = models.CharField(max_length=32, blank=True)
 
-    website = models.CharField(max_length=128, blank=True, null=True)
-    phone = models.CharField(max_length=64, blank=True, null=True)
-    altphone = models.CharField(max_length=64, blank=True, null=True)
-    notes = models.TextField(blank=True, null=True)
+    website = models.CharField(max_length=128, blank=True)
+    phone = models.CharField(max_length=64, blank=True)
+    altphone = models.CharField(max_length=64, blank=True)
+    notes = models.TextField(blank=True)
 
     is_member = models.BooleanField(default=True)
 
@@ -141,9 +141,9 @@ class Member(models.Model):
 class Volunteer(models.Model):
 
     member = models.OneToOneField('Member', related_name='volunteer',
-                                  on_delete=models.CASCADE)
+        on_delete=models.CASCADE)
 
-    notes = models.TextField(blank=True, null=True)
+    notes = models.TextField(blank=True)
     active = models.BooleanField(default=True)
 
     portrait = models.ImageField(

@@ -13,7 +13,7 @@ class Command(BaseCommand):
     help = 'Dump database to <output_file> using mysqldump'
 
     can_import_settings = True
-    requires_model_validation = True
+    requires_system_checks = True
 
     def _dump_to_filename(self, filename):
         if os.path.exists(filename):

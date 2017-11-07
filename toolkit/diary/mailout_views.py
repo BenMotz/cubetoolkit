@@ -67,7 +67,7 @@ def _render_mailout_subject_and_body(days_ahead, copy_days_ahead):
         'copy_days_ahead': copy_days_ahead,
     }
 
-    return subject_text, mail_template.render(django.template.Context(context))
+    return subject_text, mail_template.render(context)
 
 
 def _render_mailout_form(request, body_text, subject_text, context):

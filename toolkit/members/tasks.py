@@ -5,7 +5,7 @@ from email.header import Header
 
 import six
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from celery import task, current_task
 from celery.utils.log import get_task_logger

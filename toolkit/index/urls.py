@@ -2,7 +2,7 @@ from django.conf.urls import url
 import django.utils.functional as functional
 import django.views.generic.edit as generic_edit
 from django.contrib.auth.decorators import permission_required
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 
 from toolkit.index.models import IndexLink, IndexCategory
 

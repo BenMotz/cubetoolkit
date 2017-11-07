@@ -6,7 +6,7 @@ from collections import OrderedDict
 
 from django.http import HttpResponse, Http404, HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.conf import settings
 from django.forms.models import modelformset_factory
 from django.contrib import messages
@@ -16,8 +16,8 @@ import django.db
 from django.db.models import Q
 import django.utils.timezone as timezone
 from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.decorators.http import require_POST, require_http_methods
-from django.utils.decorators import method_decorator
 from django.utils.html import escape
 import six
 
@@ -540,13 +540,11 @@ def edit_showing(request, showing_id=None):
     return render(request, 'form_showing.html', context)
 
 
-class EditEventView(View):
+class EditEventView(PermissionRequiredMixin, View):
     """Handle the "edit event" form."""
     # Quite complex, so a class based view
 
-    @method_decorator(permission_required('toolkit.write'))
-    def dispatch(self, request, *args, **kwargs):
-        return super(EditEventView, self).dispatch(request, *args, **kwargs)
+    permission_required = 'toolkit.write'
 
     def _save(self, event, media_item, form, media_form):
         # Some factored out code: method is passed valid event and media form,
@@ -868,9 +866,17 @@ def printed_programme_edit(request, operation):
             edited_form = new_programme_form
 
         if edited_form.is_valid():
-            edited_form.save()
-            logger.info("Printed programme archive updated")
-            return HttpResponseRedirect(reverse("edit-printed-programmes"))
+            try:
+                # Without a transaction an IntegrityError will leave a broken
+                # transaction
+                with django.db.transaction.atomic():
+                    edited_form.save()
+            except django.db.IntegrityError:
+                edited_form.add_error('form_month',
+                    'Printed programme with this month/year already exists.')
+            else:
+                logger.info("Printed programme archive updated")
+                return HttpResponseRedirect(reverse("edit-printed-programmes"))
 
     context = {
         'formset': formset,
@@ -912,14 +918,10 @@ def view_rota_vacancies(request):
     return render(request, u'view_rota_vacancies.html', context)
 
 
-class EditRotaView(View):
+class EditRotaView(PermissionRequiredMixin, View):
     """Handle the "edit rota" page."""
 
-    # The following ensure that a user with the correct permission is logged
-    # in:
-    @method_decorator(permission_required('diary.change_rotaentry'))
-    def dispatch(self, request, *args, **kwargs):
-        return super(EditRotaView, self).dispatch(request, *args, **kwargs)
+    permission_required = 'diary.change_rotaentry'
 
     def get(self, request, year=None, day=None, month=None):
         # Fiddly way to set startdate to the start of the local day:

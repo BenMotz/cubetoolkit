@@ -1,9 +1,4 @@
 from django import forms
-# Widgety:
-from django.utils.safestring import mark_safe
-from django.utils.html import conditional_escape
-from django.forms.utils import flatatt
-from django.utils.encoding import force_text
 
 
 class ChosenSelectMultiple(forms.SelectMultiple):
@@ -11,6 +6,9 @@ class ChosenSelectMultiple(forms.SelectMultiple):
     SelectMultiple widget using the "Chosen" jquery plugin:
     http://harvesthq.github.io/chosen/
     """
+
+    template_name = 'widgets/chosenselectmultiple.html'
+
     class Media(object):
         # Define media (CSS & JS) used by this control. To include this
         # automatically the template containing the form must have the
@@ -27,33 +25,21 @@ class ChosenSelectMultiple(forms.SelectMultiple):
         self.width = kwargs.pop('width', None)
         super(ChosenSelectMultiple, self).__init__(*args, **kwargs)
 
-    def render(self, name, value, attrs=None, choices=()):
-        # Use the default rendering:
-        output = super(ChosenSelectMultiple, self).render(
-            name, value, attrs=attrs, choices=choices)
-
-        final_attrs = self.build_attrs(attrs, name=name)
-
-        if self.width:
-            options = "{width: '%s'}" % self.width
-        else:
-            options = "{}"
-
-        # Add JS code to get the "Chosen" library to do the setup
-        output += (u"<script type='text/javascript'>"
-                   "$('#{control_id}').chosen({options});"
-                   "</script>".format(
-                       control_id=final_attrs[u'id'],
-                       options=options
-                   ))
-
-        return mark_safe(output)
+    def get_context(self, name, value, attrs):
+        context = super(ChosenSelectMultiple, self).get_context(name, value, attrs)
+        context['widget'].update({
+            'width': self.width,
+        })
+        return context
 
 
 class HtmlTextarea(forms.Textarea):
     """TextArea widget overloaded to provide a wysiwyg HTML editor, using the
     'CKEditor' editor
     """
+
+    template_name = 'widgets/htmltextarea.html'
+
     class Media(object):
         # Define media (CSS & JS) used by this control. To include this
         # automatically the template containing the form must have the
@@ -62,35 +48,15 @@ class HtmlTextarea(forms.Textarea):
             'js/lib/ckeditor/ckeditor.js',
         )
 
-    # Generate HTML for the editor control:
-    def render(self, name, value, attrs=None):
-        if value is None:
-            value = ''
-
-        final_attrs = self.build_attrs(attrs, name=name)
-
-        output = [
-            u"<div class='ckeditor_django_wrapper'>",
-            u'<textarea{0}>{1}</textarea>'.format(
-                flatatt(final_attrs),
-                conditional_escape(force_text(value))
-            ),
-            u"</div>",
-            u"<script type='text/javascript'>",
-            u" CKEDITOR.replace('{0}');".format(
-                final_attrs['id']
-            ),
-            u"</script>",
-        ]
-
-        return mark_safe(u'\n'.join(output))
-
 
 class JQueryDateTimePicker(forms.DateTimeInput):
     """
     Override DateTimeInput form widget to automatically use the JQueryUI
     control
     """
+
+    template_name = 'widgets/jquerydatetimepicker.html'
+
     def __init__(self, *args, **kwargs):
         # Change the default date/time format to match that used by the
         # jquery widget (which is also the more conventional UK format)
@@ -109,21 +75,3 @@ class JQueryDateTimePicker(forms.DateTimeInput):
             'js/lib/jquery-ui.min.js',
             'js/lib/jquery-ui-timepicker-addon.js',
         )
-
-    def render(self, name, value, attrs=None):
-        # Use the default rendering (a textbox) :
-        output = super(JQueryDateTimePicker, self).render(
-            name, value, attrs=attrs)
-
-        final_attrs = self.build_attrs(attrs, type=self.input_type, name=name)
-
-        # Add JS code to attach the JQuery UI code and make the "magic" happen.
-        # Note that the (hardcoded) dateFormat/timeFormat match that set for
-        # the textbox in __init__
-        output += (u"<script type='text/javascript'>"
-                   "$('#{control_id}').datetimepicker({{ "
-                   "dateFormat : 'dd/mm/yy', timeFormat : 'hh:mm', minDate : 0"
-                   "}});"
-                   "</script>".format(control_id=final_attrs[u'id']))
-
-        return mark_safe(output)

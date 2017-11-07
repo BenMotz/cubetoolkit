@@ -88,10 +88,10 @@ class MediaItem(models.Model):
         verbose_name='Image file')
     mimetype = models.CharField(max_length=64, editable=False)
 
-    credit = models.CharField(max_length=256, null=True, blank=True,
+    credit = models.CharField(max_length=256, blank=True,
                               default="Internet scavenged",
                               verbose_name='Image credit')
-    caption = models.CharField(max_length=256, null=True, blank=True)
+    caption = models.CharField(max_length=256, blank=True)
 
     class Meta:
         db_table = 'MediaItems'
@@ -127,7 +127,7 @@ class MediaItem(models.Model):
 @python_2_unicode_compatible
 class EventTag(models.Model):
     name = models.CharField(max_length=32, unique=True)
-    slug = models.SlugField(max_length=50, unique=True)
+    slug = models.SlugField(max_length=50, unique=True)  # allow_unicode=True?
     read_only = models.BooleanField(default=False, editable=False)
     promoted = models.BooleanField(default=False)
     sort_order = models.IntegerField(null=True, blank=True, editable=True)
@@ -677,7 +677,7 @@ class PrintedProgramme(models.Model):
     programme = models.FileField(upload_to="printedprogramme", max_length=256,
                                  null=False, blank=False,
                                  verbose_name='Programme PDF')
-    designer = models.CharField(max_length=256, null=True, blank=True)
+    designer = models.CharField(max_length=256, blank=True)
     notes = models.TextField(max_length=8192, null=True, blank=True)
 
     objects = PrintedProgrammeQuerySet.as_manager()

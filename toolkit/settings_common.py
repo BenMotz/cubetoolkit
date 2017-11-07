@@ -2,7 +2,7 @@ import sys
 import os
 
 import six.moves
-import django.core.urlresolvers
+import django.urls
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
@@ -160,7 +160,7 @@ ADMINS = (
 )
 
 # Authorisation related settings:
-LOGIN_URL = django.core.urlresolvers.reverse_lazy('login')
+LOGIN_URL = django.urls.reverse_lazy('login')
 
 PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',
@@ -240,18 +240,17 @@ STATICFILES_FINDERS = (
     # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
-MIDDLEWARE_CLASSES = (
+MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.auth.middleware.SessionAuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'wagtail.wagtailcore.middleware.SiteMiddleware',
-    'wagtail.wagtailredirects.middleware.RedirectMiddleware',
-)
+    'wagtail.wagtailcore.middleware.SiteMiddleware', #
+    'wagtail.wagtailredirects.middleware.RedirectMiddleware', #
+]
 
 SECURE_CONTENT_TYPE_NOSNIFF = True
 
@@ -343,9 +342,6 @@ INSTALLED_APPS = (
 
     'modelcluster',
     'taggit',
-    # Remove at Django 1.9+ (required for circular template refs when
-    # customising wagtail admin)
-    'overextends',
 )
 
 # Common logging config. Different settings files can tweak this.
