@@ -169,7 +169,7 @@ def rota_form_factory(showing):
         # Don't have to have anything selected:
         required=False,
         # List of IDs which should be selected:
-        initial=(entry.pk for entry in rota_entries),
+        initial=[entry.pk for entry in rota_entries if not entry.standard],
         help_text='Hold down "Control", or "Command" on a Mac, to select more '
                   'than one.'
     )
