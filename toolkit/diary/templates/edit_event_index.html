@@ -170,34 +170,33 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
 
 {% include "messages.html" %}
 
-{% with extra_columns=rooms|length|add:2 %}
-
+{% with room_columns=rooms|length %}
 <table>
-    <tr><td></td><td colspan="{{ extra_columns }}"><a href="{% url "add-event" %}">New event</a></td></tr>
-{% if rooms %}
-<tr><td colspan="{{ extra_columns|add:1 }}"></td>
+    <tr><td></td><td colspan="{{ room_columns|add:1 }}"><a href="{% url "add-event" %}">New event</a></td></tr>
+{% if multiroom_enabled %}
+<tr><td colspan="2"></td>
 {% for room in rooms %}
-    <th>{{ room.name }}</th>
+    <th>{{ room.name|default:"<!-- No Room -->" }}</th>
 {% endfor %}
 </tr>
 {% endif %}
 {% for day, showings in dates.items %}
     {% ifchanged %}
         <tr class="row_year">
-            <td colspan="{{ extra_columns }}"><h1>{{ day|date:"Y" }}</h1></td>
-            <td></td>
+            <td colspan="2"><h1>{{ day|date:"Y" }}</h1></td>
+            <td colspan="{{ room_columns }}"></td>
         </tr>
     {% endifchanged %}
     {% ifchanged %}
         <tr class="row_month">
-            <td colspan="{{ extra_columns }}"><h2>{{ day|date:"F" }}</h2></td>
-            <td></td>
+            <td colspan="2"><h2>{{ day|date:"F" }}</h2></td>
+            <td colspan="{{ room_columns }}"></td>
         </tr>
     {% endifchanged %}
     {% if day in ideas %}
         <tr>
             <td><a href="{% url "edit-ideas" year=day.year month=day.month %}">IDEAS</a></td>
-            <td colspan="{{ extra_columns }}" class="ideas"><div class="idea-edit" id="idea-edit-{{day.year}}-{{day.month}}">{{ ideas|lookup:day }}</div></td>
+            <td colspan="{{ room_columns|add:1 }}" class="ideas"><div class="idea-edit" id="idea-edit-{{day.year}}-{{day.month}}">{{ ideas|lookup:day }}</div></td>
         </tr>
     {% endif %}
 
@@ -205,7 +204,7 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
         <tr>
         {% if forloop.first %}
             {# First showing of the day, blank row plus add an event link #}
-            <td colspan="{{ extra_columns|add:1 }}">&nbsp;</td>
+            <td colspan="{{ room_columns|add:2 }}">&nbsp;</td>
         </tr>
         <tr>
             <td><a href="{% url "add-event" %}?date={{day|date:"j-m-Y"}}">{{ day|date:"D j"}}</a></td>
@@ -217,8 +216,10 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
             <td>
                 <a href="{% url "edit-showing" showing_id=showing.pk %}" {% if start_localtime.hour <= 17 %}class="daytime"{% endif %}>{{ showing.start|date:"H:i" }}</a>
             </td>
+
         {% for room in rooms %}
-            {% if showing.room == room %}
+            {# if multiroom_enabled is false then rooms will only have one item, so there shouldn't be any repeats! #}
+            {% if showing.room == room or not multiroom_enabled %}
             <td>{{ showing.booked_by }} <a href="{% url "edit-event-details-view" pk=showing.event.pk %}"
                     class="{{ showing.cancelled|yesno:"cancelled," }}
                            {{ showing.discounted|yesno:"discounted," }}
@@ -237,27 +238,8 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
                 {{ showing.sold_out|yesno:"(marked SOLD OUT)," }}
             </td>
             {% else %}
-                <td></td>
+                <td>&nbsp;</td>
             {% endif %}
-        {% empty %}
-            {# If room mode is disabled. This is a nasty copy/paste from above. #}
-            <td>{{ showing.booked_by }} <a href="{% url "edit-event-details-view" pk=showing.event.pk %}"
-                    class="{{ showing.cancelled|yesno:"cancelled," }}
-                           {{ showing.discounted|yesno:"discounted," }}
-                           {{ showing.event.private|yesno:"private," }}
-                           {{ showing.event.outside_hire|yesno:"external," }}
-                           {{ showing.confirmed|yesno:"confirmed,unconfirmed" }}
-                           {% if start_localtime.hour <= 17 %}daytime{% endif %}">
-                {% if showing.confirmed %}
-                    {{ showing.event.pre_title|upper }} {{ showing.event.name|upper }} {{ showing.event.post_title|upper }}
-                {% else %}
-                    {{ showing.event.name }}
-                {% endif %}
-                {{ showing.discounted|yesno:"*," }}
-                {{ showing.cancelled|yesno:"(CANCELLED)," }}
-                </a>
-                {{ showing.sold_out|yesno:"(marked SOLD OUT)," }}
-            </td>
         {% endfor %}
         </tr>
         {% endwith %}
@@ -265,7 +247,7 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
         {# No showings on this day, but show the day anyway (with a link to add an event) #}
         <tr>
             <td><a href="{% url "add-event" %}?date={{day|date:"j-m-Y"}}">{{ day|date:"D j"}}</a></td>
-            <td colspan="{{ extra_columns }}"></td>
+            <td colspan="{{ room_columns|add:1 }}"></td>
         </tr>
     {% endfor %}
 {% endfor %}
