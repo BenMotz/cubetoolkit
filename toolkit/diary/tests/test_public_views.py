@@ -264,8 +264,8 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "view_event.html")
         self.assertContains(
             response,
-            u'<a href="{0}" target="_blank">Book tickets</a>'.format(
-                ticket_link),
+            u'<a href="{0}"  rel="noopener noreferrer" target="_blank">'
+            u'Book tickets</a>'.format(ticket_link),
             html=True
         )
 

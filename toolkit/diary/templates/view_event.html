@@ -49,7 +49,7 @@
             <p class="tickets">Tickets: {{ event.pricing }}</p>
         {% endif %}
         {% if event.ticket_link and not all_showings_finished %}
-           <p class="action"><a href="{{ event.ticket_link }}" target="_blank">Book tickets</a></p>
+           <p class="action"><a href="{{ event.ticket_link }}" rel="noopener noreferrer" target="_blank">Book tickets</a></p>
         {% endif %}
         <div class="copy">
             {{ event.copy_html }}
