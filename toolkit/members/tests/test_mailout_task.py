@@ -7,7 +7,7 @@ from mock import patch, call
 
 from django.conf import settings
 from django.test import TestCase
-from django.test.utils import override_settings
+from django.core import mail
 
 import toolkit.members.tasks
 from toolkit.members.models import Member
@@ -23,17 +23,15 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
 
     def _assert_mail_as_expected(self, msgstr, is_utf8, from_addr, dest_addr,
                                  body_contains, expected_subject):
-        if six.PY3:
-            msgstr = msgstr.decode("utf-8")
         message = email.parser.Parser().parsestr(msgstr)
 
         self.assertEqual(message.get_content_type(), 'text/plain')
         self.assertFalse(message.is_multipart())
+        # It's always UTF-8, even if the content is ASCII:
+        self.assertEqual(message.get_charsets(), ["utf-8"])
         if is_utf8:
-            self.assertEqual(message.get_charsets(), ["utf-8"])
             self.assertEqual(message['Content-Transfer-Encoding'], '8bit')
         else:
-            self.assertEqual(message.get_charsets(), ["us-ascii"])
             self.assertEqual(message['Content-Transfer-Encoding'], '7bit')
         self.assertEqual(message['From'], from_addr)
         self.assertEqual(message['To'], dest_addr)
@@ -49,7 +47,7 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
             0][1] else subject[0][0]
         self.assertEqual(subject, expected_subject)
 
-    def _assert_mail_sent(self, result, current_task_mock, smtplib_mock,
+    def _assert_mail_sent(self, result, current_task_mock,
                           subject, body, is_utf8):
         current_task_mock.update_state.assert_has_calls([
             call(state='PROGRESS017', meta={'total': 6, 'sent': 1}),
@@ -61,23 +59,19 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
             call(state='PROGRESS101', meta={'total': 6, 'sent': 6})
         ])
 
-        # Expect to have connected:
-        smtplib_mock.assert_called_once_with('smtp.test', 8281)
-
         # Sent 6 mails, plus one summary:
-        conn = smtplib_mock.return_value
-        self.assertEqual(conn.sendmail.call_count, 7)
+        self.assertEqual(len(mail.outbox), 7)
 
         # Validate summary:
-        summary_mail_call = conn.sendmail.call_args_list[6]
-        self.assertEqual(summary_mail_call[0][0],
+        summary_mail = mail.outbox[6]
+        self.assertEqual(summary_mail.from_email,
                          settings.VENUE['mailout_from_address'])
-        self.assertEqual(summary_mail_call[0][1],
+        self.assertEqual(summary_mail.to,
                          [settings.VENUE['mailout_delivery_report_to']])
         # Check mail twice, to check for each bit of expected text in the body;
         # The mail count:
         self._assert_mail_as_expected(
-            summary_mail_call[0][2],
+            str(summary_mail.message()),
             is_utf8,
             settings.VENUE['mailout_from_address'],
             settings.VENUE['mailout_delivery_report_to'],
@@ -86,7 +80,7 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         )
         # And the actual body text:
         self._assert_mail_as_expected(
-            summary_mail_call[0][2],
+            str(summary_mail.message()),
             is_utf8,
             settings.VENUE['mailout_from_address'],
             settings.VENUE['mailout_delivery_report_to'],
@@ -98,44 +92,35 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         # False => no error, 6 == sent count:
         self.assertEqual(result, (False, 6, 'Ok'))
 
-        # Disconnect:
-        conn.quit.assert_called_once_with()
-
-    @patch("smtplib.SMTP")
     @patch("toolkit.members.tasks.current_task")
-    @override_settings(EMAIL_HOST="smtp.test", EMAIL_PORT=8281)
-    def test_send_unicode(self, current_task_mock, smtplib_mock):
+    def test_send_unicode(self, current_task_mock):
         subject = u"The Subject \u2603!"
         body = u"The Body!\nThat will be \u20ac1, please\nTa \u2603!"
         result = toolkit.members.tasks.send_mailout(subject, body)
         self._assert_mail_sent(result, current_task_mock,
-                               smtplib_mock, subject, body, True)
+                               subject, body, True)
 
-    @patch("smtplib.SMTP")
     @patch("toolkit.members.tasks.current_task")
-    @override_settings(EMAIL_HOST="smtp.test", EMAIL_PORT=8281)
-    def test_send_ascii(self, current_task_mock, smtplib_mock):
+    def test_send_ascii(self, current_task_mock):
         subject = u"The Subject!"
         body = u"The Body!\nThat will be $1, please\nTa!"
         result = toolkit.members.tasks.send_mailout(subject, body)
         self._assert_mail_sent(result, current_task_mock,
-                               smtplib_mock, subject, body, False)
+                               subject, body, False)
 
-    @patch("smtplib.SMTP")
     @patch("toolkit.members.tasks.current_task")
-    @override_settings(EMAIL_HOST="smtp.test", EMAIL_PORT=8281)
-    def test_send_iso88591_subj(self, current_task_mock, smtplib_mock):
+    def test_send_iso88591_subj(self, current_task_mock):
         subject = u"The \xa31 Subject!"
         body = u"The Body!\nThat will be $1, please\nTa!"
         result = toolkit.members.tasks.send_mailout(subject, body)
         self._assert_mail_sent(result, current_task_mock,
-                               smtplib_mock, subject, body, False)
+                               subject, body, False)
 
-    @patch("smtplib.SMTP")
+    @patch("django.core.mail.get_connection")
     @patch("toolkit.members.tasks.current_task")
-    @override_settings(EMAIL_HOST="smtp.test", EMAIL_PORT=8281)
-    def test_connect_fail(self, current_task_mock, smtplib_mock):
-        smtplib_mock.side_effect = smtplib.SMTPConnectError("Blah", 101)
+    def test_connect_fail(self, current_task_mock, connection_mock):
+        connection_mock.return_value.open.side_effect = \
+            smtplib.SMTPConnectError("Blah", 101)
 
         result = toolkit.members.tasks.send_mailout(
             u"The \xa31 Subject!", u"The Body!\nThat will be $1, please\nTa!"
@@ -145,12 +130,25 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
             result,
             (True, 0, "Failed to connect to SMTP server: ('Blah', 101)"))
 
-    @patch("smtplib.SMTP")
+    @patch("django.core.mail.backends.base.BaseEmailBackend.close")
     @patch("toolkit.members.tasks.current_task")
-    @override_settings(EMAIL_HOST="smtp.test", EMAIL_PORT=8281)
-    def test_send_fail(self, current_task_mock, smtplib_mock):
-        smtplib_mock.return_value.sendmail.side_effect = smtplib.SMTPException(
-            "Something failed", 101)
+    def test_disconnect_fail(self, current_task_mock, close_mock):
+        subject = u"The Subject \u2603!"
+        body = u"The Body!\nThat will be \u20ac1, please\nTa \u2603!"
+        close_mock.side_effect = (
+                smtplib.SMTPServerDisconnected("Already disconnected?"))
+
+        result = toolkit.members.tasks.send_mailout(subject, body)
+        self._assert_mail_sent(result, current_task_mock,
+                               subject, body, True)
+
+        close_mock.assert_called_once()
+
+    @patch("django.core.mail.get_connection")
+    @patch("toolkit.members.tasks.current_task")
+    def test_send_fail(self, current_task_mock, connection_mock):
+        exception = smtplib.SMTPException("Something failed", 101)
+        connection_mock.return_value.send_messages.side_effect = exception
 
         result = toolkit.members.tasks.send_mailout(
             u"The \xa31 Subject!", u"The Body!\nThat will be $1, please\nTa!"
@@ -159,12 +157,16 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         # Overall, operation succeeded:
         self.assertEqual((False, 6, "Ok"), result)
 
-    @patch("smtplib.SMTP")
+        # Check errors are in the report message:
+        report = connection_mock.return_value.send_messages.call_args[0][0][0]
+        expected = "6 errors:\n" + "\n".join([str(exception)] * 6)
+        self.assertIn(expected, report.body)
+
+    @patch("django.core.mail.get_connection")
     @patch("toolkit.members.tasks.current_task")
-    @override_settings(EMAIL_HOST="smtp.test", EMAIL_PORT=8281)
-    def test_send_fail_disconnected(self, current_task_mock, smtplib_mock):
-        smtplib_mock.return_value.sendmail.side_effect = \
-                smtplib.SMTPServerDisconnected("Something failed")
+    def test_send_fail_disconnected(self, current_task_mock, connection_mock):
+        connection_mock.return_value.send_messages.side_effect = (
+                smtplib.SMTPServerDisconnected("Something failed"))
 
         result = toolkit.members.tasks.send_mailout(
             u"The \xa31 Subject!", u"The Body!\nThat will be $1, please\nTa!"
@@ -173,12 +175,12 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         self.assertEqual(
             result, (True, 0, "Mailout job died: 'Something failed'"))
 
-    @patch("smtplib.SMTP")
+    @patch("django.core.mail.get_connection")
     @patch("toolkit.members.tasks.current_task")
-    @override_settings(EMAIL_HOST="smtp.test", EMAIL_PORT=8281)
-    def test_random_error(self, current_task_mock, smtplib_mock):
+    def test_random_error(self, current_task_mock, connection_mock):
         # Test a non SMTP error
-        smtplib_mock.return_value.sendmail.side_effect = IOError("something")
+        connection_mock.return_value.send_messages.side_effect = (
+            IOError("something"))
 
         result = toolkit.members.tasks.send_mailout(
             u"The \xa31 Subject!", u"The Body!\nThat will be $1, please\nTa!"
@@ -187,10 +189,8 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         # Overall, operation succeeded:
         self.assertEqual(result, (True, 0, "Mailout job died: 'something'"))
 
-    @patch("smtplib.SMTP")
     @patch("toolkit.members.tasks.current_task")
-    @override_settings(EMAIL_HOST="smtp.test", EMAIL_PORT=8281)
-    def test_no_recipients(self, current_task_mock, smtplib_mock):
+    def test_no_recipients(self, current_task_mock):
         Member.objects.all().delete()
         # Test a non SMTP error
         result = toolkit.members.tasks.send_mailout(
@@ -198,3 +198,18 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         )
 
         self.assertEqual(result, (True, 0, "No recipients found"))
+
+    @patch("toolkit.members.tasks.current_task")
+    def test_send_unicode_email_address(self, current_task_mock):
+        subject = u"The Subject \u2603!"
+        body = u"The Body!\nThat will be \u20ac1, please\nTa \u2603!"
+
+        member = Member.objects.get(id=1)
+        member.email = u"\u0205ne@\u0205xample.com"
+        member.save()
+
+        result = toolkit.members.tasks.send_mailout(subject, body)
+        self._assert_mail_sent(result, current_task_mock,
+                               subject, body, True)
+        self.assertEqual(mail.outbox[0].to, [u'\u0205ne@\u0205xample.com'])
+

@@ -1,9 +1,6 @@
 import smtplib
-from email import charset
-from email.mime.text import MIMEText
-from email.header import Header
 
-import six
+import django.core.mail
 from django.conf import settings
 from django.urls import reverse
 
@@ -15,38 +12,19 @@ from toolkit.members.models import Member
 logger = get_task_logger(__name__)
 
 
-def string_is_ascii(string):
-    return all(ord(char) < 0x7F for char in string)
-
-
-def _send_email(smtp_conn, destination, subject, body, mail_is_ascii):
+def _send_email(email_conn, destination, subject, body):
     error = None
 
-    # Body, encoded in either ASCII or UTF-8:
-    body_charset = "ascii" if mail_is_ascii else "utf-8"
-    msg = MIMEText(body.encode(body_charset, "replace"), "plain", body_charset)
-
-    # Assume 'From' is always ASCII(!)
-    msg['From'] = settings.VENUE['mailout_from_address']
-    msg['To'] = Header(destination)
-    msg['Subject'] = Header(subject)
+    msg = django.core.mail.EmailMessage(
+        subject=subject,
+        body=body,
+        from_email=settings.VENUE['mailout_from_address'],
+        to=[destination],
+        connection=email_conn,
+    )
 
     try:
-        # Enforce ascii destination email address:
-        if six.PY2:
-            smtp_conn.sendmail(settings.VENUE['mailout_from_address'],
-                               [destination.encode("ascii")],
-                               msg.as_string())
-        else:
-            smtp_conn.sendmail(settings.VENUE['mailout_from_address'],
-                               [destination],
-                               msg.as_string().encode("utf-8"))
-
-    except UnicodeError:
-        msg = "Non-ascii email address {0}".format(
-            destination.encode("ascii", "replace"))
-        logger.error(msg)
-        return msg
+        msg.send()
     except smtplib.SMTPServerDisconnected as ssd:
         logger.error("Failed sending to {0}: {1}".format(destination, ssd))
         # don't handle this:
@@ -58,8 +36,8 @@ def _send_email(smtp_conn, destination, subject, body, mail_is_ascii):
     return error
 
 
-def send_mailout_report(smtp_conn, report_to, sent, err_list,
-                        subject, body, body_is_ascii):
+def send_mailout_report(email_conn, report_to, sent, err_list,
+                        subject, body):
         # All done? Send report:
         report = ("%d copies of the following were sent out on %s members "
                   "list\n" % (sent, settings.VENUE['name']))
@@ -73,8 +51,7 @@ def send_mailout_report(smtp_conn, report_to, sent, err_list,
         report += "\n"
         report += body
 
-        _send_email(smtp_conn, report_to,
-                    subject, report, body_is_ascii)
+        _send_email(email_conn, report_to, subject, report)
 
 
 def send_mailout_to(subject, body, recipients, task=None, report_to=None):
@@ -87,12 +64,7 @@ def send_mailout_to(subject, body, recipients, task=None, report_to=None):
     where error is True if an error occurred.
     """
 
-    # Configure to 'intelligently' use shortest encoding for subject, but just
-    # send body of email as 8 bit plain. (This was the default behaviour in
-    # Django 1.5.x - retain it so as not to rock the boat for mail delivery)
-    charset.add_charset('utf-8', charset.SHORTEST, None, 'utf-8')
-
-    header_template = u"Dear {0},\n\n"
+    preamble_template = u"Dear {0},\n\n"
     signature_template = (
         u"\n"
         u"\n"
@@ -110,18 +82,13 @@ def send_mailout_to(subject, body, recipients, task=None, report_to=None):
     logger.info("Sending mailout to {0} recipients".format(count))
 
     # Open connection to SMTP server:
+    email_conn = django.core.mail.get_connection(fail_silently=False)
     try:
-        smtp_conn = smtplib.SMTP(settings.EMAIL_HOST, settings.EMAIL_PORT)
+        email_conn.open()
     except Exception as exc:
         msg = "Failed to connect to SMTP server: {0}".format(exc)
         logger.error(msg)
         return (True, 0, msg)
-
-    # Cache if body is 7 bit clean (will need to check each sender name, but
-    # save a bit of time by not scanning everything)
-    body_is_ascii = (
-        string_is_ascii(body) and
-        string_is_ascii(signature_template))
 
     err_list = []
 
@@ -130,11 +97,7 @@ def send_mailout_to(subject, body, recipients, task=None, report_to=None):
 
     try:
         for recipient in recipients:
-            # Nb; this is not the email header, it's just the "Dear XYZ"
-            # bit at the top of the mail:
-            header = header_template.format(
-                recipient.name
-            )
+            body_preamble = preamble_template.format(recipient.name)
 
             # Build per-recipient signature, with customised unsubscribe links:
             signature = signature_template.format(
@@ -143,12 +106,10 @@ def send_mailout_to(subject, body, recipients, task=None, report_to=None):
                 recipient.mailout_key,
             )
             # Build final email, still in unicode:
-            mail_body = header + body + signature
-            mail_is_ascii = body_is_ascii and string_is_ascii(header)
+            mail_body = body_preamble + body + signature
 
-            error = _send_email(smtp_conn, recipient.email,
-                                subject, mail_body, mail_is_ascii)
-
+            error = _send_email(email_conn, recipient.email, subject,
+                                mail_body)
             if error:
                 err_list.append(error)
 
@@ -160,15 +121,15 @@ def send_mailout_to(subject, body, recipients, task=None, report_to=None):
                     meta={'sent': sent, 'total': count})
 
         if report_to:
-            send_mailout_report(smtp_conn, report_to, sent, err_list,
-                                subject, body, body_is_ascii)
+            send_mailout_report(email_conn, report_to, sent, err_list,
+                                subject, body)
 
     except Exception as exc:
         logger.exception("Mailout job failed, '{0}'".format(exc))
         return (True, sent, "Mailout job died: '{0}'".format(exc))
     finally:
         try:
-            smtp_conn.quit()
+            email_conn.close()
         except smtplib.SMTPException as smtpe:
             logger.error("SMTP Quit failed: {0}".format(smtpe))
 
