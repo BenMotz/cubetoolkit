@@ -5,7 +5,9 @@ var mailoutController = function (options) {
 
     // Configured by setupPage:
     var mail_subject;
-    var mail_body;
+    var mail_body_text;
+    var mail_body_html;
+    var mail_send_html;
     var progressURL;
     var execURL;
     var testURL;
@@ -27,7 +29,9 @@ var mailoutController = function (options) {
         var progressBarId;
 
         mail_subject = options.subject;
-        mail_body = options.body;
+        mail_body_text = options.body_text;
+        mail_body_html = options.body_html;
+        mail_send_html = options.send_html;
 
         progressURL = options.progressURL;
         execURL = options.execURL;
@@ -99,7 +103,9 @@ var mailoutController = function (options) {
 
         data = 'csrfmiddlewaretoken=' + encodeURIComponent(csrftoken) +
                '&subject=' +  encodeURIComponent(mail_subject) +
-               '&body=' + encodeURIComponent(mail_body);
+               '&body_text=' + encodeURIComponent(mail_body_text) +
+               '&body_html=' + encodeURIComponent(mail_body_html) +
+               '&send_html=' + encodeURIComponent(mail_send_html);
 
         send_xhr = jQuery.ajax(execURL, {
             'type': 'POST',
@@ -133,7 +139,9 @@ var mailoutController = function (options) {
         var data = 'csrfmiddlewaretoken=' + encodeURIComponent(csrftoken) +
                '&address=' + encodeURIComponent(email) +
                '&subject=' +  encodeURIComponent(mail_subject) +
-               '&body=' + encodeURIComponent(mail_body);
+               '&body_text=' + encodeURIComponent(mail_body_text) +
+               '&body_html=' + encodeURIComponent(mail_body_html) +
+               '&send_html=' + encodeURIComponent(mail_send_html);
 
         send_xhr = jQuery.ajax(testURL, {
             'type': 'POST',

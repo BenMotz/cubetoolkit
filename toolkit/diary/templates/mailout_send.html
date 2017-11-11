@@ -19,7 +19,7 @@ Mailout dispatch
         font-family: monospace;
         white-space: nowrap;
     }
-    p#body {
+    p#body_text, p#body_html {
         font-family: monospace;
         white-space: pre-wrap;
     }
@@ -37,7 +37,9 @@ Mailout dispatch
 <script type="text/javascript">
 $(document).ready(function() {
     var subject = "{{ subject|safe|escapejs }}";
-    var body = "{{ body|safe|escapejs }}";
+    var send_html = {{ send_html|yesno:"true,false" }};
+    var body_text = "{{ body_text|safe|escapejs }}";
+    var body_html = "{{ body_html|safe|escapejs }}";
     mailoutController({
         progressURL: "{% url "mailout-progress" %}",
         execURL: "{% url "exec-mailout" %}",
@@ -45,7 +47,9 @@ $(document).ready(function() {
         progressBarId: "progress",
         jQuery: $,
         subject: subject,
-        body: body
+        body_text: body_text,
+        body_html: body_html,
+        send_html: send_html
     });
 });
 </script>
@@ -57,12 +61,16 @@ $(document).ready(function() {
 <p id="progress"></p>
 <p id="test">Optionally, <span id="test_send">send</span> the email to a
 <label for="id_test_email">single recipient
-(</label><input id="id_test_email" type="email" placeholder="something@example.com"></input>*),
+(</label><input id="id_test_email" type="email" placeholder="something@example.com">*),
 to test everything is working as expected. (* must be a cube member!)</p>
 <p class="label">Subject:</p>
 <p class="mail" id="subject">{{ subject }}</p>
 <p class="label">Body:</p>
-<p class="mail" id="body">{{body}}</p>
+<p class="mail" id="body_text">{{ body_text }}</p>
+{% if send_html %}
+<p class="label">HTML Body:</p>
+<p class="mail" id="body_html">{{ body_html }}</p>
+{% endif %}
 
 {% endblock %}
 

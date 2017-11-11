@@ -237,18 +237,45 @@ class NewEventForm(forms.Form):
 
 
 class MailoutForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.html_mailout_enabled = kwargs.pop('html_mailout_enabled')
+        super(MailoutForm, self).__init__(*args, **kwargs)
+        if not self.html_mailout_enabled:
+            del self.fields['send_html']
+            del self.fields['body_html']
+
+    send_html = forms.BooleanField(label="Send HTML mailout",
+                initial=True,
+                required=False)
+
     subject = forms.CharField(max_length=128, required=True, label_suffix='')
-    body = forms.CharField(
-            required=True,
-            widget=forms.Textarea(attrs={'wrap': 'soft', 'cols': 80}))
+
+    body_text = forms.CharField(
+                required=True,
+                widget=forms.Textarea(attrs={'wrap': 'soft', 'cols': 80}))
+
+    body_html = forms.CharField(
+                widget=HtmlTextarea(attrs={'wrap': 'soft'}))
 
 
 class MailoutTestForm(forms.Form):
+    def __init__(self, *args, **kwargs):
+        self.html_mailout_enabled = kwargs.pop('html_mailout_enabled')
+        super(MailoutTestForm, self).__init__(*args, **kwargs)
+        if not self.html_mailout_enabled:
+            del self.fields['send_html']
+            del self.fields['body_html']
+
     address = forms.EmailField(required=True)
+
+    send_html = forms.BooleanField(required=False)
+
     subject = forms.CharField(max_length=128, required=True)
-    body = forms.CharField(
-            required=True,
-            widget=forms.Textarea(attrs={'wrap': 'soft', 'cols': 80}))
+
+    body_text = forms.CharField(required=True)
+
+    body_html = forms.CharField()
+
 
 
 class SearchForm(forms.Form):

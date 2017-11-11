@@ -3,6 +3,7 @@ from toolkit.settings_common import *
 ROOT_URLCONF = 'toolkit.urls_flat'
 
 MULTIROOM_ENABLED = True
+HTML_MAILOUT_ENABLED = True
 
 VENUE = {
     'name': 'Star and Shadow',
