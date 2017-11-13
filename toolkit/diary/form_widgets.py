@@ -48,6 +48,18 @@ class HtmlTextarea(forms.Textarea):
             'js/lib/ckeditor/ckeditor.js',
         )
 
+    def __init__(self, *args, **kwargs):
+        self.enable_tables = kwargs.pop('enable_tables', False)
+        self.height = kwargs.pop('height', None)
+        super(HtmlTextarea, self).__init__(*args, **kwargs)
+
+    def get_context(self, name, value, attrs):
+        context = super(HtmlTextarea, self).get_context(name, value, attrs)
+        context['widget']['enable_tables'] = self.enable_tables
+        if self.height:
+            context['widget']['height'] = self.height
+        return context
+
 
 class JQueryDateTimePicker(forms.DateTimeInput):
     """
