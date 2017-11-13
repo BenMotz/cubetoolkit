@@ -9,11 +9,13 @@ MYSQLDUMP_BINARY = "/usr/bin/mysqldump"
 
 
 class Command(BaseCommand):
-    args = '<output_file>'
     help = 'Dump database to <output_file> using mysqldump'
 
     can_import_settings = True
     requires_system_checks = True
+
+    def add_arguments(self, parser):
+        parser.add_argument('output_file', type=str)
 
     def _dump_to_filename(self, filename):
         if os.path.exists(filename):
@@ -46,11 +48,9 @@ class Command(BaseCommand):
         print("Done")
 
     def handle(self, *args, **options):
-        if len(args) > 1:
-            raise CommandError("Only expecting one argument")
-        elif len(args) == 0:
-            raise CommandError("No filename supplied")
+        output_filename = options.get('output_file')
 
-        output_filename = args[0]
+        if not output_filename or not output_filename.strip():
+            raise CommandError("No filename supplied")
 
         self._dump_to_filename(output_filename)
