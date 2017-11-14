@@ -5,12 +5,21 @@
 {{ block.super }}
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
 <style>
-    em {
+    .volunteer em {
         font-style: normal;
         color: red;
     }
-    tr {
-        page-break-inside: avoid;
+    .volunteer {
+        border-top: thin dotted gray;
+        padding-top: 0.5rem;
+    }
+    p.name {
+        font-weight: bold;
+        font-size: 120%;
+    }
+    h4 {
+        text-align: center;
+        color: red;
     }
 </style>
 {% endblock %}
@@ -18,45 +27,49 @@
 {% block title %}{{ VENUE.name }} Volunteers{% endblock %}
 
 {% block body %}
-{# {% for v, n in roles.items %} <p><b>{{ v }}</b><br> {{ n }} </p> {% endfor %} #}
-<h2>{{ VENUE.name }} Volunteers Report</h2>
+<h2>{{ VENUE.name }} Volunteers</h2>
 {% include "messages.html" %}
-Total number of {{ VENUE.name }} volunteers: {{ volunteers|length }}<p>
-Report generated: {% now "d/m/Y" %}<p>
-<a href="{% url "add-volunteer" %}" title="add new volunteer">[add volunteer]</a>
+<p><a href="{% url "add-volunteer" %}" title="add new volunteer">[add volunteer]</a>
 <a href="{% url "retire-select-volunteer" %}" title="retire volunteer">[retire volunteer]</a>
 <a href="{% url "unretire-select-volunteer" %}" title="unretire volunteer">[unretire volunteer]</a><br>
-<h3>Contact details:</h3>
-<table>
-{% for volunteer in volunteers %}
-{% with volunteer.member as member %}
-
-{% cycle '<tr>' '' %}
-<td valign="top" align="right">
-{% if volunteer.portrait %}
-<a href="{{ volunteer.portrait.url }}">
-    <img src="{{ volunteer.portrait|thumbnail_url:'portrait' }}" border="0" width="75" alt="Photo of {{ member.name }}"></a><br>
-{% else %}
-<img src="{{ default_mugshot }}"  alt="Photo of {{ member.name }}" border="0" width="75"><br>
-{% endif %}
-<a href="{% url "edit-volunteer" volunteer.pk %}">[update]</a></td>
-<td>&nbsp;&nbsp;</td>
-<td valign="top">
-<b><font size="4">{{ member.name }}</font></b><p>
-<b>notes:</b> {{ volunteer.notes|default:"" }}<p>
-<b>roles:</b>{{ volunteer.roles.all|join:", "|lower|default:"<em>Request role information</em>" }}<p>
-{{ member.email|urlize|default:"<em>Request email address</em>" }}<br>
-{{ member.address }}{% if member.address %}<br>{% endif %}
-{{ member.postcode }}{% if member.postcode %}<br>{% endif %}
-{{ member.phone }}{% if member.phone %}<br>{% endif %}
-{{ member.altphone|default:"<em>Request mobile number</em>" }}<br>
-<a href="{% url "edit-volunteer" volunteer.pk %}">[update]</a><br>
-<br>
-</td>
-{% cycle '' '</tr>' %}
-
-{% endwith %}
-{% endfor %}
-</table>
+Active {{ VENUE.name }} volunteers: {{ volunteers|length }}</p>
+<div class="container">
+    {% for volunteer in volunteers %}
+        {% with volunteer.member as member %}
+        {% cycle '<div class="row">' '' %}
+            <div class="col-sm">
+                <div class="volunteer row">
+                    <div class="col-4">
+                        {% if volunteer.portrait %}
+                        <a href="{{ volunteer.portrait.url }}">
+                            <img src="{{ volunteer.portrait|thumbnail_url:'portrait' }}" border="0" width="75" alt="Photo of {{ member.name }}">
+                        </a><br>
+                        {% else %}
+                        <img src="{{ default_mugshot }}"  alt="Photo of {{ member.name }}" border="0" width="75"><br>
+                        {% endif %}
+                        <a href="{% url "edit-volunteer" volunteer.pk %}">[update]</a>
+                    </div>
+                    <div class="col-8">
+                        <p class="name">{{ member.name }}</p>
+                        <p><b>notes:</b> {{ volunteer.notes|default:"" }}</p>
+                        <p><b>roles:</b>{{ volunteer.roles.all|join:", "|lower|default:"<em>Request role information</em>" }}</p>
+                        <p>{{ member.email|urlize|default:"<em>Request email address</em>" }}<br>
+                        {% if member.address %}<br>{% endif %}
+                        {% if member.postcode %}{{ member.postcode }}<br>{% endif %}
+                        {% if not member.phone and not member.altphone %}
+                        <em>Request phone number</em><br>
+                        {% else %}
+                        {% if member.phone %}{{ member.phone }}<br>{% endif %}
+                        {% if member.altphone %}{{ member.altphone }}<br>{% endif %}
+                        {% endif %}
+                        <a href="{% url "edit-volunteer" volunteer.pk %}">[update]</a>
+                        </p>
+                    </div>
+                </div>
+            </div><!-- col-sm -->
+        {% cycle '' '</div><!-- row -->' %}
+        {% endwith %}
+    {% endfor %}
+</div><!-- container -->
 <h2>The volunteer role report can now be found <a href="{% url "view-volunteer-role-report" %}">here</a>.</h2>
 {% endblock %}
