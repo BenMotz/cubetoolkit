@@ -11,6 +11,9 @@
     color: red;
     list-style-type: disclosure-closed;
 }
+.hidden {
+    display: none;
+}
 </style>
 {% endblock css %}
 
@@ -33,6 +36,7 @@ function update_role_display() {
 function update_outdated_highlights() {
     var max_age_months = +$('#id_age_highlight').val();
     var max_age_date = new Date();
+    var hide_up_to_date = $('#id_hide_current')[0].checked;
 
     max_age_date.setMonth(max_age_date.getMonth() - max_age_months);
 
@@ -42,8 +46,14 @@ function update_outdated_highlights() {
     for(var i = 0; i < records.length; i++) {
         if(records[i].dataset.trainingTime < max_age_s_since_epoch) {
             records[i].classList.add("outdated");
+            records[i].classList.remove("hidden");
         } else {
             records[i].classList.remove("outdated");
+            if(hide_up_to_date) {
+                records[i].classList.add("hidden");
+            } else {
+                records[i].classList.remove("hidden");
+            }
         }
     }
 }
@@ -57,6 +67,7 @@ $(document).ready(function() {
             width: '50%',
     }).change(update_role_display);
     $('#id_age_highlight').change(update_outdated_highlights);
+    $('#id_hide_current').change(update_outdated_highlights);
 });
 </script>
 {% endblock script %}
@@ -70,9 +81,12 @@ record <em>and</em> they have a role selected in their profile.<br />
 (This means that out of date training is only flagged if a volunteer is
 still active in that role)</p>
 
-<p><span class="outdated">Higlight</span> training that is more than
+<ul>
+    <li><span class="outdated">Higlight</span> training that is more than
 <input id="id_age_highlight" type="number" value="12" min="0" style="width: 4em;">
-months in the past.</p>
+months in the past.</li>
+    <li><label>Only show outdated training <input id="id_hide_current" type="checkbox"></label></li>
+</ul>
 
 <p>Roles to display: <select multiple="multiple" id="id_role_select">
 {% for role, _ in report_data %}
