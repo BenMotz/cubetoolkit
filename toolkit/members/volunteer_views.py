@@ -263,14 +263,18 @@ def view_volunteer_training_records(request):
     # Now sort by role ID / volunteer Name, using an obnoxiously complicated
     # comprehension (sorry):
     role_map_list = sorted(
+        # List of (role, [(volunteer, record), (volunteer, record), ...])
+        # tuples, with the list of (vol, rec) tuples sorted by
+        # volunteer.member.name:
         [
             (role, sorted(
                     [(vol, record) for vol, record in vol_map.items()],
-                    key=lambda v_r: v_r[0].member.name
+                    key=lambda v_r: v_r[0].member.name.lower()
                    )
             ) for role, vol_map in role_map.items()
         ],
-        key=lambda r_l: r_l[0].name
+        #... and sort the [ (role, [(vol, rec), ...]), ...] list by role name:
+        key=lambda r_l: r_l[0].name.lower()
     )
 
     context = {
