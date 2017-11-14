@@ -661,7 +661,7 @@ class TestAddTraining(MembersTestsMixin, TestCase):
             "succeeded": True,
             "id": 1,
             "role": str(role),
-            "training_date": "2015-02-01",
+            "training_date": "01/02/2015",
             "trainer": trainer,
             "notes": notes.strip()
         })

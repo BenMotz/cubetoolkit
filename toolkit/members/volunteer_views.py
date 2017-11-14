@@ -218,7 +218,7 @@ def add_volunteer_training_record(request, volunteer_id):
             'succeeded': True,
             'id': new_record.id,
             'role': str(new_record.role),
-            'training_date': new_record.training_date,
+            'training_date': new_record.training_date.strftime("%d/%m/%Y"),
             'trainer': new_record.trainer,
             'notes': new_record.notes,
         }

@@ -220,7 +220,7 @@ $(document).ready(function() {
     {% for record in volunteer.training_records.all %}
         <tr>
             <td>{{ record.role }}</td>
-            <td>{{ record.training_date }}</td>
+            <td>{{ record.training_date|date:"d/m/Y" }}</td>
             <td>{{ record.trainer }}</td>
             <td>{% if record.notes %}<a class="toggle-notes" href="#">(+)</a>{% endif %}</td>
             <td>
