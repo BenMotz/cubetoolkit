@@ -27,7 +27,7 @@ logger.setLevel(logging.DEBUG)
 
 
 def _render_mailout_subject_and_body(days_ahead, copy_days_ahead):
-    # Render default mail contents;
+    # Render default mail contents. Returns (subject, text mail, html mail)
 
     # Read data
     start_date = timezone.now()
@@ -56,8 +56,12 @@ def _render_mailout_subject_and_body(days_ahead, copy_days_ahead):
     subject_text = "%s forthcoming events%s" % (
                     settings.VENUE['longname'], first_event_date)
 
-    # Render into mail template
-    mail_template = django.template.loader.get_template("mailout_body.txt")
+    # Render into mail templates
+    text_mail_template = django.template.loader.get_template(
+        "mailout_body.txt")
+
+    html_mail_template = django.template.loader.get_template(
+        "mailout_body.html")
 
     context = {
         'start_date': start_date,
@@ -67,12 +71,19 @@ def _render_mailout_subject_and_body(days_ahead, copy_days_ahead):
         'copy_days_ahead': copy_days_ahead,
     }
 
-    return subject_text, mail_template.render(context)
+    return (
+        subject_text,
+        text_mail_template.render(context),
+        html_mail_template.render(context),
+    )
 
 
-def _render_mailout_form(request, body_text, subject_text, context):
-    form = diary_forms.MailoutForm(initial={'subject': subject_text,
-                                            'body': body_text})
+def _render_mailout_form(request, body_text, body_html, subject_text, context):
+    form = diary_forms.MailoutForm(
+        html_mailout_enabled=settings.HTML_MAILOUT_ENABLED,
+        initial={'subject': subject_text,
+                 'body_text': body_text,
+                 'body_html': body_html})
     email_count = (toolkit.members.models.Member.objects.mailout_recipients()
                                                         .count())
     context.update({
@@ -102,15 +113,18 @@ def mailout(request):
                     request.GET.get('copydaysahead', copy_days_ahead))
         except ValueError:
             pass
-        subject_text, body_text = _render_mailout_subject_and_body(
+        subject_text, body_text, body_html = _render_mailout_subject_and_body(
                 days_ahead, copy_days_ahead)
         context = {
             "days_ahead": days_ahead,
             "copy_days_ahead": copy_days_ahead
         }
-        return _render_mailout_form(request, body_text, subject_text, context)
+        return _render_mailout_form(request, body_text, body_html,
+            subject_text, context)
     elif request.method == 'POST':
-        form = diary_forms.MailoutForm(request.POST)
+        form = diary_forms.MailoutForm(
+            request.POST,
+            html_mailout_enabled=settings.HTML_MAILOUT_ENABLED)
         if not form.is_valid():
             return render(request, 'form_mailout.html', {'form': form})
         return render(request, 'mailout_send.html', form.cleaned_data)
@@ -120,8 +134,9 @@ def mailout(request):
 @permission_required('toolkit.write')
 @require_POST
 def exec_mailout(request):
-
-    form = diary_forms.MailoutForm(request.POST)
+    form = diary_forms.MailoutForm(
+        request.POST,
+        html_mailout_enabled=settings.HTML_MAILOUT_ENABLED)
     if not form.is_valid():
         logger.error("Mailout failed: {0}".format(repr(form.errors)))
         response = {
@@ -131,8 +146,16 @@ def exec_mailout(request):
         return HttpResponse(json.dumps(response),
                             content_type="application/json")
 
+    if settings.HTML_MAILOUT_ENABLED and form.cleaned_data['send_html']:
+        body_html = form.cleaned_data['body_html']
+    else:
+        body_html = None
+
     result = toolkit.members.tasks.send_mailout.delay(
-        form.cleaned_data['subject'], form.cleaned_data['body'])
+        form.cleaned_data['subject'],
+        form.cleaned_data['body_text'],
+        body_html,
+        )
 
     response = HttpResponse(
         json.dumps({'status': 'ok', 'task_id': result.task_id, 'progress': 0}),
@@ -145,7 +168,11 @@ def exec_mailout(request):
 @permission_required('toolkit.write')
 @require_POST
 def mailout_test_send(request):
-    form = diary_forms.MailoutTestForm(request.POST)
+    # Essentially the same as the form for exec_mailout, but with an 'address'
+    # field. Should really refactor to use the same form + a separate 'address'
+    # form.
+    form = diary_forms.MailoutTestForm(request.POST,
+        html_mailout_enabled=settings.HTML_MAILOUT_ENABLED)
     if not form.is_valid():
         response = {
             'status': 'error',
@@ -155,6 +182,10 @@ def mailout_test_send(request):
     else:
         members = Member.objects.filter(
             email=form.cleaned_data['address'])[:1]
+        if settings.HTML_MAILOUT_ENABLED and form.cleaned_data['send_html']:
+            body_html = form.cleaned_data['body_html']
+        else:
+            body_html = None
         if members.count() == 0:
             response = {
                 'status': 'error',
@@ -163,7 +194,8 @@ def mailout_test_send(request):
         else:
             error, _, error_message = toolkit.members.tasks.send_mailout_to(
                 form.cleaned_data['subject'],
-                form.cleaned_data['body'],
+                form.cleaned_data['body_text'],
+                body_html,
                 members)
             response = {
                 'status': 'ok' if not error else 'error',

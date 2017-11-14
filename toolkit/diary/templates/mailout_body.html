@@ -1,0 +1,100 @@
+{% load showing_date_format %}
+{% spaceless %}
+        <p>
+        <a href="http://www.cubecinema.com/programme/">http://www.cubecinema.com/programme/</a>
+        </p>
+        <table>
+{% for showing in showings %}
+    {% ifchanged %}
+        <tr>
+            <td colspan="3">
+                {{ showing.start|date:"Y" }}
+            </td>
+        </tr>
+    {% endifchanged %}
+    {% ifchanged %}
+        <tr>
+            <td colspan="3">
+                {{ showing.start|date:"F"|upper }}
+            </td>
+        </tr>
+    {% endifchanged %}
+    <tr>
+        <td>
+    {% ifchanged %}
+        {{ showing.start|date:"D"}} {{ showing.start|date:"d" }}&nbsp;
+    {% endifchanged %}
+        </td>
+        <td>
+    {{showing.start|date:"H:i"}} ....
+        </td><td>
+    {% if showing.hide_in_programme or showing.event.private %}
+        Closed for private event.
+    {% else %}
+        {{ showing.event.name|capfirst }}
+        {% if showing.sold_out %} (Sold out!){% endif %}
+        {% if showing.cancelled %} (CANCELLED){% endif %}
+        {% if showing.discounted %} *{% endif %}
+    {% endif %}
+        </td>
+    </tr>
+{% endfor %}
+        </table>
+
+<p>* cheap night</p>
+
+<p>For complete listings including all future events, please visit:
+<a href="http://www.cubecinema.com/programme/">http://www.cubecinema.com/programme/</a></p>
+
+{% for showing in showings_details %}
+{% ifchanged %}
+<hr>
+
+<p>
+{% if showing.event.pre_title %}
+{{ showing.event.pre_title }}:<br>
+{% endif %}
+<strong>{{ showing.event.name|upper }}</strong><br>
+{% if showing.event.post_title %}
+{{ showing.event.post_title }}
+</p>
+{% endif %}
+<p>
+{% if showing.event.film_information %}
+{{ showing.event.film_information }}<br>
+{% endif %}
+{{ showing.event.showings.public|showingdates }}
+</p>
+
+<p>
+{% if showing.event.pricing %}Tickets: {{ showing.event.pricing }}<br>{% endif %}
+{% if showing.event.ticket_link %}Advance tickets: {{ showing.event.ticket_link|urlize }}{% endif %}
+</p>
+
+{{ showing.event.copy|safe }}
+
+{% endifchanged %}
+{% endfor %}
+
+        <hr>
+        <p>
+        For complete and up to date listings, please visit:
+        <a href="http://www.cubecinema.com/programme/">http://www.cubecinema.com/programme/</a>
+        </p>
+
+        <p>Cube Microplex Cinema is located at:<br>
+        Dove Street South<br>
+        Bristol<br>
+        BS2 8JD</p>
+
+        <p>
+        Postal:<br>
+        4 Princess Row<br>
+        Bristol<br>
+        BS2 8NQ
+        </p>
+
+        <p><a href="http://www.cubecinema.com">http://www.cubecinema.com</a></p>
+
+        <p>tel: <a href="tel:+441179074190">0117 907 4190</a></p>
+{% endspaceless %}

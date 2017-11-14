@@ -96,7 +96,10 @@ CALENDAR_HISTORIC_SHADIER = 1.0
 
 ###############################################################################
 
+# Enable/disable some lumps of functionality that the Cube doesn't (currently)
+# use but the Star + Shadow (probably) does:
 MULTIROOM_ENABLED = False
+HTML_MAILOUT_ENABLED = False
 
 ###############################################################################
 #
