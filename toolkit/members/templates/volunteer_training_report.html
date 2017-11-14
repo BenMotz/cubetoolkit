@@ -14,6 +14,11 @@
 .hidden {
     display: none;
 }
+label {
+    margin-bottom: 0.2rem;
+        margin-left: 1rem;
+
+}
 </style>
 {% endblock css %}
 
@@ -36,7 +41,10 @@ function update_role_display() {
 function update_outdated_highlights() {
     var max_age_months = +$('#id_age_highlight').val();
     var max_age_date = new Date();
-    var hide_up_to_date = $('#id_hide_current')[0].checked;
+
+    var show_all = $('#id_show_all')[0].checked;
+    var show_current = $('#id_show_current')[0].checked;
+    var show_expired = $('#id_show_expired')[0].checked;
 
     max_age_date.setMonth(max_age_date.getMonth() - max_age_months);
 
@@ -45,14 +53,20 @@ function update_outdated_highlights() {
     var records = $('.training_record');
     for(var i = 0; i < records.length; i++) {
         if(records[i].dataset.trainingTime < max_age_s_since_epoch) {
+            // expired
             records[i].classList.add("outdated");
-            records[i].classList.remove("hidden");
-        } else {
-            records[i].classList.remove("outdated");
-            if(hide_up_to_date) {
-                records[i].classList.add("hidden");
-            } else {
+            if(show_all || show_expired) {
                 records[i].classList.remove("hidden");
+            } else {
+                records[i].classList.add("hidden");
+            }
+        } else {
+            // current
+            records[i].classList.remove("outdated");
+            if(show_all || show_current) {
+                records[i].classList.remove("hidden");
+            } else {
+                records[i].classList.add("hidden");
             }
         }
     }
@@ -66,8 +80,7 @@ $(document).ready(function() {
         {
             width: '50%',
     }).change(update_role_display);
-    $('#id_age_highlight').change(update_outdated_highlights);
-    $('#id_hide_current').change(update_outdated_highlights);
+    $('input').change(update_outdated_highlights);
 });
 </script>
 {% endblock script %}
@@ -81,12 +94,15 @@ record <em>and</em> they have a role selected in their profile.<br />
 (This means that out of date training is only flagged if a volunteer is
 still active in that role)</p>
 
-<ul>
-    <li><span class="outdated">Higlight</span> training that is more than
+<p>
+<span class="outdated">Higlight</span> training that is more than
 <input id="id_age_highlight" type="number" value="12" min="0" style="width: 4em;">
-months in the past.</li>
-    <li><label>Only show outdated training <input id="id_hide_current" type="checkbox"></label></li>
-</ul>
+months in the past.<br>
+Show:<br>
+<label><input type="radio" id="id_show_all" name="showstuff" checked> All training</label><br>
+<label><input type="radio" id="id_show_current" name="showstuff"> Current training</label><br>
+<label><input type="radio" id="id_show_expired" name="showstuff"> Expired training</label>
+</p>
 
 <p>Roles to display: <select multiple="multiple" id="id_role_select">
 {% for role, _ in report_data %}
