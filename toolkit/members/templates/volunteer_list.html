@@ -21,7 +21,57 @@
         text-align: center;
         color: red;
     }
+    .inactive {
+        color: gray;
+    }
+    .inactive img {
+        opacity: 0.5;
+    }
+    .inactive em {
+        color: gray;
+    }
+
+    .inactive_hidden {
+        display: none;
+    }
+    .filtered {
+        display: none;
+    }
 </style>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
+<script>
+$(document).ready(function() {
+    function filter_volunteers() {
+        var filter_text = $('#id_input_filter')[0].value;
+        filter_text = filter_text.toLowerCase();
+        $('.volunteer').each(function(i, el) {
+            var name = $(el).find('p.name').text();
+            name = name.toLowerCase();
+            if(name.indexOf(filter_text) !== -1) {
+                $(el).removeClass("filtered");;
+            } else {
+                $(el).addClass("filtered");;
+            }
+        });
+    };
+    function show_retired_changed() {
+        // undefined if element isn't present:
+        var show_retired = $('#id_show_retired').prop("checked");
+        if(show_retired === true) {
+            $(".inactive").removeClass("inactive_hidden");
+        } else if(show_retired === false) {
+            $(".inactive").addClass("inactive_hidden");
+        }
+    }
+    filter_volunteers();
+    show_retired_changed();
+    $('#id_input_filter').keyup(filter_volunteers);
+    $('#id_show_retired').change(show_retired_changed);
+});
+</script>
 {% endblock %}
 
 {% block title %}{{ VENUE.name }} Volunteers{% endblock %}
@@ -32,42 +82,55 @@
 <p><a href="{% url "add-volunteer" %}" title="add new volunteer">[add volunteer]</a>
 <a href="{% url "retire-select-volunteer" %}" title="retire volunteer">[retire volunteer]</a>
 <a href="{% url "unretire-select-volunteer" %}" title="unretire volunteer">[unretire volunteer]</a><br>
-Active {{ VENUE.name }} volunteers: {{ volunteers|length }}</p>
-<div class="container">
+Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
+<p><input type="text" placeholder="Filter by name..." id="id_input_filter">
+{% if retired_data_included %}
+<label>Show retired <input id="id_show_retired" type="checkbox" checked></label>
+{% else %}
+<a href="{% url "view-volunteer-list" %}?show-retired=true">Show retired</a>
+{% endif %}
+</p>
+<div class="row">
     {% for volunteer in volunteers %}
         {% with volunteer.member as member %}
-        {% cycle '<div class="row">' '' %}
-            <div class="col-sm">
-                <div class="volunteer row">
-                    <div class="col-4">
-                        {% if volunteer.portrait %}
-                        <a href="{{ volunteer.portrait.url }}">
-                            <img src="{{ volunteer.portrait|thumbnail_url:'portrait' }}" border="0" width="75" alt="Photo of {{ member.name }}">
-                        </a><br>
-                        {% else %}
-                        <img src="{{ default_mugshot }}"  alt="Photo of {{ member.name }}" border="0" width="75"><br>
-                        {% endif %}
+        <div class="volunteer col-sm-6 {{ volunteer.active|yesno:",inactive" }}">
+            <div class="row">
+                <div class="col-4">
+                    {% if volunteer.portrait %}
+                    <a href="{{ volunteer.portrait.url }}">
+                        <img src="{{ volunteer.portrait|thumbnail_url:'portrait' }}" border="0" width="75" alt="Photo of {{ member.name }}">
+                    </a><br>
+                    {% else %}
+                    <img src="{{ default_mugshot }}"  alt="Photo of {{ member.name }}" border="0" width="75"><br>
+                    {% endif %}
+                    {% if volunteer.active %}
                         <a href="{% url "edit-volunteer" volunteer.pk %}">[update]</a>
-                    </div>
-                    <div class="col-8">
-                        <p class="name">{{ member.name }}</p>
-                        <p><b>notes:</b> {{ volunteer.notes|default:"" }}</p>
-                        <p><b>roles:</b>{{ volunteer.roles.all|join:", "|lower|default:"<em>Request role information</em>" }}</p>
-                        <p>{{ member.email|urlize|default:"<em>Request email address</em>" }}<br>
-                        {% if member.address %}<br>{% endif %}
-                        {% if member.postcode %}{{ member.postcode }}<br>{% endif %}
-                        {% if not member.phone and not member.altphone %}
-                        <em>Request phone number</em><br>
-                        {% else %}
-                        {% if member.phone %}{{ member.phone }}<br>{% endif %}
-                        {% if member.altphone %}{{ member.altphone }}<br>{% endif %}
-                        {% endif %}
-                        <a href="{% url "edit-volunteer" volunteer.pk %}">[update]</a>
-                        </p>
-                    </div>
+                    {% else %}
+                        <form action="{% url 'activate-volunteer' %}" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="volunteer" value="{{ volunteer.pk }}">
+                        <p><input type="submit" name="submit" value="unretire"></p>
+                        </form>
+                    {% endif %}
                 </div>
-            </div><!-- col-sm -->
-        {% cycle '' '</div><!-- row -->' %}
+                <div class="col-8">
+                    <p class="name">{{ member.name }}{% if not volunteer.active %} (retired){% endif %}</p>
+                    <p><b>notes:</b> {{ volunteer.notes|default:"" }}</p>
+                    <p><b>roles:</b>{{ volunteer.roles.all|join:", "|lower|default:"<em>Request role information</em>" }}</p>
+                    <p>{{ member.email|urlize|default:"<em>Request email address</em>" }}<br>
+                    {% if member.address %}<br>{% endif %}
+                    {% if member.postcode %}{{ member.postcode }}<br>{% endif %}
+                    {% if not member.phone and not member.altphone %}
+                    <em>Request phone number</em><br>
+                    {% else %}
+                    {% if member.phone %}{{ member.phone }}<br>{% endif %}
+                    {% if member.altphone %}{{ member.altphone }}<br>{% endif %}
+                    {% endif %}
+                    {% if volunteer.active %}<a href="{% url "edit-volunteer" volunteer.pk %}">[update]</a>{% endif %}
+                    </p>
+                </div>
+            </div>
+        </div><!-- col-sm -->
         {% endwith %}
     {% endfor %}
 </div><!-- container -->

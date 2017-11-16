@@ -22,14 +22,20 @@ logger.setLevel(logging.DEBUG)
 @permission_required('toolkit.read')
 @require_safe
 def view_volunteer_list(request):
+    show_retired = request.GET.get('show-retired', None) is not None
     # Get all volunteers, sorted by name:
-    volunteers = (Volunteer.objects.filter(active=True)
+    volunteers = (Volunteer.objects
                   .order_by('member__name')
                   .select_related()
                   .prefetch_related('roles'))
+    if not show_retired:
+        volunteers = volunteers.filter(active=True)
+    active_count = sum(1 for v in volunteers if v.active)
     context = {
         'volunteers': volunteers,
         'default_mugshot': settings.DEFAULT_MUGSHOT,
+        'retired_data_included': show_retired,
+        'active_count': active_count,
     }
     return render(request, 'volunteer_list.html', context)
 

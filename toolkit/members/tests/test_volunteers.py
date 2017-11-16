@@ -27,16 +27,28 @@ class TestVolunteerListViews(MembersTestsMixin, TestCase):
         self.assertTrue(self.client.login(
             username="admin", password="T3stPassword!"))
 
-    def test_list_page_loads(self):
-        url = reverse("view-volunteer-list")
+    def _test_list_page_common(self, url, include_retired):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
         self.assertContains(response, "Volunteer One")
         self.assertContains(response, "Volunteer Two")
         self.assertContains(response, "Volunteer Three")
+        if include_retired:
+            self.assertContains(response, "Volunteer Four")
+        else:
+            self.assertNotContains(response, "Volunteer Four")
 
         self.assertTemplateUsed(response, "volunteer_list.html")
+
+
+    def test_list_page_loads_default(self):
+        url = reverse("view-volunteer-list")
+        self._test_list_page_common(url, include_retired=False)
+
+    def test_list_page_loads_include_inactive(self):
+        url = reverse("view-volunteer-list") + "?show-retired=true"
+        self._test_list_page_common(url, include_retired=True)
 
     def test_role_report_loads(self):
         url = reverse("view-volunteer-role-report")
