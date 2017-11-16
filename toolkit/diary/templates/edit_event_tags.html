@@ -16,7 +16,7 @@ Editing Event Tags
       border: thin dotted gray;
       padding: 5px;
       margin: 2%;
-      width: 400px;
+      width: 600px;
       background: white;
   }
   .header {
@@ -28,7 +28,7 @@ Editing Event Tags
       color: red;
   }
   select {
-      width: 330px;
+      width: 150px;
   }
   #sortable {
       list-style-type: none;
@@ -159,6 +159,9 @@ function updateOrdering() {
 <p class="warn">Deleting tags cannot be undone, please take care</p>
 <p>Add new tags at the end of the list. Drag and drop "in menu" tags to set the
 order they appear in the site navigation menu.</p>
+<p>To add an information page for a tag (with general info), create a new
+'Event Tag Page' in <a href="{% url "wagtailadmin_home" %}">the Content
+Management System</a>.</p>
 {% include "messages.html" %}
 </div>
 <form method="post">
@@ -183,6 +186,7 @@ order they appear in the site navigation menu.</p>
         {% else %}
             {{ form.name }}
         {% endif %}
+        {% if form.instance.event_tag_page %}(<a href="{% url "wagtailadmin_pages:edit" form.instance.event_tag_page.id %}">edit info page</a>){% endif %}
         {# Model on the back end enforces the read_only flag, so no integrity/security worries about the hidden field... #}
         <span class="tag-options">
             {% if form.instance.read_only or not form.id.value%}

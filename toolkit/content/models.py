@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django.db import models
 from django.http import Http404
 
@@ -16,6 +18,8 @@ from wagtail.contrib.forms.edit_handlers import FormSubmissionsPanel
 from wagtail.core import blocks
 from wagtail.images import blocks as image_blocks
 from modelcluster.fields import ParentalKey
+
+import toolkit.diary.models
 
 
 class BasicArticlePage(Page):
@@ -47,6 +51,59 @@ class BasicArticlePage(Page):
         ImageChooserPanel("image"),
     ]
     settings_panels = None
+
+
+class EventTagPage(Page):
+    body = RichTextField(blank=False)
+    image = models.ForeignKey(
+        "wagtailimages.Image",
+        on_delete=models.SET_NULL,
+        related_name="+",
+        null=True,
+        blank=True,
+    )
+    event_tag = models.OneToOneField(
+        "diary.EventTag",
+        related_name="event_tag_page",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+
+    content_panels = Page.content_panels + [
+        FieldPanel("body"),
+        FieldPanel("event_tag"),
+        ImageChooserPanel("image"),
+    ]
+    settings_panels = None
+
+    def get_context(self, request):
+        context = super(EventTagPage, self).get_context(request)
+        events = OrderedDict()
+
+        # In MySQL/MariaDB it's apparently more performant to separately
+        # run the taq query, then just pass a list into the showings query,
+        # than to have a subquery (which is what you'd get if we passed
+        # self.event_tags.all() directly into event__tags__in).
+        # See note on performance here:
+        # https://docs.djangoproject.com/en/1.11/ref/models/querysets/#in
+        # (borne out experimentally)
+        if self.event_tag:
+            showings = (
+                toolkit.diary.models.Showing.objects.public()
+                .filter(event__tags__in=[self.event_tag])
+                .start_in_future()
+                .order_by("start")
+                .select_related()
+                .prefetch_related("event__media")
+                .prefetch_related("event__tags")
+            )
+            # Build a list of events for that list of showings:
+            for showing in showings:
+                events.setdefault(showing.event, list()).append(showing)
+
+        context["events"] = events
+        return context
 
 
 class WidthBlock(blocks.StructBlock):

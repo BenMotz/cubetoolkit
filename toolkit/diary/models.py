@@ -15,6 +15,7 @@ from django.conf import settings
 
 from toolkit.diary.validators import validate_in_future
 import toolkit.util.image as imagetools
+from toolkit.content.models import BasicArticlePage
 
 logger = logging.getLogger(__name__)
 
@@ -307,6 +308,9 @@ class Event(models.Model):
     def all_showings_confirmed(self) -> bool:
         return all(s.confirmed for s in self.showings.all())
 
+    def public_showings_in_future(self):
+        return self.showings.public().in_future()
+
     @property
     def copy_html(self):
         """If self.legacy_copy == True, then try to mangle self.copy into
@@ -401,6 +405,10 @@ class ShowingQuerySet(QuerySet):
     def start_in_range(self, startdate, enddate):
         """Filter showings that have a start date in the given range"""
         return self.filter(start__range=[startdate, enddate])
+
+    def start_in_future(self):
+        """Filter showings that have a start date in the future"""
+        return self.filter(start__gte=django.utils.timezone.now())
 
     def public(self):
         """

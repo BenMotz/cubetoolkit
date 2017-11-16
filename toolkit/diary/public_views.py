@@ -12,7 +12,7 @@ from django.utils.html import conditional_escape
 import django.utils.timezone as timezone
 import django.views.generic as generic
 
-from toolkit.diary.models import Showing, Event, PrintedProgramme
+from toolkit.diary.models import Showing, Event, PrintedProgramme, EventTag
 from toolkit.diary.daterange import get_date_range
 from toolkit.diary.forms import SearchForm
 
@@ -36,6 +36,14 @@ def _view_diary(request, startdate, enddate, tag=None, extra_title=None):
         .prefetch_related("event__tags")
     )
     if tag:
+        tag_qs = EventTag.objects.filter(slug=tag)[:1]
+        # If there is a wagtail page associated with the tag then render that
+        # (there'll be an attribute error if there isn't)
+        try:
+            if tag_qs and tag_qs[0].event_tag_page:
+                return tag_qs[0].event_tag_page.serve(request)
+        except AttributeError:
+            pass
         showings = showings.filter(event__tags__slug=tag)
 
     # Build a list of events for that list of showings:
