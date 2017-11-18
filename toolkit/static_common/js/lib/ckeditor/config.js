@@ -38,7 +38,7 @@ CKEDITOR.editorConfig = function( config ) {
 	} else {
 		config.extraAllowedContent = '';
 	}
-	config.extraAllowedContent += 'iframe[*];img[src,alt]';
+	config.extraAllowedContent += 'img[src,alt]';
 	// Enable the built-in spell checker if the browser provides one:
 	config.disableNativeSpellChecker = false;
 

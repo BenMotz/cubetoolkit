@@ -50,12 +50,14 @@ class HtmlTextarea(forms.Textarea):
 
     def __init__(self, *args, **kwargs):
         self.enable_tables = kwargs.pop('enable_tables', False)
+        self.enable_iframes = kwargs.pop('enable_iframes', True)
         self.height = kwargs.pop('height', None)
         super(HtmlTextarea, self).__init__(*args, **kwargs)
 
     def get_context(self, name, value, attrs):
         context = super(HtmlTextarea, self).get_context(name, value, attrs)
         context['widget']['enable_tables'] = self.enable_tables
+        context['widget']['enable_iframes'] = self.enable_iframes
         if self.height:
             context['widget']['height'] = self.height
         return context

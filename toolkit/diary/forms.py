@@ -255,7 +255,10 @@ class MailoutForm(forms.Form):
                 widget=forms.Textarea(attrs={'wrap': 'soft', 'cols': 80}))
 
     body_html = forms.CharField(
-                widget=HtmlTextarea(enable_tables=True, height="120ex"))
+                widget=HtmlTextarea(
+                    enable_tables=True,
+                    enable_iframes=False,
+                    height="120ex"))
 
 
 class MailoutTestForm(forms.Form):
