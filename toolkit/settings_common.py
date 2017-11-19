@@ -11,6 +11,7 @@ VENUE = {
     'name': 'Cube',
     'longname': 'Cube Microplex',
     'cinemaname': 'Cube Cinema',
+    'url': 'http://www.cubecinema.com',
     'piwik_id': 3,
     'twitter': 'https://twitter.com/cubecinema',
     'facebook': 'https://www.facebook.com/cubecinema/',

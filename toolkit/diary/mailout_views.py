@@ -69,6 +69,7 @@ def _render_mailout_subject_and_body(days_ahead, copy_days_ahead):
         'showings': showings,
         'showings_details': showings_once_per_event,
         'copy_days_ahead': copy_days_ahead,
+        'site_url': settings.VENUE['url']
     }
 
     return (

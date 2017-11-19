@@ -1,7 +1,8 @@
 {% load showing_date_format %}
+{% load thumbnail_l %}
 {% spaceless %}
         <p>
-        <a href="http://www.cubecinema.com/programme/">http://www.cubecinema.com/programme/</a>
+        <a href="{{ site_url }}/programme/">Cube Cinema Programme</a>
         </p>
         <table>
 {% for showing in showings %}
@@ -44,11 +45,13 @@
 <p>* cheap night</p>
 
 <p>For complete listings including all future events, please visit:
-<a href="http://www.cubecinema.com/programme/">http://www.cubecinema.com/programme/</a></p>
+<a href="{{ site_url }}/programme/">Cube Cinema Programme</a></p>
 
 {% for showing in showings_details %}
 {% ifchanged %}
 <hr>
+
+
 
 <p>
 {% if showing.event.pre_title %}
@@ -71,6 +74,9 @@
 {% if showing.event.ticket_link %}Advance tickets: {{ showing.event.ticket_link|urlize }}{% endif %}
 </p>
 
+ <img src="{{ site_url }}{{ showing.event.media.first.media_file|thumbnail_url:'indexview' }}"
+ alt="Picture for event '{{ showing.event.name }}'">
+
 {{ showing.event.copy|safe }}
 
 {% endifchanged %}
@@ -79,7 +85,7 @@
         <hr>
         <p>
         For complete and up to date listings, please visit:
-        <a href="http://www.cubecinema.com/programme/">http://www.cubecinema.com/programme/</a>
+        <a href="{{ site_url }}/programme/">Cube Cinema Programme</a>
         </p>
 
         <p>Cube Microplex Cinema is located at:<br>
@@ -94,7 +100,7 @@
         BS2 8NQ
         </p>
 
-        <p><a href="http://www.cubecinema.com">http://www.cubecinema.com</a></p>
+        <p><a href="{{ site_url }}>www.cubecinema.com</a></p>
 
-        <p>tel: <a href="tel:+441179074190">0117 907 4190</a></p>
+        <p>tel: 0117 907 4190</p>
 {% endspaceless %}
