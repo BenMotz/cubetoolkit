@@ -9,6 +9,7 @@ VENUE = {
     'name': 'Star and Shadow',
     'longname': 'Star and Shadow',
     'cinemaname': 'Star and Shadow Cinema',
+    'url': 'https://starandshadow.xtreamlab.net/',
     'piwik_id': 29,
     'twitter': 'https://twitter.com/StarAndShadow',
     'facebook': 'https://www.facebook.com/StarAndShadow',
