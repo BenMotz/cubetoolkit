@@ -77,6 +77,10 @@ $(document).ready(function() {
             minDate : 0,
         });
 
+        // Filter widget:
+        $('#id_input_filter').keyup(filter_events);
+        filter_events();
+
         prefs_updated(edit_prefs);
 
         // Idea in-place edits
@@ -119,6 +123,40 @@ function dateRangeSelected(dateText, inst) {
     }
     window.location.href = "{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=" + days_ahead;
 }
+
+var filter_timer = null;
+var DEBOUNCE_TIMEOUT = 150; // milliseconds
+function filter_events() {
+    // use a timer to 'debounce' input (i.e. wait 150ms to see if the user has
+    // stopped typing)
+    if(filter_timer !== null) {
+        window.clearTimeout(filter_timer);
+    }
+    filter_timer = window.setTimeout(function() {
+        var filter_text = $('#id_input_filter').val();
+        if(filter_text === undefined)
+            return true;
+
+        filter_text = filter_text.toLowerCase();
+
+        var event_rows = $('tr');
+
+        event_rows.each(function(index, el) {
+            var jq_el = $(el);
+            var header_row = jq_el.hasClass("row_month") || jq_el.hasClass("row_year");
+            if(!header_row) {
+                var name_cell = jq_el.children(':nth-child(3)');
+                if(name_cell.text().toLowerCase().indexOf(filter_text) !== -1) {
+                    // NB: if filter text is "" then this will always match, and
+                    //     everything will be shown
+                    jq_el.show();
+                } else {
+                    jq_el.hide();
+                }
+            }
+        });
+    }, DEBOUNCE_TIMEOUT);
+}
 function set_edit_pref(pref, value) {
     if(edit_prefs[pref] !== value) {
         edit_prefs[pref] = value;
@@ -153,7 +191,7 @@ function prefs_updated(data) {
 Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">this window</a></p>
 
 <p><a name="top"></a></p>
-<h4>Key:</h4>
+<b>Key:</b>
 <p>
 <span class="unconfirmed">unconfirmed are lower case and wiggly underlined</span><br>
 <span class="confirmed">CONFIRMED ARE UPPER CASE</span><br>
@@ -163,10 +201,12 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
 <span class="cancelled">Cancelled events are red</span><br>
 <span class="daytime">Daytime (before 6pm) events have a light background</span></p>
 
-<div class="programme"><p align='center'><a href="{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=183">See 6 months</a> |
-<a href="{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=365">See 1 year</a> |
-<a href="{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=730">See 2 years</a></p>
-<p align='center'><label for="id_start">See from now until:</label> <input type="text" name="lookahead_to" value="{{ end|date:'j-m-Y'}}" id="id_lookahead_to" /></p>
+<div class="programme">
+<p align='center'>See: <a href="{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=183">6 months</a> |
+<a href="{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=365">1 year</a> |
+<a href="{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=730">2 years</a> |
+<label>until: <input type="text" name="lookahead_to" value="{{ end|date:'j-m-Y'}}" id="id_lookahead_to"></label><br>
+<label>Filter events: <input type="text" placeholder="by title/booker column" id="id_input_filter" autofocus></label></p>
 
 {% include "messages.html" %}
 
