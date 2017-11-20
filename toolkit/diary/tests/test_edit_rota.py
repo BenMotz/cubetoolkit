@@ -1,6 +1,7 @@
 from __future__ import absolute_import, unicode_literals
-from datetime import timedelta
+from datetime import timedelta, datetime
 
+import pytz
 from mock import patch
 
 from django.test import TestCase
@@ -312,3 +313,54 @@ class EditRotaNotes(DiaryTestsMixin, TestCase):
 
         showing = Showing.objects.get(pk=self.e4s3.pk)
         self.assertEqual(showing.rota_notes, "")
+
+
+class ViewRotaVacancies(DiaryTestsMixin, TestCase):
+    """Test of view of upcoming vacancies"""
+
+    def setUp(self):
+        super(ViewRotaVacancies, self).setUp()
+        self.assertTrue(
+            self.client.login(username="rota_editor",
+                              password="T3stPassword!3")
+        )
+
+    def tearDown(self):
+        self.client.logout()
+
+    @patch('django.utils.timezone.now')
+    def test_get(self, now_patch):
+        now_patch.return_value = self._fake_now
+        url = reverse("view-rota-vacancies")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_rota_vacancies.html")
+        self.assertNotContains(response, '<i>needs</i>')
+
+    @patch('django.utils.timezone.now')
+    def test_get_nothing_upcoming(self, now_patch):
+        now_patch.return_value = pytz.timezone(
+            "Europe/London").localize(datetime(2013, 4, 12, 11, 00))
+        url = reverse("view-rota-vacancies")
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_rota_vacancies.html")
+
+        self.assertContains(
+            response,
+            '<p><b>'
+            ' Sat 13th 18:00'
+            ' &mdash;'
+            ' <a href="/programme/showing/id/6/">Event three title</a></b>'
+            ' <i>needs</i>'
+            ' Role 1 (standard),'
+            ' Role 1 (standard) #2,'
+            ' Role 1 (standard) #3,'
+            ' Role 1 (standard) #4,'
+            ' Role 1 (standard) #5,'
+            ' Role 1 (standard) #6'
+            ' </p>',
+            html=True
+        )
