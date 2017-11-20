@@ -6,6 +6,6 @@ CKEDITOR.replace('{{ widget.attrs.id }}',{
 {% if widget.height %}height:'{{ widget.height }}',{% endif %}
 {% if not widget.enable_iframes %}disallowedContent: 'iframe',{% endif %}
 removePlugins: '{{ widget.enable_tables|yesno:",table" }},{{ widget.enable_iframes|yesno:",youtube" }}',
-extraAllowedContent: '{{ widget.enable_tables|yesno:"td[colspan];hr," }};{{ widget.enable_iframes|yesno:"iframe[*]," }}'
+extraAllowedContent: 'img[src,alt];{{ widget.enable_tables|yesno:"td[colspan];hr," }};{{ widget.enable_iframes|yesno:"iframe[*]," }}'
 });
 </script>
