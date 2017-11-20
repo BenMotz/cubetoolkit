@@ -1,0 +1,97 @@
+{% load showing_date_format %}
+{% load thumbnail_l %}
+{% spaceless %}
+        <p>
+        <a href="{{ site_url }}/programme/">Star and Shadow Programme</a>
+        </p>
+        <table>
+{% for showing in showings %}
+    {% ifchanged %}
+        <tr>
+            <td colspan="3">
+                {{ showing.start|date:"Y" }}
+            </td>
+        </tr>
+    {% endifchanged %}
+    {% ifchanged %}
+        <tr>
+            <td colspan="3">
+                {{ showing.start|date:"F"|upper }}
+            </td>
+        </tr>
+    {% endifchanged %}
+    <tr>
+        <td>
+    {% ifchanged %}
+        {{ showing.start|date:"D"}} {{ showing.start|date:"d" }}&nbsp;
+    {% endifchanged %}
+        </td>
+        <td>
+    {{showing.start|date:"H:i"}} ....
+        </td><td>
+    {% if showing.hide_in_programme or showing.event.private %}
+        Closed for private event.
+    {% else %}
+        {{ showing.event.name|capfirst }}
+        {% if showing.sold_out %} (Sold out!){% endif %}
+        {% if showing.cancelled %} (CANCELLED){% endif %}
+        {% if showing.discounted %} *{% endif %}
+    {% endif %}
+        </td>
+    </tr>
+{% endfor %}
+        </table>
+
+<p>* cheap night</p>
+
+<p>For complete listings including all future events, please visit:
+<a href="{{ site_url }}/programme/">Star and Shadow Programme</a></p>
+
+{% for showing in showings_details %}
+{% ifchanged %}
+<hr>
+
+
+<p>
+{% if showing.event.pre_title %}
+{{ showing.event.pre_title }}:<br>
+{% endif %}
+<strong>{{ showing.event.name|upper }}</strong><br>
+{% if showing.event.post_title %}
+{{ showing.event.post_title }}
+</p>
+{% endif %}
+<p>
+{% if showing.event.film_information %}
+{{ showing.event.film_information }}<br>
+{% endif %}
+{{ showing.event.showings.public|showingdates }}
+</p>
+
+<p>
+{% if showing.event.pricing %}Tickets: {{ showing.event.pricing }}<br>{% endif %}
+{% if showing.event.ticket_link %}Advance tickets: {{ showing.event.ticket_link|urlize }}{% endif %}
+</p>
+
+ <img src="{{ site_url }}{{ showing.event.media.first.media_file|thumbnail_url:'indexview' }}"
+ alt="Picture for event '{{ showing.event.name }}'">
+
+{{ showing.event.copy|safe }}
+
+{% endifchanged %}
+{% endfor %}
+
+        <hr>
+        <p>
+        For complete and up to date listings, please visit:
+        <a href="{{ site_url }}/programme/">Star and Shadow Programme</a>
+        </p>
+
+        <p><a href="{{ site_url }}">Star & Shadow Cinema Co-op</a> is located at<br>
+        Warwick St<br>
+        Newcastle upon Tyne<br>
+        NE2 1BB<br>
+		info@starandshadow.org.uk</p>
+		
+        <p>tel: 0191 261 0066</p>
+{% endspaceless %}
