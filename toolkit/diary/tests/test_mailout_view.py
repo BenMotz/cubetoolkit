@@ -1,6 +1,6 @@
 from __future__ import absolute_import
 
-from mock import patch, sentinel
+from mock import patch
 import fixtures
 
 from django.test import TestCase
@@ -69,7 +69,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             <textarea name="body_html" id="id_body_html" rows="10" cols="40"
             required>
             <p><a href="http://www.cubecinema.com/programme/">
-            http://www.cubecinema.com/programme/</a></p><table><tr>
+            Cube Cinema Programme</a></p><table><tr>
             <td colspan="3">
             2013
             </td></tr><tr><td colspan="3">
@@ -83,20 +83,21 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             </td></tr></table><p>* cheap night</p><p>For complete listings
             including all future events, please visit:
             <a href="http://www.cubecinema.com/programme/">
-            http://www.cubecinema.com/programme/</a></p><hr><p>
+            Cube Cinema Programme</a></p><hr><p>
             Pretitle four:<br><strong>EVENT FOUR TITL\u0112</strong><br>
-            Posttitle four</p>
-            <p>
+            Posttitle four
+            </p><p>
             Film info for four<br>
             Sun 9th / 6pm
-            </p>
-            <p>
+            </p><p>
             Tickets: \u00a3milliion per thing<br></p>
+            <img src="http://www.cubecinema.com"
+            alt="Picture for event 'Event four titl\u0113'">
             Event four C\u014dpy
             <hr><p>
             For complete and up to date listings, please visit:
             <a href="http://www.cubecinema.com/programme/">
-            http://www.cubecinema.com/programme/</a></p><p>Cube Microplex
+            Cube Cinema Programme</a></p><p>Cube Microplex
             Cinema is located at:<br>
             Dove Street South<br>
             Bristol<br>
@@ -106,8 +107,8 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             Bristol<br>
             BS2 8NQ
             </p><p><a href="http://www.cubecinema.com">
-            http://www.cubecinema.com</a></p>
-            <p>tel: <a href="tel:+441179074190">0117 907 4190</a></p>
+            www.cubecinema.com</a></p>
+            <p>tel: 0117 907 4190</p>
             </textarea>""")
 
     def tearDown(self):
