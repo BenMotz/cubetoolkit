@@ -26,7 +26,8 @@ class ChosenSelectMultiple(forms.SelectMultiple):
         super(ChosenSelectMultiple, self).__init__(*args, **kwargs)
 
     def get_context(self, name, value, attrs):
-        context = super(ChosenSelectMultiple, self).get_context(name, value, attrs)
+        context = super(ChosenSelectMultiple, self).get_context(
+            name, value, attrs)
         context['widget'].update({
             'width': self.width,
         })

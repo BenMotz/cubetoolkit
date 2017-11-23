@@ -245,8 +245,8 @@ class MailoutForm(forms.Form):
             del self.fields['body_html']
 
     send_html = forms.BooleanField(label="Send HTML mailout",
-                initial=True,
-                required=False)
+                                   initial=True,
+                                   required=False)
 
     subject = forms.CharField(max_length=128, required=True, label_suffix='')
 
@@ -278,7 +278,6 @@ class MailoutTestForm(forms.Form):
     body_text = forms.CharField(required=True)
 
     body_html = forms.CharField()
-
 
 
 class SearchForm(forms.Form):

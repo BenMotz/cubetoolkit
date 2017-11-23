@@ -11,7 +11,7 @@ from django.db.models import F
 import six
 
 from toolkit.members.forms import (VolunteerForm, MemberFormWithoutNotes,
-    TrainingRecordForm, GroupTrainingForm)
+                                   TrainingRecordForm, GroupTrainingForm)
 from toolkit.members.models import Member, Volunteer, TrainingRecord
 from toolkit.diary.models import Role
 
@@ -245,10 +245,10 @@ def delete_volunteer_training_record(request, training_record_id):
     if not record.volunteer.active:
         logger.error(u"Tried to delete training record for inactive volunteer")
         return HttpResponse("Can't delete record for inactive volunteer",
-            status=403, content_type="text/plain")
+                            status=403, content_type="text/plain")
 
     logger.info(u"Deleting training_record '{0}' for volunteer '{1}'"
-        .format(record.id, record.volunteer.member.name))
+                .format(record.id, record.volunteer.member.name))
     record.delete()
     return HttpResponse("OK", content_type="text/plain")
 
@@ -257,9 +257,8 @@ def delete_volunteer_training_record(request, training_record_id):
 @require_safe
 def view_volunteer_training_records(request):
     records = (TrainingRecord.objects.filter(volunteer__active=True)
-        .filter(volunteer__roles=F('role'))
-        .select_related()
-        )
+               .filter(volunteer__roles=F('role'))
+               .select_related())
     role_map = {}
     for record in records:
         vol_map = role_map.setdefault(record.role, {})
@@ -276,10 +275,10 @@ def view_volunteer_training_records(request):
             (role, sorted(
                     [(vol, record) for vol, record in vol_map.items()],
                     key=lambda v_r: v_r[0].member.name.lower()
-                   )
-            ) for role, vol_map in role_map.items()
+                   ))
+            for role, vol_map in role_map.items()
         ],
-        #... and sort the [ (role, [(vol, rec), ...]), ...] list by role name:
+        # ...and sort the [ (role, [(vol, rec), ...]), ...] list by role name:
         key=lambda r_l: r_l[0].name.lower()
     )
 
@@ -315,7 +314,7 @@ def add_volunteer_training_group_record(request):
             messages.add_message(request, messages.SUCCESS,
                                  u"Added %d training records for %s" %
                                  (len(form.cleaned_data['volunteers']),
-                                 form.cleaned_data['role']))
+                                  form.cleaned_data['role']))
             return HttpResponseRedirect(
                 reverse('add-volunteer-training-group-record'))
     else:  # i.e. request.method == 'GET':

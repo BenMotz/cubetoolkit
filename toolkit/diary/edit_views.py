@@ -875,7 +875,8 @@ def printed_programme_edit(request, operation):
                 with django.db.transaction.atomic():
                     edited_form.save()
             except django.db.IntegrityError:
-                edited_form.add_error('form_month',
+                edited_form.add_error(
+                    'form_month',
                     'Printed programme with this month/year already exists.')
             else:
                 logger.info("Printed programme archive updated")

@@ -899,7 +899,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
         event.post_title = 'post_title'
         event.pricing = 'pricing'
         event.film_information = 'film_info'
-        event.duration = time(0,20)
+        event.duration = time(0, 20)
         event.copy = 'copy'
         event.copy_summary = 'copy_summary'
         event.terms = 'terms'

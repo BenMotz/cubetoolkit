@@ -41,7 +41,6 @@ class TestVolunteerListViews(MembersTestsMixin, TestCase):
 
         self.assertTemplateUsed(response, "volunteer_list.html")
 
-
     def test_list_page_loads_default(self):
         url = reverse("view-volunteer-list")
         self._test_list_page_common(url, include_retired=False)
@@ -653,7 +652,7 @@ class TestAddTraining(MembersTestsMixin, TestCase):
 
     def test_add_training(self):
         url = reverse("add-volunteer-training-record",
-            kwargs={"volunteer_id": 1})
+                      kwargs={"volunteer_id": 1})
         role = Role.objects.get(id=2)
         vol = Volunteer.objects.get(id=1)
 
@@ -687,12 +686,12 @@ class TestAddTraining(MembersTestsMixin, TestCase):
         self.assertEqual(record.trainer, trainer)
         self.assertEqual(record.notes, notes.strip())
         self.assertEqual(record.training_date,
-            datetime.date(day=1, month=2, year=2015))
+                         datetime.date(day=1, month=2, year=2015))
         self.assertTrue(role in vol.roles.all())
 
     def test_add_training_missing_data(self):
         url = reverse("add-volunteer-training-record",
-            kwargs={"volunteer_id": 1})
+                      kwargs={"volunteer_id": 1})
         response = self.client.post(url, data={})
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {
@@ -709,7 +708,7 @@ class TestAddTraining(MembersTestsMixin, TestCase):
     def test_add_training_inactive_volunteer(self):
         vol = Volunteer.objects.filter(active=False)[0]
         url = reverse("add-volunteer-training-record",
-            kwargs={"volunteer_id": vol.id})
+                      kwargs={"volunteer_id": vol.id})
         response = self.client.post(url, data={
             'training-role': 1,
             'training-trainer': "Trainer",
@@ -747,7 +746,7 @@ class TestDeleteTraining(MembersTestsMixin, TestCase):
         record.save()
 
         url = reverse("delete-volunteer-training-record",
-            kwargs={"training_record_id": record.id})
+                      kwargs={"training_record_id": record.id})
         response = self.client.post(url)
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response['Content-Type'], "text/plain")
@@ -771,7 +770,7 @@ class TestDeleteTraining(MembersTestsMixin, TestCase):
         vol.save()
 
         url = reverse("delete-volunteer-training-record",
-            kwargs={"training_record_id": record.id})
+                      kwargs={"training_record_id": record.id})
         response = self.client.post(url)
         self.assertEqual(response.status_code, 403)
 
@@ -849,7 +848,6 @@ class TestAddGroupTraining(MembersTestsMixin, TestCase):
             u'Select a valid choice. %d is not one of the available choices.'
             % (volunteers[1].member.id))
 
-
     def test_add_group_record_missing_data(self):
         url = reverse("add-volunteer-training-group-record")
 
@@ -891,23 +889,26 @@ class TestViewVolunteerTraining(MembersTestsMixin, TestCase):
         for vol in volunteers:
             self.assertTrue(vol.active)
             vol.roles.add(role)
-            record = TrainingRecord(volunteer=vol, role=role,
-                trainer="trainer", training_date=training_date)
+            record = TrainingRecord(
+                volunteer=vol, role=role, trainer="trainer",
+                training_date=training_date)
             record.save()
 
         # Add a second, older record, that should not take precedence, for
         # vol[0]
         newer_date = training_date - datetime.timedelta(days=1)
-        new_record = TrainingRecord(volunteer=volunteers[0], role=role,
-            trainer="trainer", training_date=newer_date)
+        new_record = TrainingRecord(
+            volunteer=volunteers[0], role=role, trainer="trainer",
+            training_date=newer_date)
         new_record.save()
 
         # Add a third old record, that should also not take
         # precedence, for vol[0] (to force coverage of one of the
         # conditionals in the view...)
         newer_date = training_date - datetime.timedelta(days=1)
-        new_record = TrainingRecord(volunteer=volunteers[0], role=role,
-            trainer="trainer", training_date=newer_date)
+        new_record = TrainingRecord(
+            volunteer=volunteers[0], role=role, trainer="trainer",
+            training_date=newer_date)
         new_record.save()
 
         # Make vol[1] inactive
@@ -939,7 +940,6 @@ class TestViewVolunteerTraining(MembersTestsMixin, TestCase):
         self.assertNotContains(response, "Volunteer Two")
         self.assertNotContains(response, "Volunteer Three")
         self.assertNotContains(response, "Volunteer Four")
-
 
     def test_no_post(self):
         url = reverse("view-volunteer-training-report")

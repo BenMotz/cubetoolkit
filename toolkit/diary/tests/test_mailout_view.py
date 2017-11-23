@@ -126,7 +126,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         self.assertContains(response, self.expected_mailout_header_text)
         self.assertContains(response, self.expected_mailout_event_text)
         self.assertContains(response, self.expected_mailout_subject_text,
-            html=True)
+                            html=True)
         # Fairly general, to be insensitive to template/form changes:
         self.assertNotContains(response, 'send_html')
         self.assertNotContains(response, 'HTML email')
@@ -141,14 +141,15 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         self.assertContains(response, self.expected_mailout_header_text)
         self.assertContains(response, self.expected_mailout_event_text)
         self.assertContains(response, self.expected_mailout_event_html,
-            html=True)
+                            html=True)
         self.assertContains(response, self.expected_mailout_subject_text,
-            html=True)
+                            html=True)
         self.assertContains(response,
-            '<input type="checkbox" name="send_html" '
-            'checked id="id_send_html" />',
-            html=True)
-        self.assertContains(response,
+                            '<input type="checkbox" name="send_html" '
+                            'checked id="id_send_html" />',
+                            html=True)
+        self.assertContains(
+            response,
             '<h3><label for="id_body_html">Body of HTML email</label></h3>',
             html=True)
 
@@ -162,7 +163,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         self.assertContains(response, self.expected_mailout_header_text)
         self.assertContains(response, self.expected_mailout_event_text)
         self.assertContains(response, self.expected_mailout_subject_text,
-            html=True)
+                            html=True)
 
     def test_get_form_invalid_daysahead(self):
         url = reverse("members-mailout")
@@ -174,7 +175,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         self.assertContains(response, self.expected_mailout_header_text)
         self.assertContains(response, self.expected_mailout_event_text)
         self.assertContains(response, self.expected_mailout_subject_text,
-            html=True)
+                            html=True)
 
     def test_get_form_no_events(self):
         url = reverse("members-mailout")
@@ -188,8 +189,10 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         self.assertNotContains(response, self.expected_mailout_event_text)
 
         # Expected subject - no "commencing" string:
-        self.assertContains(response, self.expected_mailout_subject_text
-            .replace(" commencing Sunday 9 June", ""), html=True)
+        self.assertContains(
+            response,
+            self.expected_mailout_subject_text.replace(
+                " commencing Sunday 9 June", ""), html=True)
 
     @override_settings(HTML_MAILOUT_ENABLED=False)
     def test_post_form_html_disabled(self):
@@ -224,12 +227,12 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         self.assertContains(response, u'Let the bodies hit the floor\netc.')
         # HTML content:
         self.assertContains(response,
-            u'<p class="label">HTML Body:</p>',
-            html=True)
+                            u'<p class="label">HTML Body:</p>',
+                            html=True)
         self.assertContains(response,
-            u'<p class="mail" id="body_html">'
-            u'&lt;h1&gt;Should not be ignored&lt;/h1&gt;</p>',
-            html=True)
+                            u'<p class="mail" id="body_html">'
+                            u'&lt;h1&gt;Should not be ignored&lt;/h1&gt;</p>',
+                            html=True)
 
     @override_settings(HTML_MAILOUT_ENABLED=False)
     def test_post_form_html_enabled_do_not_send_html(self):

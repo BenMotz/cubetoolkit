@@ -1,7 +1,7 @@
 import smtplib
 
 from django.core.mail import (get_connection, EmailMessage,
-    EmailMultiAlternatives)
+                              EmailMultiAlternatives)
 from django.conf import settings
 from django.urls import reverse
 
@@ -45,8 +45,8 @@ def _send_email(email_conn, destination, subject, body_text, body_html):
 def send_mailout_report(email_conn, report_to, sent, err_list,
                         subject, body_text, body_html):
         # All done? Send report:
-        report_text = ("%d copies of the following were sent out on %s members "
-                       "list\n" % (sent, settings.VENUE['name']))
+        report_text = ("%d copies of the following were sent out on %s members"
+                       " list\n" % (sent, settings.VENUE['name']))
         if len(err_list) > 0:
             # Only send a max of 100 error messages!
             report_text += "{0} errors:\n{1}".format(
@@ -80,11 +80,13 @@ def _get_text_preamble_signature(recipient):
                 recipient.mailout_key,
         ))
 
+
 def _get_html_preamble_signature(recipient):
     preamble_template = (
         u'<!doctype html><html><head>'
         u'<meta name="viewport" content="width=device-width" />'
-        u'<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />'
+        u'<meta http-equiv="Content-Type" content="text/html; '
+        u'charset=UTF-8" />'
         u'<title>Cube Programme of Events</title>'
         u'<style></style></head><body>'
         u'<p>Dear {0},</p>')
@@ -106,8 +108,9 @@ def _get_html_preamble_signature(recipient):
                 recipient.mailout_key,
         ))
 
+
 def send_mailout_to(subject, body_text, body_html, recipients, task=None,
-        report_to=None):
+                    report_to=None):
     """
     Sends email with supplied subject/body to supplied set of recipients.
     Requires subject and body to be unicode.

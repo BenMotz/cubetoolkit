@@ -121,7 +121,7 @@ def mailout(request):
             "copy_days_ahead": copy_days_ahead
         }
         return _render_mailout_form(request, body_text, body_html,
-            subject_text, context)
+                                    subject_text, context)
     elif request.method == 'POST':
         form = diary_forms.MailoutForm(
             request.POST,
@@ -172,7 +172,8 @@ def mailout_test_send(request):
     # Essentially the same as the form for exec_mailout, but with an 'address'
     # field. Should really refactor to use the same form + a separate 'address'
     # form.
-    form = diary_forms.MailoutTestForm(request.POST,
+    form = diary_forms.MailoutTestForm(
+        request.POST,
         html_mailout_enabled=settings.HTML_MAILOUT_ENABLED)
     if not form.is_valid():
         response = {

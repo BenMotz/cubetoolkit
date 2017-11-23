@@ -55,7 +55,7 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         self.assertEqual(subject, expected_subject)
 
     def _assert_mail_sent(self, result, subject, body_text, body_html,
-            is_utf8):
+                          is_utf8):
         self.current_task_mock.update_state.assert_has_calls([
             call(state='PROGRESS017', meta={'total': 6, 'sent': 1}),
             call(state='PROGRESS034', meta={'total': 6, 'sent': 2}),
@@ -223,4 +223,3 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         result = toolkit.members.tasks.send_mailout(subject, body, None)
         self._assert_mail_sent(result, subject, body, None, True)
         self.assertEqual(mail.outbox[0].to, [u'\u0205ne@\u0205xample.com'])
-
