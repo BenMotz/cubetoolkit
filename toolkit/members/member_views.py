@@ -68,6 +68,7 @@ def search(request):
         context = {
             'search_terms': search_terms,
             'members': results,
+            'membership_expiry_enabled': settings.MEMBERSHIP_EXPIRY_ENABLED,
         }
         return render(request, 'search_members_results.html', context)
 
@@ -80,7 +81,10 @@ def search(request):
 def view(request, member_id):
     # Is this view actually used?
     member = get_object_or_404(Member, id=member_id)
-    return render(request, 'view_member.html', {'member': member})
+    return render(request, 'view_member.html', {
+        'member': member,
+        'membership_expiry_enabled': settings.MEMBERSHIP_EXPIRY_ENABLED,
+    })
 
 
 @permission_required('toolkit.write')
@@ -156,10 +160,13 @@ def edit_member(request, member_id):
 
     member = get_object_or_404(Member, id=member_id)
 
+    user_has_permission = request.user.has_perm('toolkit.write')
+
     context = {}
 
     if request.method == 'POST':
-        form = MemberForm(request.POST, instance=member)
+        form = MemberForm(request.POST, instance=member,
+                          hide_internal_fields=not user_has_permission)
         if form.is_valid():
             logger.info(u"Saving changes to member '{0}' (id: {1})".format(
                 member.name, member.pk))
@@ -169,11 +176,14 @@ def edit_member(request, member_id):
             if request.user.has_perm('toolkit.write'):
                 return HttpResponseRedirect(reverse("search-members"))
     else:
-        form = MemberForm(instance=member)
+        form = MemberForm(instance=member,
+                          hide_internal_fields=not user_has_permission)
 
     context = {
         'member': member,
         'form': form,
+        'membership_expiry_enabled': settings.MEMBERSHIP_EXPIRY_ENABLED,
+        'membership_length_days': settings.MEMBERSHIP_LENGTH_DAYS,
     }
     return render(request, 'form_member.html', context)
 
@@ -288,6 +298,13 @@ def member_statistics(request):
                          .exclude(is_member=True)
                          .count(),
     }
+    if settings.MEMBERSHIP_EXPIRY_ENABLED:
+        extra_context = {
+                'm_unexpired_count': Member.objects.unexpired().count(),
+                'm_expired_count': Member.objects.expired().count(),
+
+        }
+        context.update(extra_context)
 
     return render(request, 'stats.html', context)
 

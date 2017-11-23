@@ -1,3 +1,4 @@
+from datetime import date
 from django.conf import settings
 import django.contrib.contenttypes as contenttypes
 import django.contrib.auth.models as auth_models
@@ -30,11 +31,14 @@ class MembersTestsMixin(object):
         self.mem_1.save()
         self.mem_2 = Member(name=u"Tw\u020d Member",
                             email="two@example.com", number="02",
-                            postcode="")
+                            postcode="",
+                            membership_expires=date(day=31, month=5, year=2010)
+                            )
         self.mem_2.save()
         self.mem_3 = Member(name=u"Some Third Chap",
                             email="two@member.test", number="000",
-                            postcode="NORAD")
+                            postcode="NORAD",
+                            membership_expires=date(day=1, month=6, year=2010))
         self.mem_3.save()
         self.mem_4 = Member(name="Volunteer One", email="volon@cube.test",
                             number="3", phone="0800 000 000", address="1 Road",

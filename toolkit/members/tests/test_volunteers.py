@@ -321,7 +321,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertEqual(new_member.phone, "+44 1000000000000001")
         self.assertEqual(new_member.altphone, "-1 3202394 2352 23 234")
         self.assertFalse(new_member.mailout)
-        self.assertTrue(new_member.mailout_failed)
+        # not in form, shouldn't have changed:
+        self.assertFalse(new_member.mailout_failed)
         self.assertTrue(new_member.is_member)
         # Member notes aren't included on the form:
         self.assertEqual(new_member.notes, '')
@@ -443,7 +444,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertEqual(member.phone, "+44 1000000000000001")
         self.assertEqual(member.altphone, "-1 3202394 2352 23 234")
         self.assertFalse(member.mailout)
-        self.assertTrue(member.mailout_failed)
+        # not in form, shouldn't have changed:
+        self.assertFalse(member.mailout_failed)
         self.assertTrue(member.is_member)
         # Member notes aren't included on the form:
         self.assertEqual(member.notes, '')

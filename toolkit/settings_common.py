@@ -101,6 +101,8 @@ CALENDAR_HISTORIC_SHADIER = 1.0
 # use but the Star + Shadow (probably) does:
 MULTIROOM_ENABLED = False
 HTML_MAILOUT_ENABLED = False
+MEMBERSHIP_EXPIRY_ENABLED = False
+MEMBERSHIP_LENGTH_DAYS = 365
 
 ###############################################################################
 #

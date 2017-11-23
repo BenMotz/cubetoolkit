@@ -1,11 +1,13 @@
-from __future__ import print_function
-from mock import patch
+import datetime
 
+from mock import patch
 from six.moves import urllib
+
 from django.test import TestCase
 from django.test.client import RequestFactory
 from django.urls import reverse
 from django.conf import settings
+from django.test.utils import override_settings
 
 import django.contrib.auth.models as auth_models
 
@@ -55,15 +57,43 @@ class AddMemberIPAuth(TestCase):
         self.assertNotIn('Location', response)
 
 
-class TestMemberModelManager(MembersTestsMixin, TestCase):
+@patch('toolkit.members.models.timezone_now')
+class TestMemberModelManagerBase(MembersTestsMixin):
 
-    def test_email_recipients(self):
+    def test_email_recipients(self, now_mock):
         recipients = Member.objects.mailout_recipients()
         self.assertEqual(recipients.count(), 6)
         for member in recipients:
             self.assertTrue(member.mailout)
             self.assertFalse(member.mailout_failed)
             self.assertTrue(member.email)
+
+    def test_expired(self, now_mock):
+        now_mock.return_value.date.return_value = \
+            datetime.date(day=1, month=6, year=2010)
+
+        members = Member.objects.expired().all()
+        self.assertEqual(len(members), 1)
+        self.assertEqual(members[0], self.mem_2)
+
+    def test_unexpired(self, now_mock):
+        now_mock.return_value.date.return_value = \
+            datetime.date(day=1, month=6, year=2010)
+
+        members = Member.objects.unexpired().all()
+        self.assertEqual(len(members), 8)
+
+
+@override_settings(MEMBERSHIP_EXPIRY_ENABLED=True)
+class TestMemberModelManagerExpiryEnabled(TestMemberModelManagerBase,
+                                          TestCase):
+    pass
+
+
+@override_settings(MEMBERSHIP_EXPIRY_ENABLED=False)
+class TestMemberModelManagerExpiryDisabled(TestMemberModelManagerBase,
+                                           TestCase):
+    pass
 
 
 class TestMemberModel(TestCase):
@@ -117,6 +147,30 @@ class TestMemberModel(TestCase):
         old_member = Member.objects.get(id=1)
         self.assertEqual(old_member.number, "Orange squash")
 
+    @override_settings(MEMBERSHIP_EXPIRY_ENABLED=True)
+    @override_settings(MEMBERSHIP_LENGTH_DAYS=100)
+    @patch('toolkit.members.models.timezone_now')
+    def test_default_expiry_expiry_enabled(self, now_mock):
+        now_mock.return_value.date.return_value = \
+            datetime.date(day=1, month=1, year=2000)
+
+        new_member = Member(name="New Member")
+        new_member.save()
+
+        new_member.refresh_from_db()
+        self.assertEqual(new_member.membership_expires,
+                         datetime.date(2000, 4, 10))
+        self.assertFalse(new_member.has_expired())
+
+    @override_settings(MEMBERSHIP_EXPIRY_ENABLED=False)
+    def test_default_expiry_expiry_disabled(self):
+        new_member = Member(name="New Member")
+        new_member.save()
+
+        new_member.refresh_from_db()
+        self.assertIsNone(new_member.membership_expires)
+        self.assertFalse(new_member.has_expired())
+
 
 class TestAddMemberView(MembersTestsMixin, TestCase):
 
@@ -136,7 +190,10 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_new_member.html")
 
-    def test_post_form(self):
+    def _test_post_form_common(self, now_mock, expiry_enabled):
+        now_mock.return_value.date.return_value = \
+            datetime.date(day=1, month=1, year=2000)
+
         new_name = u"Some New \u20acejit"
 
         self.assertEqual(Member.objects.filter(name=new_name).count(), 0)
@@ -157,9 +214,25 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
             member.email, u"blah.blah-blah@hard-to-tell-if-genuine.uk")
         self.assertEqual(member.postcode, u"SW1A 1AA")
         self.assertEqual(member.mailout, True)
+        if expiry_enabled:
+            self.assertEqual(member.membership_expires,
+                             datetime.date(2000, 4, 11))
+        else:
+            self.assertIsNone(member.membership_expires)
 
         self.assertContains(
             response, u"Added member: {0}".format(member.number))
+
+    @override_settings(MEMBERSHIP_EXPIRY_ENABLED=False)
+    @patch('toolkit.members.models.timezone_now')
+    def test_post_form_expiry_disabled(self, now_mock):
+        self._test_post_form_common(now_mock, expiry_enabled=False)
+
+    @override_settings(MEMBERSHIP_EXPIRY_ENABLED=True)
+    @override_settings(MEMBERSHIP_LENGTH_DAYS=101)
+    @patch('toolkit.members.models.timezone_now')
+    def test_post_form_expiry_enabled(self, now_mock):
+        self._test_post_form_common(now_mock, expiry_enabled=True)
 
     def test_post_minimal_submission(self):
         new_name = u"Another New \u20acejit"
@@ -223,7 +296,10 @@ class TestSearchMemberView(MembersTestsMixin, TestCase):
 
         self.assertFalse(member_patch.objects.filter.called)
 
-    def test_query_with_results(self):
+    def _common_test_query_with_results(self, now_mock, expiry_enabled):
+        now_mock.return_value.date.return_value = \
+            datetime.date(day=1, month=6, year=2010)
+
         url = reverse("search-members")
         response = self.client.get(url, data={'q': u'member'})
 
@@ -254,6 +330,20 @@ class TestSearchMemberView(MembersTestsMixin, TestCase):
             html=True)
         self.assertContains(response, u"<td>NORAD</td>", html=True)
 
+        if expiry_enabled:
+            self.assertContains(response,
+                                "<th>Membership expires</th>",
+                                html=True)
+            self.assertContains(response,
+                                '<td class="expired">31/05/2010</td>',
+                                html=True)
+            self.assertContains(response,
+                                '<td>01/06/2010</td>',
+                                html=True)
+            self.assertContains(response, "expires")
+        else:
+            self.assertNotContains(response, "expires")
+
         # Should have Edit / Delete buttons:
         self.assertContains(
             response, u'<input type="submit" value="Edit">', html=True)
@@ -271,6 +361,16 @@ class TestSearchMemberView(MembersTestsMixin, TestCase):
                                     "delete-member", kwargs={"member_id": 3})))
         self.assertContains(response, expected_edit_form)
         self.assertContains(response, expected_delete_form)
+
+    @override_settings(MEMBERSHIP_EXPIRY_ENABLED=False)
+    @patch('toolkit.members.models.timezone_now')
+    def test_query_with_results_expiry_disabled(self, now_mock):
+        self._common_test_query_with_results(now_mock, expiry_enabled=False)
+
+    @override_settings(MEMBERSHIP_EXPIRY_ENABLED=True)
+    @patch('toolkit.members.models.timezone_now')
+    def test_query_with_results_expiry_enabled(self, now_mock):
+        self._common_test_query_with_results(now_mock, expiry_enabled=True)
 
     def test_query_no_results(self):
         url = reverse("search-members")
@@ -333,6 +433,7 @@ class TestEditMemberViewNotLoggedIn(MembersTestsMixin, TestCase):
         self.assertRedirects(response, expected_redirect)
 
     # GET tests ###########################################
+    @override_settings(MEMBERSHIP_EXPIRY_ENABLED=True)
     def test_edit_get_form(self):
         member = Member.objects.get(pk=2)
 
@@ -342,6 +443,10 @@ class TestEditMemberViewNotLoggedIn(MembersTestsMixin, TestCase):
         })
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_member.html")
+
+        # Shouldn't have these fields
+        self.assertNotContains(response, "expires:")
+        self.assertNotContains(response, "Is member")
 
     def test_edit_get_form_no_key(self):
         url = reverse("edit-member", kwargs={"member_id": 2})
@@ -395,7 +500,8 @@ class TestEditMemberViewNotLoggedIn(MembersTestsMixin, TestCase):
         self.assertEqual(member.notes, "")
         self.assertFalse(member.mailout)
         self.assertFalse(member.mailout_failed)
-        self.assertFalse(member.is_member)
+        # Shouldn't have been changed:
+        self.assertTrue(member.is_member)
 
         # Shouldn't have been changed:
         self.assertEqual(member.mailout_key, member_mailout_key)
@@ -403,6 +509,7 @@ class TestEditMemberViewNotLoggedIn(MembersTestsMixin, TestCase):
         self.assertContains(response, new_name)
         self.assertContains(response, "Member 02 updated")
 
+    @override_settings(MEMBERSHIP_EXPIRY_ENABLED=True)
     def test_edit_post_form_all_data(self):
         new_name = u'N\u018EW Name'
 
@@ -427,7 +534,9 @@ class TestEditMemberViewNotLoggedIn(MembersTestsMixin, TestCase):
             'mailout': "t",
             'mailout_failed': "t",
             'is_member': "t",
+            # Should be ignored:
             "mailout_key": "sinister",
+            'membership_expires': "01/01/2020",
         })
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_member.html")
@@ -449,6 +558,8 @@ class TestEditMemberViewNotLoggedIn(MembersTestsMixin, TestCase):
 
         # Shouldn't have been changed:
         self.assertEqual(member.mailout_key, member_mailout_key)
+        self.assertEqual(member.membership_expires,
+                         datetime.date(day=31, month=5, year=2010))
 
         self.assertContains(response, new_name)
         self.assertContains(response, "Member 02 updated")
@@ -543,13 +654,14 @@ class TestEditMemberViewLoggedIn(MembersTestsMixin, TestCase):
 
     # POST tests ###########################################
     # Only test differences from not logged in view...
-    def test_edit_post_form_minimal_data(self):
+    def _test_edit_post_form_minimal_data_common(self):
         new_name = u'N\u018EW Name'
 
         member = Member.objects.get(pk=2)
         self.assertEqual(member.name, u"Tw\u020d Member")
 
         member_mailout_key = member.mailout_key
+        membership_expires = member.membership_expires
 
         url = reverse("edit-member", kwargs={"member_id": 2})
         response = self.client.post(
@@ -562,10 +674,50 @@ class TestEditMemberViewLoggedIn(MembersTestsMixin, TestCase):
         # Secret key shouldn't have been changed:
         self.assertEqual(member.mailout_key, member_mailout_key)
 
+        # Expiry date shouldn't have changed:
+        self.assertEqual(member.membership_expires, membership_expires)
+
         # Should redirect to search page, with a success message inserted:
         self.assertRedirects(response, reverse("search-members"))
         self.assertContains(response, "Member 02 updated")
 
+    @override_settings(MEMBERSHIP_EXPIRY_ENABLED=True)
+    def test_edit_post_form_minimal_data_expiry_enabled(self):
+        self._test_edit_post_form_minimal_data_common()
+
+    @override_settings(MEMBERSHIP_EXPIRY_ENABLED=False)
+    def test_edit_post_form_minimal_data_expiry_disabled(self):
+        self._test_edit_post_form_minimal_data_common()
+
+    def _test_edit_post_form_modify_expiry(self, expiry_enabled):
+        member = Member.objects.get(pk=2)
+        membership_expires = member.membership_expires
+
+        url = reverse("edit-member", kwargs={"member_id": 2})
+        self.client.post(url, data={
+            'name': member.name,
+            # Always try to set. Should only succeed if expiry is enabled.
+            'membership_expires': "01/02/1980",
+        }, follow=True)
+
+        member = Member.objects.get(pk=2)
+
+        # Expiry date shouldn't have changed:
+        if expiry_enabled:
+            self.assertEqual(member.membership_expires,
+                             datetime.date(1980, 2, 1))
+        else:
+            self.assertEqual(member.membership_expires, membership_expires)
+
+    @override_settings(MEMBERSHIP_EXPIRY_ENABLED=True)
+    def test_edit_post_modify_expiry_expiry_enabled(self):
+        self._test_edit_post_form_modify_expiry(expiry_enabled=True)
+
+    @override_settings(MEMBERSHIP_EXPIRY_ENABLED=False)
+    def test_edit_post_form_modify_expiry_expiry_disabled(self):
+        self._test_edit_post_form_modify_expiry(expiry_enabled=False)
+
+    @override_settings(MEMBERSHIP_EXPIRY_ENABLED=True)
     def test_edit_post_form_invalid_data_missing(self):
         member = Member.objects.get(pk=2)
         start_name = member.name
@@ -781,3 +933,20 @@ class TestMemberMiscViews(MembersTestsMixin, TestCase):
         url = reverse("member-homepages")
         response = self.client.post(url)
         self.assertEqual(response.status_code, 405)
+
+    def test_view_member(self):
+        url = reverse("view-member", kwargs={"member_id": 3})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_member.html")
+        self.assertContains(
+            response, u"Some Third Chap")
+        self.assertContains(
+            response, "two@member.test")
+        self.assertContains(
+            response, u"NORAD")
+
+    def test_view_non_existant_member(self):
+        url = reverse("view-member", kwargs={"member_id": 999})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)

@@ -8,12 +8,37 @@
         font-weight: normal;
         text-align: left;
     }
-    input[type="text"], textarea {
+    input[type="text"], input[type="email"], textarea {
         width: 300px;
     }
 </style>
 {% endblock %}
 
+{% block script %}
+{{ block.super }}
+{% if membership_expiry_enabled %}
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
+<script>
+function get_date_in_future(days_ahead) {
+    return new Date(+(new Date()) + (days_ahead * 24 * 3600 * 1000));
+}
+
+function format_date(d) {
+    return d.getDate() + "/" + (d.getMonth() + 1) + "/" + (1900 + d.getYear());
+}
+
+$(document).ready(function() {
+    $('#id_membership_expires').after('<button type="button" id="id_renew">Renew</button>');
+    $('#id_renew').click(function() {
+        $('#id_membership_expires').val(
+            format_date(get_date_in_future({{ membership_length_days }}))
+        );
+        return false;
+    });
+});
+{% endif %}
+</script>
+{% endblock %}
 {% block body %}
 <h3>Edit a Member.</h3>
 {% if message %}<h3>{{ message }}</h3>{% endif %}

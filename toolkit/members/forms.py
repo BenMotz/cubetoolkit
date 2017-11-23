@@ -7,6 +7,7 @@ from django.core.files.uploadedfile import SimpleUploadedFile
 from toolkit.members.models import Member
 import toolkit.diary.models
 from toolkit.diary.form_widgets import ChosenSelectMultiple
+from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
@@ -21,6 +22,15 @@ class NewMemberForm(forms.ModelForm):
 
 
 class MemberForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        hide_internal_fields = kwargs.pop('hide_internal_fields', True)
+        super(MemberForm, self).__init__(*args, **kwargs)
+
+        if not settings.MEMBERSHIP_EXPIRY_ENABLED or hide_internal_fields:
+            del self.fields['membership_expires']
+        if hide_internal_fields:
+            del self.fields['is_member']
+
     class Meta(object):
         model = toolkit.members.models.Member
         exclude = ()
@@ -33,7 +43,8 @@ class MemberFormWithoutNotes(forms.ModelForm):
 
     class Meta(object):
         model = toolkit.members.models.Member
-        exclude = ('is_member', 'notes',)
+        exclude = ('is_member', 'notes', 'mailout_failed',
+                   'membership_expires')
 
 
 class VolunteerForm(forms.ModelForm):
@@ -118,6 +129,7 @@ class GroupTrainingForm(forms.Form):
         .order_by('name'),
         widget=ChosenSelectMultiple(width="100%"),
         required=True)
-    notes = forms.CharField(widget=forms.Textarea, required=False,
+    notes = forms.CharField(
+        widget=forms.Textarea, required=False,
         help_text="(will be added to all selected volunteer's training "
         "records)")

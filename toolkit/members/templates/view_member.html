@@ -45,6 +45,9 @@ $(document).ready(function() {
     <p>{{ member.altphone }}</p>
     <p>Receives mailout? {{ member.mailout|yesno }}</p>
     <p>Mailout failed? {{ member.mailout_failed|yesno }}</p>
+    {% if membership_expiry_enabled %}
+    <p>Membership expires on: {{ member.membership_expires|default:"(no date set)" }}</p>
+    {% endif %}
     <p>
 <form method="get" action="{% url "edit-member" member.pk %}"><input type="submit" value="Edit"></form> 
 <form method="post" class="delete" action="{% url "delete-member" member.pk %}">{% csrf_token %}<input type="submit" value="Delete"></form>

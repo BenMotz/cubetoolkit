@@ -22,6 +22,12 @@
 <h3>Member Totals.</h3>
 <table class="table">
     <tr><td>Total members</td><td>{{ m_count }}</td></tr>
+    {% if m_unexpired_count is not None%}
+    <tr><td>Members with valid membership</td><td>{{ m_unexpired_count }}</td></tr>
+    {% endif %}
+    {% if m_expired_count is not None%}
+    <tr><td>Members with expired membership</td><td>{{ m_expired_count }}</td></tr>
+    {% endif %}
     <tr><td>Members with email</td><td>{{ m_email_count }} ({{ m_email_viable}} viable; {{ m_email_unsub }} unsubscribed)</td></tr>
     <tr><td>Members with postcode</td><td>{{ m_postcode }}</td></tr>
     <tr><td>Unsubscribed non members</td><td>{{ m_cruft }}</td></tr>

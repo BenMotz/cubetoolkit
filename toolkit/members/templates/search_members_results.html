@@ -20,7 +20,9 @@
         border-bottom: thin dotted gray;
             padding: 3px 5px;
     }
-
+    .expired {
+        color: red;
+    }
 </style>
 {% endblock %}
 
@@ -48,7 +50,12 @@ $(document).ready(function() {
 <tr>
 <th>Member #</th><th>Name</th>
 <th></th><th></th>
-<th>Email</th><th>Homepage</th><th>Postcode</th><th>Last updated</th><th>Mailout?</th></tr>
+<th>Email</th><th>Postcode</th><th>Last updated</th>
+{% if membership_expiry_enabled %}
+<th>Membership expires</th>
+{% endif %}
+<th>Mailout?</th>
+</tr>
 {% for member in members %}
 <tr>
 <td>{{ member.number }}</td>
@@ -56,9 +63,11 @@ $(document).ready(function() {
 <td><form method="get" action="{% url "edit-member" member.pk %}"><input type="submit" value="Edit"></form></td>
 <td><form class="delete" method="post" action="{% url "delete-member" member.pk %}">{% csrf_token %}<input type="submit" value="Delete"></form></td>
 <td>{% if member.email %}{{ member.email|urlize }}{% else %} - {% endif %}</td>
-<td>{% if member.website %}{{ member.website|urlize }}{% else %} - {% endif %}</td>
 <td>{{ member.postcode|default_if_none:"-" }}</td>
 <td>{{ member.updated_at|date:"d/m/Y" }}</td>
+{% if membership_expiry_enabled %}
+<td {% if member.has_expired %}class="expired"{% endif %}>{{ member.membership_expires|date:"d/m/Y" }}</td>
+{% endif %}
 <td>{{ member.mailout|yesno }}</td>
 {% endfor %}
 </table>

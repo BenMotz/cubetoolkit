@@ -7,7 +7,9 @@ import datetime
 import django.db  # Used for raw query for stats
 from django.conf import settings
 from django.db import models
+from django.db.models import Q
 from django.utils.encoding import python_2_unicode_compatible
+from django.utils.timezone import now as timezone_now
 
 from toolkit.diary.models import Role
 from toolkit.util import generate_random_string
@@ -55,6 +57,27 @@ class MemberManager(models.Manager):
             postcode_stats = [row for row in cursor.fetchall()]
         return postcode_stats
 
+    def expired(self):
+        """Get all members with an expiry date defined, where that date is in
+        the past"""
+        return (self.filter(membership_expires__isnull=False)
+                    .filter(membership_expires__lt=timezone_now().date()))
+
+    def unexpired(self):
+        """Get all members either without an expiry date defined, or with an
+        expiry date in the future (or today)"""
+        return (self.filter(
+                    Q(membership_expires__isnull=True)
+                    | Q(membership_expires__gte=timezone_now().date())))
+
+
+def get_default_membership_expiry():
+    if settings.MEMBERSHIP_EXPIRY_ENABLED:
+        return (timezone_now().date() +
+                datetime.timedelta(days=settings.MEMBERSHIP_LENGTH_DAYS))
+    else:
+        return None
+
 
 @python_2_unicode_compatible
 class Member(models.Model):
@@ -78,6 +101,8 @@ class Member(models.Model):
     notes = models.TextField(blank=True)
 
     is_member = models.BooleanField(default=True)
+    membership_expires = models.DateField(
+        null=True, blank=True, default=get_default_membership_expiry)
 
     mailout = models.BooleanField(default=True)
     mailout_failed = models.BooleanField(default=False)
@@ -97,6 +122,9 @@ class Member(models.Model):
 
     def __str__(self):
         return self.name
+
+    def __init__(self, *args, **kwargs):
+        super(Member, self).__init__(*args, **kwargs)
 
     def save(self, *args, **kwargs):
         # If a user number hasn't been set, save a placeholder, then re-save
@@ -131,6 +159,12 @@ class Member(models.Model):
             membership_no = str(self.pk + offset)
 
         return membership_no
+
+    def has_expired(self):
+        if settings.MEMBERSHIP_EXPIRY_ENABLED and self.membership_expires:
+            return self.membership_expires < timezone_now().date()
+        else:
+            return False
 
 #    weak_email_validator = \
 #       re.compile(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b")
