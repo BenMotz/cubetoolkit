@@ -4,6 +4,7 @@ from django.core.mail import (get_connection, EmailMessage,
                               EmailMultiAlternatives)
 from django.conf import settings
 from django.urls import reverse
+import django.template
 
 from celery import task, current_task
 from celery.utils.log import get_task_logger
@@ -81,34 +82,6 @@ def _get_text_preamble_signature(recipient):
         ))
 
 
-def _get_html_preamble_signature(recipient):
-    preamble_template = (
-        u'<!doctype html><html><head>'
-        u'<meta name="viewport" content="width=device-width" />'
-        u'<meta http-equiv="Content-Type" content="text/html; '
-        u'charset=UTF-8" />'
-        u'<title>Cube Programme of Events</title>'
-        u'<style></style></head><body>'
-        u'<p>Dear {0},</p>')
-    signature_template = (
-        u'<p>If you wish to be removed from our mailing list please use this '
-        u'link:<br>'
-        u'<a href="{0}{1}?k={3}">{0}{1}?k={3}</a><br>'
-        u'To edit details of your membership, please use this link:<br>'
-        u'<a href="{0}{2}?k={3}">{0}{2}?k={3}<br>'
-        u'</body>'
-        u'</html>'
-    )
-    return (
-        preamble_template.format(recipient.name),
-        signature_template.format(
-                settings.VENUE['email_unsubscribe_host'],
-                reverse("unsubscribe-member", args=(recipient.pk,)),
-                reverse("edit-member", args=(recipient.pk,)),
-                recipient.mailout_key,
-        ))
-
-
 def send_mailout_to(subject, body_text, body_html, recipients, task=None,
                     report_to=None):
     """
@@ -125,6 +98,18 @@ def send_mailout_to(subject, body_text, body_html, recipients, task=None,
     one_percent = count // 100 or 1
 
     logger.info("Sending mailout to {0} recipients".format(count))
+
+    html_mail_template = django.template.loader.get_template(
+        "mailout_wrapper.html")
+    html_mail_context = {
+        'subject': subject,
+        'body': body_html,
+        'email_unsubscribe_host': settings.VENUE['email_unsubscribe_host'],
+        'member_name': "member",
+        'unsubscribe_link': "[error]",
+        'edit_link': "[error]",
+        'mailout_key': "",
+    }
 
     # Open connection to SMTP server:
     email_conn = get_connection(fail_silently=False)
@@ -149,8 +134,14 @@ def send_mailout_to(subject, body_text, body_html, recipients, task=None,
             mail_body_text = text_pre + body_text + text_post
 
             if body_html:
-                html_pre, html_post = _get_html_preamble_signature(recipient)
-                mail_body_html = html_pre + body_html + html_post
+                html_mail_context.update({
+                    'member_name': recipient.name,
+                    'unsubscribe_link': reverse("unsubscribe-member",
+                                                args=(recipient.pk,)),
+                    'edit_link': reverse("edit-member", args=(recipient.pk,)),
+                    'mailout_key': recipient.mailout_key
+                })
+                mail_body_html = html_mail_template.render(html_mail_context)
             else:
                 mail_body_html = None
 
