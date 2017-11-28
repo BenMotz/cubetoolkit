@@ -57,7 +57,9 @@
 {% if showing.event.pre_title %}
 {{ showing.event.pre_title }}:<br>
 {% endif %}
-<strong>{{ showing.event.name|upper }}</strong><br>
+<strong>
+<a href="{{ site_url }}{% url 'single-event-view-with-slug' event_id=showing.event.id event_slug=showing.event.event_slug %}?pk_campaign=Email-28Nov2017">
+{{ showing.event.name|upper }}</a></strong><br>
 {% if showing.event.post_title %}
 {{ showing.event.post_title }}
 </p>
