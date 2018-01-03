@@ -1,4 +1,5 @@
 import smtplib
+import email.errors
 
 from django.core.mail import (get_connection, EmailMessage,
                               EmailMultiAlternatives)
@@ -32,13 +33,16 @@ def _send_email(email_conn, destination, subject, body_text, body_html):
 
     try:
         msg.send()
+    except email.errors.MessageParseError as hpe:
+        error = "Failed sending to '{0}': {1}".format(destination, hpe)
+        logger.error(error)
     except smtplib.SMTPServerDisconnected as ssd:
-        logger.error("Failed sending to {0}: {1}".format(destination, ssd))
+        logger.error("Failed sending to '{0}': {1}".format(destination, ssd))
         # don't handle this:
         raise
     except smtplib.SMTPException as smtpe:
         error = str(smtpe)
-        logger.error("Failed sending to {0}: {1}".format(destination, smtpe))
+        logger.error("Failed sending to '{0}': {1}".format(destination, smtpe))
 
     return error
 
