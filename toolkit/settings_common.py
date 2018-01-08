@@ -1,5 +1,6 @@
 import sys
 import os
+import datetime
 
 import six.moves
 import django.urls
@@ -88,6 +89,10 @@ VOLUNTEER_PORTRAIT_DIR = 'volunteers'
 # Currently only used for setting an outer limit on what year printed
 # programmes can be uploaded
 DAWN_OF_TIME = 1998
+
+# Used to indicate if volunteer/member added dates are when they were actually
+# added, vs. if they were bulk imported from the old toolkit
+DAWN_OF_TOOLKIT = datetime.date(year=2014, month=2, day=12)
 
 # Colour used for the calendar view if multiroom isn't enabled:
 CALENDAR_DEFAULT_COLOUR = "#33CC33"

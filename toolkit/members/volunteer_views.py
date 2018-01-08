@@ -191,6 +191,7 @@ def edit_volunteer(request, volunteer_id, create_new=False):
         'vol_form': vol_form,
         'mem_form': mem_form,
         'training_record_form': training_record_form,
+        'dawn_of_toolkit': settings.DAWN_OF_TOOLKIT,
     }
     return render(request, 'form_volunteer.html', context)
 
