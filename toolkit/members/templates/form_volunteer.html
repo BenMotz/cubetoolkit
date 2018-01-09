@@ -75,20 +75,20 @@ $(document).ready(function() {
 {% block body %}
 <h3>{{ pagetitle }} {{ volunteer.member.name }}</h3>
 {% if message %}<h3>{{ message }}</h3>{% endif %}
-<p>Added: {{ volunteer.created_at|date:"d/m/Y" }}<br>
-Last updated: {{ volunteer.updated_at|date:"d/m/Y" }}<br>
-</p>
 <form id="main_form" action="" method="POST" enctype="multipart/form-data">
 {% csrf_token %}
 <p><input type="submit" value="Save changes"> <a href="{% url "view-volunteer-list" %}">Cancel</a></p>
+
 <div id="mem_form">
+<h4>Contact details</h4>
 <table>
 {{ mem_form.as_table }}
-<tr><td colspan = "2">&nbsp;</td></tr>
 </table>
 </div>
 
 <div id="vol_form">
+<h4>Volunteer facts</h4>
+</p>
 <table>
     <tr><td></td><td>
         <div id="webcampreview">
@@ -106,8 +106,18 @@ Last updated: {{ volunteer.updated_at|date:"d/m/Y" }}<br>
         <canvas id="canvas"></canvas>
         {{ vol_form.image_data }}
     </td></tr>
-    <tr><th>{{ vol_form.portrait.label_tag }}</th><td> {{ vol_form.portrait.errors }}{{ vol_form.portrait }}</td></tr>
-    <tr><th>{{ vol_form.notes.label_tag }}</th><td> {{ vol_form.notes.errors }}{{ vol_form.notes }}</td></tr>
+    <tr><th>{{ vol_form.portrait.label_tag }}</th>
+        <td> {{ vol_form.portrait.errors }}{{ vol_form.portrait }}</td></tr>
+    <tr><td>Inducted:</td>
+{% if volunteer.is_old %}
+        <td>Before {{ dawn_of_toolkit|date:"d/m/Y" }} (when the toolkit was rebooted)</td></tr>
+{% else %}
+        <td>{{ volunteer.created_at|date:"d/m/Y" }}</td></tr>
+{% endif %}
+    <tr><td>Updated:</td>
+        <td>{{ volunteer.updated_at|date:"d/m/Y" }}</td></tr>
+    <tr><th>{{ vol_form.notes.label_tag }}</th>
+        <td> {{ vol_form.notes.errors }}{{ vol_form.notes }}</td></tr>
 </table>
 </div>
 <div id="roles">
