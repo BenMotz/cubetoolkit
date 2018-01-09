@@ -10,6 +10,7 @@ from django.db import models
 from django.db.models import Q
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now as timezone_now
+from django.core.exceptions import ValidationError
 
 from toolkit.diary.models import Role
 from toolkit.util import generate_random_string
@@ -232,15 +233,37 @@ class Volunteer(models.Model):
 
 
 class TrainingRecord(models.Model):
+    ROLE_TRAINING = 'R'
+    GENERAL_TRAINING = 'G'
+    GENERAL_TRAINING_DESC = "General Safety Training"
+
+    TRAINING_TYPE_CHOICES = (
+        (ROLE_TRAINING, "Role Specific Training"),
+        (GENERAL_TRAINING, GENERAL_TRAINING_DESC),
+    )
+
     class Meta:
         db_table = 'TrainingRecords'
         ordering = ['role', 'training_date', 'volunteer']
 
     volunteer = models.ForeignKey(Volunteer, related_name='training_records',
                                   on_delete=models.CASCADE)
+    training_type = models.CharField(max_length=1,
+                                     choices=TRAINING_TYPE_CHOICES,
+                                     blank=False)
+
     role = models.ForeignKey(Role, related_name='training_records',
-                             on_delete=models.CASCADE,)
+                             on_delete=models.CASCADE, null=True, blank=True)
+
     # Default to when the record is created:
     training_date = models.DateField(default=datetime.date.today)
     trainer = models.CharField(max_length=128)
     notes = models.TextField(blank=True)
+
+    def clean(self):
+        if self.training_type == ROLE_TRAINING and role is None:
+            raise ValidationError("Training role must be selected when "
+                "training record is 'Role Specific'.")
+        elif self.training_type == GENERAL_TRAINING and role is not None:
+            raise ValidationError("Training role must not be set for "
+                "'General Safety' training records.")
