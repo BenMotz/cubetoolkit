@@ -218,13 +218,18 @@ def add_volunteer_training_record(request, volunteer_id):
         record_form.save()
         logger.info(u"Added training record {0} for volunteer '{0}'".format(
             new_record.id, volunteer.member.name))
-        # Now make sure the volunteer has that role selected:
-        volunteer.roles.add(new_record.role)
+
+        if new_record.training_type == TrainingRecord.ROLE_TRAINING:
+            # Now make sure the volunteer has that role selected:
+            volunteer.roles.add(new_record.role)
+            training_description = str(new_record.role)
+        else:
+            training_description = new_record.GENERAL_TRAINING_DESC
 
         response = {
             'succeeded': True,
             'id': new_record.id,
-            'role': str(new_record.role),
+            'training_description': training_description,
             'training_date': new_record.training_date.strftime("%d/%m/%Y"),
             'trainer': new_record.trainer,
             'notes': new_record.notes,

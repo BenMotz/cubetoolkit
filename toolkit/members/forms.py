@@ -113,7 +113,7 @@ class VolunteerForm(forms.ModelForm):
 class TrainingRecordForm(forms.ModelForm):
     class Meta(object):
         model = toolkit.members.models.TrainingRecord
-        fields = ('role', 'trainer', 'training_date', 'notes')
+        fields = ('training_type', 'role', 'trainer', 'training_date', 'notes')
 
 
 class GroupTrainingForm(forms.Form):

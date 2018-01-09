@@ -1,5 +1,16 @@
 var setupTraining = function(options) {
-    // To toggle notes field in training records:
+    var GENERAL_TRAINING_VALUE = "general";
+
+    set_field_links();
+    $("#training-record form").submit(submit_training_form);
+    // hack in the general training type:
+    $('#id_training-role').prepend(
+        '<option value="' + GENERAL_TRAINING_VALUE
+        + '">General Safety Training</option>');
+    // force something to be selected (where the browser supports it)
+    $('#id_training-role').val('').attr("required", "");
+
+    /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
     function delete_complete(anchor) {
         anchor.closest('tr').next('tr').remove();
@@ -30,19 +41,27 @@ var setupTraining = function(options) {
         });
     }
 
-    set_field_links();
-
     // Add a training record:
-    $("#training-record form").submit(function() {
+    function submit_training_form() {
         var url = options.add_training_record_url;
+        var training_type;
+        var role = $('#id_training-role').val();
+        if (role === GENERAL_TRAINING_VALUE) {
+            role = null;
+            training_type = 'G';
+        } else {
+            training_type = 'R';
+        }
         var data = {
             'csrfmiddlewaretoken': options.csrf_token,
-            'training-role': $('#id_training-role').val(),
+            'training-role': role,
+            'training-training_type': training_type,
             'training-trainer': $('#id_training-trainer').val(),
             'training-training_date': $('#id_training-training_date').val(),
             'training-initial-training_date': $('#initial-training-id_training-training_date').val(),
             'training-notes': $('#id_training-notes').val(),
         };
+        console.log("data:", data);
         $('#form-errors').hide();
         $('#form-errors').children().text('');
         jQuery.post(
@@ -53,14 +72,14 @@ var setupTraining = function(options) {
                 alert("Network / server error when adding training record");
             });
         return false;
-    });
+    }
 
     function record_add_complete(data) {
         if(data.succeeded === true) {
             $("#training-record form")[0].reset();
             $('#new-record-row').before(
                 '<tr>' +
-                '    <td>' + data.role + '</td>' +
+                '    <td>' + data.training_description + '</td>' +
                 '    <td>' + data.training_date + '</td>' +
                 '    <td>' + data.trainer + '</td>' +
                 '    <td>' +

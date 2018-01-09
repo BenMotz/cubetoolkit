@@ -4,6 +4,8 @@ import logging
 import binascii
 import datetime
 
+from monthdelta import monthdelta
+
 import django.db  # Used for raw query for stats
 from django.conf import settings
 from django.db import models
@@ -231,6 +233,12 @@ class Volunteer(models.Model):
         return (self.created_at
             and self.created_at.date() <= settings.DAWN_OF_TOOLKIT)
 
+    def latest_general_training_record(self):
+        records = (self.training_records
+                   .filter(training_type=TrainingRecord.GENERAL_TRAINING)
+                   .order_by('-training_date')[:1])
+        return records[0] if records else None
+
 
 class TrainingRecord(models.Model):
     ROLE_TRAINING = 'R'
@@ -261,9 +269,15 @@ class TrainingRecord(models.Model):
     notes = models.TextField(blank=True)
 
     def clean(self):
-        if self.training_type == ROLE_TRAINING and role is None:
-            raise ValidationError("Training role must be selected when "
-                "training record is 'Role Specific'.")
-        elif self.training_type == GENERAL_TRAINING and role is not None:
-            raise ValidationError("Training role must not be set for "
-                "'General Safety' training records.")
+        if self.training_type == self.ROLE_TRAINING and self.role is None:
+            raise ValidationError(
+                {"role": "Training role must be selected"})
+        elif (self.training_type == self.GENERAL_TRAINING
+                and self.role is not None):
+            raise ValidationError(
+                {"role": "Training role must not be set for 'General Safety' "
+                         "training records."})
+
+    def has_expired(self, expiry_age=settings.DEFAULT_TRAINING_EXPIRY_MONTHS):
+        threshold = datetime.date.today() - monthdelta(expiry_age)
+        return self.training_date and self.training_date < threshold

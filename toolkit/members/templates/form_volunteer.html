@@ -48,7 +48,11 @@ canvas {
 .training-notes td {
     white-space: pre-line;
 }
-
+.needs-training {
+    color: red;
+    font-weight: bold;
+    font-size: 110%;
+}
 </style>
 {% endblock %}
 
@@ -114,6 +118,15 @@ $(document).ready(function() {
 {% else %}
         <td>{{ volunteer.created_at|date:"d/m/Y" }}</td></tr>
 {% endif %}
+{% with volunteer.latest_general_training_record as general_training %}
+    {% if not general_training %}
+    <tr><td class="needs-training" colspan="2">No General Safety Training!</td></tr>
+    {% elif general_training.has_expired %}
+    <tr><td>Safety trained on:</td><td class="needs-training">{{ general_training.training_date|date:"d/m/Y" }} (out of date!)</td></tr>
+    {% else %}
+    <tr><td>Safety trained on:</td><td>{{ general_training.training_date|date:"d/m/Y" }}</td></tr>
+    {% endif %}
+{% endwith %}
     <tr><td>Updated:</td>
         <td>{{ volunteer.updated_at|date:"d/m/Y" }}</td></tr>
     <tr><th>{{ vol_form.notes.label_tag }}</th>
@@ -146,7 +159,13 @@ $(document).ready(function() {
         </tr>
     {% for record in volunteer.training_records.all %}
         <tr>
+            {% if record.training_type == record.ROLE_TRAINING %}
             <td>{{ record.role }}</td>
+            {% elif record.training_type == record.GENERAL_TRAINING %}
+            <td>{{ record.GENERAL_TRAINING_DESC }}</td>
+            {% else %}
+            <td>????</td>
+            {% endif %}
             <td>{{ record.training_date|date:"d/m/Y" }}</td>
             <td>{{ record.trainer }}</td>
             <td>{% if record.notes %}<a class="toggle-notes" href="#">(+)</a>{% endif %}</td>
