@@ -293,16 +293,16 @@ def view_volunteer_training_records(request):
 
     # Second data set - all active volunteers.
     qs = (TrainingRecord.objects
-            .filter(training_type=TrainingRecord.GENERAL_TRAINING)
-            .order_by('-training_date'))
+          .filter(training_type=TrainingRecord.GENERAL_TRAINING)
+          .order_by('-training_date'))
 
     volunteers = (Volunteer.objects.filter(active=True)
-        .order_by('member__name').select_related()
-        # Use above queryset to prepopulate a 'general_training' attribute on
-        # the retrieved volunteers (to keep the number of queries sane)
-        .prefetch_related(
-            Prefetch('training_records', queryset=qs,
-                     to_attr='general_training')))
+                  .order_by('member__name').select_related()
+                  # Use above queryset to prepopulate a 'general_training'
+                  # attribute on the retrieved volunteers (to keep the number
+                  # of queries sane)
+                  .prefetch_related(Prefetch('training_records', queryset=qs,
+                                             to_attr='general_training')))
 
     context = {
         'report_data': role_map_list,

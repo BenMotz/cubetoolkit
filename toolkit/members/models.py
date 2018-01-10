@@ -231,7 +231,7 @@ class Volunteer(models.Model):
 
     def is_old(self):
         return (self.created_at
-            and self.created_at.date() <= settings.DAWN_OF_TOOLKIT)
+                and self.created_at.date() <= settings.DAWN_OF_TOOLKIT)
 
     def latest_general_training_record(self):
         records = (self.training_records
@@ -270,8 +270,9 @@ class TrainingRecord(models.Model):
 
     def __repr__(self):
         return ("TrainingRecord(volunteer=%d, type=%s, role=%s, date=%s "
-                "trainer=%s)" % (self.volunteer_id, self.training_type,
-                self.role_id, self.training_date, self.trainer))
+                "trainer=%s)"
+                % (self.volunteer_id, self.training_type, self.role_id,
+                   self.training_date, self.trainer))
 
     def clean(self):
         if self.training_type == self.ROLE_TRAINING and self.role is None:
@@ -284,7 +285,8 @@ class TrainingRecord(models.Model):
                          "training records."})
 
     def save(self, *args, **kwargs):
-        if self.training_type not in (self.GENERAL_TRAINING, self.ROLE_TRAINING):
+        if self.training_type not in (self.GENERAL_TRAINING,
+                                      self.ROLE_TRAINING):
             raise django.db.IntegrityError("training_type invalid or missing")
         return super(TrainingRecord, self).save(*args, **kwargs)
 

@@ -17,12 +17,24 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='trainingrecord',
             name='training_type',
-            field=models.CharField(choices=[default='R', ('R', 'Role Specific Training'), ('G', 'General Safety Training')], max_length=1),
+            field=models.CharField(
+                default='R',
+                choices=[
+                    ('R',
+                     'Role Specific Training'),
+                    ('G',
+                     'General Safety Training')],
+                max_length=1),
             preserve_default=False,
         ),
         migrations.AlterField(
             model_name='trainingrecord',
             name='role',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='training_records', to='diary.Role'),
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name='training_records',
+                to='diary.Role'),
         ),
     ]
