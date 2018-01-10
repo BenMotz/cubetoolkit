@@ -125,5 +125,26 @@ Show:<br>
   </ul>
 </div>
 {% endfor %}
+<div>
+  <h2>General training</h2>
+  <ul>
+  {% for volunteer in volunteers %}
+      {% with volunteer.general_training.0 as record %}
+      <li class="training_record"
+          data-training-time="{{ record.training_date|date:"U"|default:"0" }}">
+        <a href="{% url "edit-volunteer" volunteer_id=volunteer.id %}">
+          {{ volunteer.member.name }}
+        </a>
+        &mdash;
+        {% if record %}
+            last trained {{ record.training_date|date:"d/m/Y" }}
+        {% else %}
+            never trained
+        {% endif %}
+      </li>
+      {% endwith %}
+  {% endfor %}
+  </ul>
+</div>
 
 {% endblock %}

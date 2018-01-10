@@ -1,4 +1,5 @@
 import logging
+from collections import OrderedDict
 
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
@@ -7,7 +8,7 @@ from django.conf import settings
 from django.contrib.auth.decorators import permission_required
 from django.contrib import messages
 from django.views.decorators.http import require_POST, require_safe
-from django.db.models import F
+from django.db.models import F, Prefetch
 import six
 
 from toolkit.members.forms import (VolunteerForm, MemberFormWithoutNotes,
@@ -262,9 +263,11 @@ def delete_volunteer_training_record(request, training_record_id):
 @permission_required('toolkit.read')
 @require_safe
 def view_volunteer_training_records(request):
+    # Two sets of data, the complicated one (training records) and the simpler
+    # one (all active volunteers, for the 'general' dates.)
     records = (TrainingRecord.objects.filter(volunteer__active=True)
                .filter(volunteer__roles=F('role'))
-               .select_related())
+               .select_related().prefetch_related('role'))
     role_map = {}
     for record in records:
         vol_map = role_map.setdefault(record.role, {})
@@ -288,8 +291,22 @@ def view_volunteer_training_records(request):
         key=lambda r_l: r_l[0].name.lower()
     )
 
+    # Second data set - all active volunteers.
+    qs = (TrainingRecord.objects
+            .filter(training_type=TrainingRecord.GENERAL_TRAINING)
+            .order_by('-training_date'))
+
+    volunteers = (Volunteer.objects.filter(active=True)
+        .order_by('member__name').select_related()
+        # Use above queryset to prepopulate a 'general_training' attribute on
+        # the retrieved volunteers (to keep the number of queries sane)
+        .prefetch_related(
+            Prefetch('training_records', queryset=qs,
+                     to_attr='general_training')))
+
     context = {
         'report_data': role_map_list,
+        'volunteers': volunteers
     }
     return render(request, 'volunteer_training_report.html', context)
 
