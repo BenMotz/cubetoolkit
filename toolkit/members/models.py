@@ -268,6 +268,11 @@ class TrainingRecord(models.Model):
     trainer = models.CharField(max_length=128)
     notes = models.TextField(blank=True)
 
+    def __repr__(self):
+        return ("TrainingRecord(volunteer=%d, type=%s, role=%s, date=%s "
+                "trainer=%s)" % (self.volunteer_id, self.training_type,
+                self.role_id, self.training_date, self.trainer))
+
     def clean(self):
         if self.training_type == self.ROLE_TRAINING and self.role is None:
             raise ValidationError(
@@ -277,6 +282,11 @@ class TrainingRecord(models.Model):
             raise ValidationError(
                 {"role": "Training role must not be set for 'General Safety' "
                          "training records."})
+
+    def save(self, *args, **kwargs):
+        if self.training_type not in (self.GENERAL_TRAINING, self.ROLE_TRAINING):
+            raise django.db.IntegrityError("training_type invalid or missing")
+        return super(TrainingRecord, self).save(*args, **kwargs)
 
     def has_expired(self, expiry_age=settings.DEFAULT_TRAINING_EXPIRY_MONTHS):
         threshold = datetime.date.today() - monthdelta(expiry_age)
