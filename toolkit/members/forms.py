@@ -4,7 +4,7 @@ import datetime
 
 from django import forms
 from django.core.files.uploadedfile import SimpleUploadedFile
-from toolkit.members.models import Member
+from toolkit.members.models import Member, TrainingRecord
 import toolkit.diary.models
 from toolkit.diary.form_widgets import ChosenSelectMultiple
 from django.conf import settings
@@ -112,14 +112,17 @@ class VolunteerForm(forms.ModelForm):
 
 class TrainingRecordForm(forms.ModelForm):
     class Meta(object):
-        model = toolkit.members.models.TrainingRecord
+        model = TrainingRecord
         fields = ('training_type', 'role', 'trainer', 'training_date', 'notes')
 
 
 class GroupTrainingForm(forms.Form):
+    type = forms.ChoiceField(
+        choices=TrainingRecord.TRAINING_TYPE_CHOICES,
+        required=True)
     role = forms.ModelChoiceField(
         queryset=toolkit.diary.models.Role.objects.all(),
-        required=True)
+        required=False)
     training_date = forms.DateField(
         required=True, initial=datetime.date.today)
     trainer = forms.CharField(
@@ -133,3 +136,9 @@ class GroupTrainingForm(forms.Form):
         widget=forms.Textarea, required=False,
         help_text="(will be added to all selected volunteer's training "
         "records)")
+
+    def clean(self):
+        super(GroupTrainingForm, self).clean()
+        if (self.cleaned_data.get("type") == TrainingRecord.ROLE_TRAINING
+                and self.cleaned_data.get("role") is None):
+            self.add_error("role", "This field is required")

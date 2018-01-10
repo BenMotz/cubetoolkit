@@ -316,16 +316,18 @@ def add_volunteer_training_group_record(request):
     if request.method == 'POST':
         form = GroupTrainingForm(request.POST)
         if form.is_valid():
+            training_type = form.cleaned_data['type']
             role = form.cleaned_data['role']
             trainer = form.cleaned_data['trainer']
             members = form.cleaned_data['volunteers']
             logger.info(
-                "Bulk add training records for role '%s', trainer '%s', "
-                " members '%s'" % (role, trainer, members))
+                "Bulk add training records, type %s, role '%s', trainer '%s', "
+                " members '%s'" % (training_type, role, trainer, members))
 
             for member in members:
                 volunteer = member.volunteer
                 record = TrainingRecord(
+                    training_type=training_type,
                     role=role,
                     trainer=trainer,
                     training_date=form.cleaned_data['training_date'],
@@ -333,11 +335,18 @@ def add_volunteer_training_group_record(request):
                     volunteer=volunteer
                 )
                 record.save()
+            if training_type == TrainingRecord.ROLE_TRAINING:
+                # Now make sure the volunteer has that role selected:
                 volunteer.roles.add(role)
-            messages.add_message(request, messages.SUCCESS,
-                                 u"Added %d training records for %s" %
-                                 (len(form.cleaned_data['volunteers']),
-                                  form.cleaned_data['role']))
+                messages.add_message(request, messages.SUCCESS,
+                                     u"Added %d training records for %s" %
+                                     (len(form.cleaned_data['volunteers']),
+                                      form.cleaned_data['role']))
+            elif training_type == TrainingRecord.GENERAL_TRAINING:
+                messages.add_message(request, messages.SUCCESS,
+                                     u"Added %d %s records" %
+                                     (len(form.cleaned_data['volunteers']),
+                                      TrainingRecord.GENERAL_TRAINING_DESC))
             return HttpResponseRedirect(
                 reverse('add-volunteer-training-group-record'))
     else:  # i.e. request.method == 'GET':
