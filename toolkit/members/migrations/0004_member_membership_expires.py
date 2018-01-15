@@ -3,6 +3,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
+import toolkit.members.models
 
 
 class Migration(migrations.Migration):
@@ -15,6 +16,9 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='member',
             name='membership_expires',
-            field=models.DateField(blank=True, null=True),
-        ),
+            field=models.DateField(
+                blank=True,
+                default=toolkit.members.models.get_default_membership_expiry,
+                null=True),
+            ),
     ]
