@@ -25,10 +25,17 @@ logger.setLevel(logging.DEBUG)
 def view_volunteer_list(request):
     show_retired = request.GET.get('show-retired', None) is not None
     # Get all volunteers, sorted by name:
+    qs = (TrainingRecord.objects
+          .filter(training_type=TrainingRecord.GENERAL_TRAINING)
+          .order_by('-training_date'))
+
     volunteers = (Volunteer.objects
                   .order_by('member__name')
                   .select_related()
-                  .prefetch_related('roles'))
+                  .prefetch_related('roles')
+                  .prefetch_related(Prefetch('training_records', queryset=qs,
+                                             to_attr='general_training')))
+
     if not show_retired:
         volunteers = volunteers.filter(active=True)
     active_count = sum(1 for v in volunteers if v.active)
@@ -37,6 +44,7 @@ def view_volunteer_list(request):
         'default_mugshot': settings.DEFAULT_MUGSHOT,
         'retired_data_included': show_retired,
         'active_count': active_count,
+        'general_training_desc': TrainingRecord.GENERAL_TRAINING_DESC
     }
     return render(request, 'volunteer_list.html', context)
 

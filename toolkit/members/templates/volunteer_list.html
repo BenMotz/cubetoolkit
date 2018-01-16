@@ -115,6 +115,13 @@ Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
                 </div>
                 <div class="col-8">
                     <p class="name">{{ member.name }}{% if not volunteer.active %} (retired){% endif %}</p>
+                    {% with volunteer.general_training.0 as general_training %}
+                    {% if not general_training %}
+                    <em>Needs {{ general_training_desc }}</em><br>
+                    {% elif general_training.has_expired %}
+                    <em>{{ general_training_desc }} out of date ({{ general_training.training_date|date:"d/m/Y" }})</em><br>
+                    {% endif %}
+                    {% endwith %}
                     <p><b>notes:</b> {{ volunteer.notes|default:"" }}</p>
                     <p><b>roles:</b>{{ volunteer.roles.all|join:", "|lower|default:"<em>Request role information</em>" }}</p>
                     <p>{{ member.email|urlize|default:"<em>Request email address</em>" }}<br>
@@ -135,4 +142,5 @@ Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
     {% endfor %}
 </div><!-- container -->
 <h2>The volunteer role report can now be found <a href="{% url "view-volunteer-role-report" %}">here</a>.</h2>
+<h2>The volunteer training report can now be found <a href="{% url "view-volunteer-training-report" %}">here</a>.</h2>
 {% endblock %}
