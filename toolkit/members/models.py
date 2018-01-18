@@ -288,8 +288,14 @@ class TrainingRecord(models.Model):
         if self.training_type not in (self.GENERAL_TRAINING,
                                       self.ROLE_TRAINING):
             raise django.db.IntegrityError("training_type invalid or missing")
+        if self.training_type == self.ROLE_TRAINING and self.role is None:
+            raise django.db.IntegrityError(
+                "role not defined but training_type is role")
         return super(TrainingRecord, self).save(*args, **kwargs)
 
-    def has_expired(self, expiry_age=settings.DEFAULT_TRAINING_EXPIRY_MONTHS):
-        threshold = datetime.date.today() - monthdelta(expiry_age)
+    def has_expired(self, expiry_age=None):
+        # Don't use settings. in declaration, as it makes it impossible to mock
+        if expiry_age is None:
+            expiry_age = settings.DEFAULT_TRAINING_EXPIRY_MONTHS
+        threshold = timezone_now().date() - monthdelta(expiry_age)
         return self.training_date and self.training_date < threshold

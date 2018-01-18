@@ -649,7 +649,7 @@ class TestAddTraining(MembersTestsMixin, TestCase):
     def tearDown(self):
         self.client.logout()
 
-    def test_add_training(self):
+    def _test_add_training_common(self, is_general):
         url = reverse("add-volunteer-training-record",
                       kwargs={"volunteer_id": 1})
         role = Role.objects.get(id=2)
@@ -660,33 +660,53 @@ class TestAddTraining(MembersTestsMixin, TestCase):
         trainer = u"Friendly Trainer \u0187hri\u01a8topher"
         notes = u" No notes\nare noted... here. "
 
-        response = self.client.post(url, data={
+        post_data={
             'training-training_type': TrainingRecord.ROLE_TRAINING,
-            'training-role': role.id,
             'training-trainer': trainer,
             'training-training_date': "1/2/2015",
             'training-notes':  notes
-        })
+        }
+        if is_general:
+            post_data['training-training_type'] = \
+                    TrainingRecord.GENERAL_TRAINING
+            post_data['training-role'] = ""
+        else:
+            post_data['training-training_type'] = TrainingRecord.ROLE_TRAINING
+            post_data['training-role'] = role.id
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual({
+        response = self.client.post(url, data=post_data)
+        expected = {
             "succeeded": True,
             "id": 1,
             "training_description": str(role),
             "training_date": "01/02/2015",
             "trainer": trainer,
             "notes": notes.strip()
-        }, response.json())
+        }
+        if is_general:
+            expected['training_description'] = \
+                TrainingRecord.GENERAL_TRAINING_DESC
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), expected)
 
         vol = Volunteer.objects.get(id=1)
         self.assertEqual(len(vol.training_records.all()), 1)
         record = vol.training_records.all()[0]
-        self.assertEqual(record.role, role)
+        self.assertEqual(record.role, None if is_general else role)
         self.assertEqual(record.trainer, trainer)
         self.assertEqual(record.notes, notes.strip())
         self.assertEqual(record.training_date,
                          datetime.date(day=1, month=2, year=2015))
-        self.assertTrue(role in vol.roles.all())
+        if is_general:
+            self.assertFalse(role in vol.roles.all())
+        else:
+            self.assertTrue(role in vol.roles.all())
+
+    def test_add_role_training(self):
+        self._test_add_training_common(is_general=False)
+
+    def test_add_general_training(self):
+        self._test_add_training_common(is_general=True)
 
     def test_add_training_missing_training_type_data(self):
         url = reverse("add-volunteer-training-record",
