@@ -277,7 +277,7 @@ class TrainingRecord(models.Model):
     def clean(self):
         if self.training_type == self.ROLE_TRAINING and self.role is None:
             raise ValidationError(
-                {"role": "Training role must be selected"})
+                {"role": "This field is required."})
         elif (self.training_type == self.GENERAL_TRAINING
                 and self.role is not None):
             raise ValidationError(

@@ -343,9 +343,11 @@ def add_volunteer_training_group_record(request):
                     volunteer=volunteer
                 )
                 record.save()
+                if training_type == TrainingRecord.ROLE_TRAINING:
+                    # Now make sure the volunteer has that role selected:
+                    volunteer.roles.add(role)
+
             if training_type == TrainingRecord.ROLE_TRAINING:
-                # Now make sure the volunteer has that role selected:
-                volunteer.roles.add(role)
                 messages.add_message(request, messages.SUCCESS,
                                      u"Added %d training records for %s" %
                                      (len(form.cleaned_data['volunteers']),

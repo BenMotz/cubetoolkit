@@ -141,4 +141,4 @@ class GroupTrainingForm(forms.Form):
         super(GroupTrainingForm, self).clean()
         if (self.cleaned_data.get("type") == TrainingRecord.ROLE_TRAINING
                 and self.cleaned_data.get("role") is None):
-            self.add_error("role", "This field is required")
+            self.add_error("role", "This field is required.")

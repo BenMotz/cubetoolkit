@@ -237,8 +237,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         # Should have default mugshot:
         self.assertContains(
             response,
-            '<img id="photo" alt="No photo yet" '
-            'src="{0}" border="0" width="75">'
+            '<img id="photo" alt="No photo yet" src="{0}" width="75">'
             .format(settings.DEFAULT_MUGSHOT),
             html=True)
 
@@ -662,22 +661,22 @@ class TestAddTraining(MembersTestsMixin, TestCase):
         notes = u" No notes\nare noted... here. "
 
         response = self.client.post(url, data={
+            'training-training_type': TrainingRecord.ROLE_TRAINING,
             'training-role': role.id,
             'training-trainer': trainer,
             'training-training_date': "1/2/2015",
-            'training-initial-training_date': "2015-03-01",
             'training-notes':  notes
         })
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json(), {
+        self.assertEqual({
             "succeeded": True,
             "id": 1,
-            "role": str(role),
+            "training_description": str(role),
             "training_date": "01/02/2015",
             "trainer": trainer,
             "notes": notes.strip()
-        })
+        }, response.json())
 
         vol = Volunteer.objects.get(id=1)
         self.assertEqual(len(vol.training_records.all()), 1)
@@ -689,7 +688,7 @@ class TestAddTraining(MembersTestsMixin, TestCase):
                          datetime.date(day=1, month=2, year=2015))
         self.assertTrue(role in vol.roles.all())
 
-    def test_add_training_missing_data(self):
+    def test_add_training_missing_training_type_data(self):
         url = reverse("add-volunteer-training-record",
                       kwargs={"volunteer_id": 1})
         response = self.client.post(url, data={})
@@ -697,11 +696,30 @@ class TestAddTraining(MembersTestsMixin, TestCase):
         self.assertEqual(response.json(), {
             "succeeded": False,
             "errors": {
-                u'role': [u'This field is required.'],
+                u'training_type': [u'This field is required.'],
                 u'trainer': [u'This field is required.'],
                 u'training_date': [u'This field is required.'],
             }
         })
+        vol = Volunteer.objects.get(id=1)
+        self.assertEqual(len(vol.training_records.all()), 0)
+
+    def test_add_training_missing_role(self):
+        url = reverse("add-volunteer-training-record",
+                      kwargs={"volunteer_id": 1})
+        response = self.client.post(url, data={
+            'training-training_type': TrainingRecord.ROLE_TRAINING,
+            'training-trainer': "trainer",
+            'training-training_date': "1/2/2015",
+            'training-notes':  "notes"
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual({
+            "succeeded": False,
+            "errors": {
+                u'role': [u'This field is required.'],
+            }
+        }, response.json())
         vol = Volunteer.objects.get(id=1)
         self.assertEqual(len(vol.training_records.all()), 0)
 
@@ -713,7 +731,6 @@ class TestAddTraining(MembersTestsMixin, TestCase):
             'training-role': 1,
             'training-trainer': "Trainer",
             'training-training_date': "1/2/2015",
-            'training-initial-training_date': "2015-03-01",
             'training-notes':  None
         })
         self.assertEqual(response.status_code, 200)
@@ -739,6 +756,7 @@ class TestDeleteTraining(MembersTestsMixin, TestCase):
 
         record = TrainingRecord(
             volunteer=vol,
+            training_type=TrainingRecord.ROLE_TRAINING,
             role=role,
             trainer="Trainer",
             training_date=datetime.date(day=29, month=2, year=2012),
@@ -760,6 +778,7 @@ class TestDeleteTraining(MembersTestsMixin, TestCase):
 
         record = TrainingRecord(
             volunteer=vol,
+            training_type=TrainingRecord.ROLE_TRAINING,
             role=role,
             trainer="Trainer",
             training_date=datetime.date(day=29, month=2, year=2012),
@@ -791,7 +810,7 @@ class TestAddGroupTraining(MembersTestsMixin, TestCase):
         response = self.client.get(url)
         self.assertTemplateUsed(response, "form_group_training.html")
 
-    def test_add_group_record(self):
+    def _shared_test_add_group_role_record(self, test_general):
         url = reverse("add-volunteer-training-group-record")
 
         role = Role.objects.get(id=1)
@@ -801,25 +820,45 @@ class TestAddGroupTraining(MembersTestsMixin, TestCase):
 
         volunteers = Volunteer.objects.filter(active=True)[:3]
         self.assertEqual(len(volunteers), 3)
-
-        response = self.client.post(url, data={
-            "role": role.id,
+        post_data = {
+            "role": "",
             "trainer": trainer,
             "training_date": "4/5/2016",
             "notes": notes,
             "volunteers": [v.member.id for v in volunteers]
-        })
+        }
+
+        if test_general:
+            post_data["type"] = TrainingRecord.GENERAL_TRAINING
+        else:
+            post_data["type"] = TrainingRecord.ROLE_TRAINING
+            post_data["role"] = role.id
+
+        response = self.client.post(url, data=post_data)
         self.assertRedirects(response, url)
 
         volunteers = Volunteer.objects.filter(active=True)[:3]
         for vol in volunteers:
-            self.assertTrue(role in vol.roles.all())
             recs = vol.training_records.all()
             self.assertEqual(len(recs), 1)
-            self.assertEqual(recs[0].role, role)
+            if test_general:
+                self.assertEqual(recs[0].training_type,
+                                 TrainingRecord.GENERAL_TRAINING)
+                self.assertEqual(recs[0].role, None)
+            else:
+                self.assertTrue(role in vol.roles.all())
+                self.assertEqual(recs[0].training_type,
+                                 TrainingRecord.ROLE_TRAINING)
+                self.assertEqual(recs[0].role, role)
             self.assertEqual(recs[0].notes, notes.strip())
             self.assertEqual(recs[0].trainer, trainer)
             self.assertEqual(recs[0].training_date, training_date)
+
+    def test_add_group_role_record(self):
+        self._shared_test_add_group_role_record(test_general=False)
+
+    def test_add_group_general_record(self):
+        self._shared_test_add_group_role_record(test_general=True)
 
     def test_add_group_inactive_volunteer(self):
         url = reverse("add-volunteer-training-group-record")
@@ -832,6 +871,7 @@ class TestAddGroupTraining(MembersTestsMixin, TestCase):
         volunteers[1].save()
 
         response = self.client.post(url, data={
+            "type": TrainingRecord.ROLE_TRAINING,
             "role": role.id,
             "trainer": "trainer",
             "training_date": "4/5/2016",
@@ -858,14 +898,38 @@ class TestAddGroupTraining(MembersTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_group_training.html")
 
-        self.assertFormError(response, 'form', 'role',
+        self.assertFormError(response, 'form', 'type',
                              u'This field is required.')
+        # 'role' isn't requireed unless 'type' is selected
+        #self.assertFormError(response, 'form', 'role',
+        #                     u'This field is required.')
         self.assertFormError(response, 'form', 'training_date',
                              u'This field is required.')
         self.assertFormError(response, 'form', 'trainer',
                              u'This field is required.')
         self.assertFormError(response, 'form', 'volunteers',
                              u'This field is required.')
+
+    def test_add_group_record_missing_role(self):
+        url = reverse("add-volunteer-training-group-record")
+
+        self.assertEqual(len(TrainingRecord.objects.all()), 0)
+
+        response = self.client.post(url, data={
+            "type": TrainingRecord.ROLE_TRAINING,
+            "trainer": "trainer",
+            "training_date": "4/5/2016",
+            "notes": "",
+            "volunteers": 1
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_group_training.html")
+
+        self.assertFormError(response, 'form', 'role',
+                             u'This field is required.')
+
+
 
 
 class TestViewVolunteerTraining(MembersTestsMixin, TestCase):
@@ -890,16 +954,17 @@ class TestViewVolunteerTraining(MembersTestsMixin, TestCase):
             self.assertTrue(vol.active)
             vol.roles.add(role)
             record = TrainingRecord(
-                volunteer=vol, role=role, trainer="trainer",
-                training_date=training_date)
+                volunteer=vol, training_type=TrainingRecord.ROLE_TRAINING,
+                role=role, trainer="trainer", training_date=training_date)
             record.save()
 
         # Add a second, older record, that should not take precedence, for
         # vol[0]
         newer_date = training_date - datetime.timedelta(days=1)
         new_record = TrainingRecord(
-            volunteer=volunteers[0], role=role, trainer="trainer",
-            training_date=newer_date)
+            volunteer=volunteers[0],
+            training_type=TrainingRecord.ROLE_TRAINING, role=role,
+            trainer="trainer", training_date=newer_date)
         new_record.save()
 
         # Add a third old record, that should also not take
@@ -907,8 +972,25 @@ class TestViewVolunteerTraining(MembersTestsMixin, TestCase):
         # conditionals in the view...)
         newer_date = training_date - datetime.timedelta(days=1)
         new_record = TrainingRecord(
-            volunteer=volunteers[0], role=role, trainer="trainer",
-            training_date=newer_date)
+            volunteer=volunteers[0],
+            training_type=TrainingRecord.ROLE_TRAINING, role=role,
+            trainer="trainer", training_date=newer_date)
+        new_record.save()
+
+        # Similarly, add an older and a newer general training record for vol
+        # 3:
+        older_date = training_date - datetime.timedelta(days=2)
+        new_record = TrainingRecord(
+            volunteer=volunteers[2],
+            training_type=TrainingRecord.GENERAL_TRAINING,
+            trainer="old trainer", training_date=older_date)
+        new_record.save()
+
+        newer_date = training_date - datetime.timedelta(days=1)
+        new_record = TrainingRecord(
+            volunteer=volunteers[2],
+            training_type=TrainingRecord.GENERAL_TRAINING,
+            trainer="new trainer", training_date=newer_date)
         new_record.save()
 
         # Make vol[1] inactive
@@ -937,8 +1019,27 @@ class TestViewVolunteerTraining(MembersTestsMixin, TestCase):
               </ul>
             </div>""", html=True)
         self.assertNotContains(response, "Role 2")
+        self.assertContains(response,"""
+            <div>
+              <h2>General Safety Training</h2>
+              <ul>
+                  <li class="training_record" data-training-time="0">
+                    <a href="/volunteers/1/edit">
+                      Volunteer One
+                    </a>
+                    &mdash; never trained
+                  </li>
+                  <li class="training_record" data-training-time="1462230000">
+                    <a href="/volunteers/3/edit">
+                      Volunteer Three
+                    </a>
+                    &mdash;
+                        last trained 03/05/2016
+                  </li>
+              </ul>
+            </div>""", html=True)
+
         self.assertNotContains(response, "Volunteer Two")
-        self.assertNotContains(response, "Volunteer Three")
         self.assertNotContains(response, "Volunteer Four")
 
     def test_no_post(self):
