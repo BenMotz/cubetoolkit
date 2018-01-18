@@ -9,7 +9,6 @@ import datetime
 from django.db import models
 from django.conf import settings
 import django.utils.timezone
-import django.core.exceptions
 from django.utils.safestring import mark_safe
 from django.utils.encoding import python_2_unicode_compatible
 from django.db.models.query import QuerySet

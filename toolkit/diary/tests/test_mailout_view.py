@@ -84,7 +84,9 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             including all future events, please visit:
             <a href="http://www.cubecinema.com/programme/">
             Cube Cinema Programme</a></p><hr><p>
-            Pretitle four:<br><strong>EVENT FOUR TITL\u0112</strong><br>
+            Pretitle four:<br><strong><a
+            href="http://www.cubecinema.com/programme/event/,4/">EVENT
+            FOUR TITL\u0112</a></strong><br>
             Posttitle four
             </p><p>
             Film info for four<br>
