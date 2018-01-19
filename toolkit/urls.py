@@ -23,10 +23,11 @@ urlpatterns = [
     url(r'^volunteers/', include(toolkit.members.urls.volunteer_urls)),
     url(r'^auth/', include(toolkit.toolkit_auth.urls.urlpatterns)),
     url(r'^index/', include(toolkit.index.urls.urlpatterns)),
+    url(r'^$', toolkit.diary.urls.view_diary, name="default-view"),
 
     # Main index page: requires logging in, even though some other parts
     # (eg diary index) don't.
-    url(r'^$', login_required(
+    url(r'^toolkit/$', login_required(
         generic.list.ListView.as_view(
             model=IndexLink,
             template_name='toolkit_index.html')
