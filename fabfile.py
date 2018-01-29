@@ -40,6 +40,16 @@ def production():
     # See note above:
     env.deploy_script_settings = "toolkit.deploy_settings"
 
+def treesparror():
+    """Configure to deploy live on treesparror"""
+    env.target = "production"
+    env.site_root = "/home/toolkit/site"
+    env.user = "toolkit"
+    env.hosts = ["treesparror.cubecinema.com"]
+    env.settings = "live_settings.py"
+    # See note above:
+    env.deploy_script_settings = "toolkit.deploy_settings"
+
 
 def deploy_code():
     """Deploy code from git HEAD onto target"""
