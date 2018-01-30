@@ -7,6 +7,7 @@
             <li><a href="{% url "type-view" tag.slug %}"><span>{{ tag.name|title }}</span></a></li>
             {% endfor %}
             <li><a href="{% url "default-view" %}"><span>All</span></a></li>
+            <li><a href="{% url "archive-view-index" %}"><span>Archive</span></a></li>
         </ul>
     </li>
     {% for top_level_child in request.site.root_page.get_children.live.in_menu %}
