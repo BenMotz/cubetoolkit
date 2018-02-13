@@ -3,6 +3,7 @@ import django.conf
 import django.views.generic as generic
 import django.views.static
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
 
 from wagtail.wagtailadmin import urls as wagtailadmin_urls
 from wagtail.wagtaildocs import urls as wagtaildocs_urls
@@ -45,3 +46,9 @@ urlpatterns = [
     # Wagtail's serving mechanism
     url(r'', include(wagtail_urls)),
 ]
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns = [
+        url(r'^__debug__/', include(debug_toolbar.urls)),
+    ] + urlpatterns
