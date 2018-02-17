@@ -1,0 +1,105 @@
+@charset "utf-8";
+/* CSS Document  */
+
+/*Custom css to override starandshadow_site/toolkit/static_common/css/static_pages.css */
+code,
+kbd,
+pre,
+samp {
+       font-family: Fixedsys, Terminal, monospace;
+    font-size: 1em;
+}
+textarea {
+       font-family: Fixedsys, Terminal, monospace;
+    /*font-family: sans-serif;*/
+}
+
+body, html, button, input, select, textarea {
+    font-family: Fixedsys, Terminal, monospace;
+    font-weight: 600;
+
+}
+   #site-nav {
+
+    font-family: Fixedsys, Terminal, monospace;
+    }
+
+
+html {
+
+	background-color: #082080;
+}
+
+mark {
+    background: #ff0;
+    color: #082080;
+}
+
+body {
+
+    color: #082080;
+}
+a {
+    color: #082080;
+    text-decoration: underline;
+}
+
+#mobile-menu-btn:before {/
+
+    color: #082080;
+}
+
+.site-description h4 {
+ 
+    color: #082080;
+
+}
+
+.action a:hover {
+    color: #082080 !important;
+   
+}
+
+.copy p {
+   
+    color: #082080;
+
+}
+.copy p > a {
+    color: #082080;
+
+    border-bottom: 1px dotted #082080;
+}
+.copy p > a:visited {
+    color: #082080;
+}
+
+.black_overlay {
+  
+    background: #e3cae3;
+ 
+}
+
+#sidebar {
+
+    background-color: #e3cae3;
+ 
+}
+#site-nav {
+
+    background: #e3cae3;
+   
+}
+.grid {
+ 
+    background: #e3cae3;
+
+}.grid-item {
+   
+    background-color: #e3cae3;
+}.action a {
+    color: black !important;
+    background: #e3cae3 !important;
+    border: 0.1em solid black;
+    border-radius: 0 !important;}
+  

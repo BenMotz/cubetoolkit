@@ -1,0 +1,16 @@
+@charset "utf-8";
+/* CSS Document  */
+
+/*Custom css to override starandshadow_site/toolkit/diary/static/diary/cssprogram.css */
+
+span.tags {
+	position: absolute;
+	left: 0;
+	top: 0;
+	text-transform: uppercase;
+	font-weight: 400;
+	font-size: 1em;
+	/* sally edit tab bg color */
+	background-color: rgba(8,32,128,0.6);
+	/* end sally edit */
+}
