@@ -1,0 +1,22 @@
+{% extends "base_wagtail.html" %}
+{% load wagtailcore_tags wagtailimages_tags %}
+
+{% block css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{{ STATIC_URL }}css/static_pages_custom.css">
+{% endblock %}
+
+{% block body %}
+{{ block.super }}
+<div class="programme copy">
+    <div class="grid-sizer"></div>
+    <div class="gutter-sizer"></div>
+    {% for block in page.content %}
+    <div class="grid-item grid-item--width{{ block.value.width }}
+    {% if block.value.content.0.block_type == "image" %}event-image event_image{% endif %}
+    ">
+        {% include_block block.value.content %}
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
