@@ -76,8 +76,12 @@
 {% if showing.event.ticket_link %}Advance tickets: {{ showing.event.ticket_link|urlize }}{% endif %}
 </p>
 
+{% with showing.event.media.first as media_item %}
+    {% if media_item %}
  <img src="{{ site_url }}{{ showing.event.media.first.media_file|thumbnail_url:'indexview' }}"
  alt="Picture for event '{{ showing.event.name }}'">
+    {% endif %}
+{% endwith %}
 
 {{ showing.event.copy|safe }}
 

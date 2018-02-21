@@ -93,8 +93,6 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             Sun 9th / 6pm
             </p><p>
             Tickets: \u00a3milliion per thing<br></p>
-            <img src="http://www.cubecinema.com"
-            alt="Picture for event 'Event four titl\u0113'">
             Event four C\u014dpy
             <hr><p>
             For complete and up to date listings, please visit:
