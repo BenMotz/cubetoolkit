@@ -4,9 +4,11 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <title>{{ subject }}</title>
 <style>
-</style></head>
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+</style>
+</head>
 <body>
-<p>Dear {{ member_name }},</p>
+<p>Dear {{ member_name }}</p>
 {{ body|safe }}
 <p>If you wish to be removed from our mailing list please use this link:<br>
 <a href="{{ email_unsubscribe_host }}{{ unsubscribe_link }}?k={{ mailout_key }}">{{ email_unsubscribe_host }}{{ unsubscribe_link }}?k={{ mailout_key }}</a><br>
