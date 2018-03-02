@@ -34,10 +34,9 @@ mark {
     background: #ff0;
     color: #082080;
 }
-
 body {
 
-    color: #082080;
+    color: #000000;
 }
 a {
     color: #082080;
@@ -102,4 +101,4 @@ a {
     background: #e3cae3 !important;
     border: 0.1em solid black;
     border-radius: 0 !important;}
-  
+
