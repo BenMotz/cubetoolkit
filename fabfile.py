@@ -17,8 +17,8 @@ def _assert_target_set():
     require('site_root', provided_by=('staging', 'production'))
 
 
-def staging():
-    """Configure to deploy to staging server"""
+def cube_staging():
+    """Configure to deploy to staging on cubecinema.com"""
     env.target = "staging"
     env.site_root = "/home/staging/site"
     env.user = "staging"
@@ -30,8 +30,8 @@ def staging():
     env.deploy_script_settings = "toolkit.deploy_settings"
 
 
-def production():
-    """Configure to deploy live"""
+def cube_production():
+    """Configure to deploy live on cubecinema.com"""
     env.target = "production"
     env.site_root = "/home/toolkit/site"
     env.user = "toolkit"
@@ -40,13 +40,14 @@ def production():
     # See note above:
     env.deploy_script_settings = "toolkit.deploy_settings"
 
-def treesparror():
-    """Configure to deploy live on treesparror"""
+
+def star_and_shadow_production():
+    """Configure to deploy star and shadow live on xtreamlab.net"""
     env.target = "production"
-    env.site_root = "/home/toolkit/site"
-    env.user = "toolkit"
-    env.hosts = ["treesparror.cubecinema.com"]
-    env.settings = "live_settings.py"
+    env.site_root = "/home/users/starandshadow/star_site"
+    env.user = "starandshadow"
+    env.hosts = ["xtreamlab.net"]
+    env.settings = "production_settings.py"
     # See note above:
     env.deploy_script_settings = "toolkit.deploy_settings"
 
