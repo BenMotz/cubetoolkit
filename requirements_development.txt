@@ -1,4 +1,4 @@
 # Required for deploying:
-fabric
+fabric3
 # Improve the Django interactive shell:
 ipython
