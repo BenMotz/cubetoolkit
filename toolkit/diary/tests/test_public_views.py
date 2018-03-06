@@ -181,7 +181,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
                          u"tags": u"tag two",
                          u"image": None,
                          u"start": u"13/04/2013 18:00",
-                         u"link": u"/programme/event/id/3/",
+                         u"link": u"/id/3/",
                          u"copy": u"Event three Copy"
                          }])
 
