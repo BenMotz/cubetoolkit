@@ -14,13 +14,17 @@ CODE_DIRS = ["toolkit", "easy_thumbnails"]
 
 def _assert_target_set():
     # utility method to check that target is defined:
-    require('site_root', provided_by=('staging', 'production'))
+    require('site_root', provided_by=('cube_staging',
+                                      'cube_production',
+                                      'star_and_shadow_production')
+            )
 
 
 def cube_staging():
     """Configure to deploy to staging on cubecinema.com"""
     env.target = "staging"
     env.site_root = "/home/staging/site"
+    env.media = "/home/staging/site/media/"
     env.user = "staging"
     env.hosts = ["cubecinema.com"]
     env.settings = "staging_settings.py"
@@ -34,6 +38,7 @@ def cube_production():
     """Configure to deploy live on cubecinema.com"""
     env.target = "production"
     env.site_root = "/home/toolkit/site"
+    env.media = "/home/toolkit/site/media/"
     env.user = "toolkit"
     env.hosts = ["cubecinema.com"]
     env.settings = "live_settings.py"
@@ -126,6 +131,24 @@ def deploy_media():
     local('rsync -av --delete media/ {0}@{1}:{2}/media'.format(env.user, env.hosts[0], env.site_root))
 
 
+def get_media():
+    """Rsync media content from a production server to your development environment"""
+
+    _assert_target_set()
+
+    local('rsync -av --delete --exclude=thumbnails {0}@{1}:{2}/ media/'.format(env.user, env.hosts[0], env.media))
+
+
+def sync_media_from_production_to_staging():
+    """Rsync media content from the production server to the staging server. Invoke as fab cube_staging sync_media_from_production_to_staging"""
+
+    # TODO define explicitly
+    _assert_target_set()
+
+    with cd(env.site_root):
+        run('rsync -av --delete --exclude=thumbnails /home/toolkit/site/media/ {0}'.format(env.media))
+
+
 def run_migrations():
     """Run migrations to make sure database schema is in sync with the application"""
 
@@ -155,7 +178,7 @@ def upgrade_requirements():
 
 # Disabled, for destruction avoidance
 def bootstrap():
-    """Wipe out what has gone before, build virtual environment, uppload code"""
+    """Wipe out what has gone before, build virtual environment, upload code"""
 
     _assert_target_set()
 
