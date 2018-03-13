@@ -87,17 +87,34 @@ def view(request, member_id):
     })
 
 
-@permission_required('toolkit.write')
-@require_POST
+@require_http_methods(["GET", "POST"])
 def delete_member(request, member_id):
+
+    if not _check_access_permitted_for_member_key(
+            'toolkit.write', request, member_id):
+        # Manually wrap this function in the standard 'permission_required'
+        # decorator and call it to get the redirect to the login page:
+        return permission_required('toolkit.write')(edit_member)(
+            request, member_id)
+        # See comments in edit_member
+
     member = get_object_or_404(Member, id=member_id)
+
+    user_has_permission = request.user.has_perm('toolkit.write')
+
     logger.info(u"Deleting member '{0}'".format(member.name))
     member.delete()  # This will delete associated volunteer record, if any
-    messages.add_message(request, messages.SUCCESS,
-                         u"Deleted member: {0} ({1})".format(
-                             member.number, member.name))
 
-    return HttpResponseRedirect(reverse("search-members"))
+    if request.user.has_perm('toolkit.write'):
+        messages.add_message(request, messages.SUCCESS,
+                             u"Deleted member: {0} ({1})".format(
+                                 member.number, member.name))
+        return HttpResponseRedirect(reverse("search-members"))
+
+    else:
+        # It's a punter deleting their record
+        # TODO implement a confirmation page
+        return HttpResponseRedirect(reverse("goodbye"))
 
 
 def _check_access_permitted_for_member_key(permission, request, member_id):
@@ -318,3 +335,7 @@ def member_homepages(request):
     return render(request, 'homepages.html', {
             'members': members}
     )
+
+
+def goodbye(request):
+    return render(request, 'goodbye.html')

@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+{% block title %}
+{{ VENUE.name }}: Records Deletion
+{% endblock %}
+
+{% block body %}
+<img src="{{ STATIC_URL }}{{ VENUE.internal_header_img }}">
+<h1>{{VENUE.name }}</h1>
+<p>Your membership record has now been completely removed from our records.</p>
+<p>If this was a terrible mistake, please 
+<a href="{{ VENUE.contact_page }}">contact us</a> and provide us with the deletion link from the bottom of your member's email.</p>
+{% endblock %}
+

@@ -72,9 +72,12 @@ def _get_text_preamble_signature(recipient):
         u"\n"
         u"If you wish to be removed from our mailing list please use this "
         u"link:\n"
-        u"{0}{1}?k={3}\n"
+        u"{0}{1}?k={4}\n"
         u"To edit details of your membership, please use this link:\n"
-        u"{0}{2}?k={3}\n"
+        u"{0}{2}?k={4}\n"
+        u"To permanently remove your membership details from our records, "
+        u"please use this link:\n"
+        u"{0}{3}?k={4}\n"
     )
     return (
         preamble_template.format(recipient.name),
@@ -82,6 +85,7 @@ def _get_text_preamble_signature(recipient):
                 settings.VENUE['email_unsubscribe_host'],
                 reverse("unsubscribe-member", args=(recipient.pk,)),
                 reverse("edit-member", args=(recipient.pk,)),
+                reverse("delete-member", args=(recipient.pk,)),
                 recipient.mailout_key,
         ))
 

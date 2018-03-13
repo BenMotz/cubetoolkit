@@ -10,7 +10,7 @@ from toolkit.members.volunteer_views import (
 from toolkit.members.member_views import (
     add_member, search, view,
     edit_member, delete_member, member_statistics, member_homepages,
-    unsubscribe_member, unsubscribe_member_right_now)
+    unsubscribe_member, unsubscribe_member_right_now, goodbye)  # TODO rename goodbye
 
 # Volunteers:
 volunteer_urls = [
@@ -59,7 +59,7 @@ member_urls = [
     url(r'^(?P<member_id>\d+)$', view,
         name='view-member'),
     url(r'^(?P<member_id>\d+)/edit/$', edit_member,
-        name='edit-member'),
+        name='edit-member'),   # TODO duplicate of line 73 below?
     url(r'^(?P<member_id>\d+)/delete$', delete_member,
         name='delete-member'),
     url(r'^statistics/$', member_statistics,
@@ -76,4 +76,6 @@ member_urls = [
         name='unsubscribe-member'),
     url(r'^(?P<member_id>\d+)/unsubscribe-now/$', unsubscribe_member_right_now,
         name='unsubscribe-member-right-now'),
+    url(r'^goodbye/$', goodbye,
+        name='goodbye')
 ]
