@@ -26,7 +26,7 @@ class Command(BaseCommand):
                 member.email,
                 member.created_at)
             )
-        # member.delete()
+            member.delete()
 
         self.stdout.write(self.style.SUCCESS(
             '\nDeleted %d non-members\n' % len(dead_wood)))
