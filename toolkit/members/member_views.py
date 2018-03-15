@@ -37,7 +37,10 @@ def add_member(request):
         # Validate form fields
         if form.is_valid():
             # Form is valid, save data:
-            logger.info(u"Adding member '{0}'".format(instance.name))
+            logger.info(u"Adding member '{0} <{1}>'".format(
+                instance.name,
+                instance.email)
+            )
             form.save()
             # Member added ok, new blank form:
             form = NewMemberForm()
@@ -97,24 +100,43 @@ def delete_member(request, member_id):
         return permission_required('toolkit.write')(edit_member)(
             request, member_id)
         # See comments in edit_member
+        # TODO if a punter has already deleted themselves and clicks
+        # on their mailout link again, they will get the login page, which
+        # will probablu confuse them.
 
     member = get_object_or_404(Member, id=member_id)
 
     user_has_permission = request.user.has_perm('toolkit.write')
 
-    logger.info(u"Deleting member '{0}'".format(member.name))
-    member.delete()  # This will delete associated volunteer record, if any
-
     if request.user.has_perm('toolkit.write'):
         messages.add_message(request, messages.SUCCESS,
                              u"Deleted member: {0} ({1})".format(
                                  member.number, member.name))
+        logger.info(u"Member {0} {1} <{1}> deleted by admin".format(
+              member.number,
+              member.name,
+              member.email)
+              )
+        member.delete()  # This will delete associated volunteer record, if any
+
         return HttpResponseRedirect(reverse("search-members"))
 
     else:
-        # It's a punter deleting their record
-        # TODO implement a confirmation page
-        return HttpResponseRedirect(reverse("goodbye"))
+        # This is a punter deleting their own membership record
+        confirmed = request.GET.get('confirmed', 'no')
+
+        if confirmed == 'yes':
+
+            logger.info(u"Member {0} {1} <{2}> self-deleted".format(
+                  member.number,
+                  member.name,
+                  member.email)
+                  )
+            member.delete()
+
+            return HttpResponseRedirect(reverse("goodbye"))
+        else:
+            return render(request, 'confirm-deletion.html')
 
 
 def _check_access_permitted_for_member_key(permission, request, member_id):
