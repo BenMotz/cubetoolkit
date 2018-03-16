@@ -67,10 +67,21 @@ def send_mailout_report(email_conn, report_to, sent, err_list,
 
 def _get_text_preamble_signature(recipient):
     preamble_template = u"Dear {0},\n\n"
+    if not(recipient.gdpr_opt_in):
+        gdpr_opt_in_template = (
+            u"If you'd like to continue to receive emails about events and fundraising for the Cube, "
+            u"you'll need to make sure you opt-in before 21 May 2018.\n\n"
+            u"Please choose to opt-in so you won't miss out on what's happening at your favourite Microplex.\n\n"
+            u"Use this link to opt-in:\n\n"
+            u"{1}{2}?k={3}\n\n"
+        )
+    else:
+        # gdpr_opt_in_template = u"Congratulations, you opted in on {0}\n\n"
+        gdpr_opt_in_template = u""
     signature_template = (
         u"\n"
         u"\n"
-        u"If you wish to be removed from our mailing list please use this "
+        u"If you no longer wish to receive emails from us, please use this "
         u"link:\n"
         u"{0}{1}?k={4}\n"
         u"To see what details we hold on you and to edit the details of "
@@ -82,13 +93,20 @@ def _get_text_preamble_signature(recipient):
     )
     return (
         preamble_template.format(recipient.name),
+        gdpr_opt_in_template.format(
+            recipient.gdpr_opt_in,
+            settings.VENUE['email_unsubscribe_host'],
+            reverse("opt_in", args=(recipient.pk,)),
+            recipient.mailout_key,
+        ),
         signature_template.format(
-                settings.VENUE['email_unsubscribe_host'],
-                reverse("unsubscribe-member", args=(recipient.pk,)),
-                reverse("edit-member", args=(recipient.pk,)),
-                reverse("delete-member", args=(recipient.pk,)),
-                recipient.mailout_key,
-        ))
+            settings.VENUE['email_unsubscribe_host'],
+            reverse("unsubscribe-member", args=(recipient.pk,)),
+            reverse("edit-member", args=(recipient.pk,)),
+            reverse("delete-member", args=(recipient.pk,)),
+            recipient.mailout_key,
+        ),
+    )
 
 
 def send_mailout_to(subject, body_text, body_html, recipients, task=None,
@@ -137,10 +155,10 @@ def send_mailout_to(subject, body_text, body_html, recipients, task=None,
     try:
         for recipient in recipients:
             # Build per-recipient signature, with customised unsubscribe links:
-            text_pre, text_post = _get_text_preamble_signature(recipient)
+            text_pre, text_gdpr, text_post = _get_text_preamble_signature(recipient)
 
             # Build final email, still in unicode:
-            mail_body_text = text_pre + body_text + text_post
+            mail_body_text = text_pre + text_gdpr + body_text + text_post
 
             if body_html:
                 html_mail_context.update({

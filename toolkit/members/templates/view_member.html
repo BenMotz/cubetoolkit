@@ -45,6 +45,7 @@ $(document).ready(function() {
     <p>{{ member.altphone }}</p>
     <p>Receives mailout? {{ member.mailout|yesno }}</p>
     <p>Mailout failed? {{ member.mailout_failed|yesno }}</p>
+    <p>GDPR opt-in: {{ member.gdpr_opt_in|date:"d/m/Y" }}</p>
     {% if membership_expiry_enabled %}
     <p>Membership expires on: {{ member.membership_expires|default:"(no date set)" }}</p>
     {% endif %}

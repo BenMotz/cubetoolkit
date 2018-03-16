@@ -7,6 +7,7 @@ from django.urls import reverse
 from django.contrib.auth.decorators import permission_required
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils import timezone
 from django.views.decorators.http import (require_POST, require_safe,
                                           require_http_methods)
 from django.conf import settings
@@ -41,7 +42,9 @@ def add_member(request):
                 instance.name,
                 instance.email)
             )
-            form.save()
+            member = form.save(commit=False)
+            member.gdpr_opt_in = timezone.now() 
+            member.save()
             # Member added ok, new blank form:
             form = NewMemberForm()
             messages.add_message(request, messages.SUCCESS,
@@ -290,7 +293,52 @@ def unsubscribe_member_right_now(request, member_id):
                   {'member': member, 'action': action})
 
 
-@permission_required('toolkit.read')
+@require_http_methods(["GET", "POST"])
+def opt_in(request, member_id):
+
+    if not _check_access_permitted_for_member_key('toolkit.write', request,
+                                                  member_id):
+        return permission_required('toolkit.write')(unsubscribe_member)(
+            request, member_id)
+
+    member = get_object_or_404(Member, id=member_id)
+
+    if request.method == 'POST':
+        # Default to opt-in
+        action = request.POST.get('action', 'opt-in')
+        confirm = request.POST.get('confirm', False)
+        if confirm == "yes":
+            if action == 'opt-in':
+                member.gdpr_opt_in = timezone.now()
+                messages.add_message(request,
+                                     messages.SUCCESS,
+                                     u"Thank you {0} for opting in to continue to receive our emails"
+                                     .format(member.name)
+                                     )
+            else:   # opt-out
+                member.gdpr_opt_in = None
+                messages.add_message(request,
+                                     messages.SUCCESS,
+                                     (u"We are sorry to see you have opted out. "
+                                      u"If you do not opt-in by 21 May 2018 "
+                                      u"we will delete your membership from our records")
+                                     )
+            member.save()
+
+            logger.info(u"Member '{0}' (id: {1}) <{2}>: {3} on {4}"
+                        .format(member.name,
+                                member.pk,
+                                member.email,
+                                action,
+                                member.gdpr_opt_in)
+                        )
+
+    action = 'opt-out' if member.gdpr_opt_in else 'opt-in'
+
+    return render(request, 'form_member_edit_opt_in.html',
+                  {'member': member, 'action': action})
+
+
 @require_safe
 def member_statistics(request):
     # View for the 'statistics' page of the 'membership database'
@@ -336,6 +384,12 @@ def member_statistics(request):
                          .exclude(mailout=True)
                          .exclude(is_member=True)
                          .count(),
+
+        # Members with email without GDPR opt-in
+        'm_no_gdpr': Member.objects
+                           .mailout_recipients()
+                           .filter(gdpr_opt_in__isnull=True)
+                           .count(),
     }
     if settings.MEMBERSHIP_EXPIRY_ENABLED:
         extra_context = {
