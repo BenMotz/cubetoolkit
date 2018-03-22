@@ -14,7 +14,7 @@ from django.conf import settings
 import six
 
 from toolkit.members.forms import NewMemberForm, MemberForm
-from toolkit.members.models import Member
+from toolkit.members.models import Member, Volunteer
 from toolkit.util import compare_constant_time
 from toolkit.toolkit_auth.decorators import ip_or_permission_required
 
@@ -43,7 +43,7 @@ def add_member(request):
                 instance.email)
             )
             member = form.save(commit=False)
-            member.gdpr_opt_in = timezone.now() 
+            member.gdpr_opt_in = timezone.now()
             member.save()
             # Member added ok, new blank form:
             form = NewMemberForm()
@@ -125,6 +125,19 @@ def delete_member(request, member_id):
         return HttpResponseRedirect(reverse("search-members"))
 
     else:
+
+        # Check the punter isn't an active volunteer
+        vol = Volunteer.objects.filter(member__email=member.email)
+        # Rashly take the first result
+        vol = vol.first()
+        if vol and vol.active:
+            # TODO send mail to admins
+            logger.info(u"Futile attempt by active volunteer {0} <{1}> to delete themselves".format(
+                  vol.member.name,
+                  vol.member.email)
+            )
+            return render(request, 'email_admin.html')
+
         # This is a punter deleting their own membership record
         confirmed = request.GET.get('confirmed', 'no')
 

@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib import messages
 from django.views.decorators.http import require_POST, require_safe
 from django.db.models import F, Prefetch
+from django.utils import timezone
 import six
 
 from toolkit.members.forms import (VolunteerForm, MemberFormWithoutNotes,
@@ -171,7 +172,9 @@ def edit_volunteer(request, volunteer_id, create_new=False):
         if vol_form.is_valid() and mem_form.is_valid():
             logger.info(u"Saving changes to volunteer '{0}' (id: {1})".format(
                 volunteer.member.name, str(volunteer.pk)))
-            mem_form.save()
+            member = mem_form.save(commit=False)
+            member.gdpr_opt_in = timezone.now()
+            member.save()
             volunteer.member = member
             vol_form.save()
             messages.add_message(

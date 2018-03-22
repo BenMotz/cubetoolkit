@@ -120,6 +120,8 @@ $(document).ready(function() {
 {% else %}
         <td>{{ volunteer.created_at|date:"d/m/Y" }}</td></tr>
 {% endif %}
+    <tr><td>GDPR opt-in:</td>
+        <td>{{ volunteer.member.gdpr_opt_in|date:"d/m/Y" }}</td></tr>
 {% with volunteer.latest_general_training_record as general_training %}
     {% if not general_training %}
     <tr><td class="needs-training" colspan="2">No General Safety Training!</td></tr>
