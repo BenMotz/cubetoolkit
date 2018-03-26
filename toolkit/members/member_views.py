@@ -333,8 +333,8 @@ def opt_in(request, member_id):
                 messages.add_message(request,
                                      messages.SUCCESS,
                                      (u"We are sorry to see you have opted out. "
-                                      u"If you do not opt-in by 21 May 2018 "
-                                      u"we will delete your membership from our records")
+                                      u"If you do not opt-in by 25 May 2018 "
+                                      u"we will delete your membership from our records.")
                                      )
             member.save()
 

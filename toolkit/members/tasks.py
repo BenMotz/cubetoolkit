@@ -70,7 +70,7 @@ def _get_text_preamble_signature(recipient):
     if not(recipient.gdpr_opt_in):
         gdpr_opt_in_template = (
             u"If you'd like to continue to receive emails about events and fundraising for the Cube, "
-            u"you'll need to make sure you opt-in before 21 May 2018.\n\n"
+            u"you'll need to make sure you opt-in before 25 May 2018.\n\n"
             u"Please choose to opt-in so you won't miss out on what's happening at your favourite Microplex.\n\n"
             u"Use this link to opt-in:\n\n"
             u"{1}{2}?k={3}\n\n"
