@@ -1,0 +1,19 @@
+{% extends 'base.html' %}
+{% block title %}Member Opt-in Status{% endblock %}
+
+{% block body %}
+<h3>Manage {{ VENUE.longname }} Member Opt-in Status</h3>
+{% include "messages.html" %}
+<form action="{% url "opt_in" member_id=member.id%}" method="POST">
+{% csrf_token %}
+<input name="confirm" type="hidden" value="yes" />
+<input name="k" type="hidden" value="{{ member.mailout_key }}" />
+<input name="action" type="hidden" value="{{ action }}" />
+<table>
+<tr><th>Member:</th><td>{{ member.name }}</td>
+<tr><th>Opt-in Status:</th><td>{{ member.gdpr_opt_in|yesno:"Opted in,Opted out" }}</td>
+<tr><th>Opt-in date:</th><td>{{ member.gdpr_opt_in|date:"d/m/Y" }}</td>
+</table>
+<p><input type="submit" value="{{ member.gdpr_opt_in|yesno:'opt-out,opt-in' }}"></p>
+</form>
+{% endblock %}

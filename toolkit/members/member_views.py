@@ -7,13 +7,14 @@ from django.urls import reverse
 from django.contrib.auth.decorators import permission_required
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
+from django.utils import timezone
 from django.views.decorators.http import (require_POST, require_safe,
                                           require_http_methods)
 from django.conf import settings
 import six
 
 from toolkit.members.forms import NewMemberForm, MemberForm
-from toolkit.members.models import Member
+from toolkit.members.models import Member, Volunteer
 from toolkit.util import compare_constant_time
 from toolkit.toolkit_auth.decorators import ip_or_permission_required
 
@@ -37,8 +38,13 @@ def add_member(request):
         # Validate form fields
         if form.is_valid():
             # Form is valid, save data:
-            logger.info(u"Adding member '{0}'".format(instance.name))
-            form.save()
+            logger.info(u"Adding member '{0} <{1}>'".format(
+                instance.name,
+                instance.email)
+            )
+            member = form.save(commit=False)
+            member.gdpr_opt_in = timezone.now()
+            member.save()
             # Member added ok, new blank form:
             form = NewMemberForm()
             messages.add_message(request, messages.SUCCESS,
@@ -87,17 +93,66 @@ def view(request, member_id):
     })
 
 
-@permission_required('toolkit.write')
-@require_POST
+@require_http_methods(["GET", "POST"])
 def delete_member(request, member_id):
-    member = get_object_or_404(Member, id=member_id)
-    logger.info(u"Deleting member '{0}'".format(member.name))
-    member.delete()  # This will delete associated volunteer record, if any
-    messages.add_message(request, messages.SUCCESS,
-                         u"Deleted member: {0} ({1})".format(
-                             member.number, member.name))
 
-    return HttpResponseRedirect(reverse("search-members"))
+    if not _check_access_permitted_for_member_key(
+            'toolkit.write', request, member_id):
+        # Manually wrap this function in the standard 'permission_required'
+        # decorator and call it to get the redirect to the login page:
+        return permission_required('toolkit.write')(edit_member)(
+            request, member_id)
+        # See comments in edit_member
+        # TODO if a punter has already deleted themselves and clicks
+        # on their mailout link again, they will get the login page, which
+        # will probablu confuse them.
+
+    member = get_object_or_404(Member, id=member_id)
+
+    user_has_permission = request.user.has_perm('toolkit.write')
+
+    if request.user.has_perm('toolkit.write'):
+        messages.add_message(request, messages.SUCCESS,
+                             u"Deleted member: {0} ({1})".format(
+                                 member.number, member.name))
+        logger.info(u"Member {0} {1} <{1}> deleted by admin".format(
+              member.number,
+              member.name,
+              member.email)
+              )
+        member.delete()  # This will delete associated volunteer record, if any
+
+        return HttpResponseRedirect(reverse("search-members"))
+
+    else:
+
+        # Check the punter isn't an active volunteer
+        vol = Volunteer.objects.filter(member__email=member.email)
+        # Rashly take the first result
+        vol = vol.first()
+        if vol and vol.active:
+            # TODO send mail to admins
+            logger.info(u"Futile attempt by active volunteer {0} <{1}> to delete themselves".format(
+                  vol.member.name,
+                  vol.member.email)
+            )
+            return render(request, 'email_admin.html')
+
+        # This is a punter deleting their own membership record
+        confirmed = request.GET.get('confirmed', 'no')
+
+        if confirmed == 'yes':
+
+            logger.info(u"Member {0} {1} <{2}> self-deleted".format(
+                  member.number,
+                  member.name,
+                  member.email)
+                  )
+            member.delete()
+
+            return HttpResponseRedirect(reverse("goodbye"))
+        else:
+            return render(request, 'confirm-deletion.html')
 
 
 def _check_access_permitted_for_member_key(permission, request, member_id):
@@ -251,7 +306,52 @@ def unsubscribe_member_right_now(request, member_id):
                   {'member': member, 'action': action})
 
 
-@permission_required('toolkit.read')
+@require_http_methods(["GET", "POST"])
+def opt_in(request, member_id):
+
+    if not _check_access_permitted_for_member_key('toolkit.write', request,
+                                                  member_id):
+        return permission_required('toolkit.write')(unsubscribe_member)(
+            request, member_id)
+
+    member = get_object_or_404(Member, id=member_id)
+
+    if request.method == 'POST':
+        # Default to opt-in
+        action = request.POST.get('action', 'opt-in')
+        confirm = request.POST.get('confirm', False)
+        if confirm == "yes":
+            if action == 'opt-in':
+                member.gdpr_opt_in = timezone.now()
+                messages.add_message(request,
+                                     messages.SUCCESS,
+                                     u"Thank you {0} for opting in to continue to receive our emails"
+                                     .format(member.name)
+                                     )
+            else:   # opt-out
+                member.gdpr_opt_in = None
+                messages.add_message(request,
+                                     messages.SUCCESS,
+                                     (u"We are sorry to see you have opted out. "
+                                      u"If you do not opt-in by 25 May 2018 "
+                                      u"we will delete your membership from our records.")
+                                     )
+            member.save()
+
+            logger.info(u"Member '{0}' (id: {1}) <{2}>: {3} on {4}"
+                        .format(member.name,
+                                member.pk,
+                                member.email,
+                                action,
+                                member.gdpr_opt_in)
+                        )
+
+    action = 'opt-out' if member.gdpr_opt_in else 'opt-in'
+
+    return render(request, 'form_member_edit_opt_in.html',
+                  {'member': member, 'action': action})
+
+
 @require_safe
 def member_statistics(request):
     # View for the 'statistics' page of the 'membership database'
@@ -297,6 +397,12 @@ def member_statistics(request):
                          .exclude(mailout=True)
                          .exclude(is_member=True)
                          .count(),
+
+        # Members with email without GDPR opt-in
+        'm_no_gdpr': Member.objects
+                           .mailout_recipients()
+                           .filter(gdpr_opt_in__isnull=True)
+                           .count(),
     }
     if settings.MEMBERSHIP_EXPIRY_ENABLED:
         extra_context = {
@@ -318,3 +424,7 @@ def member_homepages(request):
     return render(request, 'homepages.html', {
             'members': members}
     )
+
+
+def goodbye(request):
+    return render(request, 'goodbye.html')

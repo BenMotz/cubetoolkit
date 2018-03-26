@@ -70,8 +70,8 @@ class MemberManager(models.Manager):
         """Get all members either without an expiry date defined, or with an
         expiry date in the future (or today)"""
         return (self.filter(
-                    Q(membership_expires__isnull=True)
-                    | Q(membership_expires__gte=timezone_now().date())))
+                    Q(membership_expires__isnull=True) |
+                    Q(membership_expires__gte=timezone_now().date())))
 
 
 def get_default_membership_expiry():
@@ -116,6 +116,7 @@ class Member(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    gdpr_opt_in = models.DateTimeField(null=True, blank=True)
 
     # Custom manager, includes helpful methods for selecting members:
     objects = MemberManager()
@@ -230,8 +231,8 @@ class Volunteer(models.Model):
             self.__original_portrait = None
 
     def is_old(self):
-        return (self.created_at
-                and self.created_at.date() <= settings.DAWN_OF_TOOLKIT)
+        return (self.created_at and
+                self.created_at.date() <= settings.DAWN_OF_TOOLKIT)
 
     def latest_general_training_record(self):
         records = (self.training_records
@@ -278,8 +279,8 @@ class TrainingRecord(models.Model):
         if self.training_type == self.ROLE_TRAINING and self.role is None:
             raise ValidationError(
                 {"role": "This field is required."})
-        elif (self.training_type == self.GENERAL_TRAINING
-                and self.role is not None):
+        elif (self.training_type == self.GENERAL_TRAINING and
+                self.role is not None):
             raise ValidationError(
                 {"role": "Training role must not be set for 'General Safety' "
                          "training records."})

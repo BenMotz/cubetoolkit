@@ -30,6 +30,7 @@ class MemberForm(forms.ModelForm):
             del self.fields['membership_expires']
         if hide_internal_fields:
             del self.fields['is_member']
+        del self.fields['gdpr_opt_in']
 
     class Meta(object):
         model = toolkit.members.models.Member
@@ -44,7 +45,7 @@ class MemberFormWithoutNotes(forms.ModelForm):
     class Meta(object):
         model = toolkit.members.models.Member
         exclude = ('is_member', 'notes', 'mailout_failed',
-                   'membership_expires')
+                   'membership_expires', 'gdpr_opt_in')
 
 
 class VolunteerForm(forms.ModelForm):

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+{% block title %}
+{{ VENUE.longname }}: Unsuccessful Membership Records Deletion
+{% endblock %}
+
+{% block body %}
+<img src="{{ STATIC_URL }}{{ VENUE.internal_header_img }}">
+<h1>{{VENUE.longname }}</h1>
+<h2>Unsuccessful Membership Record Deletion</h2>
+<p>As, according to our records, you are an active volunteer, this is not the appropriate facility to remove your records.</p>
+<p>Please <a href="{{ VENUE.contact_page }}">email</a> and ask to be retired as a Cube Volunteer.</p>
+<p><a href="/">Home</a></p>
+{% endblock %}
+
