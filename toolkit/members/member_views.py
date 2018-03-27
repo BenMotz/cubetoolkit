@@ -112,15 +112,33 @@ def delete_member(request, member_id):
     user_has_permission = request.user.has_perm('toolkit.write')
 
     if request.user.has_perm('toolkit.write'):
-        messages.add_message(request, messages.SUCCESS,
-                             u"Deleted member: {0} ({1})".format(
-                                 member.number, member.name))
-        logger.info(u"Member {0} {1} <{1}> deleted by admin".format(
-              member.number,
-              member.name,
-              member.email)
-              )
-        member.delete()  # This will delete associated volunteer record, if any
+
+        # Check the person being deleted isn't an active volunteer.
+        # This is mostly to prevent toolkit admins accidentally
+        # deleting themselves by clicking on the delete link in their email
+        # whilst logged on.
+        vol = Volunteer.objects.filter(member__id=member_id)
+        vol = vol.first()
+        if vol and vol.active:
+            messages.add_message(request, messages.ERROR,
+                                 u"Can't delete active volunteer {0} ({1}). Retire them first.".format(
+                                     member.name, member.number))
+            logger.info(u"Attempt to delete active volunteer {0} {1} <{1}>".format(
+                  member.number,
+                  member.name,
+                  member.email)
+                  )
+
+        else:
+            messages.add_message(request, messages.SUCCESS,
+                                 u"Deleted member: {0} ({1})".format(
+                                     member.number, member.name))
+            logger.info(u"Member {0} {1} <{1}> deleted by admin".format(
+                  member.number,
+                  member.name,
+                  member.email)
+                  )
+            member.delete()  # This will delete associated volunteer record, if any
 
         return HttpResponseRedirect(reverse("search-members"))
 
