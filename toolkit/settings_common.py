@@ -21,6 +21,7 @@ VENUE = {
     'flickr': 'https://secure.flickr.com/groups/cubemicroplex/',
     'vimeo': 'https://vimeo.com/cubemicroplex/',
     'youtube': 'https://www.youtube.com/user/cubelog',
+    'nav_menu_img': '',
     'internal_header_img': 'content/logo.gif',
     'wagtale_admin_img': '/static/content/logo.gif',
     'favicon': '/static/favicon/favicon_cube.ico',
