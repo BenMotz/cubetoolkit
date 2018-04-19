@@ -120,13 +120,13 @@ MEMBERSHIP_LENGTH_DAYS = 365
 WAGTAIL_SITE_NAME = 'The Cube Microplex'
 
 # Don't show fields to change user passwords (for other users, in admin)
-WAGTAILUSERS_PASSWORD_ENABLED = False
+WAGTAILUSERS_PASSWORD_ENABLED = True
 
 # Don't allow user to change their own password
-WAGTAIL_PASSWORD_MANAGEMENT_ENABLED = False
+WAGTAIL_PASSWORD_MANAGEMENT_ENABLED = True
 
 # Disable password reset function
-WAGTAIL_PASSWORD_RESET_ENABLED = False
+WAGTAIL_PASSWORD_RESET_ENABLED = True
 
 # Don't automatically check for (and notify) new Wagtail versions:
 WAGTAIL_ENABLE_UPDATE_CHECK = False
@@ -323,6 +323,7 @@ INSTALLED_APPS = (
     'toolkit.util',
     'toolkit.content',
     'easy_thumbnails',
+    'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',  # Needed by auth framework
     # Sessions framework: used to store preferences and login details
