@@ -133,7 +133,7 @@ def delete_member(request, member_id):
             messages.add_message(request, messages.SUCCESS,
                                  u"Deleted member: {0} ({1})".format(
                                      member.number, member.name))
-            logger.info(u"Member {0} {1} <{1}> deleted by admin".format(
+            logger.info(u"Member {0} {1} <{2}> deleted by admin".format(
                   member.number,
                   member.name,
                   member.email)

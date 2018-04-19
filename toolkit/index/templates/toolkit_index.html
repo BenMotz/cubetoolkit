@@ -24,43 +24,51 @@
 <ul>
     <li><a href="{% url "default-view" %}">Diary for the public</a></li>
     <li><a href="{% url "archive-view-index" %}">Public diary archive</a></li>
-    <li><a href="{% url "default-edit" %}">Edit the diary</a></li>
-    <li><a href="{% url "diary-edit-calendar" %}">Edit the diary from a calendar</a></li>
-    <li><a href="{% url "view_event_field" field="copy" %}">Copy report</a></li>
-    <li><a href="{% url "view_event_field" field="copy_summary" %}">Copy summary report</a></li>
-    <li><a href="{% url "view_event_field" field="terms" %}">Terms report</a></li>
-    <li><a href="{% url "edit-printed-programmes" %}">Upload printed programme PDFs</a></li>
+    {% if user.is_superuser %}
+        <li><a href="{% url "default-edit" %}">Edit the diary</a></li>
+        <li><a href="{% url "diary-edit-calendar" %}">Edit the diary from a calendar</a></li>
+        <li><a href="{% url "view_event_field" field="copy" %}">Copy report</a></li>
+        <li><a href="{% url "view_event_field" field="copy_summary" %}">Copy summary report</a></li>
+        <li><a href="{% url "view_event_field" field="terms" %}">Terms report</a></li>
+        <li><a href="{% url "edit-printed-programmes" %}">Upload printed programme PDFs</a></li>
+    {% endif %}
 </ul>
 <h2>Rota</h2>
 <ul>
     <li><a href="{% url "rota-edit" %}">Edit the rota</a></li>
     <li><a href="{% url "view-rota-vacancies" %}">List vacancies in the next 6 days</a> (for easy emailing)</li>
 </ul>
-<h2>Meta-programming</h2>
-<ul>
-    <li><a href="{% url "edit_event_tags" %}">Edit available event tags</a></li>
-    <li><a href="{% url "edit_event_templates" %}">Edit available event templates</a></li>
-    <li><a href="{% url "edit_roles" %}">Edit available volunteer/event roles</a></li>
-</ul>
-<h2>Volunteers</h2>
-<ul>
-    <li><a href="{% url "view-volunteer-list" %}">Volunteers profiles</a></li>
-    <li><a href="{% url "view-volunteer-role-report" %}">Volunteer role report</a></li>
-    <li><a href="{% url "add-volunteer-training-group-record" %}">Add volunteer training records</a></li>
-    <li><a href="{% url "view-volunteer-training-report" %}">Volunteer training report</a></li>
-</ul>
-<h2>Members</h2>
-<ul>
-    <li><a href="{% url "add-member" %}">Members database</a></li>
-    <li><a href="{% url "member-homepages" %}">Members homepages</a></li>
-    <li><a href="{% url "members-mailout" %}">Members mailout</a></li>
-    <li><a href="{% url "member-statistics" %}">Members statistics</a></li>
-</ul>
-<h2>Website</h2>
-<ul>
-    <li><a href="{% url "wagtailadmin_home" %}">Content management</a></li>
-</ul>
 
+{% if user.is_superuser %}
+
+    <h2>Meta-programming</h2>
+    <ul>
+        <li><a href="{% url "edit_event_tags" %}">Edit available event tags</a></li>
+        <li><a href="{% url "edit_event_templates" %}">Edit available event templates</a></li>
+        <li><a href="{% url "edit_roles" %}">Edit available volunteer/event roles</a></li>
+   </ul>
+
+    <h2>Volunteers</h2>
+    <ul>
+        <li><a href="{% url "view-volunteer-list" %}">Volunteers profiles</a></li>
+        <li><a href="{% url "view-volunteer-role-report" %}">Volunteer role report</a></li>
+        <li><a href="{% url "add-volunteer-training-group-record" %}">Add volunteer training records</a></li>
+        <li><a href="{% url "view-volunteer-training-report" %}">Volunteer training report</a></li>
+    </ul>
+
+    <h2>Members</h2>
+    <ul>
+        <li><a href="{% url "add-member" %}">Members database</a></li>
+        <li><a href="{% url "member-homepages" %}">Members homepages</a></li>
+        <li><a href="{% url "members-mailout" %}">Members mailout</a></li>
+        <li><a href="{% url "member-statistics" %}">Members statistics</a></li>
+    </ul>
+    <h2>Website</h2>
+    <ul>
+        <li><a href="{% url "wagtailadmin_home" %}">Content management</a></li>
+    </ul>
+
+{% endif %}
 
 <ul>
 {% for link in object_list %}
@@ -77,8 +85,13 @@
 {% endfor %}
 </ul>
 <hr>
-<p><a href="{% url "create-index-link" %}">Add link</a> &#xb7;
-<a href="{% url "create-index-category" %}">Add link group</a> &#xb7;
-<a href="{% url "logout" %}">Log out</a></p>
+<p>You logged in as {{ user }} at {{ user.last_login }}</p>
+<p>
+{% if user.is_superuser %}
+    <a href="{% url "create-index-link" %}">Add link</a> &#xb7;
+    <a href="{% url "create-index-category" %}">Add link group</a> &#xb7;
+{% endif %}
+<a href="{% url "logout" %}">Log out</a>
+</p>
 
 {% endblock %}
