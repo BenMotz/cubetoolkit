@@ -2,48 +2,61 @@
 /* CSS Document  */
 
 /*Custom css to override starandshadow_site/toolkit/static_common/css/static_pages.css */
+
+
+  /* FONT */
+  
 code,
 kbd,
 pre,
-samp {
-       font-family: Fixedsys, Terminal, monospace;
-    font-size: 1em;
+samp, 
+code,
+kbd,
+pre,
+samp, 
+textarea, 
+body, 
+html, 
+button, 
+input, 
+select, 
+textarea, 
+#site-nav,
+#site-nav ul li a,
+.copy p {
+   
+	font-family: 'Source Code Pro', monospace;
+    font-weight: 500;
+
 }
-textarea {
-       font-family: Fixedsys, Terminal, monospace;
-    /*font-family: sans-serif;*/
-}
+ 
+  
+  /*OVERALL FONT SIZE*/
 
-body, html, button, input, select, textarea {
-    font-family: Fixedsys, Terminal, monospace;
-    font-weight: 600;
+	body {
+    font-size: 1.4em;
+	  font-weight: 500;
+	}
 
-}
-   #site-nav {
-
-    font-family: Fixedsys, Terminal, monospace;
-    }
-
-
-html {
-
-	background-color: #082080;
+  /*TEXT AND BACKGROUND COLOURS*/	
+	
+html, body, #sidebar, .grid-item, .grid, .black_overlay, .showing:nth-child(7n+3) {
+color: #082080;
+	background-color: #e3cae3;
 }
 
 mark {
     background: #ff0;
     color: #082080;
 }
-body {
 
-    color: #000000;
-}
 a {
     color: #082080;
-    text-decoration: underline;
+	#text-decoration: underline; 
+   
 }
 
-#mobile-menu-btn:before {/
+#mobile-menu-btn:before {
 
     color: #082080;
 }
@@ -67,38 +80,35 @@ a {
 .copy p > a {
     color: #082080;
 
-    border-bottom: 1px dotted #082080;
+    border-bottom: 0px dotted #082080;
+	
+    text-decoration: underline;
 }
 .copy p > a:visited {
     color: #082080;
 }
 
-.black_overlay {
-  
-    background: #e3cae3;
- 
-}
 
-#sidebar {
 
-    background-color: #e3cae3;
- 
-}
-#site-nav {
 
-    background: #e3cae3;
-   
-}
-.grid {
- 
-    background: #e3cae3;
-
-}.grid-item {
-   
-    background-color: #e3cae3;
-}.action a {
+.action a {
     color: black !important;
     background: #e3cae3 !important;
     border: 0.1em solid black;
     border-radius: 0 !important;}
+
+#site-nav ul li a{    text-decoration: none; }
+
+/* NAV*/
+
+.nav-wrap {
+    position: relative;
+    left: 0;
+    width: 170px;
+    border-top-width: 0px;
+    border-right-width: 0px;
+    border-bottom-width: 0px;
+    border-left-width: 0px;
+    border-spacing: 0px;
+    padding-top: 30px; }
 

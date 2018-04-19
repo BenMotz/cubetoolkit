@@ -19,6 +19,7 @@ VENUE = {
     'flickr': '',
     'vimeo': '',
     'youtube': 'https://www.youtube.com/channel/UCJxp1CvJlDsWBEJrguvhoLw/',
+    'nav_menu_img': 'content/ss_logo_e3cae3_pink3.jpg',
     'internal_header_img': 'content/star_and_shadow_100_82.png',
     'wagtale_admin_img': '/static/content/star_and_shadow_100_82.png',
     'favicon': '/static/favicon/favicon_ss.ico',
