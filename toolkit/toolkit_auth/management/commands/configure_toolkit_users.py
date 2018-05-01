@@ -21,7 +21,12 @@ def _get_password(use):
     return password
 
 
-def _create_or_update_user(name, email, permissions, is_superuser=False):
+def _create_or_update_user(
+        name,
+        email,
+        permissions,
+        is_superuser=False,
+        is_staff=False):
     if not auth_models.User.objects.filter(username=name).exists():
         password = _get_password(name)
         user = auth_models.User.objects.create_user(name, email, password)
@@ -37,6 +42,7 @@ def _create_or_update_user(name, email, permissions, is_superuser=False):
         user.user_permissions.add(permission)
 
     user.is_superuser = is_superuser
+    user.is_staff = is_staff
     user.save()
 
 
@@ -77,7 +83,8 @@ def _configure_users():
         "admin", 'toolkit_admin@localhost',
         [write_permission, read_permission, edit_rota_permission],
         # Mark admin as superuser, to get wagtail superuser control:
-        is_superuser=True)
+        is_superuser=True,
+        is_staff=True)
 
     # Read only (and write to the rota) user:
     _create_or_update_user(
