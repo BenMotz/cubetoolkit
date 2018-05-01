@@ -115,6 +115,11 @@ Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
                 </div>
                 <div class="col-8">
                     <p class="name">{{ member.name }}{% if not volunteer.active %} (retired){% endif %}</p>
+                    {% if volunteer.member.gdpr_opt_in %}
+                       <p><b>GDPR opt in:</b> {{ volunteer.member.gdpr_opt_in|date:"d/m/Y" }}</p>
+                    {% else %}
+                       <p><em><b>No GDPR opt-in</b></em></p>
+                    {% endif %}
                     {% with volunteer.general_training.0 as general_training %}
                     {% if not general_training %}
                     <em>Needs {{ general_training_desc }}</em><br>

@@ -17,5 +17,11 @@ Login required
     <input type="submit" value="Continue" />
     <input type="hidden" name="next" value="{{ next }}" />
 </form>
+
+{% if VENUE.show_user_management %}
+    <p>Have you only gone and forgotten your password?
+    <a href="{% url "password_reset" %}">Reset password</a></p>
+{% endif %}
+
 {% endblock %}
 

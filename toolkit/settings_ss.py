@@ -32,7 +32,8 @@ VENUE = {
     # delivery are sent:
     'mailout_delivery_report_to': u'admin@starandshadow.org.uk',
     # "From" address for mailout
-    'mailout_from_address': u'mailout@starandshadow.org.uk'
+    'mailout_from_address': u'mailout@starandshadow.org.uk',
+    'show_user_management': True
 }
 
 WAGTAIL_SITE_NAME = 'The Star and Shadow'
