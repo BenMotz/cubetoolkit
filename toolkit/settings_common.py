@@ -34,7 +34,8 @@ VENUE = {
     # delivery are sent:
     'mailout_delivery_report_to': u'cubeadmin@cubecinema.com',
     # "From" address for mailout
-    'mailout_from_address': u'mailout@cubecinema.com'
+    'mailout_from_address': u'mailout@cubecinema.com',
+    'show_user_management': False
  }
 
 # The following list of IP addresses is used to restrict access to some pages
@@ -177,6 +178,7 @@ ADMINS = (
 
 # Authorisation related settings:
 LOGIN_URL = django.urls.reverse_lazy('login')
+LOGIN_REDIRECT_URL = django.urls.reverse_lazy('toolkit-index')
 
 PASSWORD_HASHERS = (
     'django.contrib.auth.hashers.PBKDF2PasswordHasher',

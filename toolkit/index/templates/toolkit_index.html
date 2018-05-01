@@ -91,6 +91,9 @@
     <a href="{% url "create-index-link" %}">Add link</a> &#xb7;
     <a href="{% url "create-index-category" %}">Add link group</a> &#xb7;
 {% endif %}
+{% if VENUE.show_user_management %}
+    <a href="{% url "password_change" %}">Change password</a> &#xb7;
+{% endif %}
 <a href="{% url "logout" %}">Log out</a>
 </p>
 
