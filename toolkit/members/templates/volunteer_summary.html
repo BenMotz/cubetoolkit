@@ -27,45 +27,47 @@
 <a href="{% url "unretire-select-volunteer" %}" title="unretire volunteer">unretire volunteer</a><br>
 Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
 
-<div class="container">
-    <strong> 
-    <div class="row">
-        <div class="col-sm">
+<table class="table table-sm table-striped">
+    <thead>
+      <tr>
+        <th>
             Name
-        </div>
-        <div class="col-sm">
+        </th>
+        <th>
             Email
-        </div>
-        <div class="col-sm">
+        </th>
+        <th>
             GDPR opt in
-        </div>
-        <div class="col-sm">
+        </th>
+        <th>
             Inducted
-        </div>
-    </div>
-    </strong>
+        </th>
+      </tr>
+    </thead>
+
+    <tbody>
     {% for volunteer in volunteers %}
         {% with volunteer.member as member %}
-            <div class="row">
-                <div class="col-sm">
+            <tr>
+                <th scope="row">
                         <a href="{% url "edit-volunteer" volunteer.pk %}">{{ member.name }}{% if not volunteer.active %} (retired){% endif %}</a>
-                </div>
-                <div class="col-sm">
+                </th>
+                <td>
                     {{ member.email|urlize|default:"<em>Request email address</em>" }}
-                </div>
-                <div class="col-sm">
+                </td>
+                <td>
                     {% if volunteer.member.gdpr_opt_in %}
                        {{ volunteer.member.gdpr_opt_in|date:"d/m/Y" }}
                     {% endif %}
-                </div>
-                <div class="col-sm">
+                </td>
+                <td>
                     {{ volunteer.created_at|date:"d/m/Y" }}
-                </div>
- 
-            </div>
+                </td>
+            </tr>
         {% endwith %}
     {% endfor %}
-</div><!-- container -->
+    </tbody>
+</table><!-- table -->
 
 <h4>The volunteer role report can now be found <a href="{% url "view-volunteer-role-report" %}">here</a>.</h4>
 <h4>The volunteer training report can now be found <a href="{% url "view-volunteer-training-report" %}">here</a>.</h4>
