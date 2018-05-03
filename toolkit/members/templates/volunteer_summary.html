@@ -34,10 +34,10 @@ Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
             Name
         </div>
         <div class="col-sm">
-            GDPR opt in
+            Email
         </div>
         <div class="col-sm">
-            Email
+            GDPR opt in
         </div>
         <div class="col-sm">
             Inducted
@@ -48,17 +48,15 @@ Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
         {% with volunteer.member as member %}
             <div class="row">
                 <div class="col-sm">
-                    <div class="name">
                         <a href="{% url "edit-volunteer" volunteer.pk %}">{{ member.name }}{% if not volunteer.active %} (retired){% endif %}</a>
-                     </div>
-                    </div>
+                </div>
+                <div class="col-sm">
+                    {{ member.email|urlize|default:"<em>Request email address</em>" }}
+                </div>
                 <div class="col-sm">
                     {% if volunteer.member.gdpr_opt_in %}
                        {{ volunteer.member.gdpr_opt_in|date:"d/m/Y" }}
                     {% endif %}
-                </div>
-                <div class="col-sm">
-                    {{ member.email|urlize|default:"<em>Request email address</em>" }}
                 </div>
                 <div class="col-sm">
                     {{ volunteer.created_at|date:"d/m/Y" }}
