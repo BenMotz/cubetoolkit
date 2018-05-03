@@ -1,6 +1,7 @@
 {% extends 'base_admin.html' %}
 {% load thumbnail_l %}
 {% load hash_filter %}
+{% block title %}Volunteers Summary ordered by {{ sort_type }}{% endblock %}
 {% block css %}
 {{ block.super }}
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
@@ -17,7 +18,7 @@
 {% endblock %}
 
 {% block body %}
-<h2>{{ VENUE.name }} Volunteers Summary</h2>
+<h2>{{ VENUE.name }} Volunteers Summary ordered by {{ sort_type }}</h2>
 {% include "messages.html" %}
 
 <p>
@@ -26,6 +27,16 @@
 <a href="{% url "retire-select-volunteer" %}" title="retire volunteer">retire volunteer</a> &#xb7;
 <a href="{% url "unretire-select-volunteer" %}" title="unretire volunteer">unretire volunteer</a><br>
 Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
+
+<div class="btn-group dropright">
+  <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Order by <span class="caret"></span>
+  </button>
+  <div class="dropdown-menu">
+      <a class="dropdown-item" href="{% url "view-volunteer-summary" %}">Order by name</a>
+      <a class="dropdown-item" href="{% url "view-volunteer-summary" %}?order=inducted">Order by induction date (most recent first)</a>
+  </div>
+</div>
 
 <table class="table table-sm table-striped">
     <thead>
@@ -50,18 +61,21 @@ Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
         {% with volunteer.member as member %}
             <tr>
                 <th scope="row">
-                        <a href="{% url "edit-volunteer" volunteer.pk %}">{{ member.name }}{% if not volunteer.active %} (retired){% endif %}</a>
+                    <a href="{% url "edit-volunteer" volunteer.pk %}">{{ member.name }}</a>
                 </th>
                 <td>
                     {{ member.email|urlize|default:"<em>Request email address</em>" }}
                 </td>
                 <td>
                     {% if volunteer.member.gdpr_opt_in %}
-                       {{ volunteer.member.gdpr_opt_in|date:"d/m/Y" }}
+                        {{ volunteer.member.gdpr_opt_in|date:"d/m/Y" }}
                     {% endif %}
                 </td>
-                <td>
-                    {{ volunteer.created_at|date:"d/m/Y" }}
+                <td>{% if volunteer.is_old %}
+                        before {{ dawn_of_toolkit|date:"d/m/Y" }}
+                    {% else %}
+                        {{ volunteer.created_at|date:"d/m/Y" }}
+                    {% endif %}
                 </td>
             </tr>
         {% endwith %}

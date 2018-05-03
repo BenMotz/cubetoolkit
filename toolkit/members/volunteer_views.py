@@ -53,15 +53,26 @@ def view_volunteer_list(request):
 @permission_required('toolkit.read')
 @require_safe
 def view_volunteer_summary(request):
-    # Get all volunteers, sorted by name:
-    volunteers = (Volunteer.objects
-                  .filter(active=True)
-                  .order_by('member__name'))
+
+    order = request.GET.get('order', 'name')
+
+    if 'name' in order:
+        volunteers = (Volunteer.objects
+                               .filter(active=True)
+                               .order_by('member__name'))
+        sort_type = 'name'
+    else:
+        volunteers = (Volunteer.objects
+                               .filter(active=True)
+                               .order_by('-member__created_at'))
+        sort_type = 'inducation date'
 
     active_count = volunteers.count()
     context = {
         'volunteers': volunteers,
         'active_count': active_count,
+        'sort_type': sort_type,
+        'dawn_of_toolkit': settings.DAWN_OF_TOOLKIT,
     }
     return render(request, 'volunteer_summary.html', context)
 
