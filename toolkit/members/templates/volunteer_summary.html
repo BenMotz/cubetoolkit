@@ -1,0 +1,88 @@
+{% extends 'base_admin.html' %}
+{% load thumbnail_l %}
+{% load hash_filter %}
+{% block title %}Volunteers Summary ordered by {{ sort_type }}{% endblock %}
+{% block css %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
+<style>
+    .volunteer em {
+        font-style: normal;
+        color: red;
+    }
+    .volunteer {
+        border-top: thin dotted gray;
+        padding-top: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<h2>{{ VENUE.name }} Volunteers Summary ordered by {{ sort_type }}</h2>
+{% include "messages.html" %}
+
+<p>
+<a href="{% url "view-volunteer-list" %}" title="volunteers profiles">volunteers profiles</a> &#xb7;
+<a href="{% url "add-volunteer" %}" title="add new volunteer">add volunteer</a> &#xb7;
+<a href="{% url "retire-select-volunteer" %}" title="retire volunteer">retire volunteer</a> &#xb7;
+<a href="{% url "unretire-select-volunteer" %}" title="unretire volunteer">unretire volunteer</a><br>
+Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
+
+<div class="btn-group dropright">
+  <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Order by <span class="caret"></span>
+  </button>
+  <div class="dropdown-menu">
+      <a class="dropdown-item" href="{% url "view-volunteer-summary" %}">Order by name</a>
+      <a class="dropdown-item" href="{% url "view-volunteer-summary" %}?order=inducted">Order by induction date (most recent first)</a>
+  </div>
+</div>
+
+<table class="table table-sm table-striped">
+    <thead>
+      <tr>
+        <th>
+            Name
+        </th>
+        <th>
+            Email
+        </th>
+        <th>
+            GDPR opt in
+        </th>
+        <th>
+            Inducted
+        </th>
+      </tr>
+    </thead>
+
+    <tbody>
+    {% for volunteer in volunteers %}
+        {% with volunteer.member as member %}
+            <tr>
+                <th scope="row">
+                    <a href="{% url "edit-volunteer" volunteer.pk %}">{{ member.name }}</a>
+                </th>
+                <td>
+                    {{ member.email|urlize|default:"<em>Request email address</em>" }}
+                </td>
+                <td>
+                    {% if volunteer.member.gdpr_opt_in %}
+                        {{ volunteer.member.gdpr_opt_in|date:"d/m/Y" }}
+                    {% endif %}
+                </td>
+                <td>{% if volunteer.is_old %}
+                        before {{ dawn_of_toolkit|date:"d/m/Y" }}
+                    {% else %}
+                        {{ volunteer.created_at|date:"d/m/Y" }}
+                    {% endif %}
+                </td>
+            </tr>
+        {% endwith %}
+    {% endfor %}
+    </tbody>
+</table><!-- table -->
+
+<h4>The volunteer role report can now be found <a href="{% url "view-volunteer-role-report" %}">here</a>.</h4>
+<h4>The volunteer training report can now be found <a href="{% url "view-volunteer-training-report" %}">here</a>.</h4>
+{% endblock %}

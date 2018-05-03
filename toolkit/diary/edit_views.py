@@ -942,9 +942,11 @@ class EditRotaView(PermissionRequiredMixin, View):
         start_date, days_ahead = get_date_range(
             year, month, day, query_days_ahead, default_days_ahead=30)
 
-        # Don't allow data from before yesterday to be displayed:
-        if start_date < yesterday_local_date:
-            start_date = yesterday_local_date
+        if not request.user.is_superuser:
+            # Don't allow data from before yesterday to be displayed:
+            # TODO datepicker is still nobbled to yesterday
+            if start_date < yesterday_local_date:
+                start_date = yesterday_local_date
 
         end_date = start_date + datetime.timedelta(days=days_ahead)
         showings = (Showing.objects.not_cancelled()
