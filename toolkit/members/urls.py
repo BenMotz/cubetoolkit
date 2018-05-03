@@ -1,7 +1,7 @@
 from django.conf.urls import url
 
 from toolkit.members.volunteer_views import (
-    view_volunteer_list,
+    view_volunteer_list, view_volunteer_summary,
     view_volunteer_role_report, edit_volunteer, select_volunteer,
     activate_volunteer, add_volunteer_training_record,
     add_volunteer_training_group_record, view_volunteer_training_records,
@@ -28,6 +28,8 @@ volunteer_urls = [
         name='add-volunteer-training-group-record'),
     url(r'^view/$', view_volunteer_list,
         name='view-volunteer-list'),
+    url(r'^view/summary/$', view_volunteer_summary,
+        name='view-volunteer-summary'),
     url(r'^view/rolereport/$', view_volunteer_role_report,
         name='view-volunteer-role-report'),
     url(r'^view/trainingreport/$', view_volunteer_training_records,

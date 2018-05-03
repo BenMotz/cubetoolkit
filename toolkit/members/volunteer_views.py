@@ -52,6 +52,22 @@ def view_volunteer_list(request):
 
 @permission_required('toolkit.read')
 @require_safe
+def view_volunteer_summary(request):
+    # Get all volunteers, sorted by name:
+    volunteers = (Volunteer.objects
+                  .filter(active=True)
+                  .order_by('member__name'))
+
+    active_count = volunteers.count()
+    context = {
+        'volunteers': volunteers,
+        'active_count': active_count,
+    }
+    return render(request, 'volunteer_summary.html', context)
+
+
+@permission_required('toolkit.read')
+@require_safe
 def view_volunteer_role_report(request):
     # Build dict of role names -> volunteer names
     role_vol_map = {}

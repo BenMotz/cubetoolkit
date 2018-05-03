@@ -1,0 +1,74 @@
+{% extends 'base_admin.html' %}
+{% load thumbnail_l %}
+{% load hash_filter %}
+{% block css %}
+{{ block.super }}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
+<style>
+    .volunteer em {
+        font-style: normal;
+        color: red;
+    }
+    .volunteer {
+        border-top: thin dotted gray;
+        padding-top: 0.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<h2>{{ VENUE.name }} Volunteers Summary</h2>
+{% include "messages.html" %}
+
+<p>
+<a href="{% url "view-volunteer-list" %}" title="volunteers profiles">volunteers profiles</a> &#xb7;
+<a href="{% url "add-volunteer" %}" title="add new volunteer">add volunteer</a> &#xb7;
+<a href="{% url "retire-select-volunteer" %}" title="retire volunteer">retire volunteer</a> &#xb7;
+<a href="{% url "unretire-select-volunteer" %}" title="unretire volunteer">unretire volunteer</a><br>
+Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
+
+<div class="container">
+    <strong> 
+    <div class="row">
+        <div class="col-sm">
+            Name
+        </div>
+        <div class="col-sm">
+            GDPR opt in
+        </div>
+        <div class="col-sm">
+            Email
+        </div>
+        <div class="col-sm">
+            Inducted
+        </div>
+    </div>
+    </strong>
+    {% for volunteer in volunteers %}
+        {% with volunteer.member as member %}
+            <div class="row">
+                <div class="col-sm">
+                    <div class="name">
+                        <a href="{% url "edit-volunteer" volunteer.pk %}">{{ member.name }}{% if not volunteer.active %} (retired){% endif %}</a>
+                     </div>
+                    </div>
+                <div class="col-sm">
+                    {% if volunteer.member.gdpr_opt_in %}
+                       {{ volunteer.member.gdpr_opt_in|date:"d/m/Y" }}
+                    {% endif %}
+                </div>
+                <div class="col-sm">
+                    {{ member.email|urlize|default:"<em>Request email address</em>" }}
+                </div>
+                <div class="col-sm">
+                    {{ volunteer.created_at|date:"d/m/Y" }}
+                </div>
+ 
+            </div>
+        {% endwith %}
+    {% endfor %}
+</div><!-- container -->
+
+<h4>The volunteer role report can now be found <a href="{% url "view-volunteer-role-report" %}">here</a>.</h4>
+<h4>The volunteer training report can now be found <a href="{% url "view-volunteer-training-report" %}">here</a>.</h4>
+{% endblock %}
