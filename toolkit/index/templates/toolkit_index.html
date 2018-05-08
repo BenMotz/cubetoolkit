@@ -5,6 +5,7 @@
 {% endblock %}
 
 {% block css %}
+<link rel="stylesheet" href="{{ STATIC_URL }}css/font-awesome/css/font-awesome.min.css">
 {{ block.super }}
 <style>
     .index-edit {
@@ -95,7 +96,7 @@
 {% if VENUE.show_user_management %}
     <a href="{% url "password_change" %}">Change password</a> &#xb7;
 {% endif %}
-<a href="{% url "logout" %}">Log out</a>
+<a href="{% url "logout" %}"><span class="fa fa-sign-out"></span> Log out</a>
 </p>
 
 {% endblock %}

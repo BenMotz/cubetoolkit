@@ -32,7 +32,7 @@ def cube_staging():
     # so that a different logfile can be set, as the deploy user may not have
     # permission to access the normal log file
     env.deploy_script_settings = "toolkit.deploy_settings"
-
+    env.dev_db_name = "toolkit"
 
 def cube_production():
     """Configure to deploy live on cubecinema.com"""
@@ -44,6 +44,7 @@ def cube_production():
     env.settings = "live_settings.py"
     # See note above:
     env.deploy_script_settings = "toolkit.deploy_settings"
+    env.dev_db_name = "toolkit"
 
 
 def star_and_shadow_production():
@@ -55,6 +56,7 @@ def star_and_shadow_production():
     env.settings = "production_settings.py"
     # See note above:
     env.deploy_script_settings = "toolkit.deploy_settings"
+    env.dev_db_name = "starshadow"
 
 
 def deploy_code():
@@ -233,13 +235,16 @@ def _load_database_dump(dump_filename):
                          "(must have permission to drop and create database!)",
                          default="root")
 
-    if not console.confirm("About to do something irreversible to the 'toolkit'"
-                           "database on your local system. Sure? ", default=False):
+    if not console.confirm("About to do something irreversible to the %s "
+                           "database on your local system. Sure? " % env.dev_db_name,
+                           default=False):
         utils.abort("User aborted")
         local("rm {0}".format(dump_filename))
 
-    local("mysql -u{db_username} -p toolkit < {dump_filename}".format(
-        db_username=db_username, dump_filename=dump_filename))
+    local("mysql -u{db_username} -p {dev_db_name} < {dump_filename}".format(
+        db_username=db_username,
+        dev_db_name=env.dev_db_name,
+        dump_filename=dump_filename))
 
 
 def sync_to_local_database():
