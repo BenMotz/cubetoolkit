@@ -44,10 +44,11 @@ setup_page(true);
 {{ block.super }}
 <div class="print-media">
     {% if printed_programmes %}
-    <p>Print:</p>
-    {% for printed_programme in printed_programmes %}
-    <a href="{{ printed_programme.programme.url }}" title="Printed programme for {{ printed_programme.month|date:"M Y" }}"><i class="fa fa-file"></i></a>
-    {% endfor %}
+        <p>Print:</p>
+        {% for printed_programme in printed_programmes %}
+            <a href="{{ printed_programme.programme.url }}" title="Printed programme for {{ printed_programme.month|date:"M Y" }}">
+            <i class="fa fa-file"></i></a>
+        {% endfor %}
     {% endif %}
 </div><!-- end .print-media -->
 {% endblock navmenu-footer %}
@@ -59,25 +60,32 @@ setup_page(true);
     <div class="gutter-sizer"></div>
 {% for event, showings in events.items %}
     <div class="showing" id="event_{{ event.id }}">
+
         <div class="event_image">
-        {% with media_item=event.media.all.0 event_slug=event.name|slugify %}{% if media_item %}<a href="{% url "single-event-view-with-slug" event_id=event.id event_slug=event_slug %}"><img src="{{ media_item.media_file|thumbnail_url:'indexview' }}" alt="Picture for event {{ event.name }}"></a>{% endif %}
-            {% if event.tags.all %}<span class="tags">{% for tag in event.tags.all %}<a href="{% url "type-view" tag.slug %}" class="tag_{{tag.name}}">{{tag.name}}</a> {% endfor %}</span>{% endif %}
+            {% with media_item=event.media.all.0 event_slug=event.name|slugify %}
+            {% if media_item %}<a href="{% url "single-event-view-with-slug" event_id=event.id event_slug=event_slug %}">
+                <img src="{{ media_item.media_file|thumbnail_url:'indexview' }}" alt="Picture for event {{ event.name }}"></a>
+            {% endif %}
+            {% if event.tags.all %}
+                <span class="tags">
+                    {% for tag in event.tags.all %}
+                       <a href="{% url "type-view" tag.slug %}" class="tag_{{tag.name}}">{{tag.name}}</a>
+                    {% endfor %}
+                </span>
+            {% endif %}
         </div><!-- div event_image -->
         <a href="{% url "single-event-view-with-slug" event_id=event.id event_slug=event_slug %}">
-            <p>
-                <span class="pre_title">
-                    {{ event.pre_title }}
-                </span>
-            </p>
+            <p><span class="pre_title">
+                {{ event.pre_title }}
+            </span></p>
             <h3>{{ event.name }}</h3>
             <span class="post_title">
                 {{ event.post_title }}
             </span>
         </a>
-        <p>
-            <div class="event_details">
-                <p class="start_and_pricing">
-                    {% for showing in showings %}
+        <p><div class="event_details">
+            <p class="start_and_pricing">
+                {% for showing in showings %}
                     {% if showing.sold_out %}<span class="sold_out">{% endif %}
                     {% if showing.cancelled %}<span class="cancelled">{% endif %}
                     {{ showing.start|date:"D j F " }}//{{ showing.start|date:" H:i" }}
@@ -85,18 +93,30 @@ setup_page(true);
                     {% if showing.sold_out %}</span> (SOLD OUT){% endif %}
                     {% if showing.discounted %}<abbr class="discounted" title="* cheap night">*</abbr>{% endif %}<br>
                     {% endfor %}
-                </p>
-                <p class="copy">{{ event.copy_summary|truncatewords:16 }} [<a class="more" href="{% url "single-event-view-with-slug" event_id=event.id event_slug=event_slug %}">more</a>]</p>
-            </div>{% endwith %}
+            </p>
+            <p class="copy">{{ event.copy_summary|truncatewords:16 }} [<a class="more" href="{% url "single-event-view-with-slug" event_id=event.id event_slug=event_slug %}">more</a>]</p>
+        </div>{% endwith %}
     </div>{% endfor %}<!-- end .showing -->
 </div><!-- end #programme -->
+
 <div class="list">
   {% for showing in showings %}
-    {% ifchanged %}<p class="month">{{ showing.start|date:"F"|upper }}{% endifchanged %}{% ifchanged %}{{ showing.start|date:" Y" }}{% endifchanged %}
-    {% ifchanged %}<p class="day">{{ showing.start|date:"D"}} {{ showing.start|date:"d" }}{% else %}
-    <p class="sameday"> {% endifchanged %} <span class="time">{{showing.start|date:"H:i"}}</span> .... {% if showing.hide_in_programme or showing.event.private %}Closed for private event.{% else %}<a href="{% url "single-event-view" event_id=showing.event_id %}">{{ showing.event.pre_title|title }} {{ showing.event.name|capfirst }} {{ showing.event.post_title|title }}{% if showing.cancelled %} (CANCELLED){% endif %}{% if showing.sold_out %} (SOLD OUT){% endif %}{% if showing.discounted %} *{% endif %}{% endif %}</a></p>
+    {% ifchanged %}<p class="month">{{ showing.start|date:"F"|upper }}{% endifchanged %}
+    {% ifchanged %}{{ showing.start|date:" Y" }}{% endifchanged %}
+    {% ifchanged %}<p class="day">{{ showing.start|date:"D"}} {{ showing.start|date:"d" }}
+    {% else %}
+        <p class="sameday">
+    {% endifchanged %}
+    <span class="time">{{showing.start|date:"H:i"}}</span> ....
+    {% if showing.hide_in_programme or showing.event.private %}Closed for private event.
+    {% else %}
+        <a href="{% url "single-event-view" event_id=showing.event_id %}">{{ showing.event.pre_title|title }} {{ showing.event.name|capfirst }} {{ showing.event.post_title|title }}
+    {% if showing.cancelled %} (CANCELLED){% endif %}
+    {% if showing.sold_out %} (SOLD OUT){% endif %}
+    {% if showing.discounted %} *{% endif %}{% endif %}</a></p>
 {% endfor %}
 <p>&nbsp;</p>
 <p>* cheap night</p>
 </div><!-- end .list -->
+
 {% endblock body %}
