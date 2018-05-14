@@ -10,7 +10,7 @@ VENUE = {
     'name': 'Star and Shadow',
     'longname': 'Star and Shadow',
     'cinemaname': 'Star and Shadow Cinema',
-    'url': 'https://starandshadow.xtreamlab.net/',
+    'url': 'https://starandshadow.org.uk/',
     'contact_page': '/about/contact/',
     'piwik_id': 29,
     'twitter': 'https://twitter.com/StarAndShadow',
@@ -27,12 +27,12 @@ VENUE = {
     # This is used as the hostname for unsubscribe links in emails
     # i.e. emails will have links added to
     # [this]/members/100/unsubscribe)
-    'email_unsubscribe_host': 'http://arnold.local:8000',
+    'email_unsubscribe_host': 'https://starandshadow.org.uk',
     # Default address to which reports of a successful mailout
     # delivery are sent:
-    'mailout_delivery_report_to': u'admin@starandshadow.org.uk',
+    'mailout_delivery_report_to': u'info@starandshadow.org.uk',
     # "From" address for mailout
-    'mailout_from_address': u'mailout@starandshadow.org.uk',
+    'mailout_from_address': u'info@starandshadow.org.uk',
     'show_user_management': True
 }
 
@@ -53,7 +53,7 @@ DAWN_OF_TIME = 1998
 #
 
 ADMINS = (
-    # ('Your Name', 'your_email@example.com')
+    ('Marcus Valentine', 'marcus@marcusv.org')
 )
 
 TEMPLATES[0]['DIRS'] = (
