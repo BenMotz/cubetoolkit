@@ -18,11 +18,14 @@ from toolkit.index.models import IndexLink
 
 urlpatterns = [
     url(r'^programme/', include(toolkit.diary.urls.programme_urls)),
-    url(r'^toolkit/diary/', include(toolkit.diary.urls.diary_urls)),
+    url(r'^diary/', include(toolkit.diary.urls.diary_urls)),
     url(r'^members/', include(toolkit.members.urls.member_urls)),
-    url(r'^toolkit/volunteers/', include(toolkit.members.urls.volunteer_urls)),
-    url(r'^toolkit/auth/', include(toolkit.toolkit_auth.urls.urlpatterns)),
+    url(r'^volunteers/', include(toolkit.members.urls.volunteer_urls)),
+    url(r'^auth/', include(toolkit.toolkit_auth.urls.urlpatterns)),
     url(r'^toolkit/index/', include(toolkit.index.urls.urlpatterns)),
+    url(r'^$', toolkit.diary.urls.view_diary, name="default-view"),
+    url(r'^id/(?P<event_id>\d+)/$', toolkit.diary.urls.view_event,
+        name="single-event-view"),
 
     # Main index page: requires logging in, even though some other parts
     # (eg diary index) don't.
