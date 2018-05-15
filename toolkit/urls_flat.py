@@ -4,6 +4,7 @@ import django.views.generic as generic
 import django.views.static
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from django.contrib import admin
 
 from wagtail.wagtailadmin import urls as wagtailadmin_urls
 from wagtail.wagtaildocs import urls as wagtaildocs_urls
@@ -17,6 +18,7 @@ import toolkit.diary.urls
 from toolkit.index.models import IndexLink
 
 urlpatterns = [
+    url(r'^toolkit/admin/', admin.site.urls),
     url(r'^programme/', include(toolkit.diary.urls.programme_urls)),
     url(r'^diary/', include(toolkit.diary.urls.diary_urls)),
     url(r'^members/', include(toolkit.members.urls.member_urls)),

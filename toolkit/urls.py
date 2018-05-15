@@ -47,6 +47,8 @@ urlpatterns = [
 
     url(r'^cms/', include(wagtailadmin_urls)),
     url(r'^documents/', include(wagtaildocs_urls)),
+    # For anything not caught by a more specific rule above, hand over to
+    # Wagtail's serving mechanism
     url(r'^pages/', include(wagtail_urls)),
 ]
 

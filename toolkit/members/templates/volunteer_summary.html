@@ -45,8 +45,13 @@ Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
             Name
         </th>
         <th>
-            Email
+            User Name
         </th>
+        {% if VENUE.show_user_management %}
+            <th>
+                Email
+            </th>
+        {% endif %}
         <th>
             GDPR opt in
         </th>
@@ -63,6 +68,11 @@ Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
                 <th scope="row">
                     <a href="{% url "edit-volunteer" volunteer.pk %}">{{ member.name }}</a>
                 </th>
+                {% if VENUE.show_user_management %}
+                    <td>
+                        {{ volunteer.user.username }}
+                    </td>
+                {% endif %}
                 <td>
                     {{ member.email|urlize|default:"<em>Request email address</em>" }}
                 </td>

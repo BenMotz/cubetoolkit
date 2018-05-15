@@ -51,6 +51,7 @@ def star_and_shadow_production():
     """Configure to deploy star and shadow live on xtreamlab.net"""
     env.target = "production"
     env.site_root = "/home/users/starandshadow/star_site"
+    env.media = "/home/users/starandshadow/star_site/media"
     env.user = "starandshadow"
     env.hosts = ["xtreamlab.net"]
     env.settings = "production_settings.py"

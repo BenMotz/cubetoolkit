@@ -13,6 +13,7 @@ from django.db.models import Q
 from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now as timezone_now
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
 
 from toolkit.diary.models import Role
 from toolkit.util import generate_random_string
@@ -178,7 +179,11 @@ class Member(models.Model):
 
 class Volunteer(models.Model):
 
-    member = models.OneToOneField('Member', related_name='volunteer',
+    user = models.OneToOneField(User,
+                                on_delete=models.CASCADE,
+                                )
+    member = models.OneToOneField('Member',
+                                  related_name='volunteer',
                                   on_delete=models.CASCADE)
 
     notes = models.TextField(blank=True)
