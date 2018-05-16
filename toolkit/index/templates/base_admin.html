@@ -70,7 +70,10 @@ body {
               <a class="nav-link" href="{% url "add-member" %}">Member Database</a>
             </li>
           {% endif %}
-          {% if VENUE.show_user_management %}
+          {% comment TODO Make this work properly when not logged in %}
+              if VENUE.show_user_management
+          {% endcomment %}
+          {% if user.volunteer.pk %}
               <li class="nav-item">
                 <a class="nav-link" href="{% url "edit-volunteer" user.volunteer.pk %}"><span class="fa fa-user"></span> {{ user.volunteer.member.name }}</a>
               </li>

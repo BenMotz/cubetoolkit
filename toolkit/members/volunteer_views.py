@@ -6,6 +6,9 @@ from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.conf import settings
 from django.contrib.auth.decorators import permission_required
+from django.contrib.auth.models import User
+import django.contrib.auth.models as auth_models
+import django.contrib.contenttypes as contenttypes
 from django.contrib import messages
 from django.views.decorators.http import require_POST, require_safe
 from django.db.models import F, Prefetch
@@ -13,12 +16,59 @@ from django.utils import timezone
 import six
 
 from toolkit.members.forms import (VolunteerForm, MemberFormWithoutNotes,
-                                   TrainingRecordForm, GroupTrainingForm)
+                                   TrainingRecordForm, GroupTrainingForm,
+                                   UserForm)
 from toolkit.members.models import Member, Volunteer, TrainingRecord
 from toolkit.diary.models import Role
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
+
+
+def _define_permissions(option):
+    '''Define toolkit permissions'''
+    # Create dummy ContentType:
+    ct = contenttypes.models.ContentType.objects.get_or_create(
+        model='',
+        app_label='toolkit'
+    )[0]
+
+    if option == 'write':
+
+        # Create 'write' permission:
+        write_permission = auth_models.Permission.objects.get_or_create(
+            name='Write access to all toolkit content',
+            content_type=ct,
+            codename='write'
+        )[0]
+        return write_permission
+
+    elif option == 'read':
+
+        # Create 'read' permission:
+        read_permission = auth_models.Permission.objects.get_or_create(
+            name='Read access to all toolkit content',
+            content_type=ct,
+            codename='read'
+        )[0]
+        return read_permission
+
+    elif option == 'rota':
+
+        # retrieve permission for editing diary.models.RotaEntry rows:
+        diary_content_type = contenttypes.models.ContentType.objects.get(
+            app_label='diary',
+            model='rotaentry',
+        )
+
+        edit_rota_permission = auth_models.Permission.objects.get(
+            codename='change_rotaentry',
+            content_type=diary_content_type
+        )
+        return edit_rota_permission
+
+    else:
+        raise RuntimeError('unknown option %s' % option)
 
 
 @permission_required('toolkit.read')
@@ -174,6 +224,7 @@ def edit_volunteer(request, volunteer_id, create_new=False):
         # Called from "edit" url
         volunteer = get_object_or_404(Volunteer, id=volunteer_id)
         member = volunteer.member
+        user = volunteer.user
         new_training_record = TrainingRecord(volunteer=volunteer)
     else:
         # Called from "add" url
@@ -181,6 +232,8 @@ def edit_volunteer(request, volunteer_id, create_new=False):
         member = Member()
         volunteer.member = Member()
         new_training_record = None
+
+        user = User()
 
     # Now, if the view was loaded with "GET" then display the edit form, and
     # if it was called with POST then read the updated volunteer data from the
@@ -196,14 +249,42 @@ def edit_volunteer(request, volunteer_id, create_new=False):
             request.POST,
             instance=member
         )
-        if vol_form.is_valid() and mem_form.is_valid():
-            logger.info(u"Saving changes to volunteer '{0}' (id: {1})".format(
-                volunteer.member.name, str(volunteer.pk)))
+        user_form = UserForm(
+            request.POST,
+            instance=user
+        )
+
+        if (vol_form.is_valid() and
+                mem_form.is_valid() and
+                user_form.is_valid()):
+
             member = mem_form.save(commit=False)
             member.gdpr_opt_in = timezone.now()
             member.save()
             volunteer.member = member
-            vol_form.save()
+
+            user = user_form.save(commit=False)
+            user.email = volunteer.member.email
+            # TODO split name in first_name and last_name
+            user.last_name = volunteer.member.name
+            user.save()
+            if user.is_superuser:
+                logger.info(
+                    'Setting super user permissions for %s' % user.last_name)
+                user.user_permissions.add(_define_permissions('write'))
+                user.user_permissions.add(_define_permissions('read'))
+                user.user_permissions.add(_define_permissions('rota'))
+            else:
+                logger.info(
+                   'Setting volunteer permissions for %s' % user.last_name)
+                user.user_permissions.add(_define_permissions('rota'))
+
+            volunteer.user = user
+            volunteer.save()
+
+            logger.info(u"Saving changes to volunteer '{0}' (id: {1})".format(
+                volunteer.member.name, str(volunteer.pk)))
+
             messages.add_message(
                 request,
                 messages.SUCCESS,
@@ -212,8 +293,9 @@ def edit_volunteer(request, volunteer_id, create_new=False):
                 )
             )
             # Go to the volunteer list view:
-            return HttpResponseRedirect(reverse("view-volunteer-list"))
+            return HttpResponseRedirect(reverse("view-volunteer-summary"))
     else:
+        user_form = UserForm(instance=user)
         vol_form = VolunteerForm(instance=volunteer)
         mem_form = MemberFormWithoutNotes(instance=volunteer.member)
 
@@ -227,6 +309,7 @@ def edit_volunteer(request, volunteer_id, create_new=False):
         'pagetitle': 'Add Volunteer' if create_new else 'Edit Volunteer',
         'default_mugshot': settings.DEFAULT_MUGSHOT,
         'volunteer': volunteer,
+        'user_form': user_form,
         'vol_form': vol_form,
         'mem_form': mem_form,
         'training_record_form': training_record_form,

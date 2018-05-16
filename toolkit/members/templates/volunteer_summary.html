@@ -44,14 +44,17 @@ Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
         <th>
             Name
         </th>
-        <th>
-            User Name
-        </th>
         {% if VENUE.show_user_management %}
             <th>
-                Email
+                User Name
+            </th>
+            <th>
+                <abbr title="administrator - has complete rights to see and do everything">Panopticon</abbr>
             </th>
         {% endif %}
+        <th>
+            Email
+        </th>
         <th>
             GDPR opt in
         </th>
@@ -71,6 +74,11 @@ Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
                 {% if VENUE.show_user_management %}
                     <td>
                         {{ volunteer.user.username }}
+                    </td>
+                    <td>
+                        {% if volunteer.user.is_superuser %}
+                            <span class="fa fa-check-circle fa-lg"></span>
+                        {% endif %}
                     </td>
                 {% endif %}
                 <td>

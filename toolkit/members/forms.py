@@ -4,6 +4,7 @@ import datetime
 
 from django import forms
 from django.core.files.uploadedfile import SimpleUploadedFile
+from django.contrib.auth.models import User
 from toolkit.members.models import Member, TrainingRecord
 import toolkit.diary.models
 from toolkit.diary.form_widgets import ChosenSelectMultiple
@@ -46,6 +47,14 @@ class MemberFormWithoutNotes(forms.ModelForm):
         model = toolkit.members.models.Member
         exclude = ('is_member', 'notes', 'mailout_failed',
                    'membership_expires', 'gdpr_opt_in')
+
+
+class UserForm(forms.ModelForm):
+    prefix = "user"
+
+    class Meta(object):
+        model = User
+        fields = ('username', 'is_active', 'is_staff', 'is_superuser')
 
 
 class VolunteerForm(forms.ModelForm):

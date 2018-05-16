@@ -82,7 +82,7 @@ def _configure_users():
     _create_or_update_user(
         "admin", 'toolkit_admin@localhost',
         [write_permission, read_permission, edit_rota_permission],
-        # Mark admin as superuser, to get wagtail superuser control:
+        # Mark admin as staff, to get wagtail superuser control:
         is_superuser=True,
         is_staff=True)
 
