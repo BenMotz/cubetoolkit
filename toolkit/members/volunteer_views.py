@@ -197,13 +197,15 @@ def edit_volunteer(request, volunteer_id, create_new=False):
             instance=member
         )
         if vol_form.is_valid() and mem_form.is_valid():
-            logger.info(u"Saving changes to volunteer '{0}' (id: {1})".format(
-                volunteer.member.name, str(volunteer.pk)))
             member = mem_form.save(commit=False)
             member.gdpr_opt_in = timezone.now()
             member.save()
             volunteer.member = member
             vol_form.save()
+
+            logger.info(u"Saving changes to volunteer '{0}' (id: {1})".format(
+                volunteer.member.name, str(volunteer.pk)))
+
             messages.add_message(
                 request,
                 messages.SUCCESS,
