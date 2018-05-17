@@ -85,6 +85,7 @@ edit_rota(
     jQuery,
     "{% url "rota-edit" %}",
     "{{ edit_showing_notes_url_prefix }}",
+    "{{ VENUE.vols_email }}",
     "{{ csrf_token }}"
 );
 </script>

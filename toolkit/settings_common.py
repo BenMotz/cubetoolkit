@@ -35,6 +35,8 @@ VENUE = {
     'mailout_delivery_report_to': u'cubeadmin@cubecinema.com',
     # "From" address for mailout
     'mailout_from_address': u'mailout@cubecinema.com',
+    # email address shown when volunteer removes themselves from rota
+    'vols_email': u'volunteers@cubecinema.com',
     'show_user_management': False
  }
 
