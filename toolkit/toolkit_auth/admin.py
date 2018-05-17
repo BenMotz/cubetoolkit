@@ -1,4 +1,6 @@
 from django.contrib import admin
+from django.contrib.auth.admin import UserAdmin
+from django.contrib.auth.models import User
 
 from django.conf import settings
 from toolkit.diary.models import (Showing, Event, DiaryIdea, MediaItem,
@@ -12,6 +14,12 @@ admin.site.site_title = settings.VENUE['name']
 # Default is Site administration
 admin.site.index_title = 'Administration Backend'
 
+UserAdmin.list_display = ('last_name',
+                          'username',
+                          'email',
+                          'is_active',
+                          'is_superuser',
+                          'date_joined')
 
 class DiaryIdeaAdmin(admin.ModelAdmin):
     # TODO disable creation
@@ -52,7 +60,8 @@ class ShowingAdmin(admin.ModelAdmin):
 class EventAdmin(admin.ModelAdmin):
     model = Event
 
-
+admin.site.unregister(User)
+admin.site.register(User, UserAdmin)
 admin.site.register(DiaryIdea, DiaryIdeaAdmin)
 admin.site.register(Event, EventAdmin)
 admin.site.register(Showing, ShowingAdmin)

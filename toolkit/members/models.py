@@ -235,6 +235,9 @@ class Volunteer(models.Model):
         except (IOError, OSError, ValueError):
             self.__original_portrait = None
 
+    def __str__(self):
+        return self.member.name
+
     def is_old(self):
         return (self.created_at and
                 self.created_at.date() <= settings.DAWN_OF_TOOLKIT)

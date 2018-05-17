@@ -192,7 +192,7 @@ def select_volunteer(request, action, active=True):
 @permission_required('toolkit.write')
 @require_POST
 def activate_volunteer(request, set_active=True):
-    # Sets the 'active' value for the volunteer with the id passed  in the
+    # Sets the 'active' value for the volunteer with the id passed in the
     # 'volunteer' parameter of the POST request
 
     vol_pk = request.POST.get('volunteer', None)
@@ -202,6 +202,10 @@ def activate_volunteer(request, set_active=True):
     assert isinstance(set_active, bool)
     vol.active = set_active
     vol.save()
+    # Keep the user flag in sync. Inactive vols can't login.
+    if hasattr(vol, 'user'):
+        vol.user.is_active = set_active
+        vol.user.save()
 
     logger.info(u"Set volunteer.active to {0} for volunteer {1}"
                 .format(str(set_active), vol_pk))
