@@ -1,4 +1,4 @@
-function edit_rota(jQuery, rota_edit_base_url, edit_rota_notes_url_prefix, CSRF_TOKEN) {
+function edit_rota(jQuery, rota_edit_base_url, edit_rota_notes_url_prefix, vol_email, CSRF_TOKEN) {
     "use strict";
     var $ = jQuery;
 
@@ -43,8 +43,8 @@ function edit_rota(jQuery, rota_edit_base_url, edit_rota_notes_url_prefix, CSRF_
     function nameEditedCallback(value) {
         if (value === "" && this.revert !== "") {
             window.alert("Rota entry cleared.\nPlease consider emailing " +
-                         "volunteers@cubecinema.com to say that the shift " +
-                         "needs covering.");
+                         vol_email +
+                         " to say that the shift needs covering.");
         }
     }
 
