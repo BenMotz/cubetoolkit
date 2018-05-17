@@ -54,7 +54,7 @@ class UserForm(forms.ModelForm):
 
     class Meta(object):
         model = User
-        fields = ('username', 'is_active', 'is_staff', 'is_superuser')
+        fields = ('username', 'is_active', 'is_superuser')
 
 
 class VolunteerForm(forms.ModelForm):

@@ -83,16 +83,6 @@ $(document).ready(function() {
 <h3>{{ pagetitle }} {{ volunteer.member.name }}</h3>
 {% if message %}<h3>{{ message }}</h3>{% endif %}
 
-<table>
-    <tr><td>Admin:</td>
-        <td>{{ volunteer.admin }}</td>
-    </tr>
-    <tr><td>Programmer:</td>
-        <td>{{ volunteer.programmer }}</td></tr>
-    <tr><td>Username:</td>
-        <td>{{ volunteer.user.username }}</td></tr>
-</table>
-
 <form id="main_form" action="" method="POST" enctype="multipart/form-data">
 {% csrf_token %}
 <p><input type="submit" value="Save changes"> <a href="{% url "view-volunteer-list" %}">Cancel</a></p>

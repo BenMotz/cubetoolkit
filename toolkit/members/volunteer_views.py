@@ -271,6 +271,8 @@ def edit_volunteer(request, volunteer_id, create_new=False):
             if user.is_superuser:
                 logger.info(
                     'Setting super user permissions for %s' % user.last_name)
+                user.is_staff = True
+                user.save()
                 user.user_permissions.add(_define_permissions('write'))
                 user.user_permissions.add(_define_permissions('read'))
                 user.user_permissions.add(_define_permissions('rota'))
@@ -292,6 +294,14 @@ def edit_volunteer(request, volunteer_id, create_new=False):
                     u"Created" if create_new else u"Updated", member.name
                 )
             )
+
+            if create_new:
+                messages.add_message(
+                    request,
+                    messages.SUCCESS,
+                    u"Don't forget to set a password for the new volunteer"
+                    )
+
             # Go to the volunteer list view:
             return HttpResponseRedirect(reverse("view-volunteer-summary"))
     else:
