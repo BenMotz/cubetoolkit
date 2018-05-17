@@ -1,4 +1,5 @@
 {% extends "base_admin.html" %}
+{% load admin_urls %}
 
 {% block title %}
 {{ VENUE.longname }} Toolkit
@@ -69,6 +70,12 @@
         <li><a href="{% url "wagtailadmin_home" %}">Content management</a></li>
     </ul>
 
+    {% if VENUE.show_user_management %}
+        <h2>Administration</h2>
+        <ul>
+            <li><a href="{% url "admin:index" %}">Administration backend</a> to manage passwords</li>
+       </ul>
+    {% endif %}
 {% endif %}
 
 <ul>
