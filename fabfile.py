@@ -60,6 +60,19 @@ def star_and_shadow_production():
     env.dev_db_name = "starshadow"
 
 
+def star_and_shadow_staging():
+    """Configure to deploy star and shadow staging on xtreamlab.net"""
+    env.target = "staging"
+    env.site_root = "/home/users/starandshadow/staging"
+    env.media = "/home/users/starandshadow/staging/media"
+    env.user = "starandshadow"
+    env.hosts = ["xtreamlab.net"]
+    env.settings = "staging_settings.py"
+    # See note above:
+    env.deploy_script_settings = "toolkit.deploy_settings"
+    env.dev_db_name = "starshadow_staging"
+
+
 def deploy_code():
     """Deploy code from git HEAD onto target"""
 
@@ -199,7 +212,7 @@ def bootstrap():
     if virtualenv_version[0] == "1" and int(virtualenv_version[1]) < 7:
         run("virtualenv {0}".format(venv_path))
     else:
-        run("virtualenv --system-site-packages {0}".format(venv_path))
+        run("virtualenv --system-site-packages --python=python3 {0}".format(venv_path))
 
     utils.puts("\nRemote site is prepared. Now copy the settings file to '{0}/{1}'"
                " and run the 'deploy' command from this fabric file."
