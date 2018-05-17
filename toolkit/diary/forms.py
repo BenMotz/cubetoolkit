@@ -107,6 +107,8 @@ class ShowingForm(forms.ModelForm):
         super(ShowingForm, self).__init__(*args, **kwargs)
         if not settings.MULTIROOM_ENABLED:
             del self.fields['room']
+        if settings.VENUE['show_user_management']:
+            self.fields['booked_by'].widget.attrs['disabled'] = True
 
     class Meta(object):
         model = toolkit.diary.models.Showing
@@ -203,7 +205,10 @@ class CloneShowingForm(forms.Form):
     clone_start = forms.DateTimeField(required=True,
                                       validators=[validate_in_future],
                                       widget=JQueryDateTimePicker())
-    booked_by = forms.CharField(min_length=1, max_length=128, required=True)
+    if not settings.VENUE['show_user_management']:
+        booked_by = forms.CharField(min_length=1,
+                                    max_length=128,
+                                    required=True)
 
 
 class NewEventForm(forms.Form):
@@ -211,7 +216,8 @@ class NewEventForm(forms.Form):
         super(NewEventForm, self).__init__(*args, **kwargs)
         if not settings.MULTIROOM_ENABLED:
             del self.fields['room']
-
+        if settings.VENUE['show_user_management']:
+            del self.fields['booked_by']
     room = forms.ModelChoiceField(
         queryset=toolkit.diary.models.Room.objects.all(),
         required=True)

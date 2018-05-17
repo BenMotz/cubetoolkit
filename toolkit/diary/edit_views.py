@@ -360,7 +360,11 @@ def add_showing(request, event_id):
         # the new object immediately:
         new_showing = toolkit.diary.models.Showing(copy_from=source_showing)
         new_showing.start = clone_showing_form.cleaned_data['clone_start']
-        new_showing.booked_by = clone_showing_form.cleaned_data['booked_by']
+        if settings.VENUE['show_user_management']:
+            new_showing.booked_by = request.user.last_name
+        else:
+            new_showing.booked_by = \
+                clone_showing_form.cleaned_data['booked_by']
         # Need to save showing before cloning the rota, as the rota entries
         # need the key of the Showing, and that won't get created until the
         # Showing is saved...
@@ -419,13 +423,23 @@ def add_event(request):
             start = form.cleaned_data['start']
             for day_count in range(0, form.cleaned_data['number_of_days']):
                 day_offset = datetime.timedelta(days=day_count)
-                new_showing = Showing(
-                        event=new_event,
-                        start=(start + day_offset),
-                        discounted=form.cleaned_data['discounted'],
-                        confirmed=form.cleaned_data['confirmed'],
-                        booked_by=form.cleaned_data['booked_by'],
-                        )
+
+                if settings.VENUE['show_user_management']:
+                    new_showing = Showing(
+                            event=new_event,
+                            start=(start + day_offset),
+                            discounted=form.cleaned_data['discounted'],
+                            confirmed=form.cleaned_data['confirmed'],
+                            booked_by=request.user.last_name
+                            )
+                else:
+                    new_showing = Showing(
+                            event=new_event,
+                            start=(start + day_offset),
+                            discounted=form.cleaned_data['discounted'],
+                            confirmed=form.cleaned_data['confirmed'],
+                            booked_by=form.cleaned_data['booked_by'],
+                            )
                 if settings.MULTIROOM_ENABLED:
                     new_showing.room = form.cleaned_data['room']
                 new_showing.save()
