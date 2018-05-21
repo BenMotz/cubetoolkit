@@ -1,0 +1,60 @@
+{% extends "base_public.html" %}
+{% load thumbnail_l %}
+
+{% block title %}
+{{ VENUE.name }}: {{ event.name }}
+{% endblock %}
+
+{% block css %}
+    {{ block.super }}
+    <link rel="stylesheet" href="{{ STATIC_URL }}diary/css/event.css">
+    <link rel="stylesheet" href="{{ STATIC_URL }}diary/css/event_custom.css">
+{% endblock %}
+
+{% block body %}
+{{ block.super }}
+<div class="programme{% if all_showings_sold_out %} sold_out{% endif %}{% if all_showings_cancelled %} cancelled{% endif %}">
+    <div class="grid-sizer"></div>
+    <div class="gutter-sizer"></div>
+    <div class="grid-item grid-item--width2 event-image">
+        <div class="event_image">
+        {% with event.media.all.0 as media_item %}
+            {% if media_item %}
+                <a href="{{ media_url }}{{ media_item.media_file }}"><img src="{{ media_item.media_file|thumbnail_url:'eventdetail' }}" alt="Picture for event {{ showing.event.name }}" {% if media_item.credit %}title="Image credit: {{ media_item.credit }}"{% endif %}></a>
+            {% endif %}
+        {% endwith %}
+        </div><!-- end .event_image -->
+    </div><!-- end .grid-item -->
+    <div class="grid-item grid-item--width3">
+        <p>{% if event.pre_title %}<span class="pre_title">{{ event.pre_title }}</span>{% endif %}<h3>{{ event.name|capfirst }}</h3>{% if event.post_title %}<span class="post_title">{{ event.post_title }}</span>{% endif %}</p>
+        {% if event.film_information %}
+        <p class="info">{{ event.film_information }}</p>
+        {% endif %}
+        <p class="showings">
+        -<br>
+            {% for showing in showings %}
+            {% if showing.sold_out %}<span class="sold_out">{% endif %}
+            {% if showing.cancelled %}<span class="cancelled">{% endif %}
+            {% if showing.start.year != current_year %}
+                {{ showing.start|date:"D j F Y " }}//{{ showing.start|date:" H:i" }}
+            {% else %}
+                {{ showing.start|date:"D j F " }}//{{ showing.start|date:" H:i" }}
+            {% endif %}
+            {% if MULTIROOM_ENABLED %}/ {{ showing.room }}{% endif %}
+            {% if showing.cancelled %}</span> (cancelled){% endif %}
+            {% if showing.sold_out %}</span> (SOLD OUT){% endif %}
+            {% if showing.discounted %}<abbr class="discounted" title="* cheap night">*</abbr>{% endif %}<br>
+            {% endfor %}
+        </p>
+        {% if event.pricing %}
+            <p class="tickets">Tickets: {{ event.pricing }}</p>
+        {% endif %}
+        {% if event.ticket_link and not all_showings_finished %}
+           <p class="action"><a href="{{ event.ticket_link }}" rel="noopener noreferrer" target="_blank">Book tickets</a></p>
+        {% endif %}
+        <div class="copy">
+            {{ event.copy_html }}
+        </div><!-- end .copy -->
+    </div><!-- end .grid-item -->
+</div><!-- end .programme -->
+{% endblock %}
