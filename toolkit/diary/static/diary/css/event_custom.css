@@ -1,0 +1,122 @@
+@charset "utf-8";
+/* CSS Document  */
+
+/*Custom css to override starandshadow_site/toolkit/diary/static/diary/css/program.css */
+
+@import url("");
+
+/*SP - Note to Marcus -  The css below is copied from static_pages_custom.css. It can be deleted if the @import url above is functional, to avoid unnecessary repitition*/
+
+ 
+span.tags {
+   
+    background-color: rgba(32,32,128,0.6);
+}
+
+  /* FONT */
+  
+code,
+kbd,
+pre,
+samp, 
+code,
+kbd,
+pre,
+samp, 
+textarea, 
+body, 
+html, 
+button, 
+input, 
+select, 
+textarea, 
+#site-nav,
+#site-nav ul li a,
+.copy p {
+   
+	font-family: 'Source Code Pro', monospace;
+    font-weight: 500;
+
+}
+ 
+  
+  /*OVERALL FONT SIZE*/
+
+	body {
+    font-size: 1.4em;
+	  font-weight: 500;
+	}
+
+  /*TEXT AND BACKGROUND COLOURS*/	
+	
+html, body, #sidebar, .grid-item, .grid, .black_overlay, .showing:nth-child(7n+3) {
+color: #082080;
+	background-color: #e3cae3;
+}
+
+mark {
+    background: #ff0;
+    color: #082080;
+}
+
+a {
+    color: #082080;
+	#text-decoration: underline; 
+   
+}
+
+#mobile-menu-btn:before {
+
+    color: #082080;
+}
+
+.site-description h4 {
+ 
+    color: #082080;
+
+}
+
+.action a:hover {
+    color: #082080 !important;
+   
+}
+
+.copy p {
+   
+    color: #082080;
+
+}
+.copy p > a {
+    color: #082080;
+
+    border-bottom: 0px dotted #082080;
+	
+    text-decoration: underline;
+}
+.copy p > a:visited {
+    color: #082080;
+}
+
+
+
+
+.action a {
+    color: black !important;
+    background: #e3cae3 !important;
+    border: 0.1em solid black;
+    border-radius: 0 !important;}
+
+#site-nav ul li a{    text-decoration: none; }
+
+/* NAV*/
+
+.nav-wrap {
+    position: relative;
+    left: 0;
+    width: 170px;
+    border-top-width: 0px;
+    border-right-width: 0px;
+    border-bottom-width: 0px;
+    border-left-width: 0px;
+    border-spacing: 0px;
+    padding-top: 30px; }
