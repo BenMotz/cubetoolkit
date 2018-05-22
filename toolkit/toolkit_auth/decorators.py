@@ -56,8 +56,11 @@ def user_logged_out_callback(sender, request, user, **kwargs):
 
 
 @receiver(user_login_failed)
-def user_login_failed_callback(sender, credentials, **kwargs):
+def user_login_failed_callback(sender, request, credentials, **kwargs):
 
-    logger.warning('login failed for: {credentials}'.format(
+    ip = request.META.get('REMOTE_ADDR')
+
+    logger.warning('login failed for: {credentials} from {ip}'.format(
         credentials=credentials,
+        ip=ip,
     ))
