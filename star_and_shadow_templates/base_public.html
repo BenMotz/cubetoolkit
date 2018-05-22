@@ -36,10 +36,10 @@
 <div id="container" class="body">
     <div id="sidebar" class="panel">
       <div class="nav-wrap">
+          <a href="{% url "default-view" %}"><img src="{{ STATIC_URL }}{{ VENUE.nav_menu_img }}" alt="{{ VEMUE.name }} logo" width="175" height="168"></a>
           <div id="site-title" class="clearfix">
               {% capture navmenu-title %}
               {% block navmenu-title %}
-              <a href="/"><img src="{{ STATIC_URL }}{{ VENUE.nav_menu_img }}" alt="Star and Shadow logo" width="175" height="168"></a>
               {% endblock navmenu-title %}
               {% endcapture %}
           </div><!-- end #site-title -->
