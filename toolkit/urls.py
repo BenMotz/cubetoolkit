@@ -26,6 +26,9 @@ urlpatterns = [
     url(r'^$', toolkit.diary.urls.view_diary, name="default-view"),
     url(r'^id/(?P<event_id>\d+)/$', toolkit.diary.urls.view_event,
         name="single-event-view"),
+    url(r'^robots\.txt$', generic.TemplateView.as_view(
+                              template_name='robots.txt',
+                              content_type='text/plain')),
 
     # Main index page: requires logging in, even though some other parts
     # (eg diary index) don't.
