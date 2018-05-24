@@ -34,7 +34,7 @@ VENUE = {
     # "From" address for mailout
     'mailout_from_address': u'info@starandshadow.org.uk',
     # email address shown when volunteer removes themselves from rota
-    'vols_email': u'volunteers@starandshadow.org.uk',
+    'vols_email': u'volunteers@lists.starandshadow.org.uk',
     'show_user_management': True
 }
 
