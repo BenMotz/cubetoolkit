@@ -48,8 +48,6 @@ $(document).ready(function() {
 <table>
 <tr><th>Member:</th><td>{{ member.number }}</td>
 {{ form.as_table }}
-<tr><th>GDPR opt in:</th>
-    <td>{{ member.gdpr_opt_in|date:"d/m/Y"|default:'<div class="alert alert-danger"><strong>NOT OPTED IN</strong></div>' }}</td>
 <tr><th>Last updated:</th><td>{{ member.updated_at|date:"d/m/Y" }}</td>
 <tr><th>Added:</th><td>{{ member.created_at|date:"d/m/Y" }}</td>
 <tr><td colspan = "2">&nbsp;</td></tr>

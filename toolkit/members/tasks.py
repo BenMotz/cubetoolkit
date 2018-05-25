@@ -67,7 +67,7 @@ def send_mailout_report(email_conn, report_to, sent, err_list,
 
 def _get_text_preamble_signature(recipient):
     preamble_template = u"Dear {0},\n\n"
-    if not(recipient.gdpr_opt_in):
+    if False:  # not(recipient.gdpr_opt_in):
         gdpr_opt_in_template = (
             u"If you'd like to continue to receive emails about events and fundraising for the Cube, "
             u"you'll need to make sure you opt-in before 25 May 2018.\n\n"
