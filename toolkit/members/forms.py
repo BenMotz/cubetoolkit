@@ -30,6 +30,7 @@ class MemberForm(forms.ModelForm):
             del self.fields['membership_expires']
         if hide_internal_fields:
             del self.fields['is_member']
+            del self.fields['mailout_failed']
         del self.fields['gdpr_opt_in']
 
     class Meta(object):
