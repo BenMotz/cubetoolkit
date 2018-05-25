@@ -107,8 +107,12 @@ class ShowingForm(forms.ModelForm):
         super(ShowingForm, self).__init__(*args, **kwargs)
         if not settings.MULTIROOM_ENABLED:
             del self.fields['room']
-        if settings.VENUE['show_user_management']:
-            self.fields['booked_by'].widget.attrs['disabled'] = True
+
+        # TODO this works for creation
+        # Figure out how to handle editing of existing showings
+        # Should we keep the original booker? Probably.
+        # if settings.VENUE['show_user_management']:
+        #    self.fields['booked_by'].widget.attrs['disabled'] = True
 
     class Meta(object):
         model = toolkit.diary.models.Showing

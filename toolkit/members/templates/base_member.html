@@ -15,7 +15,7 @@
 {% endblock %}
 
 {% block footer %}
-{% if user.is_authenticated %}
+{% if user.is_superuser %}
 <p>
 <p>
 <a href="{% url "add-member" %}">Add member</a> |

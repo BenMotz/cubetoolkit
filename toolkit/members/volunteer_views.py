@@ -2,11 +2,12 @@ import logging
 from collections import OrderedDict
 
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
+from django.http import HttpResponseServerError
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.conf import settings
 from django.contrib.auth.decorators import permission_required
-from django.contrib.auth.models import User
+from django.contrib.auth.models import Group, User
 import django.contrib.auth.models as auth_models
 import django.contrib.contenttypes as contenttypes
 from django.contrib import messages
@@ -23,52 +24,6 @@ from toolkit.diary.models import Role
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
-
-
-def _define_permissions(option):
-    '''Define toolkit permissions'''
-    # Create dummy ContentType:
-    ct = contenttypes.models.ContentType.objects.get_or_create(
-        model='',
-        app_label='toolkit'
-    )[0]
-
-    if option == 'write':
-
-        # Create 'write' permission:
-        write_permission = auth_models.Permission.objects.get_or_create(
-            name='Write access to all toolkit content',
-            content_type=ct,
-            codename='write'
-        )[0]
-        return write_permission
-
-    elif option == 'read':
-
-        # Create 'read' permission:
-        read_permission = auth_models.Permission.objects.get_or_create(
-            name='Read access to all toolkit content',
-            content_type=ct,
-            codename='read'
-        )[0]
-        return read_permission
-
-    elif option == 'rota':
-
-        # retrieve permission for editing diary.models.RotaEntry rows:
-        diary_content_type = contenttypes.models.ContentType.objects.get(
-            app_label='diary',
-            model='rotaentry',
-        )
-
-        edit_rota_permission = auth_models.Permission.objects.get(
-            codename='change_rotaentry',
-            content_type=diary_content_type
-        )
-        return edit_rota_permission
-
-    else:
-        raise RuntimeError('unknown option %s' % option)
 
 
 @permission_required('toolkit.read')
@@ -115,7 +70,7 @@ def view_volunteer_summary(request):
         volunteers = (Volunteer.objects
                                .filter(active=True)
                                .order_by('-member__created_at'))
-        sort_type = 'inducation date'
+        sort_type = 'induction date'
 
     active_count = volunteers.count()
     context = {
@@ -230,8 +185,12 @@ def edit_volunteer(request, volunteer_id, create_new=False):
         member = volunteer.member
         user = volunteer.user
         new_training_record = TrainingRecord(volunteer=volunteer)
+        logger.debug('%s is limbering up to edit volunteer "%s" (id:%d)' %
+                     (request.user.last_name, volunteer, volunteer.id))
     else:
         # Called from "add" url
+        logger.debug('%s is limbering up to add a new volunteer...' %
+                     request.user.last_name)
         volunteer = Volunteer()
         member = Member()
         volunteer.member = Member()
@@ -264,29 +223,66 @@ def edit_volunteer(request, volunteer_id, create_new=False):
 
             member = mem_form.save(commit=False)
             member.gdpr_opt_in = timezone.now()
+            logger.debug('Saving member "%s" (id:%s)' % (member, member.id))
             member.save()
+
+            logger.debug('Attaching member "%s" (id:%s) to volunteer "%s" (id:%s)' %
+                         (member, member.id, volunteer, volunteer.id))
             volunteer.member = member
 
             user = user_form.save(commit=False)
             user.email = volunteer.member.email
-            # TODO split name in first_name and last_name
+            #  TODO consider splitting name in first_name and last_name
             user.last_name = volunteer.member.name
+            logger.debug('Saving user "%s" (id:%s)' % (user, user.id))
             user.save()
-            if user.is_superuser:
+
+            logger.debug('Attaching user "%s" (id:%s) to vol "%s" (id:%s)' %
+                         (user, user.id, volunteer, volunteer.id))
+            volunteer.user = user
+            logger.debug('Saving volunteer "%s" (id:%s)' %
+                         (volunteer, volunteer.id))
+            vol_form.save()
+
+            prog_group = Group.objects.filter(name='Programmers')
+            if prog_group:
+                prog_group = prog_group[0]
+            else:
+                # raise RunTimeError:
+                logger.error("Can't find the Programmers group")
+                return HttpResponseServerError()
+
+            if user.volunteer.roles.filter(name="Programmer"):
                 logger.info(
-                    'Setting super user permissions for %s' % user.last_name)
-                user.is_staff = True
-                user.save()
-                user.user_permissions.add(_define_permissions('write'))
-                user.user_permissions.add(_define_permissions('read'))
-                user.user_permissions.add(_define_permissions('rota'))
+                   'Adding %s to the Programmer group' % user.last_name)
+                user.groups.add(prog_group)
             else:
                 logger.info(
-                   'Setting volunteer permissions for %s' % user.last_name)
-                user.user_permissions.add(_define_permissions('rota'))
+                   'Removing %s from the Programmer group' % user.last_name)
+                user.groups.remove(prog_group)
 
-            volunteer.user = user
-            volunteer.save()
+            if user.is_superuser:
+                logger.info(
+                    '%s is a super user' % user.last_name)
+                user.is_staff = True
+            else:
+                logger.info(
+                   '%s is not a super user' % user.last_name)
+                user.is_staff = False
+            user.save()
+
+            # Set volunteer permissions
+            logger.info(
+                'Granting rota editing permissions to %s' % user.last_name)
+            diary_content_type = contenttypes.models.ContentType.objects.get(
+                app_label='diary',
+                model='rotaentry',
+            )
+            edit_rota_permission = auth_models.Permission.objects.get(
+                codename='change_rotaentry',
+                content_type=diary_content_type
+            )
+            user.user_permissions.add(edit_rota_permission)
 
             logger.info(u"Saving changes to volunteer '{0}' (id: {1})".format(
                 volunteer.member.name, str(volunteer.pk)))
@@ -300,10 +296,13 @@ def edit_volunteer(request, volunteer_id, create_new=False):
             )
 
             if create_new:
+                password = User.objects.make_random_password(length=16)
+                user.set_password(password)
+                user.save()
                 messages.add_message(
                     request,
                     messages.SUCCESS,
-                    u"Don't forget to set a password for the new volunteer"
+                    u"Password: %s" % password
                     )
 
             # Go to the volunteer list view:
@@ -352,8 +351,10 @@ def add_volunteer_training_record(request, volunteer_id):
         return JsonResponse(response)
     elif record_form.is_valid():
         record_form.save()
-        logger.info(u"Added training record {0} for volunteer '{0}'".format(
-            new_record.id, volunteer.member.name))
+        logger.info(u"{0} added training record {1} for volunteer '{2}'"
+                    .format(request.user.last_name,
+                            new_record.id,
+                            volunteer.member.name))
 
         if new_record.training_type == TrainingRecord.ROLE_TRAINING:
             # Now make sure the volunteer has that role selected:
@@ -389,8 +390,10 @@ def delete_volunteer_training_record(request, training_record_id):
         return HttpResponse("Can't delete record for inactive volunteer",
                             status=403, content_type="text/plain")
 
-    logger.info(u"Deleting training_record '{0}' for volunteer '{1}'"
-                .format(record.id, record.volunteer.member.name))
+    logger.info(u"{0} deleted training_record {1} for volunteer '{2}'"
+                .format(request.user.last_name,
+                        record.id,
+                        record.volunteer.member.name))
     record.delete()
     return HttpResponse("OK", content_type="text/plain")
 

@@ -65,7 +65,7 @@ def _return_to_editindex(request):
         return HttpResponseRedirect(reverse("default-edit"))
 
 
-@permission_required('toolkit.write')
+@permission_required('toolkit.programmer')
 def cancel_edit(request):
     # Again, a dirty hack, used with the above method, used for the "Cancel"
     # link in forms, to either close the popup or just redirect to the edit
@@ -73,7 +73,7 @@ def cancel_edit(request):
     return _return_to_editindex(request)
 
 
-@permission_required('toolkit.read')
+@permission_required('toolkit.programmer')
 def edit_diary_list(request, year=None, day=None, month=None):
     # Basic "edit" list view. Logic about processing of year/month/day
     # parameters is basically the same as for the public diary view.
@@ -192,7 +192,7 @@ def _adjust_colour_historic(colour):
     )
 
 
-@permission_required('toolkit.read')
+@permission_required('toolkit.programmer')
 def edit_diary_data(request):
     date_format = "%Y-%m-%d"
 
@@ -273,7 +273,7 @@ def edit_diary_data(request):
                         content_type="application/json; charset=utf-8")
 
 
-@permission_required('toolkit.read')
+@permission_required('toolkit.programmer')
 def edit_diary_calendar(request, year=None, month=None, day=None):
     defaultView = "month"
     try:
@@ -309,7 +309,7 @@ def edit_diary_calendar(request, year=None, month=None, day=None):
     return render(request, 'edit_event_calendar_index.html', context)
 
 
-@permission_required('toolkit.read')
+@permission_required('toolkit.programmer')
 def set_edit_preferences(request):
     # Store user preferences as specified in the request's GET variables,
     # and return a JSON object containing all current user preferences
@@ -321,7 +321,7 @@ def set_edit_preferences(request):
     return HttpResponse(json.dumps(prefs), content_type="application/json")
 
 
-@permission_required('toolkit.write')
+@permission_required('toolkit.programmer')
 @require_POST
 def add_showing(request, event_id):
     # Add a showing to an existing event. Must be called via POST. Uses POSTed
@@ -370,6 +370,11 @@ def add_showing(request, event_id):
         # Showing is saved...
         new_showing.save()
         new_showing.clone_rota_from_showing(source_showing)
+        logger.info(u'{0} added showing on {1} for event "{2}"'
+                    .format(
+                        request.user.last_name,
+                        new_showing.start.strftime("%d/%m/%y at %H:%M"),
+                        new_showing.event.name))
         messages.add_message(
             request, messages.SUCCESS, u"Added showing on {0} for event '{1}'"
             .format(
@@ -392,7 +397,7 @@ def add_showing(request, event_id):
         return render(request, 'form_showing.html', context)
 
 
-@permission_required('toolkit.write')
+@permission_required('toolkit.programmer')
 @require_http_methods(["GET", "POST"])
 def add_event(request):
     # Called GET, with a "date" parameter of the form day-month-year:
@@ -445,6 +450,11 @@ def add_event(request):
                 new_showing.save()
                 # Set showing roles to those from its template:
                 new_showing.reset_rota_to_default()
+
+            logger.info('%s added event "%s" showing at %s' %
+                        (request.user.last_name,
+                         new_event.name,
+                         new_showing.start.strftime("%H:%M on %d/%m/%y")))
 
             messages.add_message(
                 request, messages.SUCCESS,
@@ -505,7 +515,7 @@ def add_event(request):
         return render(request, 'form_new_event_and_showing.html', context)
 
 
-@permission_required('toolkit.write')
+@permission_required('toolkit.programmer')
 @require_http_methods(["GET", "POST"])
 def edit_showing(request, showing_id=None):
     showing = get_object_or_404(Showing, pk=showing_id)
@@ -514,6 +524,11 @@ def edit_showing(request, showing_id=None):
 
     if request.method == 'POST':
         form = diary_forms.ShowingForm(request.POST, instance=showing)
+
+        # TODO make this work, See comments in forms.py
+        # if settings.VENUE['show_user_management']:
+        #    form.booked_by = request.user.last_name
+
         rota_form = RotaForm(request.POST)
         if showing.in_past():
             messages.add_message(request, messages.ERROR,
@@ -532,8 +547,15 @@ def edit_showing(request, showing_id=None):
                     showing.start.strftime("%H:%M on %d/%m/%y")
                 )
             )
+            logger.info('%s updated showing for "%s" at %s' %
+                        (request.user.last_name,
+                         showing.event.name,
+                         showing.start.strftime("%H:%M on %d/%m/%y")))
 
             return _return_to_editindex(request)
+
+        # logger.debug('form.is_valid: %s' % form.is_valid())
+        # logger.debug('rota_form.is_valid: %s' % rota_form.is_valid())
     else:
         form = diary_forms.ShowingForm(instance=showing)
         rota_form = RotaForm()
@@ -561,7 +583,7 @@ class EditEventView(PermissionRequiredMixin, View):
     """Handle the "edit event" form."""
     # Quite complex, so a class based view
 
-    permission_required = 'toolkit.write'
+    permission_required = 'toolkit.programmer'
 
     def _save(self, event, media_item, form, media_form):
         # Some factored out code: method is passed valid event and media form,
@@ -608,7 +630,6 @@ class EditEventView(PermissionRequiredMixin, View):
         # Get the event's media item, or start a new one:
         media_item = event.get_main_mediaitem() or MediaItem()
 
-        logger.info(u"Updating event {0}".format(event_id))
         # Create and populate forms:
         form = diary_forms.EventForm(request.POST, instance=event)
         media_form = diary_forms.MediaItemForm(request.POST,
@@ -618,6 +639,12 @@ class EditEventView(PermissionRequiredMixin, View):
         # Validate
         if form.is_valid() and media_form.is_valid():
             self._save(event, media_item, form, media_form)
+
+            logger.info(u'{0} updated event "{1}" (id:{2})'.format(
+                request.user.last_name,
+                event.name,
+                event_id))
+
             messages.add_message(request, messages.SUCCESS,
                                  u"Updated details for event '{0}'"
                                  .format(event.name))
@@ -631,6 +658,7 @@ class EditEventView(PermissionRequiredMixin, View):
             'programme_copy_summary_max_chars':
                 settings.PROGRAMME_COPY_SUMMARY_MAX_CHARS,
         }
+
         return render(request, 'form_event.html', context)
 
     def get(self, request, event_id):
@@ -657,7 +685,7 @@ class EditEventView(PermissionRequiredMixin, View):
         return render(request, 'form_event.html', context)
 
 
-@permission_required('toolkit.write')
+@permission_required('toolkit.programmer')
 def edit_ideas(request, year=None, month=None):
     # GET: return form for editing event for given month/year
     # POST: store editied idea, go back to edit list
@@ -704,7 +732,7 @@ def edit_ideas(request, year=None, month=None):
         return render(request, 'form_idea.html', context)
 
 
-@permission_required('toolkit.write')
+@permission_required('toolkit.programmer')
 @require_POST
 def delete_showing(request, showing_id):
     # Delete the given showing
@@ -719,8 +747,8 @@ def delete_showing(request, showing_id):
             reverse("edit-showing", kwargs={'showing_id': showing_id})
         )
     else:
-        logging.info(u"Deleting showing id {0} (for event id {1})"
-                     .format(showing_id, showing.event_id))
+        logging.info(u"{0} deleted showing id {1} (for event id {2})"
+                     .format(request.user, showing_id, showing.event_id))
         messages.add_message(
             request, messages.SUCCESS, u"Deleted showing for '{0}' on {1}"
             .format(
@@ -732,7 +760,7 @@ def delete_showing(request, showing_id):
     return _return_to_editindex(request)
 
 
-@permission_required('toolkit.read')
+@permission_required('toolkit.programmer')
 def view_event_field(request, field, year, month, day):
     # Method shared across various (slightly primitive) views into event data;
     # the copy, terms and rota reports.
@@ -856,7 +884,7 @@ def edit_roles(request):
     return render(request, 'form_edit_roles.html', {'formset': formset})
 
 
-@permission_required('toolkit.write')
+@permission_required('toolkit.programmer')
 def printed_programme_edit(request, operation):
     assert operation in ('edit', 'add')
 
@@ -1008,12 +1036,15 @@ class EditRotaView(PermissionRequiredMixin, View):
             return HttpResponse("Invalid request",
                                 status=400, content_type="text/plain")
 
-        logger.info(u"Update role id {0} (#{1}) for showing "
-                    u"{2} '{3}' -> '{4}' ({5})"
-                    .format(rota_entry.role_id, rota_entry.rank,
-                            rota_entry.showing_id, rota_entry.name, name,
+        logger.info(u"{0} updated role id {1} (#{2}) for showing "
+                    u"'{3}' '{4}' -> '{5}' ({6})"
+                    .format(request.user.last_name,
+                            rota_entry.role_id,
+                            rota_entry.rank,
+                            Showing.objects.filter(id=rota_entry.showing_id).first(),
+                            rota_entry.name,
+                            name,
                             rota_entry.pk))
-
         rota_entry.name = name
         rota_entry.save()
 

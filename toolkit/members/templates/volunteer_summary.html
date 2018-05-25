@@ -51,6 +51,9 @@ Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
             <th>
                 <abbr title="administrator - has complete rights to see and do everything">Panopticon</abbr>
             </th>
+            <th>
+                <abbr title="Can edit the diary but not access details of volunteers and members">Programmer</abbr>
+            </th>
         {% endif %}
         <th>
             Email
@@ -77,6 +80,11 @@ Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
                     </td>
                     <td>
                         {% if volunteer.user.is_superuser %}
+                            <span class="fa fa-check-circle fa-lg"></span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if volunteer.user.groups.all.0.name == "Programmers" %}
                             <span class="fa fa-check-circle fa-lg"></span>
                         {% endif %}
                     </td>

@@ -392,7 +392,7 @@ LOGGING = {
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
-            'formatter': 'simple',
+            'formatter': 'verbose',
             # Args:
             'stream': sys.stderr,
         },
@@ -418,10 +418,15 @@ LOGGING = {
         # }
     },
 
+    # https://stackoverflow.com/questions/22134895/django-logging-to-console
     'loggers': {
         'django': {
             'propagate': True,
             'level': 'INFO',
+        },
+        'toolkit': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
         },
     },
 

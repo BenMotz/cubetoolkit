@@ -133,10 +133,11 @@ def delete_member(request, member_id):
             messages.add_message(request, messages.SUCCESS,
                                  u"Deleted member: {0} ({1})".format(
                                      member.number, member.name))
-            logger.info(u"Member {0} {1} <{2}> deleted by admin".format(
+            logger.info(u"Member {0} {1} <{2}> deleted by {3}".format(
                   member.number,
                   member.name,
-                  member.email)
+                  member.email,
+                  request.user.last_name)
                   )
             member.delete()  # This will delete associated volunteer record, if any
 

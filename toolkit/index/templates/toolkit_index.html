@@ -25,7 +25,7 @@
 <ul>
     <li><a href="{% url "default-view" %}">Diary for the public</a></li>
     <li><a href="{% url "archive-view-index" %}">Public diary archive</a></li>
-    {% if user.is_superuser %}
+    {% if user.is_superuser or user.groups.all.0.name == "Programmers" %}
         <li><a href="{% url "default-edit" %}">Edit the diary</a></li>
         <li><a href="{% url "diary-edit-calendar" %}">Edit the diary from a calendar</a></li>
         <li><a href="{% url "view_event_field" field="copy" %}">Copy report</a></li>
@@ -93,7 +93,16 @@
 {% endfor %}
 </ul>
 <hr>
-<p>You logged in as {{ user }} at {{ user.last_login }}</p>
+<p>You logged in as {{ user }} at {{ user.last_login }}
+You are a
+{% if user.is_superuser %}
+   Panopticon.
+{% elif user.groups.all.0.name == "Programmers" %}
+   Programmer.
+{% else %}
+   Volunteer.
+{% endif %}
+</p>
 <p>
 {% if user.is_superuser %}
     <a href="{% url "create-index-link" %}">Add link</a> &#xb7;

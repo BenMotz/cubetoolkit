@@ -21,7 +21,6 @@ processes       = 1
 # the socket (use the full path to be safe)
 socket          = /tmp/starandshadow_staging_django.sock
 # TODO work out permission to run in /var/run
-#socket          = /var/run/ed_django.sock
 # Socket  permissions. Was 664, then 666. 660 works now
 chmod-socket    = 660
 # clear environment on exit
@@ -39,7 +38,7 @@ thunder-lock    = true
 limit-as = 512
 
 # Enable stats
-stats = 127.0.0.1:9195
+stats = 127.0.0.1:9196
 
 safe-pidfile    = /tmp/star_shadow_staging_django.pid
 daemonize       = /var/log/starandshadow/star_staging_django.log
