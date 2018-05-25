@@ -65,7 +65,7 @@ def view_volunteer_summary(request):
         volunteers = (Volunteer.objects
                                .filter(active=True)
                                .order_by('-member__created_at'))
-        sort_type = 'inducation date'
+        sort_type = 'induction date'
 
     active_count = volunteers.count()
     context = {
