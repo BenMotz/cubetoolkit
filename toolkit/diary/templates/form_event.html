@@ -4,6 +4,7 @@ Event Details for {{ event.name }}
 {% endblock %}
 {% block css %}
 {{ block.super }}
+<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
 <style>
     /* Slightly OTT way to stop bootstrap's fetish box-sizing from breaking
        the chosen layout. There's probably a better way to do this: */
@@ -106,6 +107,7 @@ $(document).ready(function() {
 
 <div id="title">
 <h1>Edit details for "{{ event.name }}"</h1>
+{% include "messages.html" %}
 <p>
 {% for showing in event.showings.all %}
 Booked for: {{ showing.start|date:"H:i d/m/Y"  }} <br>

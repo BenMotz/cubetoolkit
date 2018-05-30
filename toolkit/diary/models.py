@@ -213,7 +213,7 @@ class Event(models.Model):
         default=False, null=False, editable=False)
 
     terms = models.TextField(
-        max_length=4096, default=settings.DEFAULT_TERMS_TEXT,
+        max_length=4096,
         null=True, blank=True)
     notes = models.TextField(
         max_length=4096, null=True, blank=True,

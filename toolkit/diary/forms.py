@@ -37,7 +37,10 @@ class EventForm(forms.ModelForm):
             # Use the custom WYSIWYG text editor widget:
             'copy': HtmlTextarea(attrs={'wrap': 'soft'}),
             'copy_summary': forms.Textarea(attrs={'wrap': 'soft'}),
-            'terms': forms.Textarea(attrs={'wrap': 'soft'}),
+            'terms': forms.Textarea(attrs={
+                'wrap': 'soft',
+                'placeholder': 'e.g ' + settings.DEFAULT_TERMS_TEXT,
+                }),
             'notes': forms.Textarea(attrs={
                 'wrap': 'soft',
                 'rows': 5,  # Arbitrary
@@ -242,7 +245,7 @@ class NewEventForm(forms.Form):
     booked_by = forms.CharField(min_length=1, max_length=64, required=True)
     private = forms.BooleanField(required=False)
     outside_hire = forms.BooleanField(required=False)
-    confirmed = forms.BooleanField(required=False)
+    # confirmed = forms.BooleanField(required=False)
     discounted = forms.BooleanField(required=False)
 
 
