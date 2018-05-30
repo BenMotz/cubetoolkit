@@ -423,7 +423,7 @@ def add_event(request):
                         event=new_event,
                         start=(start + day_offset),
                         discounted=form.cleaned_data['discounted'],
-                        confirmed=form.cleaned_data['confirmed'],
+                        # confirmed=form.cleaned_data['confirmed'],
                         booked_by=form.cleaned_data['booked_by'],
                         )
                 if settings.MULTIROOM_ENABLED:
@@ -501,7 +501,29 @@ def edit_showing(request, showing_id=None):
     if request.method == 'POST':
         form = diary_forms.ShowingForm(request.POST, instance=showing)
         rota_form = RotaForm(request.POST)
-        if showing.in_past():
+        form.is_valid()
+
+        confirmed = form.cleaned_data['confirmed']
+        logger.debug('confirmed? %s' % confirmed)
+        if showing.event.terms:
+            terms_word_count = len(showing.event.terms.split())
+        else:
+            terms_word_count = 0
+        logger.debug('Event terms word count: %s' % terms_word_count)
+
+        if confirmed and terms_word_count < settings.PROGRAMME_EVENT_TERMS_MIN_WORDS:
+            messages.add_message(
+                request, messages.ERROR, (
+                     u"Can't confirm showing of '{0}' at {1} as the "
+                     u"event terms are missing or too short. "
+                     u"Please add more details."
+                    )
+                .format(
+                    showing.event.name,
+                    showing.start.strftime("%H:%M on %d/%m/%y")
+                ))
+
+        elif showing.in_past():
             messages.add_message(request, messages.ERROR,
                                  "Can't edit showings that are in the past")
         elif form.is_valid() and rota_form.is_valid():
@@ -594,15 +616,37 @@ class EditEventView(PermissionRequiredMixin, View):
         # Get the event's media item, or start a new one:
         media_item = event.get_main_mediaitem() or MediaItem()
 
-        logger.info(u"Updating event {0}".format(event_id))
+        logger.info(u"{0} updated booking {1} for event '{2}'".format(
+            request.user.last_name, event_id, event.name))
         # Create and populate forms:
         form = diary_forms.EventForm(request.POST, instance=event)
         media_form = diary_forms.MediaItemForm(request.POST,
                                                request.FILES,
                                                instance=media_item)
 
+        # Search fo unconfirmed bookings
+        unconfirmed = [booking for booking in event.showings.all() if not booking.confirmed]
+        logger.debug('%s: Unconfirmed bookings: %s' %
+                     (event.name, unconfirmed))
+        terms_ok = True
+        if not unconfirmed:
+            # All bookings are confirmed. Now checking the event terms
+            if event.terms:
+                terms_word_count = len(event.terms.split())
+            else:
+                terms_word_count = 0
+            logger.debug('Event terms: %s' % event.terms)
+            logger.debug('Event terms word count: %d' % terms_word_count)
+            if terms_word_count <= settings.PROGRAMME_EVENT_TERMS_MIN_WORDS:
+                terms_ok = False
+                msg = (u"Event terms for confirmed event '{0}' are missing "
+                       u"or too short. Please amend."
+                       .format(event.name))
+                logger.info(msg)
+                messages.add_message(request, messages.ERROR, msg)
+
         # Validate
-        if form.is_valid() and media_form.is_valid():
+        if terms_ok and form.is_valid() and media_form.is_valid():
             self._save(event, media_item, form, media_form)
             messages.add_message(request, messages.SUCCESS,
                                  u"Updated details for event '{0}'"

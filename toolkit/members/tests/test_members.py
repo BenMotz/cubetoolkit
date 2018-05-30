@@ -553,7 +553,6 @@ class TestEditMemberViewNotLoggedIn(MembersTestsMixin, TestCase):
         self.assertEqual(member.altphone, "-1 3202394 2352 23 234")
         self.assertEqual(member.notes, "plays the balalaika really badly")
         self.assertTrue(member.mailout)
-        self.assertTrue(member.mailout_failed)
         self.assertTrue(member.is_member)
 
         # Shouldn't have been changed:
