@@ -6,6 +6,7 @@ from django.http import HttpResponseServerError
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.conf import settings
+from django.core.mail import send_mail
 from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.models import Group, User
 import django.contrib.auth.models as auth_models
@@ -299,12 +300,51 @@ def edit_volunteer(request, volunteer_id, create_new=False):
                 password = User.objects.make_random_password(length=16)
                 user.set_password(password)
                 user.save()
-                messages.add_message(
-                    request,
-                    messages.SUCCESS,
-                    u"Password: %s" % password
-                    )
-
+                # Email the new volunteer
+                vol_body = (
+                    u"Dear %s\n\n"
+                    u"Thank you for signing up as a volunteer at The %s.\n\n"
+                    u"To access the toolkit, browse to %s and login with\n\n"
+                    u"user: %s\n"
+                    u"password: %s\n\n"
+                    u"Once logged in, you can change your password "
+                    u"to something less annoying.\n\n"
+                    u"Wishing you a tolerable day." % (
+                     volunteer.member.name,
+                     settings.VENUE['longname'],
+                     (settings.VENUE['url'] + 'toolkit'),
+                     user.username,
+                     password))
+                send_mail(
+                    ('[%s] Welcome new volunteer %s' % (
+                     (settings.VENUE['longname'],
+                      volunteer.member.name))),
+                    vol_body,
+                    settings.VENUE['mailout_from_address'],
+                    [volunteer.member.email],
+                    fail_silently=False,
+                )
+                # Email admin
+                admin_body = (
+                    u"I'm delighted to inform you that %s has just added "
+                    u"new volunteer\n\n"
+                    u"%s <%s>\n\n"
+                    u"to the toolkit.\n\n"
+                    u"Please add them to the volunteers mailing list "
+                    u"at your earliest convenience." % (
+                     request.user.last_name,
+                     volunteer.member.name,
+                     volunteer.member.email)
+                )
+                send_mail(
+                    ('[%s] New volunteer %s' %
+                        (settings.VENUE['longname'],
+                         volunteer.member.name)),
+                    admin_body,
+                    settings.VENUE['mailout_from_address'],
+                    settings.VENUE['vols_admin_address'],
+                    fail_silently=False,
+                )
             # Go to the volunteer list view:
             return HttpResponseRedirect(reverse("view-volunteer-summary"))
     else:
