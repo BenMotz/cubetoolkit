@@ -163,11 +163,35 @@ def activate_volunteer(request, set_active=True):
         vol.user.is_active = set_active
         vol.user.save()
 
-    logger.info(u"Set volunteer.active to {0} for volunteer {1}"
-                .format(str(set_active), vol_pk))
+    logger.info(u"{0} set active to {1} for volunteer {2}"
+                .format(request.user.last_name,
+                        str(set_active),
+                        vol.member.name))
     messages.add_message(request, messages.SUCCESS, u"{0} volunteer {1}"
                          .format(u"Unretired" if set_active else u"Retired",
                                  vol.member.name))
+    # email admin with the news
+    admin_body = (
+        u"I'm delighted to inform you that %s has updated the "
+        u"status of volunteer\n\n"
+        u"%s <%s>\n\n"
+        u"to %s.\n\n"
+        u"Please amend the volunteers mailing list "
+        u"at your earliest convenience." % (
+         request.user.last_name,
+         vol.member.name,
+         vol.member.email,
+         u"unretired" if set_active else u"retired")
+    )
+    send_mail(
+        ('[%s] Change in volunteer status %s' % (
+          settings.VENUE['longname'],
+          vol.member.name)),
+        admin_body,
+        settings.VENUE['mailout_from_address'],
+        settings.VENUE['vols_admin_address'],
+        fail_silently=False,
+    )
 
     return HttpResponseRedirect(reverse("view-volunteer-list"))
 
