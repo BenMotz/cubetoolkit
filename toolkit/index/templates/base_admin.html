@@ -68,8 +68,26 @@ body {
             </div>
           </li>
           {% if user.is_superuser %}
-            <li class="nav-item">
-              <a class="nav-link" href="{% url "add-member" %}">Member Database</a>
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="{% url "search-members" %}" id="dropdown03" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Members</a>
+              <div class="dropdown-menu" aria-labelledby="dropdown04">
+                <a class="dropdown-item" href="{% url "add-member" %}">Add Member</a>
+                <a class="dropdown-item" href="{% url "search-members" %}">Search Members</a>
+                <a class="dropdown-item" href="{% url "member-statistics" %}">Member Statistics</a>
+              </div>
+            </li>
+
+            <li class="nav-item dropdown">
+              <a class="nav-link dropdown-toggle" href="{% url "view-volunteer-summary" %}" id="dropdown04" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Volunteers</a>
+              <div class="dropdown-menu" aria-labelledby="dropdown03">
+                <a class="dropdown-item" href="{% url "view-volunteer-summary" %}">Volunteers summary</a>
+                <a class="dropdown-item" href="{% url "view-volunteer-list" %}">Volunteers profiles</a>
+                <a class="dropdown-item" href="{% url "add-volunteer" %}">Add new volunteer</a>
+                <a class="dropdown-item" href="{% url "retire-select-volunteer" %}">Retire volunteer</a>
+                <a class="dropdown-item" href="{% url "unretire-select-volunteer" %}">Unretire volunteer</a>
+                <a class="dropdown-item" href="{% url "view-volunteer-role-report" %}">Volunteer role report</a>
+                <a class="dropdown-item" href="{% url "view-volunteer-training-report" %}">Volunteer training report</a>
+              </div>
             </li>
           {% endif %}
           {% comment TODO Make this work properly when not logged in %}

@@ -25,7 +25,10 @@
 <a href="{% url "view-volunteer-list" %}" title="volunteers profiles">volunteers profiles</a> &#xb7;
 <a href="{% url "add-volunteer" %}" title="add new volunteer">add volunteer</a> &#xb7;
 <a href="{% url "retire-select-volunteer" %}" title="retire volunteer">retire volunteer</a> &#xb7;
-<a href="{% url "unretire-select-volunteer" %}" title="unretire volunteer">unretire volunteer</a><br>
+<a href="{% url "unretire-select-volunteer" %}" title="unretire volunteer">unretire volunteer</a> &#xb7;
+<a href="{% url "view-volunteer-role-report" %}" title="volunteer role report">volunteer role report</a> &#xb7;
+<a href="{% url "view-volunteer-training-report" %}" title="volunteer training report">volunteer training report</a>
+<br>
 Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
 
 <div class="btn-group dropright">
@@ -35,6 +38,7 @@ Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
   <div class="dropdown-menu">
       <a class="dropdown-item" href="{% url "view-volunteer-summary" %}">Order by name</a>
       <a class="dropdown-item" href="{% url "view-volunteer-summary" %}?order=inducted">Order by induction date (most recent first)</a>
+      <a class="dropdown-item" href="{% url "view-volunteer-summary" %}?order=logged-in">Order by logged in date (most recent first)</a>
   </div>
 </div>
 
@@ -58,12 +62,19 @@ Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
         <th>
             Email
         </th>
-        <th>
-            GDPR opt in
-        </th>
+        {% if not VENUE.show_user_management %}
+            <th>
+                GDPR opt in
+            </th>
+        {% endif %}
         <th>
             Inducted
         </th>
+        {% if VENUE.show_user_management %}
+        <th>
+            Last logged in
+        </th>
+        {% endif %}
       </tr>
     </thead>
 
@@ -92,23 +103,27 @@ Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
                 <td>
                     {{ member.email|urlize|default:"<em>Request email address</em>" }}
                 </td>
-                <td>
-                    {% if volunteer.member.gdpr_opt_in %}
-                        {{ volunteer.member.gdpr_opt_in|date:"d/m/Y" }}
-                    {% endif %}
-                </td>
+                    {% if not VENUE.show_user_management %}
+                    <td>
+                        {% if volunteer.member.gdpr_opt_in %}
+                            {{ volunteer.member.gdpr_opt_in|date:"d/m/Y" }}
+                        {% endif %}
+                    </td>
+                {% endif %}
                 <td>{% if volunteer.is_old %}
                         before {{ dawn_of_toolkit|date:"d/m/Y" }}
                     {% else %}
                         {{ volunteer.created_at|date:"d/m/Y" }}
                     {% endif %}
                 </td>
+                {% if VENUE.show_user_management %}
+                <td>
+                    {{ volunteer.user.last_login|default:"Never" }}
+                <td>
+                {% endif %}
             </tr>
         {% endwith %}
     {% endfor %}
     </tbody>
 </table><!-- table -->
-
-<h4>The volunteer role report can now be found <a href="{% url "view-volunteer-role-report" %}">here</a>.</h4>
-<h4>The volunteer training report can now be found <a href="{% url "view-volunteer-training-report" %}">here</a>.</h4>
 {% endblock %}
