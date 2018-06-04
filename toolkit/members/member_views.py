@@ -249,6 +249,14 @@ def edit_member(request, member_id):
                                  u"Member {0} updated".format(member.number))
             if request.user.has_perm('toolkit.write'):
                 return HttpResponseRedirect(reverse("search-members"))
+
+            if hasattr(member, 'volunteer') and hasattr(member.volunteer, 'user'):
+                # For volunteers, keep user name in sync with member name
+                logger.info(u"Updating user name '%s' to '%s'" % (
+                    member.volunteer.user.last_name, member.name))
+                member.volunteer.user.last_name = member.name
+                member.volunteer.user.save()
+
     else:
         form = MemberForm(instance=member,
                           hide_internal_fields=not user_has_permission)
