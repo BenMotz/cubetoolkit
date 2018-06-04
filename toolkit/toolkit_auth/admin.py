@@ -60,6 +60,11 @@ class ShowingAdmin(admin.ModelAdmin):
 class EventAdmin(admin.ModelAdmin):
     model = Event
 
+
+class RotaEntryAdmin(admin.ModelAdmin):
+    model = RotaEntry
+
+
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
 admin.site.register(DiaryIdea, DiaryIdeaAdmin)
@@ -67,3 +72,4 @@ admin.site.register(Event, EventAdmin)
 admin.site.register(Showing, ShowingAdmin)
 admin.site.register(Member, MemberAdmin)
 admin.site.register(Volunteer, VolunteerAdmin)
+admin.site.register(RotaEntry, RotaEntryAdmin)

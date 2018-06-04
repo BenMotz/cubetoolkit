@@ -1077,6 +1077,15 @@ class EditRotaView(PermissionRequiredMixin, View):
             return HttpResponse("Invalid request",
                                 status=400, content_type="text/plain")
 
+        if settings.VENUE['show_user_management'] and request.user.is_superuser:
+            pass  # super user has free reign
+        elif name:
+            # Coerce entered name to volunteer's name,
+            # regardless of what was entered
+            name = request.user.volunteer.member.name
+        else:
+            name = ''
+
         logger.info(u"{0} updated role id {1} (#{2}) for showing "
                     u"'{3}' '{4}' -> '{5}' ({6})"
                     .format(request.user.last_name,

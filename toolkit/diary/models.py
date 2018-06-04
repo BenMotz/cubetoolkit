@@ -637,7 +637,9 @@ class RotaEntry(models.Model):
         ordering = ['role', 'rank']
 
     def __str__(self):
-        return "{0} {1}".format(str(self.role), self.rank)
+        return "{0} - {1} {2}".format(self.showing,
+                                str(self.role),
+                                self.rank)
 
     def __init__(self, *args, **kwargs):
         # Allow a template keyword arg to be supplied. If it is, copy rota

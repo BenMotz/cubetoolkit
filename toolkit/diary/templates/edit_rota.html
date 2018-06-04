@@ -114,7 +114,13 @@ edit_rota(
             {% if showing.in_past %}
                 {{ rota_entry.name }}
             {% else %}
-                <span class="rota_name" id="{{ rota_entry.pk }}">{{ rota_entry.name|default:placeholder_text }}</span>
+                {% if user.is_superuser %}
+                    <span class="rota_name" id="{{ rota_entry.pk }}">{{ rota_entry.name|default:placeholder_text }}</span>
+                {% elif rota_entry.name == user.volunteer.member.name or not rota_entry.name %}
+                    <span class="rota_name" id="{{ rota_entry.pk }}">{{ rota_entry.name|default:placeholder_text }}</span>
+                {% else %}
+                    {{ rota_entry.name }}
+                {% endif %}
             {% endif %}
             </li>
         {% endfor %}
