@@ -36,7 +36,7 @@ VENUE = {
     # email address shown when volunteer removes themselves from rota
     'vols_email': u'volunteers@lists.starandshadow.org.uk',
     # List of people to get notifications when new vols are added.
-    'vols_admin_address': ['marcus@marcusv.org'],
+    'vols_admin_address': ['marcus@marcusv.org, info@starandshadow.org.uk'],
     'show_user_management': True
 }
 
