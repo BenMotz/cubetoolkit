@@ -25,7 +25,10 @@
 <a href="{% url "view-volunteer-list" %}" title="volunteers profiles">volunteers profiles</a> &#xb7;
 <a href="{% url "add-volunteer" %}" title="add new volunteer">add volunteer</a> &#xb7;
 <a href="{% url "retire-select-volunteer" %}" title="retire volunteer">retire volunteer</a> &#xb7;
-<a href="{% url "unretire-select-volunteer" %}" title="unretire volunteer">unretire volunteer</a><br>
+<a href="{% url "unretire-select-volunteer" %}" title="unretire volunteer">unretire volunteer</a> &#xb7;
+<a href="{% url "view-volunteer-role-report" %}" title="volunteer role report">volunteer role report</a> &#xb7;
+<a href="{% url "view-volunteer-training-report" %}" title="volunteer training report">volunteer training report</a>
+<br>
 Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
 
 <div class="btn-group dropright">
@@ -48,9 +51,6 @@ Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
             Email
         </th>
         <th>
-            GDPR opt in
-        </th>
-        <th>
             Inducted
         </th>
       </tr>
@@ -65,11 +65,6 @@ Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
                 </th>
                 <td>
                     {{ member.email|urlize|default:"<em>Request email address</em>" }}
-                </td>
-                <td>
-                    {% if volunteer.member.gdpr_opt_in %}
-                        {{ volunteer.member.gdpr_opt_in|date:"d/m/Y" }}
-                    {% endif %}
                 </td>
                 <td>{% if volunteer.is_old %}
                         before {{ dawn_of_toolkit|date:"d/m/Y" }}

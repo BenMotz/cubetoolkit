@@ -5,6 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse
 from django.conf import settings
+from django.core.mail import send_mail
 from django.contrib.auth.decorators import permission_required
 from django.contrib import messages
 from django.views.decorators.http import require_POST, require_safe
@@ -153,11 +154,35 @@ def activate_volunteer(request, set_active=True):
     vol.active = set_active
     vol.save()
 
-    logger.info(u"Set volunteer.active to {0} for volunteer {1}"
-                .format(str(set_active), vol_pk))
+    logger.info(u"{0} set active to {1} for volunteer {2}"
+                .format(request.user.last_name,
+                        str(set_active),
+                        vol.member.name))
     messages.add_message(request, messages.SUCCESS, u"{0} volunteer {1}"
                          .format(u"Unretired" if set_active else u"Retired",
                                  vol.member.name))
+    # email admin with the news
+    admin_body = (
+        u"I'm delighted to inform you that %s has updated the "
+        u"status of volunteer\n\n"
+        u"%s <%s>\n\n"
+        u"to %s.\n\n"
+        u"Please amend the volunteers mailing list "
+        u"at your earliest convenience." % (
+         request.user.last_name,
+         vol.member.name,
+         vol.member.email,
+         u"unretired" if set_active else u"retired")
+    )
+    send_mail(
+        ('[%s] Change in volunteer status %s' % (
+          settings.VENUE['longname'],
+          vol.member.name)),
+        admin_body,
+        settings.VENUE['mailout_from_address'],
+        settings.VENUE['vols_admin_address'],
+        fail_silently=False,
+    )
 
     return HttpResponseRedirect(reverse("view-volunteer-list"))
 
@@ -212,6 +237,28 @@ def edit_volunteer(request, volunteer_id, create_new=False):
                 u"{0} volunteer '{1}'".format(
                     u"Created" if create_new else u"Updated", member.name
                 )
+            )
+
+            # Email admin
+            admin_body = (
+                u"I'm delighted to inform you that %s has just added "
+                u"new volunteer\n\n"
+                u"%s <%s>\n\n"
+                u"to the toolkit.\n\n"
+                u"Please add them to the volunteers mailing list "
+                u"at your earliest convenience." % (
+                    request.user.last_name,
+                    volunteer.member.name,
+                    volunteer.member.email)
+            )
+            send_mail(
+                 ('[%s] New volunteer %s' %
+                     (settings.VENUE['longname'],
+                      volunteer.member.name)),
+                 admin_body,
+                 settings.VENUE['mailout_from_address'],
+                 settings.VENUE['vols_admin_address'],
+                 fail_silently=False,
             )
             # Go to the volunteer list view:
             return HttpResponseRedirect(reverse("view-volunteer-list"))
