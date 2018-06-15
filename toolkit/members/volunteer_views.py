@@ -239,29 +239,30 @@ def edit_volunteer(request, volunteer_id, create_new=False):
                 )
             )
 
-            # Email admin
-            admin_body = (
-                u"I'm delighted to inform you that %s has just added "
-                u"new volunteer\n\n"
-                u"%s <%s>\n\n"
-                u"to the toolkit.\n\n"
-                u"Please add them to the volunteers mailing list "
-                u"at your earliest convenience." % (
-                    request.user.last_name,
-                    volunteer.member.name,
-                    volunteer.member.email)
-            )
-            send_mail(
-                 ('[%s] New volunteer %s' %
-                     (settings.VENUE['longname'],
-                      volunteer.member.name)),
-                 admin_body,
-                 settings.VENUE['mailout_from_address'],
-                 settings.VENUE['vols_admin_address'],
-                 fail_silently=False,
-            )
+            if create_new:
+                # Email admin
+                admin_body = (
+                    u"I'm delighted to inform you that %s has just added "
+                    u"new volunteer\n\n"
+                    u"%s <%s>\n\n"
+                    u"to the toolkit.\n\n"
+                    u"Please add them to the volunteers mailing list "
+                    u"at your earliest convenience." % (
+                        request.user.last_name,
+                        volunteer.member.name,
+                        volunteer.member.email)
+                )
+                send_mail(
+                     ('[%s] New volunteer %s' %
+                         (settings.VENUE['longname'],
+                          volunteer.member.name)),
+                     admin_body,
+                     settings.VENUE['mailout_from_address'],
+                     settings.VENUE['vols_admin_address'],
+                     fail_silently=False,
+                )
             # Go to the volunteer list view:
-            return HttpResponseRedirect(reverse("view-volunteer-list"))
+            return HttpResponseRedirect(reverse("view-volunteer-summary"))
     else:
         vol_form = VolunteerForm(instance=volunteer)
         mem_form = MemberFormWithoutNotes(instance=volunteer.member)
