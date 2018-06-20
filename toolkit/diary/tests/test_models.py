@@ -267,9 +267,8 @@ class EventTagsFromTemplate(DiaryTestsMixin, TestCase):
         self.assertEqual(new_event.tags.count(), 2)
         self.assertEqual(new_event.tags.all()[0].name, u"tag one")
         self.assertEqual(new_event.tags.all()[0].slug, u"tag-one")
-        self.assertEqual(new_event.tags.all()[
-                         1].name, u"\u0167ag \u0165hre\u0119")
-        self.assertEqual(new_event.tags.all()[1].slug, u"ag-three")
+        self.assertEqual(new_event.tags.all()[1].name, u"tag three")
+        self.assertEqual(new_event.tags.all()[1].slug, u"tag-three")
 
     def test_set_no_tags_from_template(self):
         new_event = Event(
