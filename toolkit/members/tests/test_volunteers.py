@@ -254,7 +254,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         response = self.client.post(url, data={
             u'mem-name': u'New Volunteer, called \u0187hri\u01a8topher'
         }, follow=True)
-        self.assertRedirects(response, reverse("view-volunteer-list"))
+        self.assertRedirects(response, reverse("view-volunteer-summary"))
 
         self.assertContains(
             response,
@@ -294,7 +294,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
             u'vol-roles': [2, 3],
         }, follow=True)
 
-        self.assertRedirects(response, reverse("view-volunteer-list"))
+        self.assertRedirects(response, reverse("view-volunteer-summary"))
 
         self.assertContains(
             response,
@@ -353,7 +353,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         response = self.client.post(url, data={
             u'mem-name': u'Renam\u018fd Vol'
         }, follow=True)
-        self.assertRedirects(response, reverse("view-volunteer-list"))
+        self.assertRedirects(response, reverse("view-volunteer-summary"))
 
         self.assertContains(
             response,
@@ -415,7 +415,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
             u'vol-roles': [2, 3],
         }, follow=True)
 
-        self.assertRedirects(response, reverse("view-volunteer-list"))
+        self.assertRedirects(response, reverse("view-volunteer-summary"))
 
         self.assertContains(
             response,
@@ -498,7 +498,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
             u'mem-name': u'Pictureless Person',
             u'vol-portrait-clear': 't',
         })
-        self.assertRedirects(response, reverse("view-volunteer-list"))
+        self.assertRedirects(response, reverse("view-volunteer-summary"))
 
         vol = Volunteer.objects.get(id=1)
         self.assertEqual(vol.member.name, u'Pictureless Person')
@@ -540,7 +540,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
                 u'vol-portrait': new_jpg_file,
             })
 
-        self.assertRedirects(response, reverse("view-volunteer-list"))
+        self.assertRedirects(response, reverse("view-volunteer-summary"))
 
         vol = Volunteer.objects.get(id=1)
         self.assertEqual(vol.member.name, u'Pictureless Person')
@@ -554,7 +554,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         # Should have deleted the old images:
         self.assertFalse(os.path.isfile(temp_old_jpg.name))
 
-        # XXX do this properly:
+        # TODO do this properly:
         shutil.rmtree(os.path.join('/tmp', settings.VOLUNTEER_PORTRAIT_DIR))
 
     @override_settings(MEDIA_ROOT="/tmp")
@@ -578,7 +578,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
                                 % TINY_VALID_BASE64_PNG)
         })
 
-        self.assertRedirects(response, reverse("view-volunteer-list"))
+        self.assertRedirects(response, reverse("view-volunteer-summary"))
 
         vol = Volunteer.objects.get(id=1)
         self.assertEqual(vol.member.name, u'Pictureless Person')
@@ -592,7 +592,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
             self.assertEqual(
                 imgf.read(), binascii.a2b_base64(TINY_VALID_BASE64_PNG))
 
-        # XXX do this properly!
+        # TODO do this properly!
         shutil.rmtree(os.path.join('/tmp', settings.VOLUNTEER_PORTRAIT_DIR))
 
     def test_post_update_vol_set_portrait_data_uri_bad_mimetype(self):
