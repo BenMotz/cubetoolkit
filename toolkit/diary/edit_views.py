@@ -663,17 +663,19 @@ class EditEventView(PermissionRequiredMixin, View):
         terms_ok = True
         if not unconfirmed:
             # All bookings are confirmed. Now checking the event terms
+            form.is_valid()  # Ensure we are looking at the correct form
             if event.terms:
                 terms_word_count = len(event.terms.split())
             else:
                 terms_word_count = 0
             logger.debug('Event terms: %s' % event.terms)
-            logger.debug('Event terms word count: %d' % terms_word_count)
-            if terms_word_count <= settings.PROGRAMME_EVENT_TERMS_MIN_WORDS:
+            logger.debug('Event terms word count: %d (need %d)' %
+                (terms_word_count, settings.PROGRAMME_EVENT_TERMS_MIN_WORDS))
+            if terms_word_count < settings.PROGRAMME_EVENT_TERMS_MIN_WORDS:
                 terms_ok = False
                 msg = (u"Event terms for confirmed event '{0}' are missing "
-                       u"or too short. Please amend."
-                       .format(event.name))
+                       u"or too short. Please enter at least {1} words."
+                       .format(event.name, settings.PROGRAMME_EVENT_TERMS_MIN_WORDS))
                 logger.info(msg)
                 messages.add_message(request, messages.ERROR, msg)
 
