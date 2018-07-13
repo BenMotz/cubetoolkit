@@ -78,8 +78,8 @@ def deploy_code():
 
     _assert_target_set()
 
-    # Create tar of (local) git HEAD:
-    archive = "site_transfer.tgz"
+    # Create tar of (local) git HEAD using the hash as the filename
+    archive = '%s.tgz' % local('git rev-parse HEAD', capture=True)
     local_root = os.path.dirname(__file__)
     utils.puts("Changing to {0}".format(local_root))
     with lcd(local_root):
