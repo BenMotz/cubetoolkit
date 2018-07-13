@@ -1,6 +1,6 @@
 {% load showing_date_format %}{% load strip_lines %}{# This is a bit gnarly in places, because newlines are significant... #}CUBE PROGRAMME OF EVENTS
 
-http://www.cubecinema.com/programme/
+https://cubecinema.com/programme/
 
 {% filterblanklines %}
 {% for showing in showings %}
@@ -18,7 +18,7 @@ http://www.cubecinema.com/programme/
 * cheap night
 
 For complete listings including all future events, please visit:
-http://www.cubecinema.com/programme/
+https://cubecinema.com/programme/
 {% filtermultipleblanklines %}
 {% for showing in showings_details %}{% ifchanged %}----------------------------------------------------------------------------
 
@@ -38,7 +38,7 @@ http://www.cubecinema.com/programme/
 --
 {% endfiltermultipleblanklines %}
 For complete and up to date listings, please visit:
-http://www.cubecinema.com/programme/
+https://cubecinema.com/programme/
 
 Cube Microplex Cinema
 is located at:
@@ -51,6 +51,6 @@ Postal:
 Bristol
 BS2 8NQ
 
-http://www.cubecinema.com
+https://cubecinema.com
 
 tel: 0117 907 4190
