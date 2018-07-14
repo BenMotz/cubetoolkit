@@ -55,6 +55,7 @@ $(document).ready(function() {
 <th>Membership expires</th>
 {% endif %}
 <th>Mailout?</th>
+<th>Volunteer?</th>
 </tr>
 {% for member in members %}
 <tr>
@@ -70,6 +71,13 @@ $(document).ready(function() {
 <td {% if member.has_expired %}class="expired"{% endif %}>{{ member.membership_expires|date:"d/m/Y" }}</td>
 {% endif %}
 <td>{{ member.mailout|yesno }}</td>
+<td>{% if member.volunteer %}
+        {% if member.volunteer.active %}
+            <form method="get" action="{% url "edit-volunteer" member.volunteer.pk %}"><input type="submit" value="Edit"></form>
+        {% else %}
+            Retired
+        {% endif %}
+    {% endif %}</td>
 {% endfor %}
 </table>
 
