@@ -43,7 +43,7 @@ WAGTAIL_SITE_NAME = 'The Star and Shadow'
 # Disable 'allow editing from magic IP range' for now
 CUBE_IP_ADDRESSES = ()
 
-DEFAULT_MUGSHOT = "/static/members/default_mugshot.gif"
+DEFAULT_MUGSHOT = "/static/content/ss_logo_e3cae3_pink3.jpg"
 
 # Currently only used for setting an outer limit on what year printed
 # programmes can be uploaded
