@@ -1,0 +1,82 @@
+{% extends 'base_admin.html' %}
+{% block title %}
+{{ VENUE.name }} Duplicated Members
+{% endblock %}
+
+{% block script %}
+{{ block.super }}
+<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('form.delete').submit(
+        function(event) {
+            return confirm('Delete member? This cannot be undone.');
+        }
+    );
+});
+</script>
+{% endblock %}
+
+{% block body %}
+<p>
+<h2>{{ VENUE.name }} Duplicated Members ordered by {{ sort_type }}</h2>
+<p>Found {{ dupe_count }} duplicates from {{ member_count }} members.</p>
+
+<div class="btn-group dropright">
+  <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+      Order by <span class="caret"></span>
+  </button>
+  <div class="dropdown-menu">
+      <a class="dropdown-item" href="{% url "member-duplicates" %}?order=number">Number</a>
+      <a class="dropdown-item" href="{% url "member-duplicates" %}?order=name">Name</a>
+      <a class="dropdown-item" href="{% url "member-duplicates" %}?order=email">Email</a>
+      <a class="dropdown-item" href="{% url "member-duplicates" %}?order=created-oldest-first">Creation date (oldest first)</a>
+      <a class="dropdown-item" href="{% url "member-duplicates" %}?order=created-most-recent-first">Creation date (most recent first)</a>
+      <a class="dropdown-item" href="{% url "member-duplicates" %}?order=updated-oldest-first">Last update (oldest first)</a>
+      <a class="dropdown-item" href="{% url "member-duplicates" %}?order=updated-most-recent-first">Last update (most recent first)</a>
+  </div>
+</div>
+
+<table class="table table-sm table-striped">
+    <thead>
+      <tr>
+        <th>Number</th>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Created</th>
+        <th>Updated</th>
+        {% if membership_expiry_enabled %}
+            <th>Membership expires</th>
+        {% endif %}
+        <th>Mailout?</th>
+        <th></th>
+        <th></th>
+        <th>Volunteer?</th>
+      </tr>
+    </thead>
+
+{% for member in members %}
+<tr>
+    <td>{{ member.number }}</td>
+    <td>{{ member.name }}</td>
+    <td>{{ member.email|urlize }}</td>
+    <td>{{ member.created_at|date:"d/m/Y" }}</td>
+    <td>{{ member.updated_at|date:"d/m/Y" }}</td>
+    {% if membership_expiry_enabled %}
+        <td {% if member.has_expired %}class="expired"{% endif %}>{{ member.membership_expires|date:"d/m/Y" }}</td>
+    {% endif %}
+    <td>{{ member.mailout|yesno }}</td>
+    <td><form method="get" action="{% url "edit-member" member.pk %}"><input type="submit" value="Edit"></form></td>
+    <td><form class="delete" method="post" action="{% url "delete-member" member.pk %}">{% csrf_token %}<input type="submit" value="Delete"></form></td>
+    <td>{% if member.volunteer %}
+            {% if member.volunteer.active %}
+                <form method="get" action="{% url "edit-volunteer" member.volunteer.pk %}"><input type="submit" value="Edit"></form>
+            {% else %}
+                Retired
+            {% endif %}
+        {% endif %}</td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}
+

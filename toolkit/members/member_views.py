@@ -2,7 +2,7 @@ import logging
 
 from django.http import HttpResponseRedirect
 from django.shortcuts import get_object_or_404, render
-from django.db.models import Q
+from django.db.models import Count, Q
 from django.urls import reverse
 from django.contrib.auth.decorators import permission_required
 from django.contrib import messages
@@ -431,6 +431,51 @@ def member_statistics(request):
         context.update(extra_context)
 
     return render(request, 'stats.html', context)
+
+
+@require_safe
+def member_duplicates(request):
+
+    order = request.GET.get('order', 'email')
+    sort_type = 'email'
+
+    dupes = (Member.objects.values('email')
+                           .exclude(email='')
+                           .annotate(Count('id'))
+                           .filter(id__count__gt=1))
+
+    members = Member.objects.filter(email__in=[item['email'] for item in dupes])
+
+    if 'number' in order:
+        members = members.order_by('number')
+        sort_type = 'number'
+    if 'name' in order:
+        members = members.order_by('name')
+        sort_type = 'name'
+    if 'email' in order:
+        members = members.order_by('email')
+        sort_type = 'email'
+    if 'created-most-recent-first' in order:
+        members = members.order_by('-created_at')
+        sort_type = 'creation date, most recent first'
+    if 'created-oldest-first' in order:
+        members = members.order_by('created_at')
+        sort_type = 'creation date, oldest first'
+    if 'updated-most-recent-first' in order:
+        members = members.order_by('-updated_at')
+        sort_type = 'last update, most recent first'
+    if 'updated-oldest-first' in order:
+        members = members.order_by('updated_at')
+        sort_type = 'last update, oldest first'
+
+    context = {
+        'sort_type': sort_type,
+        'members': members,
+        'dupe_count': len(dupes),
+        'member_count': len(members),
+    }
+
+    return render(request, 'dupes.html', context)
 
 
 @require_safe

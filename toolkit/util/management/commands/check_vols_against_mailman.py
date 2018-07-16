@@ -16,7 +16,7 @@ class Command(BaseCommand):
     def _get_mailman_vols(self):
         vols = []
         path, filename = os.path.split(__file__)
-        print(path)
+
         server = input("Enter name of server that mailman is running on [%s]: " %
                        server_default)
         if not server:
