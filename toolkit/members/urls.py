@@ -9,8 +9,9 @@ from toolkit.members.volunteer_views import (
 
 from toolkit.members.member_views import (
     add_member, search, view,
-    edit_member, delete_member, member_statistics, member_homepages,
-    unsubscribe_member, unsubscribe_member_right_now, opt_in, goodbye)  # TODO rename goodbye
+    edit_member, delete_member, member_statistics,
+    member_duplicates, member_homepages, unsubscribe_member,
+    unsubscribe_member_right_now, opt_in, goodbye)  # TODO rename goodbye
 
 # Volunteers:
 volunteer_urls = [
@@ -61,19 +62,19 @@ member_urls = [
     url(r'^(?P<member_id>\d+)$', view,
         name='view-member'),
     url(r'^(?P<member_id>\d+)/edit/$', edit_member,
-        name='edit-member'),   # TODO duplicate of line 73 below?
+        name='edit-member'),
     url(r'^(?P<member_id>\d+)/delete$', delete_member,
         name='delete-member'),
     url(r'^statistics/$', member_statistics,
         name='member-statistics'),
+    url(r'^duplicates/$', member_duplicates,
+        name='member-duplicates'),
 
     # External:
     url(r'^homepages/$', member_homepages,
         name='member-homepages'),
 
     # Semi-external (see member_views.py for details)
-    url(r'^(?P<member_id>\d+)/edit/$', edit_member,
-        name='edit-member'),
     url(r'^(?P<member_id>\d+)/unsubscribe/$', unsubscribe_member,
         name='unsubscribe-member'),
     url(r'^(?P<member_id>\d+)/unsubscribe-now/$', unsubscribe_member_right_now,
