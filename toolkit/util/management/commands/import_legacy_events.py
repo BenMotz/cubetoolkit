@@ -10,7 +10,9 @@ I used d4e9757916fdf0b9aee0c907fd9aee08da922b19
 '''
 
 import datetime
+import os
 import pytz
+import shutil
 
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
@@ -18,8 +20,18 @@ from django.core.exceptions import ValidationError, ObjectDoesNotExist
 import django.utils.timezone
 
 from toolkit.diary.models import Event, EventTag, EventTemplate, Showing, Room
+from toolkit.diary.models import MediaItem
 
 import MySQLdb
+
+# Adjust to taste
+dbuser = 'starshadow'
+dbpass = ''
+dbdb = 'ssarchive'
+ARCHIVE_IMAGE_PATH = '/home/marcus/toolkit/star_shadow/archive/static'
+IMAGE_PATH = '/home/marcus/toolkit/star_shadow/star_site_3/media/diary'
+
+EVENT_IMAGES_PATH = "diary"
 
 
 class Command(BaseCommand):
@@ -28,11 +40,11 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         try:
-            self.stdout.write('Connecting to database...')
+            self.stdout.write('Connecting to database %s...' % dbdb)
             db = MySQLdb.connect("localhost",
-                                 "starshadow",
-                                 "",
-                                 "ssarchive")
+                                 dbuser,
+                                 dbpass,
+                                 dbdb)
         except MySQLdb.Error as e:
             self.stdout.write(self.style.ERROR(
                 'Failed to connect to archive database'))
@@ -42,6 +54,7 @@ class Command(BaseCommand):
         sql = "SELECT * FROM `programming_event` WHERE `deleted` = 0 AND `confirmed` = 1 AND `private` = 0 ORDER BY `startDate` DESC"
         cursor.execute(sql)  # returns number of rows
         events = cursor.fetchall()
+        # events = events[0:20]
 
         self.stdout.write('Found %d events' % len(events))
 
@@ -72,6 +85,25 @@ class Command(BaseCommand):
                 sql = "SELECT `file` FROM `fileupload_picture` WHERE `id` = %d" % picture_id
                 cursor.execute(sql)  # returns number of rows
                 picture_file = cursor.fetchone()[0]
+                picture_file_with_path = os.path.join(ARCHIVE_IMAGE_PATH,
+                                                      picture_file)
+                if os.path.isfile(picture_file_with_path):
+                    dest_picture = os.path.basename(picture_file)
+                    dest_picture_with_path = os.path.join(IMAGE_PATH,
+                                                          dest_picture)
+                    dest_picture = os.path.basename(picture_file)
+                    if os.path.isfile(dest_picture_with_path):
+                        self.stdout.write(self.style.WARNING(
+                           '%s already exists' % dest_picture_with_path))
+                    else:
+                        self.stdout.write(
+                            'Copying %s' % dest_picture_with_path)
+                        shutil.copyfile(picture_file_with_path,
+                                        dest_picture_with_path)
+                else:
+                    self.stdout.write(self.style.ERROR(
+                        "Can't find %s" % picture_file_with_path))
+                    picture_id = ''
             else:
                 picture_file = ''
 
@@ -92,13 +124,7 @@ class Command(BaseCommand):
             startDateAsaTime = startDateAsaTime + startTime
             # date = datetime.strptime(startDate + startTime, '%Y-%m-%d %H:%M:%S')
 
-            if picture_id:
-                sql = "SELECT `file` FROM `fileupload_picture` WHERE `id` = %d" % picture_id
-                cursor.execute(sql)  # returns number of rows
-                picture_file = cursor.fetchone()[0]
-            else:
-                picture_file = ''
-
+            # continue  # FIXME
             # Attempt to create an cube toolkit style event
             e = Event()
             e.legacy_id = legacy_id
@@ -112,18 +138,31 @@ class Command(BaseCommand):
                                                        programmerEmail)
             else:
                 e.notes = notes
-            e.template = EventTemplate.objects.filter(name='Film (DVD)').first()
+            # Use this for film
+            # e.template = EventTemplate.objects.filter(name='Film (DVD)').first()
             if duration is not None and duration != '':
                 e.duration = duration
             else:
                 e.duration = datetime.time(0, 0)
-            # TODO images
+
             e.full_clean()
             e.save()
             e.tags.add(EventTag.objects.filter(name='film').first())
 
+            if picture_id:
+                image_path = os.path.join(EVENT_IMAGES_PATH, dest_picture)
+                media_item = MediaItem(
+                    media_file=image_path,
+                    credit=title
+                )
+                media_item.full_clean()
+                media_item.save()
+                e.media.add(media_item)
+
+            # Graft event to a showing
             timezone = pytz.timezone("Europe/London")
-            fake_start = django.utils.timezone.now() + datetime.timedelta(days=1)
+            fake_start = (django.utils.timezone.now() +
+                          datetime.timedelta(days=1))
 
             s = Showing()
             s.event = e
@@ -150,7 +189,8 @@ class Command(BaseCommand):
             s.full_clean()
             # Store datetime with timezone information
             s.start = timezone.localize(startDateAsaTime)
-            s.save(force=True)  # Force, to allow saving of showing with start in past
+            # Force, to allow saving of showing with start in past
+            s.save(force=True)
 
         self.stdout.write(self.style.SUCCESS(
             '%d legacy events imported' % len(events)))
