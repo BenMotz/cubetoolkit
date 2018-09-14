@@ -1,8 +1,15 @@
 '''
 Columns in programming_event
+
 id 	title 	summary 	body 	website 	notes 	programmer_id 	confirmed
 private 	featured 	picture_id 	approval_id 	startDate 	startTime
 endTime 	deleted
+
+Columns in programming_film
+
+id title length summary body director year lang certificate_id season_id notes
+programmer_id confirmed private featured picture_id country approval_id
+startDate startTime filmFormat_id deleted
 
 Partially inspired by import_script/import_database.py,
 buried deep in the history of this repo.
@@ -37,19 +44,21 @@ EVENT_IMAGES_PATH = "diary"
 class Command(BaseCommand):
     help = "import events from legacy star and shadow django web site"
 
-    def handle(self, *args, **options):
-
+    def _conn_to_archive_database(self):
         try:
             self.stdout.write('Connecting to database %s...' % dbdb)
             db = MySQLdb.connect("localhost",
                                  dbuser,
                                  dbpass,
                                  dbdb)
+            return db
         except MySQLdb.Error as e:
             self.stdout.write(self.style.ERROR(
-                'Failed to connect to archive database'))
-            return
+                'Failed to connect to database %s' % dbdb))
 
+    def handle(self, *args, **options):
+
+        db = self._conn_to_archive_database()
         cursor = db.cursor()
         sql = "SELECT * FROM `programming_event` WHERE `deleted` = 0 AND `confirmed` = 1 AND `private` = 0 ORDER BY `startDate` DESC"
         cursor.execute(sql)  # returns number of rows
