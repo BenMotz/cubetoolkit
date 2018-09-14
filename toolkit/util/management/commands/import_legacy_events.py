@@ -70,6 +70,36 @@ class Command(BaseCommand):
 
         return(programmerName, programmerEmail)
 
+    def _copy_image(self, cursor, picture_id):
+        '''If an image exists for the film or event, copy it from the legacy
+        file structure the current file structure'''
+
+        if picture_id:
+            sql = "SELECT `file` FROM `fileupload_picture` WHERE `id` = %d" % picture_id
+            cursor.execute(sql)  # returns number of rows
+            picture_file = cursor.fetchone()[0]
+            picture_file_with_path = os.path.join(ARCHIVE_IMAGE_PATH,
+                                                  picture_file)
+            if os.path.isfile(picture_file_with_path):
+                dest_picture = os.path.basename(picture_file)
+                dest_picture_with_path = os.path.join(IMAGE_PATH,
+                                                      dest_picture)
+                if os.path.isfile(dest_picture_with_path):
+                    self.stdout.write(self.style.WARNING(
+                       '%s already exists' % dest_picture_with_path))
+                else:
+                    self.stdout.write(
+                        'Copying %s' % dest_picture_with_path)
+                    shutil.copyfile(picture_file_with_path,
+                                    dest_picture_with_path)
+            else:
+                self.stdout.write(self.style.ERROR(
+                    "Can't find %s" % picture_file_with_path))
+                picture_id = ''
+        else:
+            picture_file = ''
+        return picture_file
+
     def handle(self, *args, **options):
 
         db = self._conn_to_archive_database()
@@ -101,31 +131,7 @@ class Command(BaseCommand):
             (programmerName, programmerEmail) = self._find_programmer(cursor,
                                                                       programmer_id)
 
-            if picture_id:
-                sql = "SELECT `file` FROM `fileupload_picture` WHERE `id` = %d" % picture_id
-                cursor.execute(sql)  # returns number of rows
-                picture_file = cursor.fetchone()[0]
-                picture_file_with_path = os.path.join(ARCHIVE_IMAGE_PATH,
-                                                      picture_file)
-                if os.path.isfile(picture_file_with_path):
-                    dest_picture = os.path.basename(picture_file)
-                    dest_picture_with_path = os.path.join(IMAGE_PATH,
-                                                          dest_picture)
-                    dest_picture = os.path.basename(picture_file)
-                    if os.path.isfile(dest_picture_with_path):
-                        self.stdout.write(self.style.WARNING(
-                           '%s already exists' % dest_picture_with_path))
-                    else:
-                        self.stdout.write(
-                            'Copying %s' % dest_picture_with_path)
-                        shutil.copyfile(picture_file_with_path,
-                                        dest_picture_with_path)
-                else:
-                    self.stdout.write(self.style.ERROR(
-                        "Can't find %s" % picture_file_with_path))
-                    picture_id = ''
-            else:
-                picture_file = ''
+            picture_file = self._copy_image(cursor, picture_id)
 
             self.stdout.write('%s "%s" %s %s "%s" %s <%s>' % (
                 legacy_id,
@@ -244,10 +250,7 @@ class Command(BaseCommand):
             (programmerName, programmerEmail) = self._find_programmer(cursor,
                                                                       programmer_id)
 
-            if picture_id:
-                sql = "SELECT `file` FROM `fileupload_picture` WHERE `id` = %d" % picture_id
-                cursor.execute(sql)  # returns number of rows
-                picture_file = cursor.fetchone()[0]
+            picture_file = self._copy_image(cursor, picture_id)
 
             self.stdout.write('%s "%s" (%s, %s) %s %s "%s" %s <%s>' % (
                 legacy_id,
