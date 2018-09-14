@@ -56,14 +56,29 @@ class Command(BaseCommand):
             self.stdout.write(self.style.ERROR(
                 'Failed to connect to database %s' % dbdb))
 
+    def _find_programmer(self, cursor, programmer_id):
+
+        # id name homePhone mobilePhone email notes user_id photo
+        if not programmer_id:
+            return('unknown', 'unknown')
+
+        sql = "SELECT * FROM `programming_programmer` WHERE `id` = %d" % programmer_id
+        cursor.execute(sql)
+        programmer = cursor.fetchone()
+        programmerName = programmer[1]
+        programmerEmail = programmer[4]
+
+        return(programmerName, programmerEmail)
+
     def handle(self, *args, **options):
 
         db = self._conn_to_archive_database()
         cursor = db.cursor()
+
         sql = "SELECT * FROM `programming_event` WHERE `deleted` = 0 AND `confirmed` = 1 AND `private` = 0 ORDER BY `startDate` DESC"
         cursor.execute(sql)  # returns number of rows
         events = cursor.fetchall()
-        # events = events[0:20]
+        events = events[0:20]  # FIXME
 
         self.stdout.write('Found %d events' % len(events))
 
@@ -83,12 +98,8 @@ class Command(BaseCommand):
             if duration < datetime.timedelta(0):
                 duration = datetime.timedelta(0)
 
-            # id bane homePhone mobilePhone email notes user_id photo
-            sql = "SELECT * FROM `programming_programmer` WHERE `id` = %d" % programmer_id
-            cursor.execute(sql)
-            programmer = cursor.fetchone()
-            programmerName = programmer[1]
-            programmerEmail = programmer[4]
+            (programmerName, programmerEmail) = self._find_programmer(cursor,
+                                                                      programmer_id)
 
             if picture_id:
                 sql = "SELECT `file` FROM `fileupload_picture` WHERE `id` = %d" % picture_id
@@ -133,7 +144,7 @@ class Command(BaseCommand):
             startDateAsaTime = startDateAsaTime + startTime
             # date = datetime.strptime(startDate + startTime, '%Y-%m-%d %H:%M:%S')
 
-            # continue  # FIXME
+            continue  # FIXME
             # Attempt to create an cube toolkit style event
             e = Event()
             e.legacy_id = legacy_id
@@ -203,5 +214,53 @@ class Command(BaseCommand):
 
         self.stdout.write(self.style.SUCCESS(
             '%d legacy events imported' % len(events)))
+
+        sql = "SELECT * FROM `programming_film` WHERE `deleted` = 0 AND `confirmed` = 1 AND `private` = 0 ORDER BY `startDate` DESC"
+        cursor.execute(sql)  # returns number of rows
+        films = cursor.fetchall()
+        films = films[0:20]
+
+        self.stdout.write('Found %d films' % len(films))
+
+        for film in films:
+            legacy_id = film[0]
+            title = film[1]
+            length = film[2]
+            summary = film[3]
+            body = film[4]
+            director = film[5]
+            year = film[6]
+            language = film[7]
+            certificate_id = film[8]
+            session_id = film[9]
+            notes = film[10]
+            programmer_id = film[11]
+            picture_id = film[15]
+            country = film[16]
+            startDate = film[18]  # class 'datetime.date'
+            startTime = film[19]  # class 'datetime.timedelta'
+            filmformat_id = film[20]
+
+            (programmerName, programmerEmail) = self._find_programmer(cursor,
+                                                                      programmer_id)
+
+            if picture_id:
+                sql = "SELECT `file` FROM `fileupload_picture` WHERE `id` = %d" % picture_id
+                cursor.execute(sql)  # returns number of rows
+                picture_file = cursor.fetchone()[0]
+
+            self.stdout.write('%s "%s" (%s, %s) %s %s "%s" %s <%s>' % (
+                legacy_id,
+                title,
+                director,
+                year,
+                startDate,
+                startTime,
+                picture_file,
+                programmerName, programmerEmail
+            ))
+
+        self.stdout.write(self.style.SUCCESS(
+            '%d legacy films imported' % len(films)))
 
         db.close()
