@@ -17,7 +17,6 @@ I used d4e9757916fdf0b9aee0c907fd9aee08da922b19
 '''
 
 import datetime
-from datetime import date
 import os
 import pytz
 import shutil
@@ -34,7 +33,7 @@ import MySQLdb
 
 # Adjust to taste
 dbuser = 'starshadow'
-dbpass = ''
+dbpass = 'ye2EUsSUCYY8ALx7'
 dbdb = 'ssarchive'
 ARCHIVE_IMAGE_PATH = '/home/marcus/toolkit/star_shadow/archive/static'
 IMAGE_PATH = '/home/marcus/toolkit/star_shadow/star_site_3/media/diary'
@@ -114,134 +113,139 @@ class Command(BaseCommand):
                 picture_file = ''
         return picture_file, dest_picture
 
+    def _read_archive_db(self, cursor, table):
+
+        # ORDER BY `startDate` DESC"
+        sql = "SELECT * FROM `%s` WHERE `deleted` = 0 AND `confirmed` = 1 AND `private` = 0" % table
+        rows = cursor.execute(sql)  # returns number of rows
+        self.stdout.write('%s: %d rows found' % (table, rows))
+        events = cursor.fetchall()
+        # events = events[0:10]
+        return events
+
     def handle(self, *args, **options):
 
         timezone = pytz.timezone("Europe/London")
         db = self._conn_to_archive_database()
         cursor = db.cursor()
-        # ORDER BY `startDate` DESC"
-        sql = "SELECT * FROM `programming_event` WHERE `deleted` = 0 AND `confirmed` = 1 AND `private` = 0"
-        # sql = "SELECT * FROM `programming_festival` WHERE `deleted` = 0 AND `confirmed` = 1 AND `private` = 0"
-        # sql = "SELECT * FROM `programming_gig` WHERE `deleted` = 0 AND `confirmed` = 1 AND `private` = 0"
-        cursor.execute(sql)  # returns number of rows
-        events = cursor.fetchall()
-        events = events[0:0]  # FIXME
 
-        self.stdout.write('Found %d events' % len(events))
+        for table in ['programming_event', 'programming_festival', 'programming_gig']:
+            events = self._read_archive_db(cursor, table)
 
-        for event in events:
-            legacy_id = event[0]
-            title = event[1]
-            summary = event[2]
-            body = event[3]
-            website = event[4]
-            notes = event[5]
-            programmer_id = event[6]
-            picture_id = event[10]
-            startDate = event[12]  # class 'datetime.date'
-            startTime = event[13]  # class 'datetime.timedelta'
-            '''For festival
-            endDate = event[14]  # class 'datetime.date'
-            endTime = event[15]  # class 'datetime.timedelta'
-            '''
-            if isinstance(event[14], date):
-                endTime = event[14]  # event or gig
-            else:
-                endTime = ''  # festival
-            if endTime and startTime:
-                duration = endTime - startTime  # class datetime.timedelta
-            else:
-                duration = datetime.timedelta(0)
-            if duration < datetime.timedelta(0):
-                duration = datetime.timedelta(0)
+            for event in events:
+                legacy_id = event[0]
+                title = event[1]
+                summary = event[2]
+                body = event[3]
+                website = event[4]
+                notes = event[5]
+                programmer_id = event[6]
+                picture_id = event[10]
+                startDate = event[12]  # class 'datetime.date'
+                startTime = event[13]  # class 'datetime.timedelta'
+                '''For programming_festival
+                endDate = event[14]  # class 'datetime.date'
+                endTime = event[15]  # class 'datetime.timedelta'
+                '''
+                if table not in 'programming_festival':
+                    endTime = event[14]  # event or gig
+                    if endTime and startTime:
+                        duration = endTime - startTime  # class datetime.timedelta
+                        if duration < datetime.timedelta(0):
+                            duration = datetime.timedelta(0)
+                    else:
+                        duration = datetime.timedelta(0)
+                else:  # festival
+                    endTime = ''
+                    duration = datetime.timedelta(0)
 
-            programmerName, programmerEmail = self._find_programmer(cursor,
-                                                                    programmer_id)
+                programmerName, programmerEmail = self._find_programmer(cursor,
+                                                                        programmer_id)
 
-            picture_file, dest_picture = self._copy_image(cursor, picture_id)
+                picture_file, dest_picture = self._copy_image(cursor, picture_id)
 
-            self.stdout.write('%s "%s" %s %s "%s" %s <%s>' % (
-                legacy_id,
-                title,
-                startDate,
-                duration,
-                picture_file,
-                programmerName, programmerEmail
-            ))
+                self.stdout.write('%s "%s" %s %s "%s" %s <%s>' % (
+                    legacy_id,
+                    title,
+                    startDate,
+                    duration,
+                    picture_file,
+                    programmerName, programmerEmail
+                ))
 
-            duration = (datetime.datetime.min +
-                        duration).time()  # class datetime.time
-            startDateAsaTime = datetime.datetime.combine(
-                startDate,
-                datetime.datetime.min.time())
-            startDateAsaTime = startDateAsaTime + startTime
-            # date = datetime.strptime(startDate + startTime, '%Y-%m-%d %H:%M:%S')
+                duration = (datetime.datetime.min +
+                            duration).time()  # class datetime.time
+                startDateAsaTime = datetime.datetime.combine(
+                    startDate,
+                    datetime.datetime.min.time())
+                startDateAsaTime = startDateAsaTime + startTime
+                # date = datetime.strptime(startDate + startTime, '%Y-%m-%d %H:%M:%S')
 
-            # continue  # FIXME
-            # Attempt to create an cube toolkit style event
-            e = Event()
-            e.legacy_id = legacy_id
-            e.name = title
-            e.copy = '%s\n\n%s' % (body, website) or ''
-            e.copy_summary = summary or ''
-            e.legacy_copy = False
-            if programmerEmail is not None and programmerEmail.strip() != '':
-                e.notes = "%s\n\nBooked by %s <%s>" % (notes,
-                                                       programmerName,
-                                                       programmerEmail)
-            else:
-                e.notes = notes
-            # TODO set a tag?
-            if duration is not None and duration != '':
-                e.duration = duration
-            else:
-                e.duration = datetime.time(0, 0)
+                # continue  # FIXME
+                # Attempt to create an cube toolkit style event
+                e = Event()
+                e.legacy_id = legacy_id
+                e.name = title
+                e.copy = '%s\n\n%s' % (body, website) or ''
+                e.copy_summary = summary or ''
+                e.legacy_copy = False
+                if programmerEmail is not None and programmerEmail.strip() != '':
+                    e.notes = "%s\n\nBooked by %s <%s>" % (notes,
+                                                           programmerName,
+                                                           programmerEmail)
+                else:
+                    e.notes = notes
+                if duration is not None and duration != '':
+                    e.duration = duration
+                else:
+                    e.duration = datetime.time(0, 0)
 
-            e.full_clean()
-            e.save()
-            e.tags.add(EventTag.objects.filter(name='film').first())
+                e.full_clean()
+                e.save()
+                if table in 'programming_gig':
+                    e.tags.add(EventTag.objects.filter(name='music').first())
 
-            if picture_id:
-                image_path = os.path.join(EVENT_IMAGES_PATH, dest_picture)
-                media_item = MediaItem(
-                    media_file=image_path,
-                    credit=title
-                )
-                media_item.full_clean()
-                media_item.save()
-                e.media.add(media_item)
+                if picture_id:
+                    image_path = os.path.join(EVENT_IMAGES_PATH, dest_picture)
+                    media_item = MediaItem(
+                        media_file=image_path,
+                        credit=title
+                    )
+                    media_item.full_clean()
+                    media_item.save()
+                    e.media.add(media_item)
 
-            # Graft event to a showing
-            timezone = pytz.timezone("Europe/London")
-            fake_start = (django.utils.timezone.now() +
-                          datetime.timedelta(days=1))
+                # Graft event to a showing
+                fake_start = (django.utils.timezone.now() +
+                              datetime.timedelta(days=1))
 
-            s = Showing()
-            s.event = e
-            # The full_clean checks that start is in the future
-            # so set a valid start date now, and after the call to
-            # full_clean change it to the actual value before saving
-            s.start = fake_start
-            if programmerName is not None and programmerName.strip() != '':
-                s.booked_by = programmerName
-            else:
-                s.booked_by = 'unknown'
-            s.confirmed = True
-            s.room = Room.objects.filter(name='Cinema').first()
+                s = Showing()
+                s.event = e
+                # The full_clean checks that start is in the future
+                # so set a valid start date now, and after the call to
+                # full_clean change it to the actual value before saving
+                s.start = fake_start
+                if programmerName is not None and programmerName.strip() != '':
+                    s.booked_by = programmerName
+                else:
+                    s.booked_by = 'unknown'
+                s.confirmed = True
+                s.room = Room.objects.filter(name='Cinema').first()
 
-            s.full_clean()
-            # Store datetime with timezone information
-            s.start = timezone.localize(startDateAsaTime)
-            # Force, to allow saving of showing with start in past
-            s.save(force=True)
+                s.full_clean()
+                # Store datetime with timezone information
+                s.start = timezone.localize(startDateAsaTime)
+                # Force, to allow saving of showing with start in past
+                s.save(force=True)
 
-        self.stdout.write(self.style.SUCCESS(
-            '%d legacy events imported' % len(events)))
+            self.stdout.write(self.style.SUCCESS(
+                '%s %d events imported' % (table, len(events))))
 
-        # return # FIXME
+        # return  # FIXME
 
         # Test testing add ORDER BY `startDate` DESC
-        sql = "SELECT * FROM `programming_film` WHERE `deleted` = 0 AND `confirmed` = 1 AND `private` = 0 AND `id` = 898"
+        # AND `id` = 898"
+        sql = "SELECT * FROM `programming_film` WHERE `deleted` = 0 AND `confirmed` = 1 AND `private` = 0"
         cursor.execute(sql)  # returns number of rows
         films = cursor.fetchall()
         # films = films[1100:]
@@ -309,8 +313,8 @@ class Command(BaseCommand):
                                                        programmerEmail)
             else:
                 e.notes = notes
-            e.template = EventTemplate.objects.filter(name='Film (DVD)').first()
-            # FIXME  uses last integer
+            # e.template = EventTemplate.objects.filter(name='Film (DVD)').first()
+            # FIXME  consider duration
             # print(length)
             if False and length is not None and length != '':
                 e.duration = [int(s) for s in length.split() if s.isdigit()][-1]
