@@ -39,6 +39,16 @@ class Command(BaseCommand):
         # events = events[0:10]
         return documents
 
+    def add_arguments(self, parser):
+        # Named (optional) arguments
+        parser.add_argument(
+            '--inspect',
+            action='store_true',
+            dest='inspect',
+            default=False,
+            help='Dry-run, list authors and document types',
+        )
+
     def handle(self, *args, **options):
 
         db = self._conn_to_archive_database()
@@ -46,22 +56,30 @@ class Command(BaseCommand):
         doc_types = []
         authors = []
 
-        if True:
-            documents = self._read_archive_db(cursor, 'content_document')
+        documents = self._read_archive_db(cursor, 'content_document')
 
-            for document in documents:
-                legacy_id = document[0]
-                title = document[1]
-                title = " ".join(title.split())
-                source = document[2]
-                source = " ".join(source.split())
-                summary = document[3]
-                author = document[4].title()
-                author = " ".join(author.split())
-                created = document[5]
-                doc_type = document[6]
-                body = document[7]
+        for document in documents:
+            legacy_id = document[0]
+            title = document[1]
+            title = " ".join(title.split())
+            source = document[2]
+            source = " ".join(source.split())
+            summary = document[3]
+            author = document[4].title()
+            author = " ".join(author.split())
+            created = document[5]
+            doc_type = document[6]
+            body = document[7]
 
+            # Fix authors
+            if author in ['A Neatrour',
+                          'Adriin Neatrour',
+                          'Adrin Neatrour',
+                          'Adrin Netarour',
+                          'Adrinneatrour']:
+                author = 'Adrin Neatrour'
+
+            if not options['inspect']:
                 self.stdout.write('%s "%s" "%s" "%s" %s "%s"' % (
                     legacy_id,
                     title,
@@ -71,15 +89,18 @@ class Command(BaseCommand):
                     doc_type
                 ))
 
-                if doc_type not in doc_types:
-                    doc_types.append(doc_type)
-                if author not in authors:
-                    authors.append(author)
+            if doc_type not in doc_types:
+                doc_types.append(doc_type)
+            if author not in authors:
+                authors.append(author)
 
-                # continue  # FIXME
+            # continue  # FIXME
 
-        print(doc_types)
-        print(sorted(authors))
+        if options['inspect']:
+
+            print('doc types: %s' % doc_types)
+            print('Authors: %s' % sorted(authors))
+
         self.stdout.write(self.style.SUCCESS(
                 '%d documents imported' % len(documents)))
 
