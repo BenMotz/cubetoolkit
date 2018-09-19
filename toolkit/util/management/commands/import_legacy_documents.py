@@ -44,6 +44,7 @@ class Command(BaseCommand):
         db = self._conn_to_archive_database()
         cursor = db.cursor()
         doc_types = []
+        authors = []
 
         if True:
             documents = self._read_archive_db(cursor, 'content_document')
@@ -56,6 +57,7 @@ class Command(BaseCommand):
                 source = " ".join(source.split())
                 summary = document[3]
                 author = document[4].title()
+                author = " ".join(author.split())
                 created = document[5]
                 doc_type = document[6]
                 body = document[7]
@@ -71,10 +73,13 @@ class Command(BaseCommand):
 
                 if doc_type not in doc_types:
                     doc_types.append(doc_type)
+                if author not in authors:
+                    authors.append(author)
 
                 # continue  # FIXME
 
         print(doc_types)
+        print(sorted(authors))
         self.stdout.write(self.style.SUCCESS(
                 '%d documents imported' % len(documents)))
 
