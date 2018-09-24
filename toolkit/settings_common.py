@@ -72,6 +72,8 @@ PROGRAMME_EVENT_TERMS_MIN_WORDS = 3
 # Max size of uploaded diary media items (enforced by MediaItemForm)
 PROGRAMME_MEDIA_MAX_SIZE_MB = 5  # Megabytes (i.e. * 1024 * 1024 bytes)
 
+ROTA_DAYS_AHEAD = 10  # How many days ahead to show rota vacancies
+
 DEFAULT_MUGSHOT = "/static/members/default_mugshot.gif"
 
 # SMTP host/port settings. For complete list of relevant settings see:

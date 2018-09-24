@@ -977,7 +977,7 @@ def printed_programme_edit(request, operation):
 
 @permission_required('diary.change_rotaentry')
 def view_rota_vacancies(request):
-    days_ahead = 6
+    days_ahead = settings.ROTA_DAYS_AHEAD
     start = timezone.now()
     end_date = start + datetime.timedelta(days=days_ahead)
     showings = (Showing.objects.not_cancelled()
