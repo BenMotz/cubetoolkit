@@ -28,15 +28,21 @@ Editing {{ event_list_name }}
   .daytime {
       background-color: #FFFF99;
   }
+  .room-title {
+      text-align: center;
+      font-weight: bold;
+  }
   a {
       color: #2a00ff;
   }
   table { border-collapse: collapse; }
   tr:nth-child(odd) td {
       background-color: #d0d0d0;
+      border: 1px solid black;
   }
   tr:nth-child(even) td {
       background-color: #c0c0c0;
+      border: 1px solid black;
   }
   td:first-child {
       text-align: right;
@@ -213,13 +219,6 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
 {% with room_columns=rooms|length %}
 <table>
     <tr><td></td><td colspan="{{ room_columns|add:1 }}"><a href="{% url "add-event" %}">New event</a></td></tr>
-{% if multiroom_enabled %}
-<tr><td colspan="2"></td>
-{% for room in rooms %}
-    <th>{{ room.name|default:"<!-- No Room -->" }}</th>
-{% endfor %}
-</tr>
-{% endif %}
 {% for day, showings in dates.items %}
     {% ifchanged %}
         <tr class="row_year">
@@ -230,7 +229,9 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
     {% ifchanged %}
         <tr class="row_month">
             <td colspan="2"><h2>{{ day|date:"F" }}</h2></td>
-            <td colspan="{{ room_columns }}"></td>
+            {% for room in rooms %}
+                <td class="room-title">{{ room.name|default:"<!-- No Room -->" }}</td>
+            {% endfor %}
         </tr>
     {% endifchanged %}
     {% if day in ideas %}

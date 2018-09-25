@@ -178,7 +178,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
     context['end'] = enddatetime
     context['edit_prefs'] = edit_prefs.get_preferences(request.session)
     context['rooms'] = (
-        [None] + list(Room.objects.all()) if settings.MULTIROOM_ENABLED
+        list(Room.objects.all()) if settings.MULTIROOM_ENABLED
         else [None])
     context['multiroom_enabled'] = settings.MULTIROOM_ENABLED
     return render(request, 'edit_event_index.html', context)
