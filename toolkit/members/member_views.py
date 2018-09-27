@@ -442,6 +442,7 @@ def member_statistics(request):
     return render(request, 'stats.html', context)
 
 
+@permission_required('toolkit.read')
 @require_safe
 def member_duplicates(request):
 
