@@ -31,8 +31,9 @@ Your username is <strong>{{ user }}</strong></p>
         </span>
         {% else %}
             {{ showing.start|date:"D jS H:i" }}
-        {% endif %} &mdash;
-        <a href="{{ VENUE.url }}{% url "single-showing-view" showing.pk %}">{{ showing.event.name }}</a></b> <i>needs</i>
+        {% endif %}
+        <br>
+        <a href="{{ VENUE.url }}{% url "single-showing-view" showing.pk %}">{{ showing.event.name }}</a></b> <i>needs</i><br>
         {% for rota_entry in vacant_roles %}
             {{ rota_entry.role.name }}{% if rota_entry.rank > 1 %} #{{ rota_entry.rank }}{% endif %}{% if not forloop.last %},{% endif %}
         {% empty %}
