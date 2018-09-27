@@ -151,6 +151,7 @@ function filter_events() {
             var jq_el = $(el);
             var header_row = jq_el.hasClass("row_month") || jq_el.hasClass("row_year");
             if(!header_row) {
+                // FIXME only considering column 3. Need to consider rest of the columns for multiroom
                 var name_cell = jq_el.children(':nth-child(3)');
                 if(name_cell.text().toLowerCase().indexOf(filter_text) !== -1) {
                     // NB: if filter text is "" then this will always match, and
@@ -199,8 +200,8 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
 <p><a name="top"></a></p>
 <b>Key:</b>
 <p>
-<span class="unconfirmed">unconfirmed are lower case and wiggly underlined</span><br>
-<span class="confirmed">CONFIRMED ARE UPPER CASE</span><br>
+<span class="unconfirmed">Unconfirmed events are in lower case and wiggly underlined</span><br>
+<span class="confirmed">Confirmed events are in normal case</span><br>
 <span class="private">Private events are in italics</span><br>
 <span class="external">Outside hires are bolded</span><br>
 <span class="discounted">Discounted events (like cheap night) are magenta and have an *</span><br>
@@ -269,7 +270,7 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
                            {{ showing.confirmed|yesno:"confirmed,unconfirmed" }}
                            {% if start_localtime.hour <= 17 %}daytime{% endif %}">
                 {% if showing.confirmed %}
-                    {{ showing.event.pre_title|upper }} {{ showing.event.name|upper }} {{ showing.event.post_title|upper }}
+                    {{ showing.event.pre_title }} {{ showing.event.name }} {{ showing.event.post_title }}
                 {% else %}
                     {{ showing.event.name }}
                 {% endif %}
