@@ -11,6 +11,12 @@ id title length summary body director year lang certificate_id season_id notes
 programmer_id confirmed private featured picture_id country approval_id
 startDate startTime filmFormat_id deleted
 
+Columns in programming_season
+
+id title summary body notes
+programmer_id confirmed private featured picture_id approval_id
+startDate endDate deleted
+
 Partially inspired by import_script/import_database.py,
 buried deep in the history of this repo.
 I used d4e9757916fdf0b9aee0c907fd9aee08da922b19
@@ -35,6 +41,11 @@ import MySQLdb
 dbuser = 'starshadow'
 dbpass = 'ye2EUsSUCYY8ALx7'
 dbdb = 'ssarchive'
+tables = ['programming_event',
+          'programming_festival',
+          'programming_gig',
+          'programming_season',
+          ]
 ARCHIVE_IMAGE_PATH = '/home/marcus/toolkit/star_shadow/archive/static'
 IMAGE_PATH = '/home/marcus/toolkit/star_shadow/star_site_3/media/diary'
 
@@ -50,7 +61,8 @@ class Command(BaseCommand):
             db = MySQLdb.connect("localhost",
                                  dbuser,
                                  dbpass,
-                                 dbdb)
+                                 dbdb,
+                                 charset='utf8')
             return db
         except MySQLdb.Error as e:
             self.stdout.write(self.style.ERROR(
@@ -120,7 +132,6 @@ class Command(BaseCommand):
         rows = cursor.execute(sql)  # returns number of rows
         self.stdout.write('%s: %d rows found' % (table, rows))
         events = cursor.fetchall()
-        # events = events[0:10]
         return events
 
     def handle(self, *args, **options):
@@ -129,7 +140,7 @@ class Command(BaseCommand):
         db = self._conn_to_archive_database()
         cursor = db.cursor()
 
-        for table in ['programming_event', 'programming_festival', 'programming_gig']:
+        for table in tables:
             events = self._read_archive_db(cursor, table)
 
             for event in events:
@@ -137,17 +148,25 @@ class Command(BaseCommand):
                 title = event[1]
                 summary = event[2]
                 body = event[3]
-                website = event[4]
-                notes = event[5]
-                programmer_id = event[6]
-                picture_id = event[10]
-                startDate = event[12]  # class 'datetime.date'
-                startTime = event[13]  # class 'datetime.timedelta'
-                '''For programming_festival
-                endDate = event[14]  # class 'datetime.date'
-                endTime = event[15]  # class 'datetime.timedelta'
-                '''
-                if table not in 'programming_festival':
+                if table in 'programming_season':
+                    website = ''
+                    notes = event[4]
+                    programmer_id = event[5]
+                    picture_id = event[9]
+                    startDate = event[11]  # class 'datetime.date'
+                    endDate = event[12]  # class 'datetime.timedelta'
+                else:
+                    website = event[4]
+                    notes = event[5]
+                    programmer_id = event[6]
+                    picture_id = event[10]
+                    startDate = event[12]  # class 'datetime.date'
+                    startTime = event[13]  # class 'datetime.timedelta'
+                    '''For programming_festival
+                    endDate = event[14]  # class 'datetime.date'
+                    endTime = event[15]  # class 'datetime.timedelta'
+                    '''
+                if table not in ['programming_festival', 'programming_season']:
                     endTime = event[14]  # event or gig
                     if endTime and startTime:
                         duration = endTime - startTime  # class datetime.timedelta
@@ -155,14 +174,19 @@ class Command(BaseCommand):
                             duration = datetime.timedelta(0)
                     else:
                         duration = datetime.timedelta(0)
-                else:  # festival
+                else:  # festival, season
+                    startTime = datetime.timedelta(seconds=18*60*60)  # Invent a start time of 6pm
                     endTime = ''
                     duration = datetime.timedelta(0)
 
                 programmerName, programmerEmail = self._find_programmer(cursor,
                                                                         programmer_id)
 
-                picture_file, dest_picture = self._copy_image(cursor, picture_id)
+                if True:
+                    picture_file, dest_picture = self._copy_image(cursor, picture_id)
+                else:
+                    picture_file = ''
+                    dest_picture = ''
 
                 self.stdout.write('%s "%s" %s %s "%s" %s <%s>' % (
                     legacy_id,
@@ -186,7 +210,10 @@ class Command(BaseCommand):
                 e = Event()
                 e.legacy_id = legacy_id
                 e.name = title
-                e.copy = '%s\n\n%s' % (body, website) or ''
+                if website:
+                    e.copy = '%s\n\n%s' % (body, website) or ''
+                else:
+                    e.copy = body or ''
                 e.copy_summary = summary or ''
                 e.legacy_copy = False
                 if programmerEmail is not None and programmerEmail.strip() != '':
@@ -195,6 +222,7 @@ class Command(BaseCommand):
                                                            programmerEmail)
                 else:
                     e.notes = notes
+                e.notes = '%s\n\nImported from %s' % (e.notes, table)
                 if duration is not None and duration != '':
                     e.duration = duration
                 else:
@@ -248,7 +276,6 @@ class Command(BaseCommand):
         sql = "SELECT * FROM `programming_film` WHERE `deleted` = 0 AND `confirmed` = 1 AND `private` = 0"
         cursor.execute(sql)  # returns number of rows
         films = cursor.fetchall()
-        # films = films[1100:]
 
         self.stdout.write('Found %d films' % len(films))
 
@@ -314,13 +341,12 @@ class Command(BaseCommand):
             else:
                 e.notes = notes
             # e.template = EventTemplate.objects.filter(name='Film (DVD)').first()
-            # FIXME  consider duration
-            # print(length)
+            # TODO consider duration, but it's hellishly complicated, due to
+            # multiple formats and multiple films
             if False and length is not None and length != '':
                 e.duration = [int(s) for s in length.split() if s.isdigit()][-1]
             else:
                 e.duration = datetime.time(0, 0)
-            # print(e.duration)
             e.full_clean()
             e.save()
             e.tags.add(EventTag.objects.filter(name='film').first())
