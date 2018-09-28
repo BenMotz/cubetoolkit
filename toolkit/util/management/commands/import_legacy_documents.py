@@ -47,6 +47,7 @@ class Command(BaseCommand):
 
         # ORDER BY `startDate` DESC"
         sql = "SELECT * FROM `%s`" % table
+        # sql = "SELECT * FROM `%s` WHERE `id` = 164" % table
         # sql = "SELECT * FROM `%s`"#  LIMIT 10" % table
         # sql = "SELECT * FROM `%s` ORDER BY `created` DESC LIMIT 10 OFFSET 10" % table
         rows = cursor.execute(sql)  # returns number of rows
@@ -61,7 +62,7 @@ class Command(BaseCommand):
             action='store_true',
             dest='inspect',
             default=False,
-            help='Dry-run, list authors and document types',
+            help='Enumerate authors and document types and create in wordpress',
         )
 
         parser.add_argument(
@@ -80,6 +81,7 @@ class Command(BaseCommand):
         authors = []
 
         documents = self._read_archive_db(cursor, 'content_document')
+        fail_count = 0
 
         for document in documents:
             legacy_id = document[0]
@@ -95,12 +97,19 @@ class Command(BaseCommand):
             body = document[7]
 
             # Fix authors
-            if author in ['A Neatrour',
+            if author in ['',
+                          'A Neatrour',
                           'Adriin Neatrour',
                           'Adrin Neatrour',
                           'Adrin Netarour',
                           'Adrinneatrour']:
                 author = 'Adrin Neatrour'
+            if author in ['Yaron Golan For Kino Bambino']:
+                author = 'Yaron Golan'
+            if author in ['Phil Eastine']:
+                author = 'Phil Eastein'
+            if author in ['I.M., M.F With John Smith (Adt)']:
+                author = 'Ilana Mitchell'
 
             if not options['inspect']:
                 self.stdout.write('%s "%s" "%s" "%s" %s "%s"' % (
@@ -113,7 +122,11 @@ class Command(BaseCommand):
                 ))
 
             body = body.replace("’", "'")
+            body = body.replace("<br />", "\n")
+            body = body.replace("</p>", "\n")
             body = strip_tags(body)
+            summary = strip_tags(summary)
+            title = strip_tags(title)
 
             newbody = ''
             paras = body.split("&nbsp;\n\n")
@@ -130,9 +143,9 @@ class Command(BaseCommand):
             shebang = ("wp post create \
                 --post_content=\"%s\" \
                 --post_date='%s 18:00:00' \
-                --post_title='%s' \
+                --post_title=\"%s\" \
                 --post_status=Publish \
-                --post_excerpt='%s' \
+                --post_excerpt=\"%s\" \
                 --user='%s' \
                 --post_category=['%s'] \
                 --post_mime_type='text/html' \
@@ -159,6 +172,7 @@ class Command(BaseCommand):
                         print(line)
                 except subprocess.CalledProcessError as e:
                     print('%s: %s' % (shebang, str(e.output, 'utf-8')))
+                    fail_count = fail_count + 1
                     continue
 
             if doc_type not in doc_types:
@@ -186,7 +200,61 @@ class Command(BaseCommand):
             self.stdout.write('doc types: %s' % doc_types)
             self.stdout.write('Authors: %s' % sorted(authors))
 
-        self.stdout.write(self.style.SUCCESS(
-                '%d documents imported' % len(documents)))
+            for author in authors:
+                first_name = author.split(' ')[0].lower()
+                made_up_email = '%s@bogus-domain.org' % first_name
+                # print(made_up_email)
+                # wp user create bob bob@example.com --role=author
+                shebang = ("wp user create \"%s\" \"%s\" \
+                    --role=editor \
+                    --porcelain \
+                    --ssh=%s \
+                    --path=%s" % (
+                    author,
+                    made_up_email,
+                    wordpress_server,
+                    wordpress_path,
+                ))
+                self.stdout.write('Creating user %s' % author)
+                try:
+                    out = subprocess.check_output(shebang,
+                                                  shell=True,
+                                                  stderr=subprocess.STDOUT)
+                    # out is bytes
+                    out = str(out, 'utf-8')
+                    for line in out.splitlines():
+                        print(line)
+                except subprocess.CalledProcessError as e:
+                    print('%s: %s' % (shebang, str(e.output, 'utf-8')))
+                    continue
+
+            for doc_type in doc_types:
+                # wp term create category Apple
+                shebang = ("wp term create category \"%s\" \
+                    --ssh=%s \
+                    --path=%s" % (
+                    doc_type,
+                    wordpress_server,
+                    wordpress_path,
+                ))
+                self.stdout.write('Creating category %s' % doc_type)
+                try:
+                    out = subprocess.check_output(shebang,
+                                                  shell=True,
+                                                  stderr=subprocess.STDOUT)
+                    # out is bytes
+                    out = str(out, 'utf-8')
+                    for line in out.splitlines():
+                        print(line)
+                except subprocess.CalledProcessError as e:
+                    print('%s: %s' % (shebang, str(e.output, 'utf-8')))
+                    continue
+
+        else:
+            self.stdout.write(self.style.SUCCESS(
+                    '%d documents imported' % len(documents)))
+            if fail_count:
+                self.stdout.write(self.style.WARNING(
+                    '%d documents imports failed' % fail_count))
 
         db.close()
