@@ -2,6 +2,10 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
+from djcelery.models import (
+    TaskState, WorkerState, PeriodicTask,
+    IntervalSchedule, CrontabSchedule)
+
 from django.conf import settings
 from toolkit.diary.models import (Showing, Event, DiaryIdea, MediaItem,
                                   EventTemplate, EventTag, Role, RotaEntry,
@@ -20,6 +24,7 @@ UserAdmin.list_display = ('last_name',
                           'is_active',
                           'is_superuser',
                           'date_joined')
+
 
 class DiaryIdeaAdmin(admin.ModelAdmin):
     # TODO disable creation
@@ -46,10 +51,11 @@ class MemberAdmin(admin.ModelAdmin):
                    'gdpr_opt_in']
     search_fields = ['name',
                      'email']
+    ordering = ['name']
 
 
 class VolunteerAdmin(admin.ModelAdmin):
-    # TODO get obeject name to return soemthing sensible
+    # TODO get object name to return soemthing sensible
     model = Volunteer
 
 
@@ -65,11 +71,22 @@ class RotaEntryAdmin(admin.ModelAdmin):
     model = RotaEntry
 
 
+class RoomAdmin(admin.ModelAdmin):
+    model = Room
+
+
+admin.site.unregister(TaskState)
+admin.site.unregister(WorkerState)
+admin.site.unregister(IntervalSchedule)
+admin.site.unregister(CrontabSchedule)
+admin.site.unregister(PeriodicTask)
+
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
-admin.site.register(DiaryIdea, DiaryIdeaAdmin)
-admin.site.register(Event, EventAdmin)
-admin.site.register(Showing, ShowingAdmin)
+# admin.site.register(DiaryIdea, DiaryIdeaAdmin)
+# admin.site.register(Event, EventAdmin)
+# admin.site.register(Showing, ShowingAdmin)
 admin.site.register(Member, MemberAdmin)
 admin.site.register(Volunteer, VolunteerAdmin)
-admin.site.register(RotaEntry, RotaEntryAdmin)
+# admin.site.register(RotaEntry, RotaEntryAdmin)
+admin.site.register(Room, RoomAdmin)

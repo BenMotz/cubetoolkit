@@ -326,6 +326,8 @@ TEMPLATES = [
 ROOT_URLCONF = 'toolkit.urls'
 
 INSTALLED_APPS = (
+     # Django-celery
+    'djcelery',
     'toolkit.diary',
     'toolkit.members',
     'toolkit.toolkit_auth',
@@ -349,8 +351,6 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
 
-    # Django-celery
-    'djcelery',
     # DB-backed message queue (app just provides migrations),
     'kombu.transport.django',
 
