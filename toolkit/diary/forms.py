@@ -212,6 +212,10 @@ class CloneShowingForm(forms.Form):
     clone_start = forms.DateTimeField(required=True,
                                       validators=[validate_in_future],
                                       widget=JQueryDateTimePicker())
+    if settings.MULTIROOM_ENABLED:
+        room = forms.ModelChoiceField(
+            queryset=toolkit.diary.models.Room.objects.all(),
+            required=True)
     if not settings.VENUE['show_user_management']:
         booked_by = forms.CharField(min_length=1,
                                     max_length=128,

@@ -365,6 +365,8 @@ def add_showing(request, event_id):
         else:
             new_showing.booked_by = \
                 clone_showing_form.cleaned_data['booked_by']
+        if settings.MULTIROOM_ENABLED:
+            new_showing.room = clone_showing_form.cleaned_data['room']
         # Need to save showing before cloning the rota, as the rota entries
         # need the key of the Showing, and that won't get created until the
         # Showing is saved...
