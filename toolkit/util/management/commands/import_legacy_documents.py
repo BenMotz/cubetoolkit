@@ -82,6 +82,7 @@ class Command(BaseCommand):
 
         documents = self._read_archive_db(cursor, 'content_document')
         fail_count = 0
+        failed_docs = list()
 
         for document in documents:
             legacy_id = document[0]
@@ -98,12 +99,13 @@ class Command(BaseCommand):
 
             # Fix authors
             if author in ['',
+                          'Adrin Neatrour',
                           'A Neatrour',
                           'Adriin Neatrour',
                           'Adrin Neatrour',
                           'Adrin Netarour',
                           'Adrinneatrour']:
-                author = 'Adrin Neatrour'
+                author = 'adrinneatrour'
             if author in ['Yaron Golan For Kino Bambino']:
                 author = 'Yaron Golan'
             if author in ['Phil Eastine']:
@@ -111,8 +113,7 @@ class Command(BaseCommand):
             if author in ['I.M., M.F With John Smith (Adt)']:
                 author = 'Ilana Mitchell'
 
-            if not options['inspect']:
-                self.stdout.write('%s "%s" "%s" "%s" %s "%s"' % (
+            doc_str = ('%s "%s" "%s" "%s" %s "%s"' % (
                     legacy_id,
                     title,
                     source,
@@ -120,6 +121,8 @@ class Command(BaseCommand):
                     created,
                     doc_type
                 ))
+            if not options['inspect']:
+                self.stdout.write(doc_str)
 
             body = body.replace("’", "'")
             body = body.replace("<br />", "\n")
@@ -173,6 +176,7 @@ class Command(BaseCommand):
                 except subprocess.CalledProcessError as e:
                     print('%s: %s' % (shebang, str(e.output, 'utf-8')))
                     fail_count = fail_count + 1
+                    failed_docs.append(doc_str)
                     continue
 
             if doc_type not in doc_types:
@@ -252,9 +256,11 @@ class Command(BaseCommand):
 
         else:
             self.stdout.write(self.style.SUCCESS(
-                    '%d documents imported' % len(documents)))
+                    '%d documents considered' % len(documents)))
             if fail_count:
                 self.stdout.write(self.style.WARNING(
                     '%d documents imports failed' % fail_count))
+                for failed_doc in failed_docs:
+                    self.stdout.write(self.style.WARNING(failed_doc))
 
         db.close()
