@@ -254,37 +254,42 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
             {# Subsequent showings for this day #}
             <td>&nbsp;</td>
         {% endif %}
-        {% with showing.start|localtime as start_localtime %}
-            <td>
-                <a href="{% url "edit-showing" showing_id=showing.pk %}" {% if start_localtime.hour <= 17 %}class="daytime"{% endif %}>{{ showing.start|date:"H:i" }}</a>
-            </td>
+            {% with showing.start|localtime as start_localtime %}
+                <td>
+                    <a href="{% url "edit-showing" showing_id=showing.pk %}" {% if start_localtime.hour <= 17 %}class="daytime"{% endif %}>{{ showing.start|date:"H:i" }}</a>
+                    {% ifchanged showing.start %}
+                        showing time changed
+                    {% else %}
+                        showing time not changed
+                    {% endifchanged %}
+                </td>
 
-        {% for room in rooms %}
-            {# if multiroom_enabled is false then rooms will only have one item, so there shouldn't be any repeats! #}
-            {% if showing.room == room or not multiroom_enabled %}
-            <td>{{ showing.booked_by }} <a href="{% url "edit-event-details-view" pk=showing.event.pk %}"
-                    class="{{ showing.cancelled|yesno:"cancelled," }}
-                           {{ showing.discounted|yesno:"discounted," }}
-                           {{ showing.event.private|yesno:"private," }}
-                           {{ showing.event.outside_hire|yesno:"external," }}
-                           {{ showing.confirmed|yesno:"confirmed,unconfirmed" }}
-                           {% if start_localtime.hour <= 17 %}daytime{% endif %}">
-                {% if showing.confirmed %}
-                    {{ showing.event.pre_title }} {{ showing.event.name }} {{ showing.event.post_title }}
-                {% else %}
-                    {{ showing.event.name }}
-                {% endif %}
-                {{ showing.discounted|yesno:"*," }}
-                {{ showing.cancelled|yesno:"(CANCELLED)," }}
-                </a>
-                {{ showing.sold_out|yesno:"(marked SOLD OUT)," }}
-            </td>
-            {% else %}
-                <td>&nbsp;</td>
-            {% endif %}
-        {% endfor %}
-        </tr>
-        {% endwith %}
+                {% for room in rooms %}
+                    {# if multiroom_enabled is false then rooms will only have one item, so there shouldn't be any repeats! #}
+                    {% if showing.room == room or not multiroom_enabled %}
+                        <td>{{ showing.booked_by }} <a href="{% url "edit-event-details-view" pk=showing.event.pk %}"
+                            class="{{ showing.cancelled|yesno:"cancelled," }}
+                                   {{ showing.discounted|yesno:"discounted," }}
+                                   {{ showing.event.private|yesno:"private," }}
+                                   {{ showing.event.outside_hire|yesno:"external," }}
+                                   {{ showing.confirmed|yesno:"confirmed,unconfirmed" }}
+                            {% if start_localtime.hour <= 17 %}daytime{% endif %}">
+                                {% if showing.confirmed %}
+                                    {{ showing.event.pre_title }} {{ showing.event.name }} {{ showing.event.post_title }}
+                                {% else %}
+                                    {{ showing.event.name }}
+                                {% endif %}
+                            {{ showing.discounted|yesno:"*," }}
+                            {{ showing.cancelled|yesno:"(CANCELLED)," }}
+                            </a>
+                            {{ showing.sold_out|yesno:"(marked SOLD OUT)," }}
+                        </td>
+                    {% else %}
+                        <td>&nbsp;</td>
+                    {% endif %}
+                {% endfor %}
+                </tr>
+            {% endwith %}
     {% empty %}
         {# No showings on this day, but show the day anyway (with a link to add an event) #}
         <tr>
