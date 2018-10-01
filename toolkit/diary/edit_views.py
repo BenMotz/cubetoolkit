@@ -123,8 +123,12 @@ def edit_diary_list(request, year=None, day=None, month=None):
     enddatetime = startdatetime + datetime.timedelta(days=days_ahead)
 
     # Get all showings in the date range
-    showings = (Showing.objects.start_in_range(startdatetime, enddatetime)
-                               .order_by('start').select_related())
+    if settings.MULTIROOM_ENABLED:  # Is this test required?
+        showings = (Showing.objects.start_in_range(startdatetime, enddatetime)
+                                   .order_by('start', 'room').select_related())
+    else:
+        showings = (Showing.objects.start_in_range(startdatetime, enddatetime)
+                                   .order_by('start').select_related())
     # Build two dicts, to hold the showings and the ideas. These dicts are
     # initially empty, and get filled in if there are actually showings or
     # ideas for those dates.

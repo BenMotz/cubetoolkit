@@ -1,5 +1,6 @@
 {% extends "base_admin.html" %}
 {% load hash_filter tz %}
+{#  {% load get_next %} #}
 
 {% block title %}
 Editing {{ event_list_name }}
@@ -257,11 +258,13 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
             {% with showing.start|localtime as start_localtime %}
                 <td>
                     <a href="{% url "edit-showing" showing_id=showing.pk %}" {% if start_localtime.hour <= 17 %}class="daytime"{% endif %}>{{ showing.start|date:"H:i" }}</a>
+                    {% comment %}
                     {% ifchanged showing.start %}
                         showing time changed
                     {% else %}
                         showing time not changed
                     {% endifchanged %}
+                    {% endcomment %}
                 </td>
 
                 {% for room in rooms %}
@@ -283,6 +286,17 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
                             {{ showing.cancelled|yesno:"(CANCELLED)," }}
                             </a>
                             {{ showing.sold_out|yesno:"(marked SOLD OUT)," }}
+                            {% comment "Pondering how to get entries with the same line onto the same row" %}
+                            counter: {{ forloop.parentloop.counter0 }}<br />
+                            {% with showings|next:forloop.parentloop.counter0 as next_showing %}
+                                Next Showing: {{  next_showing.start|localtime }}<br />
+                                {% if showing.start|localtime == next_showing.start|localtime %}
+                                    Next show time is same
+                                {% else %}
+                                    Next show time is different
+                                {% endif %}
+                            {% endwith %}
+                            {% endcomment %}
                         </td>
                     {% else %}
                         <td>&nbsp;</td>
