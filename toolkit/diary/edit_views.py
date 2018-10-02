@@ -588,9 +588,13 @@ def edit_showing(request, showing_id=None):
 
     # Also create a form for "cloning" the showing (ie. adding another one),
     # but initialise it with values from existing event, but a day later...
+    if settings.MULTIROOM_ENABLED:  # Assume cloning into a different room
+        clone_start = showing.start
+    else:
+        clone_start = showing.start + datetime.timedelta(days=1)
     clone_showing_form = diary_forms.CloneShowingForm(
         initial={
-            'clone_start': showing.start + datetime.timedelta(days=1)
+            'clone_start': clone_start
         }
     )
 
