@@ -31,6 +31,10 @@ urlpatterns = [
     url(r'^robots\.txt$', generic.TemplateView.as_view(
         template_name='robots.txt',
         content_type='text/plain')),
+    # Archive Star and Shadow
+    url(r'^on/(?P<event_type>\w+)/(?P<legacy_id>\d+)/$',
+        toolkit.diary.public_views.redirect_legacy_event,
+        name='redirect-legacy-event'),
 
     # Main index page: requires logging in, even though some other parts
     # (eg diary index) don't.

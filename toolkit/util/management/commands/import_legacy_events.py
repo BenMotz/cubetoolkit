@@ -340,6 +340,7 @@ class Command(BaseCommand):
                                                        programmerEmail)
             else:
                 e.notes = notes
+            e.notes = '%s\n\nImported from %s' % (e.notes, 'programming_film')
             # e.template = EventTemplate.objects.filter(name='Film (DVD)').first()
             # TODO consider duration, but it's hellishly complicated, due to
             # multiple formats and multiple films

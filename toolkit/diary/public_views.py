@@ -7,7 +7,7 @@ from collections import OrderedDict
 
 from django.db.models import Q
 from django.http import HttpResponse, Http404
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.conf import settings
 from django.utils.html import conditional_escape
@@ -278,6 +278,40 @@ def view_event(request, event_id=None, legacy_id=None, event_slug=None):
         'media_url': settings.MEDIA_URL
     }
     return render(request, 'view_event.html', context)
+
+
+def redirect_legacy_event(request, event_type=None, legacy_id=None):
+    '''Star and Shadow - archive site stylee url
+    Expecting event type to be one of
+    season, film, gig, event, festival, meeting'''
+    logger.debug('Given legacy url %s, %s, %s' % (
+        request.path, event_type, legacy_id))
+    if 'gig' == event_type:
+        legacy_table = 'programming_gig'
+    elif 'season' == event_type:
+        legacy_table = 'programming_season'
+    elif 'film' == event_type:
+        legacy_table = 'programming_film'
+    elif 'event' == event_type:
+        legacy_table = 'programming_event'
+    elif 'festival' == event_type:
+        legacy_table = 'programming_festival'
+    else:
+        logger.debug('Unknown event_type "%s"' % event_type)
+        raise Http404("Event not found")
+    try:
+        events = (Event.objects.filter(legacy_id=legacy_id,
+                                       notes__contains=legacy_table))
+        event = events.first()  # Only expecting one event
+        if event:
+            logger.debug('found: %s: "%s"' % (event.id, event.name))
+        else:
+            raise Http404("Event not found")
+    except IndexError:
+        logger.debug('Could not find anything matching %s and %s' % (
+            legacy_id, legacy_table))
+        raise Http404("Event not found")
+    return redirect('single-event-view', event_id=event.id)
 
 
 class ArchiveIndex(generic.ArchiveIndexView):
