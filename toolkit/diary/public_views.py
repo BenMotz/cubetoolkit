@@ -286,19 +286,7 @@ def redirect_legacy_event(request, event_type=None, legacy_id=None):
     season, film, gig, event, festival, meeting'''
     logger.debug('Given legacy url %s, %s, %s' % (
         request.path, event_type, legacy_id))
-    if 'gig' == event_type:
-        legacy_table = 'programming_gig'
-    elif 'season' == event_type:
-        legacy_table = 'programming_season'
-    elif 'film' == event_type:
-        legacy_table = 'programming_film'
-    elif 'event' == event_type:
-        legacy_table = 'programming_event'
-    elif 'festival' == event_type:
-        legacy_table = 'programming_festival'
-    else:
-        logger.debug('Unknown event_type "%s"' % event_type)
-        raise Http404("Event not found")
+    legacy_table = 'programming_' + event_type
     try:
         events = (Event.objects.filter(legacy_id=legacy_id,
                                        notes__contains=legacy_table))
@@ -306,6 +294,8 @@ def redirect_legacy_event(request, event_type=None, legacy_id=None):
         if event:
             logger.debug('found: %s: "%s"' % (event.id, event.name))
         else:
+            logger.debug('Could not find anything matching %s and %s' % (
+                legacy_id, legacy_table))
             raise Http404("Event not found")
     except IndexError:
         logger.debug('Could not find anything matching %s and %s' % (
