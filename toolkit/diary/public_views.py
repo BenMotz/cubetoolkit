@@ -282,6 +282,9 @@ def view_event(request, event_id=None, legacy_id=None, event_slug=None):
 
 def redirect_legacy_event(request, event_type=None, legacy_id=None):
     '''Star and Shadow - archive site stylee url
+    The legacy_ids are not unique. When I did the import, I wrote
+    the name of the originating table into the notes field as
+    "Imported from programming_name_of_table"
     Expecting event type to be one of
     season, film, gig, event, festival, meeting'''
     logger.debug('Given legacy url %s, %s, %s' % (
