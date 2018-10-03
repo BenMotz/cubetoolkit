@@ -46,8 +46,8 @@ tables = ['programming_event',
           'programming_gig',
           'programming_season',
           ]
-ARCHIVE_IMAGE_PATH = '/home/marcus/toolkit/star_shadow/archive/static'
-IMAGE_PATH = '/home/marcus/toolkit/star_shadow/star_site_3/media/diary'
+ARCHIVE_IMAGE_PATH = '/home/users/starandshadow/archive/static'
+IMAGE_PATH = '/home/users/starandshadow/star_site/media'
 
 EVENT_IMAGES_PATH = "diary"
 
