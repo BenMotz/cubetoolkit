@@ -37,6 +37,24 @@ def add_member(request):
         form = NewMemberForm(request.POST, instance=instance)
         # Validate form fields
         if form.is_valid():
+
+            results = (Member.objects.filter(email__icontains=instance.email)
+                                     .order_by('name'))
+            if results:
+                for result in results:
+                    logger.info('Member with id %s %s <%s> already in database' %
+                                (result.id, result.name, result.email))
+                context = {
+                    'search_terms': instance.email,
+                    'members': results,
+                    'membership_expiry_enabled': settings.MEMBERSHIP_EXPIRY_ENABLED,
+                }
+                messages.add_message(request,
+                                     messages.WARNING,
+                                     u"%s already in members' database" %
+                                     instance.email)
+                return render(request, 'search_members_results.html', context)
+
             # Form is valid, save data:
             logger.info(u"Adding member '{0} <{1}>'".format(
                 instance.name,
