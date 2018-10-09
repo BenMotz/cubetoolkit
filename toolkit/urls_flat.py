@@ -1,6 +1,7 @@
 from django.conf.urls import include, url
 import django.conf
 import django.views.generic as generic
+from django.views.generic.base import RedirectView
 import django.views.static
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
@@ -32,6 +33,9 @@ urlpatterns = [
         template_name='robots.txt',
         content_type='text/plain')),
     # Archive Star and Shadow
+    url(r'^on/(today|thisweek|thismonth|nextweek|nextmonth)/(.*)$',
+        RedirectView.as_view(url='/', permanent=True),
+        name='default-view'),
     url(r'^on/(?P<event_type>\w+)/(?P<legacy_id>\d+)/$',
         toolkit.diary.public_views.redirect_legacy_event,
         name='redirect-legacy-event'),
