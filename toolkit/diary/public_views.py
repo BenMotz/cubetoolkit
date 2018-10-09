@@ -307,6 +307,19 @@ def redirect_legacy_event(request, event_type=None, legacy_id=None):
     return redirect('single-event-view', event_id=event.id)
 
 
+def redirect_legacy_year(request, year=None):
+    '''Star and Shadow - archive site stylee url
+    In a better world we would decode the archive URLs more fully
+    for example
+    /on/2016/08/31/
+    /on/2016/03/25/feed/
+    /on/2011/w20/
+    but for the meantime at least capture the year and use that'''
+    logger.debug('Given legacy url %s, just using year %s' % (
+        request.path, year))
+    return redirect('archive-view-year', year=year)
+
+
 class ArchiveIndex(generic.ArchiveIndexView):
     # Limit to public events
     queryset = Showing.objects.public().select_related()
