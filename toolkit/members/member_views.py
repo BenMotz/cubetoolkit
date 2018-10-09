@@ -38,7 +38,7 @@ def add_member(request):
         # Validate form fields
         if form.is_valid():
 
-            results = (Member.objects.filter(email__icontains=instance.email)
+            results = (Member.objects.filter(email=instance.email)
                                      .order_by('name'))
             if results:
                 for result in results:
