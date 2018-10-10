@@ -65,6 +65,9 @@
         <li><a href="{% url "members-mailout" %}">Members mailout</a></li>
         <li><a href="{% url "member-statistics" %}">Members statistics</a></li>
         <li><a href="{% url "member-duplicates" %}">Members duplicates</a></li>
+        {% if membership_expiry_enabled %}
+            <li><a href="{% url "member-expired" %}">Expired Members</a></li>
+        {% endif %}
     </ul>
     <h2>Website</h2>
     <ul>
