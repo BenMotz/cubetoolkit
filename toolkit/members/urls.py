@@ -9,7 +9,7 @@ from toolkit.members.volunteer_views import (
 
 from toolkit.members.member_views import (
     add_member, search, view,
-    edit_member, delete_member, member_statistics,
+    edit_member, delete_member, member_statistics, member_expired,
     member_duplicates, member_homepages, unsubscribe_member,
     unsubscribe_member_right_now, opt_in, goodbye)  # TODO rename goodbye
 
@@ -69,6 +69,8 @@ member_urls = [
         name='member-statistics'),
     url(r'^duplicates/$', member_duplicates,
         name='member-duplicates'),
+    url(r'^expired/$', member_expired,
+        name='member-expired'),
 
     # External:
     url(r'^homepages/$', member_homepages,

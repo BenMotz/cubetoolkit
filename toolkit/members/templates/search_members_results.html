@@ -1,5 +1,11 @@
 {% extends 'base_member.html' %}
-{% block title %}Search members{% endblock %}
+{% block title %}
+{% if showing_expired %}
+    Expired members
+{% else %}
+    Search members
+{% endif %}
+{% endblock %}
 
 {% block css %}
 {{ block.super }}
@@ -41,11 +47,17 @@ $(document).ready(function() {
 {% endblock %}
 
 {% block body %}
-<p>Searched for "{{ search_terms }}", {{ members|length }} results<p>
 
-<form action="" method="get">
-<input type="text" name="q" size="20" maxsize="30" autofocus value="{{ search_terms }}"> <input type="submit" value="Search"><p>
-</form>
+{% if showing_expired %}
+    <p>Number of expired members: {{ members|length }}</p>
+{% else %}
+    <p>Searched for "{{ search_terms }}", {{ members|length }} results</p>
+    <form action="" method="get">
+        <input type="text" name="q" size="20" maxsize="30" autofocus value="{{ search_terms }}">
+        <input type="submit" value="Search"><p>
+    </form>
+{% endif %}
+
 <table class="table">
 <tr>
 <th>Member #</th><th>Name</th>

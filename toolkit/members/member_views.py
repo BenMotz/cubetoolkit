@@ -90,6 +90,7 @@ def search(request):
             Q(email__icontains=search_terms) |
             Q(number=search_terms)).order_by('name')
         context = {
+            'showing_expired': False,
             'search_terms': search_terms,
             'members': results,
             'membership_expiry_enabled': settings.MEMBERSHIP_EXPIRY_ENABLED,
@@ -398,6 +399,7 @@ def opt_in(request, member_id):
 
 
 @require_safe
+@permission_required('toolkit.read')
 def member_statistics(request):
     # View for the 'statistics' page of the 'membership database'
 
@@ -458,6 +460,18 @@ def member_statistics(request):
         context.update(extra_context)
 
     return render(request, 'stats.html', context)
+
+
+@require_safe
+@permission_required('toolkit.read')
+def member_expired(request):
+    expired = Member.objects.expired()
+    context = {
+        'showing_expired': True,
+        'search_terms': '',
+        'members': expired,
+        'membership_expiry_enabled': settings.MEMBERSHIP_EXPIRY_ENABLED, }
+    return render(request, 'search_members_results.html', context)
 
 
 @permission_required('toolkit.read')

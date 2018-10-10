@@ -21,6 +21,9 @@
 <a href="{% url "add-member" %}">Add member</a> |
 <a href="{% url "search-members" %}">Search / Edit / Delete</a> |
 <a href="{% url "member-statistics" %}">Statistics</a>
+{% if membership_expiry_enabled %}
+    | <a href="{% url "member-expired" %}">Expired Members</a>
+{% endif %}
 </p>
 {{ block.super }}
 {% endif %}

@@ -75,6 +75,9 @@ body {
                 <a class="dropdown-item" href="{% url "search-members" %}">Search Members</a>
                 <a class="dropdown-item" href="{% url "member-statistics" %}">Member Statistics</a>
                 <a class="dropdown-item" href="{% url "member-duplicates" %}">Member Duplicates</a>
+                {% if membership_expiry_enabled %}
+                   <a class="dropdown-item" href="{% url "member-expired" %}">Expired Members</a>
+                {% endif %}
               </div>
             </li>
 
