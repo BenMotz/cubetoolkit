@@ -62,16 +62,17 @@ class MemberManager(models.Manager):
         return postcode_stats
 
     def expired(self):
-        """Get all members with an expiry date defined, where that date is in
+        """Get all members with an expiry date undefined, or that date is in
         the past"""
-        return (self.filter(membership_expires__isnull=False)
-                    .filter(membership_expires__lt=timezone_now().date()))
-
-    def unexpired(self):
-        """Get all members either without an expiry date defined, or with an
-        expiry date in the future (or today)"""
         return (self.filter(
                     Q(membership_expires__isnull=True) |
+                    Q(membership_expires__lt=timezone_now().date())))
+
+    def unexpired(self):
+        """Get all members with an expiry date defined, and the
+        expiry date in the future (or today)"""
+        return (self.filter(
+                    Q(membership_expires__isnull=False) &
                     Q(membership_expires__gte=timezone_now().date())))
 
 
