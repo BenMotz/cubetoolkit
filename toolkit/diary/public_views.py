@@ -7,7 +7,7 @@ from collections import OrderedDict
 
 from django.db.models import Q
 from django.http import HttpResponse, Http404
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.conf import settings
 from django.utils.html import conditional_escape
@@ -278,6 +278,46 @@ def view_event(request, event_id=None, legacy_id=None, event_slug=None):
         'media_url': settings.MEDIA_URL
     }
     return render(request, 'view_event.html', context)
+
+
+def redirect_legacy_event(request, event_type=None, legacy_id=None):
+    '''Star and Shadow - archive site stylee url
+    The legacy_ids are not unique. When I did the import, I wrote
+    the name of the originating table into the notes field as
+    "Imported from programming_name_of_table"
+    Expecting event type to be one of
+    season, film, gig, event, festival, meeting'''
+    logger.debug('Given legacy url %s, %s, %s' % (
+        request.path, event_type, legacy_id))
+    legacy_table = 'programming_' + event_type
+    try:
+        events = (Event.objects.filter(legacy_id=legacy_id,
+                                       notes__contains=legacy_table))
+        event = events.first()  # Only expecting one event
+        if event:
+            logger.debug('found: %s: "%s"' % (event.id, event.name))
+        else:
+            logger.debug('Could not find anything matching %s and %s' % (
+                legacy_id, legacy_table))
+            raise Http404("Event not found")
+    except IndexError:
+        logger.debug('Could not find anything matching %s and %s' % (
+            legacy_id, legacy_table))
+        raise Http404("Event not found")
+    return redirect('single-event-view', event_id=event.id)
+
+
+def redirect_legacy_year(request, year=None):
+    '''Star and Shadow - archive site stylee url
+    In a better world we would decode the archive URLs more fully
+    for example
+    /on/2016/08/31/
+    /on/2016/03/25/feed/
+    /on/2011/w20/
+    but for the meantime at least capture the year and use that'''
+    logger.debug('Given legacy url %s, just using year %s' % (
+        request.path, year))
+    return redirect('archive-view-year', year=year)
 
 
 class ArchiveIndex(generic.ArchiveIndexView):
