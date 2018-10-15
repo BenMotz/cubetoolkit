@@ -1,9 +1,11 @@
 from django.conf.urls import include, url
 import django.conf
 import django.views.generic as generic
+from django.views.generic.base import RedirectView
 import django.views.static
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
+from django.contrib import admin
 
 from wagtail.wagtailadmin import urls as wagtailadmin_urls
 from wagtail.wagtaildocs import urls as wagtaildocs_urls
@@ -17,6 +19,7 @@ import toolkit.diary.urls
 from toolkit.index.models import IndexLink
 
 urlpatterns = [
+    url(r'^toolkit/admin/', admin.site.urls),
     url(r'^programme/', include(toolkit.diary.urls.programme_urls)),
     url(r'^diary/', include(toolkit.diary.urls.diary_urls)),
     url(r'^members/', include(toolkit.members.urls.member_urls)),
@@ -26,6 +29,19 @@ urlpatterns = [
     url(r'^$', toolkit.diary.urls.view_diary, name="default-view"),
     url(r'^id/(?P<event_id>\d+)/$', toolkit.diary.urls.view_event,
         name="single-event-view"),
+    url(r'^robots\.txt$', generic.TemplateView.as_view(
+        template_name='robots.txt',
+        content_type='text/plain')),
+    # Archive Star and Shadow
+    url(r'^on/(today|thisweek|thismonth|nextweek|nextmonth)/(.*)$',
+        RedirectView.as_view(url='/', permanent=True),
+        name='default-view'),
+    url(r'^on/(?P<year>[0-9]{4})/(.*)$',
+        toolkit.diary.public_views.redirect_legacy_year,
+        name='redirect-legacy-year'),
+    url(r'^on/(?P<event_type>\w+)/(?P<legacy_id>\d+)/$',
+        toolkit.diary.public_views.redirect_legacy_event,
+        name='redirect-legacy-event'),
 
     # Main index page: requires logging in, even though some other parts
     # (eg diary index) don't.
