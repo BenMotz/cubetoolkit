@@ -20,6 +20,7 @@ admin.site.index_title = 'Administration Backend'
 
 UserAdmin.list_display = ('last_name',
                           'username',
+                          'volunteer',
                           'email',
                           'is_active',
                           'is_superuser',
@@ -57,6 +58,10 @@ class MemberAdmin(admin.ModelAdmin):
 class VolunteerAdmin(admin.ModelAdmin):
     # TODO get object name to return soemthing sensible
     model = Volunteer
+    list_display = ['member',
+                    'user',
+                    'active']
+    list_filter = ['active']
 
 
 class ShowingAdmin(admin.ModelAdmin):
