@@ -1122,14 +1122,21 @@ def edit_showing_rota_notes(request, showing_id):
     showing = get_object_or_404(Showing, pk=showing_id)
     form = diary_forms.ShowingRotaNotesForm(request.POST, instance=showing)
 
+    logger.debug('%s editing rota notes for showing "%s"' %
+                 (request.user, showing))
+    old_notes = showing.rota_notes
     if showing.in_past():
+        logger.error('%s attempted to edit rota notes for %s in the past' %
+                     (request.user, showing))
         return HttpResponse(u"Can't change rota for showings in the past",
                             status=403)
     elif form.is_valid():
         form.save()
+        logger.debug('rota_notes "%s" -> "%s"' %
+                     (old_notes, showing.rota_notes))
     else:
-        logger.error("Rota notes edit form not valid!")
-        return HttpResponse("Unknown error",
+        logger.error("form %s not valid" % form)
+        return HttpResponse("Rota notes edit form not valid!",
                             status=500, content_type="text/plain")
 
     response = escape(showing.rota_notes)
