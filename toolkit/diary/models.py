@@ -416,7 +416,7 @@ class Showing(models.Model):
     roles = models.ManyToManyField(Role, through='RotaEntry')
 
     # Free text rota field for this showing
-    rota_notes = models.TextField(max_length=1024, blank=True)
+    rota_notes = models.TextField(max_length=4096, blank=True)
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
