@@ -20,11 +20,14 @@ from django.utils.html import strip_tags
 import MySQLdb
 
 # Adjust to taste
-dbuser = 'starshadow'
-dbpass = 'ye2EUsSUCYY8ALx7'
-dbdb = 'ssarchive'
-wordpress_server = 'xtreamlab.net'
-wordpress_path = '/home/marcus/websites/dev.marcusv.org'
+dbuser = 'starandshadow_archive'
+dbpass = 'xxxxxxxxxxxxxxxxxxxxx'
+dbdb = 'starandshadow_archive'
+wordpress_server = 'localhost'
+wordpress_path = '/home/your_path_here/wordpress/'
+shell_user = 'boris'
+dir_owner = 'florence'
+url = 'dialogue.starandshadow.org.uk'
 
 
 class Command(BaseCommand):
@@ -47,7 +50,6 @@ class Command(BaseCommand):
 
         # ORDER BY `startDate` DESC"
         sql = "SELECT * FROM `%s`" % table
-        # sql = "SELECT * FROM `%s` WHERE `id` = 164" % table
         # sql = "SELECT * FROM `%s`"#  LIMIT 10" % table
         # sql = "SELECT * FROM `%s` ORDER BY `created` DESC LIMIT 10 OFFSET 10" % table
         rows = cursor.execute(sql)  # returns number of rows
@@ -107,11 +109,14 @@ class Command(BaseCommand):
                           'Adrinneatrour']:
                 author = 'adrinneatrour'
             if author in ['Yaron Golan For Kino Bambino']:
-                author = 'Yaron Golan'
+                author = 'yarongolan'
             if author in ['Phil Eastine']:
-                author = 'Phil Eastein'
+                author = 'phileastein'
             if author in ['I.M., M.F With John Smith (Adt)']:
-                author = 'Ilana Mitchell'
+                author = 'ilanamitchell'
+
+            author = author.lower()
+            author = author.replace(' ', '')
 
             doc_str = ('%s "%s" "%s" "%s" %s "%s"' % (
                     legacy_id,
@@ -141,9 +146,8 @@ class Command(BaseCommand):
                 if para:
                     # print('Paragraph %d\n\n%s\n' % (idx, para))
                     newbody = ('%s\n\n%s' % (newbody, para))
-            # print(newbody)
 
-            shebang = ("wp post create \
+            shebang = ("sudo -u %s wp post create \
                 --post_content=\"%s\" \
                 --post_date='%s 18:00:00' \
                 --post_title=\"%s\" \
@@ -152,16 +156,17 @@ class Command(BaseCommand):
                 --user='%s' \
                 --post_category=['%s'] \
                 --post_mime_type='text/html' \
-                --ssh=%s \
-                --path=%s" % (
+                --path='%s' \
+                --url='%s'" % (
+                    shell_user,
                     newbody,
                     created,
                     title,
                     summary,
                     author,
                     doc_type,
-                    wordpress_server,
                     wordpress_path,
+                    url,
                     ))
 
             if not options['inspect']:
@@ -209,15 +214,15 @@ class Command(BaseCommand):
                 made_up_email = '%s@bogus-domain.org' % first_name
                 # print(made_up_email)
                 # wp user create bob bob@example.com --role=author
-                shebang = ("wp user create \"%s\" \"%s\" \
+                shebang = ("sudo -u %s wp user create \"%s\" \"%s\" \
                     --role=editor \
                     --porcelain \
-                    --ssh=%s \
-                    --path=%s" % (
+                    --path=%s --url=%s" % (
+                    dir_owner,
                     author,
                     made_up_email,
-                    wordpress_server,
                     wordpress_path,
+                    url
                 ))
                 self.stdout.write('Creating user %s' % author)
                 try:
@@ -234,12 +239,12 @@ class Command(BaseCommand):
 
             for doc_type in doc_types:
                 # wp term create category Apple
-                shebang = ("wp term create category \"%s\" \
-                    --ssh=%s \
-                    --path=%s" % (
+                shebang = ("sudo -u %s wp term create category \"%s\" \
+                    --path=%s --url=%s" % (
+                    dir_owner,
                     doc_type,
-                    wordpress_server,
                     wordpress_path,
+                    url
                 ))
                 self.stdout.write('Creating category %s' % doc_type)
                 try:
