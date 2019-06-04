@@ -12,7 +12,7 @@ VENUE = {
     'name': 'Cube',
     'longname': 'Cube Microplex',
     'cinemaname': 'Cube Cinema',
-    'url': 'http://www.cubecinema.com',
+    'url': 'https://www.cubecinema.com',
     'contact_page': '/pages/about/directions/',
     'piwik_id': 3,
     'twitter': 'https://twitter.com/cubecinema',
@@ -116,7 +116,7 @@ CALENDAR_HISTORIC_SHADIER = 1.0
 # Enable/disable some lumps of functionality that the Cube doesn't (currently)
 # use but the Star + Shadow (probably) does:
 MULTIROOM_ENABLED = False
-HTML_MAILOUT_ENABLED = False
+HTML_MAILOUT_ENABLED = True
 MEMBERSHIP_EXPIRY_ENABLED = False
 MEMBERSHIP_LENGTH_DAYS = 365
 
@@ -395,7 +395,7 @@ LOGGING = {
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
-            'formatter': 'simple',
+            'formatter': 'verbose',
             # Args:
             'stream': sys.stderr,
         },
@@ -425,6 +425,10 @@ LOGGING = {
         'django': {
             'propagate': True,
             'level': 'INFO',
+        },
+        'toolkit': {
+            'handlers': ['console', 'file'],
+            'level': 'DEBUG',
         },
     },
 
