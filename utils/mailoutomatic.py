@@ -91,6 +91,7 @@ GoneAway += "|cannot find address on system|is a deactivated mailbox"
 GoneAway += "|Incoming mail not allowed to this address"
 GoneAway += "|Account Inactive"
 GoneAway += "|dd Requested mail action aborted"
+GoneAway += "|This mailbox is disabled"
 
 SpamAlleged = "Your email was detected as spam"
 SpamAlleged += "|Message contains spam"
@@ -101,6 +102,7 @@ SpamAlleged += "|rejected by recipients spam filter"
 SpamAlleged += "|spam detected"
 SpamAlleged += "|detected as spam"
 SpamAlleged += "|Message rejected as spam"
+SpamAlleged += "|this message looked like spam"
 
 '''Examples of over quota strings
 full, over quota
@@ -423,3 +425,5 @@ if unsubscribe:
     for key in removedDomains:
         msg_str = '%s -> %s' % (key, removedDomains[key])
         logging.info(msg_str)
+
+sys.exit(0)
