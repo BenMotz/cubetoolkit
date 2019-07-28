@@ -63,7 +63,7 @@ member_urls = [
         name='view-member'),
     url(r'^(?P<member_id>\d+)/edit/$', edit_member,
         name='edit-member'),
-    url(r'^(?P<member_id>\d+)/delete$', delete_member,
+    url(r'^(?P<member_id>\d+)/delete/$', delete_member,
         name='delete-member'),
     url(r'^statistics/$', member_statistics,
         name='member-statistics'),

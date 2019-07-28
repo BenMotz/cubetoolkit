@@ -135,6 +135,7 @@ def send_mailout_to(subject, body_text, body_html, recipients, task=None,
         'member_name': "member",
         'unsubscribe_link': "[error]",
         'edit_link': "[error]",
+        'delete_link': "[error]",
         'mailout_key': "",
     }
 
@@ -166,6 +167,7 @@ def send_mailout_to(subject, body_text, body_html, recipients, task=None,
                     'unsubscribe_link': reverse("unsubscribe-member",
                                                 args=(recipient.pk,)),
                     'edit_link': reverse("edit-member", args=(recipient.pk,)),
+                    'delete_link': reverse("delete-member", args=(recipient.pk,)),
                     'mailout_key': recipient.mailout_key
                 })
                 mail_body_html = html_mail_template.render(html_mail_context)
