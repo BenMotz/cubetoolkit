@@ -2,6 +2,7 @@ import json
 import datetime
 import logging
 import calendar
+import pytz
 
 from collections import OrderedDict
 
@@ -22,6 +23,11 @@ from toolkit.diary.forms import SearchForm
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
+
+image_cut_off_date = datetime.datetime.strptime(
+    settings.IMAGES_START_DATE, '%d %b %Y')
+utc = pytz.UTC
+image_cut_off_date = utc.localize(image_cut_off_date)
 
 
 def _view_diary(request, startdate, enddate, tag=None, extra_title=None):
@@ -264,6 +270,13 @@ def view_event(request, event_id=None, legacy_id=None, event_slug=None):
     showings = event.showings.public()
     now = timezone.now()
 
+    if request.user.is_authenticated:
+        show_images = True
+    else:
+        # All showings must be after the cut off date
+        # If they aren't, the event image won't be shown.
+        show_images = all([s.start > image_cut_off_date for s in showings])
+
     if event.private or len(showings) == 0:
         raise Http404("Event not found")
 
@@ -275,7 +288,8 @@ def view_event(request, event_id=None, legacy_id=None, event_slug=None):
         'all_showings_sold_out': all([s.sold_out for s in showings]),
         'all_showings_finished': all([s.start < now for s in showings]),
         'media': {event.id: media},
-        'media_url': settings.MEDIA_URL
+        'media_url': settings.MEDIA_URL,
+        'show_archive_images': show_images
     }
     return render(request, 'view_event.html', context)
 
