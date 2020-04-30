@@ -1,3 +1,5 @@
+[BUG] -- fab set_media_permissions needs to set directories to 755
+
 [IMPROVEMENT] Use prefetch_related_objects? https://docs.djangoproject.com/en/1.10/ref/models/querysets/#django.db.models.prefetch_related_objects
 [IMPROVEMENT] Use Trunc for date range searches: https://docs.djangoproject.com/en/1.10/ref/models/database-functions/#django.db.models.functions.datetime.Trunc
 [IMPROVEMENT] Use  HttpRequest.content_type - https://docs.djangoproject.com/en/1.10/ref/request-response/#django.http.HttpRequest.content_type
