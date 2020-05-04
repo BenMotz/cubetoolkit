@@ -46,7 +46,7 @@ verbose = True
 deleteStuff = True  # Delete processed mails from mailbox
 unsubscribe = True  # Unsubscribe members from toolkit
 expunge = True  # Expunge mailbox on completion
-maxMesgNo = 1000  # Max number of mails to process. Use a lower number for testing
+maxMesgNo = 10000  # Max number of mails to process. Use a lower number for testing
 
 
 def emailHits(domain, domains):
@@ -109,7 +109,7 @@ full, over quota
 mailbox is full
 Over quota'''
 
-OverQuota = 'over quota|mailbox.*full|overquota|too many messages|quota exceeded|user has exhausted allowed storage space|full mailbox'
+OverQuota = 'over quota|mailbox.*full|overquota|too many messages|quota exceeded|user has exhausted allowed storage space|full mailbox|temporarily deferred'
 
 SPF = "SPF verification failed for host"
 
