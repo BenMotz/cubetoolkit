@@ -22,7 +22,7 @@ from toolkit.diary.mailout_views import (
 
 programme_urls = [
     # View lists of event for various time/dates
-    url(r'^(?:view/)?$', view_diary, name="default-view"),
+    url(r'^(?:view/)?$', view_diary, name="programme-view"),
     url(r'^view/(?P<year>\d{4})/?$', view_diary, name="year-view"),
     url(r'^view/(?P<year>\d{4})/(?P<month>\d{1,2})/?$',
         view_diary, name="month-view"),

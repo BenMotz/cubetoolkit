@@ -1,12 +1,12 @@
 {% load wagtailcore_tags %}
 <ul>
     <li><a href="/">Home</a></li>
-    <li><a href="{% url "default-view" %}">Programme</a>
+    <li><a href="{% url "programme-view" %}">Programme</a>
         <ul class="sub-menu">
             {% for tag in promoted_tags %}
             <li><a href="{% url "type-view" tag.slug %}"><span>{{ tag.name|title }}</span></a></li>
             {% endfor %}
-            <li><a href="{% url "default-view" %}"><span>All</span></a></li>
+            <li><a href="{% url "programme-view" %}"><span>All</span></a></li>
             <li><a href="{% url "archive-view-index" %}"><span>Archive</span></a></li>
         </ul>
     </li>

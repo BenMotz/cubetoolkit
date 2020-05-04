@@ -323,7 +323,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
             u'<ul class="sub-menu">'
             u'<li><a href="/programme/view/tag-three/"><span>Tag Three</span></a></li>'
             u'<li><a href="/programme/view/tag-two/"><span>Tag Two</span></a></li>'
-            u'<li><a href="/"><span>All</span></a></li>'
+            u'<li><a href="/programme/"><span>All</span></a></li>'
             u'<li><a href="/programme/archive/"><span>Archive</span></a></li>'
             u'</ul>',
             html=True)
