@@ -436,18 +436,17 @@ class TestSearchMemberView(MembersTestsMixin, TestCase):
         self.assertTemplateUsed(response, "search_members_results.html")
 
 
-class TestDeleteMemberView(MembersTestsMixin, TestCase):
+class TestDeleteMemberViewLoggedIn(MembersTestsMixin, TestCase):
 
     def setUp(self):
-        super(TestDeleteMemberView, self).setUp()
-
+        super().setUp()
         self.assertTrue(self.client.login(
             username="admin", password="T3stPassword!"))
 
     def tearDown(self):
         self.client.logout()
 
-    def test_delete(self):
+    def test_delete_non_volunteer(self):
         self.assertEqual(Member.objects.filter(id=1).count(), 1)
 
         url = reverse("delete-member", kwargs={"member_id": 1})
@@ -458,12 +457,25 @@ class TestDeleteMemberView(MembersTestsMixin, TestCase):
 
         self.assertEqual(Member.objects.filter(id=1).count(), 0)
 
+    def test_delete_volunteer(self):
+        mem = self.vol_1.member
+        self.assertTrue(Member.objects.filter(id=mem.id).exists())
+
+        url = reverse("delete-member", kwargs={"member_id": mem.id})
+        response = self.client.post(url, follow=True)
+
+        self.assertRedirects(response, reverse("search-members"))
+        self.assertContains(
+            response, f"Can&#39;t delete active volunteer {mem.name}")
+
+        self.assertTrue(Member.objects.filter(id=mem.id).exists())
+
     def test_delete_nonexistent(self):
         url = reverse("delete-member", kwargs={"member_id": 1000})
         response = self.client.post(url)
         self.assertEqual(response.status_code, 404)
 
-    def test_get_not_allowed(self):
+    def test_delete_get_form_no_key_logged_in(self):
         self.assertEqual(Member.objects.filter(id=1).count(), 1)
 
         url = reverse("delete-member", kwargs={"member_id": 1})
@@ -472,6 +484,111 @@ class TestDeleteMemberView(MembersTestsMixin, TestCase):
 
         self.assertEqual(response.status_code, 405)
         self.assertEqual(Member.objects.filter(id=1).count(), 1)
+
+
+class TestDeleteMemberViewNotLoggedIn(MembersTestsMixin, TestCase):
+    def _assert_redirect_to_login(self, response, url, extra_parameters=""):
+        expected_redirect = (
+            reverse("login") +
+            "?next=" +
+            urllib.parse.quote(url + extra_parameters)
+        )
+        self.assertRedirects(response, expected_redirect)
+
+    def setUp(self):
+        super().setUp()
+        self.assertEqual(Member.objects.filter(id=self.mem_1.id).count(), 1)
+
+    def tearDown(self):
+        super().tearDown()
+
+    def test_delete_get_form_no_key(self):
+
+        url = reverse("delete-member", kwargs={"member_id": 1})
+
+        response = self.client.get(url)
+
+        self._assert_redirect_to_login(response, url)
+        self.assertEqual(Member.objects.filter(id=1).count(), 1)
+
+    def test_delete_get_form_wrong_key(self):
+        url = reverse("delete-member", kwargs={"member_id": 1})
+
+        response = self.client.get(url, data={"k": "badkey"})
+
+        self._assert_redirect_to_login(response, url, "?k=badkey")
+        self.assertEqual(Member.objects.filter(id=self.mem_1.id).count(), 1)
+
+    def test_delete_get_form_valid_key_no_confirmation(self):
+        url = reverse("delete-member", kwargs={"member_id": self.mem_1.id})
+
+        for confirmed in ["no", "nope", "", None, "1", "0", "yeees", "Yes"]:
+            data = {"k": self.mem_1.mailout_key}
+            with self.subTest(confirmed_string=confirmed):
+                if confirmed is not None:
+                    data["confirmed"] = confirmed
+                response = self.client.get(url, data=data)
+                # Shouldn't have been deleted yet:
+                self.assertEqual(
+                    Member.objects.filter(id=self.mem_1.id).count(), 1)
+
+                # Should have used the "pls confirm" form:
+                self.assertEqual(response.status_code, 200)
+                self.assertTemplateUsed(response, "confirm-deletion.html")
+
+    def test_delete_get_form_valid_key_confirm(self):
+        url = reverse("delete-member", kwargs={"member_id": self.mem_1.id})
+
+        response = self.client.get(
+            url,
+            data={
+                "k": self.mem_1.mailout_key,
+                "confirmed": "yes",
+            })
+
+        # Should have been deleted:
+        self.assertEqual(Member.objects.filter(id=self.mem_1.id).count(), 0)
+        self.assertRedirects(response, reverse("goodbye"))
+
+    def test_delete_active_volunteer_fails(self):
+        mem = self.vol_1.member
+        self.assertTrue(Member.objects.filter(id=mem.id).exists())
+
+        url = reverse("delete-member", kwargs={"member_id": mem.id})
+
+        response = self.client.get(
+            url,
+            data={
+                "k": mem.mailout_key,
+                # confirmed shouldn't make a difference, but belt+braces:
+                "confirmed": "yes",
+            })
+
+        # Should not have been deleted:
+        self.assertTrue(Member.objects.filter(id=mem.id).exists())
+        # Should have been politely told to email the admins:
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "email_admin.html")
+
+    def test_delete_inactive_volunteer_succeeds(self):
+        mem = self.vol_1.member
+        self.assertTrue(Member.objects.filter(id=mem.id).exists())
+
+        # Retire:
+        self.vol_1.active = False
+        self.vol_1.save()
+
+        url = reverse("delete-member", kwargs={"member_id": mem.id})
+        response = self.client.get(
+            url,
+            data={
+                "k": mem.mailout_key,
+                "confirmed": "yes",
+            })
+
+        # Should have been deleted:
+        self.assertEqual(Member.objects.filter(id=mem.id).count(), 0)
+        self.assertRedirects(response, reverse("goodbye"))
 
 
 class TestEditMemberViewNotLoggedIn(MembersTestsMixin, TestCase):

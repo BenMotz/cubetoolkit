@@ -1,6 +1,6 @@
 import logging
 
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponseNotAllowed
 from django.shortcuts import get_object_or_404, render
 from django.db.models import Count, Q
 from django.urls import reverse
@@ -115,81 +115,102 @@ def delete_member(request, member_id):
             'toolkit.write', request, member_id):
         # Manually wrap this function in the standard 'permission_required'
         # decorator and call it to get the redirect to the login page:
-        return permission_required('toolkit.write')(edit_member)(
+        return permission_required('toolkit.write')(delete_member)(
             request, member_id)
         # See comments in edit_member
         # TODO if a punter has already deleted themselves and clicks
         # on their mailout link again, they will get the login page, which
-        # will probablu confuse them.
+        # will probably confuse them.
 
     member = get_object_or_404(Member, id=member_id)
 
+    # Did we get access to this page using a valid email key?
+    access_using_key = _member_key_matches_request(request, member)
+
+    if request.method == "GET" and not access_using_key:
+        # Only allow GET requests to delete things if they were accompanied
+        # by a valid access key for the given member
+        return HttpResponseNotAllowed(["POST"])
+
     user_has_permission = request.user.has_perm('toolkit.write')
 
-    if request.user.has_perm('toolkit.write'):
+    vol = None
+    try:
+        vol = member.volunteer
+    except Volunteer.DoesNotExist:
+        pass
 
-        # Check the person being deleted isn't an active volunteer.
-        # This is mostly to prevent toolkit admins accidentally
-        # deleting themselves by clicking on the delete link in their email
-        # whilst logged on.
-        vol = Volunteer.objects.filter(member__id=member_id)
-        vol = vol.first()
-        if vol and vol.active:
-            messages.add_message(request, messages.ERROR,
-                                 u"Can't delete active volunteer {0} ({1}). Retire them first.".format(
-                                     member.name, member.number))
-            logger.info(u"Attempt to delete active volunteer {0} {1} <{1}>".format(
-                  member.number,
-                  member.name,
-                  member.email)
-                  )
-
-        else:
-            messages.add_message(request, messages.SUCCESS,
-                                 u"Deleted member: {0} ({1})".format(
-                                     member.number, member.name))
-            logger.info(u"Member {0} {1} <{2}> deleted by admin".format(
-                  member.number,
-                  member.name,
-                  member.email)
-                  )
-            member.delete()  # This will delete associated volunteer record, if any
-
-        return HttpResponseRedirect(reverse("search-members"))
-
-    else:
-
-        # Check the punter isn't an active volunteer
-        vol = Volunteer.objects.filter(member__email=member.email)
-        # Rashly take the first result
-        vol = vol.first()
-        if vol and vol.active:
+    # Check the person being deleted isn't an active volunteer.
+    if vol and vol.active:
+        # Volunteers who tried to delete their own record using an email link
+        # get a special message:
+        if access_using_key:
+            logger.info(f"Futile attempt by active volunteer {member.name} "
+                        f"<{member.email}> to delete themselves")
             # TODO send mail to admins
-            logger.info(u"Futile attempt by active volunteer {0} <{1}> to delete themselves".format(
-                  vol.member.name,
-                  vol.member.email)
-            )
             return render(request, 'email_admin.html')
-
-        # This is a punter deleting their own membership record
+        else:
+            messages.add_message(
+                request, messages.ERROR,
+                f"Can't delete active volunteer {member.name} "
+                f"({member.number}). Retire them first.")
+            logger.info(
+                f"Attempt to delete active volunteer {member.number} "
+                f"{member.name} <{member.email}>")
+            return HttpResponseRedirect(reverse("search-members"))
+    # Logged in, and not following an email link, so just delete:
+    elif user_has_permission and not access_using_key:
+        messages.add_message(
+            request, messages.SUCCESS,
+            f"Deleted member: {member.number} ({member.name})")
+        logger.info(
+            f"Member {member.number} {member.name} <{member.email}> deleted "
+            "by admin")
+        member.delete()  # This will delete associated volunteer record, if any
+        return HttpResponseRedirect(reverse("search-members"))
+    # Not logged in (or logged in, but using a valid email link) must be an
+    # email link, so confirm:
+    else:
         confirmed = request.GET.get('confirmed', 'no')
-
         if confirmed == 'yes':
-
-            logger.info(u"Member {0} {1} <{2}> self-deleted".format(
-                  member.number,
-                  member.name,
-                  member.email)
-                  )
+            logger.info(f"Member {member.number} {member.name} "
+                        f"<{member.email}> self-deleted")
             member.delete()
-
             return HttpResponseRedirect(reverse("goodbye"))
         else:
             return render(request, 'confirm-deletion.html')
 
 
+def _member_key_matches_request(request, member):
+    """
+    Utility method; returns True if the current request has a value 'k'
+    which is the same as the mailout_key for the given member_object.
+    """
+    try:
+        member_key = ''
+        if request.method == 'GET':
+            member_key = request.GET.get('k', None)
+        elif request.method == 'POST':
+            member_key = request.POST.get('k', None)
+
+        assert not isinstance(member_key, six.binary_type)
+        if isinstance(member_key, six.text_type):
+            # Use compare_constant_time instead of == to avoid timing
+            # attacks (no, really - read up on it)
+            return compare_constant_time(
+                member.mailout_key.encode("ascii"),
+                member_key.encode("ascii"))
+            # Keys should really both be ASCII, so this is very unlikely to
+            # raise an error unless someone intentionally feeds in
+            # junk
+    except UnicodeEncodeError:
+        # If key value is garbage:
+        return False
+
+
 def _check_access_permitted_for_member_key(permission, request, member_id):
-    """Utility method; returns True if either user is logged on and has the
+    """
+    Utility method; returns True if either user is logged on and has the
     given permission, or if the current request has a value 'k' which is the
     same as the mailout_key for the given member_id."""
     # Check if user is logged in and has permission to edit:
@@ -200,23 +221,9 @@ def _check_access_permitted_for_member_key(permission, request, member_id):
     if not access_permitted:
         try:
             member = Member.objects.get(id=member_id)
-            member_key = ''
-            if request.method == 'GET':
-                member_key = request.GET.get('k', None)
-            elif request.method == 'POST':
-                member_key = request.POST.get('k', None)
-
-            assert not isinstance(member_key, six.binary_type)
-            if isinstance(member_key, six.text_type):
-                # Use compare_constant_time instead of == to avoid timing
-                # attacks (no, really - read up on it)
-                access_permitted = compare_constant_time(
-                    member.mailout_key.encode("ascii"),
-                    member_key.encode("ascii"))
-                # Keys should really both be ASCII, so this is very unlikely to
-                # raise an error unless someone intentionally feeds in
-                # junk
-        except (ObjectDoesNotExist, UnicodeEncodeError):
+            access_permitted = _member_key_matches_request(
+                request, member)
+        except ObjectDoesNotExist:
             # If member doesn't exist, or key value is garbage:
             access_permitted = False
 
