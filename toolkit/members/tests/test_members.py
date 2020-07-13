@@ -256,10 +256,10 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
             response, u"Added member: {0}".format(member.number))
 
     def test_post_form_invalid_data_missing(self):
+        count_before = Member.objects.count()
+
         url = reverse("add-member")
         response = self.client.post(url)
-
-        count_before = Member.objects.count()
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_new_member.html")
@@ -267,6 +267,27 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
         self.assertFormError(response, 'form', 'name',
                              u'This field is required.')
 
+        self.assertEqual(count_before, Member.objects.count())
+
+    def test_post_form_invalid_duplicate_email(self):
+
+        count_before = Member.objects.count()
+
+        url = reverse("add-member")
+        response = self.client.post(url, data={
+            "name": "another new member",
+            "email": self.mem_1.email,
+            "mailout": "on",
+        }, follow=True)
+
+        # Should have redirected to the search form, with the email address as
+        # the search term:
+        expected_url = reverse("search-members")
+        self.assertRedirects(response, expected_url
+                             + f"?email={self.mem_1.email}&q=")
+
+        self.assertTemplateUsed(response, "search_members_results.html")
+        # A new shouldn't have been created
         self.assertEqual(count_before, Member.objects.count())
 
     def test_invalid_method(self):
@@ -372,10 +393,44 @@ class TestSearchMemberView(MembersTestsMixin, TestCase):
     def test_query_with_results_expiry_enabled(self, now_mock):
         self._common_test_query_with_results(now_mock, expiry_enabled=True)
 
+    @override_settings(MEMBERSHIP_EXPIRY_ENABLED=False)
+    @patch('toolkit.members.models.timezone_now')
+    def test_email_query_with_results_expiry_disabled(self, now_mock):
+        url = reverse("search-members")
+        response = self.client.get(url, data={'email': self.mem_2.email})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "search_members_results.html")
+
+        self.assertContains(
+            response, u"<td><a href='/members/2'>Tw\u020d Member</a></td>",
+            html=True)
+        self.assertContains(
+            response, u'<a href="mailto:two@example.com">two@example.com</a>',
+            html=True)
+
+        self.assertNotContains(response, "expires")
+
     def test_query_no_results(self):
         url = reverse("search-members")
 
-        response = self.client.get(url, data={'q': u'toast'})
+        testcases = [
+            ("q", {'q': 'toast'}),
+            ("email", {'email': 'toast@infinite.monkey'}),
+            ("both", {'q': 'tost', 'email': 'toast@infinite.monkey'}),
+        ]
+        for name, testcase in testcases:
+            with self.subTest(name):
+                response = self.client.get(url, data=testcase)
+
+                self.assertEqual(response.status_code, 200)
+                self.assertTemplateUsed(response,
+                                        "search_members_results.html")
+
+    def test_email_query_no_results(self):
+        url = reverse("search-members")
+
+        response = self.client.get(url, data={'email': u'toast@infinity.com'})
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "search_members_results.html")

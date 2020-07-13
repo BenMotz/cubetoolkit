@@ -37,36 +37,28 @@ def add_member(request):
         form = NewMemberForm(request.POST, instance=instance)
         # Validate form fields
         if form.is_valid():
+            # Check for existing email address:
 
-            results = (Member.objects.filter(email=instance.email)
-                                     .order_by('name'))
-            if results:
-                for result in results:
-                    logger.info('Member with id %s %s <%s> already in database' %
-                                (result.id, result.name, result.email))
-                context = {
-                    'search_terms': instance.email,
-                    'members': results,
-                    'membership_expiry_enabled': settings.MEMBERSHIP_EXPIRY_ENABLED,
-                }
-                messages.add_message(request,
-                                     messages.WARNING,
-                                     u"%s already in members' database" %
-                                     instance.email)
-                return render(request, 'search_members_results.html', context)
+            if (instance.email
+                    and Member.objects.filter(email=instance.email).exists()):
+                logger.info(
+                    f'Member with email {instance.email} already in database')
+                messages.add_message(
+                    request,
+                    messages.WARNING,
+                    f"%{instance.email} already in members' database")
+                return HttpResponseRedirect(
+                    reverse("search-members") + f"?email={instance.email}&q=")
 
             # Form is valid, save data:
-            logger.info(u"Adding member '{0} <{1}>'".format(
-                instance.name,
-                instance.email)
-            )
+            logger.info(f"Adding member '{instance.name} <{instance.email}>'")
             member = form.save(commit=False)
             member.gdpr_opt_in = timezone.now()
             member.save()
             # Member added ok, new blank form:
             form = NewMemberForm()
             messages.add_message(request, messages.SUCCESS,
-                                 u"Added member: {0}".format(instance.number))
+                                 f"Added member: {instance.number}")
             return HttpResponseRedirect(reverse("add-member"))
     elif request.method == 'GET':
         # GET request; create form object with default values
@@ -82,15 +74,20 @@ def add_member(request):
 @require_safe
 def search(request):
     search_terms = request.GET.get('q', None)
+    email_search = request.GET.get('email', None)
     results = None
 
+    results = Member.objects
+    if email_search:
+        results = results.filter(email=email_search)
     if search_terms:
-        results = Member.objects.filter(
+        results = results.filter(
             Q(name__icontains=search_terms) |
             Q(email__icontains=search_terms) |
             Q(number=search_terms)).order_by('name')
+    if search_terms or email_search:
         context = {
-            'search_terms': search_terms,
+            'search_terms': search_terms or email_search,
             'members': results,
             'membership_expiry_enabled': settings.MEMBERSHIP_EXPIRY_ENABLED,
         }
