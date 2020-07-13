@@ -49,31 +49,33 @@ def _send_email(email_conn, destination, subject, body_text, body_html):
 
 def send_mailout_report(email_conn, report_to, sent, err_list,
                         subject, body_text, body_html):
-        # All done? Send report:
-        report_text = ("%d copies of the following were sent out on %s members"
-                       " list\n" % (sent, settings.VENUE['name']))
-        if len(err_list) > 0:
-            # Only send a max of 100 error messages!
-            report_text += "{0} errors:\n{1}".format(
-                len(err_list), "\n".join(err_list[:100]))
-            if len(err_list) > 100:
-                report_text += "(Error list truncated at 100 entries)\n"
+    # All done? Send report:
+    report_text = ("%d copies of the following were sent out on %s members"
+                   " list\n" % (sent, settings.VENUE['name']))
+    if len(err_list) > 0:
+        # Only send a max of 100 error messages!
+        report_text += "{0} errors:\n{1}".format(
+            len(err_list), "\n".join(err_list[:100]))
+        if len(err_list) > 100:
+            report_text += "(Error list truncated at 100 entries)\n"
 
-        report_text += "\n"
-        report_text += body_text
+    report_text += "\n"
+    report_text += body_text
 
-        _send_email(email_conn, report_to, subject, report_text, None)
+    _send_email(email_conn, report_to, subject, report_text, None)
 
 
 def _get_text_preamble_signature(recipient):
     preamble_template = u"Dear {0},\n\n"
     if False:  # not(recipient.gdpr_opt_in):
         gdpr_opt_in_template = (
-            u"If you'd like to continue to receive emails about events and fundraising for the Cube, "
-            u"you'll need to make sure you opt-in before 25 May 2018.\n\n"
-            u"Please choose to opt-in so you won't miss out on what's happening at your favourite Microplex.\n\n"
-            u"Use this link to opt-in:\n\n"
-            u"{1}{2}?k={3}\n\n"
+            "If you'd like to continue to receive emails about events and "
+            "fundraising for the Cube, " u"you'll need to make sure you opt-in"
+            " before 25 May 2018.\n\n"
+            "Please choose to opt-in so you won't miss out on what's happening"
+            " at your favourite Microplex.\n\n"
+            "Use this link to opt-in:\n\n"
+            "{1}{2}?k={3}\n\n"
         )
     else:
         # gdpr_opt_in_template = u"Congratulations, you opted in on {0}\n\n"
@@ -156,7 +158,8 @@ def send_mailout_to(subject, body_text, body_html, recipients, task=None,
     try:
         for recipient in recipients:
             # Build per-recipient signature, with customised unsubscribe links:
-            text_pre, text_gdpr, text_post = _get_text_preamble_signature(recipient)
+            text_pre, text_gdpr, text_post = _get_text_preamble_signature(
+                recipient)
 
             # Build final email, still in unicode:
             mail_body_text = text_pre + text_gdpr + body_text + text_post
@@ -167,7 +170,8 @@ def send_mailout_to(subject, body_text, body_html, recipients, task=None,
                     'unsubscribe_link': reverse("unsubscribe-member",
                                                 args=(recipient.pk,)),
                     'edit_link': reverse("edit-member", args=(recipient.pk,)),
-                    'delete_link': reverse("delete-member", args=(recipient.pk,)),
+                    'delete_link': reverse(
+                        "delete-member", args=(recipient.pk,)),
                     'mailout_key': recipient.mailout_key
                 })
                 mail_body_html = html_mail_template.render(html_mail_context)

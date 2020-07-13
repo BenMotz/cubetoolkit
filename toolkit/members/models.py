@@ -70,8 +70,8 @@ class MemberManager(models.Manager):
         """Get all members either without an expiry date defined, or with an
         expiry date in the future (or today)"""
         return (self.filter(
-                    Q(membership_expires__isnull=True) |
-                    Q(membership_expires__gte=timezone_now().date())))
+            Q(membership_expires__isnull=True) |
+            Q(membership_expires__gte=timezone_now().date())))
 
 
 def get_default_membership_expiry():

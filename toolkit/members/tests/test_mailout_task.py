@@ -126,7 +126,7 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
     def test_send_html(self):
         subject = u"The Subject \u2603!"
         body = u"The Body!\nThat will be \u20ac1, please\nTa \u2603!"
-        body_html = u"<h1>Body<\h1>\n<p>That will be \u20ac1, please\nTa</p>"
+        body_html = u"<h1>Body<\\h1>\n<p>That will be \u20ac1, please\nTa</p>"
         result = toolkit.members.tasks.send_mailout(subject, body, body_html)
         self._assert_mail_sent(result, subject, body, None, True)
 
@@ -149,7 +149,7 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         subject = u"The Subject \u2603!"
         body = u"The Body!\nThat will be \u20ac1, please\nTa \u2603!"
         close_mock.side_effect = (
-                smtplib.SMTPServerDisconnected("Already disconnected?"))
+            smtplib.SMTPServerDisconnected("Already disconnected?"))
 
         result = toolkit.members.tasks.send_mailout(subject, body, None)
         self._assert_mail_sent(result, subject, body, None, True)
@@ -178,7 +178,7 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
     @patch("toolkit.members.tasks.get_connection")
     def test_send_fail_disconnected(self, connection_mock):
         connection_mock.return_value.send_messages.side_effect = (
-                smtplib.SMTPServerDisconnected("Something failed"))
+            smtplib.SMTPServerDisconnected("Something failed"))
 
         result = toolkit.members.tasks.send_mailout(
             u"The \xa31 Subject!", u"The Body!\nThat will be $1, please\nTa!",

@@ -17,7 +17,7 @@ class NewMemberForm(forms.ModelForm):
         model = toolkit.members.models.Member
         fields = ('name', 'email', 'postcode', 'is_member')
         widgets = {
-                'name': forms.TextInput(attrs={'autofocus': ''}),
+            'name': forms.TextInput(attrs={'autofocus': ''}),
         }
 
 

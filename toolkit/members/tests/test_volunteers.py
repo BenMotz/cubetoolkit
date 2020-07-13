@@ -660,7 +660,7 @@ class TestAddTraining(MembersTestsMixin, TestCase):
         trainer = u"Friendly Trainer \u0187hri\u01a8topher"
         notes = u" No notes\nare noted... here. "
 
-        post_data={
+        post_data = {
             'training-training_type': TrainingRecord.ROLE_TRAINING,
             'training-trainer': trainer,
             'training-training_date': "1/2/2015",
@@ -668,7 +668,7 @@ class TestAddTraining(MembersTestsMixin, TestCase):
         }
         if is_general:
             post_data['training-training_type'] = \
-                    TrainingRecord.GENERAL_TRAINING
+                TrainingRecord.GENERAL_TRAINING
             post_data['training-role'] = ""
         else:
             post_data['training-training_type'] = TrainingRecord.ROLE_TRAINING
@@ -921,7 +921,7 @@ class TestAddGroupTraining(MembersTestsMixin, TestCase):
         self.assertFormError(response, 'form', 'type',
                              u'This field is required.')
         # 'role' isn't requireed unless 'type' is selected
-        #self.assertFormError(response, 'form', 'role',
+        # self.assertFormError(response, 'form', 'role',
         #                     u'This field is required.')
         self.assertFormError(response, 'form', 'training_date',
                              u'This field is required.')
@@ -948,8 +948,6 @@ class TestAddGroupTraining(MembersTestsMixin, TestCase):
 
         self.assertFormError(response, 'form', 'role',
                              u'This field is required.')
-
-
 
 
 class TestViewVolunteerTraining(MembersTestsMixin, TestCase):
@@ -1039,7 +1037,7 @@ class TestViewVolunteerTraining(MembersTestsMixin, TestCase):
               </ul>
             </div>""", html=True)
         self.assertNotContains(response, "Role 2")
-        self.assertContains(response,"""
+        self.assertContains(response, """
             <div>
               <h2>General Safety Training</h2>
               <ul>

@@ -217,15 +217,15 @@ def activate_volunteer(request, set_active=True):
         u"to %s.\n\n"
         u"Please amend the volunteers mailing list "
         u"at your earliest convenience." % (
-         request.user.last_name,
-         vol.member.name,
-         vol.member.email,
-         u"unretired" if set_active else u"retired")
+            request.user.last_name,
+            vol.member.name,
+            vol.member.email,
+            u"unretired" if set_active else u"retired")
     )
     send_mail(
         ('[%s] Change in volunteer status %s' % (
-          settings.VENUE['longname'],
-          vol.member.name)),
+            settings.VENUE['longname'],
+            vol.member.name)),
         admin_body,
         settings.VENUE['mailout_from_address'],
         settings.VENUE['vols_admin_address'],
@@ -301,13 +301,13 @@ def edit_volunteer(request, volunteer_id, create_new=False):
                         volunteer.member.email)
                 )
                 send_mail(
-                     ('[%s] New volunteer %s' %
+                    ('[%s] New volunteer %s' %
                          (settings.VENUE['longname'],
                           volunteer.member.name)),
-                     admin_body,
-                     settings.VENUE['mailout_from_address'],
-                     settings.VENUE['vols_admin_address'],
-                     fail_silently=False,
+                    admin_body,
+                    settings.VENUE['mailout_from_address'],
+                    settings.VENUE['vols_admin_address'],
+                    fail_silently=False,
                 )
             # Go to the volunteer list view:
             return HttpResponseRedirect(reverse("view-volunteer-summary"))
@@ -317,7 +317,7 @@ def edit_volunteer(request, volunteer_id, create_new=False):
 
     if new_training_record:
         training_record_form = TrainingRecordForm(
-           prefix="training", instance=new_training_record)
+            prefix="training", instance=new_training_record)
     else:
         training_record_form = None
 
@@ -418,9 +418,9 @@ def view_volunteer_training_records(request):
         # volunteer.member.name:
         [
             (role, sorted(
-                    [(vol, record) for vol, record in vol_map.items()],
-                    key=lambda v_r: v_r[0].member.name.lower()
-                   ))
+                [(vol, record) for vol, record in vol_map.items()],
+                key=lambda v_r: v_r[0].member.name.lower()
+            ))
             for role, vol_map in role_map.items()
         ],
         # ...and sort the [ (role, [(vol, rec), ...]), ...] list by role name:

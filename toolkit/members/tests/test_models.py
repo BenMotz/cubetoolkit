@@ -12,6 +12,7 @@ from toolkit.members.models import TrainingRecord
 
 from .common import MembersTestsMixin
 
+
 class TestTrainingRecord(MembersTestsMixin, TestCase):
     def setUp(self):
         super(TestTrainingRecord, self).setUp()
@@ -84,7 +85,6 @@ class TestTrainingRecord(MembersTestsMixin, TestCase):
         self.assertTrue(record.has_expired(expiry_age=0))
         self.assertFalse(record.has_expired(expiry_age=7))
 
-
     @override_settings(DEFAULT_TRAINING_EXPIRY_MONTHS=6)
     @patch('toolkit.members.models.timezone_now')
     def test_has_expired_false(self, now_mock):
@@ -101,4 +101,3 @@ class TestTrainingRecord(MembersTestsMixin, TestCase):
             training_date=datetime.date(year=2010, month=1, day=6),
         )
         self.assertFalse(record.has_expired())
-

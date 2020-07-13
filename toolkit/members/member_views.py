@@ -362,19 +362,19 @@ def opt_in(request, member_id):
         if confirm == "yes":
             if action == 'opt-in':
                 member.gdpr_opt_in = timezone.now()
-                messages.add_message(request,
-                                     messages.SUCCESS,
-                                     u"Thank you {0} for opting in to continue to receive our emails"
-                                     .format(member.name)
-                                     )
+                messages.add_message(
+                    request,
+                    messages.SUCCESS,
+                    f"Thank you {member.name} for opting in to continue to "
+                    "receive our emails")
             else:   # opt-out
                 member.gdpr_opt_in = None
-                messages.add_message(request,
-                                     messages.SUCCESS,
-                                     (u"We are sorry to see you have opted out. "
-                                      u"If you do not opt-in by 25 May 2018 "
-                                      u"we will delete your membership from our records.")
-                                     )
+                messages.add_message(
+                    request,
+                    messages.SUCCESS,
+                    "We are sorry to see you have opted out. If you do not "
+                    "opt-in by 25 May 2018 we will delete your membership "
+                    "from our records.")
             member.save()
 
             logger.info(u"Member '{0}' (id: {1}) <{2}>: {3} on {4}"
@@ -445,8 +445,8 @@ def member_statistics(request):
     }
     if settings.MEMBERSHIP_EXPIRY_ENABLED:
         extra_context = {
-                'm_unexpired_count': Member.objects.unexpired().count(),
-                'm_expired_count': Member.objects.expired().count(),
+            'm_unexpired_count': Member.objects.unexpired().count(),
+            'm_expired_count': Member.objects.expired().count(),
 
         }
         context.update(extra_context)
@@ -466,7 +466,8 @@ def member_duplicates(request):
                            .annotate(Count('id'))
                            .filter(id__count__gt=1))
 
-    members = Member.objects.filter(email__in=[item['email'] for item in dupes])
+    members = Member.objects.filter(
+        email__in=[item['email'] for item in dupes])
 
     if 'number' in order:
         members = members.order_by('number')
@@ -507,7 +508,7 @@ def member_homepages(request):
                              .order_by('number')
                              .values('name', 'website'))
     return render(request, 'homepages.html', {
-            'members': members}
+        'members': members}
     )
 
 
