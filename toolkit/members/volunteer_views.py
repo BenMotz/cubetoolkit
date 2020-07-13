@@ -353,7 +353,7 @@ def add_volunteer_training_record(request, volunteer_id):
         return JsonResponse(response)
     elif record_form.is_valid():
         record_form.save()
-        logger.info(u"Added training record {0} for volunteer '{0}'".format(
+        logger.info(u"Added training record {0} for volunteer '{1}'".format(
             new_record.id, volunteer.member.name))
 
         if new_record.training_type == TrainingRecord.ROLE_TRAINING:
