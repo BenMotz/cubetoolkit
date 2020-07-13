@@ -1,7 +1,6 @@
 # https://docs.djangoproject.com/en/1.11/howto/custom-management-commands/
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.management.base import BaseCommand, CommandError
-from django.conf import settings
+from django.core.management.base import BaseCommand
 
 from toolkit.members.models import Member
 

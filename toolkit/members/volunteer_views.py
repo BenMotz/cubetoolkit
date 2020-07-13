@@ -1,5 +1,4 @@
 import logging
-from collections import OrderedDict
 from datetime import datetime
 
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse

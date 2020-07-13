@@ -1,7 +1,7 @@
 import os.path
 import subprocess
 import urllib
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 
 from toolkit.members.models import Volunteer
 

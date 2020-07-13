@@ -7,14 +7,9 @@ Create the document types as categories and create the wordpress users with
 matching names.
 
 '''
-import datetime
-import os
 import subprocess
 
-from django.core.management.base import BaseCommand, CommandError
-from django.conf import settings
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
-import django.utils.timezone
+from django.core.management.base import BaseCommand
 from django.utils.html import strip_tags
 
 import MySQLdb

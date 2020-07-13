@@ -2,8 +2,7 @@
 # https://stackoverflow.com/questions/8989221/django-select-only-rows-with-duplicate-field-values
 # TODO ignore vols
 
-from django.core.management.base import BaseCommand, CommandError
-from django.conf import settings
+from django.core.management.base import BaseCommand
 from django.db.models import Count
 
 from toolkit.members.models import Member

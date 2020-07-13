@@ -8,8 +8,7 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib import messages
 from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
-from django.views.decorators.http import (require_POST, require_safe,
-                                          require_http_methods)
+from django.views.decorators.http import require_safe, require_http_methods
 from django.conf import settings
 import six
 

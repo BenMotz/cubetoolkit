@@ -27,12 +27,10 @@ import os
 import pytz
 import shutil
 
-from django.core.management.base import BaseCommand, CommandError
-from django.conf import settings
-from django.core.exceptions import ValidationError, ObjectDoesNotExist
+from django.core.management.base import BaseCommand
 import django.utils.timezone
 
-from toolkit.diary.models import Event, EventTag, EventTemplate, Showing, Room
+from toolkit.diary.models import Event, EventTag, Showing, Room
 from toolkit.diary.models import MediaItem
 
 import MySQLdb

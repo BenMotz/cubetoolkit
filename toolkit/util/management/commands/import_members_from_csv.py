@@ -7,7 +7,7 @@ Rows with blank names are not imported
 
 import csv
 
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from toolkit.members.models import Member
 
 FILENAME = "upcoming.csv"

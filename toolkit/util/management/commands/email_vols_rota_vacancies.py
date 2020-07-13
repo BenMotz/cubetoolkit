@@ -9,8 +9,7 @@ import datetime
 from collections import OrderedDict
 import logging
 
-from django.core.exceptions import ObjectDoesNotExist
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.conf import settings
 from django.core.mail import send_mail
 from django.template.loader import render_to_string

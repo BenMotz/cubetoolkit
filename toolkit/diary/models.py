@@ -7,7 +7,6 @@ from six.moves import html_parser
 import datetime
 
 from django.db import models
-from django.conf import settings
 import django.utils.timezone
 from django.utils.safestring import mark_safe
 from django.utils.encoding import python_2_unicode_compatible
