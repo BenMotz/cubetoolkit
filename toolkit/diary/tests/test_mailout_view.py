@@ -68,7 +68,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         self.expected_mailout_event_html = (u"""
             <textarea name="body_html" id="id_body_html" rows="10" cols="40"
             required>
-            <p><a href="https://cubecinema.com/programme/">
+            <p><a href="https://www.cubecinema.com/programme/">
             Cube Cinema Programme</a></p><table><tr>
             <td colspan="3">
             2013
@@ -82,10 +82,10 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             Event four titl\u0113
             </td></tr></table><p>* cheap night</p><p>For complete listings
             including all future events, please visit:
-            <a href="https://cubecinema.com/programme/">
+            <a href="https://www.cubecinema.com/programme/">
             Cube Cinema Programme</a></p><hr><p>
             Pretitle four:<br><strong><a
-            href="https://cubecinema.com/programme/event/,4/">EVENT
+            href="https://www.cubecinema.com/programme/event/,4/">EVENT
             FOUR TITL\u0112</a></strong><br>
             Posttitle four
             </p><p>
@@ -96,7 +96,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             Event four C\u014dpy
             <hr><p>
             For complete and up to date listings, please visit:
-            <a href="https://cubecinema.com/programme/">
+            <a href="https://www.cubecinema.com/programme/">
             Cube Cinema Programme</a></p><p>Cube Microplex
             Cinema is located at:<br>
             Dove Street South<br>
@@ -106,7 +106,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             4 Princess Row<br>
             Bristol<br>
             BS2 8NQ
-            </p><p><a href="https://cubecinema.com">
+            </p><p><a href="https://www.cubecinema.com">
             www.cubecinema.com</a></p>
             <p>tel: 0117 907 4190</p>
             </textarea>""")
