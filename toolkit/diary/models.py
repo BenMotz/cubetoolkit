@@ -12,6 +12,7 @@ from django.utils.safestring import mark_safe
 from django.utils.encoding import python_2_unicode_compatible
 from django.db.models.query import QuerySet
 from django.utils.text import slugify
+from django.conf import settings
 import six
 
 from toolkit.diary.validators import validate_in_future
@@ -346,6 +347,12 @@ class Event(models.Model):
             text = self._plaintext_re.sub(r'\1: \2', text)
 
         return mark_safe(text)
+
+    def terms_long_enough(self):
+        if not self.terms:
+            return False
+        word_count = len(self.terms.split())
+        return word_count >= settings.PROGRAMME_EVENT_TERMS_MIN_WORDS
 
 
 @python_2_unicode_compatible

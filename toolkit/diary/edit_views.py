@@ -501,47 +501,39 @@ def edit_showing(request, showing_id=None):
     if request.method == 'POST':
         form = diary_forms.ShowingForm(request.POST, instance=showing)
         rota_form = RotaForm(request.POST)
-        form.is_valid()
 
-        confirmed = form.cleaned_data['confirmed']
-        logger.debug('confirmed? %s' % confirmed)
-        if showing.event.terms:
-            terms_word_count = len(showing.event.terms.split())
-        else:
-            terms_word_count = 0
-        logger.debug('Event terms word count: %s' % terms_word_count)
-
-        if confirmed and terms_word_count < settings.PROGRAMME_EVENT_TERMS_MIN_WORDS:
-            messages.add_message(
-                request, messages.ERROR, (
-                     u"Can't confirm showing of '{0}' at {1} as the "
-                     u"event terms are missing or too short. "
-                     u"Please add more details."
-                    )
-                .format(
-                    showing.event.name,
-                    showing.start.strftime("%H:%M on %d/%m/%y")
-                ))
-
-        elif showing.in_past():
+        if showing.in_past():
             messages.add_message(request, messages.ERROR,
                                  "Can't edit showings that are in the past")
         elif form.is_valid() and rota_form.is_valid():
-            # The rota form is separate; first save the updated showing
-            modified_showing = form.save()
-            # Then update the rota with the returned data:
-            rota = rota_form.get_rota()
-            modified_showing.update_rota(rota)
+            if (form.cleaned_data['confirmed']
+                    and not showing.event.terms_long_enough()):
+                messages.add_message(
+                    request, messages.ERROR, (
+                         "Can't confirm showing of '{0}' at {1} as the "
+                         "event terms are missing or too short. "
+                         "Please add more details."
+                        )
+                    .format(
+                        showing.event.name,
+                        showing.start.strftime("%H:%M on %d/%m/%y")
+                    ))
+            else:
+                # The rota form is separate; first save the updated showing
+                modified_showing = form.save()
+                # Then update the rota with the returned data:
+                rota = rota_form.get_rota()
+                modified_showing.update_rota(rota)
 
-            messages.add_message(
-                request, messages.SUCCESS, u"Updated showing for '{0}' at {1}"
-                .format(
-                    showing.event.name,
-                    showing.start.strftime("%H:%M on %d/%m/%y")
+                messages.add_message(
+                    request, messages.SUCCESS,
+                    "Updated showing for '{0}' at {1}"
+                    .format(
+                        showing.event.name,
+                        showing.start.strftime("%H:%M on %d/%m/%y")
+                    )
                 )
-            )
-
-            return _return_to_editindex(request)
+                return _return_to_editindex(request)
     else:
         form = diary_forms.ShowingForm(instance=showing)
         rota_form = RotaForm()

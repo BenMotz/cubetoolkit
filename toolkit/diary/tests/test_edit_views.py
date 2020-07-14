@@ -562,6 +562,39 @@ class EditShowing(DiaryTestsMixin, TestCase):
         self.assertFormError(response, 'form', 'start',
                              'Enter a valid date/time.')
 
+    @patch('django.utils.timezone.now')
+    def tests_edit_showing_terms_too_short(self, now_patch):
+        now_patch.return_value = self._fake_now
+
+        self.e4s3.confirmed = False
+        self.e4s3.save()
+
+        event = self.e4s3.event
+        event.terms = "too short"
+        event.save()
+
+        self.assertFalse(self.e4s3.event.terms_long_enough())
+
+        url = reverse("edit-showing", kwargs={"showing_id": self.e4s3.id})
+        response = self.client.post(url, data={
+            "start": "15/08/2013 19:30",
+            "booked_by": "lazy typist",
+            "confirmed": "on",
+            "role_1": "3",
+        })
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_showing.html")
+
+        # must still not be confirmed:
+        self.e4s3.refresh_from_db()
+        self.assertFalse(self.e4s3.confirmed)
+
+        self.assertContains(
+            response,
+            "event terms are missing or too short. Please add more details."
+        )
+
 
 class DeleteShowing(DiaryTestsMixin, TestCase):
 
