@@ -11,11 +11,10 @@ REQUIREMENTS_FILE=requirements.txt
 # Requirements to develop/test/deploy:
 REQUIREMENTS_DEV=requirements_development.txt
 # Default to python 2:
-PYTHON_INTERPRETER=/usr/bin/python
+PYTHON_INTERPRETER=/usr/bin/python3
 
 usage() {
-    echo "Usage: $0 [-h] [-2] [-p path]"
-    echo "Use -2 to setup for python 2"
+    echo "Usage: $0 [-h] [-p path]"
     exit 0;
 }
 
@@ -23,9 +22,6 @@ while getopts "h3p:" opt; do
     case "${opt}" in
         h)
             usage
-            ;;
-        2)
-            PYTHON_INTERPRETER=/usr/bin/python2
             ;;
         p)
             VENV_PATH=${OPTARG}
