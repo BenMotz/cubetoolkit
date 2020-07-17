@@ -277,8 +277,8 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "wagtail.wagtailcore.middleware.SiteMiddleware",
-    "wagtail.wagtailredirects.middleware.RedirectMiddleware",
+    "wagtail.core.middleware.SiteMiddleware",
+    "wagtail.contrib.redirects.middleware.RedirectMiddleware",
 ]
 
 SECURE_CONTENT_TYPE_NOSNIFF = True
@@ -348,17 +348,17 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     # Wagtail + support:
-    "wagtail.wagtailredirects",
-    "wagtail.wagtailembeds",
-    "wagtail.wagtailsites",
-    "wagtail.wagtailusers",
-    "wagtail.wagtailsnippets",
-    "wagtail.wagtaildocs",
-    "wagtail.wagtailimages",
-    "wagtail.wagtailsearch",
-    "wagtail.wagtailadmin",
-    "wagtail.wagtailcore",
-    "wagtail.wagtailforms",
+    "wagtail.contrib.redirects",
+    "wagtail.embeds",
+    "wagtail.sites",
+    "wagtail.users",
+    "wagtail.snippets",
+    "wagtail.documents",
+    "wagtail.images",
+    "wagtail.search",
+    "wagtail.admin",
+    "wagtail.core",
+    "wagtail.contrib.forms",
     "modelcluster",
     "taggit",
 )

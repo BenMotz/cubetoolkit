@@ -5,9 +5,9 @@ import django.views.static
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 
-from wagtail.wagtailadmin import urls as wagtailadmin_urls
-from wagtail.wagtaildocs import urls as wagtaildocs_urls
-from wagtail.wagtailcore import urls as wagtail_urls
+from wagtail.admin import urls as wagtailadmin_urls
+from wagtail.documents import urls as wagtaildocs_urls
+from wagtail.core import urls as wagtail_urls
 
 import toolkit.members.urls
 import toolkit.toolkit_auth.urls

@@ -13,9 +13,7 @@ pytz
 # For generating non-html copy for mailout etc:
 html2text==3.200.3
 # CMS:
-wagtail<2
-# Pin to version before Django 1.8 support was droppped:
-djangorestframework<3.7
+wagtail<2.1
 monthdelta
 
 # The MySQL-python library requires a C build chain (gcc, etc.) and the mysql
