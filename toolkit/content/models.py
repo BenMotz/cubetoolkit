@@ -1,15 +1,20 @@
 from django.db import models
 from django.http import Http404
 
-from wagtail.wagtailcore.fields import RichTextField, StreamField
-from wagtail.wagtailcore.models import Page, Orderable
-from wagtail.wagtailadmin.edit_handlers import (
-    FieldPanel, InlinePanel, MultiFieldPanel, FieldRowPanel, StreamFieldPanel)
-from wagtail.wagtailimages.edit_handlers import ImageChooserPanel
-from wagtail.wagtailforms.models import AbstractEmailForm, AbstractFormField
-from wagtail.wagtailforms.edit_handlers import FormSubmissionsPanel
-from wagtail.wagtailcore import blocks
-from wagtail.wagtailimages import blocks as image_blocks
+from wagtail.core.fields import RichTextField, StreamField
+from wagtail.core.models import Page, Orderable
+from wagtail.admin.edit_handlers import (
+    FieldPanel,
+    InlinePanel,
+    MultiFieldPanel,
+    FieldRowPanel,
+    StreamFieldPanel,
+)
+from wagtail.images.edit_handlers import ImageChooserPanel
+from wagtail.contrib.forms.models import AbstractEmailForm, AbstractFormField
+from wagtail.contrib.forms.edit_handlers import FormSubmissionsPanel
+from wagtail.core import blocks
+from wagtail.images import blocks as image_blocks
 from modelcluster.fields import ParentalKey
 
 

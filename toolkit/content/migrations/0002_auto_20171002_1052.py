@@ -8,37 +8,59 @@ import modelcluster.fields
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('wagtailcore', '0040_page_draft_title'),
-        ('content', '0001_initial'),
+        ("wagtailcore", "0040_page_draft_title"),
+        ("content", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='SectionLink',
+            name="SectionLink",
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('sort_order', models.IntegerField(null=True, editable=False, blank=True)),
-                ('text', models.CharField(max_length=1024, blank=True)),
-                ('link', models.URLField(max_length=1024)),
+                (
+                    "id",
+                    models.AutoField(
+                        verbose_name="ID",
+                        serialize=False,
+                        auto_created=True,
+                        primary_key=True,
+                    ),
+                ),
+                (
+                    "sort_order",
+                    models.IntegerField(null=True, editable=False, blank=True),
+                ),
+                ("text", models.CharField(max_length=1024, blank=True)),
+                ("link", models.URLField(max_length=1024)),
             ],
             options={
-                'ordering': ['sort_order'],
-                'abstract': False,
+                "ordering": ["sort_order"],
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='SectionRootWithLinks',
+            name="SectionRootWithLinks",
             fields=[
-                ('page_ptr', models.OneToOneField(parent_link=True, auto_created=True, primary_key=True, serialize=False, to='wagtailcore.Page')),
+                (
+                    "page_ptr",
+                    models.OneToOneField(
+                        parent_link=True,
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="wagtailcore.Page",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
-            bases=('wagtailcore.page',),
+            bases=("wagtailcore.page",),
         ),
         migrations.AddField(
-            model_name='sectionlink',
-            name='page',
-            field=modelcluster.fields.ParentalKey(related_name='links', to='content.SectionRootWithLinks'),
+            model_name="sectionlink",
+            name="page",
+            field=modelcluster.fields.ParentalKey(
+                related_name="links", to="content.SectionRootWithLinks"
+            ),
         ),
     ]
