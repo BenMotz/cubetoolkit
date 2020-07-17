@@ -124,7 +124,7 @@ class Command(BaseCommand):
             if not options['inspect']:
                 self.stdout.write(doc_str)
 
-            body = body.replace("’", "'")
+            body = body.replace("\u2019", "'")
             body = body.replace("<br />", "\n")
             body = body.replace("</p>", "\n")
             body = strip_tags(body)
@@ -187,7 +187,7 @@ class Command(BaseCommand):
 
         if options['inspect']:
 
-            body = body.replace("’", "'")
+            body = body.replace("\u2019", "'")
             body = strip_tags(body)
             newbody = ''
             paras = body.split("&nbsp;\n\n")
