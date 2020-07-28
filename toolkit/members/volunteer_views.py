@@ -1,5 +1,6 @@
 import logging
 from collections import OrderedDict
+from datetime import datetime
 
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
@@ -12,6 +13,7 @@ from django.views.decorators.http import require_POST, require_safe
 from django.db.models import F, Prefetch
 from django.utils import timezone
 import six
+import csv
 
 from toolkit.members.forms import (VolunteerForm, MemberFormWithoutNotes,
                                    TrainingRecordForm, GroupTrainingForm)
@@ -49,6 +51,53 @@ def view_volunteer_list(request):
         'general_training_desc': TrainingRecord.GENERAL_TRAINING_DESC
     }
     return render(request, 'volunteer_list.html', context)
+
+
+@permission_required('toolkit.read')
+@require_safe
+def export_volunteers_as_csv(request):
+    # TODO use settings.DAWN_OF_TOOLKIT with export
+    logger.info('User %s requested a volunteer CSV export' % request.user)
+    now = datetime.now().strftime('%d %b %Y %I-%M %p')
+    file_name = '%s Volunteers %s.csv' % (settings.VENUE['name'], now)
+    logger.info('Exported CSV filename: "%s"' % file_name)
+
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = (
+        'attachment; filename="%s"' % file_name)
+    writer = csv.writer(response)
+    writer.writerow(['Name',
+                     'Email',
+                     'Address',
+                     'City',
+                     'Postcode',
+                     'Phone',
+                     'Alternate phone',
+                     'Member notes',
+                     'Volunteer notes',
+                     'Inducted',
+                     'Last update',
+                     ])
+
+    volunteers = (Volunteer.objects
+                           .filter(active=True)
+                           .order_by('member__name'))
+    for volunteer in volunteers:
+        writer.writerow([volunteer.member.name,
+                         volunteer.member.email,
+                         volunteer.member.address.replace('\r\n', ', '),
+                         volunteer.member.posttown,
+                         volunteer.member.postcode,
+                         volunteer.member.phone,
+                         volunteer.member.altphone,
+                         volunteer.member.notes,
+                         volunteer.member.volunteer.notes,
+                         volunteer.member.created_at.strftime(
+                             '%I:%M %p %d %b %Y'),
+                         volunteer.member.updated_at.strftime(
+                             '%I:%M %p %d %b %Y'),
+                         ])
+    return response
 
 
 @permission_required('toolkit.read')

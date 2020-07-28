@@ -83,7 +83,8 @@ $(document).ready(function() {
 <a href="{% url "view-volunteer-summary" %}" title="volunteers summary">volunteers summary</a> &#xb7;
 <a href="{% url "add-volunteer" %}" title="add new volunteer">add volunteer</a> &#xb7;
 <a href="{% url "retire-select-volunteer" %}" title="retire volunteer">retire volunteer</a> &#xb7;
-<a href="{% url "unretire-select-volunteer" %}" title="unretire volunteer">unretire volunteer</a><br>
+<a href="{% url "unretire-select-volunteer" %}" title="unretire volunteer">unretire volunteer</a> &#xb7;
+<a href="{% url "view-volunteer-export" %}" title="export volunteers">export volunteers</a><br>
 Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
 <p><input type="text" placeholder="Filter by name..." id="id_input_filter">
 {% if retired_data_included %}
