@@ -1,8 +1,14 @@
+'''
+Invoke with
+python manage.py keep_vols_from_csv_retire_everyone_else
+'''
+
 import csv
 from django.core.management.base import BaseCommand, CommandError
 
 from toolkit.members.models import Volunteer
 
+# CSV file needs to be in same directory as manage.py
 FILENAME = "export.csv"
 
 
@@ -29,12 +35,23 @@ class Command(BaseCommand):
             help="Simulate - don't touch the database",
         )
 
+    def try_get_volunteer_by_name(self, name):
+        try:
+            return Volunteer.objects.get(member__name__iexact=name)
+        except Volunteer.MultipleObjectsReturned:
+            self.stdout.write(self.style.WARNING(
+                "Multiple volunteers with the same name: {0}".format(name)))
+            return None
+        except Volunteer.DoesNotExist:
+            return None
+
     def try_get_volunteer_by_email(self, email):
         try:
             return Volunteer.objects.get(member__email__iexact=email)
         except Volunteer.MultipleObjectsReturned:
             self.stdout.write(self.style.WARNING(
-                "Multiple volunteers with the same email address: {0}".format(email)))
+                "Multiple volunteers with the same email address: %s" %
+                email))
         except Volunteer.DoesNotExist:
             pass
         return None
@@ -49,7 +66,7 @@ class Command(BaseCommand):
         self.stdout.write('Trying to read {0}'.format(FILENAME))
         desired_vols = load_data(FILENAME)
         self.stdout.write(self.style.SUCCESS(
-            'Loaded %d vounteers\n' % len(desired_vols)))
+            'Loaded %d volunteers\n' % len(desired_vols)))
 
         volsToRetire = (Volunteer.objects.filter(active=True)
                                  .order_by('member__name'))
@@ -63,9 +80,18 @@ class Command(BaseCommand):
             self.stdout.write('\n%s <%s>' % (vol[1], vol[2]))
             matched_vol = self.try_get_volunteer_by_email(vol[2])
             if matched_vol:
-                self.stdout.write(self.style.SUCCESS('%s found' % vol[2]))
+                self.stdout.write(self.style.SUCCESS(
+                    'Matching email %s found' % vol[2]))
                 volsToRetire = volsToRetire.exclude(
                     member__volunteer=matched_vol)
+            if not matched_vol:
+                matched_vol = self.try_get_volunteer_by_name(vol[1])
+                if matched_vol:
+                    self.stdout.write(self.style.SUCCESS(
+                        'Matching name %s found' % vol[1]))
+                    volsToRetire = volsToRetire.exclude(
+                        member__volunteer=matched_vol)
+            if matched_vol:
                 comments = vol[3]
                 if comments:
                     self.stdout.write('*** Existing notes ***')
@@ -79,7 +105,9 @@ class Command(BaseCommand):
                     if not options['dryRun']:
                         matched_vol.save()
             else:
-                self.stdout.write(self.style.WARNING('%s not found' % vol[2]))
+                self.stdout.write(self.style.WARNING(
+                    'Confusing situation with regard to %s <%s>' %
+                    (vol[1], vol[2])))
 
         self.stdout.write(self.style.WARNING(
             '\n%s be retiring the following %d volunteers\n' %
