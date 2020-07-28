@@ -85,7 +85,8 @@ $(document).ready(function() {
 <a href="{% url "retire-select-volunteer" %}" title="retire volunteer">retire volunteer</a> &#xb7;
 <a href="{% url "unretire-select-volunteer" %}" title="unretire volunteer">unretire volunteer</a> &#xb7;
 <a href="{% url "view-volunteer-role-report" %}" title="volunteer role report">volunteer role report</a> &#xb7;
-<a href="{% url "view-volunteer-training-report" %}" title="volunteer training report">volunteer training report</a>
+<a href="{% url "view-volunteer-training-report" %}" title="volunteer training report">volunteer training report</a> &#xb7;
+<a href="{% url "view-volunteer-export" %}" title="export volunteers">export volunteers</a>
 <br>
 Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
 <p><input type="text" placeholder="Filter by name..." id="id_input_filter">
@@ -151,4 +152,5 @@ Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
         {% endwith %}
     {% endfor %}
 </div><!-- container -->
+
 {% endblock %}

@@ -68,6 +68,7 @@ body {
             </div>
           </li>
           {% if user.is_superuser %}
+
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="{% url "search-members" %}" id="dropdown03" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Members</a>
               <div class="dropdown-menu" aria-labelledby="dropdown04">
@@ -81,6 +82,7 @@ body {
               </div>
             </li>
 
+
             <li class="nav-item dropdown">
               <a class="nav-link dropdown-toggle" href="{% url "view-volunteer-summary" %}" id="dropdown04" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">Volunteers</a>
               <div class="dropdown-menu" aria-labelledby="dropdown03">
@@ -89,6 +91,7 @@ body {
                 <a class="dropdown-item" href="{% url "add-volunteer" %}">Add new volunteer</a>
                 <a class="dropdown-item" href="{% url "retire-select-volunteer" %}">Retire volunteer</a>
                 <a class="dropdown-item" href="{% url "unretire-select-volunteer" %}">Unretire volunteer</a>
+                <a class="dropdown-item" href="{% url "view-volunteer-export" %}">Export volunteers as CSV</a>
                 <a class="dropdown-item" href="{% url "view-volunteer-role-report" %}">Volunteer role report</a>
                 <a class="dropdown-item" href="{% url "view-volunteer-training-report" %}">Volunteer training report</a>
               </div>

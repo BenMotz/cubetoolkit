@@ -3,6 +3,7 @@ from django.conf.urls import url
 from toolkit.members.volunteer_views import (
     view_volunteer_list, view_volunteer_summary,
     view_volunteer_role_report, edit_volunteer, select_volunteer,
+    export_volunteers_as_csv,
     activate_volunteer, add_volunteer_training_record,
     add_volunteer_training_group_record, view_volunteer_training_records,
     delete_volunteer_training_record)
@@ -35,6 +36,8 @@ volunteer_urls = [
         name='view-volunteer-role-report'),
     url(r'^view/trainingreport/$', view_volunteer_training_records,
         name='view-volunteer-training-report'),
+    url(r'^view/export/$', export_volunteers_as_csv,
+        name='view-volunteer-export'),
     url(r'^retire/select$', select_volunteer,
         name='retire-select-volunteer',
         kwargs={'action': 'retire'}),
