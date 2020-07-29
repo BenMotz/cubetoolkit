@@ -80,14 +80,22 @@ def export_volunteers_as_csv(request):
                      'Alternate phone',
                      'Member notes',
                      'Volunteer notes',
+                     'Super user',
+                     'Programmer',
                      'Inducted',
                      'Last update',
+                     'Last login',
                      ])
 
     volunteers = (Volunteer.objects
                            .filter(active=True)
                            .order_by('member__name'))
     for volunteer in volunteers:
+        if volunteer.user.last_login:
+            lastLogin = volunteer.user.last_login.strftime(
+                             '%I:%M %p %d %b %Y')
+        else:
+            lastLogin = 'Never'
         writer.writerow([volunteer.member.name,
                          volunteer.member.email,
                          volunteer.member.address.replace('\r\n', ', '),
@@ -97,10 +105,14 @@ def export_volunteers_as_csv(request):
                          volunteer.member.altphone,
                          volunteer.member.notes,
                          volunteer.member.volunteer.notes,
+                         volunteer.user.groups.filter(
+                             name='Programmers').exists(),
+                         volunteer.user.is_superuser,
                          volunteer.member.created_at.strftime(
                              '%I:%M %p %d %b %Y'),
                          volunteer.member.updated_at.strftime(
                              '%I:%M %p %d %b %Y'),
+                         lastLogin
                          ])
     return response
 
