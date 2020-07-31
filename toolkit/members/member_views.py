@@ -41,23 +41,24 @@ def add_member(request):
             if (instance.email
                     and Member.objects.filter(email=instance.email).exists()):
                 logger.info(
-                    f'Member with email {instance.email} already in database')
+                    'Member with email %s already in database', instance.email)
                 messages.add_message(
                     request,
                     messages.WARNING,
-                    f"%{instance.email} already in members' database")
+                    "%s already in members' database" % instance.email)
                 return HttpResponseRedirect(
-                    reverse("search-members") + f"?email={instance.email}&q=")
+                    reverse("search-members") + "?email=%s&q=" % instance.email)
 
             # Form is valid, save data:
-            logger.info(f"Adding member '{instance.name} <{instance.email}>'")
+            logger.info("Adding member '%s <%s>'",
+                        instance.name, instance.email)
             member = form.save(commit=False)
             member.gdpr_opt_in = timezone.now()
             member.save()
             # Member added ok, new blank form:
             form = NewMemberForm()
             messages.add_message(request, messages.SUCCESS,
-                                 f"Added member: {instance.number}")
+                                 "Added member: %s" % instance.number)
             return HttpResponseRedirect(reverse("add-member"))
     elif request.method == 'GET':
         # GET request; create form object with default values
@@ -144,27 +145,30 @@ def delete_member(request, member_id):
         # Volunteers who tried to delete their own record using an email link
         # get a special message:
         if access_using_key:
-            logger.info(f"Futile attempt by active volunteer {member.name} "
-                        f"<{member.email}> to delete themselves")
+            logger.info("Futile attempt by active volunteer %s "
+                        "<%s> to delete themselves"
+                        % (member.name, member.email))
             # TODO send mail to admins
             return render(request, 'email_admin.html')
         else:
             messages.add_message(
                 request, messages.ERROR,
-                f"Can't delete active volunteer {member.name} "
-                f"({member.number}). Retire them first.")
+                "Can't delete active volunteer %s "
+                "(%s). Retire them first."
+                % (member.name, member.number))
             logger.info(
-                f"Attempt to delete active volunteer {member.number} "
-                f"{member.name} <{member.email}>")
+                "Attempt to delete active volunteer %s %s <%s>"
+                % (member.number, member.name, member.email))
             return HttpResponseRedirect(reverse("search-members"))
     # Logged in, and not following an email link, so just delete:
     elif user_has_permission and not access_using_key:
         messages.add_message(
             request, messages.SUCCESS,
-            f"Deleted member: {member.number} ({member.name})")
+            "Deleted member: %s (%s)"
+            % (member.number, member.name))
         logger.info(
-            f"Member {member.number} {member.name} <{member.email}> deleted "
-            "by admin")
+            "Member %s %s <%s> deleted by admin"
+            % (member.number, member.name, member.email))
         member.delete()  # This will delete associated volunteer record, if any
         return HttpResponseRedirect(reverse("search-members"))
     # Not logged in (or logged in, but using a valid email link) must be an
@@ -172,8 +176,8 @@ def delete_member(request, member_id):
     else:
         confirmed = request.GET.get('confirmed', 'no')
         if confirmed == 'yes':
-            logger.info(f"Member {member.number} {member.name} "
-                        f"<{member.email}> self-deleted")
+            logger.info("Member %s %s <%s> self-deleted",
+                        member.number, member.name, member.email)
             member.delete()
             return HttpResponseRedirect(reverse("goodbye"))
         else:
@@ -365,8 +369,8 @@ def opt_in(request, member_id):
                 messages.add_message(
                     request,
                     messages.SUCCESS,
-                    f"Thank you {member.name} for opting in to continue to "
-                    "receive our emails")
+                    "Thank you %s for opting in to continue to "
+                    "receive our emails" % member.name)
             else:   # opt-out
                 member.gdpr_opt_in = None
                 messages.add_message(

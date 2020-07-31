@@ -284,7 +284,7 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
         # the search term:
         expected_url = reverse("search-members")
         self.assertRedirects(response, expected_url
-                             + f"?email={self.mem_1.email}&q=")
+                             + "?email=%s&q=" % self.mem_1.email)
 
         self.assertTemplateUsed(response, "search_members_results.html")
         # A new shouldn't have been created
@@ -466,7 +466,7 @@ class TestDeleteMemberViewLoggedIn(MembersTestsMixin, TestCase):
 
         self.assertRedirects(response, reverse("search-members"))
         self.assertContains(
-            response, f"Can&#39;t delete active volunteer {mem.name}")
+            response, "Can&#39;t delete active volunteer %s" % mem.name)
 
         self.assertTrue(Member.objects.filter(id=mem.id).exists())
 
