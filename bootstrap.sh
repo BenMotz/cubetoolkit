@@ -10,8 +10,8 @@ VIRTUALENV_OPTIONS="--system-site-packages"
 REQUIREMENTS_FILE=requirements.txt
 # Requirements to develop/test/deploy:
 REQUIREMENTS_DEV=requirements_development.txt
-# Default to python 2:
-PYTHON_INTERPRETER=/usr/bin/python
+# Default to python 3:
+PYTHON_INTERPRETER=/usr/bin/python3
 
 usage() {
     echo "Usage: $0 [-h] [-2] [-p path]"
@@ -19,7 +19,7 @@ usage() {
     exit 0;
 }
 
-while getopts "h3p:" opt; do
+while getopts "h2p:" opt; do
     case "${opt}" in
         h)
             usage
