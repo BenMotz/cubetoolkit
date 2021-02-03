@@ -73,6 +73,19 @@ def star_and_shadow_staging():
     env.dev_db_name = "starshadow_staging"
 
 
+def star_and_shadow_staging_jorn():
+    """Configure to deploy star and shadow staging on jorn.xtreamlab.net"""
+    env.target = "staging"
+    env.site_root = "/home/users/starandshadow/staging"
+    env.media = "/home/users/starandshadow/staging/media"
+    env.user = "starandshadow"
+    env.hosts = ["jorn.xtreamlab.net"]
+    env.settings = "staging_settings.py"
+    # See note above:
+    env.deploy_script_settings = "toolkit.deploy_settings"
+    env.dev_db_name = "starshadow_staging"
+
+
 def deploy_code():
     """Deploy code from git HEAD onto target"""
 
