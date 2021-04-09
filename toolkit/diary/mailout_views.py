@@ -2,7 +2,6 @@ import json
 import datetime
 import logging
 
-import six
 import celery.result
 import redis
 import kombu.exceptions
@@ -307,7 +306,7 @@ def mailout_progress(request):
             complete = True
             error = True
             if async_result.result:
-                error_msg = six.text_type(async_result.result)
+                error_msg = str(async_result.result)
             else:
                 error_msg = "Failed: Unknown error"
         elif state == "PENDING":

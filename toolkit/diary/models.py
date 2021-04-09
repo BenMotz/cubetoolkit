@@ -3,7 +3,7 @@ import re
 import logging
 
 import html2text
-from six.moves import html_parser
+import html.parser as html_parser
 import datetime
 
 from django.db import models
@@ -13,7 +13,6 @@ from django.utils.safestring import mark_safe
 from django.utils.encoding import python_2_unicode_compatible
 from django.db.models.query import QuerySet
 from django.utils.text import slugify
-import six
 
 from toolkit.diary.validators import validate_in_future
 import toolkit.util.image as imagetools
@@ -610,7 +609,7 @@ class Showing(models.Model):
                 rota_entry
             )
 
-        for role_id, count in six.iteritems(rota):
+        for role_id, count in rota.items():
             # Number of existing rota entries for this role_id.
             # Remove from dict, so anything left in the dict at the end
             # is an error...

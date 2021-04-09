@@ -19,7 +19,6 @@ from django.contrib.auth.decorators import permission_required
 from django.contrib.auth.mixins import PermissionRequiredMixin
 from django.views.decorators.http import require_POST, require_http_methods
 from django.utils.html import escape
-import six
 
 from toolkit.diary.models import (
     Showing,
@@ -159,8 +158,8 @@ def edit_diary_list(request, year=None, day=None, month=None):
     dates = OrderedDict()
     # Actually, I lied: start of visible list is not necessarily the 1st of the
     # month, so make sure that it gets an 'IDEAS' link shown:
-    ideas = {startdate: ""}
-    for days in six.moves.range(days_ahead):
+    ideas = {startdate: ''}
+    for days in range(days_ahead):
         # Iterate through every date in the visible range, creating a dict
         # entry for each
         day_in_range = startdatetime + datetime.timedelta(days=days)

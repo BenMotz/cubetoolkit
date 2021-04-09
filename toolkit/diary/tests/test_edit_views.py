@@ -3,18 +3,15 @@ import re
 import json
 import os.path
 
-import six
 import pytz
 from datetime import datetime, date, time
 import tempfile
-import six.moves
 
 from mock import patch
 
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
-import six
 
 from toolkit.diary.models import (
     Showing,
@@ -93,7 +90,7 @@ class ViewSecurity(DiaryTestsMixin, TestCase):
     }
 
     def _assert_need_login(self, views_to_test):
-        for view_name, kwargs in six.iteritems(views_to_test):
+        for view_name, kwargs in views_to_test.items():
             url = reverse(view_name, kwargs=kwargs)
             expected_redirect = "{0}?next={1}".format(reverse("login"), url)
             # Test GET:
@@ -1247,7 +1244,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
             temp_jpg.write(b"\0" * (1024 - len(TINY_VALID_JPEG)))
 
             one_k_data = b"\0" * 1024
-            for _ in six.moves.range(1023):
+            for _ in range(1023):
                 temp_jpg.write(one_k_data)
             # the extra byte!
             temp_jpg.write(b"\0")
@@ -1288,7 +1285,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
             temp_jpg.write(b"\0" * (1024 - len(TINY_VALID_JPEG)))
 
             one_k_data = b"\0" * 1024
-            for _ in six.moves.range(1023):
+            for _ in range(1023):
                 temp_jpg.write(one_k_data)
             temp_jpg.seek(0)
 

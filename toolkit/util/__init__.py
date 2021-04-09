@@ -1,14 +1,12 @@
 import random
 import string
 
-import six
-
 
 def compare_constant_time(a, b):
     """Compare a and b in constant time.
     Use to reduce risk of timing attacks"""
-    assert isinstance(a, six.binary_type)
-    assert isinstance(b, six.binary_type)
+    assert isinstance(a, bytes)
+    assert isinstance(b, bytes)
     if len(a) != len(b):
         return False
 

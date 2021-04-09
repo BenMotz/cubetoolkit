@@ -2,7 +2,6 @@
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.management.base import BaseCommand, CommandError
 from django.conf import settings
-from django.utils.six.moves import input
 
 from toolkit.members.models import Member
 

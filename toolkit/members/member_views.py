@@ -14,7 +14,6 @@ from django.views.decorators.http import (
     require_http_methods,
 )
 from django.conf import settings
-import six
 
 from toolkit.members.forms import NewMemberForm, MemberForm
 from toolkit.members.models import Member, Volunteer

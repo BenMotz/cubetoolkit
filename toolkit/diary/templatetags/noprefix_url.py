@@ -1,6 +1,6 @@
 import logging
 
-import six.moves.urllib as urllib
+import urllib
 from django import template
 from django.template.defaulttags import url, URLNode
 from django.urls import get_script_prefix

@@ -1,7 +1,7 @@
 import datetime
 
 from mock import patch
-from six.moves import urllib
+import urllib
 
 from django.test import TestCase
 from django.test.client import RequestFactory
