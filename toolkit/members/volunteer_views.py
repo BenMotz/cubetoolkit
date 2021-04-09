@@ -11,7 +11,6 @@ from django.contrib import messages
 from django.views.decorators.http import require_POST, require_safe
 from django.db.models import F, Prefetch
 from django.utils import timezone
-import six
 import csv
 
 from toolkit.members.forms import (VolunteerForm, MemberFormWithoutNotes,
@@ -143,7 +142,7 @@ def view_volunteer_role_report(request):
 
     # Now sort role_vol_map by role name:
     role_vol_map = sorted(
-        six.iteritems(role_vol_map),
+        role_vol_map.items(),
         key=lambda role_name_tuple: role_name_tuple[0]
     )
     # (now got a list  of (role, (name1, name2, ...)) tuples, rather than a

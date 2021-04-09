@@ -10,7 +10,6 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.utils import timezone
 from django.views.decorators.http import require_safe, require_http_methods
 from django.conf import settings
-import six
 
 from toolkit.members.forms import NewMemberForm, MemberForm
 from toolkit.members.models import Member, Volunteer
@@ -196,8 +195,8 @@ def _member_key_matches_request(request, member):
         elif request.method == 'POST':
             member_key = request.POST.get('k', None)
 
-        assert not isinstance(member_key, six.binary_type)
-        if isinstance(member_key, six.text_type):
+        assert not isinstance(member_key, bytes)
+        if isinstance(member_key, str):
             # Use compare_constant_time instead of == to avoid timing
             # attacks (no, really - read up on it)
             return compare_constant_time(

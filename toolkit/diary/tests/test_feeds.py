@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 
 import datetime
-import six.moves.urllib as urllib
+import urllib
 import xml.etree.ElementTree as ElementTree
 
 from mock import patch

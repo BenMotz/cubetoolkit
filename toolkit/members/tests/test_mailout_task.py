@@ -2,7 +2,6 @@ import smtplib
 import email.parser
 import email.header
 
-import six
 from mock import patch, call
 
 from django.conf import settings
@@ -44,9 +43,6 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         self.assertEqual(message['To'], dest_addr)
 
         body = message.get_payload()
-        if six.PY2:
-            # message.get_payload has apparently changed in py3:
-            body = body.decode("utf-8")
         subject = email.header.decode_header(message['Subject'])
 
         self.assertIn(body_contains, body)
