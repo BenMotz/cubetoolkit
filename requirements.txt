@@ -1,6 +1,6 @@
 # Fix versions of django and directly related components:
 Django<1.12,>=1.11
-django-debug-toolbar==1.8.0
+django-debug-toolbar==1.11.1
 celery==3.1.20
 django-celery==3.1.17
 easy_thumbnails==2.5.0
