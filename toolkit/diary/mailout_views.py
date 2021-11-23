@@ -3,6 +3,8 @@ import datetime
 import logging
 
 import celery.result
+import redis
+import kombu.exceptions
 
 from django.http import HttpResponse
 from django.shortcuts import render
@@ -170,16 +172,32 @@ def exec_mailout(request):
     else:
         body_html = None
 
-    result = toolkit.members.tasks.send_mailout.delay(
-        form.cleaned_data["subject"],
-        form.cleaned_data["body_text"],
-        body_html,
-    )
-
-    response = HttpResponse(
-        json.dumps({"status": "ok", "task_id": result.task_id, "progress": 0}),
-        content_type="application/json",
-    )
+    try:
+        result = toolkit.members.tasks.send_mailout.delay(
+            form.cleaned_data["subject"],
+            form.cleaned_data["body_text"],
+            body_html,
+        )
+    except kombu.exceptions.KombuError as kerr:
+        logger.error("Failed starting mailout task: %s", kerr)
+        return HttpResponse(
+            json.dumps(
+                {
+                    "status": "error",
+                    "complete": True,
+                    "error": True,
+                    "error_msg": "Failed starting task: %s" % str(kerr),
+                }
+            ),
+            content_type="application/json",
+        )
+    else:
+        response = HttpResponse(
+            json.dumps(
+                {"status": "ok", "task_id": result.task_id, "progress": 0}
+            ),
+            content_type="application/json",
+        )
 
     return response
 
@@ -233,14 +251,27 @@ def mailout_test_send(request):
 @permission_required("toolkit.write")
 @require_GET
 def mailout_progress(request):
-    async_result = celery.result.AsyncResult(id=request.GET["task_id"])
-    state = async_result.state
     progress = 0
     complete = False
     # Following values are set if complete:
     error = None
     sent_count = None
     error_msg = None
+
+    try:
+        async_result = celery.result.AsyncResult(id=request.GET["task_id"])
+        state = async_result.state
+    except redis.exceptions.ConnectionError as ce:
+        logger.error(
+            "Failed connecting to redis to retrieve job status: %s", ce
+        )
+        complete = True
+        state = None
+        error = True
+        sent_count = 0
+        error_msg = (
+            "Failed connecting to redis to retrieve job status: %s" % ce
+        )
 
     if state:
         progress_parts = state.split("PROGRESS")
