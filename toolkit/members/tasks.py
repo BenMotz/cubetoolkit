@@ -233,6 +233,7 @@ def send_mailout_to(
         except smtplib.SMTPException as smtpe:
             logger.error("SMTP Quit failed: {0}".format(smtpe))
 
+    logger.info("Mailout complete")
     return (False, sent, "Ok")
 
 

@@ -137,6 +137,13 @@ WAGTAIL_PASSWORD_RESET_ENABLED = False
 # Don't automatically check for (and notify) new Wagtail versions:
 WAGTAIL_ENABLE_UPDATE_CHECK = False
 
+
+###############################################################################
+#
+# Celery settings
+CELERY_BROKER_URL = "redis://localhost:6379/0"
+CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+
 ###############################################################################
 #
 # Below here are Django settings
@@ -340,10 +347,6 @@ INSTALLED_APPS = (
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
-    # Django-celery
-    "djcelery",
-    # DB-backed message queue (app just provides migrations),
-    "kombu.transport.django",
     # Wagtail + support:
     "wagtail.wagtailredirects",
     "wagtail.wagtailembeds",
