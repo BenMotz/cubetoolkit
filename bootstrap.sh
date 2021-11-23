@@ -10,7 +10,6 @@ VIRTUALENV_OPTIONS="--system-site-packages"
 REQUIREMENTS_FILE=requirements.txt
 # Requirements to develop/test/deploy:
 REQUIREMENTS_DEV=requirements_development.txt
-# Default to python 2:
 PYTHON_INTERPRETER=/usr/bin/python3
 
 usage() {
