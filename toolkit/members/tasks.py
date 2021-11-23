@@ -1,8 +1,11 @@
 import smtplib
 import email.errors
 
-from django.core.mail import (get_connection, EmailMessage,
-                              EmailMultiAlternatives)
+from django.core.mail import (
+    get_connection,
+    EmailMessage,
+    EmailMultiAlternatives,
+)
 from django.conf import settings
 from django.urls import reverse
 import django.template
@@ -23,7 +26,7 @@ def _send_email(email_conn, destination, subject, body_text, body_html):
     msg = msg_class(
         subject=subject,
         body=body_text,
-        from_email=settings.VENUE['mailout_from_address'],
+        from_email=settings.VENUE["mailout_from_address"],
         to=[destination],
         connection=email_conn,
     )
@@ -47,15 +50,19 @@ def _send_email(email_conn, destination, subject, body_text, body_html):
     return error
 
 
-def send_mailout_report(email_conn, report_to, sent, err_list,
-                        subject, body_text, body_html):
+def send_mailout_report(
+    email_conn, report_to, sent, err_list, subject, body_text, body_html
+):
     # All done? Send report:
-    report_text = ("%d copies of the following were sent out on %s members"
-                   " list\n" % (sent, settings.VENUE['name']))
+    report_text = (
+        "%d copies of the following were sent out on %s members"
+        " list\n" % (sent, settings.VENUE["name"])
+    )
     if len(err_list) > 0:
         # Only send a max of 100 error messages!
         report_text += "{0} errors:\n{1}".format(
-            len(err_list), "\n".join(err_list[:100]))
+            len(err_list), "\n".join(err_list[:100])
+        )
         if len(err_list) > 100:
             report_text += "(Error list truncated at 100 entries)\n"
 
@@ -70,7 +77,8 @@ def _get_text_preamble_signature(recipient):
     if False:  # not(recipient.gdpr_opt_in):
         gdpr_opt_in_template = (
             "If you'd like to continue to receive emails about events and "
-            "fundraising for the Cube, " u"you'll need to make sure you opt-in"
+            "fundraising for the Cube, "
+            u"you'll need to make sure you opt-in"
             " before 25 May 2018.\n\n"
             "Please choose to opt-in so you won't miss out on what's happening"
             " at your favourite Microplex.\n\n"
@@ -97,12 +105,12 @@ def _get_text_preamble_signature(recipient):
         preamble_template.format(recipient.name),
         gdpr_opt_in_template.format(
             recipient.gdpr_opt_in,
-            settings.VENUE['email_unsubscribe_host'],
+            settings.VENUE["email_unsubscribe_host"],
             reverse("opt_in", args=(recipient.pk,)),
             recipient.mailout_key,
         ),
         signature_template.format(
-            settings.VENUE['email_unsubscribe_host'],
+            settings.VENUE["email_unsubscribe_host"],
             reverse("unsubscribe-member", args=(recipient.pk,)),
             reverse("edit-member", args=(recipient.pk,)),
             reverse("delete-member", args=(recipient.pk,)),
@@ -111,8 +119,9 @@ def _get_text_preamble_signature(recipient):
     )
 
 
-def send_mailout_to(subject, body_text, body_html, recipients, task=None,
-                    report_to=None):
+def send_mailout_to(
+    subject, body_text, body_html, recipients, task=None, report_to=None
+):
     """
     Sends email with supplied subject/body to supplied set of recipients.
     Requires subject and body to be unicode.
@@ -129,16 +138,17 @@ def send_mailout_to(subject, body_text, body_html, recipients, task=None,
     logger.info("Sending mailout to {0} recipients".format(count))
 
     html_mail_template = django.template.loader.get_template(
-        "mailout_wrapper.html")
+        "mailout_wrapper.html"
+    )
     html_mail_context = {
-        'subject': subject,
-        'body': body_html,
-        'email_unsubscribe_host': settings.VENUE['email_unsubscribe_host'],
-        'member_name': "member",
-        'unsubscribe_link': "[error]",
-        'edit_link': "[error]",
-        'delete_link': "[error]",
-        'mailout_key': "",
+        "subject": subject,
+        "body": body_html,
+        "email_unsubscribe_host": settings.VENUE["email_unsubscribe_host"],
+        "member_name": "member",
+        "unsubscribe_link": "[error]",
+        "edit_link": "[error]",
+        "delete_link": "[error]",
+        "mailout_key": "",
     }
 
     # Open connection to SMTP server:
@@ -159,27 +169,39 @@ def send_mailout_to(subject, body_text, body_html, recipients, task=None,
         for recipient in recipients:
             # Build per-recipient signature, with customised unsubscribe links:
             text_pre, text_gdpr, text_post = _get_text_preamble_signature(
-                recipient)
+                recipient
+            )
 
             # Build final email, still in unicode:
             mail_body_text = text_pre + text_gdpr + body_text + text_post
 
             if body_html:
-                html_mail_context.update({
-                    'member_name': recipient.name,
-                    'unsubscribe_link': reverse("unsubscribe-member",
-                                                args=(recipient.pk,)),
-                    'edit_link': reverse("edit-member", args=(recipient.pk,)),
-                    'delete_link': reverse(
-                        "delete-member", args=(recipient.pk,)),
-                    'mailout_key': recipient.mailout_key
-                })
+                html_mail_context.update(
+                    {
+                        "member_name": recipient.name,
+                        "unsubscribe_link": reverse(
+                            "unsubscribe-member", args=(recipient.pk,)
+                        ),
+                        "edit_link": reverse(
+                            "edit-member", args=(recipient.pk,)
+                        ),
+                        "delete_link": reverse(
+                            "delete-member", args=(recipient.pk,)
+                        ),
+                        "mailout_key": recipient.mailout_key,
+                    }
+                )
                 mail_body_html = html_mail_template.render(html_mail_context)
             else:
                 mail_body_html = None
 
-            error = _send_email(email_conn, recipient.email, subject,
-                                mail_body_text, mail_body_html)
+            error = _send_email(
+                email_conn,
+                recipient.email,
+                subject,
+                mail_body_text,
+                mail_body_html,
+            )
             if error:
                 err_list.append(error)
 
@@ -187,12 +209,20 @@ def send_mailout_to(subject, body_text, body_html, recipients, task=None,
             if task and sent % one_percent == 0:
                 progress = int((100.0 * sent) / count) + 1
                 task.update_state(
-                    state='PROGRESS{0:03}'.format(progress),
-                    meta={'sent': sent, 'total': count})
+                    state="PROGRESS{0:03}".format(progress),
+                    meta={"sent": sent, "total": count},
+                )
 
         if report_to:
-            send_mailout_report(email_conn, report_to, sent, err_list,
-                                subject, body_text, body_html)
+            send_mailout_report(
+                email_conn,
+                report_to,
+                sent,
+                err_list,
+                subject,
+                body_text,
+                body_html,
+            )
 
     except Exception as exc:
         logger.exception("Mailout job failed, '{0}'".format(exc))
@@ -203,7 +233,7 @@ def send_mailout_to(subject, body_text, body_html, recipients, task=None,
         except smtplib.SMTPException as smtpe:
             logger.error("SMTP Quit failed: {0}".format(smtpe))
 
-    return (False, sent, 'Ok')
+    return (False, sent, "Ok")
 
 
 @task()
@@ -227,8 +257,13 @@ def send_mailout(subject, body_text, body_html):
 
     if count == 0:
         logger.error("No recipients found")
-        return (True, 0, 'No recipients found')
+        return (True, 0, "No recipients found")
 
     return send_mailout_to(
-        subject, body_text, body_html, recipients, task=current_task,
-        report_to=settings.VENUE['mailout_delivery_report_to'])
+        subject,
+        body_text,
+        body_html,
+        recipients,
+        task=current_task,
+        report_to=settings.VENUE["mailout_delivery_report_to"],
+    )

@@ -22,12 +22,12 @@
 # modify it under the terms of the GNU General Public License
 # as published by the Free Software Foundation; either version 2
 # of the License, or (at your option) any later version.
-# 
+#
 # This program is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
-# 
+#
 # You should have received a copy of the GNU General Public License
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
@@ -79,22 +79,26 @@ import string
 import urllib
 import getopt
 from HTMLParser import HTMLParser
+
 # if we have Python 2.4's cookielib, use it
 try:
     import cookielib
     import urllib2
-    policy = cookielib.DefaultCookiePolicy(rfc2965 = True)
+
+    policy = cookielib.DefaultCookiePolicy(rfc2965=True)
     cookiejar = cookielib.CookieJar(policy)
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cookiejar)).open
 except ImportError:
     import ClientCookie
+
     # if this is a new ClientCookie, we need to turn on RFC2965 cookies
     cookiejar = ClientCookie.CookieJar()
     try:
-        cookiejar.set_policy(ClientCookie.DefaultCookiePolicy(rfc2965 = True))
+        cookiejar.set_policy(ClientCookie.DefaultCookiePolicy(rfc2965=True))
         # install an opener that uses this policy
         opener = ClientCookie.build_opener(
-                ClientCookie.HTTPCookieProcessor(cookiejar))
+            ClientCookie.HTTPCookieProcessor(cookiejar)
+        )
         ClientCookie.install_opener(opener)
     except AttributeError:
         # must be an old ClientCookie, which already accepts RFC2965 cookies
@@ -103,13 +107,8 @@ except ImportError:
 
 PROGRAM = sys.argv[0]
 
-try:
-    True, False
-except NameError:
-    True = 1
-    False = 0
 
-def usage(code, msg=''):
+def usage(code, msg=""):
     if code:
         fd = sys.stderr
     else:
@@ -119,63 +118,72 @@ def usage(code, msg=''):
         print >> fd, msg
     sys.exit(code)
 
+
 subscribers = {}
 nomails = {}
 maxchunk = 0
-letters = ['0']
+letters = ["0"]
 processed_letters = []
 
+
 class MailmanHTMLParser(HTMLParser):
-    '''cheap way to find email addresses and pages with multiple
-       chunks from Mailman 2.1.5 membership pages'''
+    """cheap way to find email addresses and pages with multiple
+    chunks from Mailman 2.1.5 membership pages"""
+
     def handle_starttag(self, tag, attrs):
         global maxchunk, letters
-        if tag == 'input':
+        if tag == "input":
             s = False
-            for a,v in attrs:
-                if a == 'name' and v.endswith('_realname'):
+            for a, v in attrs:
+                if a == "name" and v.endswith("_realname"):
                     subemail = v[:-9]
                     s = True
-                elif a == 'value':
+                elif a == "value":
                     subname = v
             if s and not subscribers.has_key(subemail):
                 subscribers[subemail] = subname
             t = False
-            for a,v in attrs:
-                if a == 'name' and v.endswith('_nomail'):
+            for a, v in attrs:
+                if a == "name" and v.endswith("_nomail"):
                     nmemail = v[:-7]
                     t = True
-                elif a == 'value':
+                elif a == "value":
                     subnomail = v
             if t and not nomails.has_key(nmemail):
                 nomails[nmemail] = subnomail
-        if tag == 'a':
-            for a,v in attrs:
-                if a == 'href' and v.find('/mailman/admin/'):
-                    m = re.search(r'chunk=(?P<chunkno>\d+)', v, re.I)
+        if tag == "a":
+            for a, v in attrs:
+                if a == "href" and v.find("/mailman/admin/"):
+                    m = re.search(r"chunk=(?P<chunkno>\d+)", v, re.I)
                     if m:
-                        if int(m.group('chunkno')) > maxchunk:
-                            maxchunk = int(m.group('chunkno'))
-                    m = re.search(r'letter=(?P<letter>[0-9a-z])', v, re.I)
+                        if int(m.group("chunkno")) > maxchunk:
+                            maxchunk = int(m.group("chunkno"))
+                    m = re.search(r"letter=(?P<letter>[0-9a-z])", v, re.I)
                     if m:
-                        letter = m.group('letter')
-                        if letter not in letters and letter not in processed_letters:
+                        letter = m.group("letter")
+                        if (
+                            letter not in letters
+                            and letter not in processed_letters
+                        ):
                             letters.append(letter)
 
-
+
 def main():
     global maxchunk, letters
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "ho:fnv",
-                ["help", "output=", "fullnames", "nomail", "verbose"])
+        opts, args = getopt.getopt(
+            sys.argv[1:],
+            "ho:fnv",
+            ["help", "output=", "fullnames", "nomail", "verbose"],
+        )
     except:
         usage(2)
-    
+
     fp = sys.stdout
     fullnames = False
     nomail = False
     verbose = False
-    for o,a in opts:
+    for o, a in opts:
         if o in ("-v", "--verbose"):
             verbose = True
         if o in ("-h", "--help"):
@@ -188,9 +196,8 @@ def main():
             nomail = True
     if len(args) != 3:
         usage(2)
-    member_url = 'https://%s/mailman/admin/%s/members' % (args[0], args[1])
-    p = {'adminpw':args[2]}
-        
+    member_url = "https://%s/mailman/admin/%s/members" % (args[0], args[1])
+    p = {"adminpw": args[2]}
 
     # login, picking up the cookie
     page = opener(member_url, urllib.urlencode(p))
@@ -206,9 +213,8 @@ def main():
         maxchunk = 0
         while chunk <= maxchunk:
             if verbose:
-                print >> sys.stdout, "%c(%d)" % (letter, chunk)
-            page = opener(member_url + "?letter=%s&chunk=%d" %
-                    (letter, chunk))
+                print >>sys.stdout, "%c(%d)" % (letter, chunk)
+            page = opener(member_url + "?letter=%s&chunk=%d" % (letter, chunk))
             lines = page.read()
             page.close()
 
@@ -225,13 +231,12 @@ def main():
         if nomail and nomails[email] == "off":
             continue
         if not fullnames or name == "":
-            print >>fp, email
+            print >> fp, email
         else:
-            print >>fp, '%s <%s>' % (name, email)
+            print >> fp, "%s <%s>" % (name, email)
 
     fp.close()
 
-
-if __name__ == '__main__':
-    main()
 
+if __name__ == "__main__":
+    main()

@@ -12,7 +12,7 @@ def do_filter_multiple_blank_lines(parser, token):
     """
     Filter out multiple blank lines from output
     """
-    nodelist = parser.parse(('endfiltermultipleblanklines',))
+    nodelist = parser.parse(("endfiltermultipleblanklines",))
     parser.delete_first_token()
     return MultiBlankLineFilterNode(nodelist)
 
@@ -30,9 +30,9 @@ class MultiBlankLineFilterNode(template.Node):
         output = self.nodelist.render(context)
         filtered_lines = []
 
-        for line in output.split(u'\n'):
+        for line in output.split(u"\n"):
             line = line.rstrip()
-            if filtered_lines and filtered_lines[-1] == u'' and line == u'':
+            if filtered_lines and filtered_lines[-1] == u"" and line == u"":
                 pass
             else:
                 filtered_lines.append(line)
@@ -45,7 +45,7 @@ def do_filter_blank_lines(parser, token):
     """
     Filter out any blank lines from output
     """
-    nodelist = parser.parse(('endfilterblanklines',))
+    nodelist = parser.parse(("endfilterblanklines",))
     parser.delete_first_token()
     return BlankLineFilterNode(nodelist)
 
@@ -61,5 +61,6 @@ class BlankLineFilterNode(template.Node):
     def render(self, context):
         output = self.nodelist.render(context)
         output = u"\n".join(
-            [line for line in output.split(u'\n') if line.strip() != ''])
+            [line for line in output.split(u"\n") if line.strip() != ""]
+        )
         return output

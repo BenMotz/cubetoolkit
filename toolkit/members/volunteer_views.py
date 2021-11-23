@@ -13,8 +13,12 @@ from django.db.models import F, Prefetch
 from django.utils import timezone
 import csv
 
-from toolkit.members.forms import (VolunteerForm, MemberFormWithoutNotes,
-                                   TrainingRecordForm, GroupTrainingForm)
+from toolkit.members.forms import (
+    VolunteerForm,
+    MemberFormWithoutNotes,
+    TrainingRecordForm,
+    GroupTrainingForm,
+)
 from toolkit.members.models import Member, Volunteer, TrainingRecord
 from toolkit.diary.models import Role
 
@@ -22,139 +26,143 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-@permission_required('toolkit.read')
+@permission_required("toolkit.read")
 @require_safe
 def view_volunteer_list(request):
-    show_retired = request.GET.get('show-retired', None) is not None
+    show_retired = request.GET.get("show-retired", None) is not None
     # Get all volunteers, sorted by name:
-    qs = (TrainingRecord.objects
-          .filter(training_type=TrainingRecord.GENERAL_TRAINING)
-          .order_by('-training_date'))
+    qs = TrainingRecord.objects.filter(
+        training_type=TrainingRecord.GENERAL_TRAINING
+    ).order_by("-training_date")
 
-    volunteers = (Volunteer.objects
-                  .order_by('member__name')
-                  .select_related()
-                  .prefetch_related('roles')
-                  .prefetch_related(Prefetch('training_records', queryset=qs,
-                                             to_attr='general_training')))
+    volunteers = (
+        Volunteer.objects.order_by("member__name")
+        .select_related()
+        .prefetch_related("roles")
+        .prefetch_related(
+            Prefetch(
+                "training_records", queryset=qs, to_attr="general_training"
+            )
+        )
+    )
 
     if not show_retired:
         volunteers = volunteers.filter(active=True)
     active_count = sum(1 for v in volunteers if v.active)
     context = {
-        'volunteers': volunteers,
-        'default_mugshot': settings.DEFAULT_MUGSHOT,
-        'retired_data_included': show_retired,
-        'active_count': active_count,
-        'general_training_desc': TrainingRecord.GENERAL_TRAINING_DESC
+        "volunteers": volunteers,
+        "default_mugshot": settings.DEFAULT_MUGSHOT,
+        "retired_data_included": show_retired,
+        "active_count": active_count,
+        "general_training_desc": TrainingRecord.GENERAL_TRAINING_DESC,
     }
-    return render(request, 'volunteer_list.html', context)
+    return render(request, "volunteer_list.html", context)
 
 
-@permission_required('toolkit.read')
+@permission_required("toolkit.read")
 @require_safe
 def export_volunteers_as_csv(request):
     # TODO use settings.DAWN_OF_TOOLKIT with export
-    logger.info('User %s requested a volunteer CSV export' % request.user)
-    now = datetime.now().strftime('%d %b %Y %I-%M %p')
-    file_name = '%s Volunteers %s.csv' % (settings.VENUE['name'], now)
+    logger.info("User %s requested a volunteer CSV export" % request.user)
+    now = datetime.now().strftime("%d %b %Y %I-%M %p")
+    file_name = "%s Volunteers %s.csv" % (settings.VENUE["name"], now)
     logger.info('Exported CSV filename: "%s"' % file_name)
 
-    response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = (
-        'attachment; filename="%s"' % file_name)
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = 'attachment; filename="%s"' % file_name
     writer = csv.writer(response)
-    writer.writerow(['Name',
-                     'Email',
-                     'Address',
-                     'City',
-                     'Postcode',
-                     'Phone',
-                     'Alternate phone',
-                     'Member notes',
-                     'Volunteer notes',
-                     'Inducted',
-                     'Last update',
-                     ])
+    writer.writerow(
+        [
+            "Name",
+            "Email",
+            "Address",
+            "City",
+            "Postcode",
+            "Phone",
+            "Alternate phone",
+            "Member notes",
+            "Volunteer notes",
+            "Inducted",
+            "Last update",
+        ]
+    )
 
-    volunteers = (Volunteer.objects
-                           .filter(active=True)
-                           .order_by('member__name'))
+    volunteers = Volunteer.objects.filter(active=True).order_by("member__name")
     for volunteer in volunteers:
-        writer.writerow([volunteer.member.name,
-                         volunteer.member.email,
-                         volunteer.member.address.replace('\r\n', ', '),
-                         volunteer.member.posttown,
-                         volunteer.member.postcode,
-                         volunteer.member.phone,
-                         volunteer.member.altphone,
-                         volunteer.member.notes,
-                         volunteer.member.volunteer.notes,
-                         volunteer.member.created_at.strftime(
-                             '%I:%M %p %d %b %Y'),
-                         volunteer.member.updated_at.strftime(
-                             '%I:%M %p %d %b %Y'),
-                         ])
+        writer.writerow(
+            [
+                volunteer.member.name,
+                volunteer.member.email,
+                volunteer.member.address.replace("\r\n", ", "),
+                volunteer.member.posttown,
+                volunteer.member.postcode,
+                volunteer.member.phone,
+                volunteer.member.altphone,
+                volunteer.member.notes,
+                volunteer.member.volunteer.notes,
+                volunteer.member.created_at.strftime("%I:%M %p %d %b %Y"),
+                volunteer.member.updated_at.strftime("%I:%M %p %d %b %Y"),
+            ]
+        )
     return response
 
 
-@permission_required('toolkit.read')
+@permission_required("toolkit.read")
 @require_safe
 def view_volunteer_summary(request):
 
-    order = request.GET.get('order', 'name')
+    order = request.GET.get("order", "name")
 
-    if 'name' in order:
-        volunteers = (Volunteer.objects
-                               .filter(active=True)
-                               .order_by('member__name'))
-        sort_type = 'name'
+    if "name" in order:
+        volunteers = Volunteer.objects.filter(active=True).order_by(
+            "member__name"
+        )
+        sort_type = "name"
     else:
-        volunteers = (Volunteer.objects
-                               .filter(active=True)
-                               .order_by('-member__created_at'))
-        sort_type = 'induction date'
+        volunteers = Volunteer.objects.filter(active=True).order_by(
+            "-member__created_at"
+        )
+        sort_type = "induction date"
 
     active_count = volunteers.count()
     context = {
-        'volunteers': volunteers,
-        'active_count': active_count,
-        'sort_type': sort_type,
-        'dawn_of_toolkit': settings.DAWN_OF_TOOLKIT,
+        "volunteers": volunteers,
+        "active_count": active_count,
+        "sort_type": sort_type,
+        "dawn_of_toolkit": settings.DAWN_OF_TOOLKIT,
     }
-    return render(request, 'volunteer_summary.html', context)
+    return render(request, "volunteer_summary.html", context)
 
 
-@permission_required('toolkit.read')
+@permission_required("toolkit.read")
 @require_safe
 def view_volunteer_role_report(request):
     # Build dict of role names -> volunteer names
     role_vol_map = {}
     # Query for active volunteers, sorted by name
-    volunteer_query = (Role.objects.filter(volunteer__active=True)
-                                   .values_list('name', 'volunteer__id',
-                                                'volunteer__member__name')
-                                   .order_by('volunteer__member__name',
-                                             'name'))
+    volunteer_query = (
+        Role.objects.filter(volunteer__active=True)
+        .values_list("name", "volunteer__id", "volunteer__member__name")
+        .order_by("volunteer__member__name", "name")
+    )
 
     for role, vol_id, vol_name in volunteer_query:
         role_vol_map.setdefault(role, []).append(vol_name)
 
     # Now sort role_vol_map by role name:
     role_vol_map = sorted(
-        role_vol_map.items(),
-        key=lambda role_name_tuple: role_name_tuple[0]
+        role_vol_map.items(), key=lambda role_name_tuple: role_name_tuple[0]
     )
     # (now got a list  of (role, (name1, name2, ...)) tuples, rather than a
     # dict, but that's fine)
 
     context = {
-        'role_vol_map': role_vol_map,
+        "role_vol_map": role_vol_map,
     }
-    return render(request, 'volunteer_role_report.html', context)
+    return render(request, "volunteer_role_report.html", context)
 
 
-@permission_required('toolkit.read')
+@permission_required("toolkit.read")
 @require_safe
 def select_volunteer(request, action, active=True):
     # This view is called to retire / unretire a volunteer. It presents a list
@@ -168,32 +176,35 @@ def select_volunteer(request, action, active=True):
     # depending on which view was used. This is probably not the simplest way
     # to do this...
     action_urls = {
-        'retire': reverse('inactivate-volunteer'),
-        'unretire': reverse('activate-volunteer'),
+        "retire": reverse("inactivate-volunteer"),
+        "unretire": reverse("activate-volunteer"),
     }
 
     assert action in action_urls
     assert isinstance(active, bool)
 
-    volunteers = Volunteer.objects.filter(active=active).order_by(
-        'member__name').select_related()
+    volunteers = (
+        Volunteer.objects.filter(active=active)
+        .order_by("member__name")
+        .select_related()
+    )
 
     context = {
-        'volunteers': volunteers,
-        'action': action,
-        'action_url': action_urls[action],
+        "volunteers": volunteers,
+        "action": action,
+        "action_url": action_urls[action],
     }
 
-    return render(request, 'select_volunteer.html', context)
+    return render(request, "select_volunteer.html", context)
 
 
-@permission_required('toolkit.write')
+@permission_required("toolkit.write")
 @require_POST
 def activate_volunteer(request, set_active=True):
     # Sets the 'active' value for the volunteer with the id passed  in the
     # 'volunteer' parameter of the POST request
 
-    vol_pk = request.POST.get('volunteer', None)
+    vol_pk = request.POST.get("volunteer", None)
 
     vol = get_object_or_404(Volunteer, id=vol_pk)
 
@@ -201,13 +212,18 @@ def activate_volunteer(request, set_active=True):
     vol.active = set_active
     vol.save()
 
-    logger.info(u"{0} set active to {1} for volunteer {2}"
-                .format(request.user.last_name,
-                        str(set_active),
-                        vol.member.name))
-    messages.add_message(request, messages.SUCCESS, u"{0} volunteer {1}"
-                         .format(u"Unretired" if set_active else u"Retired",
-                                 vol.member.name))
+    logger.info(
+        u"{0} set active to {1} for volunteer {2}".format(
+            request.user.last_name, str(set_active), vol.member.name
+        )
+    )
+    messages.add_message(
+        request,
+        messages.SUCCESS,
+        u"{0} volunteer {1}".format(
+            u"Unretired" if set_active else u"Retired", vol.member.name
+        ),
+    )
     # email admin with the news
     admin_body = (
         u"I'm delighted to inform you that %s has updated the "
@@ -215,26 +231,29 @@ def activate_volunteer(request, set_active=True):
         u"%s <%s>\n\n"
         u"to %s.\n\n"
         u"Please amend the volunteers mailing list "
-        u"at your earliest convenience." % (
+        u"at your earliest convenience."
+        % (
             request.user.last_name,
             vol.member.name,
             vol.member.email,
-            u"unretired" if set_active else u"retired")
+            u"unretired" if set_active else u"retired",
+        )
     )
     send_mail(
-        ('[%s] Change in volunteer status %s' % (
-            settings.VENUE['longname'],
-            vol.member.name)),
+        (
+            "[%s] Change in volunteer status %s"
+            % (settings.VENUE["longname"], vol.member.name)
+        ),
         admin_body,
-        settings.VENUE['mailout_from_address'],
-        settings.VENUE['vols_admin_address'],
+        settings.VENUE["mailout_from_address"],
+        settings.VENUE["vols_admin_address"],
         fail_silently=False,
     )
 
     return HttpResponseRedirect(reverse("view-volunteer-list"))
 
 
-@permission_required('toolkit.write')
+@permission_required("toolkit.write")
 def edit_volunteer(request, volunteer_id, create_new=False):
     # If called from the "add" url, then create_new will be True. If called
     # from the edit url then it'll be False
@@ -257,17 +276,12 @@ def edit_volunteer(request, volunteer_id, create_new=False):
     # Now, if the view was loaded with "GET" then display the edit form, and
     # if it was called with POST then read the updated volunteer data from the
     # form data and update and save the volunteer object:
-    if request.method == 'POST':
+    if request.method == "POST":
         # Three forms, one for each set of data
         vol_form = VolunteerForm(
-            request.POST,
-            request.FILES,
-            instance=volunteer
+            request.POST, request.FILES, instance=volunteer
         )
-        mem_form = MemberFormWithoutNotes(
-            request.POST,
-            instance=member
-        )
+        mem_form = MemberFormWithoutNotes(request.POST, instance=member)
         if vol_form.is_valid() and mem_form.is_valid():
             member = mem_form.save(commit=False)
             member.gdpr_opt_in = timezone.now()
@@ -275,15 +289,18 @@ def edit_volunteer(request, volunteer_id, create_new=False):
             volunteer.member = member
             vol_form.save()
 
-            logger.info(u"Saving changes to volunteer '{0}' (id: {1})".format(
-                volunteer.member.name, str(volunteer.pk)))
+            logger.info(
+                u"Saving changes to volunteer '{0}' (id: {1})".format(
+                    volunteer.member.name, str(volunteer.pk)
+                )
+            )
 
             messages.add_message(
                 request,
                 messages.SUCCESS,
                 u"{0} volunteer '{1}'".format(
                     u"Created" if create_new else u"Updated", member.name
-                )
+                ),
             )
 
             if create_new:
@@ -294,18 +311,21 @@ def edit_volunteer(request, volunteer_id, create_new=False):
                     u"%s <%s>\n\n"
                     u"to the toolkit.\n\n"
                     u"Please add them to the volunteers mailing list "
-                    u"at your earliest convenience." % (
+                    u"at your earliest convenience."
+                    % (
                         request.user.last_name,
                         volunteer.member.name,
-                        volunteer.member.email)
+                        volunteer.member.email,
+                    )
                 )
                 send_mail(
-                    ('[%s] New volunteer %s' %
-                         (settings.VENUE['longname'],
-                          volunteer.member.name)),
+                    (
+                        "[%s] New volunteer %s"
+                        % (settings.VENUE["longname"], volunteer.member.name)
+                    ),
                     admin_body,
-                    settings.VENUE['mailout_from_address'],
-                    settings.VENUE['vols_admin_address'],
+                    settings.VENUE["mailout_from_address"],
+                    settings.VENUE["vols_admin_address"],
                     fail_silently=False,
                 )
             # Go to the volunteer list view:
@@ -316,23 +336,24 @@ def edit_volunteer(request, volunteer_id, create_new=False):
 
     if new_training_record:
         training_record_form = TrainingRecordForm(
-            prefix="training", instance=new_training_record)
+            prefix="training", instance=new_training_record
+        )
     else:
         training_record_form = None
 
     context = {
-        'pagetitle': 'Add Volunteer' if create_new else 'Edit Volunteer',
-        'default_mugshot': settings.DEFAULT_MUGSHOT,
-        'volunteer': volunteer,
-        'vol_form': vol_form,
-        'mem_form': mem_form,
-        'training_record_form': training_record_form,
-        'dawn_of_toolkit': settings.DAWN_OF_TOOLKIT,
+        "pagetitle": "Add Volunteer" if create_new else "Edit Volunteer",
+        "default_mugshot": settings.DEFAULT_MUGSHOT,
+        "volunteer": volunteer,
+        "vol_form": vol_form,
+        "mem_form": mem_form,
+        "training_record_form": training_record_form,
+        "dawn_of_toolkit": settings.DAWN_OF_TOOLKIT,
     }
-    return render(request, 'form_volunteer.html', context)
+    return render(request, "form_volunteer.html", context)
 
 
-@permission_required('toolkit.write')
+@permission_required("toolkit.write")
 @require_POST
 def add_volunteer_training_record(request, volunteer_id):
     volunteer = get_object_or_404(Volunteer, id=volunteer_id)
@@ -345,15 +366,15 @@ def add_volunteer_training_record(request, volunteer_id):
     )
 
     if not volunteer.active:
-        response = {
-            'succeeded': False,
-            'errors': 'volunteer is not active'
-        }
+        response = {"succeeded": False, "errors": "volunteer is not active"}
         return JsonResponse(response)
     elif record_form.is_valid():
         record_form.save()
-        logger.info(u"Added training record {0} for volunteer '{1}'".format(
-            new_record.id, volunteer.member.name))
+        logger.info(
+            u"Added training record {0} for volunteer '{1}'".format(
+                new_record.id, volunteer.member.name
+            )
+        )
 
         if new_record.training_type == TrainingRecord.ROLE_TRAINING:
             # Now make sure the volunteer has that role selected:
@@ -363,46 +384,52 @@ def add_volunteer_training_record(request, volunteer_id):
             training_description = new_record.GENERAL_TRAINING_DESC
 
         response = {
-            'succeeded': True,
-            'id': new_record.id,
-            'training_description': training_description,
-            'training_date': new_record.training_date.strftime("%d/%m/%Y"),
-            'trainer': new_record.trainer,
-            'notes': new_record.notes,
+            "succeeded": True,
+            "id": new_record.id,
+            "training_description": training_description,
+            "training_date": new_record.training_date.strftime("%d/%m/%Y"),
+            "trainer": new_record.trainer,
+            "notes": new_record.notes,
         }
         return JsonResponse(response)
     else:
-        response = {
-            'succeeded': False,
-            'errors': record_form.errors
-        }
+        response = {"succeeded": False, "errors": record_form.errors}
         return JsonResponse(response)
 
 
-@permission_required('toolkit.write')
+@permission_required("toolkit.write")
 @require_POST
 def delete_volunteer_training_record(request, training_record_id):
     record = get_object_or_404(TrainingRecord, id=training_record_id)
 
     if not record.volunteer.active:
         logger.error(u"Tried to delete training record for inactive volunteer")
-        return HttpResponse("Can't delete record for inactive volunteer",
-                            status=403, content_type="text/plain")
+        return HttpResponse(
+            "Can't delete record for inactive volunteer",
+            status=403,
+            content_type="text/plain",
+        )
 
-    logger.info(u"Deleting training_record '{0}' for volunteer '{1}'"
-                .format(record.id, record.volunteer.member.name))
+    logger.info(
+        u"Deleting training_record '{0}' for volunteer '{1}'".format(
+            record.id, record.volunteer.member.name
+        )
+    )
     record.delete()
     return HttpResponse("OK", content_type="text/plain")
 
 
-@permission_required('toolkit.read')
+@permission_required("toolkit.read")
 @require_safe
 def view_volunteer_training_records(request):
     # Two sets of data, the complicated one (training records) and the simpler
     # one (all active volunteers, for the 'general' dates.)
-    records = (TrainingRecord.objects.filter(volunteer__active=True)
-               .filter(volunteer__roles=F('role'))
-               .select_related().prefetch_related('role'))
+    records = (
+        TrainingRecord.objects.filter(volunteer__active=True)
+        .filter(volunteer__roles=F("role"))
+        .select_related()
+        .prefetch_related("role")
+    )
     role_map = {}
     for record in records:
         vol_map = role_map.setdefault(record.role, {})
@@ -416,48 +443,55 @@ def view_volunteer_training_records(request):
         # tuples, with the list of (vol, rec) tuples sorted by
         # volunteer.member.name:
         [
-            (role, sorted(
-                [(vol, record) for vol, record in vol_map.items()],
-                key=lambda v_r: v_r[0].member.name.lower()
-            ))
+            (
+                role,
+                sorted(
+                    [(vol, record) for vol, record in vol_map.items()],
+                    key=lambda v_r: v_r[0].member.name.lower(),
+                ),
+            )
             for role, vol_map in role_map.items()
         ],
         # ...and sort the [ (role, [(vol, rec), ...]), ...] list by role name:
-        key=lambda r_l: r_l[0].name.lower()
+        key=lambda r_l: r_l[0].name.lower(),
     )
 
     # Second data set - all active volunteers.
-    qs = (TrainingRecord.objects
-          .filter(training_type=TrainingRecord.GENERAL_TRAINING)
-          .order_by('-training_date'))
+    qs = TrainingRecord.objects.filter(
+        training_type=TrainingRecord.GENERAL_TRAINING
+    ).order_by("-training_date")
 
-    volunteers = (Volunteer.objects.filter(active=True)
-                  .order_by('member__name').select_related()
-                  # Use above queryset to prepopulate a 'general_training'
-                  # attribute on the retrieved volunteers (to keep the number
-                  # of queries sane)
-                  .prefetch_related(Prefetch('training_records', queryset=qs,
-                                             to_attr='general_training')))
+    volunteers = (
+        Volunteer.objects.filter(active=True)
+        .order_by("member__name")
+        .select_related()
+        # Use above queryset to prepopulate a 'general_training'
+        # attribute on the retrieved volunteers (to keep the number
+        # of queries sane)
+        .prefetch_related(
+            Prefetch(
+                "training_records", queryset=qs, to_attr="general_training"
+            )
+        )
+    )
 
-    context = {
-        'report_data': role_map_list,
-        'volunteers': volunteers
-    }
-    return render(request, 'volunteer_training_report.html', context)
+    context = {"report_data": role_map_list, "volunteers": volunteers}
+    return render(request, "volunteer_training_report.html", context)
 
 
-@permission_required('toolkit.write')
+@permission_required("toolkit.write")
 def add_volunteer_training_group_record(request):
-    if request.method == 'POST':
+    if request.method == "POST":
         form = GroupTrainingForm(request.POST)
         if form.is_valid():
-            training_type = form.cleaned_data['type']
-            role = form.cleaned_data['role']
-            trainer = form.cleaned_data['trainer']
-            members = form.cleaned_data['volunteers']
+            training_type = form.cleaned_data["type"]
+            role = form.cleaned_data["role"]
+            trainer = form.cleaned_data["trainer"]
+            members = form.cleaned_data["volunteers"]
             logger.info(
                 "Bulk add training records, type %s, role '%s', trainer '%s', "
-                " members '%s'" % (training_type, role, trainer, members))
+                " members '%s'" % (training_type, role, trainer, members)
+            )
 
             for member in members:
                 volunteer = member.volunteer
@@ -465,9 +499,9 @@ def add_volunteer_training_group_record(request):
                     training_type=training_type,
                     role=role,
                     trainer=trainer,
-                    training_date=form.cleaned_data['training_date'],
-                    notes=form.cleaned_data['notes'],
-                    volunteer=volunteer
+                    training_date=form.cleaned_data["training_date"],
+                    notes=form.cleaned_data["notes"],
+                    volunteer=volunteer,
                 )
                 record.save()
                 if training_type == TrainingRecord.ROLE_TRAINING:
@@ -475,21 +509,32 @@ def add_volunteer_training_group_record(request):
                     volunteer.roles.add(role)
 
             if training_type == TrainingRecord.ROLE_TRAINING:
-                messages.add_message(request, messages.SUCCESS,
-                                     u"Added %d training records for %s" %
-                                     (len(form.cleaned_data['volunteers']),
-                                      form.cleaned_data['role']))
+                messages.add_message(
+                    request,
+                    messages.SUCCESS,
+                    u"Added %d training records for %s"
+                    % (
+                        len(form.cleaned_data["volunteers"]),
+                        form.cleaned_data["role"],
+                    ),
+                )
             elif training_type == TrainingRecord.GENERAL_TRAINING:
-                messages.add_message(request, messages.SUCCESS,
-                                     u"Added %d %s records" %
-                                     (len(form.cleaned_data['volunteers']),
-                                      TrainingRecord.GENERAL_TRAINING_DESC))
+                messages.add_message(
+                    request,
+                    messages.SUCCESS,
+                    u"Added %d %s records"
+                    % (
+                        len(form.cleaned_data["volunteers"]),
+                        TrainingRecord.GENERAL_TRAINING_DESC,
+                    ),
+                )
             return HttpResponseRedirect(
-                reverse('add-volunteer-training-group-record'))
+                reverse("add-volunteer-training-group-record")
+            )
     else:  # i.e. request.method == 'GET':
         form = GroupTrainingForm()
 
     context = {
-        'form': form,
+        "form": form,
     }
-    return render(request, 'form_group_training.html', context)
+    return render(request, "form_group_training.html", context)

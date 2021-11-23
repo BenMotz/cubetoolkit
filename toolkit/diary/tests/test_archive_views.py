@@ -9,11 +9,10 @@ from .common import DiaryTestsMixin
 
 
 class ArchiveViews(DiaryTestsMixin, TestCase):
-
     def setUp(self):
         super(ArchiveViews, self).setUp()
 
-        self.time_patch = patch('django.utils.timezone.now')
+        self.time_patch = patch("django.utils.timezone.now")
         time_mock = self.time_patch.start()
         time_mock.return_value = self._fake_now
 
@@ -33,8 +32,9 @@ class ArchiveViews(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "showing_archive_year.html")
 
     def test_view_month(self):
-        url = reverse("archive-view-month",
-                      kwargs={"year": "2013", "month": "4"})
+        url = reverse(
+            "archive-view-month", kwargs={"year": "2013", "month": "4"}
+        )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "showing_archive_month.html")

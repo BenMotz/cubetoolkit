@@ -13,27 +13,32 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        self.stdout.write('Members with duplicated email addresses...')
+        self.stdout.write("Members with duplicated email addresses...")
 
-        dupes = (Member.objects.values('email')
-                               .exclude(email='')
-                               .annotate(Count('id'))
-                               .order_by()
-                               .filter(id__count__gt=1))
+        dupes = (
+            Member.objects.values("email")
+            .exclude(email="")
+            .annotate(Count("id"))
+            .order_by()
+            .filter(id__count__gt=1)
+        )
 
-        members = Member.objects.filter(email__in=[item['email'] for item in dupes])
-        members = members.order_by('name')
+        members = Member.objects.filter(
+            email__in=[item["email"] for item in dupes]
+        )
+        members = members.order_by("name")
 
         for member in members:
-            self.stdout.write('%s <%s> joined %s' % (
-                member.name,
-                member.email,
-                member.created_at)
+            self.stdout.write(
+                "%s <%s> joined %s"
+                % (member.name, member.email, member.created_at)
             )
             # member.delete()
 
-        self.stdout.write(self.style.SUCCESS(
-            '\nFound %d email duplicates' % len(dupes)))
+        self.stdout.write(
+            self.style.SUCCESS("\nFound %d email duplicates" % len(dupes))
+        )
 
-        self.stdout.write(self.style.SUCCESS(
-            'from %d members\n' % len(members)))
+        self.stdout.write(
+            self.style.SUCCESS("from %d members\n" % len(members))
+        )

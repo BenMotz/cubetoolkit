@@ -6,7 +6,6 @@ from django.urls import get_script_prefix, set_script_prefix
 
 
 class TestNoPrefixURLTag(TestCase):
-
     def setUp(self):
         self._initial_prefix = get_script_prefix()
 
@@ -23,4 +22,5 @@ class TestNoPrefixURLTag(TestCase):
                 "{% noprefix_url 'day-view' '2015' '01' '01' %}"
             ).render(Context())
             self.assertEqual(
-                out, "Chicken sandwich: /programme/view/2015/01/01")
+                out, "Chicken sandwich: /programme/view/2015/01/01"
+            )

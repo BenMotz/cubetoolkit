@@ -9,13 +9,18 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('index', '0001_initial'),
+        ("index", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='indexlink',
-            name='category',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='links', to='index.IndexCategory', verbose_name='Link category'),
+            model_name="indexlink",
+            name="category",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="links",
+                to="index.IndexCategory",
+                verbose_name="Link category",
+            ),
         ),
     ]

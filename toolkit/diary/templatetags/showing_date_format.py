@@ -11,9 +11,9 @@ register = template.Library()
 
 def _ordinal_suffix(i):
     if i < 4 or i > 30 or 20 < i < 24:
-        return [None, 'st', 'nd', 'rd'][i % 10]
+        return [None, "st", "nd", "rd"][i % 10]
     else:
-        return 'th'
+        return "th"
 
 
 def _output_month(year, month, day_list, d_time):
@@ -53,12 +53,14 @@ def _output_month(year, month, day_list, d_time):
                 op.append(u", {0}".format(_format_day(d)))
             elif seq_len == 2:
                 # Only two items in the sequence: output a list
-                op.append(u", {0}, {1}".format(_format_day(prev),
-                                               _format_day(d)))
+                op.append(
+                    u", {0}, {1}".format(_format_day(prev), _format_day(d))
+                )
             else:
                 # > 2 items in the sequence, output a range
-                op.append(u"\u2013{0}, {1}".format(_format_day(prev),
-                                                   _format_day(d)))
+                op.append(
+                    u"\u2013{0}, {1}".format(_format_day(prev), _format_day(d))
+                )
             # (In both cases, also output the start of the next sequence)
             seq_len = 1
             prev = d
@@ -81,7 +83,7 @@ def _output_month(year, month, day_list, d_time):
 
 def _pretty_print_dateset(dates):
     if not dates:
-        return u''
+        return u""
 
     current_tz = get_current_timezone()
     out_strings = []
@@ -107,7 +109,7 @@ def _pretty_print_dateset(dates):
     return u", ".join(out_strings)
 
 
-@register.filter(name='showingdates')
+@register.filter(name="showingdates")
 def format_showing_dates(showings):
     dates = [s.start for s in showings]
     return _pretty_print_dateset(dates)

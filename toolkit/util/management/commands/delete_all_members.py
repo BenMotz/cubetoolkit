@@ -19,20 +19,24 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        if boolean_input('About to delete all of the members. Sure?'):
+        if boolean_input("About to delete all of the members. Sure?"):
 
             members = Member.objects.all()
 
-            self.stdout.write('Deleting...\n')
+            self.stdout.write("Deleting...\n")
 
             for member in members:
-                self.stdout.write('%s <%s> joined %s, updated %s' % (
-                    member.name,
-                    member.email,
-                    member.created_at,
-                    member.updated_at)
+                self.stdout.write(
+                    "%s <%s> joined %s, updated %s"
+                    % (
+                        member.name,
+                        member.email,
+                        member.created_at,
+                        member.updated_at,
                     )
+                )
                 member.delete()
 
-            self.stdout.write(self.style.SUCCESS(
-                '\nDeleted %d members\n' % len(members)))
+            self.stdout.write(
+                self.style.SUCCESS("\nDeleted %d members\n" % len(members))
+            )

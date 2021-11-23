@@ -7,14 +7,18 @@ from django.test import TestCase
 
 import django.db
 from django.core.exceptions import ValidationError
-from toolkit.diary.models import (Showing, Event, PrintedProgramme, EventTag,
-                                  Role)
+from toolkit.diary.models import (
+    Showing,
+    Event,
+    PrintedProgramme,
+    EventTag,
+    Role,
+)
 
 from .common import DiaryTestsMixin
 
 
 class ShowingModelCustomQueryset(DiaryTestsMixin, TestCase):
-
     def test_manager_public(self):
         records = list(Showing.objects.public())
         # From the fixtures, there are 4 showings that are confirmed and not
@@ -65,11 +69,13 @@ class ShowingModelCustomQueryset(DiaryTestsMixin, TestCase):
     def test_queryset_chaining(self):
         start = pytz.utc.localize(datetime(2000, 4, 2, 12, 0))
         end = pytz.utc.localize(datetime(2013, 9, 1, 12, 0))
-        records = list(Showing.objects.all()
-                                      .public()
-                                      .not_cancelled()
-                                      .start_in_range(start, end)
-                                      .confirmed())
+        records = list(
+            Showing.objects.all()
+            .public()
+            .not_cancelled()
+            .start_in_range(start, end)
+            .confirmed()
+        )
         self.assertEqual(len(records), 3)
         for showing in records:
             self.assertTrue(showing.confirmed)
@@ -82,7 +88,6 @@ class ShowingModelCustomQueryset(DiaryTestsMixin, TestCase):
 
 
 class EventModelNonLegacyCopy(TestCase):
-
     def setUp(self):
         self.sample_copy = (
             u"<p>Simple &amp; tidy HTML/unicode \u00a9\u014dpy\n</p>\n"
@@ -90,8 +95,9 @@ class EventModelNonLegacyCopy(TestCase):
             u"<p>And another! <a href='https://example.com/bar/'>link!</a>"
             u" and some equivalent things; &pound; &#163; \u00a3<br></p>"
         )
-        self.event = Event(name="Test event",
-                           legacy_copy=False, copy=self.sample_copy)
+        self.event = Event(
+            name="Test event", legacy_copy=False, copy=self.sample_copy
+        )
         self.event.save()
 
     def test_simple(self):
@@ -113,7 +119,6 @@ class EventModelNonLegacyCopy(TestCase):
 
 
 class EventModelLegacyCopy(TestCase):
-
     def setUp(self):
         self.sample_copy = (
             u"Simple &amp; tidy legacy \u00a9\u014dpy\n\n"
@@ -122,8 +127,9 @@ class EventModelLegacyCopy(TestCase):
             u" and some equivalent things; &pound; &#163; \u00a3..."
             u" and <this> \"'<troublemaker>'\""
         )
-        self.event = Event(name="Test event",
-                           legacy_copy=True, copy=self.sample_copy)
+        self.event = Event(
+            name="Test event", legacy_copy=True, copy=self.sample_copy
+        )
         self.event.save()
 
     def test_simple(self):
@@ -134,7 +140,7 @@ class EventModelLegacyCopy(TestCase):
     def test_html_copy(self):
         expected = (
             u"Simple &amp; tidy legacy \u00a9\u014dpy <br><br>"
-            u'With an unardorned link: '
+            u"With an unardorned link: "
             u'<a href="http://example.com/foo/">http://example.com/foo/</a>'
             u' <a href="https://example.com/foo/">https://example.com/foo/</a>'
             u" and some equivalent things; &pound; &#163; \u00a3..."
@@ -154,22 +160,15 @@ class EventModelLegacyCopy(TestCase):
 
 
 class PrintedProgrammeModelTests(TestCase):
-
     def test_month_ok(self):
-        pp = PrintedProgramme(
-            programme="/foo/bar",
-            month=date(2010, 2, 1)
-        )
+        pp = PrintedProgramme(programme="/foo/bar", month=date(2010, 2, 1))
         pp.save()
 
         pp = PrintedProgramme.objects.get(pk=pp.pk)
         self.assertEqual(pp.month, date(2010, 2, 1))
 
     def test_month_normalised(self):
-        pp = PrintedProgramme(
-            programme="/foo/bar",
-            month=date(2010, 2, 2)
-        )
+        pp = PrintedProgramme(programme="/foo/bar", month=date(2010, 2, 2))
         pp.save()
 
         pp = PrintedProgramme.objects.get(pk=pp.pk)
@@ -177,7 +176,6 @@ class PrintedProgrammeModelTests(TestCase):
 
 
 class EventPricingFromTemplate(DiaryTestsMixin, TestCase):
-
     def test_set_pricing_from_template(self):
         # No pricing specified when creating the event, and pricing specified
         # in the template:
@@ -237,7 +235,6 @@ class EventPricingFromTemplate(DiaryTestsMixin, TestCase):
 
 
 class EventTagsFromTemplate(DiaryTestsMixin, TestCase):
-
     def test_set_one_tag_from_template(self):
         new_event = Event(
             name=u"Event Title",
@@ -298,7 +295,6 @@ class EventTagsFromTemplate(DiaryTestsMixin, TestCase):
 
 
 class EventTagTests(TestCase):
-
     def test_can_delete_not_readonly(self):
         tag = EventTag(name=u"test", slug=u"test", read_only=False)
         tag.save()
@@ -368,8 +364,12 @@ class EventTagTests(TestCase):
 
     def test_can_edit_readonly_promotion(self):
         tag = EventTag(
-            name=u"test", slug=u"test", read_only=True,
-            sort_order=1, promoted=False)
+            name=u"test",
+            slug=u"test",
+            read_only=True,
+            sort_order=1,
+            promoted=False,
+        )
         tag.save()
         pk = tag.pk
         # Try to edit:
@@ -428,7 +428,6 @@ class EventTagTests(TestCase):
 
 
 class RoleTests(TestCase):
-
     def test_can_delete_not_readonly(self):
         role = Role(name=u"Role One")
         role.save()
