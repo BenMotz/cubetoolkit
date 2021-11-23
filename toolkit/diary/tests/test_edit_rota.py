@@ -329,8 +329,8 @@ class ViewRotaVacancies(DiaryTestsMixin, TestCase):
         self.client.logout()
 
     @patch('django.utils.timezone.now')
-    def test_get(self, now_patch):
-        now_patch.return_value = self._fake_now
+    def test_get_nothing_upcoming(self, now_patch):
+        now_patch.return_value = self._fake_now + timedelta(days=365)
         url = reverse("view-rota-vacancies")
         response = self.client.get(url)
 
@@ -339,7 +339,7 @@ class ViewRotaVacancies(DiaryTestsMixin, TestCase):
         self.assertNotContains(response, '<i>needs</i>')
 
     @patch('django.utils.timezone.now')
-    def test_get_nothing_upcoming(self, now_patch):
+    def test_get(self, now_patch):
         now_patch.return_value = pytz.timezone(
             "Europe/London").localize(datetime(2013, 4, 12, 11, 00))
         url = reverse("view-rota-vacancies")
