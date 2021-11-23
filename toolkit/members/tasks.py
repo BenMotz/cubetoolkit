@@ -197,7 +197,8 @@ def send_mailout_to(subject, body_text, body_html, recipients, task=None,
         except smtplib.SMTPException as smtpe:
             logger.error("SMTP Quit failed: {0}".format(smtpe))
 
-    return (False, sent, 'Ok')
+    logger.info("Mailout complete")
+    return (False, sent, "Ok")
 
 
 @task()
