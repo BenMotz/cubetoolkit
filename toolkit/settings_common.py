@@ -137,6 +137,14 @@ WAGTAIL_PASSWORD_RESET_ENABLED = False
 # Don't automatically check for (and notify) new Wagtail versions:
 WAGTAIL_ENABLE_UPDATE_CHECK = False
 
+# Disable use of remote avatars
+WAGTAIL_GRAVATAR_PROVIDER_URL = None
+
+# Restricting these lists to single items hides the configuration option:
+WAGTAILADMIN_PERMITTED_LANGUAGES = [("en", "English")]
+# TODO: use the value of "TIME_ZONE", which is unfortunately defined further
+# down :-(
+WAGTAIL_USER_TIME_ZONES = ["Europe/London"]
 
 ###############################################################################
 #
