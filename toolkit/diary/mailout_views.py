@@ -241,9 +241,10 @@ def mailout_progress(request):
     error = None
     sent_count = None
     error_msg = None
+    task_id = request.GET["task_id"]
 
     try:
-        async_result = celery.result.AsyncResult(id=request.GET["task_id"])
+        async_result = celery.result.AsyncResult(id=task_id)
         state = async_result.state
     except redis.exceptions.ConnectionError as ce:
         logger.error(
@@ -296,13 +297,15 @@ def mailout_progress(request):
                          .format(state))
 
     return HttpResponse(
-        json.dumps({
-            'task_id': async_result.task_id,
-            'complete': complete,
-            'progress': progress,
-            'error': error,
-            'error_msg': error_msg,
-            'sent_count': sent_count,
-        }),
-        content_type="application/json"
+        json.dumps(
+            {
+                "task_id": task_id,
+                "complete": complete,
+                "progress": progress,
+                "error": error,
+                "error_msg": error_msg,
+                "sent_count": sent_count,
+            }
+        ),
+        content_type="application/json",
     )
