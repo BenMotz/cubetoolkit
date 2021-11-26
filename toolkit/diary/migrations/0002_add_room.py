@@ -33,7 +33,10 @@ class Migration(migrations.Migration):
             model_name="showing",
             name="room",
             field=models.ForeignKey(
-                related_name="showings", to="diary.Room", null=True
+                related_name="showings",
+                to="diary.Room",
+                null=True,
+                on_delete=models.SET_NULL,
             ),
         ),
     ]

@@ -34,13 +34,17 @@ class Migration(migrations.Migration):
                 (
                     "role",
                     models.ForeignKey(
-                        related_name="training_records", to="diary.Role"
+                        related_name="training_records",
+                        to="diary.Role",
+                        on_delete=models.CASCADE,
                     ),
                 ),
                 (
                     "volunteer",
                     models.ForeignKey(
-                        related_name="training_records", to="members.Volunteer"
+                        related_name="training_records",
+                        to="members.Volunteer",
+                        on_delete=models.CASCADE,
                     ),
                 ),
             ],

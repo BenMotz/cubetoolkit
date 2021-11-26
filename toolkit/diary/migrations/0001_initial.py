@@ -273,7 +273,12 @@ class Migration(migrations.Migration):
                 ("rank", models.IntegerField(default=1)),
                 ("name", models.TextField(max_length=256, blank=True)),
                 ("updated_at", models.DateTimeField(auto_now=True)),
-                ("role", models.ForeignKey(to="diary.Role")),
+                (
+                    "role",
+                    models.ForeignKey(
+                        to="diary.Role", on_delete=models.CASCADE
+                    ),
+                ),
             ],
             options={
                 "ordering": ["role", "rank"],
@@ -317,7 +322,9 @@ class Migration(migrations.Migration):
                 (
                     "event",
                     models.ForeignKey(
-                        related_name="showings", to="diary.Event"
+                        related_name="showings",
+                        to="diary.Event",
+                        on_delete=models.CASCADE,
                     ),
                 ),
                 (
@@ -336,7 +343,9 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name="rotaentry",
             name="showing",
-            field=models.ForeignKey(to="diary.Showing"),
+            field=models.ForeignKey(
+                to="diary.Showing", on_delete=models.CASCADE
+            ),
             preserve_default=True,
         ),
         migrations.AddField(
@@ -380,6 +389,7 @@ class Migration(migrations.Migration):
                 blank=True,
                 to="diary.EventTemplate",
                 null=True,
+                on_delete=models.SET_NULL,
             ),
             preserve_default=True,
         ),

@@ -106,7 +106,9 @@ class Migration(migrations.Migration):
                 (
                     "member",
                     models.OneToOneField(
-                        related_name="volunteer", to="members.Member"
+                        related_name="volunteer",
+                        to="members.Member",
+                        on_delete=models.CASCADE,
                     ),
                 ),
                 (

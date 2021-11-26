@@ -48,6 +48,7 @@ class Migration(migrations.Migration):
                         related_name="links",
                         verbose_name=b"Link category",
                         to="index.IndexCategory",
+                        on_delete=models.CASCADE,
                     ),
                 ),
             ],
