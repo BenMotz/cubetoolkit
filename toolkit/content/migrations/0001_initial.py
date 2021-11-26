@@ -26,6 +26,7 @@ class Migration(migrations.Migration):
                         primary_key=True,
                         serialize=False,
                         to="wagtailcore.Page",
+                        on_delete=models.CASCADE,
                     ),
                 ),
                 ("body", wagtail.core.fields.RichTextField()),
@@ -73,7 +74,9 @@ class Migration(migrations.Migration):
                 (
                     "image",
                     models.ForeignKey(
-                        related_name="+", to="wagtailimages.Image"
+                        related_name="+",
+                        to="wagtailimages.Image",
+                        on_delete=models.CASCADE,
                     ),
                 ),
             ],
@@ -93,6 +96,7 @@ class Migration(migrations.Migration):
                         primary_key=True,
                         serialize=False,
                         to="wagtailcore.Page",
+                        on_delete=models.CASCADE,
                     ),
                 ),
                 ("intro_text", wagtail.core.fields.RichTextField(blank=True)),

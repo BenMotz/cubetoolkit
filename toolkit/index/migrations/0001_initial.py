@@ -24,10 +24,26 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='IndexLink',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('text', models.CharField(max_length=1024, blank=True)),
-                ('link', models.URLField(max_length=1024)),
-                ('category', models.ForeignKey(related_name='links', verbose_name=b'Link category', to='index.IndexCategory')),
+                (
+                    "id",
+                    models.AutoField(
+                        verbose_name="ID",
+                        serialize=False,
+                        auto_created=True,
+                        primary_key=True,
+                    ),
+                ),
+                ("text", models.CharField(max_length=1024, blank=True)),
+                ("link", models.URLField(max_length=1024)),
+                (
+                    "category",
+                    models.ForeignKey(
+                        related_name="links",
+                        verbose_name=b"Link category",
+                        to="index.IndexCategory",
+                        on_delete=models.CASCADE,
+                    ),
+                ),
             ],
             options={
                 'ordering': ['category'],

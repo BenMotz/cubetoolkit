@@ -22,8 +22,13 @@ class Migration(migrations.Migration):
             },
         ),
         migrations.AddField(
-            model_name='showing',
-            name='room',
-            field=models.ForeignKey(related_name='showings', to='diary.Room', null=True),
+            model_name="showing",
+            name="room",
+            field=models.ForeignKey(
+                related_name="showings",
+                to="diary.Room",
+                null=True,
+                on_delete=models.SET_NULL,
+            ),
         ),
     ]

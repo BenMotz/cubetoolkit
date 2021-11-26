@@ -48,6 +48,7 @@ class Migration(migrations.Migration):
                         primary_key=True,
                         serialize=False,
                         to="wagtailcore.Page",
+                        on_delete=models.CASCADE,
                     ),
                 ),
             ],

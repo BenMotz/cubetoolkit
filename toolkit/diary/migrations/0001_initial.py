@@ -126,12 +126,25 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='RotaEntry',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('required', models.BooleanField(default=True)),
-                ('rank', models.IntegerField(default=1)),
-                ('name', models.TextField(max_length=256, blank=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('role', models.ForeignKey(to='diary.Role')),
+                (
+                    "id",
+                    models.AutoField(
+                        verbose_name="ID",
+                        serialize=False,
+                        auto_created=True,
+                        primary_key=True,
+                    ),
+                ),
+                ("required", models.BooleanField(default=True)),
+                ("rank", models.IntegerField(default=1)),
+                ("name", models.TextField(max_length=256, blank=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "role",
+                    models.ForeignKey(
+                        to="diary.Role", on_delete=models.CASCADE
+                    ),
+                ),
             ],
             options={
                 'ordering': ['role', 'rank'],
@@ -142,21 +155,50 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Showing',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('start', toolkit.diary.models.FutureDateTimeField(db_index=True)),
-                ('booked_by', models.CharField(max_length=64)),
-                ('extra_copy', models.TextField(max_length=4096, null=True, blank=True)),
-                ('extra_copy_summary', models.TextField(max_length=4096, null=True, blank=True)),
-                ('confirmed', models.BooleanField(default=False)),
-                ('hide_in_programme', models.BooleanField(default=False)),
-                ('cancelled', models.BooleanField(default=False)),
-                ('discounted', models.BooleanField(default=False)),
-                ('sold_out', models.BooleanField(default=False)),
-                ('rota_notes', models.TextField(max_length=1024, blank=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('event', models.ForeignKey(related_name='showings', to='diary.Event')),
-                ('roles', models.ManyToManyField(to='diary.Role', through='diary.RotaEntry')),
+                (
+                    "id",
+                    models.AutoField(
+                        verbose_name="ID",
+                        serialize=False,
+                        auto_created=True,
+                        primary_key=True,
+                    ),
+                ),
+                (
+                    "start",
+                    toolkit.diary.models.FutureDateTimeField(db_index=True),
+                ),
+                ("booked_by", models.CharField(max_length=64)),
+                (
+                    "extra_copy",
+                    models.TextField(max_length=4096, null=True, blank=True),
+                ),
+                (
+                    "extra_copy_summary",
+                    models.TextField(max_length=4096, null=True, blank=True),
+                ),
+                ("confirmed", models.BooleanField(default=False)),
+                ("hide_in_programme", models.BooleanField(default=False)),
+                ("cancelled", models.BooleanField(default=False)),
+                ("discounted", models.BooleanField(default=False)),
+                ("sold_out", models.BooleanField(default=False)),
+                ("rota_notes", models.TextField(max_length=1024, blank=True)),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "event",
+                    models.ForeignKey(
+                        related_name="showings",
+                        to="diary.Event",
+                        on_delete=models.CASCADE,
+                    ),
+                ),
+                (
+                    "roles",
+                    models.ManyToManyField(
+                        to="diary.Role", through="diary.RotaEntry"
+                    ),
+                ),
             ],
             options={
                 'ordering': ['start'],
@@ -165,9 +207,11 @@ class Migration(migrations.Migration):
             bases=(models.Model,),
         ),
         migrations.AddField(
-            model_name='rotaentry',
-            name='showing',
-            field=models.ForeignKey(to='diary.Showing'),
+            model_name="rotaentry",
+            name="showing",
+            field=models.ForeignKey(
+                to="diary.Showing", on_delete=models.CASCADE
+            ),
             preserve_default=True,
         ),
         migrations.AddField(
@@ -195,9 +239,16 @@ class Migration(migrations.Migration):
             preserve_default=True,
         ),
         migrations.AddField(
-            model_name='event',
-            name='template',
-            field=models.ForeignKey(related_name='template', verbose_name=b'Event Type', blank=True, to='diary.EventTemplate', null=True),
+            model_name="event",
+            name="template",
+            field=models.ForeignKey(
+                related_name="template",
+                verbose_name=b"Event Type",
+                blank=True,
+                to="diary.EventTemplate",
+                null=True,
+                on_delete=models.SET_NULL,
+            ),
             preserve_default=True,
         ),
     ]

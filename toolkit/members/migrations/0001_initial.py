@@ -42,14 +42,42 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Volunteer',
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('notes', models.TextField(null=True, blank=True)),
-                ('active', models.BooleanField(default=True)),
-                ('portrait', models.ImageField(max_length=256, null=True, upload_to=b'volunteers', blank=True)),
-                ('created_at', models.DateTimeField(auto_now_add=True)),
-                ('updated_at', models.DateTimeField(auto_now=True)),
-                ('member', models.OneToOneField(related_name='volunteer', to='members.Member')),
-                ('roles', models.ManyToManyField(to='diary.Role', db_table='Volunteer_Roles', blank=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        verbose_name="ID",
+                        serialize=False,
+                        auto_created=True,
+                        primary_key=True,
+                    ),
+                ),
+                ("notes", models.TextField(null=True, blank=True)),
+                ("active", models.BooleanField(default=True)),
+                (
+                    "portrait",
+                    models.ImageField(
+                        max_length=256,
+                        null=True,
+                        upload_to=b"volunteers",
+                        blank=True,
+                    ),
+                ),
+                ("created_at", models.DateTimeField(auto_now_add=True)),
+                ("updated_at", models.DateTimeField(auto_now=True)),
+                (
+                    "member",
+                    models.OneToOneField(
+                        related_name="volunteer",
+                        to="members.Member",
+                        on_delete=models.CASCADE,
+                    ),
+                ),
+                (
+                    "roles",
+                    models.ManyToManyField(
+                        to="diary.Role", db_table="Volunteer_Roles", blank=True
+                    ),
+                ),
             ],
             options={
                 'db_table': 'Volunteers',
