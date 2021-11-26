@@ -7,6 +7,9 @@ from django.test import TestCase
 from django.urls import reverse
 from django.test.utils import override_settings
 
+import kombu.exceptions
+import redis.exceptions
+
 from toolkit.members.models import Member
 from .common import DiaryTestsMixin, ToolkitUsersFixture
 
@@ -467,6 +470,25 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         response = self.client.post(url, data={"task_id": "dummy-task-id"})
         self.assertEqual(response.status_code, 405)
 
+    @patch("toolkit.members.tasks.send_mailout.delay")
+    def test_exec_view_task_start_failure(self, delay_patch):
+        delay_patch.side_effect = kombu.exceptions.KombuError("No can do")
+
+        url = reverse("exec-mailout")
+        response = self.client.post(
+            url, data={"subject": "S", "body_text": "B", "body_html": "B"}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            {
+                "complete": True,
+                "error": True,
+                "error_msg": "Failed starting task: No can do",
+                "status": "error",
+            },
+            response.json(),
+        )
+
     @patch("celery.result.AsyncResult")
     def test_exec_view_get_progress(self, async_result_patch):
         async_result_patch.return_value.state = "PROGRESS10"
@@ -551,6 +573,30 @@ class MailoutTests(DiaryTestsMixin, TestCase):
                 "sent_count": None,
                 "progress": 0,
                 "task_id": "dummy-task-id",
+            },
+            response.json(),
+        )
+
+    @patch("celery.result.AsyncResult")
+    def test_exec_view_get_progress_failure_redis_error(
+        self, async_result_patch
+    ):
+        async_result_patch.side_effect = redis.exceptions.ConnectionError(
+            "nope"
+        )
+
+        url = reverse("mailout-progress")
+        response = self.client.get(url, data={"task_id": "dummy-task-id"})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            {
+                "complete": True,
+                "error": True,
+                "error_msg": "Failed connecting to redis to retrieve job status: nope",
+                "sent_count": 0,
+                "progress": 0,
+                "task_id": u"dummy-task-id",
             },
             response.json(),
         )
