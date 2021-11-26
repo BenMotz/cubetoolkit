@@ -213,7 +213,7 @@ def rota_form_factory(showing):
 
     # Add a MultipleChoiceField for all roles that aren't "standard"
     members["other_roles"] = forms.MultipleChoiceField(
-        ((role.pk, role.name) for role in roles if not role.standard),
+        choices=((role.pk, role.name) for role in roles if not role.standard),
         # Don't have to have anything selected:
         required=False,
         # List of IDs which should be selected:
