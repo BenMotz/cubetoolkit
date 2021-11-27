@@ -819,7 +819,7 @@ class TestAddTraining(MembersTestsMixin, TestCase):
                 "training-role": 1,
                 "training-trainer": "Trainer",
                 "training-training_date": "1/2/2015",
-                "training-notes": None,
+                "training-notes": "",
             },
         )
         self.assertEqual(response.status_code, 200)
