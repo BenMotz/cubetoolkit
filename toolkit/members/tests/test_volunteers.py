@@ -745,14 +745,18 @@ class TestAddTraining(MembersTestsMixin, TestCase):
 
     def test_add_training_inactive_volunteer(self):
         vol = Volunteer.objects.filter(active=False)[0]
-        url = reverse("add-volunteer-training-record",
-                      kwargs={"volunteer_id": vol.id})
-        response = self.client.post(url, data={
-            'training-role': 1,
-            'training-trainer': "Trainer",
-            'training-training_date': "1/2/2015",
-            'training-notes':  None
-        })
+        url = reverse(
+            "add-volunteer-training-record", kwargs={"volunteer_id": vol.id}
+        )
+        response = self.client.post(
+            url,
+            data={
+                "training-role": 1,
+                "training-trainer": "Trainer",
+                "training-training_date": "1/2/2015",
+                "training-notes": "",
+            },
+        )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), {
             "succeeded": False,

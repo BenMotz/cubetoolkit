@@ -1,6 +1,6 @@
 # Fix versions of django and directly related components:
-Django<2.2,>=2.1
-django-debug-toolbar==2.1
+Django<2.3,>=2.2
+django-debug-toolbar==3.2.2
 celery[redis]>4,<5
 easy_thumbnails==2.6.0
 # Functionality introduced at these versions is required:
