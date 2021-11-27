@@ -94,11 +94,17 @@ class ViewSecurity(DiaryTestsMixin, TestCase):
             url = reverse(view_name, kwargs=kwargs)
             expected_redirect = "{0}?next={1}".format(reverse("login"), url)
             # Test GET:
-            response = self.client.get(url)
-            self.assertRedirects(response, expected_redirect)
+            with self.subTest(f"GET {view_name} {url}"):
+                response = self.client.get(url)
+                self.assertIn(response.status_code, (302, 403))
+                if response.status_code == 302:
+                    self.assertRedirects(response, expected_redirect)
             # Test POST:
-            response = self.client.post(url)
-            self.assertRedirects(response, expected_redirect)
+            with self.subTest(f"POST {view_name} {url}"):
+                response = self.client.post(url)
+                self.assertIn(response.status_code, (302, 403))
+                if response.status_code == 302:
+                    self.assertRedirects(response, expected_redirect)
 
     def test_need_login(self):
         """
