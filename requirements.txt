@@ -2,7 +2,7 @@
 Django<2.3,>=2.2
 django-debug-toolbar==3.2.2
 celery[redis]>4,<5
-easy_thumbnails==2.6.0
+easy_thumbnails==2.7.2
 # Functionality introduced at these versions is required:
 python-magic>=0.4.0
 # These should (!) have stable APIs, so let upgrades happen
