@@ -1,4 +1,5 @@
 {% load wagtailcore_tags %}
+{% wagtail_site as current_site %}
 <ul>
     <li><a href="/">Home</a></li>
     <li><a href="{% url "programme-view" %}">Programme</a>
@@ -10,7 +11,7 @@
             <li><a href="{% url "archive-view-index" %}"><span>Archive</span></a></li>
         </ul>
     </li>
-    {% for top_level_child in request.site.root_page.get_children.live.in_menu %}
+    {% for top_level_child in current_site.root_page.get_children.live.in_menu %}
     {# Don't actually link to the top_level_child content (as there isn't any!) #}
     <li><a href="#">{{ top_level_child.seo_title|default:top_level_child.title }}</a>
         <ul class="sub-menu">
