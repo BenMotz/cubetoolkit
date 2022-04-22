@@ -18,6 +18,9 @@ html2text==3.200.3
 wagtail>=2.12,<2.13
 monthdelta
 
+# Required for legacy events in the redis queue... or something like that?
+unidecode==1.3.4
+
 # The MySQL-python library requires a C build chain (gcc, etc.) and the mysql
 # library headers to be installed, which isn't desirable on deployment hosts.
 # Instead we ensure that the corresponding OS package is installed, and the
