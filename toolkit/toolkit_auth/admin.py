@@ -2,10 +2,6 @@ from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
-from djcelery.models import (
-    TaskState, WorkerState, PeriodicTask,
-    IntervalSchedule, CrontabSchedule)
-
 from django.conf import settings
 from toolkit.diary.models import (Showing, Event, DiaryIdea, MediaItem,
                                   EventTemplate, EventTag, Role, RotaEntry,
@@ -79,12 +75,6 @@ class RotaEntryAdmin(admin.ModelAdmin):
 class RoomAdmin(admin.ModelAdmin):
     model = Room
 
-
-admin.site.unregister(TaskState)
-admin.site.unregister(WorkerState)
-admin.site.unregister(IntervalSchedule)
-admin.site.unregister(CrontabSchedule)
-admin.site.unregister(PeriodicTask)
 
 admin.site.unregister(User)
 admin.site.register(User, UserAdmin)
