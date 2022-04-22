@@ -340,8 +340,6 @@ TEMPLATES = [
 ROOT_URLCONF = 'toolkit.urls'
 
 INSTALLED_APPS = (
-     # Django-celery
-    'djcelery',
     'toolkit.diary',
     'toolkit.members',
     'toolkit.toolkit_auth',
