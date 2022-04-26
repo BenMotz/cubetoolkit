@@ -24,8 +24,9 @@ logger = logging.getLogger(__name__)
 class FutureDateTimeField(models.DateTimeField):
     """DateTime field that can only be set to times in the future.
     Used for Showing start times"""
+
     default_error_messages = {
-        'invalid': 'Date may not be in the past',
+        "invalid": "Date may not be in the past",
     }
     default_validators = [validate_in_future]
 
@@ -34,16 +35,18 @@ class FutureDateTimeField(models.DateTimeField):
 class Role(models.Model):
     name = models.CharField(max_length=64, unique=True)
 
-    standard = models.BooleanField(default=False,
-                                   help_text="Should this role be presented in"
-                                   " the main list of roles for events")
+    standard = models.BooleanField(
+        default=False,
+        help_text="Should this role be presented in"
+        " the main list of roles for events",
+    )
 
     # Allow role to be edited/deleted
     read_only = models.BooleanField(default=False)
 
     class Meta:
-        db_table = 'Roles'
-        ordering = ['name']
+        db_table = "Roles"
+        ordering = ["name"]
 
     def __str__(self):
         return self.name
@@ -61,8 +64,9 @@ class Role(models.Model):
             return
         elif self._original_read_only and not self.read_only:
             # TODO: Unit test!
-            logger.error("Tried to unprotect read-only role {0}"
-                         .format(self.name))
+            logger.error(
+                "Tried to unprotect read-only role {0}".format(self.name)
+            )
             return
         else:
             return super(Role, self).save(*args, **kwargs)
@@ -70,8 +74,9 @@ class Role(models.Model):
     def delete(self, *args, **kwargs):
         # Don't allow read_only roles to be deleted
         if self.pk and self.read_only:
-            logger.error("Tried to delete read-only role {0}"
-                         .format(self.name))
+            logger.error(
+                "Tried to delete read-only role {0}".format(self.name)
+            )
             return False
         else:
             return super(Role, self).delete(*args, **kwargs)
@@ -83,17 +88,24 @@ class MediaItem(models.Model):
     with events, in future with other things?"""
 
     media_file = models.ImageField(
-        upload_to="diary", max_length=256, null=True, blank=True,
-        verbose_name='Image file')
+        upload_to="diary",
+        max_length=256,
+        null=True,
+        blank=True,
+        verbose_name="Image file",
+    )
     mimetype = models.CharField(max_length=64, editable=False)
 
-    credit = models.CharField(max_length=256, blank=True,
-                              default="Internet scavenged",
-                              verbose_name='Image credit')
+    credit = models.CharField(
+        max_length=256,
+        blank=True,
+        default="Internet scavenged",
+        verbose_name="Image credit",
+    )
     caption = models.CharField(max_length=256, blank=True)
 
     class Meta:
-        db_table = 'MediaItems'
+        db_table = "MediaItems"
 
     def __str__(self):
         return "{0}: {1}".format(self.pk, self.media_file)
@@ -112,15 +124,21 @@ class MediaItem(models.Model):
     def autoset_mimetype(self):
         # See lib/python2.7/site-packages/django/forms/fields.py for how to do
         # basic validation of PNGs / JPEGs
-        if self.media_file and self.media_file.name != '':
+        if self.media_file and self.media_file.name != "":
             try:
                 self.mimetype = imagetools.get_mimetype(self.media_file.file)
             except IOError:
-                logger.error("Failed to determine mimetype of file {0}"
-                             .format(self.media_file.name))
+                logger.error(
+                    "Failed to determine mimetype of file {0}".format(
+                        self.media_file.name
+                    )
+                )
                 self.mimetype = "application/octet-stream"
-            logger.debug("Mime type for {0} detected as {1}"
-                         .format(self.media_file.name, self.mimetype))
+            logger.debug(
+                "Mime type for {0} detected as {1}".format(
+                    self.media_file.name, self.mimetype
+                )
+            )
 
 
 @python_2_unicode_compatible
@@ -132,8 +150,8 @@ class EventTag(models.Model):
     sort_order = models.IntegerField(null=True, blank=True, editable=True)
 
     class Meta:
-        db_table = 'EventTags'
-        ordering = ['sort_order', 'name']
+        db_table = "EventTags"
+        ordering = ["sort_order", "name"]
 
     def __init__(self, *args, **kwargs):
         super(EventTag, self).__init__(*args, **kwargs)
@@ -183,18 +201,22 @@ class Event(models.Model):
     # This is the primary key used in the old perl/bdb system
     legacy_id = models.CharField(max_length=256, null=True, editable=False)
 
-    template = models.ForeignKey('EventTemplate', verbose_name='Event Type',
-                                 related_name='template',
-                                 null=True, blank=True,
-                                 on_delete=models.SET_NULL)
-    tags = models.ManyToManyField(EventTag, db_table='Event_Tags', blank=True)
+    template = models.ForeignKey(
+        "EventTemplate",
+        verbose_name="Event Type",
+        related_name="template",
+        null=True,
+        blank=True,
+        on_delete=models.SET_NULL,
+    )
+    tags = models.ManyToManyField(EventTag, db_table="Event_Tags", blank=True)
 
     duration = models.TimeField(null=True)
 
     outside_hire = models.BooleanField(default=False)
     private = models.BooleanField(default=False)
 
-    media = models.ManyToManyField(MediaItem, db_table='Event_MediaItems')
+    media = models.ManyToManyField(MediaItem, db_table="Event_MediaItems")
 
     # Free text pricing info:
     pricing = models.CharField(max_length=256, null=False, blank=True)
@@ -210,26 +232,28 @@ class Event(models.Model):
     # "legacy" toolkit; the bizarre text wrapping will be fixed up before
     # display, regex will be applied to turn http://.* into links, etc.
     legacy_copy = models.BooleanField(
-        default=False, null=False, editable=False)
+        default=False, null=False, editable=False
+    )
 
-    terms = models.TextField(
-        max_length=4096,
-        null=True, blank=True)
+    terms = models.TextField(max_length=4096, null=True, blank=True)
     notes = models.TextField(
-        max_length=4096, null=True, blank=True,
-        verbose_name="Programmer's notes")
+        max_length=4096,
+        null=True,
+        blank=True,
+        verbose_name="Programmer's notes",
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_table = 'Events'
+        db_table = "Events"
 
     def __init__(self, *args, **kwargs):
         super(Event, self).__init__(*args, **kwargs)
         # Set field from template (if specified):
-        if 'template' in kwargs and not self.pricing:
-            self.pricing = kwargs['template'].pricing
+        if "template" in kwargs and not self.pricing:
+            self.pricing = kwargs["template"].pricing
 
     def __str__(self):
         return "{0} ({1})".format(self.name, self.id)
@@ -249,8 +273,11 @@ class Event(models.Model):
         if self.media.count() == 0:
             return
         media_item = self.media.all()[0]
-        logger.info("Removing media file {0} from event {1}"
-                    .format(media_item, self.pk))
+        logger.info(
+            "Removing media file {0} from event {1}".format(
+                media_item, self.pk
+            )
+        )
         self.media.remove(media_item)
         # # If the media item isn't associated with any events, delete it:
         # # ACTUALLY: let's keep it. Disk space is cheap, etc.
@@ -259,8 +286,9 @@ class Event(models.Model):
 
     def set_main_mediaitem(self, media_file):
         self.clear_main_mediaitem()
-        logger.info("Adding media file {0} to event {1}"
-                    .format(media_file, self.pk))
+        logger.info(
+            "Adding media file {0} to event {1}".format(media_file, self.pk)
+        )
         self.media.add(media_file)
 
     def get_main_mediaitem(self):
@@ -269,14 +297,15 @@ class Event(models.Model):
         return self.media.all()[0]
 
     # Regular expressions for mangling legacy copy:
-    _wrap_re = re.compile(r'(.{70,})\n')
-    _lotsofnewlines_re = re.compile(r'\n\n+')
+    _wrap_re = re.compile(r"(.{70,})\n")
+    _lotsofnewlines_re = re.compile(r"\n\n+")
     # Catch well-formatted links (ie. beginning http://)
-    _link_re_1 = re.compile(r'(https?:\/\/\S{4,})')
+    _link_re_1 = re.compile(r"(https?:\/\/\S{4,})")
     # Optimistic stab at spotting other things that are probably links, based
     # on a smattering of TLDs:
     _link_re_2 = re.compile(
-        r'(\s)(www\.[\w.]+\.(com|org|net|uk|de|ly|us|tk)[^\t\n\r\f\v\. ]*)')
+        r"(\s)(www\.[\w.]+\.(com|org|net|uk|de|ly|us|tk)[^\t\n\r\f\v\. ]*)"
+    )
 
     def all_showings_in_past(self):
         return all(s.in_past() for s in self.showings.all())
@@ -295,27 +324,27 @@ class Event(models.Model):
             result = self.copy.strip()
             # Strip out carriage returns:
 
-            result = result.strip().replace('\r', '')
+            result = result.strip().replace("\r", "")
             # Strip out new lines when they occur after 70 other characters
             # (try to fix wrapping)
-            result = self._wrap_re.sub(r'\1 ', result)
+            result = self._wrap_re.sub(r"\1 ", result)
             # Replace a sequence of 2+ new lines with a double line break;
-            result = self._lotsofnewlines_re.sub(' <br><br>', result)
+            result = self._lotsofnewlines_re.sub(" <br><br>", result)
 
             # Now replace all new lines with a single line break;
-            result = result.replace('\n', ' <br>\n')
+            result = result.replace("\n", " <br>\n")
 
             # Attempt to magically convert any links to HTML markup:
             result = self._link_re_1.sub(r'<a href="\1">\1</a>', result)
-            result = self._link_re_2.sub(r'\1<a href="http://\2">\2</a>',
-                                         result)
+            result = self._link_re_2.sub(
+                r'\1<a href="http://\2">\2</a>', result
+            )
 
             return mark_safe(result)
 
     # This RE needs to be compiled so that the flags can be specified, as the
     # flags option to re.sub() wasn't added until python 2.7
-    _plaintext_re = re.compile(r'\[(.*?)\]\((https?://.*?)\)',
-                               flags=re.DOTALL)
+    _plaintext_re = re.compile(r"\[(.*?)\]\((https?://.*?)\)", flags=re.DOTALL)
 
     @property
     def copy_plaintext(self):
@@ -344,7 +373,7 @@ class Event(models.Model):
 
             text = html2text.html2text(self.copy)
             # Convert links from markdown format to just the URL:
-            text = self._plaintext_re.sub(r'\1: \2', text)
+            text = self._plaintext_re.sub(r"\1: \2", text)
 
         return mark_safe(text)
 
@@ -355,7 +384,7 @@ class Room(models.Model):
     colour = models.CharField(max_length=9, default="#33CC33")
 
     class Meta:
-        db_table = 'Rooms'
+        db_table = "Rooms"
 
     def __str__(self):
         return self.name
@@ -366,6 +395,7 @@ class ShowingQuerySet(QuerySet):
     This class provides some custom methods to make searching and selecting
     sets of Showings clearer
     """
+
     def start_in_range(self, startdate, enddate):
         """Filter showings that have a start date in the given range"""
         return self.filter(start__range=[startdate, enddate])
@@ -375,9 +405,11 @@ class ShowingQuerySet(QuerySet):
         Filters so only showings that should be visible to the general public
         are included. (ie. exclude unconfirmed, hidden in programme)
         """
-        return (self.filter(event__private=False)
-                    .filter(confirmed=True)
-                    .filter(hide_in_programme=False))
+        return (
+            self.filter(event__private=False)
+            .filter(confirmed=True)
+            .filter(hide_in_programme=False)
+        )
 
     def not_cancelled(self):
         """Filter out cancelled showings"""
@@ -391,18 +423,21 @@ class ShowingQuerySet(QuerySet):
 @python_2_unicode_compatible
 class Showing(models.Model):
 
-    event = models.ForeignKey('Event', related_name='showings',
-                              on_delete=models.CASCADE)
-    room = models.ForeignKey('Room', related_name='showings', null=True,
-                             on_delete=models.SET_NULL)
+    event = models.ForeignKey(
+        "Event", related_name="showings", on_delete=models.CASCADE
+    )
+    room = models.ForeignKey(
+        "Room", related_name="showings", null=True, on_delete=models.SET_NULL
+    )
 
     start = FutureDateTimeField(db_index=True)
 
     booked_by = models.CharField(max_length=64)
 
     extra_copy = models.TextField(max_length=4096, null=True, blank=True)
-    extra_copy_summary = models.TextField(max_length=4096, null=True,
-                                          blank=True)
+    extra_copy_summary = models.TextField(
+        max_length=4096, null=True, blank=True
+    )
 
     confirmed = models.BooleanField(default=False)
     hide_in_programme = models.BooleanField(default=False)
@@ -413,7 +448,7 @@ class Showing(models.Model):
     # sales tables?
 
     # Rota entries
-    roles = models.ManyToManyField(Role, through='RotaEntry')
+    roles = models.ManyToManyField(Role, through="RotaEntry")
 
     # Free text rota field for this showing
     rota_notes = models.TextField(max_length=4096, blank=True)
@@ -425,8 +460,8 @@ class Showing(models.Model):
     objects = ShowingQuerySet.as_manager()
 
     class Meta:
-        db_table = 'Showings'
-        ordering = ['start']
+        db_table = "Showings"
+        ordering = ["start"]
 
     def __init__(self, *args, **kwargs):
         # Allow "copy_from" and "start_offset" keyword args to be supplied.
@@ -438,34 +473,48 @@ class Showing(models.Model):
         # (If start_offset is defined but copy_from is not then a ValueError is
         # raised)
 
-        copy_from = kwargs.pop('copy_from', None)
-        start_offset = kwargs.pop('start_offset', None)
+        copy_from = kwargs.pop("copy_from", None)
+        start_offset = kwargs.pop("start_offset", None)
         if start_offset and copy_from is None:
             raise ValueError("start_offset supplied with no copy_from")
 
         super(Showing, self).__init__(*args, **kwargs)
 
         if copy_from:
-            logger.info("Cloning showing from existing showing (id {0})"
-                        .format(copy_from.pk))
+            logger.info(
+                "Cloning showing from existing showing (id {0})".format(
+                    copy_from.pk
+                )
+            )
             # Manually copy fields, rather than using things from copy library,
             # as don't want to copy the rota (as that would make db writes)
-            attributes_to_copy = ('event', 'start', 'booked_by', 'extra_copy',
-                                  'confirmed', 'hide_in_programme',
-                                  'cancelled', 'discounted', 'room')
+            attributes_to_copy = (
+                "event",
+                "start",
+                "booked_by",
+                "extra_copy",
+                "confirmed",
+                "hide_in_programme",
+                "cancelled",
+                "discounted",
+                "room",
+            )
             for attribute in attributes_to_copy:
                 setattr(self, attribute, getattr(copy_from, attribute))
             if start_offset:
                 self.start += start_offset
 
     def __str__(self):
-        if (self.start is not None and
-                self.id is not None and
-                self.event is not None):
-            return ("{0} - {1} ({2})"
-                    .format(self.start.strftime("%H:%M %Z%z %d/%m/%y"),
-                            self.event.name,
-                            self.id))
+        if (
+            self.start is not None
+            and self.id is not None
+            and self.event is not None
+        ):
+            return "{0} - {1} ({2})".format(
+                self.start.strftime("%H:%M %Z%z %d/%m/%y"),
+                self.event.name,
+                self.id,
+            )
         else:
             return "[uninitialised]"
 
@@ -480,14 +529,16 @@ class Showing(models.Model):
         #
         # (For the purposes of the import script, if force=True is passed then
         # this check is bypassed)
-        force = kwargs.pop('force', False)
+        force = kwargs.pop("force", False)
         if self.start is not None:
             if self.in_past() and not force:
-                logger.error("Tried to update showing {0} with start time "
-                             "{1} in the past"
-                             .format(self.pk, self.start))
+                logger.error(
+                    "Tried to update showing {0} with start time "
+                    "{1} in the past".format(self.pk, self.start)
+                )
                 raise django.db.IntegrityError(
-                    "Can't update showings that start in the past")
+                    "Can't update showings that start in the past"
+                )
         return super(Showing, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
@@ -496,10 +547,13 @@ class Showing(models.Model):
         # this, but this will stop the forms deleting records.
         if self.start is not None:
             if self.in_past():
-                logger.error("Tried to delete showing {0} with start time "
-                             "{1} in the past".format(self.pk, self.start))
+                logger.error(
+                    "Tried to delete showing {0} with start time "
+                    "{1} in the past".format(self.pk, self.start)
+                )
                 raise django.db.IntegrityError(
-                    "Can't delete showings that start in the past")
+                    "Can't delete showings that start in the past"
+                )
         return super(Showing, self).delete(*args, **kwargs)
 
     # Extra, custom methods:
@@ -513,8 +567,9 @@ class Showing(models.Model):
     def end_time(self):
         # Used by templates
         duration = self.event.duration
-        return self.start + datetime.timedelta(hours=duration.hour,
-                                               minutes=duration.minute)
+        return self.start + datetime.timedelta(
+            hours=duration.hour, minutes=duration.minute
+        )
 
     def in_past(self):
         return self.start < django.utils.timezone.now()
@@ -551,8 +606,9 @@ class Showing(models.Model):
         # Build map of rota entries by role id
         rota_entries_by_id = {}
         for rota_entry in self.rotaentry_set.select_related():
-            rota_entries_by_id.setdefault(
-                    rota_entry.role.pk, []).append(rota_entry)
+            rota_entries_by_id.setdefault(rota_entry.role.pk, []).append(
+                rota_entry
+            )
 
         for role_id, count in six.iteritems(rota):
             # Number of existing rota entries for this role_id.
@@ -561,20 +617,25 @@ class Showing(models.Model):
             existing_entries = rota_entries_by_id.pop(role_id, [])
             # delete highest ranked instances
             while count < len(existing_entries):
-                logger.info("Removing role {0} from showing {1}"
-                            .format(role_id, self.pk))
+                logger.info(
+                    "Removing role {0} from showing {1}".format(
+                        role_id, self.pk
+                    )
+                )
                 highest_ranked = max(existing_entries, key=lambda re: re.rank)
                 highest_ranked.delete()
                 existing_entries.remove(highest_ranked)
             # add required entries
             while count > len(existing_entries):
-                logger.info("Adding role {0} to showing {1}"
-                            .format(role_id, self.pk))
+                logger.info(
+                    "Adding role {0} to showing {1}".format(role_id, self.pk)
+                )
                 # add rotaentries
                 new_re = RotaEntry(role_id=role_id, showing=self)
                 if len(existing_entries) > 0:
                     new_re.rank = (
-                        1 + max(existing_entries, key=lambda re: re.rank).rank)
+                        1 + max(existing_entries, key=lambda re: re.rank).rank
+                    )
                 new_re.save()
                 existing_entries.append(new_re)
 
@@ -588,7 +649,7 @@ class DiaryIdea(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_table = 'DiaryIdeas'
+        db_table = "DiaryIdeas"
 
     def __str__(self):
         return "{0}/{1}".format(self.month.month, self.month.year)
@@ -603,16 +664,17 @@ class EventTemplate(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     # Default roles for this event
-    roles = models.ManyToManyField(Role, db_table='EventTemplates_Roles')
+    roles = models.ManyToManyField(Role, db_table="EventTemplates_Roles")
     # Default tags for this event
     tags = models.ManyToManyField(
-        EventTag, db_table='EventTemplate_Tags', blank=True)
+        EventTag, db_table="EventTemplate_Tags", blank=True
+    )
     # Default pricing for this event
     pricing = models.CharField(max_length=256, null=False, blank=True)
 
     class Meta:
-        db_table = 'EventTemplates'
-        ordering = ['name']
+        db_table = "EventTemplates"
+        ordering = ["name"]
 
     def __str__(self):
         return self.name
@@ -633,19 +695,17 @@ class RotaEntry(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_table = 'RotaEntries'
-        ordering = ['role', 'rank']
+        db_table = "RotaEntries"
+        ordering = ["role", "rank"]
 
     def __str__(self):
-        return "{0} - {1} {2}".format(self.showing,
-                                str(self.role),
-                                self.rank)
+        return "{0} - {1} {2}".format(self.showing, str(self.role), self.rank)
 
     def __init__(self, *args, **kwargs):
         # Allow a template keyword arg to be supplied. If it is, copy rota
         # details across (except for the showing id, if that's set separately)
-        if 'template' in kwargs:
-            template = kwargs.pop('template')
+        if "template" in kwargs:
+            template = kwargs.pop("template")
         else:
             template = None
 
@@ -658,8 +718,10 @@ class RotaEntry(models.Model):
             self.role = template.role
             self.required = template.required
             self.rank = template.rank
-            logger.info("Cloning rota entry from existing rota entry with "
-                        "role_id {0}".format(template.role.pk))
+            logger.info(
+                "Cloning rota entry from existing rota entry with "
+                "role_id {0}".format(template.role.pk)
+            )
 
 
 class PrintedProgrammeQuerySet(QuerySet):
@@ -675,25 +737,32 @@ class PrintedProgrammeQuerySet(QuerySet):
 @python_2_unicode_compatible
 class PrintedProgramme(models.Model):
     month = models.DateField(editable=False, unique=True)
-    programme = models.FileField(upload_to="printedprogramme", max_length=256,
-                                 null=False, blank=False,
-                                 verbose_name='Programme PDF')
+    programme = models.FileField(
+        upload_to="printedprogramme",
+        max_length=256,
+        null=False,
+        blank=False,
+        verbose_name="Programme PDF",
+    )
     designer = models.CharField(max_length=256, blank=True)
     notes = models.TextField(max_length=8192, null=True, blank=True)
 
     objects = PrintedProgrammeQuerySet.as_manager()
 
     class Meta:
-        db_table = 'PrintedProgrammes'
+        db_table = "PrintedProgrammes"
 
     def __str__(self):
-        return "Printed programme for {0}/{1}".format(self.month.month,
-                                                      self.month.year)
+        return "Printed programme for {0}/{1}".format(
+            self.month.month, self.month.year
+        )
 
     def save(self, *args, **kwargs):
         # Enforce month column always being a date for the first of the month:
         if self.month.day != 1:
-            logger.error("PrintedProgramme has month value which isn't the 1st"
-                         " of the month")
+            logger.error(
+                "PrintedProgramme has month value which isn't the 1st"
+                " of the month"
+            )
             self.month = datetime.date(self.month.year, self.month.month, 1)
         return super(PrintedProgramme, self).save(*args, **kwargs)

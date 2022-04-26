@@ -11,14 +11,18 @@ class Migration(migrations.Migration):
 
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
-        ('members', '0007_member_gdpr_opt_in'),
+        ("members", "0007_member_gdpr_opt_in"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='volunteer',
-            name='user',
-            field=models.OneToOneField(default=None, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="volunteer",
+            name="user",
+            field=models.OneToOneField(
+                default=None,
+                on_delete=django.db.models.deletion.CASCADE,
+                to=settings.AUTH_USER_MODEL,
+            ),
             preserve_default=False,
         ),
     ]

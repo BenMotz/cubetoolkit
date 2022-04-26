@@ -27,59 +27,68 @@ class MemberManager(models.Manager):
 
     def mailout_recipients(self):
         """Get all members who should be sent the mailout"""
-        return (self.filter(email__isnull=False)
-                    .exclude(email='')
-                    .exclude(mailout_failed=True)
-                    .filter(mailout=True))
+        return (
+            self.filter(email__isnull=False)
+            .exclude(email="")
+            .exclude(mailout_failed=True)
+            .filter(mailout=True)
+        )
 
     # A few hard-coded SQL queries to get some of the more complex statistics:
     def get_stat_popular_email_domains(self):
         # Get 10 most popular email domains
         with django.db.connection.cursor() as cursor:
-            cursor.execute("SELECT "
-                           " SUBSTRING_INDEX(`email`, '@', -1) AS domain, "
-                           " COUNT(1) AS num "
-                           "FROM Members "
-                           "WHERE email != '' "
-                           "GROUP BY domain "
-                           "ORDER BY num DESC "
-                           "LIMIT 10")
+            cursor.execute(
+                "SELECT "
+                " SUBSTRING_INDEX(`email`, '@', -1) AS domain, "
+                " COUNT(1) AS num "
+                "FROM Members "
+                "WHERE email != '' "
+                "GROUP BY domain "
+                "ORDER BY num DESC "
+                "LIMIT 10"
+            )
             email_stats = [row for row in cursor.fetchall()]
         return email_stats
 
     def get_stat_popular_postcode_prefixes(self):
         # Get 10 most popular postcode prefixes
         with django.db.connection.cursor() as cursor:
-            cursor.execute("SELECT "
-                           " SUBSTRING_INDEX(`postcode`, ' ', 1) AS firstbit, "
-                           " COUNT(1) AS num "
-                           "FROM Members "
-                           "WHERE postcode != '' "
-                           "GROUP BY firstbit "
-                           "ORDER BY num DESC "
-                           "LIMIT 10")
+            cursor.execute(
+                "SELECT "
+                " SUBSTRING_INDEX(`postcode`, ' ', 1) AS firstbit, "
+                " COUNT(1) AS num "
+                "FROM Members "
+                "WHERE postcode != '' "
+                "GROUP BY firstbit "
+                "ORDER BY num DESC "
+                "LIMIT 10"
+            )
             postcode_stats = [row for row in cursor.fetchall()]
         return postcode_stats
 
     def expired(self):
         """Get all members with an expiry date undefined, or that date is in
         the past"""
-        return (self.filter(
-                    Q(membership_expires__isnull=True) |
-                    Q(membership_expires__lt=timezone_now().date())))
+        return self.filter(
+            Q(membership_expires__isnull=True)
+            | Q(membership_expires__lt=timezone_now().date())
+        )
 
     def unexpired(self):
         """Get all members with an expiry date defined, and the
         expiry date in the future (or today)"""
-        return (self.filter(
-                    Q(membership_expires__isnull=False) &
-                    Q(membership_expires__gte=timezone_now().date())))
+        return self.filter(
+            Q(membership_expires__isnull=False)
+            & Q(membership_expires__gte=timezone_now().date())
+        )
 
 
 def get_default_membership_expiry():
     if settings.MEMBERSHIP_EXPIRY_ENABLED:
-        return (timezone_now().date() +
-                datetime.timedelta(days=settings.MEMBERSHIP_LENGTH_DAYS))
+        return timezone_now().date() + datetime.timedelta(
+            days=settings.MEMBERSHIP_LENGTH_DAYS
+        )
     else:
         return None
 
@@ -107,14 +116,19 @@ class Member(models.Model):
 
     is_member = models.BooleanField(default=True)
     membership_expires = models.DateField(
-        null=True, blank=True, default=get_default_membership_expiry)
+        null=True, blank=True, default=get_default_membership_expiry
+    )
 
     mailout = models.BooleanField(default=True)
     mailout_failed = models.BooleanField(default=False)
     # Used for "click to unsubscribe"/"edit details" etc:
-    mailout_key = models.CharField(max_length=32, blank=False, null=False,
-                                   editable=False,
-                                   default=generate_random_string)
+    mailout_key = models.CharField(
+        max_length=32,
+        blank=False,
+        null=False,
+        editable=False,
+        default=generate_random_string,
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
@@ -124,7 +138,7 @@ class Member(models.Model):
     objects = MemberManager()
 
     class Meta:
-        db_table = 'Members'
+        db_table = "Members"
 
     def __str__(self):
         return self.name
@@ -136,7 +150,7 @@ class Member(models.Model):
         # If a user number hasn't been set, save a placeholder, then re-save
         # with the private key as the number:
         set_number = False
-        if self.number == '':
+        if self.number == "":
             set_number = True
             self.number = "?"
 
@@ -153,9 +167,11 @@ class Member(models.Model):
 
         if not self.pk:
             # No private key! Use a hash of the name:
-            logger.error("Trying to generate membership number without a "
-                         "private key. Falling back to hash of name.")
-            membership_no = binascii.crc32(self.name) & 0xffffffff
+            logger.error(
+                "Trying to generate membership number without a "
+                "private key. Falling back to hash of name."
+            )
+            membership_no = binascii.crc32(self.name) & 0xFFFFFFFF
         else:
             offset = 0
             # If private key is already in use as a membership number try
@@ -172,6 +188,7 @@ class Member(models.Model):
         else:
             return False
 
+
 #    weak_email_validator = \
 #       re.compile(r"\b[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,4}\b")
 #    def weak_validate_email(self):
@@ -180,29 +197,34 @@ class Member(models.Model):
 
 class Volunteer(models.Model):
 
-    user = models.OneToOneField(User,
-                                on_delete=models.CASCADE,
-                                )
-    member = models.OneToOneField('Member',
-                                  related_name='volunteer',
-                                  on_delete=models.CASCADE)
+    user = models.OneToOneField(
+        User,
+        on_delete=models.CASCADE,
+    )
+    member = models.OneToOneField(
+        "Member", related_name="volunteer", on_delete=models.CASCADE
+    )
 
     notes = models.TextField(blank=True)
     active = models.BooleanField(default=True)
 
     portrait = models.ImageField(
-        upload_to=settings.VOLUNTEER_PORTRAIT_DIR, max_length=256, null=True,
-        blank=True)
+        upload_to=settings.VOLUNTEER_PORTRAIT_DIR,
+        max_length=256,
+        null=True,
+        blank=True,
+    )
 
     # Roles
     roles = models.ManyToManyField(
-        Role, db_table='Volunteer_Roles', blank=True)
+        Role, db_table="Volunteer_Roles", blank=True
+    )
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
-        db_table = 'Volunteers'
+        db_table = "Volunteers"
 
     def save(self, *args, **kwargs):
         # Save the model.
@@ -214,14 +236,19 @@ class Volunteer(models.Model):
         if current_portrait_file != self.__original_portrait:
             # Delete old image:
             if self.__original_portrait:
-                logging.info(u"Deleting old volunteer portrait '{0}'".format(
-                    self.__original_portrait))
+                logging.info(
+                    "Deleting old volunteer portrait '{0}'".format(
+                        self.__original_portrait
+                    )
+                )
                 try:
                     os.unlink(self.__original_portrait)
                 except (IOError, OSError) as err:
                     logging.error(
-                        u"Failed deleting old volunteer portrait '{0}': {1}"
-                        .format(self.__original_portrait, err))
+                        "Failed deleting old volunteer portrait '{0}': {1}".format(
+                            self.__original_portrait, err
+                        )
+                    )
                 self.__original_portrait = None
 
         return super(Volunteer, self).save(*args, **kwargs)
@@ -232,7 +259,8 @@ class Volunteer(models.Model):
         # can be detected and the old image deleted:
         try:
             self.__original_portrait = (
-                self.portrait.file.name if self.portrait else None)
+                self.portrait.file.name if self.portrait else None
+            )
         except (IOError, OSError, ValueError):
             self.__original_portrait = None
 
@@ -240,19 +268,21 @@ class Volunteer(models.Model):
         return self.member.name
 
     def is_old(self):
-        return (self.created_at and
-                self.created_at.date() <= settings.DAWN_OF_TOOLKIT)
+        return (
+            self.created_at
+            and self.created_at.date() <= settings.DAWN_OF_TOOLKIT
+        )
 
     def latest_general_training_record(self):
-        records = (self.training_records
-                   .filter(training_type=TrainingRecord.GENERAL_TRAINING)
-                   .order_by('-training_date')[:1])
+        records = self.training_records.filter(
+            training_type=TrainingRecord.GENERAL_TRAINING
+        ).order_by("-training_date")[:1]
         return records[0] if records else None
 
 
 class TrainingRecord(models.Model):
-    ROLE_TRAINING = 'R'
-    GENERAL_TRAINING = 'G'
+    ROLE_TRAINING = "R"
+    GENERAL_TRAINING = "G"
     GENERAL_TRAINING_DESC = "General Safety Training"
 
     TRAINING_TYPE_CHOICES = (
@@ -261,17 +291,23 @@ class TrainingRecord(models.Model):
     )
 
     class Meta:
-        db_table = 'TrainingRecords'
-        ordering = ['role', 'training_date', 'volunteer']
+        db_table = "TrainingRecords"
+        ordering = ["role", "training_date", "volunteer"]
 
-    volunteer = models.ForeignKey(Volunteer, related_name='training_records',
-                                  on_delete=models.CASCADE)
-    training_type = models.CharField(max_length=1,
-                                     choices=TRAINING_TYPE_CHOICES,
-                                     blank=False)
+    volunteer = models.ForeignKey(
+        Volunteer, related_name="training_records", on_delete=models.CASCADE
+    )
+    training_type = models.CharField(
+        max_length=1, choices=TRAINING_TYPE_CHOICES, blank=False
+    )
 
-    role = models.ForeignKey(Role, related_name='training_records',
-                             on_delete=models.CASCADE, null=True, blank=True)
+    role = models.ForeignKey(
+        Role,
+        related_name="training_records",
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True,
+    )
 
     # Default to when the record is created:
     training_date = models.DateField(default=datetime.date.today)
@@ -279,28 +315,42 @@ class TrainingRecord(models.Model):
     notes = models.TextField(blank=True)
 
     def __repr__(self):
-        return ("TrainingRecord(volunteer=%d, type=%s, role=%s, date=%s "
-                "trainer=%s)"
-                % (self.volunteer_id, self.training_type, self.role_id,
-                   self.training_date, self.trainer))
+        return (
+            "TrainingRecord(volunteer=%d, type=%s, role=%s, date=%s "
+            "trainer=%s)"
+            % (
+                self.volunteer_id,
+                self.training_type,
+                self.role_id,
+                self.training_date,
+                self.trainer,
+            )
+        )
 
     def clean(self):
         if self.training_type == self.ROLE_TRAINING and self.role is None:
+            raise ValidationError({"role": "This field is required."})
+        elif (
+            self.training_type == self.GENERAL_TRAINING
+            and self.role is not None
+        ):
             raise ValidationError(
-                {"role": "This field is required."})
-        elif (self.training_type == self.GENERAL_TRAINING and
-                self.role is not None):
-            raise ValidationError(
-                {"role": "Training role must not be set for 'General Safety' "
-                         "training records."})
+                {
+                    "role": "Training role must not be set for 'General Safety' "
+                    "training records."
+                }
+            )
 
     def save(self, *args, **kwargs):
-        if self.training_type not in (self.GENERAL_TRAINING,
-                                      self.ROLE_TRAINING):
+        if self.training_type not in (
+            self.GENERAL_TRAINING,
+            self.ROLE_TRAINING,
+        ):
             raise django.db.IntegrityError("training_type invalid or missing")
         if self.training_type == self.ROLE_TRAINING and self.role is None:
             raise django.db.IntegrityError(
-                "role not defined but training_type is role")
+                "role not defined but training_type is role"
+            )
         return super(TrainingRecord, self).save(*args, **kwargs)
 
     def has_expired(self, expiry_age=None):

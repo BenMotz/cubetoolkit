@@ -8,13 +8,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('members', '0006_auto_20180223_2138'),
+        ("members", "0006_auto_20180223_2138"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='member',
-            name='gdpr_opt_in',
+            model_name="member",
+            name="gdpr_opt_in",
             field=models.DateTimeField(blank=True, null=True),
         ),
     ]

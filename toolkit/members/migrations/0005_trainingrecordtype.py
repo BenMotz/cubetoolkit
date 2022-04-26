@@ -10,31 +10,32 @@ import toolkit.members.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('members', '0004_member_membership_expires'),
+        ("members", "0004_member_membership_expires"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='trainingrecord',
-            name='training_type',
+            model_name="trainingrecord",
+            name="training_type",
             field=models.CharField(
-                default='R',
+                default="R",
                 choices=[
-                    ('R',
-                     'Role Specific Training'),
-                    ('G',
-                     'General Safety Training')],
-                max_length=1),
+                    ("R", "Role Specific Training"),
+                    ("G", "General Safety Training"),
+                ],
+                max_length=1,
+            ),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='trainingrecord',
-            name='role',
+            model_name="trainingrecord",
+            name="role",
             field=models.ForeignKey(
                 blank=True,
                 null=True,
                 on_delete=django.db.models.deletion.CASCADE,
-                related_name='training_records',
-                to='diary.Role'),
+                related_name="training_records",
+                to="diary.Role",
+            ),
         ),
     ]

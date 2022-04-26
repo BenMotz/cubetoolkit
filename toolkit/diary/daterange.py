@@ -22,9 +22,10 @@ def get_date_range(year, month, day, user_days_ahead, default_days_ahead=365):
         month = int(month) if month else None
         day = int(day) if day else None
     except ValueError:
-        logger.error("Invalid value requested in date range, one of day {0}, "
-                     "month {1}, year {2}"
-                     .format(day, month, year))
+        logger.error(
+            "Invalid value requested in date range, one of day {0}, "
+            "month {1}, year {2}".format(day, month, year)
+        )
         return (None, "Invalid values")
 
     # logger.debug("Range: day %s, month %s, year %s, span %s days",
@@ -35,7 +36,8 @@ def get_date_range(year, month, day, user_days_ahead, default_days_ahead=365):
     try:
         if day:
             startdate = current_tz.localize(
-                datetime.datetime(year, month, day))
+                datetime.datetime(year, month, day)
+            )
             days_ahead = 1
         elif month:
             startdate = current_tz.localize(datetime.datetime(year, month, 1))
@@ -49,17 +51,20 @@ def get_date_range(year, month, day, user_days_ahead, default_days_ahead=365):
             # Fiddly way to set startdate to the start of the local day:
             # Get current UTC time and convert to local time:
             now_local = django.utils.timezone.localtime(
-                django.utils.timezone.now())
+                django.utils.timezone.now()
+            )
             # Create a new local time with hour/min/sec set to zero:
             startdate = current_tz.localize(
-                datetime.datetime(now_local.year,
-                                  now_local.month,
-                                  now_local.day))
+                datetime.datetime(
+                    now_local.year, now_local.month, now_local.day
+                )
+            )
 
             days_ahead = int(default_days_ahead)
     except ValueError as vale:
-        logger.error("Invalid something requested in date range: {0}"
-                     .format(vale))
+        logger.error(
+            "Invalid something requested in date range: {0}".format(vale)
+        )
         return (None, "Invalid date")
 
     if user_days_ahead:

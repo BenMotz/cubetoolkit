@@ -13,6 +13,7 @@ from toolkit.members.models import Member, Volunteer, TrainingRecord
 
 from .common import MembersTestsMixin
 
+
 class TestTrainingRecord(MembersTestsMixin, TestCase):
     def setUp(self):
         super(TestTrainingRecord, self).setUp()
@@ -31,7 +32,7 @@ class TestTrainingRecord(MembersTestsMixin, TestCase):
 
     def test_clean_save_fail_no_type(self):
         record = TrainingRecord(
-            training_type='',
+            training_type="",
             volunteer=self.vol_1,
             role=None,
             trainer="Nike Air Jordan",
@@ -67,11 +68,12 @@ class TestTrainingRecord(MembersTestsMixin, TestCase):
         record.save()
 
     @override_settings(DEFAULT_TRAINING_EXPIRY_MONTHS=6)
-    @patch('toolkit.members.models.timezone_now')
+    @patch("toolkit.members.models.timezone_now")
     def test_has_expired_true(self, now_mock):
 
-        now_mock.return_value.date.return_value = \
-            datetime.date(day=6, month=7, year=2010)
+        now_mock.return_value.date.return_value = datetime.date(
+            day=6, month=7, year=2010
+        )
 
         record = TrainingRecord(
             training_type=TrainingRecord.GENERAL_TRAINING,
@@ -85,13 +87,13 @@ class TestTrainingRecord(MembersTestsMixin, TestCase):
         self.assertTrue(record.has_expired(expiry_age=0))
         self.assertFalse(record.has_expired(expiry_age=7))
 
-
     @override_settings(DEFAULT_TRAINING_EXPIRY_MONTHS=6)
-    @patch('toolkit.members.models.timezone_now')
+    @patch("toolkit.members.models.timezone_now")
     def test_has_expired_false(self, now_mock):
 
-        now_mock.return_value.date.return_value = \
-            datetime.date(day=6, month=7, year=2010)
+        now_mock.return_value.date.return_value = datetime.date(
+            day=6, month=7, year=2010
+        )
 
         record = TrainingRecord(
             training_type=TrainingRecord.GENERAL_TRAINING,
@@ -102,4 +104,3 @@ class TestTrainingRecord(MembersTestsMixin, TestCase):
             training_date=datetime.date(year=2010, month=1, day=6),
         )
         self.assertFalse(record.has_expired())
-

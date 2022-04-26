@@ -9,38 +9,46 @@ MYSQLDUMP_BINARY = "/usr/bin/mysqldump"
 
 
 class Command(BaseCommand):
-    help = 'Dump database to <output_file> using mysqldump'
+    help = "Dump database to <output_file> using mysqldump"
 
     can_import_settings = True
     requires_system_checks = True
 
     def add_arguments(self, parser):
-        parser.add_argument('output_file', type=str)
+        parser.add_argument("output_file", type=str)
 
     def _dump_to_filename(self, filename):
         if os.path.exists(filename):
-            raise CommandError("Dump destination '{0}' already exists"
-                               .format(filename))
+            raise CommandError(
+                "Dump destination '{0}' already exists".format(filename)
+            )
 
         if not os.path.isfile(MYSQLDUMP_BINARY):
-            raise CommandError("Couldn't find mysqldump binary (looked for {0}"
-                               .format(MYSQLDUMP_BINARY))
+            raise CommandError(
+                "Couldn't find mysqldump binary (looked for {0}".format(
+                    MYSQLDUMP_BINARY
+                )
+            )
 
-        db_settings = settings.DATABASES['default']
-        if db_settings['ENGINE'] != 'django.db.backends.mysql':
+        db_settings = settings.DATABASES["default"]
+        if db_settings["ENGINE"] != "django.db.backends.mysql":
             raise CommandError(
                 "Application does not use a mysql database (very sensible) - "
-                "it uses {0}".format(db_settings['engine']))
+                "it uses {0}".format(db_settings["engine"])
+            )
 
         with open(filename, "w") as out_file:
             print("Dumping to '{0}'".format(filename))
-            returncode = subprocess.call([
-                MYSQLDUMP_BINARY,
-                "--single-transaction",  # So LOCK TABLES isn't needed
-                "--user=" + db_settings['USER'],
-                "--password=" + db_settings['PASSWORD'],
-                db_settings['NAME'],
-            ], stdout=out_file)
+            returncode = subprocess.call(
+                [
+                    MYSQLDUMP_BINARY,
+                    "--single-transaction",  # So LOCK TABLES isn't needed
+                    "--user=" + db_settings["USER"],
+                    "--password=" + db_settings["PASSWORD"],
+                    db_settings["NAME"],
+                ],
+                stdout=out_file,
+            )
 
         if returncode != 0:
             raise CommandError("Failed (code {0})".format(returncode))
@@ -48,7 +56,7 @@ class Command(BaseCommand):
         print("Done")
 
     def handle(self, *args, **options):
-        output_filename = options.get('output_file')
+        output_filename = options.get("output_file")
 
         if not output_filename or not output_filename.strip():
             raise CommandError("No filename supplied")

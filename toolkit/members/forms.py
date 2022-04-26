@@ -16,23 +16,23 @@ logger = logging.getLogger(__name__)
 class NewMemberForm(forms.ModelForm):
     class Meta(object):
         model = toolkit.members.models.Member
-        fields = ('name', 'email', 'postcode', 'is_member')
+        fields = ("name", "email", "postcode", "is_member")
         widgets = {
-                'name': forms.TextInput(attrs={'autofocus': ''}),
+            "name": forms.TextInput(attrs={"autofocus": ""}),
         }
 
 
 class MemberForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        hide_internal_fields = kwargs.pop('hide_internal_fields', True)
+        hide_internal_fields = kwargs.pop("hide_internal_fields", True)
         super(MemberForm, self).__init__(*args, **kwargs)
 
         if not settings.MEMBERSHIP_EXPIRY_ENABLED or hide_internal_fields:
-            del self.fields['membership_expires']
+            del self.fields["membership_expires"]
         if hide_internal_fields:
-            del self.fields['is_member']
-            del self.fields['mailout_failed']
-        del self.fields['gdpr_opt_in']
+            del self.fields["is_member"]
+            del self.fields["mailout_failed"]
+        del self.fields["gdpr_opt_in"]
 
     class Meta(object):
         model = toolkit.members.models.Member
@@ -46,8 +46,13 @@ class MemberFormWithoutNotes(forms.ModelForm):
 
     class Meta(object):
         model = toolkit.members.models.Member
-        exclude = ('is_member', 'notes', 'mailout_failed',
-                   'membership_expires', 'gdpr_opt_in')
+        exclude = (
+            "is_member",
+            "notes",
+            "mailout_failed",
+            "membership_expires",
+            "gdpr_opt_in",
+        )
 
 
 class UserForm(forms.ModelForm):
@@ -55,14 +60,15 @@ class UserForm(forms.ModelForm):
 
     class Meta(object):
         model = User
-        fields = ('username', 'is_active', 'is_superuser')
+        fields = ("username", "is_active", "is_superuser")
 
 
 class VolunteerForm(forms.ModelForm):
     # Extra non-model field. If this is returned with a base64 encoded PNG data
     # URI then this is saved as the volunteer portrait.
-    image_data = forms.CharField(label="", required=False,
-                                 widget=forms.HiddenInput)
+    image_data = forms.CharField(
+        label="", required=False, widget=forms.HiddenInput
+    )
 
     # Specify prefix to allow this to coexist in a single <form> alongside
     # MemberFormWithoutNotes
@@ -72,15 +78,16 @@ class VolunteerForm(forms.ModelForm):
         super(VolunteerForm, self).__init__(*args, **kwargs)
 
         # Force ordering of roles list to be by "standard" role type, then name
-        self.fields['roles'].queryset = (
-            self.fields['roles'].queryset.order_by("-standard", "name"))
+        self.fields["roles"].queryset = self.fields["roles"].queryset.order_by(
+            "-standard", "name"
+        )
 
     class Meta(object):
         model = toolkit.members.models.Volunteer
-        fields = ('portrait', 'notes', 'roles')
+        fields = ("portrait", "notes", "roles")
         widgets = {
-            'notes': forms.Textarea(attrs={'wrap': 'soft'}),
-            'roles': forms.CheckboxSelectMultiple(),
+            "notes": forms.Textarea(attrs={"wrap": "soft"}),
+            "roles": forms.CheckboxSelectMultiple(),
         }
 
     def _parse_data_uri(self, image_data):
@@ -89,14 +96,15 @@ class VolunteerForm(forms.ModelForm):
         if not image_data.startswith(prefix):
             raise forms.ValidationError("Image data format not recognised")
 
-        base64_data = image_data[len(prefix):]
+        base64_data = image_data[len(prefix) :]
 
         try:
             data = binascii.a2b_base64(base64_data)
         except (binascii.Incomplete, binascii.Error):
             logger.exception("Invalid data")
-            raise forms.ValidationError("Image data could not be decoded "
-                                        "(base64 data invalid)")
+            raise forms.ValidationError(
+                "Image data could not be decoded " "(base64 data invalid)"
+            )
         return data
 
     def clean(self):
@@ -108,15 +116,17 @@ class VolunteerForm(forms.ModelForm):
 
         cleaned_data = super(VolunteerForm, self).clean()
 
-        image_data_uri = cleaned_data['image_data']
+        image_data_uri = cleaned_data["image_data"]
 
         if image_data_uri:
             image_data = self._parse_data_uri(image_data_uri)
-            image_file = SimpleUploadedFile("webcam_photo.png",
-                                            image_data, "image/png")
+            image_file = SimpleUploadedFile(
+                "webcam_photo.png", image_data, "image/png"
+            )
             # Use portrait field to validate the uploaded data:
-            cleaned_data['portrait'] = (
-                self.fields['portrait'].clean(image_file))
+            cleaned_data["portrait"] = self.fields["portrait"].clean(
+                image_file
+            )
 
         return cleaned_data
 
@@ -124,32 +134,36 @@ class VolunteerForm(forms.ModelForm):
 class TrainingRecordForm(forms.ModelForm):
     class Meta(object):
         model = TrainingRecord
-        fields = ('training_type', 'role', 'trainer', 'training_date', 'notes')
+        fields = ("training_type", "role", "trainer", "training_date", "notes")
 
 
 class GroupTrainingForm(forms.Form):
     type = forms.ChoiceField(
-        choices=TrainingRecord.TRAINING_TYPE_CHOICES,
-        required=True)
+        choices=TrainingRecord.TRAINING_TYPE_CHOICES, required=True
+    )
     role = forms.ModelChoiceField(
-        queryset=toolkit.diary.models.Role.objects.all(),
-        required=False)
-    training_date = forms.DateField(
-        required=True, initial=datetime.date.today)
-    trainer = forms.CharField(
-        min_length=2, max_length=128, required=True)
+        queryset=toolkit.diary.models.Role.objects.all(), required=False
+    )
+    training_date = forms.DateField(required=True, initial=datetime.date.today)
+    trainer = forms.CharField(min_length=2, max_length=128, required=True)
     volunteers = forms.ModelMultipleChoiceField(
-        queryset=Member.objects.filter(volunteer__active=True)
-        .order_by('name'),
+        queryset=Member.objects.filter(volunteer__active=True).order_by(
+            "name"
+        ),
         widget=ChosenSelectMultiple(width="100%"),
-        required=True)
+        required=True,
+    )
     notes = forms.CharField(
-        widget=forms.Textarea, required=False,
+        widget=forms.Textarea,
+        required=False,
         help_text="(will be added to all selected volunteer's training "
-        "records)")
+        "records)",
+    )
 
     def clean(self):
         super(GroupTrainingForm, self).clean()
-        if (self.cleaned_data.get("type") == TrainingRecord.ROLE_TRAINING
-                and self.cleaned_data.get("role") is None):
+        if (
+            self.cleaned_data.get("type") == TrainingRecord.ROLE_TRAINING
+            and self.cleaned_data.get("role") is None
+        ):
             self.add_error("role", "This field is required.")

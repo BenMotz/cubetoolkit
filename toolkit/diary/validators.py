@@ -7,4 +7,4 @@ def validate_in_future(time):
     # a datetime object with the timezone set (to UTC) so the comparison will
     # be correct for summertime, etc.
     if time < django.utils.timezone.now():
-        raise ValidationError('Must be in the future')
+        raise ValidationError("Must be in the future")

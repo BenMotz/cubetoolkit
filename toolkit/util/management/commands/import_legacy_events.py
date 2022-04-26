@@ -1,4 +1,4 @@
-'''
+"""
 Columns in programming_event, programming_gig
 
 id 	title 	summary 	body 	website 	notes 	programmer_id 	confirmed
@@ -20,7 +20,7 @@ startDate endDate deleted
 Partially inspired by import_script/import_database.py,
 buried deep in the history of this repo.
 I used d4e9757916fdf0b9aee0c907fd9aee08da922b19
-'''
+"""
 
 import datetime
 import os
@@ -38,16 +38,17 @@ from toolkit.diary.models import MediaItem
 import MySQLdb
 
 # Adjust to taste
-dbuser = 'starshadow'
-dbpass = 'ye2EUsSUCYY8ALx7'
-dbdb = 'ssarchive'
-tables = ['programming_event',
-          'programming_festival',
-          'programming_gig',
-          'programming_season',
-          ]
-ARCHIVE_IMAGE_PATH = '/home/users/starandshadow/archive/static'
-IMAGE_PATH = '/home/users/starandshadow/star_site/media'
+dbuser = "starshadow"
+dbpass = "ye2EUsSUCYY8ALx7"
+dbdb = "ssarchive"
+tables = [
+    "programming_event",
+    "programming_festival",
+    "programming_gig",
+    "programming_season",
+]
+ARCHIVE_IMAGE_PATH = "/home/users/starandshadow/archive/static"
+IMAGE_PATH = "/home/users/starandshadow/star_site/media"
 
 EVENT_IMAGES_PATH = "diary"
 
@@ -57,80 +58,95 @@ class Command(BaseCommand):
 
     def _conn_to_archive_database(self):
         try:
-            self.stdout.write('Connecting to database %s...' % dbdb)
-            db = MySQLdb.connect("localhost",
-                                 dbuser,
-                                 dbpass,
-                                 dbdb,
-                                 charset='utf8')
+            self.stdout.write("Connecting to database %s..." % dbdb)
+            db = MySQLdb.connect(
+                "localhost", dbuser, dbpass, dbdb, charset="utf8"
+            )
             return db
         except MySQLdb.Error as e:
-            self.stdout.write(self.style.ERROR(
-                'Failed to connect to database %s' % dbdb))
+            self.stdout.write(
+                self.style.ERROR("Failed to connect to database %s" % dbdb)
+            )
 
     def _find_programmer(self, cursor, programmer_id):
 
         # id name homePhone mobilePhone email notes user_id photo
         if not programmer_id:
-            return('unknown', 'unknown')
+            return ("unknown", "unknown")
 
-        sql = "SELECT * FROM `programming_programmer` WHERE `id` = %d" % programmer_id
+        sql = (
+            "SELECT * FROM `programming_programmer` WHERE `id` = %d"
+            % programmer_id
+        )
         cursor.execute(sql)
         programmer = cursor.fetchone()
         programmerName = programmer[1]
         programmerEmail = programmer[4]
 
-        return(programmerName, programmerEmail)
+        return (programmerName, programmerEmail)
 
     def _film_format(self, cursor, format_id):
 
         if not format_id:
-            return('')
-        sql = "SELECT `name` FROM `programming_filmformat` WHERE `id` = %d" % format_id
+            return ""
+        sql = (
+            "SELECT `name` FROM `programming_filmformat` WHERE `id` = %d"
+            % format_id
+        )
         cursor.execute(sql)
         return cursor.fetchone()[0]
 
     def _copy_image(self, cursor, picture_id):
-        '''If an image exists for the film or event, copy it from the legacy
+        """If an image exists for the film or event, copy it from the legacy
         file structure the current file structure
             picture_id: integer - foreign key from archive app events or film table
         returns
             picture_file: partial path and filename of image in archive django app
             dest_picture: filename of image
-        '''
-        picture_file = ''
-        dest_picture = ''
+        """
+        picture_file = ""
+        dest_picture = ""
 
         if picture_id:
-            sql = "SELECT `file` FROM `fileupload_picture` WHERE `id` = %d" % picture_id
+            sql = (
+                "SELECT `file` FROM `fileupload_picture` WHERE `id` = %d"
+                % picture_id
+            )
             cursor.execute(sql)  # returns number of rows
             picture_file = cursor.fetchone()[0]
-            picture_file_with_path = os.path.join(ARCHIVE_IMAGE_PATH,
-                                                  picture_file)
+            picture_file_with_path = os.path.join(
+                ARCHIVE_IMAGE_PATH, picture_file
+            )
             if os.path.isfile(picture_file_with_path):
                 dest_picture = os.path.basename(picture_file)
-                dest_picture_with_path = os.path.join(IMAGE_PATH,
-                                                      dest_picture)
+                dest_picture_with_path = os.path.join(IMAGE_PATH, dest_picture)
                 if os.path.isfile(dest_picture_with_path):
-                    self.stdout.write(self.style.WARNING(
-                       '%s already exists' % dest_picture_with_path))
-                else:
                     self.stdout.write(
-                        'Copying %s' % dest_picture_with_path)
-                    shutil.copyfile(picture_file_with_path,
-                                    dest_picture_with_path)
+                        self.style.WARNING(
+                            "%s already exists" % dest_picture_with_path
+                        )
+                    )
+                else:
+                    self.stdout.write("Copying %s" % dest_picture_with_path)
+                    shutil.copyfile(
+                        picture_file_with_path, dest_picture_with_path
+                    )
             else:
-                self.stdout.write(self.style.ERROR(
-                    "Can't find %s" % picture_file_with_path))
-                picture_file = ''
+                self.stdout.write(
+                    self.style.ERROR("Can't find %s" % picture_file_with_path)
+                )
+                picture_file = ""
         return picture_file, dest_picture
 
     def _read_archive_db(self, cursor, table):
 
         # ORDER BY `startDate` DESC"
-        sql = "SELECT * FROM `%s` WHERE `deleted` = 0 AND `confirmed` = 1 AND `private` = 0" % table
+        sql = (
+            "SELECT * FROM `%s` WHERE `deleted` = 0 AND `confirmed` = 1 AND `private` = 0"
+            % table
+        )
         rows = cursor.execute(sql)  # returns number of rows
-        self.stdout.write('%s: %d rows found' % (table, rows))
+        self.stdout.write("%s: %d rows found" % (table, rows))
         events = cursor.fetchall()
         return events
 
@@ -148,8 +164,8 @@ class Command(BaseCommand):
                 title = event[1]
                 summary = event[2]
                 body = event[3]
-                if table in 'programming_season':
-                    website = ''
+                if table in "programming_season":
+                    website = ""
                     notes = event[4]
                     programmer_id = event[5]
                     picture_id = event[9]
@@ -162,46 +178,58 @@ class Command(BaseCommand):
                     picture_id = event[10]
                     startDate = event[12]  # class 'datetime.date'
                     startTime = event[13]  # class 'datetime.timedelta'
-                    '''For programming_festival
+                    """For programming_festival
                     endDate = event[14]  # class 'datetime.date'
                     endTime = event[15]  # class 'datetime.timedelta'
-                    '''
-                if table not in ['programming_festival', 'programming_season']:
+                    """
+                if table not in ["programming_festival", "programming_season"]:
                     endTime = event[14]  # event or gig
                     if endTime and startTime:
-                        duration = endTime - startTime  # class datetime.timedelta
+                        duration = (
+                            endTime - startTime
+                        )  # class datetime.timedelta
                         if duration < datetime.timedelta(0):
                             duration = datetime.timedelta(0)
                     else:
                         duration = datetime.timedelta(0)
                 else:  # festival, season
-                    startTime = datetime.timedelta(seconds=18*60*60)  # Invent a start time of 6pm
-                    endTime = ''
+                    startTime = datetime.timedelta(
+                        seconds=18 * 60 * 60
+                    )  # Invent a start time of 6pm
+                    endTime = ""
                     duration = datetime.timedelta(0)
 
-                programmerName, programmerEmail = self._find_programmer(cursor,
-                                                                        programmer_id)
+                programmerName, programmerEmail = self._find_programmer(
+                    cursor, programmer_id
+                )
 
                 if True:
-                    picture_file, dest_picture = self._copy_image(cursor, picture_id)
+                    picture_file, dest_picture = self._copy_image(
+                        cursor, picture_id
+                    )
                 else:
-                    picture_file = ''
-                    dest_picture = ''
+                    picture_file = ""
+                    dest_picture = ""
 
-                self.stdout.write('%s "%s" %s %s "%s" %s <%s>' % (
-                    legacy_id,
-                    title,
-                    startDate,
-                    duration,
-                    picture_file,
-                    programmerName, programmerEmail
-                ))
+                self.stdout.write(
+                    '%s "%s" %s %s "%s" %s <%s>'
+                    % (
+                        legacy_id,
+                        title,
+                        startDate,
+                        duration,
+                        picture_file,
+                        programmerName,
+                        programmerEmail,
+                    )
+                )
 
-                duration = (datetime.datetime.min +
-                            duration).time()  # class datetime.time
+                duration = (
+                    datetime.datetime.min + duration
+                ).time()  # class datetime.time
                 startDateAsaTime = datetime.datetime.combine(
-                    startDate,
-                    datetime.datetime.min.time())
+                    startDate, datetime.datetime.min.time()
+                )
                 startDateAsaTime = startDateAsaTime + startTime
                 # date = datetime.strptime(startDate + startTime, '%Y-%m-%d %H:%M:%S')
 
@@ -211,41 +239,44 @@ class Command(BaseCommand):
                 e.legacy_id = legacy_id
                 e.name = title
                 if website:
-                    e.copy = '%s\n\n%s' % (body, website) or ''
+                    e.copy = "%s\n\n%s" % (body, website) or ""
                 else:
-                    e.copy = body or ''
-                e.copy_summary = summary or ''
+                    e.copy = body or ""
+                e.copy_summary = summary or ""
                 e.legacy_copy = False
-                if programmerEmail is not None and programmerEmail.strip() != '':
-                    e.notes = "%s\n\nBooked by %s <%s>" % (notes,
-                                                           programmerName,
-                                                           programmerEmail)
+                if (
+                    programmerEmail is not None
+                    and programmerEmail.strip() != ""
+                ):
+                    e.notes = "%s\n\nBooked by %s <%s>" % (
+                        notes,
+                        programmerName,
+                        programmerEmail,
+                    )
                 else:
                     e.notes = notes
-                e.notes = '%s\n\nImported from %s' % (e.notes, table)
-                if duration is not None and duration != '':
+                e.notes = "%s\n\nImported from %s" % (e.notes, table)
+                if duration is not None and duration != "":
                     e.duration = duration
                 else:
                     e.duration = datetime.time(0, 0)
 
                 e.full_clean()
                 e.save()
-                if table in 'programming_gig':
-                    e.tags.add(EventTag.objects.filter(name='music').first())
+                if table in "programming_gig":
+                    e.tags.add(EventTag.objects.filter(name="music").first())
 
                 if picture_id:
                     image_path = os.path.join(EVENT_IMAGES_PATH, dest_picture)
-                    media_item = MediaItem(
-                        media_file=image_path,
-                        credit=title
-                    )
+                    media_item = MediaItem(media_file=image_path, credit=title)
                     media_item.full_clean()
                     media_item.save()
                     e.media.add(media_item)
 
                 # Graft event to a showing
-                fake_start = (django.utils.timezone.now() +
-                              datetime.timedelta(days=1))
+                fake_start = django.utils.timezone.now() + datetime.timedelta(
+                    days=1
+                )
 
                 s = Showing()
                 s.event = e
@@ -253,12 +284,12 @@ class Command(BaseCommand):
                 # so set a valid start date now, and after the call to
                 # full_clean change it to the actual value before saving
                 s.start = fake_start
-                if programmerName is not None and programmerName.strip() != '':
+                if programmerName is not None and programmerName.strip() != "":
                     s.booked_by = programmerName
                 else:
-                    s.booked_by = 'unknown'
+                    s.booked_by = "unknown"
                 s.confirmed = True
-                s.room = Room.objects.filter(name='Cinema').first()
+                s.room = Room.objects.filter(name="Cinema").first()
 
                 s.full_clean()
                 # Store datetime with timezone information
@@ -266,8 +297,11 @@ class Command(BaseCommand):
                 # Force, to allow saving of showing with start in past
                 s.save(force=True)
 
-            self.stdout.write(self.style.SUCCESS(
-                '%s %d events imported' % (table, len(events))))
+            self.stdout.write(
+                self.style.SUCCESS(
+                    "%s %d events imported" % (table, len(events))
+                )
+            )
 
         # return  # FIXME
 
@@ -277,7 +311,7 @@ class Command(BaseCommand):
         cursor.execute(sql)  # returns number of rows
         films = cursor.fetchall()
 
-        self.stdout.write('Found %d films' % len(films))
+        self.stdout.write("Found %d films" % len(films))
 
         for film in films:
             legacy_id = film[0]
@@ -299,73 +333,80 @@ class Command(BaseCommand):
             film_format_id = film[20]
 
             startDateAsaTime = datetime.datetime.combine(
-                startDate,
-                datetime.datetime.min.time())
+                startDate, datetime.datetime.min.time()
+            )
             startDateAsaTime = startDateAsaTime + startTime
 
-            programmerName, programmerEmail = self._find_programmer(cursor,
-                                                                    programmer_id)
+            programmerName, programmerEmail = self._find_programmer(
+                cursor, programmer_id
+            )
 
             picture_file, dest_picture = self._copy_image(cursor, picture_id)
             film_format_id = self._film_format(cursor, film_format_id)
 
-            self.stdout.write('%s "%s" (%s, %s) %s %s "%s" %s <%s>' % (
-                legacy_id,
-                title,
-                director,
-                year,
-                film_format_id,
-                startDateAsaTime,
-                picture_file,
-                programmerName, programmerEmail
-            ))
+            self.stdout.write(
+                '%s "%s" (%s, %s) %s %s "%s" %s <%s>'
+                % (
+                    legacy_id,
+                    title,
+                    director,
+                    year,
+                    film_format_id,
+                    startDateAsaTime,
+                    picture_file,
+                    programmerName,
+                    programmerEmail,
+                )
+            )
 
             e = Event()
             e.legacy_id = legacy_id
             e.name = title
-            e.copy = body or ''
-            e.copy_summary = summary or ''
+            e.copy = body or ""
+            e.copy_summary = summary or ""
             if director:
-                e.film_information = 'Dir. %s' % director
+                e.film_information = "Dir. %s" % director
             if language:
-                e.film_information += ', %s' % language
+                e.film_information += ", %s" % language
             if country:
-                e.film_information += ', %s' % country
+                e.film_information += ", %s" % country
             if year:
-                e.film_information += ', %s' % year
+                e.film_information += ", %s" % year
             e.legacy_copy = False
-            if programmerEmail is not None and programmerEmail.strip() != '':
-                e.notes = "%s\n\nBooked by %s <%s>" % (notes,
-                                                       programmerName,
-                                                       programmerEmail)
+            if programmerEmail is not None and programmerEmail.strip() != "":
+                e.notes = "%s\n\nBooked by %s <%s>" % (
+                    notes,
+                    programmerName,
+                    programmerEmail,
+                )
             else:
                 e.notes = notes
-            e.notes = '%s\n\nImported from %s' % (e.notes, 'programming_film')
+            e.notes = "%s\n\nImported from %s" % (e.notes, "programming_film")
             # e.template = EventTemplate.objects.filter(name='Film (DVD)').first()
             # TODO consider duration, but it's hellishly complicated, due to
             # multiple formats and multiple films
-            if False and length is not None and length != '':
-                e.duration = [int(s) for s in length.split() if s.isdigit()][-1]
+            if False and length is not None and length != "":
+                e.duration = [int(s) for s in length.split() if s.isdigit()][
+                    -1
+                ]
             else:
                 e.duration = datetime.time(0, 0)
             e.full_clean()
             e.save()
-            e.tags.add(EventTag.objects.filter(name='film').first())
+            e.tags.add(EventTag.objects.filter(name="film").first())
 
             if picture_file:
-                self.stdout.write('Adding picture %s' % picture_file)
+                self.stdout.write("Adding picture %s" % picture_file)
                 image_path = os.path.join(EVENT_IMAGES_PATH, dest_picture)
-                media_item = MediaItem(
-                    media_file=image_path,
-                    credit=title
-                )
+                media_item = MediaItem(media_file=image_path, credit=title)
                 media_item.full_clean()
                 media_item.save()
                 e.media.add(media_item)
 
             # Graft event to a showing
-            fake_start = (django.utils.timezone.now() +
-                          datetime.timedelta(days=1))
+            fake_start = django.utils.timezone.now() + datetime.timedelta(
+                days=1
+            )
 
             s = Showing()
             s.event = e
@@ -373,12 +414,12 @@ class Command(BaseCommand):
             # so set a valid start date now, and after the call to
             # full_clean change it to the actual value before saving
             s.start = fake_start
-            if programmerName is not None and programmerName.strip() != '':
+            if programmerName is not None and programmerName.strip() != "":
                 s.booked_by = programmerName
             else:
-                s.booked_by = 'unknown'
+                s.booked_by = "unknown"
             s.confirmed = True
-            s.room = Room.objects.filter(name='Cinema').first()
+            s.room = Room.objects.filter(name="Cinema").first()
 
             s.full_clean()
             # Store datetime with timezone information
@@ -386,7 +427,8 @@ class Command(BaseCommand):
             # Force, to allow saving of showing with start in past
             s.save(force=True)
 
-        self.stdout.write(self.style.SUCCESS(
-            '%d legacy films imported' % len(films)))
+        self.stdout.write(
+            self.style.SUCCESS("%d legacy films imported" % len(films))
+        )
 
         db.close()

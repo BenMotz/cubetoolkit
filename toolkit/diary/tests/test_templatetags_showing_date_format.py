@@ -10,7 +10,6 @@ from toolkit.diary.templatetags.showing_date_format import format_showing_dates
 
 
 class TestShowingDateFormatFilter(TestCase):
-
     def setUp(self):
         self.tz = pytz.timezone("Europe/London")
 
@@ -19,28 +18,17 @@ class TestShowingDateFormatFilter(TestCase):
         return format_showing_dates(mock_showings)
 
     def _test_equiv(self, date_tuple_list, expected):
-        date_list = [
-            self.tz.localize(datetime(*t)) for t in date_tuple_list
-        ]
-        self.assertEqual(
-            expected,
-            self._run_filter_on_dates(date_list)
-        )
+        date_list = [self.tz.localize(datetime(*t)) for t in date_tuple_list]
+        self.assertEqual(expected, self._run_filter_on_dates(date_list))
 
     def test_no_showings(self):
-        self._test_equiv([], u'')
+        self._test_equiv([], "")
 
     def test_one_showing_on_the_hour(self):
-        self._test_equiv(
-            [(2012, 1, 1, 10, 00)],
-            u'Sun 1st / 10am'
-        )
+        self._test_equiv([(2012, 1, 1, 10, 00)], "Sun 1st / 10am")
 
     def test_one_showing_off_the_hour(self):
-        self._test_equiv(
-            [(2013, 2, 2, 20, 30)],
-            u'Sat 2nd / 8:30pm'
-        )
+        self._test_equiv([(2013, 2, 2, 20, 30)], "Sat 2nd / 8:30pm")
 
     def test_two_showings_seq(self):
         self._test_equiv(
@@ -48,7 +36,7 @@ class TestShowingDateFormatFilter(TestCase):
                 (2013, 2, 2, 20, 00),
                 (2013, 2, 3, 20, 00),
             ],
-            u'Sat 2nd, Sun 3rd / 8pm'
+            "Sat 2nd, Sun 3rd / 8pm",
         )
 
     def test_two_showings_non_seq(self):
@@ -57,7 +45,7 @@ class TestShowingDateFormatFilter(TestCase):
                 (2013, 2, 2, 20, 00),
                 (2013, 2, 4, 20, 00),
             ],
-            u'Sat 2nd, Mon 4th / 8pm'
+            "Sat 2nd, Mon 4th / 8pm",
         )
 
     def test_two_showings_diff_time(self):
@@ -66,7 +54,7 @@ class TestShowingDateFormatFilter(TestCase):
                 (2013, 2, 2, 20, 00),
                 (2013, 2, 3, 20, 30),
             ],
-            u'Sat 2nd / 8pm, Sun 3rd / 8:30pm'
+            "Sat 2nd / 8pm, Sun 3rd / 8:30pm",
         )
 
     def test_three_showings_seq(self):
@@ -77,7 +65,7 @@ class TestShowingDateFormatFilter(TestCase):
                 (2015, 2, 4, 20, 00),
             ],
             # \u2013 is an en dash!
-            u'Mon 2nd\u2013Wed 4th / 8pm'
+            "Mon 2nd\u2013Wed 4th / 8pm",
         )
 
     def test_five_showings_non_seq_after_two(self):
@@ -89,7 +77,7 @@ class TestShowingDateFormatFilter(TestCase):
                 (2015, 2, 6, 20, 00),
                 (2015, 2, 7, 20, 00),
             ],
-            u'Mon 2nd, Tue 3rd, Thu 5th\u2013Sat 7th / 8pm'
+            "Mon 2nd, Tue 3rd, Thu 5th\u2013Sat 7th / 8pm",
         )
 
     def test_five_showings_non_seq_after_three(self):
@@ -101,7 +89,7 @@ class TestShowingDateFormatFilter(TestCase):
                 (2015, 2, 6, 20, 00),
                 (2015, 2, 7, 20, 00),
             ],
-            u'Mon 2nd\u2013Wed 4th, Fri 6th, Sat 7th / 8pm'
+            "Mon 2nd\u2013Wed 4th, Fri 6th, Sat 7th / 8pm",
         )
 
     def test_complex(self):
@@ -121,9 +109,9 @@ class TestShowingDateFormatFilter(TestCase):
                 (2015, 2, 24, 8, 15),
                 (2015, 2, 28, 20, 00),
             ],
-            u'Sun 1st / 8pm, Mon 2nd / 8am, Mon 2nd\u2013Thu 5th, Tue 17th, '
-            u'Wed 18th, Fri 20th, Sat 21st, Mon 23rd / 8pm, Tue 24th / 8:15am,'
-            u' Sat 28th / 8pm'
+            "Sun 1st / 8pm, Mon 2nd / 8am, Mon 2nd\u2013Thu 5th, Tue 17th, "
+            "Wed 18th, Fri 20th, Sat 21st, Mon 23rd / 8pm, Tue 24th / 8:15am,"
+            " Sat 28th / 8pm",
         )
 
     def test_five_showings_seq_month_boundary(self):
@@ -135,5 +123,5 @@ class TestShowingDateFormatFilter(TestCase):
                 (2015, 3, 1, 20, 00),
                 (2015, 3, 2, 20, 00),
             ],
-            u'Thu 26th\u2013Sat 28th / 8pm, Sun 1st, Mon 2nd / 8pm'
+            "Thu 26th\u2013Sat 28th / 8pm, Sun 1st, Mon 2nd / 8pm",
         )

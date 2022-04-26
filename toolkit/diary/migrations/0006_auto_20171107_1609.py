@@ -8,25 +8,30 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('diary', '0005_alter_showing_event_on_delete'),
+        ("diary", "0005_alter_showing_event_on_delete"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='mediaitem',
-            name='caption',
-            field=models.CharField(blank=True, default='', max_length=256),
+            model_name="mediaitem",
+            name="caption",
+            field=models.CharField(blank=True, default="", max_length=256),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='mediaitem',
-            name='credit',
-            field=models.CharField(blank=True, default='Internet scavenged', max_length=256, verbose_name='Image credit'),
+            model_name="mediaitem",
+            name="credit",
+            field=models.CharField(
+                blank=True,
+                default="Internet scavenged",
+                max_length=256,
+                verbose_name="Image credit",
+            ),
         ),
         migrations.AlterField(
-            model_name='printedprogramme',
-            name='designer',
-            field=models.CharField(blank=True, default='', max_length=256),
+            model_name="printedprogramme",
+            name="designer",
+            field=models.CharField(blank=True, default="", max_length=256),
             preserve_default=False,
         ),
     ]

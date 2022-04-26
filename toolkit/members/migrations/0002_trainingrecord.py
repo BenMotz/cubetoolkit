@@ -8,13 +8,13 @@ import datetime
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('diary', '0005_alter_showing_event_on_delete'),
-        ('members', '0001_initial'),
+        ("diary", "0005_alter_showing_event_on_delete"),
+        ("members", "0001_initial"),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='TrainingRecord',
+            name="TrainingRecord",
             fields=[
                 (
                     "id",
@@ -49,8 +49,8 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
-                'ordering': ['role', 'training_date', 'volunteer'],
-                'db_table': 'TrainingRecords',
+                "ordering": ["role", "training_date", "volunteer"],
+                "db_table": "TrainingRecords",
             },
         ),
     ]

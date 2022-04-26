@@ -13,29 +13,29 @@ class SecurityTests(MembersTestsMixin, TestCase):
 
     write_required = {
         # Volunteer urls:
-        'add-volunteer': {},
-        'edit-volunteer': {'volunteer_id': 1},
-        'activate-volunteer': {},
-        'inactivate-volunteer': {},
-        'add-volunteer-training-group-record': {},
-        'add-volunteer-training-record': {'volunteer_id': 1},
-        'delete-volunteer-training-record': {'training_record_id': 1},
+        "add-volunteer": {},
+        "edit-volunteer": {"volunteer_id": 1},
+        "activate-volunteer": {},
+        "inactivate-volunteer": {},
+        "add-volunteer-training-group-record": {},
+        "add-volunteer-training-record": {"volunteer_id": 1},
+        "delete-volunteer-training-record": {"training_record_id": 1},
         # Member urls:
-        'add-member': {},
-        'edit-member': {'member_id': 1},
-        'delete-member': {'member_id': 1},
+        "add-member": {},
+        "edit-member": {"member_id": 1},
+        "delete-member": {"member_id": 1},
     }
 
     only_read_required = {
         # Volunteer urls:
-        'view-volunteer-list': {},
-        'view-volunteer-role-report': {},
-        'unretire-select-volunteer': {},
-        'retire-select-volunteer': {},
-        'view-volunteer-training-report': {},
+        "view-volunteer-list": {},
+        "view-volunteer-role-report": {},
+        "unretire-select-volunteer": {},
+        "retire-select-volunteer": {},
+        "view-volunteer-training-report": {},
         # Member urls:
-        'search-members': {},
-        'view-member': {'member_id': 1},
+        "search-members": {},
+        "view-member": {"member_id": 1},
         # TODO with SQLite test DB get "no such function: SUBSTRING_INDEX"
         # 'member-statistics': {},
     }
@@ -44,8 +44,7 @@ class SecurityTests(MembersTestsMixin, TestCase):
         """Assert that given URLs 302 redirect to the login page"""
         for view_name, kwargs in views_to_test.items():
             url = reverse(view_name, kwargs=kwargs)
-            expected_redirect = ("{0}?next={1}".format(
-                reverse("login"), url))
+            expected_redirect = "{0}?next={1}".format(reverse("login"), url)
             # Test GET:
             response = self.client.get(url)
             self.assertRedirects(response, expected_redirect)
@@ -90,17 +89,16 @@ class SecurityTests(MembersTestsMixin, TestCase):
         """URLs which should only work if the member key is known"""
 
         views_to_test = (
-            'edit-member',
-            'unsubscribe-member',
+            "edit-member",
+            "unsubscribe-member",
         )
 
         member = Member.objects.get(id=1)
 
         # First try without a key:
         for view_name in views_to_test:
-            url = reverse(view_name, kwargs={'member_id': member.id})
-            expected_redirect = "{0}?next={1}".format(
-                reverse("login"), url)
+            url = reverse(view_name, kwargs={"member_id": member.id})
+            expected_redirect = "{0}?next={1}".format(reverse("login"), url)
 
             # Test GET:
             response = self.client.get(url)
@@ -113,8 +111,9 @@ class SecurityTests(MembersTestsMixin, TestCase):
         # Now try with the key:
         for view_name in views_to_test:
             url = "{0}?k={1}".format(
-                reverse(view_name, kwargs={'member_id': member.id}),
-                member.mailout_key)
+                reverse(view_name, kwargs={"member_id": member.id}),
+                member.mailout_key,
+            )
             # Test GET:
             response = self.client.get(url)
             self.assertEqual(response.status_code, 200)

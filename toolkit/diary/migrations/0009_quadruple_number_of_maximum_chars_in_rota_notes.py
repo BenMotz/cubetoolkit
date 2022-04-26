@@ -8,13 +8,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('diary', '0008_remove_terms_from_event_model'),
+        ("diary", "0008_remove_terms_from_event_model"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='showing',
-            name='rota_notes',
+            model_name="showing",
+            name="rota_notes",
             field=models.TextField(blank=True, max_length=4096),
         ),
     ]

@@ -9,16 +9,17 @@ import toolkit.members.models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('members', '0003_auto_20171107_1609'),
+        ("members", "0003_auto_20171107_1609"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='member',
-            name='membership_expires',
+            model_name="member",
+            name="membership_expires",
             field=models.DateField(
                 blank=True,
                 default=toolkit.members.models.get_default_membership_expiry,
-                null=True),
+                null=True,
             ),
+        ),
     ]

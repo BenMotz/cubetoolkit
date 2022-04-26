@@ -14,10 +14,14 @@ CODE_DIRS = ["toolkit", "easy_thumbnails"]
 
 def _assert_target_set():
     # utility method to check that target is defined:
-    require('site_root', provided_by=('cube_staging',
-                                      'cube_production',
-                                      'star_and_shadow_production')
-            )
+    require(
+        "site_root",
+        provided_by=(
+            "cube_staging",
+            "cube_production",
+            "star_and_shadow_production",
+        ),
+    )
 
 
 def cube_staging():
@@ -33,6 +37,7 @@ def cube_staging():
     # permission to access the normal log file
     env.deploy_script_settings = "toolkit.deploy_settings"
     env.dev_db_name = "toolkit"
+
 
 def cube_production():
     """Configure to deploy live on cubecinema.com"""
@@ -92,7 +97,7 @@ def deploy_code():
     _assert_target_set()
 
     # Create tar of (local) git HEAD using the hash as the filename
-    archive = '%s.tgz' % local('git rev-parse HEAD', capture=True)
+    archive = "%s.tgz" % local("git rev-parse HEAD", capture=True)
     local_root = os.path.dirname(__file__)
     utils.puts("Changing to {0}".format(local_root))
     with lcd(local_root):
@@ -120,8 +125,11 @@ def deploy_code():
 
             # Configure the correct settings file.
             run("rm -f toolkit/settings.py?")
-            run("ln -s {0} toolkit/settings.py"
-                .format(os.path.join(env.site_root, env.settings)))
+            run(
+                "ln -s {0} toolkit/settings.py".format(
+                    os.path.join(env.site_root, env.settings)
+                )
+            )
 
 
 def deploy_static():
@@ -133,18 +141,23 @@ def deploy_static():
         utils.puts("Running collectstatic (pwd is '{0}')".format(run("pwd")))
         static_path = os.path.join(env.site_root, "static")
         run("rm -rf {0}".format(static_path))
-        run("venv/bin/python manage.py collectstatic --noinput --settings={0}"
-            .format(env.deploy_script_settings))
+        run(
+            "venv/bin/python manage.py collectstatic --noinput --settings={0}".format(
+                env.deploy_script_settings
+            )
+        )
 
 
 def set_media_permissions():
     """Set media directories to g+w"""
-    media_dirs = ["media/diary",
-                  "media/printedprogramme",
-                  "media/volunteers",
-                  "media/images",
-                  "media/original_images",
-                  "media/documents"]
+    media_dirs = [
+        "media/diary",
+        "media/printedprogramme",
+        "media/volunteers",
+        "media/images",
+        "media/original_images",
+        "media/documents",
+    ]
 
     with cd(env.site_root):
         for media_dir in media_dirs:
@@ -157,7 +170,11 @@ def deploy_media():
 
     _assert_target_set()
 
-    local('rsync -av --delete media/ {0}@{1}:{2}/media'.format(env.user, env.hosts[0], env.site_root))
+    local(
+        "rsync -av --delete media/ {0}@{1}:{2}/media".format(
+            env.user, env.hosts[0], env.site_root
+        )
+    )
 
 
 def get_media():
@@ -165,7 +182,11 @@ def get_media():
 
     _assert_target_set()
 
-    local('rsync -av --delete --exclude=thumbnails {0}@{1}:{2}/ media/'.format(env.user, env.hosts[0], env.media))
+    local(
+        "rsync -av --delete --exclude=thumbnails {0}@{1}:{2}/ media/".format(
+            env.user, env.hosts[0], env.media
+        )
+    )
 
 
 def sync_media_from_production_to_staging():
@@ -175,7 +196,11 @@ def sync_media_from_production_to_staging():
     _assert_target_set()
 
     with cd(env.site_root):
-        run('rsync -av --delete --exclude=thumbnails /home/toolkit/site/media/ {0}'.format(env.media))
+        run(
+            "rsync -av --delete --exclude=thumbnails /home/toolkit/site/media/ {0}".format(
+                env.media
+            )
+        )
 
 
 def run_migrations():
@@ -185,23 +210,29 @@ def run_migrations():
 
     with cd(env.site_root):
         utils.puts("Running database migrations")
-        run("venv/bin/python manage.py migrate --noinput --settings={0}"
-            .format(env.deploy_script_settings))
+        run(
+            "venv/bin/python manage.py migrate --noinput --settings={0}".format(
+                env.deploy_script_settings
+            )
+        )
 
 
 def install_requirements(upgrade=False):
-    """ Install requirements in remote virtualenv """
+    """Install requirements in remote virtualenv"""
     # Update the packages installed in the environment:
     venv_path = os.path.join(env.site_root, VIRTUALENV)
     req_file = os.path.join(env.site_root, REQUIREMENTS_FILE)
     upgrade_flag = "--upgrade" if upgrade else ""
     with cd(env.site_root):
-        run("{venv_path}/bin/pip install {upgrade} --requirement {req_file}".format(
-            venv_path=venv_path, upgrade=upgrade_flag, req_file=req_file))
+        run(
+            "{venv_path}/bin/pip install {upgrade} --requirement {req_file}".format(
+                venv_path=venv_path, upgrade=upgrade_flag, req_file=req_file
+            )
+        )
 
 
 def upgrade_requirements():
-    """ Upgrade all requirements in remote virtualenv """
+    """Upgrade all requirements in remote virtualenv"""
     return install_requirements(True)
 
 
@@ -211,7 +242,9 @@ def bootstrap():
 
     _assert_target_set()
 
-    if not console.confirm("Flatten remote, including media files?", default=False):
+    if not console.confirm(
+        "Flatten remote, including media files?", default=False
+    ):
         utils.abort("User aborted")
 
     # Scorch the earth
@@ -225,11 +258,18 @@ def bootstrap():
     if virtualenv_version[0] == "1" and int(virtualenv_version[1]) < 7:
         run("virtualenv {0}".format(venv_path))
     else:
-        run("virtualenv --system-site-packages --python=python3 {0}".format(venv_path))
+        run(
+            "virtualenv --system-site-packages --python=python3 {0}".format(
+                venv_path
+            )
+        )
 
-    utils.puts("\nRemote site is prepared. Now copy the settings file to '{0}/{1}'"
-               " and run the 'deploy' command from this fabric file."
-               .format(env.site_root, env.settings))
+    utils.puts(
+        "\nRemote site is prepared. Now copy the settings file to '{0}/{1}'"
+        " and run the 'deploy' command from this fabric file.".format(
+            env.site_root, env.settings
+        )
+    )
 
 
 def _fetch_database_dump(dump_filename):
@@ -240,14 +280,18 @@ def _fetch_database_dump(dump_filename):
     with cd(env.site_root):
         dump_file_path = os.path.join(env.site_root, dump_filename)
 
-        run("venv/bin/python manage.py mysqldump_database {dump_file_path} "
+        run(
+            "venv/bin/python manage.py mysqldump_database {dump_file_path} "
             "--settings={deploy_script_settings}".format(
                 dump_file_path=dump_file_path,
-                deploy_script_settings=env.deploy_script_settings
-                ))
-        run("gzip {dump_file_path} -c > {dump_file_path}.gz".format(
-            dump_file_path=dump_file_path
-            ))
+                deploy_script_settings=env.deploy_script_settings,
+            )
+        )
+        run(
+            "gzip {dump_file_path} -c > {dump_file_path}.gz".format(
+                dump_file_path=dump_file_path
+            )
+        )
         get(dump_file_path + ".gz", local_path=dump_filename + ".gz")
         run("rm {0} {0}.gz".format(dump_file_path))
 
@@ -258,20 +302,27 @@ def _load_database_dump(dump_filename):
     if not os.path.isfile(dump_filename):
         utils.abort("Couldn't find {0}".format(dump_filename))
 
-    db_username = prompt("Please enter local database username "
-                         "(must have permission to drop and create database!)",
-                         default="root")
+    db_username = prompt(
+        "Please enter local database username "
+        "(must have permission to drop and create database!)",
+        default="root",
+    )
 
-    if not console.confirm("About to do something irreversible to the %s "
-                           "database on your local system. Sure? " % env.dev_db_name,
-                           default=False):
+    if not console.confirm(
+        "About to do something irreversible to the %s "
+        "database on your local system. Sure? " % env.dev_db_name,
+        default=False,
+    ):
         utils.abort("User aborted")
         local("rm {0}".format(dump_filename))
 
-    local("mysql -u{db_username} -p {dev_db_name} < {dump_filename}".format(
-        db_username=db_username,
-        dev_db_name=env.dev_db_name,
-        dump_filename=dump_filename))
+    local(
+        "mysql -u{db_username} -p {dev_db_name} < {dump_filename}".format(
+            db_username=db_username,
+            dev_db_name=env.dev_db_name,
+            dump_filename=dump_filename,
+        )
+    )
 
 
 def sync_to_local_database():
@@ -291,7 +342,7 @@ def deploy():
 
     _assert_target_set()
 
-    if env.target == 'production':
+    if env.target == "production":
         if not console.confirm("Uploading to live site: sure?", default=False):
             utils.abort("User aborted")
 

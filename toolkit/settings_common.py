@@ -32,11 +32,11 @@ VENUE = {
     "email_unsubscribe_host": "https://cubecinema.com",
     # Default address to which reports of a successful mailout
     # delivery are sent:
-    "mailout_delivery_report_to": u"cubeadmin@cubecinema.com",
+    "mailout_delivery_report_to": "cubeadmin@cubecinema.com",
     # "From" address for mailout
-    "mailout_from_address": u"mailout@cubecinema.com",
+    "mailout_from_address": "mailout@cubecinema.com",
     # email address shown when volunteer removes themselves from rota
-    "vols_email": u"volunteers@cubecinema.com",
+    "vols_email": "volunteers@cubecinema.com",
     # List of people to get notifications when new vols are added
     "vols_admin_address": ["volunteers-owner@cubecinema.com"],
     "show_user_management": False,

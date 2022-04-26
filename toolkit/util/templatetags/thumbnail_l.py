@@ -23,9 +23,10 @@ def thumbnail_url(source, alias):
     try:
         thumb = get_thumbnailer(source)[alias]
     except Exception:
-        logger.exception("Failed generating thumbnail for {0}, {1}"
-                         .format(source, alias))
-        return ''
+        logger.exception(
+            "Failed generating thumbnail for {0}, {1}".format(source, alias)
+        )
+        return ""
     return thumb.url
 
 

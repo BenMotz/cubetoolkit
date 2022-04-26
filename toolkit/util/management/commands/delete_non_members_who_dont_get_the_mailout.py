@@ -11,22 +11,23 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        dead_wood = (Member.objects.filter(email__isnull=False)
-                                   .exclude(email='')
-                                   .exclude(mailout_failed=True)
-                                   .exclude(mailout=True)
-                                   .exclude(is_member=True)
-                     )
+        dead_wood = (
+            Member.objects.filter(email__isnull=False)
+            .exclude(email="")
+            .exclude(mailout_failed=True)
+            .exclude(mailout=True)
+            .exclude(is_member=True)
+        )
 
-        self.stdout.write('Deleting...')
+        self.stdout.write("Deleting...")
 
         for member in dead_wood:
-            self.stdout.write('%s <%s> joined %s' % (
-                member.name,
-                member.email,
-                member.created_at)
+            self.stdout.write(
+                "%s <%s> joined %s"
+                % (member.name, member.email, member.created_at)
             )
             member.delete()
 
-        self.stdout.write(self.style.SUCCESS(
-            '\nDeleted %d non-members\n' % len(dead_wood)))
+        self.stdout.write(
+            self.style.SUCCESS("\nDeleted %d non-members\n" % len(dead_wood))
+        )

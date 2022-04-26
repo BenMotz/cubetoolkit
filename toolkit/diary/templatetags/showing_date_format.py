@@ -11,9 +11,9 @@ register = template.Library()
 
 def _ordinal_suffix(i):
     if i < 4 or i > 30 or 20 < i < 24:
-        return [None, 'st', 'nd', 'rd'][i % 10]
+        return [None, "st", "nd", "rd"][i % 10]
     else:
-        return 'th'
+        return "th"
 
 
 def _output_month(year, month, day_list, d_time):
@@ -32,7 +32,7 @@ def _output_month(year, month, day_list, d_time):
 
     def _format_day(day):
         date = datetime.datetime(year=year, month=month, day=day)
-        return date.strftime(u"%a %-d%%s") % (_ordinal_suffix(day))
+        return date.strftime("%a %-d%%s") % (_ordinal_suffix(day))
 
     for d in day_list:
         if seq_len == 0:
@@ -50,38 +50,40 @@ def _output_month(year, month, day_list, d_time):
             # seen) end of the sequence
             if seq_len == 1:
                 # Only two items in the sequence: output a list
-                op.append(u", {0}".format(_format_day(d)))
+                op.append(", {0}".format(_format_day(d)))
             elif seq_len == 2:
                 # Only two items in the sequence: output a list
-                op.append(u", {0}, {1}".format(_format_day(prev),
-                                               _format_day(d)))
+                op.append(
+                    ", {0}, {1}".format(_format_day(prev), _format_day(d))
+                )
             else:
                 # > 2 items in the sequence, output a range
-                op.append(u"\u2013{0}, {1}".format(_format_day(prev),
-                                                   _format_day(d)))
+                op.append(
+                    "\u2013{0}, {1}".format(_format_day(prev), _format_day(d))
+                )
             # (In both cases, also output the start of the next sequence)
             seq_len = 1
             prev = d
 
     # Finish off: if seq_len == 1 then no output is needed
     if seq_len == 2:
-        op.append(u", {0}".format(_format_day(prev)))
+        op.append(", {0}".format(_format_day(prev)))
     elif seq_len > 2:
-        op.append(u"\u2013{0}".format(_format_day(prev)))
+        op.append("\u2013{0}".format(_format_day(prev)))
 
     # Print the start time. Only show the minutes when the start isn't on the
     # hour:
     if d_time.minute == 0:
-        time_string = d_time.strftime(u"%-I%p")
+        time_string = d_time.strftime("%-I%p")
     else:
-        time_string = d_time.strftime(u"%-I:%M%p")
+        time_string = d_time.strftime("%-I:%M%p")
 
-    return u"{0} / {1}".format(u"".join(op), time_string.lower())
+    return "{0} / {1}".format("".join(op), time_string.lower())
 
 
 def _pretty_print_dateset(dates):
     if not dates:
-        return u''
+        return ""
 
     current_tz = get_current_timezone()
     out_strings = []
@@ -104,10 +106,10 @@ def _pretty_print_dateset(dates):
 
     out_strings.append(_output_month(year, month, day_list, time))
 
-    return u", ".join(out_strings)
+    return ", ".join(out_strings)
 
 
-@register.filter(name='showingdates')
+@register.filter(name="showingdates")
 def format_showing_dates(showings):
     dates = [s.start for s in showings]
     return _pretty_print_dateset(dates)

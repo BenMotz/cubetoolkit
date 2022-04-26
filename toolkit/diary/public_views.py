@@ -25,7 +25,8 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 image_cut_off_date = datetime.datetime.strptime(
-    settings.IMAGES_START_DATE, '%d %b %Y')
+    settings.IMAGES_START_DATE, "%d %b %Y"
+)
 utc = pytz.UTC
 image_cut_off_date = utc.localize(image_cut_off_date)
 
@@ -37,12 +38,14 @@ def _view_diary(request, startdate, enddate, tag=None, extra_title=None):
     # Build query. The select_related() and prefetch_related on the end
     # encourages it to get the associated showing/event data, to reduce the
     # number of SQL queries
-    showings = (Showing.objects.public()
-                               .start_in_range(startdate, enddate)
-                               .order_by('start')
-                               .select_related()
-                               .prefetch_related('event__media')
-                               .prefetch_related('event__tags'))
+    showings = (
+        Showing.objects.public()
+        .start_in_range(startdate, enddate)
+        .order_by("start")
+        .select_related()
+        .prefetch_related("event__media")
+        .prefetch_related("event__tags")
+    )
     if tag:
         showings = showings.filter(event__tags__slug=tag)
 
@@ -52,28 +55,35 @@ def _view_diary(request, startdate, enddate, tag=None, extra_title=None):
         events.setdefault(showing.event, list()).append(showing)
 
     context = {
-        'start': startdate,
-        'end': enddate,
+        "start": startdate,
+        "end": enddate,
         # Make sure user input is escaped:
-        'event_type': conditional_escape(tag) if tag else None,
+        "event_type": conditional_escape(tag) if tag else None,
         # Set page title:
-        'extra_title': extra_title,
+        "extra_title": extra_title,
         # Set of Showing objects for date range
-        'showings': showings,
+        "showings": showings,
         # Ordered dict mapping event -> list of showings:
-        'events': events,
+        "events": events,
         # This is prepended to filepaths from the MediaPaths table to use
         # as a location for images:
-        'media_url': settings.MEDIA_URL,
-        'printed_programmes': PrintedProgramme.objects.month_in_range(
-            startdate, enddate)
+        "media_url": settings.MEDIA_URL,
+        "printed_programmes": PrintedProgramme.objects.month_in_range(
+            startdate, enddate
+        ),
     }
 
-    return render(request, 'view_showing_index.html', context)
+    return render(request, "view_showing_index.html", context)
 
 
-def view_diary(request, year=None, month=None, day=None, req_days_ahead=None,
-               event_type=None):
+def view_diary(
+    request,
+    year=None,
+    month=None,
+    day=None,
+    req_days_ahead=None,
+    event_type=None,
+):
     # Returns public diary view, starting at specified year/month/day, filtered
     # by event type.
     #
@@ -87,7 +97,7 @@ def view_diary(request, year=None, month=None, day=None, req_days_ahead=None,
     # - if dayssahead parameter is passed, that many days from the specified
     #   year/month/date
 
-    query_days_ahead = req_days_ahead or request.GET.get('daysahead', None)
+    query_days_ahead = req_days_ahead or request.GET.get("daysahead", None)
 
     # Shared utility method to parse HTTP parameters and return a date range
     startdate, days_ahead = get_date_range(year, month, day, query_days_ahead)
@@ -119,8 +129,9 @@ def view_diary_this_week(request):
     """
     startdate = _today_date_aware()
     enddate = startdate + datetime.timedelta(days=7)
-    return _view_diary(request, startdate, enddate,
-                       extra_title="What's on this week")
+    return _view_diary(
+        request, startdate, enddate, extra_title="What's on this week"
+    )
 
 
 def view_diary_next_week(request):
@@ -131,8 +142,9 @@ def view_diary_next_week(request):
     # Next monday is (7 - today) days ahead, if Monday is 0
     startdate = today + datetime.timedelta(days=(7 - today.weekday()))
     enddate = startdate + datetime.timedelta(days=7)
-    return _view_diary(request, startdate, enddate,
-                       extra_title="What's on next week")
+    return _view_diary(
+        request, startdate, enddate, extra_title="What's on next week"
+    )
 
 
 def view_diary_this_month(request):
@@ -151,8 +163,9 @@ def view_diary_this_month(request):
 
     enddate = today + datetime.timedelta(days=days_left)
 
-    return _view_diary(request, today, enddate,
-                       extra_title="What's on this month")
+    return _view_diary(
+        request, today, enddate, extra_title="What's on this month"
+    )
 
 
 def view_diary_next_month(request):
@@ -166,13 +179,15 @@ def view_diary_next_month(request):
 
     startdate = today + datetime.timedelta(days=days_to_next_month)
 
-    days_in_next_month = calendar.monthrange(startdate.year,
-                                             startdate.month)[1]
+    days_in_next_month = calendar.monthrange(startdate.year, startdate.month)[
+        1
+    ]
 
     enddate = startdate + datetime.timedelta(days=days_in_next_month)
 
-    return _view_diary(request, startdate, enddate,
-                       extra_title="What's on next month")
+    return _view_diary(
+        request, startdate, enddate, extra_title="What's on next month"
+    )
 
 
 def view_diary_json(request, year, month, day):
@@ -188,8 +203,9 @@ def view_diary_json(request, year, month, day):
         day = int(day) if day else None
     except ValueError:
         logger.error(
-            u"Invalid value in date range, one of day {0}, month {1}, year {2}"
-            .format(day, month, year)
+            "Invalid value in date range, one of day {0}, month {1}, year {2}".format(
+                day, month, year
+            )
         )
         raise Http404("Invalid values")
 
@@ -198,15 +214,17 @@ def view_diary_json(request, year, month, day):
     )
     enddatetime = startdatetime + datetime.timedelta(days=1)
 
-    context['start'] = startdatetime
+    context["start"] = startdatetime
 
     # Do query. select_related() on the end encourages it to get the
     # associated showing/event data, to reduce the number of SQL queries
-    showings = (Showing.objects.public()
-                               .start_in_range(startdatetime, enddatetime)
-                               .order_by('start')
-                               .select_related()
-                               .prefetch_related('event__media'))
+    showings = (
+        Showing.objects.public()
+        .start_in_range(startdatetime, enddatetime)
+        .order_by("start")
+        .select_related()
+        .prefetch_related("event__media")
+    )
     results = []
     # Build list of factoids to send back
     for showing in showings:
@@ -217,25 +235,34 @@ def view_diary_json(request, year, month, day):
         if media_item:
             try:
                 thumbnailer = get_thumbnailer(media_item.media_file)
-                thumbnail = thumbnailer.get_thumbnail({
-                    'size': (0, 200),
-                    'crop': 'scale',
-                    'upscale': True,
-                }).url
+                thumbnail = thumbnailer.get_thumbnail(
+                    {
+                        "size": (0, 200),
+                        "crop": "scale",
+                        "upscale": True,
+                    }
+                ).url
             except Exception:
-                logger.exception("Failed getting thumbnail for event {0}"
-                                 .format(event))
+                logger.exception(
+                    "Failed getting thumbnail for event {0}".format(event)
+                )
 
-        results.append({
-            'start': timezone.localtime(showing.start).strftime(
-                     '%d/%m/%Y %H:%M'),
-            'name': event.name,
-            'copy': event.copy_html,
-            'link': reverse("single-event-view",
-                            kwargs={'event_id': showing.event_id}),
-            'image': thumbnail,
-            'tags': ", ".join(n[0] for n in event.tags.values_list('name')),
-        })
+        results.append(
+            {
+                "start": timezone.localtime(showing.start).strftime(
+                    "%d/%m/%Y %H:%M"
+                ),
+                "name": event.name,
+                "copy": event.copy_html,
+                "link": reverse(
+                    "single-event-view", kwargs={"event_id": showing.event_id}
+                ),
+                "image": thumbnail,
+                "tags": ", ".join(
+                    n[0] for n in event.tags.values_list("name")
+                ),
+            }
+        )
 
     return HttpResponse(json.dumps(results), content_type="application/json")
 
@@ -259,10 +286,12 @@ def view_event(request, event_id=None, legacy_id=None, event_slug=None):
     try:
         if event_id:
             event = Event.objects.filter(pk=event_id).prefetch_related(
-                    'media')[0]
+                "media"
+            )[0]
         else:
             event = Event.objects.filter(legacy_id=legacy_id).prefetch_related(
-                    'media')[0]
+                "media"
+            )[0]
     except IndexError:
         raise Http404("Event not found")
 
@@ -281,104 +310,113 @@ def view_event(request, event_id=None, legacy_id=None, event_slug=None):
         raise Http404("Event not found")
 
     context = {
-        'event': event,
-        'showings': showings,
-        'current_year': timezone.now().year,
-        'all_showings_cancelled': all([s.cancelled for s in showings]),
-        'all_showings_sold_out': all([s.sold_out for s in showings]),
-        'all_showings_finished': all([s.start < now for s in showings]),
-        'media': {event.id: media},
-        'media_url': settings.MEDIA_URL,
-        'show_archive_images': show_images
+        "event": event,
+        "showings": showings,
+        "current_year": timezone.now().year,
+        "all_showings_cancelled": all([s.cancelled for s in showings]),
+        "all_showings_sold_out": all([s.sold_out for s in showings]),
+        "all_showings_finished": all([s.start < now for s in showings]),
+        "media": {event.id: media},
+        "media_url": settings.MEDIA_URL,
+        "show_archive_images": show_images,
     }
-    return render(request, 'view_event.html', context)
+    return render(request, "view_event.html", context)
 
 
 def redirect_legacy_event(request, event_type=None, legacy_id=None):
-    '''Star and Shadow - archive site stylee url
+    """Star and Shadow - archive site stylee url
     The legacy_ids are not unique. When I did the import, I wrote
     the name of the originating table into the notes field as
     "Imported from programming_name_of_table"
     Expecting event type to be one of
-    season, film, gig, event, festival, meeting'''
-    logger.debug('Given legacy url %s, %s, %s' % (
-        request.path, event_type, legacy_id))
-    legacy_table = 'programming_' + event_type
+    season, film, gig, event, festival, meeting"""
+    logger.debug(
+        "Given legacy url %s, %s, %s" % (request.path, event_type, legacy_id)
+    )
+    legacy_table = "programming_" + event_type
     try:
-        events = (Event.objects.filter(legacy_id=legacy_id,
-                                       notes__contains=legacy_table))
+        events = Event.objects.filter(
+            legacy_id=legacy_id, notes__contains=legacy_table
+        )
         event = events.first()  # Only expecting one event
         if event:
             logger.debug('found: %s: "%s"' % (event.id, event.name))
         else:
-            logger.debug('Could not find anything matching %s and %s' % (
-                legacy_id, legacy_table))
+            logger.debug(
+                "Could not find anything matching %s and %s"
+                % (legacy_id, legacy_table)
+            )
             raise Http404("Event not found")
     except IndexError:
-        logger.debug('Could not find anything matching %s and %s' % (
-            legacy_id, legacy_table))
+        logger.debug(
+            "Could not find anything matching %s and %s"
+            % (legacy_id, legacy_table)
+        )
         raise Http404("Event not found")
-    return redirect('single-event-view', event_id=event.id)
+    return redirect("single-event-view", event_id=event.id)
 
 
 def redirect_legacy_year(request, year=None):
-    '''Star and Shadow - archive site stylee url
+    """Star and Shadow - archive site stylee url
     In a better world we would decode the archive URLs more fully
     for example
     /on/2016/08/31/
     /on/2016/03/25/feed/
     /on/2011/w20/
-    but for the meantime at least capture the year and use that'''
-    logger.debug('Given legacy url %s, just using year %s' % (
-        request.path, year))
-    return redirect('archive-view-year', year=year)
+    but for the meantime at least capture the year and use that"""
+    logger.debug(
+        "Given legacy url %s, just using year %s" % (request.path, year)
+    )
+    return redirect("archive-view-year", year=year)
 
 
 class ArchiveIndex(generic.ArchiveIndexView):
     # Limit to public events
     queryset = Showing.objects.public().select_related()
 
-    date_field = 'start'
-    template_name = 'showing_archive.html'
+    date_field = "start"
+    template_name = "showing_archive.html"
 
 
 class ArchiveYear(generic.YearArchiveView):
     # Limit to public events (select_related heavily reduces query count)
     queryset = Showing.objects.public().select_related()
 
-    date_field = 'start'
-    template_name = 'showing_archive_year.html'
-    ordering = 'start'
+    date_field = "start"
+    template_name = "showing_archive_year.html"
+    ordering = "start"
 
 
 class ArchiveMonth(generic.MonthArchiveView):
     # Limit to public events (select_related heavily reduces query count)
     queryset = Showing.objects.public().select_related()
 
-    date_field = 'start'
-    template_name = 'showing_archive_month.html'
-    month_format = '%m'
-    ordering = 'start'
+    date_field = "start"
+    template_name = "showing_archive_month.html"
+    month_format = "%m"
+    ordering = "start"
 
 
 class ArchiveSearch(generic.list.ListView, generic.edit.FormMixin):
     model = Showing
-    template_name = 'showing_archive_search.html'
+    template_name = "showing_archive_search.html"
     form_class = SearchForm
 
     def get_form_kwargs(self):
         # Load form data from GET params. If no GET was supplied then pass
         # None into the form, otherwise it will generate an error to say that
         # some search parameters are required
-        return {'data': self.request.GET if len(self.request.GET) else None}
+        return {"data": self.request.GET if len(self.request.GET) else None}
 
     def get_context_data(self, **kwargs):
         # Put the form in the context data sent to the template
         context = super(ArchiveSearch, self).get_context_data(**kwargs)
-        context.update({
-            'form': self.form,
-            'search_submitted': len(self.request.GET),
-        })
+        context.update(
+            {
+                "form": self.form,
+                "search_submitted": len(self.request.GET),
+            }
+        )
         return context
 
     def get_queryset(self):
@@ -396,23 +434,24 @@ class ArchiveSearch(generic.list.ListView, generic.edit.FormMixin):
         # Start with a queryset containing all public showings:
         queryset = Showing.objects.public().select_related()
 
-        if options['search_term']:
-            if options['search_in_descriptions']:
+        if options["search_term"]:
+            if options["search_in_descriptions"]:
                 # If a search term was provided and "search descriptions"
                 # was checked, filter on the event name and copy:
                 queryset = queryset.filter(
-                    Q(event__name__icontains=options['search_term']) |
-                    Q(event__copy__icontains=options['search_term'])
+                    Q(event__name__icontains=options["search_term"])
+                    | Q(event__copy__icontains=options["search_term"])
                 )
             else:
                 # Otherwise just the event name
                 queryset = queryset.filter(
-                    event__name__icontains=options['search_term'])
+                    event__name__icontains=options["search_term"]
+                )
         # Add extra filters if start/end date were specified:
-        if options['start_date']:
-            queryset = queryset.filter(start__gte=options['start_date'])
-        if options['end_date']:
-            queryset = queryset.filter(start__lte=options['end_date'])
+        if options["start_date"]:
+            queryset = queryset.filter(start__gte=options["start_date"])
+        if options["end_date"]:
+            queryset = queryset.filter(start__lte=options["end_date"])
 
         return queryset
 

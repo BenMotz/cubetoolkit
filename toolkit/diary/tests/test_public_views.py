@@ -17,7 +17,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
 
     def test_view_default(self):
         # Hard code root URL to assert that it gets something:
-        response = self.client.get('/programme/')
+        response = self.client.get("/programme/")
         self.assertEqual(response.status_code, 200)
 
     def test_view_default_reversed(self):
@@ -26,12 +26,13 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "view_showing_index.html")
 
-    @patch('django.utils.timezone.now')
+    @patch("django.utils.timezone.now")
     def test_view_empty_slug(self, now_patch):
         # When an event has a name that results in a slugified event name of
         # ""
-        now_patch.return_value = pytz.timezone(
-            "Europe/London").localize(datetime(2013, 4, 1, 11, 00))
+        now_patch.return_value = pytz.timezone("Europe/London").localize(
+            datetime(2013, 4, 1, 11, 00)
+        )
 
         self.e2.name = "?"
         self.e2.save()
@@ -45,10 +46,11 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
             response,
             r'<a href="/programme/event/,2/">'
             r'<p><span class="pre_title"></span></p>'
-            r'<h3>?</h3>'
+            r"<h3>?</h3>"
             r'<span class="post_title"></span>'
-            r'</a>',
-            html=True)
+            r"</a>",
+            html=True,
+        )
 
     def test_view_by_type(self):
         url = reverse("type-view", kwargs={"event_type": "film"})
@@ -63,13 +65,13 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "view_showing_index.html")
 
         # Should test the contents better, I suspect...
-        self.assertContains(response, u'Event three title')
-        self.assertContains(response, u'Copy three summary')
-        self.assertContains(response, u'PRETITLE THREE')
-        self.assertContains(response, u'POSTTITLE THREE')
+        self.assertContains(response, "Event three title")
+        self.assertContains(response, "Copy three summary")
+        self.assertContains(response, "PRETITLE THREE")
+        self.assertContains(response, "POSTTITLE THREE")
         # Not confirmed / private:
-        self.assertNotContains(response, u'Event one title')
-        self.assertNotContains(response, u'Event one copy')
+        self.assertNotContains(response, "Event one title")
+        self.assertNotContains(response, "Event one copy")
 
     def test_view_by_month(self):
         url = reverse("month-view", kwargs={"year": "2010", "month": "12"})
@@ -79,7 +81,8 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
 
     def test_view_by_day(self):
         url = reverse(
-            "day-view", kwargs={"year": "2010", "month": "12", "day": "31"})
+            "day-view", kwargs={"year": "2010", "month": "12", "day": "31"}
+        )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "view_showing_index.html")
@@ -89,13 +92,17 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "view_showing_index.html")
-        self.assertContains(response,
-                            '<h4 class="site-description">Folm events</h4>',
-                            html=True)
-        self.assertContains(response,
-                            '<h4 class="site-description"> - couldn\'t find '
-                            'anything tagged folm </h4>',
-                            html=True)
+        self.assertContains(
+            response,
+            '<h4 class="site-description">Folm events</h4>',
+            html=True,
+        )
+        self.assertContains(
+            response,
+            '<h4 class="site-description"> - couldn\'t find '
+            "anything tagged folm </h4>",
+            html=True,
+        )
 
     def test_view_by_date_nothing_found(self):
         url = reverse("year-view", kwargs={"year": "2093"})
@@ -104,15 +111,16 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "view_showing_index.html")
         self.assertContains(
             response,
-            "<h4 class=\"site-description\">Nothing on between Thursday 1 Jan "
+            '<h4 class="site-description">Nothing on between Thursday 1 Jan '
             "2093 and Friday 1 Jan 2094</h4>",
-            html=True
+            html=True,
         )
 
-    @patch('django.utils.timezone.now')
+    @patch("django.utils.timezone.now")
     def test_view_this_week(self, now_patch):
-        now_patch.return_value = pytz.timezone(
-            "Europe/London").localize(datetime(2013, 4, 1, 11, 00))
+        now_patch.return_value = pytz.timezone("Europe/London").localize(
+            datetime(2013, 4, 1, 11, 00)
+        )
 
         url = reverse("view-this-week")
         response = self.client.get(url)
@@ -120,10 +128,11 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Wed 3 April // 19:00")
 
-    @patch('django.utils.timezone.now')
+    @patch("django.utils.timezone.now")
     def test_view_this_month(self, now_patch):
-        now_patch.return_value = pytz.timezone(
-            "Europe/London").localize(datetime(2013, 4, 1, 11, 00))
+        now_patch.return_value = pytz.timezone("Europe/London").localize(
+            datetime(2013, 4, 1, 11, 00)
+        )
 
         url = reverse("view-this-month")
         response = self.client.get(url)
@@ -132,14 +141,17 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Event two title")
         self.assertContains(
-            response, '<span class="cancelled">Wed 3 April // 19:00</span>',
-            html=True)
+            response,
+            '<span class="cancelled">Wed 3 April // 19:00</span>',
+            html=True,
+        )
         self.assertContains(response, "Event two copy summary")
 
-    @patch('django.utils.timezone.now')
+    @patch("django.utils.timezone.now")
     def test_view_next_week(self, now_patch):
-        now_patch.return_value = pytz.timezone(
-            "Europe/London").localize(datetime(2013, 4, 1, 11, 00))
+        now_patch.return_value = pytz.timezone("Europe/London").localize(
+            datetime(2013, 4, 1, 11, 00)
+        )
 
         url = reverse("view-next-week")
         response = self.client.get(url)
@@ -152,10 +164,11 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertContains(response, "Sat 13 April // 18:00")
         self.assertContains(response, "Copy three summary")
 
-    @patch('django.utils.timezone.now')
+    @patch("django.utils.timezone.now")
     def test_view_next_month(self, now_patch):
-        now_patch.return_value = pytz.timezone(
-            "Europe/London").localize(datetime(2013, 3, 1, 11, 00))
+        now_patch.return_value = pytz.timezone("Europe/London").localize(
+            datetime(2013, 3, 1, 11, 00)
+        )
 
         url = reverse("view-next-month")
         response = self.client.get(url)
@@ -170,38 +183,46 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
 
     # JSON day data:
     def test_day_json(self):
-        url = reverse("day-view-json",
-                      kwargs={"year": "2013", "month": "4", "day": "13"})
+        url = reverse(
+            "day-view-json", kwargs={"year": "2013", "month": "4", "day": "13"}
+        )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
 
         # Eh (shrug)
-        self.assertEqual(response.json(), [{
-                         u"name": u"Event three title",
-                         u"tags": u"tag two",
-                         u"image": None,
-                         u"start": u"13/04/2013 18:00",
-                         u"link": u"/id/3/",
-                         u"copy": u"Event three Copy"
-                         }])
+        self.assertEqual(
+            response.json(),
+            [
+                {
+                    "name": "Event three title",
+                    "tags": "tag two",
+                    "image": None,
+                    "start": "13/04/2013 18:00",
+                    "link": "/id/3/",
+                    "copy": "Event three Copy",
+                }
+            ],
+        )
 
     # View of individual showing:
     def test_view_showing(self):
-        url = reverse("single-showing-view",
-                      kwargs={"showing_id": str(self.e2s2.pk)})
+        url = reverse(
+            "single-showing-view", kwargs={"showing_id": str(self.e2s2.pk)}
+        )
         response = self.client.get(url)
-        self.assertContains(response, u'Event two title')
-        self.assertContains(response, u'Event <br>\n two <br>\n copy')
+        self.assertContains(response, "Event two title")
+        self.assertContains(response, "Event <br>\n two <br>\n copy")
         self.assertEqual(response.status_code, 200)
 
     def test_view_hidden_showing(self):
-        url = reverse("single-showing-view",
-                      kwargs={"showing_id": str(self.e2s1.pk)})
+        url = reverse(
+            "single-showing-view", kwargs={"showing_id": str(self.e2s1.pk)}
+        )
         response = self.client.get(url)
         self.assertEqual(response.status_code, 404)
 
     # Event series view:
-    @patch('django.utils.timezone.now')
+    @patch("django.utils.timezone.now")
     def test_view_event_this_year(self, now_patch):
         now_patch.return_value = self._fake_now
 
@@ -212,8 +233,8 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "view_event.html")
 
         # TODO: test data better, including media!
-        self.assertContains(response, u'Event two title')
-        self.assertContains(response, u'Event <br>\n two <br>\n copy')
+        self.assertContains(response, "Event two title")
+        self.assertContains(response, "Event <br>\n two <br>\n copy")
         self.assertEqual(response.status_code, 200)
         # Some showings *should* be listed:
         self.assertContains(response, "Tue 2 April // 19:00")
@@ -223,7 +244,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertNotContains(response, "4 Apr")
         self.assertNotContains(response, "5 Apr")
 
-    @patch('django.utils.timezone.now')
+    @patch("django.utils.timezone.now")
     def test_view_event_last_year(self, now_patch):
         # When event is in the distant past, list the year...
         now_patch.return_value = self._fake_now + timedelta(days=366)
@@ -234,8 +255,8 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "view_event.html")
 
-        self.assertContains(response, u'Event two title')
-        self.assertContains(response, u'Event <br>\n two <br>\n copy')
+        self.assertContains(response, "Event two title")
+        self.assertContains(response, "Event <br>\n two <br>\n copy")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Tue 2 April 2013 // 19:00")
         self.assertContains(response, "Wed 3 April 2013 // 19:00")
@@ -244,8 +265,9 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertNotContains(response, "5 Apr")
 
     def test_view_event_legacy(self):
-        url = reverse("single-event-view-legacyid",
-                      kwargs={"legacy_id": "100"})
+        url = reverse(
+            "single-event-view-legacyid", kwargs={"legacy_id": "100"}
+        )
         response = self.client.get(url)
         # TODO: test data!
         self.assertEqual(response.status_code, 200)
@@ -264,42 +286,46 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "view_event.html")
         self.assertContains(
             response,
-            u'<a href="{0}"  rel="noopener noreferrer" target="_blank">'
-            u'Book tickets</a>'.format(ticket_link),
-            html=True
+            '<a href="{0}"  rel="noopener noreferrer" target="_blank">'
+            "Book tickets</a>".format(ticket_link),
+            html=True,
         )
 
-    @patch('django.utils.timezone.now')
+    @patch("django.utils.timezone.now")
     def test_view_event_buy_ticket_link(self, now_patch):
         # Time is before any showings have started
         first_public_showing = self.e2.showings.public()[0]
-        now_patch.return_value = (first_public_showing.start -
-                                  timedelta(seconds=1))
-        ticket_link = u"http://www.example.com/thing/#what"
+        now_patch.return_value = first_public_showing.start - timedelta(
+            seconds=1
+        )
+        ticket_link = "http://www.example.com/thing/#what"
         self.e2.ticket_link = ticket_link
         self.e2.save()
         self._assert_ticket_link_present(self.e2.pk, ticket_link)
 
-    @patch('django.utils.timezone.now')
-    def test_view_event_buy_ticket_link_some_showings_finished(self,
-                                                               now_patch):
+    @patch("django.utils.timezone.now")
+    def test_view_event_buy_ticket_link_some_showings_finished(
+        self, now_patch
+    ):
         # Time is before last showings has started
         last_public_showing = list(self.e2.showings.public())[-1]
-        now_patch.return_value = (last_public_showing.start -
-                                  timedelta(seconds=1))
-        ticket_link = u"http://www.example.com/goo/#what"
+        now_patch.return_value = last_public_showing.start - timedelta(
+            seconds=1
+        )
+        ticket_link = "http://www.example.com/goo/#what"
         self.e2.ticket_link = ticket_link
         self.e2.save()
         self._assert_ticket_link_present(self.e2.pk, ticket_link)
 
-    @patch('django.utils.timezone.now')
+    @patch("django.utils.timezone.now")
     def test_view_event_buy_ticket_link_finished_event(self, now_patch):
         # Book ticket link should not be visible after all showings are
         # complete
         last_public_showing = list(self.e2.showings.public())[-1]
-        now_patch.return_value = (last_public_showing.start +
-                                  timedelta(seconds=1))
-        ticket_link = u"http://www.example.com/thing/#what"
+        now_patch.return_value = last_public_showing.start + timedelta(
+            seconds=1
+        )
+        ticket_link = "http://www.example.com/thing/#what"
         self.e2.ticket_link = ticket_link
         self.e2.save()
 
@@ -308,7 +334,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "view_event.html")
-        self.assertNotContains(response, u'Book tickets')
+        self.assertNotContains(response, "Book tickets")
         self.assertNotContains(response, ticket_link)
 
     def test_expected_tags_in_navmenu(self):
@@ -320,13 +346,15 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         # significant!
         self.assertContains(
             response,
-            u'<ul class="sub-menu">'
-            u'<li><a href="/programme/view/tag-three/"><span>Tag Three</span></a></li>'
-            u'<li><a href="/programme/view/tag-two/"><span>Tag Two</span></a></li>'
-            u'<li><a href="/"><span>All</span></a></li>'
-            u'<li><a href="/programme/archive/"><span>Archive</span></a></li>'
-            u'</ul>',
-            html=True)
+            '<ul class="sub-menu">'
+            '<li><a href="/programme/view/tag-three/"><span>Tag Three</span></a></li>'
+            '<li><a href="/programme/view/tag-two/"><span>Tag Two</span></a></li>'
+            '<li><a href="/"><span>All</span></a></li>'
+            '<li><a href="/programme/archive/"><span>Archive</span></a></li>'
+            "</ul>",
+            html=True,
+        )
+
     # TODO: Cancelled/confirmed/visible/cheap
 
 
@@ -338,21 +366,27 @@ class UrlTests(DiaryTestsMixin, TestCase):
         # Test all basic diary URLs
         calls_to_test = {
             # '/diary': (), # This is a 302...
-            '/programme/view/': {},
-            '/programme/view/2012': {'year': '2012'},
-            '/programme/view/2012/': {'year': '2012'},
-            '/programme/view/2012/12': {'year': '2012', 'month': '12'},
-            '/programme/view/2012/12/': {'year': '2012', 'month': '12'},
-            '/programme/view/2012/12/30': {'year': '2012', 'month': '12',
-                                           'day': '30'},
-            '/programme/view/2012/12/30/': {'year': '2012', 'month': '12',
-                                            'day': '30'},
-            '/programme/view/films/': {'event_type': 'films'},
+            "/programme/view/": {},
+            "/programme/view/2012": {"year": "2012"},
+            "/programme/view/2012/": {"year": "2012"},
+            "/programme/view/2012/12": {"year": "2012", "month": "12"},
+            "/programme/view/2012/12/": {"year": "2012", "month": "12"},
+            "/programme/view/2012/12/30": {
+                "year": "2012",
+                "month": "12",
+                "day": "30",
+            },
+            "/programme/view/2012/12/30/": {
+                "year": "2012",
+                "month": "12",
+                "day": "30",
+            },
+            "/programme/view/films/": {"event_type": "films"},
             # Tags that are similar to, but aren't quite the same as, years:
-            '/programme/view/1/': {'event_type': '1'},
-            '/programme/view/12/': {'event_type': '12'},
-            '/programme/view/123/': {'event_type': '123'},
-            '/programme/view/12345/': {'event_type': '12345'},
+            "/programme/view/1/": {"event_type": "1"},
+            "/programme/view/12/": {"event_type": "12"},
+            "/programme/view/123/": {"event_type": "123"},
+            "/programme/view/12345/": {"event_type": "12345"},
         }
         for query, response in calls_to_test.items():
             match = resolve(query)
@@ -364,11 +398,11 @@ class UrlTests(DiaryTestsMixin, TestCase):
         # Test all basic diary URLs
 
         calls_to_test = (
-            '/diary/123',
-            '/diary/-123',
-            '/diary/-2012/',
-            '/diary/2012//',
-            '/diary/2012///',
+            "/diary/123",
+            "/diary/-123",
+            "/diary/-2012/",
+            "/diary/2012//",
+            "/diary/2012///",
         )
         for query in calls_to_test:
             self.assertRaises(django.http.Http404, resolve, query)
@@ -377,16 +411,22 @@ class UrlTests(DiaryTestsMixin, TestCase):
         # Test all basic diary URLs
 
         calls_to_test = {
-            '/diary/edit': {},
-            '/diary/edit/': {},
-            '/diary/edit/2012': {'year': '2012'},
-            '/diary/edit/2012/': {'year': '2012'},
-            '/diary/edit/2012/12': {'year': '2012', 'month': '12'},
-            '/diary/edit/2012/12/': {'year': '2012', 'month': '12'},
-            '/diary/edit/2012/12/30': {'year': '2012', 'month': '12',
-                                       'day': '30'},
-            '/diary/edit/2012/12/30/': {'year': '2012', 'month': '12',
-                                        'day': '30'},
+            "/diary/edit": {},
+            "/diary/edit/": {},
+            "/diary/edit/2012": {"year": "2012"},
+            "/diary/edit/2012/": {"year": "2012"},
+            "/diary/edit/2012/12": {"year": "2012", "month": "12"},
+            "/diary/edit/2012/12/": {"year": "2012", "month": "12"},
+            "/diary/edit/2012/12/30": {
+                "year": "2012",
+                "month": "12",
+                "day": "30",
+            },
+            "/diary/edit/2012/12/30/": {
+                "year": "2012",
+                "month": "12",
+                "day": "30",
+            },
         }
         for query, response in calls_to_test.items():
             match = resolve(query)
@@ -398,18 +438,36 @@ class UrlTests(DiaryTestsMixin, TestCase):
         # Test all basic diary URLs
 
         calls_to_test = {
-            '/diary/rota': {'field': 'rota'},
-            '/diary/rota/': {'field': 'rota'},
-            '/diary/rota/2012/12': {'field': 'rota', 'year': '2012',
-                                    'month': '12'},
-            '/diary/rota/2012/12/': {'field': 'rota', 'year': '2012',
-                                     'month': '12'},
-            '/diary/rota/2012/12/30': {'field': 'rota', 'year': '2012',
-                                       'month': '12', 'day': '30'},
-            '/diary/rota/2012/12/30/': {'field': 'rota', 'year': '2012',
-                                        'month': '12', 'day': '30'},
-            '/diary/rota/2012/12//': {'field': 'rota', 'year': '2012',
-                                      'month': '12', 'day': ''},
+            "/diary/rota": {"field": "rota"},
+            "/diary/rota/": {"field": "rota"},
+            "/diary/rota/2012/12": {
+                "field": "rota",
+                "year": "2012",
+                "month": "12",
+            },
+            "/diary/rota/2012/12/": {
+                "field": "rota",
+                "year": "2012",
+                "month": "12",
+            },
+            "/diary/rota/2012/12/30": {
+                "field": "rota",
+                "year": "2012",
+                "month": "12",
+                "day": "30",
+            },
+            "/diary/rota/2012/12/30/": {
+                "field": "rota",
+                "year": "2012",
+                "month": "12",
+                "day": "30",
+            },
+            "/diary/rota/2012/12//": {
+                "field": "rota",
+                "year": "2012",
+                "month": "12",
+                "day": "",
+            },
         }
         # (rota URLS must have at least year/month, not just a year!)
         for query, response in calls_to_test.items():

@@ -6,23 +6,30 @@ from django.db import models, migrations
 
 class Migration(migrations.Migration):
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='IndexCategory',
+            name="IndexCategory",
             fields=[
-                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('name', models.CharField(max_length=1024)),
+                (
+                    "id",
+                    models.AutoField(
+                        verbose_name="ID",
+                        serialize=False,
+                        auto_created=True,
+                        primary_key=True,
+                    ),
+                ),
+                ("name", models.CharField(max_length=1024)),
             ],
             options={
-                'db_table': 'IndexLinkCategories',
+                "db_table": "IndexLinkCategories",
             },
             bases=(models.Model,),
         ),
         migrations.CreateModel(
-            name='IndexLink',
+            name="IndexLink",
             fields=[
                 (
                     "id",
@@ -46,8 +53,8 @@ class Migration(migrations.Migration):
                 ),
             ],
             options={
-                'ordering': ['category'],
-                'db_table': 'IndexLinks',
+                "ordering": ["category"],
+                "db_table": "IndexLinks",
             },
             bases=(models.Model,),
         ),

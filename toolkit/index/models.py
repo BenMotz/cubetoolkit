@@ -9,13 +9,20 @@ class IndexLink(models.Model):
 
     text = models.CharField(max_length=1024, blank=True, null=False)
     link = models.URLField(max_length=1024, blank=False, null=False)
-    category = models.ForeignKey('IndexCategory', verbose_name='Link category',
-                                 related_name='links', null=False, blank=False,
-                                 on_delete=models.CASCADE)
+    category = models.ForeignKey(
+        "IndexCategory",
+        verbose_name="Link category",
+        related_name="links",
+        null=False,
+        blank=False,
+        on_delete=models.CASCADE,
+    )
 
     class Meta:
-        db_table = 'IndexLinks'
-        ordering = ['category', ]
+        db_table = "IndexLinks"
+        ordering = [
+            "category",
+        ]
 
     def clean(self):
         if self.link:
@@ -33,7 +40,7 @@ class IndexCategory(models.Model):
     name = models.CharField(max_length=1024, blank=False, null=False)
 
     class Meta:
-        db_table = 'IndexLinkCategories'
+        db_table = "IndexLinkCategories"
 
     def clean(self):
         if self.name:

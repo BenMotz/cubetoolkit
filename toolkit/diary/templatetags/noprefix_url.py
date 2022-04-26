@@ -12,7 +12,8 @@ logger = logging.getLogger(__name__)
 class NoPrefixURLNode(URLNode):
     def __init__(self, url_node):
         super(NoPrefixURLNode, self).__init__(
-            url_node.view_name, url_node.args, url_node.kwargs, url_node.asvar)
+            url_node.view_name, url_node.args, url_node.kwargs, url_node.asvar
+        )
 
     def render(self, context):
         text = super(NoPrefixURLNode, self).render(context)
@@ -24,7 +25,7 @@ class NoPrefixURLNode(URLNode):
             logger.error("Path %s doesn't start with prefix %s", text, prefix)
 
         new_parts = list(parts)
-        new_parts[2] = parts.path[len(prefix) - 1:]
+        new_parts[2] = parts.path[len(prefix) - 1 :]
         return urllib.parse.urlunsplit(new_parts)
 
 

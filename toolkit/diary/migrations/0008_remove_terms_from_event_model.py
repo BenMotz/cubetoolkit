@@ -8,13 +8,13 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('diary', '0007_auto_20180223_2138'),
+        ("diary", "0007_auto_20180223_2138"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='event',
-            name='terms',
+            model_name="event",
+            name="terms",
             field=models.TextField(blank=True, max_length=4096, null=True),
         ),
     ]
