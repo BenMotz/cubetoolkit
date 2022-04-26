@@ -235,7 +235,7 @@ def rota_form_factory(showing):
         # Create empty results dict
         result = dict.fromkeys(self._role_ids, 0)
         for field, value in self.cleaned_data.items():
-            if field == 'other_roles':
+            if field == "other_roles":
                 result.update(
                     (int(key, 10), 1)
                     for key in self.cleaned_data.get("other_roles", ())
@@ -377,8 +377,10 @@ class NewPrintedProgrammeForm(forms.ModelForm):
 
     year = forms.ChoiceField(
         choices=[
-            (y, y) for y in range(settings.DAWN_OF_TIME,
-                                  datetime.date.today().year + 2)
+            (y, y)
+            for y in range(
+                settings.DAWN_OF_TIME, datetime.date.today().year + 2
+            )
         ],
         initial=datetime.date.today().year,
     )

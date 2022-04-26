@@ -50,7 +50,7 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         self.assertEqual(message["To"], dest_addr)
 
         body = message.get_payload()
-        subject = email.header.decode_header(message['Subject'])
+        subject = email.header.decode_header(message["Subject"])
 
         self.assertIn(body_contains, body)
         subject = (

@@ -13,7 +13,7 @@ KNOWN_PREFS = {
 
 def get_preferences(session):
     edit_prefs = dict(
-        (pref, session.get('editpref_' + pref, default))
+        (pref, session.get("editpref_" + pref, default))
         for pref, default in KNOWN_PREFS.items()
     )
     return edit_prefs
