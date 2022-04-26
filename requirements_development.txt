@@ -3,3 +3,5 @@ fabric3
 # Improve the Django interactive shell:
 ipython
 mysqlclient
+# Formatting
+black==22.3.0

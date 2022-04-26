@@ -196,7 +196,7 @@ def view_diary_json(request, year, month, day):
         day = int(day) if day else None
     except ValueError:
         logger.error(
-            u"Invalid value in date range, one of day {0}, month {1}, year {2}".format(
+            "Invalid value in date range, one of day {0}, month {1}, year {2}".format(
                 day, month, year
             )
         )

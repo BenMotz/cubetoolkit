@@ -99,7 +99,7 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
             is_utf8,
             settings.VENUE["mailout_from_address"],
             settings.VENUE["mailout_delivery_report_to"],
-            u"6 copies of the following were sent out on Cube members list",
+            "6 copies of the following were sent out on Cube members list",
             subject,
         )
         # And the actual body text:
@@ -117,27 +117,27 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         self.assertEqual(result, (False, 6, "Ok"))
 
     def test_send_unicode(self):
-        subject = u"The Subject \u2603!"
-        body = u"The Body!\nThat will be \u20ac1, please\nTa \u2603!"
+        subject = "The Subject \u2603!"
+        body = "The Body!\nThat will be \u20ac1, please\nTa \u2603!"
         result = toolkit.members.tasks.send_mailout(subject, body, None)
         self._assert_mail_sent(result, subject, body, None, True)
 
     def test_send_ascii(self):
-        subject = u"The Subject!"
-        body = u"The Body!\nThat will be $1, please\nTa!"
+        subject = "The Subject!"
+        body = "The Body!\nThat will be $1, please\nTa!"
         result = toolkit.members.tasks.send_mailout(subject, body, None)
         self._assert_mail_sent(result, subject, body, None, False)
 
     def test_send_iso88591_subj(self):
-        subject = u"The \xa31 Subject!"
-        body = u"The Body!\nThat will be $1, please\nTa!"
+        subject = "The \xa31 Subject!"
+        body = "The Body!\nThat will be $1, please\nTa!"
         result = toolkit.members.tasks.send_mailout(subject, body, None)
         self._assert_mail_sent(result, subject, body, None, False)
 
     def test_send_html(self):
-        subject = u"The Subject \u2603!"
-        body = u"The Body!\nThat will be \u20ac1, please\nTa \u2603!"
-        body_html = u"<h1>Body<\\h1>\n<p>That will be \u20ac1, please\nTa</p>"
+        subject = "The Subject \u2603!"
+        body = "The Body!\nThat will be \u20ac1, please\nTa \u2603!"
+        body_html = "<h1>Body<\\h1>\n<p>That will be \u20ac1, please\nTa</p>"
         result = toolkit.members.tasks.send_mailout(subject, body, body_html)
         self._assert_mail_sent(result, subject, body, None, True)
 
@@ -148,8 +148,8 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         )
 
         result = toolkit.members.tasks.send_mailout(
-            u"The \xa31 Subject!",
-            u"The Body!\nThat will be $1, please\nTa!",
+            "The \xa31 Subject!",
+            "The Body!\nThat will be $1, please\nTa!",
             None,
         )
 
@@ -160,8 +160,8 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
 
     @patch("django.core.mail.backends.base.BaseEmailBackend.close")
     def test_disconnect_fail(self, close_mock):
-        subject = u"The Subject \u2603!"
-        body = u"The Body!\nThat will be \u20ac1, please\nTa \u2603!"
+        subject = "The Subject \u2603!"
+        body = "The Body!\nThat will be \u20ac1, please\nTa \u2603!"
         close_mock.side_effect = smtplib.SMTPServerDisconnected(
             "Already disconnected?"
         )
@@ -177,8 +177,8 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         connection_mock.return_value.send_messages.side_effect = exception
 
         result = toolkit.members.tasks.send_mailout(
-            u"The \xa31 Subject!",
-            u"The Body!\nThat will be $1, please\nTa!",
+            "The \xa31 Subject!",
+            "The Body!\nThat will be $1, please\nTa!",
             None,
         )
 
@@ -197,8 +197,8 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         )
 
         result = toolkit.members.tasks.send_mailout(
-            u"The \xa31 Subject!",
-            u"The Body!\nThat will be $1, please\nTa!",
+            "The \xa31 Subject!",
+            "The Body!\nThat will be $1, please\nTa!",
             None,
         )
 
@@ -214,8 +214,8 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         )
 
         result = toolkit.members.tasks.send_mailout(
-            u"The \xa31 Subject!",
-            u"The Body!\nThat will be $1, please\nTa!",
+            "The \xa31 Subject!",
+            "The Body!\nThat will be $1, please\nTa!",
             None,
         )
 
@@ -226,21 +226,21 @@ class TestMemberMailoutTask(MembersTestsMixin, TestCase):
         Member.objects.all().delete()
         # Test a non SMTP error
         result = toolkit.members.tasks.send_mailout(
-            u"The \xa31 Subject!",
-            u"The Body!\nThat will be $1, please\nTa!",
+            "The \xa31 Subject!",
+            "The Body!\nThat will be $1, please\nTa!",
             None,
         )
 
         self.assertEqual(result, (True, 0, "No recipients found"))
 
     def test_send_unicode_email_address(self):
-        subject = u"The Subject \u2603!"
-        body = u"The Body!\nThat will be \u20ac1, please\nTa \u2603!"
+        subject = "The Subject \u2603!"
+        body = "The Body!\nThat will be \u20ac1, please\nTa \u2603!"
 
         member = Member.objects.get(id=1)
-        member.email = u"\u0205ne@\u0205xample.com"
+        member.email = "\u0205ne@\u0205xample.com"
         member.save()
 
         result = toolkit.members.tasks.send_mailout(subject, body, None)
         self._assert_mail_sent(result, subject, body, None, True)
-        self.assertEqual(mail.outbox[0].to, [u"\u0205ne@\u0205xample.com"])
+        self.assertEqual(mail.outbox[0].to, ["\u0205ne@\u0205xample.com"])

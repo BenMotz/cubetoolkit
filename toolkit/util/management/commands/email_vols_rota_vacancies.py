@@ -82,11 +82,14 @@ class Command(BaseCommand):
         logger.info("Emailing rota to %d volunteers..." % vols.count())
 
         # print(vacancies_txt)
-        vacancies_plain = "%s rota roles that need filling in the next %d days.\nSee the full rota at %s%s" % (
-            settings.VENUE["longname"],
-            settings.ROTA_DAYS_AHEAD,
-            settings.VENUE["url"],
-            reverse("rota-edit"),
+        vacancies_plain = (
+            "%s rota roles that need filling in the next %d days.\nSee the full rota at %s%s"
+            % (
+                settings.VENUE["longname"],
+                settings.ROTA_DAYS_AHEAD,
+                settings.VENUE["url"],
+                reverse("rota-edit"),
+            )
         )
 
         for vol in vols:

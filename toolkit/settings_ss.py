@@ -30,11 +30,11 @@ VENUE = {
     "email_unsubscribe_host": "https://starandshadow.org.uk",
     # Default address to which reports of a successful mailout
     # delivery are sent:
-    "mailout_delivery_report_to": u"info@starandshadow.org.uk",
+    "mailout_delivery_report_to": "info@starandshadow.org.uk",
     # "From" address for mailout
-    "mailout_from_address": u"info@starandshadow.org.uk",
+    "mailout_from_address": "info@starandshadow.org.uk",
     # email address shown when volunteer removes themselves from rota
-    "vols_email": u"volunteers@lists.starandshadow.org.uk",
+    "vols_email": "volunteers@lists.starandshadow.org.uk",
     "show_user_management": True,
 }
 

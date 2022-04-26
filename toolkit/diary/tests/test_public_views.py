@@ -65,13 +65,13 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "view_showing_index.html")
 
         # Should test the contents better, I suspect...
-        self.assertContains(response, u"Event three title")
-        self.assertContains(response, u"Copy three summary")
-        self.assertContains(response, u"PRETITLE THREE")
-        self.assertContains(response, u"POSTTITLE THREE")
+        self.assertContains(response, "Event three title")
+        self.assertContains(response, "Copy three summary")
+        self.assertContains(response, "PRETITLE THREE")
+        self.assertContains(response, "POSTTITLE THREE")
         # Not confirmed / private:
-        self.assertNotContains(response, u"Event one title")
-        self.assertNotContains(response, u"Event one copy")
+        self.assertNotContains(response, "Event one title")
+        self.assertNotContains(response, "Event one copy")
 
     def test_view_by_month(self):
         url = reverse("month-view", kwargs={"year": "2010", "month": "12"})
@@ -194,12 +194,12 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
             response.json(),
             [
                 {
-                    u"name": u"Event three title",
-                    u"tags": u"tag two",
-                    u"image": None,
-                    u"start": u"13/04/2013 18:00",
-                    u"link": u"/id/3/",
-                    u"copy": u"Event three Copy",
+                    "name": "Event three title",
+                    "tags": "tag two",
+                    "image": None,
+                    "start": "13/04/2013 18:00",
+                    "link": "/id/3/",
+                    "copy": "Event three Copy",
                 }
             ],
         )
@@ -210,8 +210,8 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
             "single-showing-view", kwargs={"showing_id": str(self.e2s2.pk)}
         )
         response = self.client.get(url)
-        self.assertContains(response, u"Event two title")
-        self.assertContains(response, u"Event <br>\n two <br>\n copy")
+        self.assertContains(response, "Event two title")
+        self.assertContains(response, "Event <br>\n two <br>\n copy")
         self.assertEqual(response.status_code, 200)
 
     def test_view_hidden_showing(self):
@@ -233,8 +233,8 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "view_event.html")
 
         # TODO: test data better, including media!
-        self.assertContains(response, u"Event two title")
-        self.assertContains(response, u"Event <br>\n two <br>\n copy")
+        self.assertContains(response, "Event two title")
+        self.assertContains(response, "Event <br>\n two <br>\n copy")
         self.assertEqual(response.status_code, 200)
         # Some showings *should* be listed:
         self.assertContains(response, "Tue 2 April // 19:00")
@@ -255,8 +255,8 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "view_event.html")
 
-        self.assertContains(response, u"Event two title")
-        self.assertContains(response, u"Event <br>\n two <br>\n copy")
+        self.assertContains(response, "Event two title")
+        self.assertContains(response, "Event <br>\n two <br>\n copy")
         self.assertEqual(response.status_code, 200)
         self.assertContains(response, "Tue 2 April 2013 // 19:00")
         self.assertContains(response, "Wed 3 April 2013 // 19:00")
@@ -286,8 +286,8 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "view_event.html")
         self.assertContains(
             response,
-            u'<a href="{0}"  rel="noopener noreferrer" target="_blank">'
-            u"Book tickets</a>".format(ticket_link),
+            '<a href="{0}"  rel="noopener noreferrer" target="_blank">'
+            "Book tickets</a>".format(ticket_link),
             html=True,
         )
 
@@ -298,7 +298,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         now_patch.return_value = first_public_showing.start - timedelta(
             seconds=1
         )
-        ticket_link = u"http://www.example.com/thing/#what"
+        ticket_link = "http://www.example.com/thing/#what"
         self.e2.ticket_link = ticket_link
         self.e2.save()
         self._assert_ticket_link_present(self.e2.pk, ticket_link)
@@ -312,7 +312,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         now_patch.return_value = last_public_showing.start - timedelta(
             seconds=1
         )
-        ticket_link = u"http://www.example.com/goo/#what"
+        ticket_link = "http://www.example.com/goo/#what"
         self.e2.ticket_link = ticket_link
         self.e2.save()
         self._assert_ticket_link_present(self.e2.pk, ticket_link)
@@ -325,7 +325,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         now_patch.return_value = last_public_showing.start + timedelta(
             seconds=1
         )
-        ticket_link = u"http://www.example.com/thing/#what"
+        ticket_link = "http://www.example.com/thing/#what"
         self.e2.ticket_link = ticket_link
         self.e2.save()
 
@@ -334,7 +334,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "view_event.html")
-        self.assertNotContains(response, u"Book tickets")
+        self.assertNotContains(response, "Book tickets")
         self.assertNotContains(response, ticket_link)
 
     def test_expected_tags_in_navmenu(self):
@@ -346,12 +346,12 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         # significant!
         self.assertContains(
             response,
-            u'<ul class="sub-menu">'
-            u'<li><a href="/programme/view/tag-three/"><span>Tag Three</span></a></li>'
-            u'<li><a href="/programme/view/tag-two/"><span>Tag Two</span></a></li>'
-            u'<li><a href="/programme/"><span>All</span></a></li>'
-            u'<li><a href="/programme/archive/"><span>Archive</span></a></li>'
-            u"</ul>",
+            '<ul class="sub-menu">'
+            '<li><a href="/programme/view/tag-three/"><span>Tag Three</span></a></li>'
+            '<li><a href="/programme/view/tag-two/"><span>Tag Two</span></a></li>'
+            '<li><a href="/programme/"><span>All</span></a></li>'
+            '<li><a href="/programme/archive/"><span>Archive</span></a></li>'
+            "</ul>",
             html=True,
         )
 

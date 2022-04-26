@@ -175,7 +175,7 @@ class TestViews(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         self.assertFormError(
-            response, "form", "name", u"This field is required."
+            response, "form", "name", "This field is required."
         )
 
         cat = IndexCategory.objects.get(id=1)
@@ -186,7 +186,7 @@ class TestViews(TestCase):
         response = self.client.post(url)
         self.assertEqual(response.status_code, 200)
         self.assertFormError(
-            response, "form", "name", u"This field is required."
+            response, "form", "name", "This field is required."
         )
 
         cat = IndexCategory.objects.get(id=1)

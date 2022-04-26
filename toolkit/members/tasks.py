@@ -73,12 +73,12 @@ def send_mailout_report(
 
 
 def _get_text_preamble_signature(recipient):
-    preamble_template = u"Dear {0},\n\n"
+    preamble_template = "Dear {0},\n\n"
     if False:  # not(recipient.gdpr_opt_in):
         gdpr_opt_in_template = (
             "If you'd like to continue to receive emails about events and "
             "fundraising for the Cube, "
-            u"you'll need to make sure you opt-in"
+            "you'll need to make sure you opt-in"
             " before 25 May 2018.\n\n"
             "Please choose to opt-in so you won't miss out on what's happening"
             " at your favourite Microplex.\n\n"
@@ -87,19 +87,19 @@ def _get_text_preamble_signature(recipient):
         )
     else:
         # gdpr_opt_in_template = u"Congratulations, you opted in on {0}\n\n"
-        gdpr_opt_in_template = u""
+        gdpr_opt_in_template = ""
     signature_template = (
-        u"\n"
-        u"\n"
-        u"If you no longer wish to receive emails from us, please use this "
-        u"link:\n"
-        u"{0}{1}?k={4}\n"
-        u"To see what details we hold on you and to edit the details of "
-        u"your membership, please use this link:\n"
-        u"{0}{2}?k={4}\n"
-        u"To permanently remove your membership details from our records, "
-        u"please use this link:\n"
-        u"{0}{3}?k={4}\n"
+        "\n"
+        "\n"
+        "If you no longer wish to receive emails from us, please use this "
+        "link:\n"
+        "{0}{1}?k={4}\n"
+        "To see what details we hold on you and to edit the details of "
+        "your membership, please use this link:\n"
+        "{0}{2}?k={4}\n"
+        "To permanently remove your membership details from our records, "
+        "please use this link:\n"
+        "{0}{3}?k={4}\n"
     )
     return (
         preamble_template.format(recipient.name),

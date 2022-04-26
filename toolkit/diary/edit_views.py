@@ -122,7 +122,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
     local_now = timezone.localtime(timezone.now())
     if startdate < local_now.date():
         # Redirect to page with today as the start date:
-        new_url = u"{0}?daysahead={1}".format(
+        new_url = "{0}?daysahead={1}".format(
             reverse(
                 "day-edit",
                 kwargs={
@@ -193,7 +193,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
     context["ideas"] = ideas
     context["dates"] = dates
     # Page title:
-    context["event_list_name"] = u"Diary for {0} to {1}".format(
+    context["event_list_name"] = "Diary for {0} to {1}".format(
         startdatetime.strftime("%d-%m-%Y"), enddatetime.strftime("%d-%m-%Y")
     )
     context["start"] = startdatetime
@@ -229,7 +229,7 @@ def edit_diary_data(request):
         end = datetime.datetime.strptime(end_raw, date_format)
     except (ValueError, TypeError):
         logger.error(
-            u"Invalid value in date range, one of start '{0}' or end, '{1}'".format(
+            "Invalid value in date range, one of start '{0}' or end, '{1}'".format(
                 start_raw, end_raw
             )
         )
@@ -377,7 +377,7 @@ def add_showing(request, event_id):
         django.core.exceptions.ObjectDoesNotExist,
     ) as err:
         logger.error(
-            u"Failed getting object for showing clone operation: {0}".format(
+            "Failed getting object for showing clone operation: {0}".format(
                 err
             )
         )
@@ -406,7 +406,7 @@ def add_showing(request, event_id):
         messages.add_message(
             request,
             messages.SUCCESS,
-            u"Added showing on {0} for event '{1}'".format(
+            "Added showing on {0} for event '{1}'".format(
                 new_showing.start.strftime("%d/%m/%y at %H:%M"),
                 new_showing.event.name,
             ),
@@ -475,7 +475,7 @@ def add_event(request):
             messages.add_message(
                 request,
                 messages.SUCCESS,
-                u"Added event '{0}' with showing on {1}".format(
+                "Added event '{0}' with showing on {1}".format(
                     new_event.name,
                     new_showing.start.strftime("%d/%m/%y at %H:%M"),
                 ),
@@ -669,7 +669,7 @@ class EditEventView(PermissionRequiredMixin, View):
         media_item = event.get_main_mediaitem() or MediaItem()
 
         logger.info(
-            u"{0} updated booking {1} for event '{2}'".format(
+            "{0} updated booking {1} for event '{2}'".format(
                 request.user.last_name, event_id, event.name
             )
         )
@@ -704,8 +704,8 @@ class EditEventView(PermissionRequiredMixin, View):
             if terms_word_count < settings.PROGRAMME_EVENT_TERMS_MIN_WORDS:
                 terms_ok = False
                 msg = (
-                    u"Event terms for confirmed event '{0}' are missing "
-                    u"or too short. Please enter at least {1} words.".format(
+                    "Event terms for confirmed event '{0}' are missing "
+                    "or too short. Please enter at least {1} words.".format(
                         event.name, settings.PROGRAMME_EVENT_TERMS_MIN_WORDS
                     )
                 )
@@ -718,7 +718,7 @@ class EditEventView(PermissionRequiredMixin, View):
             messages.add_message(
                 request,
                 messages.SUCCESS,
-                u"Updated details for event '{0}'".format(event.name),
+                "Updated details for event '{0}'".format(event.name),
             )
             return _return_to_editindex(request)
 
@@ -782,7 +782,7 @@ def edit_ideas(request, year=None, month=None):
                 messages.add_message(
                     request,
                     messages.SUCCESS,
-                    u"Updated ideas for {0}/{1}".format(month, year),
+                    "Updated ideas for {0}/{1}".format(month, year),
                 )
                 return _return_to_editindex(request)
     else:
@@ -815,8 +815,8 @@ def delete_showing(request, showing_id):
     showing = Showing.objects.get(pk=showing_id)
     if showing.in_past():
         logger.error(
-            u"Attempted to delete showing id {0} that has already "
-            u"started/finished".format(showing_id)
+            "Attempted to delete showing id {0} that has already "
+            "started/finished".format(showing_id)
         )
         messages.add_message(
             request,
@@ -828,14 +828,14 @@ def delete_showing(request, showing_id):
         )
     else:
         logging.info(
-            u"Deleting showing id {0} (for event id {1})".format(
+            "Deleting showing id {0} (for event id {1})".format(
                 showing_id, showing.event_id
             )
         )
         messages.add_message(
             request,
             messages.SUCCESS,
-            u"Deleted showing for '{0}' on {1}".format(
+            "Deleted showing for '{0}' on {1}".format(
                 showing.event.name, showing.start.strftime("%d/%m/%y")
             ),
         )
@@ -872,7 +872,7 @@ def view_event_field(request, field, year, month, day):
 
     search = request.GET.get("search")
     if search:
-        logging.info(u"Search term: {0}".format(search))
+        logging.info("Search term: {0}".format(search))
         # Note slightly sneaky use of **; this effectively results in a method
         # call like: showings.filter(event__copy__icontains=search)
         showings = showings.filter(
@@ -889,7 +889,7 @@ def view_event_field(request, field, year, month, day):
         "search": search,
     }
 
-    return render(request, u"view_{0}.html".format(field), context)
+    return render(request, "view_{0}.html".format(field), context)
 
 
 @permission_required("toolkit.write")
@@ -1059,7 +1059,7 @@ def view_rota_vacancies(request):
         "showings_vacant_roles": showings_vacant_roles,
     }
 
-    return render(request, u"view_rota_vacancies.html", context)
+    return render(request, "view_rota_vacancies.html", context)
 
 
 class EditRotaView(PermissionRequiredMixin, View):
@@ -1116,12 +1116,12 @@ class EditRotaView(PermissionRequiredMixin, View):
             "edit_showing_notes_url_prefix": showing_notes_url_prefix,
         }
 
-        return render(request, u"edit_rota.html", context)
+        return render(request, "edit_rota.html", context)
 
     def post(self, request, year=None, day=None, month=None):
         # Get rota entry
         try:
-            entry_id = int(request.POST[u"id"])
+            entry_id = int(request.POST["id"])
         except (ValueError, KeyError):
             logger.error("Invalid entry_id")
             return HttpResponse(
@@ -1132,20 +1132,20 @@ class EditRotaView(PermissionRequiredMixin, View):
         # Check associated showing:
         if rota_entry.showing.in_past():
             return HttpResponse(
-                u"Can't change rota for showings in the past", status=403
+                "Can't change rota for showings in the past", status=403
             )
 
         # Get entered name, and store in rota entry:
         try:
-            name = request.POST[u"value"]
+            name = request.POST["value"]
         except KeyError:
             return HttpResponse(
                 "Invalid request", status=400, content_type="text/plain"
             )
 
         logger.info(
-            u"Update role id {0} (#{1}) for showing "
-            u"{2} '{3}' -> '{4}' ({5})".format(
+            "Update role id {0} (#{1}) for showing "
+            "{2} '{3}' -> '{4}' ({5})".format(
                 rota_entry.role_id,
                 rota_entry.rank,
                 rota_entry.showing_id,
@@ -1172,7 +1172,7 @@ def edit_showing_rota_notes(request, showing_id):
 
     if showing.in_past():
         return HttpResponse(
-            u"Can't change rota for showings in the past", status=403
+            "Can't change rota for showings in the past", status=403
         )
     elif form.is_valid():
         form.save()

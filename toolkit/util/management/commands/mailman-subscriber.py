@@ -213,7 +213,7 @@ def main():
         maxchunk = 0
         while chunk <= maxchunk:
             if verbose:
-                print >>sys.stdout, "%c(%d)" % (letter, chunk)
+                print >> sys.stdout, "%c(%d)" % (letter, chunk)
             page = opener(member_url + "?letter=%s&chunk=%d" % (letter, chunk))
             lines = page.read()
             page.close()

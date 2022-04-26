@@ -40,7 +40,7 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
 
     def assert_has_message(self, response, msg, level):
         self.assertContains(
-            response, u'<li class="{0}">{1}</li>'.format(level, msg)
+            response, '<li class="{0}">{1}</li>'.format(level, msg)
         )
 
     def _setup_test_data(self):
@@ -50,21 +50,19 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
         )
 
         # Roles:
-        r1 = Role(name=u"Role 1 (standard)", read_only=False, standard=True)
+        r1 = Role(name="Role 1 (standard)", read_only=False, standard=True)
         r1.save()
-        r2 = Role(
-            name=u"Role 2 (nonstandard)", read_only=False, standard=False
-        )
+        r2 = Role(name="Role 2 (nonstandard)", read_only=False, standard=False)
         r2.save()
-        r3 = Role(name=u"Role 3", read_only=False, standard=False)
+        r3 = Role(name="Role 3", read_only=False, standard=False)
         r3.save()
 
         # Tags:
-        t1 = EventTag(name=u"tag one", slug=u"tag-one", read_only=False)
+        t1 = EventTag(name="tag one", slug="tag-one", read_only=False)
         t1.save()
         t2 = EventTag(
-            name=u"tag two",
-            slug=u"tag-two",
+            name="tag two",
+            slug="tag-two",
             promoted=True,
             sort_order=2,
             read_only=False,
@@ -72,8 +70,8 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
         t2.save()
         # 'ag-three' is what slugify() gives for that name:
         t3 = EventTag(
-            name=u"tag three",
-            slug=u"tag-three",
+            name="tag three",
+            slug="tag-three",
             sort_order=1,
             promoted=True,
             read_only=False,
@@ -153,16 +151,16 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
         e3.save()
 
         e4 = Event(
-            name=u"Event four titl\u0113",
-            copy=u"Event four C\u014dpy",
-            pricing=u"\u00a3milliion per thing",
-            pre_title=u"Pretitle four",
-            post_title=u"Posttitle four",
-            film_information=u"Film info for four",
-            copy_summary=u"\u010copy four summary",
-            terms=u"Terminal price: \u00a31 / \u20ac3",
+            name="Event four titl\u0113",
+            copy="Event four C\u014dpy",
+            pricing="\u00a3milliion per thing",
+            pre_title="Pretitle four",
+            post_title="Posttitle four",
+            film_information="Film info for four",
+            copy_summary="\u010copy four summary",
+            terms="Terminal price: \u00a31 / \u20ac3",
             duration="01:00:00",
-            notes=u"\u0147otes on event fou\u0159",
+            notes="\u0147otes on event fou\u0159",
         )
         e4.save()
         e4.tags.set(
@@ -173,23 +171,23 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
         e4.save()
 
         e5 = Event(
-            name=u"PRIVATE Event FIVE titl\u0113!",
-            copy=u"PRIVATE Event 5ive C\u014dpy",
-            copy_summary=u"\u010copy five summary",
-            terms=u"More terms; price: \u00a32 / \u20ac5",
+            name="PRIVATE Event FIVE titl\u0113!",
+            copy="PRIVATE Event 5ive C\u014dpy",
+            copy_summary="\u010copy five summary",
+            terms="More terms; price: \u00a32 / \u20ac5",
             duration="10:00:00",
-            notes=u"\u0147otes on event five",
+            notes="\u0147otes on event five",
             private=True,
         )
         e5.save()
 
         e6 = Event(
-            name=u"PRIVATE OUTSIDE Event (Six)",
-            copy=u"PRIVATE OUTSIDE Event 6ix copy",
-            copy_summary=u"OUTSIDE PRIVATE \u010copy six summary",
-            terms=u"Ever More terms; price: \u00a32 / \u20ac5",
+            name="PRIVATE OUTSIDE Event (Six)",
+            copy="PRIVATE OUTSIDE Event 6ix copy",
+            copy_summary="OUTSIDE PRIVATE \u010copy six summary",
+            terms="Ever More terms; price: \u00a32 / \u20ac5",
             duration="4:00:00",
-            notes=u"\u0147otes on private/outwide event six",
+            notes="\u0147otes on private/outwide event six",
             outside_hire=True,
             private=True,
         )
@@ -280,7 +278,7 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
                 datetime(2013, 6, 9, 18, 00)
             ),
             event=e4,
-            booked_by=u"\u0102nother \u0170ser",
+            booked_by="\u0102nother \u0170ser",
             confirmed=True,
             rota_notes="Some notes about the Rota!",
         )
@@ -345,7 +343,7 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
         self.tmpl1.save()
         self.tmpl1.roles.set([r1])
         self.tmpl1.tags.set([t1])
-        self.tmpl1.pricing = u"Entry: \u00a35 / \u20ac10"
+        self.tmpl1.pricing = "Entry: \u00a35 / \u20ac10"
         self.tmpl1.save()
 
         # Two roles, two tags

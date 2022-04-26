@@ -25,14 +25,14 @@ class MembersTestsMixin(object):
 
         # Members:
         self.mem_1 = Member(
-            name=u"Member On\u0205",
+            name="Member On\u0205",
             email="one@example.com",
             number="1",
             postcode="BS1 1AA",
         )
         self.mem_1.save()
         self.mem_2 = Member(
-            name=u"Tw\u020d Member",
+            name="Tw\u020d Member",
             email="two@example.com",
             number="02",
             postcode="",
@@ -40,7 +40,7 @@ class MembersTestsMixin(object):
         )
         self.mem_2.save()
         self.mem_3 = Member(
-            name=u"Some Third Chap",
+            name="Some Third Chap",
             email="two@member.test",
             number="000",
             postcode="NORAD",
@@ -99,14 +99,14 @@ class MembersTestsMixin(object):
         )
         self.mem_7.save()
         self.mem_8 = Member(
-            name=u"Number Eight, No mailout please",
+            name="Number Eight, No mailout please",
             email="bart@bart.test",
             number="010",
             mailout=False,
         )
         self.mem_8.save()
         self.mem_8 = Member(
-            name=u"Number Nine, mailout failed",
+            name="Number Nine, mailout failed",
             email="frobney@squoo.test",
             number="010",
             mailout_failed=True,
@@ -116,7 +116,7 @@ class MembersTestsMixin(object):
         # Volunteers:
         self.vol_1 = Volunteer(
             member=self.mem_4,
-            notes=u"Likes the $, the \u00a3 and the \u20ac",
+            notes="Likes the $, the \u00a3 and the \u20ac",
             portrait=settings.MEDIA_ROOT + "/path/to/portrait",
         )
         self.vol_1.save()
@@ -132,7 +132,7 @@ class MembersTestsMixin(object):
         self.vol_3.save()
 
         self.vol_4 = Volunteer(
-            member=self.mem_7, active=False, notes=u"Subliminal, superluminous"
+            member=self.mem_7, active=False, notes="Subliminal, superluminous"
         )
         self.vol_4.save()
         self.vol_4.roles.set([r3])

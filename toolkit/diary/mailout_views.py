@@ -265,7 +265,7 @@ def mailout_progress(request):
             else:
                 error = True
                 sent_count = 0
-                error_msg = u"Couldn't retrieve status from completed job"
+                error_msg = "Couldn't retrieve status from completed job"
         elif state == "FAILURE":
             complete = True
             error = True
@@ -277,7 +277,7 @@ def mailout_progress(request):
             progress = 0
         else:
             logger.error(
-                u"Invalid data from async mailout task: {0}".format(state)
+                "Invalid data from async mailout task: {0}".format(state)
             )
 
     return HttpResponse(

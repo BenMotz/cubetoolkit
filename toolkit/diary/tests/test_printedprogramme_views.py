@@ -44,8 +44,8 @@ class AddPrintedProgrammeTests(DiaryTestsMixin, TestCase):
             data={
                 "form_month": "1",
                 "year": "2010",
-                "designer": u"Designer name",
-                "notes": u"Blah blah notes",
+                "designer": "Designer name",
+                "notes": "Blah blah notes",
                 "programme": "",
             },
         )
@@ -55,7 +55,7 @@ class AddPrintedProgrammeTests(DiaryTestsMixin, TestCase):
             response,
             "new_programme_form",
             "programme",
-            u"This field is required.",
+            "This field is required.",
         )
         self.assertEqual(PrintedProgramme.objects.count(), 0)
 
@@ -70,8 +70,8 @@ class AddPrintedProgrammeTests(DiaryTestsMixin, TestCase):
                 data={
                     "form_month": "1",
                     "year": "2010",
-                    "designer": u"Designer name",
-                    "notes": u"Blah blah notes",
+                    "designer": "Designer name",
+                    "notes": "Blah blah notes",
                     "programme": temp_pdf,
                 },
             )
@@ -81,14 +81,14 @@ class AddPrintedProgrammeTests(DiaryTestsMixin, TestCase):
             response,
             "new_programme_form",
             "programme",
-            u"The submitted file is empty.",
+            "The submitted file is empty.",
         )
         self.assertEqual(PrintedProgramme.objects.count(), 0)
 
     def test_add_progamme_invalid_duplicate_month(self):
         # Add programme for Jan 1999
         PrintedProgramme(
-            month=date(1999, 1, 1), designer=u"What?", programme="fake/fake"
+            month=date(1999, 1, 1), designer="What?", programme="fake/fake"
         ).save()
         url = reverse("add-printed-programme")
 
@@ -101,8 +101,8 @@ class AddPrintedProgrammeTests(DiaryTestsMixin, TestCase):
                 data={
                     "form_month": "1",
                     "year": "1999",
-                    "designer": u"Designer name",
-                    "notes": u"Blah blah notes",
+                    "designer": "Designer name",
+                    "notes": "Blah blah notes",
                     "programme": temp_pdf,
                 },
             )
@@ -112,7 +112,7 @@ class AddPrintedProgrammeTests(DiaryTestsMixin, TestCase):
             response,
             "new_programme_form",
             "form_month",
-            u"Printed programme with this month/year already exists.",
+            "Printed programme with this month/year already exists.",
         )
         # No more objects should have been added:
         self.assertEqual(PrintedProgramme.objects.count(), 1)
@@ -132,15 +132,15 @@ class AddPrintedProgrammeTests(DiaryTestsMixin, TestCase):
                 data={
                     "form_month": "4",
                     "year": "2010",
-                    "designer": u"Designer nam\u0119",
-                    "notes": u"Blah blah no\u0167es",
+                    "designer": "Designer nam\u0119",
+                    "notes": "Blah blah no\u0167es",
                     "programme": temp_pdf,
                 },
             )
             filename = os.path.basename(temp_pdf.name)
         self.assertRedirects(response, reverse("edit-printed-programmes"))
         # Check file upload:
-        expected_upload = os.path.join(u"printedprogramme", filename)
+        expected_upload = os.path.join("printedprogramme", filename)
         self.test_upload = os.path.join("/tmp", expected_upload)
 
         self.assertTrue(os.path.isfile(self.test_upload))
@@ -149,8 +149,8 @@ class AddPrintedProgrammeTests(DiaryTestsMixin, TestCase):
         self.assertEqual(PrintedProgramme.objects.count(), 1)
         pp = PrintedProgramme.objects.all()[0]
         self.assertEqual(pp.month, date(2010, 4, 1))
-        self.assertEqual(pp.designer, u"Designer nam\u0119")
-        self.assertEqual(pp.notes, u"Blah blah no\u0167es")
+        self.assertEqual(pp.designer, "Designer nam\u0119")
+        self.assertEqual(pp.notes, "Blah blah no\u0167es")
         self.assertEqual(pp.programme.name, expected_upload)
 
 
@@ -176,13 +176,13 @@ class EditPrintedProgrammeTests(DiaryTestsMixin, TestCase):
     def _add_data(self):
         PrintedProgramme(
             month=date(2010, 6, 1),
-            designer=u"Loop lop loop",
-            programme=u"/foo/bar",
+            designer="Loop lop loop",
+            programme="/foo/bar",
         ).save()
         PrintedProgramme(
             month=date(2010, 7, 1),
-            designer=u"Can be yours for \u20ac10",
-            programme=u"/what/bar/Nun",
+            designer="Can be yours for \u20ac10",
+            programme="/what/bar/Nun",
         ).save()
 
     def test_edit_view_loads_no_data(self):
@@ -195,8 +195,8 @@ class EditPrintedProgrammeTests(DiaryTestsMixin, TestCase):
         url = reverse("edit-printed-programmes")
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
-        self.assertContains(response, u"Loop lop loop")
-        self.assertContains(response, u"Can be yours for \u20ac10")
+        self.assertContains(response, "Loop lop loop")
+        self.assertContains(response, "Can be yours for \u20ac10")
 
     def test_edit_view_edit_data(self):
         url = reverse("edit-printed-programmes")
@@ -207,23 +207,23 @@ class EditPrintedProgrammeTests(DiaryTestsMixin, TestCase):
                 "form-INITIAL_FORMS": "2",
                 "form-MAX_NUM_FORMS": "1000",
                 # "form-0-programme": "",
-                "form-0-designer": u"Someon\u0113",
-                "form-0-notes": u"",
+                "form-0-designer": "Someon\u0113",
+                "form-0-notes": "",
                 "form-0-id": "2",
                 # "form-1-programme": "",
                 # "form-1-designer": "Socks",
-                "form-1-notes": u"Sm\u20aclt TERRIBLE",
+                "form-1-notes": "Sm\u20aclt TERRIBLE",
                 "form-1-id": "1",
             },
         )
         self.assertRedirects(response, reverse("edit-printed-programmes"))
         # Check edits saved
         pp1 = PrintedProgramme.objects.get(pk=1)
-        self.assertEqual(pp1.notes, u"Sm\u20aclt TERRIBLE")
-        self.assertEqual(pp1.designer, u"")
-        self.assertEqual(pp1.programme, u"/foo/bar")
+        self.assertEqual(pp1.notes, "Sm\u20aclt TERRIBLE")
+        self.assertEqual(pp1.designer, "")
+        self.assertEqual(pp1.programme, "/foo/bar")
 
         pp2 = PrintedProgramme.objects.get(pk=2)
-        self.assertEqual(pp2.notes, u"")
-        self.assertEqual(pp2.designer, u"Someon\u0113")
-        self.assertEqual(pp2.programme, u"/what/bar/Nun")
+        self.assertEqual(pp2.notes, "")
+        self.assertEqual(pp2.designer, "Someon\u0113")
+        self.assertEqual(pp2.programme, "/what/bar/Nun")

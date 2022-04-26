@@ -196,7 +196,7 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
             day=1, month=1, year=2000
         )
 
-        new_name = u"Some New \u20acejit"
+        new_name = "Some New \u20acejit"
 
         self.assertEqual(Member.objects.filter(name=new_name).count(), 0)
 
@@ -204,10 +204,10 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
         response = self.client.post(
             url,
             data={
-                u"name": new_name,
-                u"email": u"blah.blah-blah@hard-to-tell-if-genuine.uk",
-                u"postcode": "SW1A 1AA",
-                u"mailout": "on",
+                "name": new_name,
+                "email": "blah.blah-blah@hard-to-tell-if-genuine.uk",
+                "postcode": "SW1A 1AA",
+                "mailout": "on",
             },
             follow=True,
         )
@@ -217,9 +217,9 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
 
         member = Member.objects.get(name=new_name)
         self.assertEqual(
-            member.email, u"blah.blah-blah@hard-to-tell-if-genuine.uk"
+            member.email, "blah.blah-blah@hard-to-tell-if-genuine.uk"
         )
-        self.assertEqual(member.postcode, u"SW1A 1AA")
+        self.assertEqual(member.postcode, "SW1A 1AA")
         self.assertEqual(member.mailout, True)
         if expiry_enabled:
             self.assertEqual(
@@ -229,7 +229,7 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
             self.assertIsNone(member.membership_expires)
 
         self.assertContains(
-            response, u"Added member: {0}".format(member.number)
+            response, "Added member: {0}".format(member.number)
         )
 
     @override_settings(MEMBERSHIP_EXPIRY_ENABLED=False)
@@ -244,7 +244,7 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
         self._test_post_form_common(now_mock, expiry_enabled=True)
 
     def test_post_minimal_submission(self):
-        new_name = u"Another New \u20acejit"
+        new_name = "Another New \u20acejit"
 
         self.assertEqual(Member.objects.filter(name=new_name).count(), 0)
 
@@ -252,7 +252,7 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
         response = self.client.post(
             url,
             data={
-                u"name": new_name,
+                "name": new_name,
             },
             follow=True,
         )
@@ -261,12 +261,12 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_new_member.html")
 
         member = Member.objects.get(name=new_name)
-        self.assertEqual(member.email, u"")
-        self.assertEqual(member.postcode, u"")
+        self.assertEqual(member.email, "")
+        self.assertEqual(member.postcode, "")
         self.assertEqual(member.is_member, False)
 
         self.assertContains(
-            response, u"Added member: {0}".format(member.number)
+            response, "Added member: {0}".format(member.number)
         )
 
     def test_post_form_invalid_data_missing(self):
@@ -279,7 +279,7 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_new_member.html")
 
         self.assertFormError(
-            response, "form", "name", u"This field is required."
+            response, "form", "name", "This field is required."
         )
 
         self.assertEqual(count_before, Member.objects.count())
@@ -343,45 +343,45 @@ class TestSearchMemberView(MembersTestsMixin, TestCase):
         )
 
         url = reverse("search-members")
-        response = self.client.get(url, data={"q": u"member"})
+        response = self.client.get(url, data={"q": "member"})
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "search_members_results.html")
 
         self.assertContains(
             response,
-            u"<td><a href='/members/1'>Member On\u0205</a></td>",
+            "<td><a href='/members/1'>Member On\u0205</a></td>",
             html=True,
         )
         self.assertContains(
             response,
-            u'<a href="mailto:one@example.com">one@example.com</a>',
+            '<a href="mailto:one@example.com">one@example.com</a>',
             html=True,
         )
-        self.assertContains(response, u"<td>BS1 1AA</td>", html=True)
+        self.assertContains(response, "<td>BS1 1AA</td>", html=True)
 
         self.assertContains(
             response,
-            u"<td><a href='/members/2'>Tw\u020d Member</a></td>",
+            "<td><a href='/members/2'>Tw\u020d Member</a></td>",
             html=True,
         )
         self.assertContains(
             response,
-            u'<a href="mailto:two@example.com">two@example.com</a>',
+            '<a href="mailto:two@example.com">two@example.com</a>',
             html=True,
         )
 
         self.assertContains(
             response,
-            u"<td><a href='/members/3'>Some Third Chap</a></td>",
+            "<td><a href='/members/3'>Some Third Chap</a></td>",
             html=True,
         )
         self.assertContains(
             response,
-            u'<td><a href="mailto:two@member.test">two@member.test</a></td>',
+            '<td><a href="mailto:two@member.test">two@member.test</a></td>',
             html=True,
         )
-        self.assertContains(response, u"<td>NORAD</td>", html=True)
+        self.assertContains(response, "<td>NORAD</td>", html=True)
 
         if expiry_enabled:
             self.assertContains(
@@ -397,10 +397,10 @@ class TestSearchMemberView(MembersTestsMixin, TestCase):
 
         # Should have Edit / Delete buttons:
         self.assertContains(
-            response, u'<input type="submit" value="Edit">', html=True
+            response, '<input type="submit" value="Edit">', html=True
         )
         self.assertContains(
-            response, u'<input type="submit" value="Delete">', html=True
+            response, '<input type="submit" value="Delete">', html=True
         )
 
         expected_edit_form = (
@@ -440,12 +440,12 @@ class TestSearchMemberView(MembersTestsMixin, TestCase):
 
         self.assertContains(
             response,
-            u"<td><a href='/members/2'>Tw\u020d Member</a></td>",
+            "<td><a href='/members/2'>Tw\u020d Member</a></td>",
             html=True,
         )
         self.assertContains(
             response,
-            u'<a href="mailto:two@example.com">two@example.com</a>',
+            '<a href="mailto:two@example.com">two@example.com</a>',
             html=True,
         )
 
@@ -471,7 +471,7 @@ class TestSearchMemberView(MembersTestsMixin, TestCase):
     def test_email_query_no_results(self):
         url = reverse("search-members")
 
-        response = self.client.get(url, data={"email": u"toast@infinity.com"})
+        response = self.client.get(url, data={"email": "toast@infinity.com"})
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "search_members_results.html")
@@ -494,7 +494,7 @@ class TestDeleteMemberViewLoggedIn(MembersTestsMixin, TestCase):
         response = self.client.post(url, follow=True)
 
         self.assertRedirects(response, reverse("search-members"))
-        self.assertContains(response, u"Deleted member: 1 (Member On\u0205)")
+        self.assertContains(response, "Deleted member: 1 (Member On\u0205)")
 
         self.assertEqual(Member.objects.filter(id=1).count(), 0)
 
@@ -698,10 +698,10 @@ class TestEditMemberViewNotLoggedIn(MembersTestsMixin, TestCase):
 
     # POST tests ###########################################
     def test_edit_post_form_minimal_data(self):
-        new_name = u"N\u018EW Name"
+        new_name = "N\u018EW Name"
 
         member = Member.objects.get(pk=2)
-        self.assertEqual(member.name, u"Tw\u020d Member")
+        self.assertEqual(member.name, "Tw\u020d Member")
         member_mailout_key = member.mailout_key
         self.assertTrue(member.is_member)
 
@@ -740,10 +740,10 @@ class TestEditMemberViewNotLoggedIn(MembersTestsMixin, TestCase):
 
     @override_settings(MEMBERSHIP_EXPIRY_ENABLED=True)
     def test_edit_post_form_all_data(self):
-        new_name = u"N\u018EW Name"
+        new_name = "N\u018EW Name"
 
         member = Member.objects.get(pk=2)
-        self.assertEqual(member.name, u"Tw\u020d Member")
+        self.assertEqual(member.name, "Tw\u020d Member")
         member_mailout_key = member.mailout_key
         self.assertTrue(member.is_member)
 
@@ -798,10 +798,10 @@ class TestEditMemberViewNotLoggedIn(MembersTestsMixin, TestCase):
         self.assertContains(response, "Member 02 updated")
 
     def test_edit_post_form_invalid_emails(self):
-        new_name = u"N\u018EW Name"
+        new_name = "N\u018EW Name"
 
         member = Member.objects.get(pk=2)
-        self.assertEqual(member.name, u"Tw\u020d Member")
+        self.assertEqual(member.name, "Tw\u020d Member")
         member_mailout_key = member.mailout_key
         self.assertTrue(member.is_member)
 
@@ -818,7 +818,7 @@ class TestEditMemberViewNotLoggedIn(MembersTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_member.html")
 
         self.assertFormError(
-            response, "form", "email", u"Enter a valid email address."
+            response, "form", "email", "Enter a valid email address."
         )
 
         member = Member.objects.get(pk=2)
@@ -842,7 +842,7 @@ class TestEditMemberViewNotLoggedIn(MembersTestsMixin, TestCase):
 
         # Only mandatory field is "name":
         self.assertFormError(
-            response, "form", "name", u"This field is required."
+            response, "form", "name", "This field is required."
         )
 
         member = Member.objects.get(pk=2)
@@ -902,10 +902,10 @@ class TestEditMemberViewLoggedIn(MembersTestsMixin, TestCase):
     # POST tests ###########################################
     # Only test differences from not logged in view...
     def _test_edit_post_form_minimal_data_common(self):
-        new_name = u"N\u018EW Name"
+        new_name = "N\u018EW Name"
 
         member = Member.objects.get(pk=2)
-        self.assertEqual(member.name, u"Tw\u020d Member")
+        self.assertEqual(member.name, "Tw\u020d Member")
 
         member_mailout_key = member.mailout_key
         membership_expires = member.membership_expires
@@ -986,7 +986,7 @@ class TestEditMemberViewLoggedIn(MembersTestsMixin, TestCase):
 
         # Only mandatory field is "name":
         self.assertFormError(
-            response, "form", "name", u"This field is required."
+            response, "form", "name", "This field is required."
         )
 
         member = Member.objects.get(pk=2)
@@ -1095,7 +1095,7 @@ class TestUnsubscribeMemberView(MembersTestsMixin, TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_member_edit_subs.html")
-        self.assertContains(response, u"Member 02 unsubscribed")
+        self.assertContains(response, "Member 02 unsubscribed")
 
         # Not subscribed:
         self._assert_unsubscribed(2)
@@ -1119,7 +1119,7 @@ class TestUnsubscribeMemberView(MembersTestsMixin, TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_member_edit_subs.html")
-        self.assertContains(response, u"Member 02 subscribed")
+        self.assertContains(response, "Member 02 subscribed")
 
         # subscribed:
         self._assert_subscribed(2)
@@ -1140,7 +1140,7 @@ class TestUnsubscribeMemberView(MembersTestsMixin, TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_member_edit_subs.html")
-        self.assertNotContains(response, u"Member 02 unsubscribed")
+        self.assertNotContains(response, "Member 02 unsubscribed")
 
         # Still subscribed:
         self._assert_subscribed(2)
@@ -1198,14 +1198,14 @@ class TestMemberMiscViews(MembersTestsMixin, TestCase):
 
         self.assertContains(
             response,
-            u'<a href="http://1.foo.test/" '
-            u'rel="nofollow">http://1.foo.test/</a>',
+            '<a href="http://1.foo.test/" '
+            'rel="nofollow">http://1.foo.test/</a>',
             html=True,
         )
         self.assertContains(
             response,
-            u'<a href="http://two.foo.test/" '
-            u'rel="nofollow">http://two.foo.test/</a>',
+            '<a href="http://two.foo.test/" '
+            'rel="nofollow">http://two.foo.test/</a>',
             html=True,
         )
 
@@ -1219,9 +1219,9 @@ class TestMemberMiscViews(MembersTestsMixin, TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "view_member.html")
-        self.assertContains(response, u"Some Third Chap")
+        self.assertContains(response, "Some Third Chap")
         self.assertContains(response, "two@member.test")
-        self.assertContains(response, u"NORAD")
+        self.assertContains(response, "NORAD")
 
     def test_view_non_existant_member(self):
         url = reverse("view-member", kwargs={"member_id": 999})

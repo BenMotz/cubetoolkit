@@ -57,23 +57,23 @@ class EventForm(forms.ModelForm):
             "pricing": forms.TextInput(
                 attrs={
                     "placeholder": (
-                        u"e.g. '\u00A30 Full / \u00A30 Concession' "
-                        u"or '\u00A30 advance, \u00A30 on the door'"
+                        "e.g. '\u00A30 Full / \u00A30 Concession' "
+                        "or '\u00A30 advance, \u00A30 on the door'"
                     ),
                 }
             ),
             "film_information": forms.TextInput(
                 attrs={
-                    "placeholder": u"e.g. Dir: [director], 1990, USA, 120 mins, "
-                    u"Cert: 15",
+                    "placeholder": "e.g. Dir: [director], 1990, USA, 120 mins, "
+                    "Cert: 15",
                 }
             ),
             "pre_title": forms.TextInput(
                 attrs={
                     "placeholder": (
                         (
-                            u"Text displayed before / above the event"
-                            u"name, e.g. '%s presents'"
+                            "Text displayed before / above the event"
+                            "name, e.g. '%s presents'"
                         )
                         % settings.VENUE["name"]
                     ),
@@ -82,8 +82,8 @@ class EventForm(forms.ModelForm):
             "post_title": forms.TextInput(
                 attrs={
                     "placeholder": (
-                        u"Text displayed after / below the event name,"
-                        u" e.g. 'with support from A Band'"
+                        "Text displayed after / below the event name,"
+                        " e.g. 'with support from A Band'"
                     ),
                 }
             ),
@@ -108,11 +108,11 @@ class EventForm(forms.ModelForm):
         )
 
     def clean_copy_summary(self):
-        copy_summary = self.cleaned_data.get(u"copy_summary", u"")
+        copy_summary = self.cleaned_data.get("copy_summary", "")
         if len(copy_summary) > settings.PROGRAMME_COPY_SUMMARY_MAX_CHARS:
             raise forms.ValidationError(
-                u"Copy summary must be {0} characters or fewer (currently {1} "
-                u"characters)".format(
+                "Copy summary must be {0} characters or fewer (currently {1} "
+                "characters)".format(
                     settings.PROGRAMME_COPY_SUMMARY_MAX_CHARS,
                     len(copy_summary),
                 )
@@ -131,14 +131,14 @@ class MediaItemForm(forms.ModelForm):
         exclude = ("mimetype", "caption")
 
     def clean_media_file(self):
-        media_file = self.cleaned_data.get(u"media_file", None)
+        media_file = self.cleaned_data.get("media_file", None)
         if media_file:
             size_MB = media_file.size / 1048576.0
             max_MB = settings.PROGRAMME_MEDIA_MAX_SIZE_MB
             if size_MB > max_MB:
                 raise forms.ValidationError(
-                    u"Media file must be {0} MB or less "
-                    u"(uploaded file is {1:.2f} MB)".format(max_MB, size_MB)
+                    "Media file must be {0} MB or less "
+                    "(uploaded file is {1:.2f} MB)".format(max_MB, size_MB)
                 )
         return media_file
 
@@ -202,7 +202,7 @@ def rota_form_factory(showing):
         _role_ids.append(role.pk)
         if role.standard:
             # For each "standard" role, add an Integer field;
-            members[u"role_{0}".format(role.pk)] = forms.IntegerField(
+            members["role_{0}".format(role.pk)] = forms.IntegerField(
                 min_value=0,
                 max_value=settings.MAX_COUNT_PER_ROLE,
                 required=True,

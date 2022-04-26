@@ -144,20 +144,18 @@ class TestActivateDeactivateVolunteer(MembersTestsMixin, TestCase):
         self.assertTrue(vol.active)
 
         url = reverse("inactivate-volunteer")
-        response = self.client.post(
-            url, data={u"volunteer": u"2"}, follow=True
-        )
+        response = self.client.post(url, data={"volunteer": "2"}, follow=True)
 
         self.assertRedirects(response, reverse("view-volunteer-list"))
 
         vol = Volunteer.objects.get(id=2)
         self.assertFalse(vol.active)
 
-        self.assertContains(response, u"Retired volunteer Volunteer Two")
+        self.assertContains(response, "Retired volunteer Volunteer Two")
 
     def test_retire_bad_vol_id(self):
         url = reverse("inactivate-volunteer")
-        response = self.client.post(url, data={u"volunteer": u"2000"})
+        response = self.client.post(url, data={"volunteer": "2000"})
         self.assertEqual(response.status_code, 404)
 
     def test_retire_no_vol_id(self):
@@ -170,20 +168,18 @@ class TestActivateDeactivateVolunteer(MembersTestsMixin, TestCase):
         self.assertFalse(vol.active)
 
         url = reverse("activate-volunteer")
-        response = self.client.post(
-            url, data={u"volunteer": u"4"}, follow=True
-        )
+        response = self.client.post(url, data={"volunteer": "4"}, follow=True)
 
         self.assertRedirects(response, reverse("view-volunteer-list"))
 
         vol = Volunteer.objects.get(id=self.vol_4.pk)
         self.assertTrue(vol.active)
 
-        self.assertContains(response, u"Unretired volunteer Volunteer Four")
+        self.assertContains(response, "Unretired volunteer Volunteer Four")
 
     def test_unretire_bad_vol_id(self):
         url = reverse("activate-volunteer")
-        response = self.client.post(url, data={u"volunteer": u"2000"})
+        response = self.client.post(url, data={"volunteer": "2000"})
         self.assertEqual(response.status_code, 404)
 
     def test_unretire_no_vol_id(self):
@@ -261,15 +257,15 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         url = reverse("add-volunteer")
         response = self.client.post(
             url,
-            data={u"mem-name": u"New Volunteer, called \u0187hri\u01a8topher"},
+            data={"mem-name": "New Volunteer, called \u0187hri\u01a8topher"},
             follow=True,
         )
         self.assertRedirects(response, reverse("view-volunteer-summary"))
 
         self.assertContains(
             response,
-            u'<li class="success">Created volunteer &#39;New Volunteer, '
-            u"called \u0187hri\u01a8topher&#39;</li>",
+            '<li class="success">Created volunteer &#39;New Volunteer, '
+            "called \u0187hri\u01a8topher&#39;</li>",
             html=True,
         )
 
@@ -279,7 +275,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
 
         # New things:
         new_member = Member.objects.get(
-            name=u"New Volunteer, called \u0187hri\u01a8topher"
+            name="New Volunteer, called \u0187hri\u01a8topher"
         )
         # Implicitly check Volunteer record exists:
         self.assertTrue(new_member.volunteer.active)
@@ -292,19 +288,19 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         response = self.client.post(
             url,
             data={
-                u"mem-name": u"Another New Volunteer",
-                u"mem-email": "snoo@whatver.com",
-                u"mem-address": "somewhere over the rainbow, I guess",
-                u"mem-posttown": "Town Town Town!",
-                u"mem-postcode": "< Sixteen chars?",
-                u"mem-country": "Suriname",
-                u"mem-website": "http://still_don't_care/",
-                u"mem-phone": "+44 1000000000000001",
-                u"mem-altphone": "-1 3202394 2352 23 234",
-                u"mem-mailout_failed": "t",
-                u"mem-notes": "member notes shouldn't be on this form!",
-                u"vol-notes": "plays the balalaika really badly",
-                u"vol-roles": [2, 3],
+                "mem-name": "Another New Volunteer",
+                "mem-email": "snoo@whatver.com",
+                "mem-address": "somewhere over the rainbow, I guess",
+                "mem-posttown": "Town Town Town!",
+                "mem-postcode": "< Sixteen chars?",
+                "mem-country": "Suriname",
+                "mem-website": "http://still_don't_care/",
+                "mem-phone": "+44 1000000000000001",
+                "mem-altphone": "-1 3202394 2352 23 234",
+                "mem-mailout_failed": "t",
+                "mem-notes": "member notes shouldn't be on this form!",
+                "vol-notes": "plays the balalaika really badly",
+                "vol-roles": [2, 3],
             },
             follow=True,
         )
@@ -313,8 +309,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
 
         self.assertContains(
             response,
-            u'<li class="success">Created volunteer &#39;Another New '
-            u"Volunteer&#39;</li>",
+            '<li class="success">Created volunteer &#39;Another New '
+            "Volunteer&#39;</li>",
             html=True,
         )
 
@@ -323,7 +319,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertEqual(Member.objects.count(), init_mem_count + 1)
 
         # New things:
-        new_member = Member.objects.get(name=u"Another New Volunteer")
+        new_member = Member.objects.get(name="Another New Volunteer")
         self.assertEqual(new_member.email, "snoo@whatver.com")
         self.assertEqual(
             new_member.address, "somewhere over the rainbow, I guess"
@@ -360,7 +356,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
 
         # The only mandatory field (!)
         self.assertFormError(
-            response, "mem_form", "name", u"This field is required."
+            response, "mem_form", "name", "This field is required."
         )
 
     def test_post_edit_vol_minimal_data(self):
@@ -369,14 +365,14 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
 
         url = reverse("edit-volunteer", kwargs={"volunteer_id": 1})
         response = self.client.post(
-            url, data={u"mem-name": u"Renam\u018fd Vol"}, follow=True
+            url, data={"mem-name": "Renam\u018fd Vol"}, follow=True
         )
         self.assertRedirects(response, reverse("view-volunteer-summary"))
 
         self.assertContains(
             response,
-            u'<li class="success">Updated volunteer &#39;Renam\u018fd '
-            u"Vol&#39;</li>",
+            '<li class="success">Updated volunteer &#39;Renam\u018fd '
+            "Vol&#39;</li>",
             html=True,
         )
 
@@ -389,7 +385,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         member = volunteer.member
         self.assertTrue(member.volunteer.active)
         # Changed things:
-        self.assertEqual(member.name, u"Renam\u018fd Vol")
+        self.assertEqual(member.name, "Renam\u018fd Vol")
         self.assertEqual(member.email, "")
         self.assertEqual(member.address, "")
         self.assertEqual(member.posttown, "")
@@ -420,19 +416,19 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         response = self.client.post(
             url,
             data={
-                u"mem-name": u"Renam\u018fd Vol",
-                u"mem-email": "snoo@whatver.com",
-                u"mem-address": "somewhere over the rainbow, I guess",
-                u"mem-posttown": "Town Town Town!",
-                u"mem-postcode": "< Sixteen chars?",
-                u"mem-country": "Suriname",
-                u"mem-website": "http://still_don't_care/",
-                u"mem-phone": "+44 1000000000000001",
-                u"mem-altphone": "-1 3202394 2352 23 234",
-                u"mem-mailout_failed": "t",
-                u"mem-notes": "member notes shouldn't be on this form!",
-                u"vol-notes": "plays the balalaika really badly",
-                u"vol-roles": [2, 3],
+                "mem-name": "Renam\u018fd Vol",
+                "mem-email": "snoo@whatver.com",
+                "mem-address": "somewhere over the rainbow, I guess",
+                "mem-posttown": "Town Town Town!",
+                "mem-postcode": "< Sixteen chars?",
+                "mem-country": "Suriname",
+                "mem-website": "http://still_don't_care/",
+                "mem-phone": "+44 1000000000000001",
+                "mem-altphone": "-1 3202394 2352 23 234",
+                "mem-mailout_failed": "t",
+                "mem-notes": "member notes shouldn't be on this form!",
+                "vol-notes": "plays the balalaika really badly",
+                "vol-roles": [2, 3],
             },
             follow=True,
         )
@@ -441,8 +437,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
 
         self.assertContains(
             response,
-            u'<li class="success">Updated volunteer &#39;Renam\u018fd '
-            u"Vol&#39;</li>",
+            '<li class="success">Updated volunteer &#39;Renam\u018fd '
+            "Vol&#39;</li>",
             html=True,
         )
 
@@ -454,7 +450,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         volunteer = Volunteer.objects.get(id=1)
         member = volunteer.member
         self.assertTrue(member.volunteer.active)
-        self.assertEqual(member.name, u"Renam\u018fd Vol")
+        self.assertEqual(member.name, "Renam\u018fd Vol")
         self.assertEqual(member.email, "snoo@whatver.com")
         self.assertEqual(member.address, "somewhere over the rainbow, I guess")
         self.assertEqual(member.posttown, "Town Town Town!")
@@ -489,7 +485,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
 
         # The only mandatory field (!)
         self.assertFormError(
-            response, "mem_form", "name", u"This field is required."
+            response, "mem_form", "name", "This field is required."
         )
 
     def test_post_update_vol_invalid_vol_id(self):
@@ -522,14 +518,14 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         response = self.client.post(
             url,
             data={
-                u"mem-name": u"Pictureless Person",
-                u"vol-portrait-clear": "t",
+                "mem-name": "Pictureless Person",
+                "vol-portrait-clear": "t",
             },
         )
         self.assertRedirects(response, reverse("view-volunteer-summary"))
 
         vol = Volunteer.objects.get(id=1)
-        self.assertEqual(vol.member.name, u"Pictureless Person")
+        self.assertEqual(vol.member.name, "Pictureless Person")
         self.assertEqual(vol.portrait, "")
 
         # Should have deleted the old images:
@@ -571,15 +567,15 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
             response = self.client.post(
                 url,
                 data={
-                    u"mem-name": u"Pictureless Person",
-                    u"vol-portrait": new_jpg_file,
+                    "mem-name": "Pictureless Person",
+                    "vol-portrait": new_jpg_file,
                 },
             )
 
         self.assertRedirects(response, reverse("view-volunteer-summary"))
 
         vol = Volunteer.objects.get(id=1)
-        self.assertEqual(vol.member.name, u"Pictureless Person")
+        self.assertEqual(vol.member.name, "Pictureless Person")
 
         # Portrait path should be:
         self.assertEqual(
@@ -614,8 +610,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         response = self.client.post(
             url,
             data={
-                u"mem-name": u"Pictureless Person",
-                u"vol-image_data": (
+                "mem-name": "Pictureless Person",
+                "vol-image_data": (
                     "data:image/png;base64,%s" % TINY_VALID_BASE64_PNG
                 ),
             },
@@ -624,7 +620,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertRedirects(response, reverse("view-volunteer-summary"))
 
         vol = Volunteer.objects.get(id=1)
-        self.assertEqual(vol.member.name, u"Pictureless Person")
+        self.assertEqual(vol.member.name, "Pictureless Person")
 
         # Portrait path should be:
         self.assertEqual(vol.portrait.name, expected_upload_path)
@@ -648,8 +644,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         response = self.client.post(
             url,
             data={
-                u"mem-name": u"Pictureless Person",
-                u"vol-image_data": (
+                "mem-name": "Pictureless Person",
+                "vol-image_data": (
                     "data:image/jpeg;base64,%s" % TINY_VALID_BASE64_PNG
                 ),
             },
@@ -662,7 +658,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         #                      u'Image data format not recognised')
 
         vol = Volunteer.objects.get(id=1)
-        self.assertNotEqual(vol.member.name, u"Pictureless Person")
+        self.assertNotEqual(vol.member.name, "Pictureless Person")
         self.assertEqual(vol.portrait.name, initial_portrait)
 
     def test_post_update_vol_set_portrait_data_bad_bytes(self):
@@ -675,8 +671,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         response = self.client.post(
             url,
             data={
-                u"mem-name": u"Pictureless Person",
-                u"vol-image_data": "data:image/png;base64,%s" % INVALID_PNG,
+                "mem-name": "Pictureless Person",
+                "vol-image_data": "data:image/png;base64,%s" % INVALID_PNG,
             },
         )
 
@@ -687,7 +683,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         #                      u'Image data format not recognised')
 
         vol = Volunteer.objects.get(id=1)
-        self.assertNotEqual(vol.member.name, u"Pictureless Person")
+        self.assertNotEqual(vol.member.name, "Pictureless Person")
         self.assertEqual(vol.portrait.name, initial_portrait)
 
 
@@ -710,8 +706,8 @@ class TestAddTraining(MembersTestsMixin, TestCase):
 
         self.assertFalse(role in vol.roles.all())
 
-        trainer = u"Friendly Trainer \u0187hri\u01a8topher"
-        notes = u" No notes\nare noted... here. "
+        trainer = "Friendly Trainer \u0187hri\u01a8topher"
+        notes = " No notes\nare noted... here. "
 
         post_data = {
             "training-training_type": TrainingRecord.ROLE_TRAINING,
@@ -775,9 +771,9 @@ class TestAddTraining(MembersTestsMixin, TestCase):
             {
                 "succeeded": False,
                 "errors": {
-                    u"training_type": [u"This field is required."],
-                    u"trainer": [u"This field is required."],
-                    u"training_date": [u"This field is required."],
+                    "training_type": ["This field is required."],
+                    "trainer": ["This field is required."],
+                    "training_date": ["This field is required."],
                 },
             },
         )
@@ -802,7 +798,7 @@ class TestAddTraining(MembersTestsMixin, TestCase):
             {
                 "succeeded": False,
                 "errors": {
-                    u"role": [u"This field is required."],
+                    "role": ["This field is required."],
                 },
             },
             response.json(),
@@ -911,8 +907,8 @@ class TestAddGroupTraining(MembersTestsMixin, TestCase):
         url = reverse("add-volunteer-training-group-record")
 
         role = Role.objects.get(id=1)
-        trainer = u"Trainer \u0187hri\u01a8topher"
-        notes = u" Some not\u018fs\nwere noted here. "
+        trainer = "Trainer \u0187hri\u01a8topher"
+        notes = " Some not\u018fs\nwere noted here. "
         training_date = datetime.date(day=4, month=5, year=2016)
 
         volunteers = Volunteer.objects.filter(active=True)[:3]
@@ -989,7 +985,7 @@ class TestAddGroupTraining(MembersTestsMixin, TestCase):
             response,
             "form",
             "volunteers",
-            u"Select a valid choice. %d is not one of the available choices."
+            "Select a valid choice. %d is not one of the available choices."
             % (volunteers[1].member.id),
         )
 
@@ -1004,19 +1000,19 @@ class TestAddGroupTraining(MembersTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_group_training.html")
 
         self.assertFormError(
-            response, "form", "type", u"This field is required."
+            response, "form", "type", "This field is required."
         )
         # 'role' isn't requireed unless 'type' is selected
         # self.assertFormError(response, 'form', 'role',
         #                     u'This field is required.')
         self.assertFormError(
-            response, "form", "training_date", u"This field is required."
+            response, "form", "training_date", "This field is required."
         )
         self.assertFormError(
-            response, "form", "trainer", u"This field is required."
+            response, "form", "trainer", "This field is required."
         )
         self.assertFormError(
-            response, "form", "volunteers", u"This field is required."
+            response, "form", "volunteers", "This field is required."
         )
 
     def test_add_group_record_missing_role(self):
@@ -1039,7 +1035,7 @@ class TestAddGroupTraining(MembersTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_group_training.html")
 
         self.assertFormError(
-            response, "form", "role", u"This field is required."
+            response, "form", "role", "This field is required."
         )
 
 

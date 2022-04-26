@@ -294,7 +294,7 @@ def edit_member(request, member_id):
         )
         if form.is_valid():
             logger.info(
-                u"Saving changes to member '{0}' (id: {1})".format(
+                "Saving changes to member '{0}' (id: {1})".format(
                     member.name, member.pk
                 )
             )
@@ -302,7 +302,7 @@ def edit_member(request, member_id):
             messages.add_message(
                 request,
                 messages.SUCCESS,
-                u"Member {0} updated".format(member.number),
+                "Member {0} updated".format(member.number),
             )
             if request.user.has_perm("toolkit.write"):
                 return HttpResponseRedirect(reverse("search-members"))
@@ -345,14 +345,14 @@ def unsubscribe_member(request, member_id):
             member.mailout = action == "subscribe"
             member.save()
             logger.info(
-                u"{0} member '{1}' (id: {2}) from mailing list".format(
+                "{0} member '{1}' (id: {2}) from mailing list".format(
                     action, member.name, member.pk
                 )
             )
             messages.add_message(
                 request,
                 messages.SUCCESS,
-                u"Member {0} {1}d".format(member.number, action),
+                "Member {0} {1}d".format(member.number, action),
             )
 
     action = "unsubscribe" if member.mailout else "subscribe"
@@ -388,14 +388,14 @@ def unsubscribe_member_right_now(request, member_id):
     member.mailout = False
     member.save()
     logger.info(
-        u"{0} member '{1}' (id: {2}) from mailing list".format(
+        "{0} member '{1}' (id: {2}) from mailing list".format(
             action, member.name, member.pk
         )
     )
     messages.add_message(
         request,
         messages.SUCCESS,
-        u"Member {0} {1}d".format(member.number, action),
+        "Member {0} {1}d".format(member.number, action),
     )
 
     return render(
@@ -442,7 +442,7 @@ def opt_in(request, member_id):
             member.save()
 
             logger.info(
-                u"Member '{0}' (id: {1}) <{2}>: {3} on {4}".format(
+                "Member '{0}' (id: {1}) <{2}>: {3} on {4}".format(
                     member.name,
                     member.pk,
                     member.email,

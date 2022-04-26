@@ -30,14 +30,14 @@ class MultiBlankLineFilterNode(template.Node):
         output = self.nodelist.render(context)
         filtered_lines = []
 
-        for line in output.split(u"\n"):
+        for line in output.split("\n"):
             line = line.rstrip()
-            if filtered_lines and filtered_lines[-1] == u"" and line == u"":
+            if filtered_lines and filtered_lines[-1] == "" and line == "":
                 pass
             else:
                 filtered_lines.append(line)
 
-        return u"\n".join(filtered_lines)
+        return "\n".join(filtered_lines)
 
 
 @register.tag(name="filterblanklines")
@@ -60,7 +60,7 @@ class BlankLineFilterNode(template.Node):
 
     def render(self, context):
         output = self.nodelist.render(context)
-        output = u"\n".join(
-            [line for line in output.split(u"\n") if line.strip() != ""]
+        output = "\n".join(
+            [line for line in output.split("\n") if line.strip() != ""]
         )
         return output

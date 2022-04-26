@@ -146,7 +146,8 @@ class Command(BaseCommand):
                     newbody = "%s\n\n%s" % (newbody, para)
             # print(newbody)
 
-            shebang = "sudo -u %s wp post create \
+            shebang = (
+                "sudo -u %s wp post create \
                 --post_content=\"%s\" \
                 --post_date='%s 18:00:00' \
                 --post_title=\"%s\" \
@@ -156,16 +157,18 @@ class Command(BaseCommand):
                 --post_category=['%s'] \
                 --post_mime_type='text/html' \
                 --path='%s' \
-                --url='%s'" % (
-                shell_user,
-                newbody,
-                created,
-                title,
-                summary,
-                author,
-                doc_type,
-                wordpress_path,
-                url,
+                --url='%s'"
+                % (
+                    shell_user,
+                    newbody,
+                    created,
+                    title,
+                    summary,
+                    author,
+                    doc_type,
+                    wordpress_path,
+                    url,
+                )
             )
 
             if not options["inspect"]:

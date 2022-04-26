@@ -90,10 +90,10 @@ class ShowingModelCustomQueryset(DiaryTestsMixin, TestCase):
 class EventModelNonLegacyCopy(TestCase):
     def setUp(self):
         self.sample_copy = (
-            u"<p>Simple &amp; tidy HTML/unicode \u00a9\u014dpy\n</p>\n"
-            u"<p>With a <a href='http://example.com/foo/'>link!</a>"
-            u"<p>And another! <a href='https://example.com/bar/'>link!</a>"
-            u" and some equivalent things; &pound; &#163; \u00a3<br></p>"
+            "<p>Simple &amp; tidy HTML/unicode \u00a9\u014dpy\n</p>\n"
+            "<p>With a <a href='http://example.com/foo/'>link!</a>"
+            "<p>And another! <a href='https://example.com/bar/'>link!</a>"
+            " and some equivalent things; &pound; &#163; \u00a3<br></p>"
         )
         self.event = Event(
             name="Test event", legacy_copy=False, copy=self.sample_copy
@@ -110,10 +110,10 @@ class EventModelNonLegacyCopy(TestCase):
 
     def test_plaintext_copy(self):
         expected = (
-            u"Simple & tidy HTML/unicode \u00a9\u014dpy \n\n"
-            u"With a link!: http://example.com/foo/\n\n"
-            u"And another! link!: https://example.com/bar/"
-            u" and some equivalent things; \u00a3 \u00a3 \u00a3  \n\n"
+            "Simple & tidy HTML/unicode \u00a9\u014dpy \n\n"
+            "With a link!: http://example.com/foo/\n\n"
+            "And another! link!: https://example.com/bar/"
+            " and some equivalent things; \u00a3 \u00a3 \u00a3  \n\n"
         )
         self.assertEqual(self.event.copy_plaintext, expected)
 
@@ -121,11 +121,11 @@ class EventModelNonLegacyCopy(TestCase):
 class EventModelLegacyCopy(TestCase):
     def setUp(self):
         self.sample_copy = (
-            u"Simple &amp; tidy legacy \u00a9\u014dpy\n\n"
-            u"With an unardorned link: http://example.com/foo/"
-            u" https://example.com/foo/"
-            u" and some equivalent things; &pound; &#163; \u00a3..."
-            u" and <this> \"'<troublemaker>'\""
+            "Simple &amp; tidy legacy \u00a9\u014dpy\n\n"
+            "With an unardorned link: http://example.com/foo/"
+            " https://example.com/foo/"
+            " and some equivalent things; &pound; &#163; \u00a3..."
+            " and <this> \"'<troublemaker>'\""
         )
         self.event = Event(
             name="Test event", legacy_copy=True, copy=self.sample_copy
@@ -139,22 +139,22 @@ class EventModelLegacyCopy(TestCase):
 
     def test_html_copy(self):
         expected = (
-            u"Simple &amp; tidy legacy \u00a9\u014dpy <br><br>"
-            u"With an unardorned link: "
-            u'<a href="http://example.com/foo/">http://example.com/foo/</a>'
-            u' <a href="https://example.com/foo/">https://example.com/foo/</a>'
-            u" and some equivalent things; &pound; &#163; \u00a3..."
-            u" and <this> \"'<troublemaker>'\""
+            "Simple &amp; tidy legacy \u00a9\u014dpy <br><br>"
+            "With an unardorned link: "
+            '<a href="http://example.com/foo/">http://example.com/foo/</a>'
+            ' <a href="https://example.com/foo/">https://example.com/foo/</a>'
+            " and some equivalent things; &pound; &#163; \u00a3..."
+            " and <this> \"'<troublemaker>'\""
         )
         self.assertEqual(self.event.copy_html, expected)
 
     def test_plaintext_copy(self):
         expected = (
-            u"Simple & tidy legacy \u00a9\u014dpy\n\n"
-            u"With an unardorned link: http://example.com/foo/"
-            u" https://example.com/foo/"
-            u" and some equivalent things; \u00a3 \u00a3 \u00a3..."
-            u" and <this> \"'<troublemaker>'\""
+            "Simple & tidy legacy \u00a9\u014dpy\n\n"
+            "With an unardorned link: http://example.com/foo/"
+            " https://example.com/foo/"
+            " and some equivalent things; \u00a3 \u00a3 \u00a3..."
+            " and <this> \"'<troublemaker>'\""
         )
         self.assertEqual(self.event.copy_plaintext, expected)
 
@@ -180,64 +180,64 @@ class EventPricingFromTemplate(DiaryTestsMixin, TestCase):
         # No pricing specified when creating the event, and pricing specified
         # in the template:
         new_event = Event(
-            name=u"Event Title",
+            name="Event Title",
             template=self.tmpl1,
         )
-        self.assertEqual(new_event.pricing, u"Entry: \u00a35 / \u20ac10")
+        self.assertEqual(new_event.pricing, "Entry: \u00a35 / \u20ac10")
         new_event.save()
-        self.assertEqual(new_event.pricing, u"Entry: \u00a35 / \u20ac10")
+        self.assertEqual(new_event.pricing, "Entry: \u00a35 / \u20ac10")
 
     def test_dont_set_pricing_from_template(self):
         # Pricing specified when creating the event, and pricing specified in
         # the template:
         new_event = Event(
-            name=u"Event Title",
-            pricing=u"Actual pricing",
+            name="Event Title",
+            pricing="Actual pricing",
             template=self.tmpl1,
         )
-        self.assertEqual(new_event.pricing, u"Actual pricing")
+        self.assertEqual(new_event.pricing, "Actual pricing")
         new_event.save()
-        self.assertEqual(new_event.pricing, u"Actual pricing")
+        self.assertEqual(new_event.pricing, "Actual pricing")
 
     def test_cant_set_pricing_from_template(self):
         # Pricing specified when creating the event, and no pricing specified
         # in the template:
         new_event = Event(
-            name=u"Event Title",
-            pricing=u"Actual pricing",
+            name="Event Title",
+            pricing="Actual pricing",
             template=self.tmpl3,
         )
-        self.assertEqual(new_event.pricing, u"Actual pricing")
+        self.assertEqual(new_event.pricing, "Actual pricing")
         new_event.save()
-        self.assertEqual(new_event.pricing, u"Actual pricing")
+        self.assertEqual(new_event.pricing, "Actual pricing")
 
     def test_set_from_template_no_pricing(self):
         # No pricing specified when creating the event, and no pricing
         # specified in the template:
         new_event = Event(
-            name=u"Event Title",
+            name="Event Title",
             template=self.tmpl3,
         )
-        self.assertEqual(new_event.pricing, u"")
+        self.assertEqual(new_event.pricing, "")
         new_event.save()
-        self.assertEqual(new_event.pricing, u"")
+        self.assertEqual(new_event.pricing, "")
 
     def test_no_template(self):
         # Pricing specified when creating the event, and no pricing specified
         # in the template:
         new_event = Event(
-            name=u"Event Title",
-            pricing=u"Actual pricing",
+            name="Event Title",
+            pricing="Actual pricing",
         )
-        self.assertEqual(new_event.pricing, u"Actual pricing")
+        self.assertEqual(new_event.pricing, "Actual pricing")
         new_event.save()
-        self.assertEqual(new_event.pricing, u"Actual pricing")
+        self.assertEqual(new_event.pricing, "Actual pricing")
 
 
 class EventTagsFromTemplate(DiaryTestsMixin, TestCase):
     def test_set_one_tag_from_template(self):
         new_event = Event(
-            name=u"Event Title",
+            name="Event Title",
             template=self.tmpl1,
         )
         new_event.save()
@@ -247,12 +247,12 @@ class EventTagsFromTemplate(DiaryTestsMixin, TestCase):
         new_event.reset_tags_to_default()
 
         self.assertEqual(new_event.tags.count(), 1)
-        self.assertEqual(new_event.tags.all()[0].name, u"tag one")
-        self.assertEqual(new_event.tags.all()[0].slug, u"tag-one")
+        self.assertEqual(new_event.tags.all()[0].name, "tag one")
+        self.assertEqual(new_event.tags.all()[0].slug, "tag-one")
 
     def test_set_two_tags_from_template(self):
         new_event = Event(
-            name=u"Event Title",
+            name="Event Title",
             template=self.tmpl2,
         )
         new_event.save()
@@ -262,14 +262,14 @@ class EventTagsFromTemplate(DiaryTestsMixin, TestCase):
         new_event.reset_tags_to_default()
 
         self.assertEqual(new_event.tags.count(), 2)
-        self.assertEqual(new_event.tags.all()[0].name, u"tag one")
-        self.assertEqual(new_event.tags.all()[0].slug, u"tag-one")
-        self.assertEqual(new_event.tags.all()[1].name, u"tag three")
-        self.assertEqual(new_event.tags.all()[1].slug, u"tag-three")
+        self.assertEqual(new_event.tags.all()[0].name, "tag one")
+        self.assertEqual(new_event.tags.all()[0].slug, "tag-one")
+        self.assertEqual(new_event.tags.all()[1].name, "tag three")
+        self.assertEqual(new_event.tags.all()[1].slug, "tag-three")
 
     def test_set_no_tags_from_template(self):
         new_event = Event(
-            name=u"Event Title",
+            name="Event Title",
             template=self.tmpl3,
         )
         new_event.save()
@@ -284,7 +284,7 @@ class EventTagsFromTemplate(DiaryTestsMixin, TestCase):
     def test_set_tags_no_template(self):
         # No template set, call reset_tags
         new_event = Event(
-            name=u"Event Title",
+            name="Event Title",
         )
         new_event.save()
         self.assertEqual(new_event.tags.count(), 0)
@@ -296,7 +296,7 @@ class EventTagsFromTemplate(DiaryTestsMixin, TestCase):
 
 class EventTagTests(TestCase):
     def test_can_delete_not_readonly(self):
-        tag = EventTag(name=u"test", slug=u"test", read_only=False)
+        tag = EventTag(name="test", slug="test", read_only=False)
         tag.save()
         pk = tag.pk
 
@@ -305,7 +305,7 @@ class EventTagTests(TestCase):
         self.assertEqual(EventTag.objects.filter(id=pk).count(), 0)
 
     def test_cant_delete_readonly(self):
-        tag = EventTag(name=u"test", slug=u"test", read_only=True)
+        tag = EventTag(name="test", slug="test", read_only=True)
         tag.save()
         pk = tag.pk
 
@@ -316,7 +316,7 @@ class EventTagTests(TestCase):
         self.assertEqual(tag.name, "test")
 
     def test_can_edit_not_readonly(self):
-        tag = EventTag(name=u"test", slug=u"test", read_only=False)
+        tag = EventTag(name="test", slug="test", read_only=False)
         tag.save()
         pk = tag.pk
         # Try to edit:
@@ -329,7 +329,7 @@ class EventTagTests(TestCase):
         self.assertEqual(tag.sort_order, 0xBAD)
 
     def test_can_change_to_readonly(self):
-        tag = EventTag(name=u"test", slug=u"test", read_only=False)
+        tag = EventTag(name="test", slug="test", read_only=False)
         tag.save()
         pk = tag.pk
 
@@ -346,7 +346,7 @@ class EventTagTests(TestCase):
         self.assertFalse(tag.save())
 
     def test_cant_edit_most_of_readonly(self):
-        tag = EventTag(name=u"test", slug=u"test", read_only=True)
+        tag = EventTag(name="test", slug="test", read_only=True)
         tag.save()
         pk = tag.pk
         # Try to edit:
@@ -364,8 +364,8 @@ class EventTagTests(TestCase):
 
     def test_can_edit_readonly_promotion(self):
         tag = EventTag(
-            name=u"test",
-            slug=u"test",
+            name="test",
+            slug="test",
             read_only=True,
             sort_order=1,
             promoted=False,
@@ -389,47 +389,47 @@ class EventTagTests(TestCase):
         self.assertEqual(tag.sort_order, 0xF00BA)
 
     def test_clean_case(self):
-        tag = EventTag(name=u"BIGlettersHERE")
+        tag = EventTag(name="BIGlettersHERE")
         tag.clean()
         self.assertEqual(tag.name, "biglettershere")
         self.assertEqual(tag.slug, "biglettershere")
 
     def test_slugify(self):
-        tag = EventTag(name=u"with space", slug=u"")
+        tag = EventTag(name="with space", slug="")
         tag.clean()
         self.assertEqual(tag.name, "with space")
         self.assertEqual(tag.slug, "with-space")
 
-        tag = EventTag(name=u"with&ampersand")
+        tag = EventTag(name="with&ampersand")
         tag.clean()
         self.assertEqual(tag.name, "with&ampersand")
         self.assertEqual(tag.slug, "withampersand")
 
-        tag = EventTag(name=u"with?questionmark")
+        tag = EventTag(name="with?questionmark")
         tag.clean()
         self.assertEqual(tag.name, "with?questionmark")
         self.assertEqual(tag.slug, "withquestionmark")
 
-        tag = EventTag(name=u"with#hash")
+        tag = EventTag(name="with#hash")
         tag.clean()
         self.assertEqual(tag.name, "with#hash")
         self.assertEqual(tag.slug, "withhash")
 
     def test_reject_blank(self):
-        tag = EventTag(name=u"")
+        tag = EventTag(name="")
         self.assertRaises(ValidationError, tag.full_clean)
 
     def test_must_be_unique(self):
-        t1 = EventTag(name=u"jim", slug=u"jim")
+        t1 = EventTag(name="jim", slug="jim")
         t1.save()
 
-        t2 = EventTag(name=u"jim!", slug=u"jim")
+        t2 = EventTag(name="jim!", slug="jim")
         self.assertRaises(django.db.IntegrityError, t2.save)
 
 
 class RoleTests(TestCase):
     def test_can_delete_not_readonly(self):
-        role = Role(name=u"Role One")
+        role = Role(name="Role One")
         role.save()
         pk = role.pk
 
@@ -438,7 +438,7 @@ class RoleTests(TestCase):
         self.assertEqual(Role.objects.filter(id=pk).count(), 0)
 
     def test_cant_delete_readonly(self):
-        role = Role(name=u"Role One", read_only=True)
+        role = Role(name="Role One", read_only=True)
         role.save()
         pk = role.pk
 
@@ -446,22 +446,22 @@ class RoleTests(TestCase):
         self.assertEqual(Role.objects.filter(id=pk).count(), 1)
 
         role_re = Role.objects.get(id=pk)
-        self.assertEqual(role_re.name, u"Role One")
+        self.assertEqual(role_re.name, "Role One")
 
     def test_can_edit_not_readonly(self):
-        role = Role(name=u"Role One")
+        role = Role(name="Role One")
         role.save()
         pk = role.pk
 
         # Try to edit:
-        role.name = u"Some other thing"
+        role.name = "Some other thing"
         role.save()
 
         role = Role.objects.get(id=pk)
-        self.assertEqual(role.name, u"Some other thing")
+        self.assertEqual(role.name, "Some other thing")
 
     def test_can_change_to_readonly(self):
-        role = Role(name=u"Role One", read_only=False)
+        role = Role(name="Role One", read_only=False)
         role.save()
         pk = role.pk
 
@@ -474,11 +474,11 @@ class RoleTests(TestCase):
         role = Role.objects.get(id=pk)
         self.assertTrue(role.read_only)
 
-        role.name = u"Whatever"
+        role.name = "Whatever"
         self.assertFalse(role.save())
 
     def test_cannot_change_from_readonly(self):
-        role = Role(name=u"Role One", read_only=True, standard=False)
+        role = Role(name="Role One", read_only=True, standard=False)
         role.save()
         pk = role.pk
 
@@ -488,28 +488,28 @@ class RoleTests(TestCase):
         role.save()
 
         role = Role.objects.get(id=pk)
-        self.assertEqual(role.name, u"Role One")
+        self.assertEqual(role.name, "Role One")
         self.assertEqual(role.read_only, True)
         # Can only chang role.standard if nothing else is fiddled with
         # (i.e. atomic?)
         self.assertEqual(role.standard, False)
 
     def test_cannot_change_name_when_readonly(self):
-        role = Role(name=u"Role One", read_only=True, standard=False)
+        role = Role(name="Role One", read_only=True, standard=False)
         role.save()
         pk = role.pk
 
         role = Role.objects.get(id=pk)
-        role.name = u"Rick"
+        role.name = "Rick"
         role.save()
 
         role = Role.objects.get(id=pk)
-        self.assertEqual(role.name, u"Role One")
+        self.assertEqual(role.name, "Role One")
         self.assertEqual(role.read_only, True)
         self.assertEqual(role.standard, False)
 
     def test_can_change_standard_when_readonly(self):
-        role = Role(name=u"Role One", read_only=True, standard=False)
+        role = Role(name="Role One", read_only=True, standard=False)
         role.save()
         pk = role.pk
 
@@ -518,28 +518,28 @@ class RoleTests(TestCase):
         role.save()
 
         role = Role.objects.get(id=pk)
-        self.assertEqual(role.name, u"Role One")
+        self.assertEqual(role.name, "Role One")
         self.assertEqual(role.read_only, True)
         self.assertEqual(role.standard, True)
 
     def test_cant_edit_readonly_name(self):
-        role = Role(name=u"Role One", read_only=True)
+        role = Role(name="Role One", read_only=True)
         role.save()
         pk = role.pk
         # Try to edit:
-        role.name = u"Not a womble"
+        role.name = "Not a womble"
         self.assertFalse(role.save())
 
         role = Role.objects.get(id=pk)
-        self.assertEqual(role.name, u"Role One")
+        self.assertEqual(role.name, "Role One")
 
     def test_reject_blank(self):
-        role = Role(name=u"")
+        role = Role(name="")
         self.assertRaises(ValidationError, role.full_clean)
 
     def test_must_be_unique(self):
-        r1 = Role(name=u"Roller")
+        r1 = Role(name="Roller")
         r1.save()
 
-        r2 = Role(name=u"Roller")
+        r2 = Role(name="Roller")
         self.assertRaises(django.db.IntegrityError, r2.save)

@@ -213,30 +213,30 @@ def activate_volunteer(request, set_active=True):
     vol.save()
 
     logger.info(
-        u"{0} set active to {1} for volunteer {2}".format(
+        "{0} set active to {1} for volunteer {2}".format(
             request.user.last_name, str(set_active), vol.member.name
         )
     )
     messages.add_message(
         request,
         messages.SUCCESS,
-        u"{0} volunteer {1}".format(
-            u"Unretired" if set_active else u"Retired", vol.member.name
+        "{0} volunteer {1}".format(
+            "Unretired" if set_active else "Retired", vol.member.name
         ),
     )
     # email admin with the news
     admin_body = (
-        u"I'm delighted to inform you that %s has updated the "
-        u"status of volunteer\n\n"
-        u"%s <%s>\n\n"
-        u"to %s.\n\n"
-        u"Please amend the volunteers mailing list "
-        u"at your earliest convenience."
+        "I'm delighted to inform you that %s has updated the "
+        "status of volunteer\n\n"
+        "%s <%s>\n\n"
+        "to %s.\n\n"
+        "Please amend the volunteers mailing list "
+        "at your earliest convenience."
         % (
             request.user.last_name,
             vol.member.name,
             vol.member.email,
-            u"unretired" if set_active else u"retired",
+            "unretired" if set_active else "retired",
         )
     )
     send_mail(
@@ -290,7 +290,7 @@ def edit_volunteer(request, volunteer_id, create_new=False):
             vol_form.save()
 
             logger.info(
-                u"Saving changes to volunteer '{0}' (id: {1})".format(
+                "Saving changes to volunteer '{0}' (id: {1})".format(
                     volunteer.member.name, str(volunteer.pk)
                 )
             )
@@ -298,20 +298,20 @@ def edit_volunteer(request, volunteer_id, create_new=False):
             messages.add_message(
                 request,
                 messages.SUCCESS,
-                u"{0} volunteer '{1}'".format(
-                    u"Created" if create_new else u"Updated", member.name
+                "{0} volunteer '{1}'".format(
+                    "Created" if create_new else "Updated", member.name
                 ),
             )
 
             if create_new:
                 # Email admin
                 admin_body = (
-                    u"I'm delighted to inform you that %s has just added "
-                    u"new volunteer\n\n"
-                    u"%s <%s>\n\n"
-                    u"to the toolkit.\n\n"
-                    u"Please add them to the volunteers mailing list "
-                    u"at your earliest convenience."
+                    "I'm delighted to inform you that %s has just added "
+                    "new volunteer\n\n"
+                    "%s <%s>\n\n"
+                    "to the toolkit.\n\n"
+                    "Please add them to the volunteers mailing list "
+                    "at your earliest convenience."
                     % (
                         request.user.last_name,
                         volunteer.member.name,
@@ -371,7 +371,7 @@ def add_volunteer_training_record(request, volunteer_id):
     elif record_form.is_valid():
         record_form.save()
         logger.info(
-            u"Added training record {0} for volunteer '{1}'".format(
+            "Added training record {0} for volunteer '{1}'".format(
                 new_record.id, volunteer.member.name
             )
         )
@@ -403,7 +403,7 @@ def delete_volunteer_training_record(request, training_record_id):
     record = get_object_or_404(TrainingRecord, id=training_record_id)
 
     if not record.volunteer.active:
-        logger.error(u"Tried to delete training record for inactive volunteer")
+        logger.error("Tried to delete training record for inactive volunteer")
         return HttpResponse(
             "Can't delete record for inactive volunteer",
             status=403,
@@ -411,7 +411,7 @@ def delete_volunteer_training_record(request, training_record_id):
         )
 
     logger.info(
-        u"Deleting training_record '{0}' for volunteer '{1}'".format(
+        "Deleting training_record '{0}' for volunteer '{1}'".format(
             record.id, record.volunteer.member.name
         )
     )
@@ -512,7 +512,7 @@ def add_volunteer_training_group_record(request):
                 messages.add_message(
                     request,
                     messages.SUCCESS,
-                    u"Added %d training records for %s"
+                    "Added %d training records for %s"
                     % (
                         len(form.cleaned_data["volunteers"]),
                         form.cleaned_data["role"],
@@ -522,7 +522,7 @@ def add_volunteer_training_group_record(request):
                 messages.add_message(
                     request,
                     messages.SUCCESS,
-                    u"Added %d %s records"
+                    "Added %d %s records"
                     % (
                         len(form.cleaned_data["volunteers"]),
                         TrainingRecord.GENERAL_TRAINING_DESC,

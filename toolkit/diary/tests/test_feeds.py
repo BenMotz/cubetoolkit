@@ -59,10 +59,10 @@ class FeedTests(DiaryTestsMixin, TestCase):
 
         showing = self.e4s3
 
-        self.assertEqual(item.find("title").text, u"Event four titl\u0113")
+        self.assertEqual(item.find("title").text, "Event four titl\u0113")
         self.assertEqual(
             item.find("description").text,
-            u"09/06/2013 17:00<br><br>Event four C\u014dpy",
+            "09/06/2013 17:00<br><br>Event four C\u014dpy",
         )
         item_link_path = urllib.parse.urlparse(item.find("link").text).path
         self.assertEqual(
