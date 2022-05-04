@@ -252,8 +252,6 @@ def mailout_test_send(request):
 @permission_required("toolkit.write")
 @require_GET
 def mailout_progress(request):
-    async_result = celery.result.AsyncResult(id=request.GET["task_id"])
-    state = async_result.state
     progress = 0
     complete = False
     # Following values are set if complete:
