@@ -1,14 +1,11 @@
 # Fix versions of django and directly related components:
 Django<2.3,>=2.2
-django-debug-toolbar==3.2.2
 celery[redis]>4,<5
 easy_thumbnails==2.7.2
 # Functionality introduced at these versions is required:
 python-magic>=0.4.0
 # These should (!) have stable APIs, so let upgrades happen
 python-dateutil
-mock
-fixtures<4
 pytz
 # For generating non-html copy for mailout etc:
 html2text==3.200.3

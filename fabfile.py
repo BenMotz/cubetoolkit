@@ -6,7 +6,7 @@ from fabric import utils
 from fabric.contrib import console
 
 VIRTUALENV = "venv"
-REQUIREMENTS_FILE = "requirements.txt"
+REQUIREMENTS_FILE = "requirements/base.txt"
 
 # This is deleted whenever code is deployed
 CODE_DIRS = ["toolkit", "easy_thumbnails"]

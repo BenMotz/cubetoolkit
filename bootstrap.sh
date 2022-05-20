@@ -6,10 +6,8 @@ set -e
 
 VENV_PATH=./venv
 VIRTUALENV_OPTIONS="--system-site-packages"
-# Requirements to run the django app:
-REQUIREMENTS_FILE=requirements.txt
-# Requirements to develop/test/deploy:
-REQUIREMENTS_DEV=requirements_development.txt
+# Requirements to run the django app and develop/test/deploy:
+REQUIREMENTS_DEV=requirements/dev.txt
 PYTHON_INTERPRETER=/usr/bin/python3
 
 usage() {
@@ -46,5 +44,4 @@ virtualenv -p ${PYTHON_INTERPRETER} $VENV_PATH $VIRTUALENV_OPTIONS
 source $VENV_PATH/bin/activate
 
 pip install --upgrade pip
-pip install --requirement $REQUIREMENTS_FILE
 pip install --requirement $REQUIREMENTS_DEV

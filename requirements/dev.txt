@@ -1,0 +1,16 @@
+-r base.txt
+
+django-debug-toolbar==3.2.2
+
+# For running tests
+mock
+fixtures<4
+
+# Formatter
+black==22.3.0
+
+# For deploying
+fabric3
+
+# Improve the Django interactive shell:
+ipython
