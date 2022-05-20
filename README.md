@@ -13,14 +13,18 @@ diary, membership database, and CMS (using Wagtail).
 It was initially written to closely emulate a set of Perl CGI scripts, which
 is why the UI is the way it is.
 
-Installation
-------------
-This is very much the code for the Cube's purposes, as such no great effort
-has been made to make it easy to install elsewhere. There are detailed
-instructions on the Cube wiki about how to get the development version up and
-running, and how to deploy to the Cube's live and staging servers. If anyone
-ever expresses any interest at all then I'd be happy to suck that out of the
-Cube wiki into this repository.
+Deployment for production
+-------------------------
+
+At present the application is deployed directly onto a real live server that
+you could drop on your foot if you were so minded. The process for deployment
+is somewhat complicated, and there are detailed instructions on the Cube wiki
+about how to deploy to do it.(If anyone ever expresses any interest at all then
+I'd be happy to suck that out of the Cube wiki into this repository.)
+
+In the future the plan is to deploy the application in a container; there is
+a Dockerfile you can build (`docker build . --tag toolkit:latest`), however
+this is not yet in use in production.
 
 License
 -------

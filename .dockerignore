@@ -1,4 +1,5 @@
 .git
+.tox
 media/
 venv/
 site_transfer.tgz

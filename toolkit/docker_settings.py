@@ -15,14 +15,19 @@ DATABASES = {
     }
 }
 
+CELERY_BROKER_URL = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = os.environ.get("REDIS_URL", "redis://localhost:6379/0")
+
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ["SECRET_KEY"]
 
-LOGGING["handlers"]["file"]["filename"] = "/var/log/cubetoolkit/debug.log"
+# Disable the log file
+del LOGGING["handlers"]["file"]
+LOGGING["loggers"]["toolkit"]["handlers"] = ["console"]
 
-# Enable logging to the logfile (configured in settings_common.py)
+# Instead enable logging to the console (configured in settings_common.py)
 LOGGING["root"] = {
-    "handlers": ["file", "mail_admins"],
+    "handlers": ["console", "mail_admins"],
     "level": "DEBUG",
 }
 
