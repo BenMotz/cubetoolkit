@@ -12,6 +12,8 @@ html2text==3.200.3
 # CMS:
 wagtail>=2.12,<2.13
 monthdelta
+# needed by wagtail for old form data:
+unidecode
 
 # The MySQL-python library requires a C build chain (gcc, etc.) and the mysql
 # library headers to be installed, which isn't desirable on deployment hosts.
