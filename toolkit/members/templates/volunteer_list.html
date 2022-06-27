@@ -141,6 +141,7 @@ Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
                     {% if member.phone %}{{ member.phone }}<br>{% endif %}
                     {% if member.altphone %}{{ member.altphone }}<br>{% endif %}
                     {% endif %}
+                    {% if member.personal_pronouns %}This volunteer uses {{ member.personal_pronouns }} pronouns.<br>{% endif %}
                     {% if volunteer.active %}<a href="{% url "edit-volunteer" volunteer.pk %}">[update]</a>{% endif %}
                     </p>
                 </div>

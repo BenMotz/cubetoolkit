@@ -110,6 +110,7 @@ class Member(models.Model):
     website = models.CharField(max_length=128, blank=True)
     phone = models.CharField(max_length=64, blank=True)
     altphone = models.CharField(max_length=64, blank=True)
+    personal_pronouns = models.CharField(max_length=64, blank=True)
     notes = models.TextField(blank=True)
 
     is_member = models.BooleanField(default=True)
