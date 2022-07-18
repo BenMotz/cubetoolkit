@@ -7,16 +7,19 @@ from django.db import migrations, models
 
 class Migration(migrations.Migration):
 
-    replaces = [('members', '0008_member_preferred_pronouns'), ('members', '0009_auto_20220627_1114')]
+    replaces = [
+        ("members", "0008_member_preferred_pronouns"),
+        ("members", "0009_auto_20220627_1114"),
+    ]
 
     dependencies = [
-        ('members', '0007_member_gdpr_opt_in'),
+        ("members", "0007_member_gdpr_opt_in"),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='member',
-            name='personal_pronouns',
+            model_name="member",
+            name="personal_pronouns",
             field=models.CharField(blank=True, max_length=64),
         ),
     ]
