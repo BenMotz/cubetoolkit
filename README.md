@@ -26,6 +26,10 @@ In the future the plan is to deploy the application in a container; there is
 a Dockerfile you can build (`docker build . --tag toolkit:latest`), however
 this is not yet in use in production.
 
+There is a `docker-compose.yml` file that may be used with docker-compose to
+run the toolkit and associated services: this is currently intended for
+development and experimentation, not for production.
+
 License
 -------
 The code is copyright Ben Motz and other contributors. It's currently,
