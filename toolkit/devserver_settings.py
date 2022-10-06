@@ -35,7 +35,7 @@ VENUE["email_unsubcribe_host"] = "localhost:8000"
 DEBUG = True
 TEMPLATES[0]["OPTIONS"]["debug"] = True
 
-ALLOWED_HOSTS = ("127.0.0.1",)
+ALLOWED_HOSTS = ("127.0.0.1", "localhost", "0.0.0.0")
 
 # Django toolbar things:
 INTERNAL_IPS = ("127.0.0.1",)
