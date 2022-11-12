@@ -23,7 +23,7 @@ elif ! [[ -S /var/run/mysqld/mysqld.sock ]] ; then
   exit 3
 fi
 
-if ! wait-for-it $redis_host_port --timeout=360 ; then
+if [[ -n $redis_host_port ]] && ! wait-for-it $redis_host_port --timeout=360 ; then
   echo "Redis not available"
   exit 4
 fi
