@@ -1,8 +1,6 @@
 #!/bin/bash
 set -eu
 
-export DB_HOST=${DB_HOST:-mariadb}
-export DB_PORT=${DB_PORT:-3306}
 export REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
 
 COMMAND=$1
@@ -15,8 +13,13 @@ redis_host_port=${redis_suffix%%/*}
    exit 2
  fi
 
-if ! wait-for-it $DB_HOST:$DB_PORT --timeout=360 ; then
-  echo "Database not available"
+if [[ -n $DB_HOST && -n $DB_PORT ]] ; then
+  if ! wait-for-it $DB_HOST:$DB_PORT --timeout=360 ; then
+    echo "Database host not available"
+    exit 3
+  fi
+elif ! [[ -S /var/run/mysqld/mysqld.sock ]] ; then
+  echo "Database socket not available"
   exit 3
 fi
 
