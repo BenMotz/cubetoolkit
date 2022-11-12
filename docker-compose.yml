@@ -3,9 +3,6 @@ version: "3.7"
 networks:
   toolkit:
     driver: bridge
-volumes:
-  media_data:
-  mariadb_data:
 services:
   toolkit:
     networks:
@@ -15,19 +12,22 @@ services:
     command: ["tk_run", "gunicorn"]
     restart: on-failure
     environment: &commonEnv
-      DB_NAME: "toolkit"
-      DB_USER: "toolkit"
-      DB_PASSWORD: "rubbishpassword"
-      DB_HOST: "mariadb"
-      DB_PORT: "3306"
-      REDIS_URL: "redis://redis:6379/0"
-      SECRET_KEY: "totallyinsecureandnotverysecretkeywhichiswhythisisunsafe"
+      DB_NAME: "${DB_NAME:-toolkit}"
+      DB_USER: "${DB_USER:-toolkit}"
+      DB_PASSWORD: "${DB_PASSWORD-devserver_db_password}"
+      DB_HOST: ""
+      DB_PORT: ""
+      REDIS_URL: "redis://localhost:6379/0"
+      SECRET_KEY: "${DJANGO_SECRET_KEY:?django secret key not set}"
     ports:
       - "8000:8000"
     volumes:
-      - type: volume
-        source: media_data
+      - type: bind
+        source: media
         target: /site/media/
+      - type: bind
+        source: /var/run/mysqld/mysqld.sock
+        target: /var/run/mysqld/mysqld.sock
   celery:
     networks:
       - toolkit
@@ -35,20 +35,11 @@ services:
     command: ["tk_run", "celery"]
     restart: on-failure
     environment: *commonEnv
+    volumes:
+      - type: bind
+        source: /var/run/mysqld/mysqld.sock
+        target: /var/run/mysqld/mysqld.sock
   redis:
     networks:
       - toolkit
     image: redis:7-bullseye
-  mariadb:
-    networks:
-      - toolkit
-    image: mariadb:10
-    environment:
-      MARIADB_USER: toolkit
-      MARIADB_PASSWORD: rubbishpassword
-      MARIADB_ROOT_PASSWORD: rubbishpassword
-      MARIADB_DATABASE: toolkit
-    volumes:
-      - type: volume
-        source: mariadb_data
-        target: /var/lib/mysql
