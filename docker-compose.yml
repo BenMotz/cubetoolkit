@@ -17,7 +17,7 @@ services:
       DB_PASSWORD: "${DB_PASSWORD-devserver_db_password}"
       DB_HOST: ""
       DB_PORT: ""
-      REDIS_URL: "redis://localhost:6379/0"
+      REDIS_URL: "redis://redis:6379/0"
       SECRET_KEY: "${DJANGO_SECRET_KEY:?django secret key not set}"
     ports:
       - "8000:8000"
