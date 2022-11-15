@@ -35,8 +35,7 @@ COPY --from=build /build/wheels /wheels/
 
 WORKDIR "/site"
 
-RUN addgroup --system toolkit \
-    && adduser --system --ingroup toolkit toolkit \
+RUN adduser --no-create-home --disabled-login --gecos x toolkit \
     && pip install --upgrade pip \
     && pip install --no-cache-dir --no-index --find-links=/wheels/ /wheels/* \
     && rm -rf /wheels/
