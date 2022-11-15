@@ -20,7 +20,9 @@ services:
       REDIS_URL: "redis://redis:6379/0"
       SECRET_KEY: "${DJANGO_SECRET_KEY:?django secret key not set}"
     ports:
-      - "8000:8000"
+      - target: "8000"
+        published: "8000"
+        protocol: tcp
     volumes:
       - type: bind
         source: media
