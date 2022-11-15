@@ -42,13 +42,6 @@ RUN adduser --no-create-home --disabled-login --gecos x toolkit \
 
 COPY --chown=toolkit:toolkit . /site/
 
-ENV DB_NAME=toolkit \
-    DB_USER=toolkit \
-    DB_HOST=localhost \
-    DB_PORT=3306 \
-    DB_PASSWORD=devserver_db_password \
-    SECRET_KEY=""
-
 RUN ln -s /site/containerconfig/tk_run.sh /usr/local/bin/tk_run \
      && ln -s /site/toolkit/docker_settings.py /site/toolkit/settings.py \
      && SECRET_KEY="X" /site/manage.py collectstatic --noinput --settings=toolkit.docker_settings \

@@ -8,12 +8,9 @@ COMMAND=$1
 redis_suffix=${REDIS_URL#redis://}
 redis_host_port=${redis_suffix%%/*}
 
- if [[ -z $SECRET_KEY ]] ; then
-   echo SECRET_KEY environment variable not defined
-   exit 2
- fi
+echo "Running as: $(id)"
 
-if [[ -n $DB_HOST && -n $DB_PORT ]] ; then
+if [[ -v DB_HOST && -v DB_PORT && -n $DB_HOST && -n $DB_PORT ]] ; then
   if ! wait-for-it $DB_HOST:$DB_PORT --timeout=360 ; then
     echo "Database host not available"
     exit 3
