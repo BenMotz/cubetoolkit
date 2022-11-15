@@ -25,7 +25,7 @@ services:
         protocol: tcp
     volumes:
       - type: bind
-        source: media
+        source: "${MEDIA_PATH:-$PWD/media/}"
         target: /site/media/
       - type: bind
         source: /var/run/mysqld/mysqld.sock
