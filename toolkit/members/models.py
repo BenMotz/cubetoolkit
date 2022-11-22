@@ -10,7 +10,6 @@ import django.db  # Used for raw query for stats
 from django.conf import settings
 from django.db import models
 from django.db.models import Q
-from django.utils.encoding import python_2_unicode_compatible
 from django.utils.timezone import now as timezone_now
 from django.core.exceptions import ValidationError
 
@@ -91,7 +90,6 @@ def get_default_membership_expiry():
         return None
 
 
-@python_2_unicode_compatible
 class Member(models.Model):
 
     # This is the primary key used in the old perl/bdb system, used as the

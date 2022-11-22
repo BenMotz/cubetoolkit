@@ -9,7 +9,6 @@ import datetime
 from django.db import models
 import django.utils.timezone
 from django.utils.safestring import mark_safe
-from django.utils.encoding import python_2_unicode_compatible
 from django.db.models.query import QuerySet
 from django.utils.text import slugify
 from django.conf import settings
@@ -30,7 +29,6 @@ class FutureDateTimeField(models.DateTimeField):
     default_validators = [validate_in_future]
 
 
-@python_2_unicode_compatible
 class Role(models.Model):
     name = models.CharField(max_length=64, unique=True)
 
@@ -81,7 +79,6 @@ class Role(models.Model):
             return super(Role, self).delete(*args, **kwargs)
 
 
-@python_2_unicode_compatible
 class MediaItem(models.Model):
     """Media (eg. video, audio, html fragment?). Currently to be assoicated
     with events, in future with other things?"""
@@ -140,7 +137,6 @@ class MediaItem(models.Model):
             )
 
 
-@python_2_unicode_compatible
 class EventTag(models.Model):
     name = models.CharField(max_length=32, unique=True)
     slug = models.SlugField(max_length=50, unique=True)  # allow_unicode=True?
@@ -186,7 +182,6 @@ class EventTag(models.Model):
             return super(EventTag, self).delete(*args, **kwargs)
 
 
-@python_2_unicode_compatible
 class Event(models.Model):
 
     name = models.CharField(max_length=256, blank=False)
@@ -383,7 +378,6 @@ class Event(models.Model):
         return word_count >= settings.PROGRAMME_EVENT_TERMS_MIN_WORDS
 
 
-@python_2_unicode_compatible
 class Room(models.Model):
     name = models.CharField(max_length=64)
     colour = models.CharField(max_length=9, default="#33CC33")
@@ -425,7 +419,6 @@ class ShowingQuerySet(QuerySet):
         return self.filter(confirmed=True)
 
 
-@python_2_unicode_compatible
 class Showing(models.Model):
 
     event = models.ForeignKey(
@@ -645,7 +638,6 @@ class Showing(models.Model):
                 existing_entries.append(new_re)
 
 
-@python_2_unicode_compatible
 class DiaryIdea(models.Model):
     month = models.DateField(editable=False)
     ideas = models.TextField(max_length=16384, null=True, blank=True)
@@ -660,7 +652,6 @@ class DiaryIdea(models.Model):
         return "{0}/{1}".format(self.month.month, self.month.year)
 
 
-@python_2_unicode_compatible
 class EventTemplate(models.Model):
 
     name = models.CharField(max_length=32)
@@ -685,7 +676,6 @@ class EventTemplate(models.Model):
         return self.name
 
 
-@python_2_unicode_compatible
 class RotaEntry(models.Model):
 
     role = models.ForeignKey(Role, on_delete=models.CASCADE)
@@ -739,7 +729,6 @@ class PrintedProgrammeQuerySet(QuerySet):
         return self.filter(month__range=[start_date, end])
 
 
-@python_2_unicode_compatible
 class PrintedProgramme(models.Model):
     month = models.DateField(editable=False, unique=True)
     programme = models.FileField(
