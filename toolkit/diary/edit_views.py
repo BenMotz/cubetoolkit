@@ -845,7 +845,7 @@ def delete_showing(request, showing_id):
 
 
 @permission_required("toolkit.read")
-def view_event_field(request, field, year, month, day):
+def view_event_field(request, field, year=None, month=None, day=None):
     # Method shared across various (slightly primitive) views into event data;
     # the copy, terms and rota reports.
     #
