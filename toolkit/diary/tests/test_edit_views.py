@@ -545,7 +545,7 @@ class EditShowing(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_showing.html")
         self.assert_has_message(
-            response, "Can&#39;t edit showings that are in the past", "error"
+            response, "Can&#x27;t edit showings that are in the past", "error"
         )
 
     @patch("django.utils.timezone.now")

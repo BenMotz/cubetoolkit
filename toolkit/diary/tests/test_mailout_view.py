@@ -221,7 +221,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "mailout_send.html")
         # Text content:
-        self.assertContains(response, "Yet another member&#39;s mailout")
+        self.assertContains(response, "Yet another member&#x27;s mailout")
         self.assertContains(response, "Let the bodies hit the floor\netc.")
         # HTML content:
         self.assertNotContains(response, "HTML Body")
@@ -242,7 +242,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "mailout_send.html")
         # Text content:
-        self.assertContains(response, "Yet another member&#39;s mailout")
+        self.assertContains(response, "Yet another member&#x27;s mailout")
         self.assertContains(response, "Let the bodies hit the floor\netc.")
         # HTML content:
         self.assertContains(

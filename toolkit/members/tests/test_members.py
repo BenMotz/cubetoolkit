@@ -507,7 +507,7 @@ class TestDeleteMemberViewLoggedIn(MembersTestsMixin, TestCase):
 
         self.assertRedirects(response, reverse("search-members"))
         self.assertContains(
-            response, "Can&#39;t delete active volunteer %s" % mem.name
+            response, "Can&#x27;t delete active volunteer %s" % mem.name
         )
 
         self.assertTrue(Member.objects.filter(id=mem.id).exists())

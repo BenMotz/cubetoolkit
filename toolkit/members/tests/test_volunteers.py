@@ -264,8 +264,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
 
         self.assertContains(
             response,
-            '<li class="success">Created volunteer &#39;New Volunteer, '
-            "called \u0187hri\u01a8topher&#39;</li>",
+            '<li class="success">Created volunteer &#x27;New Volunteer, '
+            "called \u0187hri\u01a8topher&#x27;</li>",
             html=True,
         )
 
@@ -310,8 +310,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
 
         self.assertContains(
             response,
-            '<li class="success">Created volunteer &#39;Another New '
-            "Volunteer&#39;</li>",
+            '<li class="success">Created volunteer &#x27;Another New '
+            "Volunteer&#x27;</li>",
             html=True,
         )
 
@@ -372,8 +372,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
 
         self.assertContains(
             response,
-            '<li class="success">Updated volunteer &#39;Renam\u018fd '
-            "Vol&#39;</li>",
+            '<li class="success">Updated volunteer &#x27;Renam\u018fd '
+            "Vol&#x27;</li>",
             html=True,
         )
 
@@ -439,8 +439,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
 
         self.assertContains(
             response,
-            '<li class="success">Updated volunteer &#39;Renam\u018fd '
-            "Vol&#39;</li>",
+            '<li class="success">Updated volunteer &#x27;Renam\u018fd '
+            "Vol&#x27;</li>",
             html=True,
         )
 
