@@ -10,7 +10,7 @@ pytz
 # For generating non-html copy for mailout etc:
 html2text==3.200.3
 # CMS:
-wagtail>=2.12,<2.13
+wagtail>=2.13,<2.14
 monthdelta
 # needed by wagtail for old form data:
 unidecode
