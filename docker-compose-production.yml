@@ -1,0 +1,43 @@
+version: "3.7"
+networks:
+  toolkit_production:
+    driver: bridge
+services:
+  toolkit:
+    user: "1001:1001"
+    networks:
+      - toolkit_production
+    image: toolkit:production
+    build: .
+    command: ["tk_run", "gunicorn"]
+    restart: on-failure
+    ports:
+      - "127.0.0.1:7191:8000"
+    volumes:
+      - type: bind
+        source: /home/toolkit/site/media/
+        target: /site/media/
+      - type: bind
+        source: /var/run/mysqld/mysqld.sock
+        target: /var/run/mysqld/mysqld.sock
+      - type: bind
+        source: /home/toolkit/settings_docker_production.py
+        target: /site/toolkit/settings.py
+  celery:
+    user: "1002:1002"
+    networks:
+      - toolkit_production
+    image: toolkit:production
+    command: ["tk_run", "celery"]
+    restart: on-failure
+    volumes:
+      - type: bind
+        source: /var/run/mysqld/mysqld.sock
+        target: /var/run/mysqld/mysqld.sock
+      - type: bind
+        source: /home/toolkit/settings_docker_production.py
+        target: /site/toolkit/settings.py
+  redis:
+    networks:
+      - toolkit_production
+    image: redis:7-bullseye

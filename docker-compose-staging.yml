@@ -1,0 +1,43 @@
+version: "3.7"
+networks:
+  toolkit_staging:
+    driver: bridge
+services:
+  toolkit:
+    user: "1002:1002"
+    networks:
+      - toolkit_staging
+    image: toolkit:staging
+    build: .
+    command: ["tk_run", "gunicorn"]
+    restart: on-failure
+    ports:
+      - "127.0.0.1:7192:8000"
+    volumes:
+      - type: bind
+        source: /home/staging/site/media/
+        target: /site/media/
+      - type: bind
+        source: /var/run/mysqld/mysqld.sock
+        target: /var/run/mysqld/mysqld.sock
+      - type: bind
+        source: /home/staging/settings_docker_staging.py
+        target: /site/toolkit/settings.py
+  celery:
+    user: "1002:1002"
+    networks:
+      - toolkit_staging
+    image: toolkit:staging
+    command: ["tk_run", "celery"]
+    restart: on-failure
+    volumes:
+      - type: bind
+        source: /var/run/mysqld/mysqld.sock
+        target: /var/run/mysqld/mysqld.sock
+      - type: bind
+        source: /home/staging/settings_docker_staging.py
+        target: /site/toolkit/settings.py
+  redis:
+    networks:
+      - toolkit_staging
+    image: redis:7-bullseye
