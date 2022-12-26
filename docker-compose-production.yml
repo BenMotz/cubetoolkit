@@ -24,7 +24,7 @@ services:
         source: /home/toolkit/settings_docker_production.py
         target: /site/toolkit/settings.py
   celery:
-    user: "1002:1002"
+    user: "1001:1001"
     networks:
       - toolkit_production
     image: toolkit:production
