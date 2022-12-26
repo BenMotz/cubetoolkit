@@ -17,18 +17,22 @@ Deployment for production
 -------------------------
 
 At present the application is deployed directly onto a real live server that
-you could drop on your foot if you were so minded. The process for deployment
-is somewhat complicated, and there are detailed instructions on the Cube wiki
-about how to deploy to do it.(If anyone ever expresses any interest at all then
-I'd be happy to suck that out of the Cube wiki into this repository.)
+you could drop on your foot if you were so minded. On that server it runs
+from a container managed by docker-compose. The full process for deployment
+is mildly complicated, and there are detailed instructions on the Cube wiki
+about how to do it.
 
-In the future the plan is to deploy the application in a container; there is
-a Dockerfile you can build (`docker build . --tag toolkit:latest`), however
-this is not yet in use in production.
 
-There is a `docker-compose.yml` file that may be used with docker-compose to
-run the toolkit and associated services: this is currently intended for
-development and experimentation, not for production.
+Running for development
+-----------------------
+
+There are two ways to run locally; under docker, and directly with your local
+python.
+
+A docker-compose.yml file is provided that should work to run the toolkit and
+required services. Note the configuration it provides is not very secure.
+
+For advice on running under local python see the cube wiki or ask me.
 
 License
 -------

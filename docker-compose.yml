@@ -1,12 +1,15 @@
 # This compose file is for development and test, not for production deployment!
 version: "3.7"
 networks:
-  toolkit:
+  toolkit_dev:
     driver: bridge
+volumes:
+  media_data:
+  mariadb_data:
 services:
   toolkit:
     networks:
-      - toolkit
+      - toolkit_dev
     image: toolkit:latest
     build: .
     command: ["tk_run", "gunicorn"]
@@ -14,34 +17,40 @@ services:
     environment: &commonEnv
       DB_NAME: "${DB_NAME:-toolkit}"
       DB_USER: "${DB_USER:-toolkit}"
-      DB_PASSWORD: "${DB_PASSWORD-devserver_db_password}"
-      DB_HOST: ""
-      DB_PORT: ""
+      DB_PASSWORD: "${DB_PASSWORD:-devserver_db_password}"
+      DB_HOST: "mariadb"
+      DB_PORT: "3306"
       REDIS_URL: "redis://redis:6379/0"
-      SECRET_KEY: "${DJANGO_SECRET_KEY:?django secret key not set}"
+      SECRET_KEY: "${DJANGO_SECRET_KEY:-really_bad_django_secret_key}"
     ports:
       - target: "8000"
         published: "8000"
         protocol: tcp
     volumes:
-      - type: bind
-        source: "${MEDIA_PATH:-$PWD/media/}"
+      - type: volume
+        source: media_data
         target: /site/media/
-      - type: bind
-        source: /var/run/mysqld/mysqld.sock
-        target: /var/run/mysqld/mysqld.sock
   celery:
     networks:
-      - toolkit
+      - toolkit_dev
     image: toolkit:latest
     command: ["tk_run", "celery"]
     restart: on-failure
     environment: *commonEnv
-    volumes:
-      - type: bind
-        source: /var/run/mysqld/mysqld.sock
-        target: /var/run/mysqld/mysqld.sock
   redis:
     networks:
-      - toolkit
+      - toolkit_dev
     image: redis:7-bullseye
+  mariadb:
+    networks:
+      - toolkit_dev
+    image: mariadb:10
+    environment:
+      MARIADB_USER: "${DB_USER:-toolkit}"
+      MARIADB_PASSWORD: "${DB_PASSWORD-devserver_db_password}"
+      MARIADB_ROOT_PASSWORD: rubbishpassword
+      MARIADB_DATABASE: toolkit
+    volumes:
+      - type: volume
+        source: mariadb_data
+        target: /var/lib/mysql
