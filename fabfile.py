@@ -8,7 +8,7 @@ from fabric import utils
 from fabric.contrib import console
 
 IMAGE_REPOSITORY = "toolkit"
-IMAGE_BUILD_DIR = "tmp_toolkit_image_build"
+IMAGE_BUILD_DIR = "tmp_toolkit_deploy_{}"
 
 
 def _assert_target_set():
@@ -52,6 +52,10 @@ def cube_production():
     env.media_user = "toolkit"
 
 
+def _image_build_dir(build_root):
+    return os.path.join(build_root, IMAGE_BUILD_DIR.format(env.target))
+
+
 def build_remote_image():
     """Upload git HEAD snapshot to target and build the image"""
 
@@ -75,7 +79,7 @@ def build_remote_image():
         utils.puts("Uploading to remote")
         put(archive, build_root)
 
-        image_build_dir = os.path.join(build_root, IMAGE_BUILD_DIR)
+        image_build_dir = _image_build_dir(build_root)
 
         # Delete old build directory
         utils.puts("Deleting and recreating {0}".format(image_build_dir))
@@ -99,7 +103,7 @@ def build_remote_image():
 
 def docker_compose_up():
     build_root = run("echo $HOME", quiet=True)
-    image_build_dir = os.path.join(build_root, IMAGE_BUILD_DIR)
+    image_build_dir = _image_build_dir(build_root)
     compose_file = os.path.join(image_build_dir, env.docker_compose_file)
     with cd(image_build_dir):
         utils.puts("Bringing up docker-compose")
