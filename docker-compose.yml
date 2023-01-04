@@ -47,7 +47,7 @@ services:
     image: mariadb:10
     environment:
       MARIADB_USER: "${DB_USER:-toolkit}"
-      MARIADB_PASSWORD: "${DB_PASSWORD-devserver_db_password}"
+      MARIADB_PASSWORD: "${DB_PASSWORD:-devserver_db_password}"
       MARIADB_ROOT_PASSWORD: rubbishpassword
       MARIADB_DATABASE: toolkit
     volumes:
