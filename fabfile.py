@@ -95,7 +95,7 @@ def build_remote_image():
 
             utils.puts("Building image")
             run(
-                "docker build --tag {0}:{1} .".format(
+                "docker build --pull --tag {0}:{1} .".format(
                     IMAGE_REPOSITORY, env.docker_image_tag
                 )
             )
