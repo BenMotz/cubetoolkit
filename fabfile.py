@@ -164,6 +164,29 @@ def sync_media_from_production_to_staging():
 
 
 @task
+def fetch_database_dump(dump_filename="database_dump.sql"):
+    dump_file_gz = dump_filename + ".gz"
+    if os.path.exists(dump_filename) or os.path.exists(dump_file_gz):
+        utils.abort(f"Local file {dump_filename} already exists")
+
+    utils.puts("Generating remote database dump")
+
+    # Ask manage.py in the toolkit container for the mysqldump command to run
+    # (which will include the DB name, user and password)
+    dump_command = run(
+        f"docker exec {env.docker_compose_project}_toolkit_1 "
+        "./manage.py mysqldump_database --print-command STDOUT",
+        quiet=True,
+    )
+
+    run(f"{dump_command} | gzip > {dump_file_gz}", quiet=True)
+    get(dump_file_gz, local_path=dump_file_gz)
+    run(f"rm {dump_file_gz}")
+
+    local(f"gunzip {dump_file_gz}")
+
+
+@task
 def deploy():
     """Upload code, build image, bring docker-compose up"""
 
