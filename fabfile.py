@@ -1,8 +1,7 @@
 import os
 import os.path
 
-from fabric.api import require, env, run, cd, local, put, lcd, get, prompt
-from fabric.tasks import Task
+from fabric.api import require, env, run, cd, local, put, lcd, get, task
 from fabric.context_managers import settings
 from fabric import utils
 from fabric.contrib import console
@@ -28,6 +27,7 @@ def _assert_docker_available():
         utils.abort("Docker not available or user does not have permission")
 
 
+@task
 def cube_staging():
     """Configure to deploy to staging on cubecinema.com"""
     env.target = "staging"
@@ -40,6 +40,7 @@ def cube_staging():
     env.media_user = "staging"
 
 
+@task
 def cube_production():
     """Configure to deploy live on cubecinema.com"""
     env.target = "production"
@@ -56,6 +57,7 @@ def _image_build_dir(build_root):
     return os.path.join(build_root, IMAGE_BUILD_DIR.format(env.target))
 
 
+@task
 def build_remote_image():
     """Upload git HEAD snapshot to target and build the image"""
 
@@ -101,6 +103,7 @@ def build_remote_image():
             )
 
 
+@task
 def docker_compose_up():
     build_root = run("echo $HOME", quiet=True)
     image_build_dir = _image_build_dir(build_root)
@@ -114,6 +117,7 @@ def docker_compose_up():
         )
 
 
+@task
 def set_media_permissions():
     """Set media directories to g+w"""
     media_dirs = [
@@ -131,6 +135,7 @@ def set_media_permissions():
             run("chmod g+w {0}".format(path))
 
 
+@task
 def get_media():
     """Rsync media content from a production server to your development environment"""
 
@@ -143,6 +148,7 @@ def get_media():
     )
 
 
+@task
 def sync_media_from_production_to_staging():
     """Rsync media content from the production server to the staging server. Invoke as fab cube_staging sync_media_from_production_to_staging"""
 
@@ -157,6 +163,7 @@ def sync_media_from_production_to_staging():
         )
 
 
+@task
 def deploy():
     """Upload code, build image, bring docker-compose up"""
 
