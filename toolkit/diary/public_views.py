@@ -1,4 +1,3 @@
-import json
 import datetime
 import logging
 import calendar
@@ -6,15 +5,12 @@ import calendar
 from collections import OrderedDict
 
 from django.db.models import Q
-from django.http import HttpResponse, Http404
+from django.http import Http404
 from django.shortcuts import render, redirect
-from django.urls import reverse
 from django.conf import settings
 from django.utils.html import conditional_escape
 import django.utils.timezone as timezone
 import django.views.generic as generic
-
-from easy_thumbnails.files import get_thumbnailer
 
 from toolkit.diary.models import Showing, Event, PrintedProgramme
 from toolkit.diary.daterange import get_date_range
@@ -181,83 +177,6 @@ def view_diary_next_month(request):
     return _view_diary(
         request, startdate, enddate, extra_title="What's on next month"
     )
-
-
-def view_diary_json(request, year, month, day):
-    # Used by the experimental new index; returns a JSON object containing
-    # various bits of data about the events on the given year/month/day
-
-    context = {}
-
-    # Parse parameters:
-    try:
-        year = int(year) if year else None
-        month = int(month) if month else None
-        day = int(day) if day else None
-    except ValueError:
-        logger.error(
-            "Invalid value in date range, one of day {0}, month {1}, year {2}".format(
-                day, month, year
-            )
-        )
-        raise Http404("Invalid values")
-
-    startdatetime = timezone.get_current_timezone().localize(
-        datetime.datetime(year, month, day)
-    )
-    enddatetime = startdatetime + datetime.timedelta(days=1)
-
-    context["start"] = startdatetime
-
-    # Do query. select_related() on the end encourages it to get the
-    # associated showing/event data, to reduce the number of SQL queries
-    showings = (
-        Showing.objects.public()
-        .start_in_range(startdatetime, enddatetime)
-        .order_by("start")
-        .select_related()
-        .prefetch_related("event__media")
-    )
-    results = []
-    # Build list of factoids to send back
-    for showing in showings:
-        event = showing.event
-
-        thumbnail = None
-        media_item = event.get_main_mediaitem()
-        if media_item:
-            try:
-                thumbnailer = get_thumbnailer(media_item.media_file)
-                thumbnail = thumbnailer.get_thumbnail(
-                    {
-                        "size": (0, 200),
-                        "crop": "scale",
-                        "upscale": True,
-                    }
-                ).url
-            except Exception:
-                logger.exception(
-                    "Failed getting thumbnail for event {0}".format(event)
-                )
-
-        results.append(
-            {
-                "start": timezone.localtime(showing.start).strftime(
-                    "%d/%m/%Y %H:%M"
-                ),
-                "name": event.name,
-                "copy": event.copy_html,
-                "link": reverse(
-                    "single-event-view", kwargs={"event_id": showing.event_id}
-                ),
-                "image": thumbnail,
-                "tags": ", ".join(
-                    n[0] for n in event.tags.values_list("name")
-                ),
-            }
-        )
-
-    return HttpResponse(json.dumps(results), content_type="application/json")
 
 
 def view_showing(request, showing_id=None):

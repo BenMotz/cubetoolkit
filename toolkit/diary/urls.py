@@ -39,7 +39,6 @@ from toolkit.diary.public_views import (
     view_diary_next_month,
     view_showing,
     view_event,
-    view_diary_json,
 )
 
 from toolkit.diary.mailout_views import (
@@ -106,12 +105,6 @@ programme_urls = [
     ),
     # Search
     url(r"^archive/search/$", ArchiveSearch.as_view(), name="archive-search"),
-    # Get JSON describing events on a given (single) date:
-    url(
-        r"^view/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/json$",
-        view_diary_json,
-        name="day-view-json",
-    ),
     # RSS feed
     url(
         r"^rss/$",

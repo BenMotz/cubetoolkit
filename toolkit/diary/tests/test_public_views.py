@@ -181,29 +181,6 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertContains(response, "Sat 13 April // 18:00")
         self.assertContains(response, "Copy three summary")
 
-    # JSON day data:
-    def test_day_json(self):
-        url = reverse(
-            "day-view-json", kwargs={"year": "2013", "month": "4", "day": "13"}
-        )
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-
-        # Eh (shrug)
-        self.assertEqual(
-            response.json(),
-            [
-                {
-                    "name": "Event three title",
-                    "tags": "tag two",
-                    "image": None,
-                    "start": "13/04/2013 18:00",
-                    "link": "/id/3/",
-                    "copy": "Event three Copy",
-                }
-            ],
-        )
-
     # View of individual showing:
     def test_view_showing(self):
         url = reverse(
