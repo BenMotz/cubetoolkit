@@ -10,7 +10,7 @@ from django.conf import settings
 from django.urls import reverse
 import django.template
 
-from celery import task, current_task
+from celery import shared_task, current_task
 from celery.utils.log import get_task_logger
 
 from toolkit.members.models import Member
@@ -237,7 +237,7 @@ def send_mailout_to(
     return (False, sent, "Ok")
 
 
-@task()
+@shared_task()
 def send_mailout(subject, body_text, body_html):
     """
     Sends email with supplied subject/body to all members who have an email
