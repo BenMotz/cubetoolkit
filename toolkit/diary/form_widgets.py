@@ -14,7 +14,6 @@ class ChosenSelectMultiple(forms.SelectMultiple):
         # automatically the template containing the form must have the
         # {{ form.media }} tag
         js = (
-            "js/lib/jquery.min.js",
             "js/lib/chosen.jquery.js",
         )
         css = {
@@ -89,7 +88,6 @@ class JQueryDateTimePicker(forms.DateTimeInput):
             ),
         }
         js = (
-            "js/lib/jquery.min.js",
             "js/lib/jquery-ui.min.js",
             "js/lib/jquery-ui-timepicker-addon.js",
         )

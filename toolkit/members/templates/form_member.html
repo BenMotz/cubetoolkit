@@ -17,7 +17,6 @@
 {% block script %}
 {{ block.super }}
 {% if membership_expiry_enabled %}
-<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery.min.js"></script>
 <script>
 function get_date_in_future(days_ahead) {
     return new Date(+(new Date()) + (days_ahead * 24 * 3600 * 1000));
