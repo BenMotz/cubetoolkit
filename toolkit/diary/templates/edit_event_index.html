@@ -233,7 +233,7 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
             </td>
         {% with showing.start|localtime as start_localtime %}
             <td>
-                <a href="{% url "edit-showing" showing_id=showing.pk %}" {% if start_localtime.hour <= 17 %}class="daytime"{% endif %}>{{ showing.start|date:"H:i" }}</a>
+                <a href="{% url "edit-event-details-view" pk=showing.event.pk %}" {% if start_localtime.hour <= 17 %}class="daytime"{% endif %}>{{ showing.start|date:"H:i" }}</a>
             </td>
 
         {% for room in rooms %}
