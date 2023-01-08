@@ -81,23 +81,6 @@ $(document).ready(function() {
 </ul>
 {% endif %}
 
-<form id="clone_form" action="{% url "add-showing" event_id=showing.event.id %}?copy_from={{showing.id}}" method="post">
-<table>
-    <tr><td colspan="2"></td></tr>
-    <tr><td colspan="2"><h4>BOOKING: <a href="{% url "edit-event-details-view" pk=showing.event_id %}">{{ showing.event.name }}</a></h4></td></tr>
-    <tr><td colspan="2"></td></tr>
-
-    <tr><th class="subhead" colspan="2">Clone booking</th></tr>
-    <tr><td colspan="2">{% csrf_token %}</td></tr>
-    <tr><th>Event:</th><td>{{ showing.event.name }}</td>
-    {{ clone_showing_form.as_table }}
-    <tr><th colspan="2">
-        <input type="submit" value="Clone" /> <a href="{% url "cancel-edit" %}">Cancel</a>
-    </th></tr>
-    <tr><td colspan="2" class="spacer"></td></tr>
-</table>
-</form>
-
 <form id="delete_form" action="{% url "delete-showing" showing_id=showing.id %}" method="post">
 <table>
     <tr><th class="subhead" colspan="2">Delete booking</th></tr>

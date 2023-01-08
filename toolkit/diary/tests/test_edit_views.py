@@ -380,13 +380,6 @@ class EditShowing(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_showing.html")
 
-        # "clone" part should have expected start time:
-        self.assertContains(
-            response,
-            '<input id="id_clone_start" name="clone_start" type="text"'
-            ' value="10/06/2013 18:00" required />',
-            html=True,
-        )
         # Edit should have existing values:
         self.assertContains(
             response,

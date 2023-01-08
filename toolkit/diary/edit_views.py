@@ -590,16 +590,9 @@ def edit_showing(request, showing_id=None):
         form = diary_forms.ShowingForm(instance=showing)
         rota_form = RotaForm()
 
-    # Also create a form for "cloning" the showing (ie. adding another one),
-    # but initialise it with values from existing event, but a day later...
-    clone_showing_form = diary_forms.CloneShowingForm(
-        initial={"clone_start": showing.start + datetime.timedelta(days=1)}
-    )
-
     context = {
         "showing": showing,
         "form": form,
-        "clone_showing_form": clone_showing_form,
         "rota_form": rota_form,
         "max_role_assignment_count": settings.MAX_COUNT_PER_ROLE,
     }
