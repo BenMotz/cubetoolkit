@@ -1,5 +1,4 @@
 from django.conf.urls import url
-from django.views.generic import DetailView
 from toolkit.diary.models import Event
 from django.contrib.auth.decorators import permission_required
 
@@ -7,6 +6,7 @@ import toolkit.diary.feeds
 from toolkit.diary.edit_views import (
     EditEventView,
     EditRotaView,
+    EventDetailView,
     cancel_edit,
     edit_diary_list,
     edit_diary_calendar,
@@ -160,7 +160,7 @@ diary_urls = [
     url(
         r"^edit/event/id/(?P<pk>\d+)/view/$",
         permission_required("toolkit.read")(
-            DetailView.as_view(
+            EventDetailView.as_view(
                 model=Event, template_name="view_event_privatedetails.html"
             )
         ),

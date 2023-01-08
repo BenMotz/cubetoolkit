@@ -1,0 +1,24 @@
+    <tr>
+        <td>
+    {% if showing.in_past %}
+            <span title="Showing has started, can't edit">{{ showing.start|date:"d/m/Y H:i" }} {% if MULTIROOM_ENABLED %}in {{ showing.room }}{% endif %}</span>
+    {% else %}
+            <a href="{% url "edit-showing" showing.pk %}">{{ showing.start|date:"d/m/Y H:i"  }} {% if MULTIROOM_ENABLED %}in {{ showing.room }}{% endif %}</a>
+    {% endif %}
+        </td>
+        <td>
+            {{ showing.booked_by }}
+        </td>
+        <td>{{showing.confirmed|yesno}}</td>
+        <td>{{showing.hide_in_programme|yesno}}</td>
+        <td>{{showing.cancelled|yesno}}</td>
+        <td>{{showing.discounted|yesno}}</td>
+        <td>{{showing.sold_out|yesno}}</td>
+        <td>
+    {% if showing.in_past %}
+            (Past)
+    {% else %}
+            <a href="{% url "edit-showing" showing.pk %}">Edit</a>
+    {% endif %}
+        </td>
+    </tr>

@@ -215,48 +215,13 @@ class AddShowingView(DiaryTestsMixin, TestCase):
     def test_add_showing_must_post(self):
         # Add a new showing
         url = reverse("add-showing", kwargs={"event_id": 1})
-        url += "?copy_from=2"
         # TODO: Add more query data that might work
         response = self.client.get(url)
 
         self.assertEqual(response.status_code, 405)
 
-    @patch("django.utils.timezone.now")
-    def test_add_showing_mismatching_event_id(self, now_patch):
-        now_patch.return_value = self._fake_now
-
-        url = reverse("add-showing", kwargs={"event_id": 1})
-        url += "?copy_from=2"
-
-        showing_count_before = Showing.objects.count()
-
-        source = Showing.objects.get(id=2)
-
-        self.assertEqual(source.event.showings.count(), 5)
-
-        # do add/clone:
-        response = self.client.post(
-            url,
-            data={
-                "booked_by": "Someone or the other - \u20ac",
-                "clone_start": "13/07/2013 20:00",
-            },
-        )
-
-        showing_count_after = Showing.objects.count()
-        self.assertEqual(showing_count_after, showing_count_before)
-
-        self.assertEqual(response.status_code, 404)
-
-    def test_add_showing_no_copy_from(self):
-        # No copy_from parameter: should return 404
-        url = reverse("add-showing", kwargs={"event_id": 1})
-        response = self.client.post(url)
-        self.assertEqual(response.status_code, 404)
-
     def test_add_showing_no_start(self):
         url = reverse("add-showing", kwargs={"event_id": 2})
-        url += "?copy_from=2"
 
         showing_count_before = Showing.objects.count()
 
@@ -274,16 +239,19 @@ class AddShowingView(DiaryTestsMixin, TestCase):
         showing_count_after = Showing.objects.count()
         self.assertEqual(showing_count_after, showing_count_before)
 
-        self.assertFormError(
-            response,
-            "clone_showing_form",
-            "clone_start",
-            "This field is required.",
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            {
+                "succeeded": False,
+                "errors": {"clone_start": ["This field is required."]},
+            },
         )
 
-    def test_add_showing_no_booked_by(self):
+    @patch("django.utils.timezone.now")
+    def test_add_showing_no_booked_by(self, now_patch):
+        now_patch.return_value = self._fake_now
         url = reverse("add-showing", kwargs={"event_id": 2})
-        url += "?copy_from=2"
 
         showing_count_before = Showing.objects.count()
 
@@ -293,17 +261,19 @@ class AddShowingView(DiaryTestsMixin, TestCase):
 
         # Start is in past, but should get error about missing booked_by
         response = self.client.post(
-            url, data={"clone_start": "13/07/2010 20:00"}
+            url, data={"clone_start": "13/07/2013 20:00"}
         )
 
         showing_count_after = Showing.objects.count()
         self.assertEqual(showing_count_after, showing_count_before)
 
-        self.assertFormError(
-            response,
-            "clone_showing_form",
-            "booked_by",
-            "This field is required.",
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            {
+                "succeeded": False,
+                "errors": {"booked_by": ["This field is required."]},
+            },
         )
 
     @patch("django.utils.timezone.now")
@@ -311,7 +281,6 @@ class AddShowingView(DiaryTestsMixin, TestCase):
         now_patch.return_value = self._fake_now
 
         url = reverse("add-showing", kwargs={"event_id": 2})
-        url += "?copy_from=2"
 
         showing_count_before = Showing.objects.count()
 
@@ -331,11 +300,13 @@ class AddShowingView(DiaryTestsMixin, TestCase):
         showing_count_after = Showing.objects.count()
         self.assertEqual(showing_count_after, showing_count_before)
 
-        self.assertFormError(
-            response,
-            "clone_showing_form",
-            "clone_start",
-            "Must be in the future",
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.json(),
+            {
+                "succeeded": False,
+                "errors": {"clone_start": ["Must be in the future"]},
+            },
         )
 
     @patch("django.utils.timezone.now")
@@ -343,11 +314,10 @@ class AddShowingView(DiaryTestsMixin, TestCase):
         now_patch.return_value = self._fake_now
 
         url = reverse("add-showing", kwargs={"event_id": 2})
-        url += "?copy_from=2"
 
         showing_count_before = Showing.objects.count()
 
-        source = Showing.objects.get(id=2)
+        source = Showing.objects.get(id=5)
 
         self.assertEqual(source.event.showings.count(), 5)
 
@@ -390,7 +360,9 @@ class AddShowingView(DiaryTestsMixin, TestCase):
             self.assertEqual(src_entry.role, dst_entry.role)
             self.assertEqual(src_entry.rank, dst_entry.rank)
 
-        self.assert_return_to_index(response)
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()["succeeded"])
+        self.assertTrue(response.json()["html"].strip().startswith("<tr>"))
 
 
 class EditShowing(DiaryTestsMixin, TestCase):

@@ -1,4 +1,4 @@
-{% extends "base_admin.html" %}
+{% extends "form_base.html" %}
 {% load thumbnail_l %}
 {% load static %}
 {% load noprefix_url %}
@@ -8,33 +8,10 @@ Details for: {{ event.name }}
 {% block css %}
 {{ block.super }}
 <style type="text/css">
-    body {
-        font-size: 100%;
-        font-family: Arial;
-    }
-    div#booking {
-        margin: 0 2em;
-    }
-    h1 {
-        font-size: 1.8em;
-        margin: 0;
-        padding: 0.5em 1em;
-        background-color: #c0c0c0;
-    }
     p {
-        margin: 0;
-        padding: 0.5em 1em;
-        background-color: #c0c0c0;
-    }
-    p.d {
-        background-color: #d0d0d0;
     }
     .copy {
-        background-color: #d0d0d0;
         padding: 0.5em;
-    }
-    .copy p {
-        background-color: #d0d0d0;
     }
     p.image_caption {
         font-style: italic;
@@ -45,45 +22,82 @@ Details for: {{ event.name }}
     p#cancel {
         margin: 1em;
     }
+    #form-errors { color: red }
 
 </style>
 {% endblock %}
 
-{% block body %}
-<h3>{{ VENUE.longname }} events diary</h3>
+{% block script %}
+{{ block.super }}
+<script src="{{ STATIC_URL }}diary/js/edit_event.js"></script>
+<script>
+$(document).ready(function() { setupPage({
+  "csrfmiddlewaretoken": "{{ csrf_token }}",
+  "add_booking_url": "{% url "add-showing" event_id=event.id %}",
+})});
+</script>
+{% endblock %}
 
+{% block body %}
 <div id="booking">
-    <h1>Details for {{ event.name }} {% if not event.all_showings_in_past %}[<a href="{% url "edit-event-details" event.pk %}">edit</a>]{% endif %}</h1>
-    <p class="d">
-    <b>Pre-title:</b> {{event.pre_title }} <br>
-    <b>Name:</b>{{ event.name }}<br>
-    <b>Post-title:</b> {{event.post_title }} </p>
-    <p class="d"><b>Tags:</b> {{ event.tags.all|join:", " }}</p>
-    <p><b>Public programme:</b> {% if event.showings.public and not event.private %}<a href="{% noprefix_url "single-event-view" event.pk %}">{% noprefix_url "single-event-view" event.pk %}</a>{% else %}
-    Event not visible in online programme: {% if event.private %}It's marked private.{% endif %} {% if not event.showings.public %}Bookings are all unconfirmed or hidden in programme.{% endif %}
-    {% endif %}</p>
-    <p>
+    <h1>{{ event.name }}
+ </h1>
+
+<div id="bookings">
+<h3>Bookings</h3>
+<form>
+{% csrf_token %}
+<table class="table">
+    <tr>
+        <th>When</th>
+        <th>Booked by</th>
+        <th>Confirmed</th>
+        <th>Secret</th>
+        <th>Cancelled</th>
+        <th>Discounted</th>
+        <th>Sold-out</th>
+        <th></th>
+    </tr>
 {% for showing in event.showings.all %}
-    {% if showing.in_past %}
-    Booked for: <span title="Showing has started, can't edit">{{ showing.start|date:"H:i d/m/Y" }} {% if MULTIROOM_ENABLED %}in {{ showing.room }}{% endif %}(past)</span><br>
-    {% else %}
-    Booked for: <a href="{% url "edit-showing" showing.pk %}">{{ showing.start|date:"H:i d/m/Y"  }} {% if MULTIROOM_ENABLED %}in {{ showing.room }}{% endif %}</a><br>
-    {% endif %}
+    {% include "view_event_privatedetails_showingrow.html" %}
 {% endfor %}
-    </p>
-    <p><b>Pricing:</b> {{ event.pricing }}
-    </p>
-    {% if event.ticket_link %}<p><b>Online tickets:</b> <a href="{{ event.ticket_link }}">{{ event.ticket_link }}</a></p>{% endif %}
-    <p class="d"><b>Film information:</b> {{ event.film_information }}<br>
-    <p class="d"><b>Programmer's notes:</b><br>
-    {{event.notes}}<br>
+    <tr id="form-errors">
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+        <td></td>
+    </tr>
+    <tr>
+        <td>{{ form.clone_start }}</td>
+        <td>{{ form.booked_by }}</td>
+        <td colspan="6"><input type="submit" class="btn btn-primary" value="Add booking" /></td>
+    </tr>
+</table>
+</form>
+</div>
+<h3>Details {% if not event.all_showings_in_past %}<a href="{% url "edit-event-details" event.pk %}">[edit]</a>{% endif %}</h3>
+    <table class="table">
+    <tr><td>Pre-title</td><td>{{event.pre_title }}</td></tr>
+    <tr><td>Name</td><td>{{ event.name }}</td></tr>
+    <tr><td>Post-title</td><td>{{event.post_title }}</td></tr>
+    <tr><td>Tags</td><td>{{ event.tags.all|join:", " }}</td></tr>
+    <tr><td>Public programme link</td><td>{% if event.showings.public and not event.private %}<a href="{% noprefix_url "single-event-view" event.pk %}">{% noprefix_url "single-event-view" event.pk %}</a>{% else %}
+    Event not visible in online programme: {% if event.private %}It's marked private.{% endif %} {% if not event.showings.public %}Bookings are all unconfirmed or hidden in programme.{% endif %}
+    {% endif %}</td></tr>
+    <tr><td>Pricing</td><td>{{ event.pricing }}</td></tr>
+    {% if event.ticket_link %}<tr><td>Online tickets</td><td><a href="{{ event.ticket_link }}">{{ event.ticket_link }}</a></td></tr>{% endif %}
+    <tr><td>Film information</td><td>{{ event.film_information }}</td></tr>
+    <tr><td>Programmer's notes</td><td>{{event.notes}}</td></tr>
     {% comment %}
     {% if event.template %}
-    <p class="d"><b>Created from template:</b>{{ event.template }} </p>
+    <tr><td>Created from template:</b>{{ event.template }} </p>
     {% endif %}
     {% endcomment %}
-
-<p><b>Event image.</b><br>
+    <tr><td>Event image</td><td>
 
 {% with event.media.all.0 as media_item %}
 {% if media_item %}
@@ -95,19 +109,13 @@ Details for: {{ event.name }}
 <i>no image yet</i>
 {% endif %}
 {% endwith %}
-</p>
+ </td></tr>
 
-<p class="d"><b>Copy for "{{ event.name }}" (for web page)</b></p>
-<div class="copy">{{event.copy_html}}</div>
-
-<p><b>Copy summary for "{{ event.name }}" (for printed programme)</b></p>
-<p class="pre">{{event.copy_summary}}</p>
-
-<p class="d"><b>Terms for "{{ event.name }}"</b></p>
-<p class="d pre">{{event.terms}}</p>
-
-{% if not event.all_showings_in_past %}<p><a href="{% url "edit-event-details" event.pk %}">[edit]</a></p>{% endif %}
-</div>
+ <tr><td>Copy (for event web page)</td><td><div class="copy">{{event.copy_html}}</div></td></tr>
+ <tr><td>Copy summary (for web index and printed programme)</td><td>
+ <p class="pre">{{event.copy_summary}}</p></td></tr>
+ <tr><td>Terms</td><td><p class="pre">{{event.terms}}</p></td></tr>
+</table>
 <!-- urgh -->
 <p id="cancel"><a href="{% url "cancel-edit" %}">Back</a></p>
 

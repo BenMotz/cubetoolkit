@@ -4,13 +4,19 @@ import logging
 
 from collections import OrderedDict
 
-from django.http import HttpResponse, Http404, HttpResponseRedirect
+from django.http import (
+    HttpResponse,
+    Http404,
+    HttpResponseRedirect,
+    JsonResponse,
+)
 from django.shortcuts import get_object_or_404, render
+from django.template.loader import render_to_string
 from django.urls import reverse
 from django.conf import settings
 from django.forms.models import modelformset_factory
 from django.contrib import messages
-from django.views.generic import View
+from django.views.generic import View, DetailView
 import django.template
 import django.db
 from django.db.models import Q
@@ -352,42 +358,36 @@ def set_edit_preferences(request):
     return HttpResponse(json.dumps(prefs), content_type="application/json")
 
 
+class EventDetailView(PermissionRequiredMixin, DetailView):
+    permission_required = "toolkit.write"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        latest_showing = self.object.showings.latest("start")
+        context["latest_showing"] = latest_showing
+        context["form"] = diary_forms.CloneShowingForm(
+            initial={
+                "clone_start": latest_showing.start
+                + datetime.timedelta(days=1)
+            }
+        )
+        return context
+
+
 @permission_required("toolkit.write")
 @require_POST
 def add_showing(request, event_id):
     # Add a showing to an existing event. Must be called via POST. Uses POSTed
-    # data to create a new showing.
-    # Must be called with a "copy_from" GET parameter. Showing options that
-    # are not specified on the form (rota entries, confirmed/cancelled/etc) are
-    # copied from the showing with the given ID.
-    #
-    # If add was successful, calls _return_to_editindex. On error goes to
-    # form_showing.html
-
-    # Although the data was POSTed, the copy_from is passed in the qyery:
-    copy_from = request.GET.get("copy_from", None)
+    # data to create a new showing based on the latest showing for the event
 
     try:
-        copy_from_pk = int(copy_from, 10)
-        source_showing = Showing.objects.get(pk=copy_from_pk)
-        target_event_id = int(event_id, 10)
-    except (
-        TypeError,
-        ValueError,
-        django.core.exceptions.ObjectDoesNotExist,
-    ) as err:
+        event = get_object_or_404(Event, pk=event_id)
+        source_showing = event.showings.latest("start")
+    except Showing.DoesNotExist as err:
         logger.error(
-            "Failed getting object for showing clone operation: {0}".format(
-                err
-            )
+            f"Failed getting object for showing clone operation: {err}"
         )
         raise Http404("Requested source showing for clone not found")
-
-    if source_showing.event_id != target_event_id:
-        logger.error("Cloned showing event ID != URL event id")
-        raise Http404(
-            "Requested source showing not associated with given " "event id"
-        )
 
     # Create form using submitted data:
     clone_showing_form = diary_forms.CloneShowingForm(request.POST)
@@ -403,27 +403,18 @@ def add_showing(request, event_id):
         # Showing is saved...
         new_showing.save()
         new_showing.clone_rota_from_showing(source_showing)
-        messages.add_message(
-            request,
-            messages.SUCCESS,
-            "Added showing on {0} for event '{1}'".format(
-                new_showing.start.strftime("%d/%m/%y at %H:%M"),
-                new_showing.event.name,
-            ),
-        )
 
-        return _return_to_editindex(request)
-    else:
-        # For now, assume this is being called from "edit showing"
-        # form, and return that
-        showing = get_object_or_404(Showing, pk=copy_from)
-        showing_form = diary_forms.ShowingForm(instance=showing)
-        context = {
-            "showing": showing,
-            "form": showing_form,
-            "clone_showing_form": clone_showing_form,
+        response = {
+            "succeeded": True,
+            "html": render_to_string(
+                "view_event_privatedetails_showingrow.html",
+                {"showing": new_showing},
+                request,
+            ),
         }
-        return render(request, "form_showing.html", context)
+    else:
+        response = {"succeeded": False, "errors": clone_showing_form.errors}
+    return JsonResponse(response)
 
 
 @permission_required("toolkit.write")
