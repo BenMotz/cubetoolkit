@@ -31,19 +31,8 @@ Editing {{ event_list_name }}
   a {
       color: #2a00ff;
   }
-  table { border-collapse: collapse; }
-  tr:nth-child(odd) td {
-      background-color: #d0d0d0;
-  }
-  tr:nth-child(even) td {
-      background-color: #c0c0c0;
-  }
   td:first-child {
       text-align: right;
-      padding-right: 10px;
-  }
-  th {
-      background-color: #c0c0c0;
   }
   #controls {
       border: thick solid black;
@@ -185,7 +174,6 @@ function prefs_updated(data) {
 {% endblock %}
 
 {% block body %}
-<h3>{{ VENUE.name }} events diary</h3>
 <p id="controls">
 Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">this window</a></p>
 
@@ -210,8 +198,8 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
 {% include "messages.html" %}
 
 {% with room_columns=rooms|length %}
-<table>
-    <tr><td></td><td colspan="{{ room_columns|add:1 }}"><a href="{% url "add-event" %}">New event</a></td></tr>
+<p><a href="{% url "add-event" %}">New event</a></p>
+<table class="table table-striped">
 {% if multiroom_enabled %}
 <tr><td colspan="2"></td>
 {% for room in rooms %}
@@ -221,15 +209,8 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
 {% endif %}
 {% for day, showings in dates.items %}
     {% ifchanged %}
-        <tr class="row_year">
-            <td colspan="2"><h1>{{ day|date:"Y" }}</h1></td>
-            <td colspan="{{ room_columns }}"></td>
-        </tr>
-    {% endifchanged %}
-    {% ifchanged %}
         <tr class="row_month">
-            <td colspan="2"><h2>{{ day|date:"F" }}</h2></td>
-            <td colspan="{{ room_columns }}"></td>
+            <td colspan="{{ room_columns|add:2 }}"><h2>{{ day|date:"F Y" }}</h2></td>
         </tr>
     {% endifchanged %}
     {% if day in ideas %}
@@ -241,16 +222,15 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
 
     {% for showing in showings %}
         <tr>
+            <td>
         {% if forloop.first %}
-            {# First showing of the day, blank row plus add an event link #}
-            <td colspan="{{ room_columns|add:2 }}">&nbsp;</td>
-        </tr>
-        <tr>
-            <td><a href="{% url "add-event" %}?date={{day|date:"j-m-Y"}}">{{ day|date:"D j"}}</a></td>
+            {# First showing of the day, show the date (which has the link to add an event) #}
+            <a href="{% url "add-event" %}?date={{day|date:"j-m-Y"}}">{{ day|date:"D\&\n\b\s\p;j"|safe }}</a>
         {% else %}
             {# Subsequent showings for this day #}
-            <td>&nbsp;</td>
+            &nbsp;
         {% endif %}
+            </td>
         {% with showing.start|localtime as start_localtime %}
             <td>
                 <a href="{% url "edit-showing" showing_id=showing.pk %}" {% if start_localtime.hour <= 17 %}class="daytime"{% endif %}>{{ showing.start|date:"H:i" }}</a>
