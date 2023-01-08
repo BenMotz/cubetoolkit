@@ -4,6 +4,7 @@ Details for: {{ showing.event.name }}
 {% endblock %}
 {% block script %}
 {{ block.super }}
+{{ rota_form.media }}
 <script type="text/javascript">
 $(document).ready(function() {
         $('#delete_form').bind("submit", function() {
@@ -96,8 +97,7 @@ $(document).ready(function() {
   </ul>
   <h4>{{ rota_form.other_roles.label_tag }}</h4>
 
-  {{ rota_form.other_roles }}<br>
-  {{ rota_form.other_roles.help_text }}
+  <p>{{ rota_form.other_roles }}</p>
   <p>
   <input class="btn btn-primary" type="submit" value="Update" />
   </p>
