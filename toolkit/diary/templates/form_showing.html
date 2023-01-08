@@ -7,7 +7,7 @@ Details for: {{ showing.event.name }}
 <script type="text/javascript">
 $(document).ready(function() {
         $('#delete_form').bind("submit", function() {
-            return confirm("Delete event: are you sure?\nThis cannot be undone!");
+            return confirm("Delete this booking: are you sure?\nThis cannot be undone!\nMaybe you want to mark it as cancelled?");
         });
         $('input.rota_count').spinner({ min: 0, max: {{ max_role_assignment_count }}});
 });
@@ -17,62 +17,48 @@ $(document).ready(function() {
 {{ block.super }}
 <style>
     @import url('{{ STATIC_URL }}css/lib/ui.spinner.css');
-
-    table {
-        width: 500px;
-        border-spacing: 0;
-        border-collapse: collapse; /* IE<7 */
-    }
-
-    tr:nth-child(odd) td, th {
-        background-color: #d0d0d0;
-    }
-    tr:nth-child(even) td, tr:nth-child(even) th {
-        background-color: #c0c0c0;
-    }
-    #delete_form input[type=text], #clone_form input[type=text] {
-        width: 90%;
-    }
-    th.subhead {
-        font-weight: bold;
-        font-size: 120%;
-    }
-    th {
-        font-weight: normal;
-        text-align: left;
-        padding: 5px 5px 5px 50px;
-        width: 100px;
-    }
-    td {
-        padding: 5px;
-    }
-    td.spacer {
-       height: 20px;
+    span.sub {
+        color: gray;
     }
     input.rota_count {
         width: 40px;
     }
-    #rota_form_cell p {
-        text-align: right;
-        padding: 0 20% 0 0;
-        margin: 2px 0;
-    }
-    #rota_form_cell select {
-        display: block;
-        float: right;
+    select {
         height: 120pt;
         width: 70%
     }
-    #rota_form_cell span.helptext {
+    #rota span.helptext {
         display: block;
         float: right;
         width: 70%;
+    }
+    ul.rota li{
+      list-style-type: none;
+    }
+    ul.rota label {
+      display: inline-block;
+      width: 50%;
+      font-weight: bold;
+      height: 0.65cm;
+      font-size: 90%;
+    }
+    @media screen and (min-width: 640px) {
+        ul.rota {
+            display: flex;
+            flex-flow: row wrap;
+        }
+        ul.rota li{
+            width: 50%;
+        }
+    }
+    @media screen and (min-width: 800px) {
+        .rota_role {
+          width: 35%;
     }
 </style>
 {% endblock %}
 
 {% block body %}
-<h3>{{ VENUE.name }} events diary</h3>
 {% if messages %}
 <ul class="messages">
     {% for message in messages %}
@@ -81,37 +67,40 @@ $(document).ready(function() {
 </ul>
 {% endif %}
 
+<h2>
+  <span class="sub">Booking @</span> {{ showing.start|date:"d/m/Y H:i" }} <span class="sub">for</span>
+  <a href="{% url "edit-event-details-view" pk=showing.event.id %}">{{ showing.event.name }}</a>
+</h2>
+
+<p>
 <form id="delete_form" action="{% url "delete-showing" showing_id=showing.id %}" method="post">
-<table>
-    <tr><th class="subhead" colspan="2">Delete booking</th></tr>
-    <tr><th>Date:</th><td>{{ showing.start|date:"d F Y" }}</td></tr>
-    <tr><th>Time:</th><td>{{ showing.start|date:"H:i" }}</td></tr>
-    <tr><th>Event:</th><td>{{ showing.event.name }}</td></tr>
-    <tr><th colspan="2">
-            <input type="submit" value="Delete" /> <a href="{% url "cancel-edit" %}">Cancel</a>
-        </th>
-    </tr>
-    <tr><td colspan="2">{% csrf_token %}</td></tr>
-    </table>
+  <input class="btn btn-danger" type="submit" value="Delete Booking" />
 </form>
+</p>
 
 <form action="{% url "edit-showing" showing_id=showing.id %}" method="post">
-    <table>
-    <tr><th class="subhead" colspan="2">Edit booking</th></tr>
-    <tr><th>Event:</th><td>{{ showing.event.name }}{% csrf_token %}</td>
-    {{ form.as_table }}
-    <tr>
-        <th colspan="2">Rota:</th>
-    </tr>
-    <tr><td colspan="2" id="rota_form_cell">
-        {{ rota_form.as_p }}
-    </td></tr>
-    <tr>
-        <th colspan="2">
-        <input type="submit" value="Update" /> <a href="{% url "cancel-edit" %}">Cancel</a>
-        </th>
-    </tr>
-    </table>
+  {% csrf_token %}
+  <table class="table">
+  {{ form.as_table }}
+  </table>
+  <p>
+  <input class="btn btn-primary" type="submit" value="Update" />
+  </p>
+  <h3>Rota</h3>
+  <ul class="rota">
+        {% for rota_entry in rota_form %}
+            {% if rota_entry.name != "other_roles" %}
+    <li>{{rota_entry.errors }} {{ rota_entry.label_tag }} {{ rota_entry }}</li>
+            {% endif %}
+        {% endfor %}
+  </ul>
+  <h4>{{ rota_form.other_roles.label_tag }}</h4>
+
+  {{ rota_form.other_roles }}<br>
+  {{ rota_form.other_roles.help_text }}
+  <p>
+  <input class="btn btn-primary" type="submit" value="Update" />
+  </p>
 </form>
 {% endblock %}
 
