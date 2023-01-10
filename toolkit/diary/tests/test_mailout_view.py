@@ -47,8 +47,6 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             " JUNE\n"
             "  Sun 09 18:00 .... Event four titl\u0113\n"
             "\n"
-            "* cheap night\n"
-            "\n"
             "For complete listings including all future events, please visit:"
             "\n"
             "https://cubecinema.com/programme/\n"
@@ -82,7 +80,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             18:00 ....
             </td><td>
             Event four titl\u0113
-            </td></tr></table><p>* cheap night</p><p>For complete listings
+            </td></tr></table><p>For complete listings
             including all future events, please visit:
             <a href="https://www.cubecinema.com/programme/">
             Cube Cinema Programme</a></p><hr><p>

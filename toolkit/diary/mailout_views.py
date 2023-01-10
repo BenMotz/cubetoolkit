@@ -48,10 +48,13 @@ def _render_mailout_subject_and_body(days_ahead, copy_days_ahead):
 
     event_ids = set()
     showings_once_per_event = []
+    show_cheap_night_key = False
     for s in showings.public().start_in_range(start_date, copy_end_date):
         if s.event_id not in event_ids:
             showings_once_per_event.append(s)
             event_ids.add(s.event_id)
+        show_cheap_night_key = show_cheap_night_key or s.discounted
+
     try:
         # %-d strips the leading 0 from the day of the month - as per the
         # python docs, this is platform specific to Linux / glibc. See
@@ -79,6 +82,7 @@ def _render_mailout_subject_and_body(days_ahead, copy_days_ahead):
         "showings": showings,
         "showings_details": showings_once_per_event,
         "copy_days_ahead": copy_days_ahead,
+        "show_cheap_night_key": show_cheap_night_key,
         "site_url": settings.VENUE["url"],
     }
 
