@@ -35,7 +35,7 @@ VENUE = {
     # "From" address for mailout
     "mailout_from_address": "mailout@cubecinema.com",
     # email address shown when volunteer removes themselves from rota
-    "vols_email": "volunteers@cubecinema.com",
+    "vols_email": "rota@cubecinema.com",
     # List of people to get notifications when new vols are added
     "vols_admin_address": ["volunteers-owner@cubecinema.com"],
     "show_user_management": False,
