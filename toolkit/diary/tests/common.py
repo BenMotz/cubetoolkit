@@ -4,6 +4,7 @@ import fixtures
 
 import django.contrib.auth.models as auth_models
 import django.contrib.contenttypes as contenttypes
+from django.urls import reverse
 
 from toolkit.diary.models import (
     Showing,
@@ -37,6 +38,10 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
             "'>Ok</body>"
             "</html>",
         )
+
+    def assert_redirect_to_index(self, response):
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, reverse("default-edit"))
 
     def assert_has_message(self, response, msg, level):
         self.assertContains(

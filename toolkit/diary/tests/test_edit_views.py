@@ -457,8 +457,7 @@ class EditShowing(DiaryTestsMixin, TestCase):
             },
         )
 
-        self.assertEqual(response.status_code, 200)
-        self.assert_return_to_index(response)
+        self.assert_redirect_to_index(response)
 
         # Check showing was updated:
         showing = Showing.objects.get(id=7)
@@ -659,7 +658,7 @@ class DeleteShowing(DiaryTestsMixin, TestCase):
         # Showing should have been deleted
         self.assertFalse(Showing.objects.filter(id=7))
 
-        self.assert_return_to_index(response)
+        self.assert_redirect_to_index(response)
 
 
 class AddEventView(DiaryTestsMixin, TestCase):
@@ -732,8 +731,7 @@ class AddEventView(DiaryTestsMixin, TestCase):
             },
         )
         # Request succeeded?
-        self.assertEqual(response.status_code, 200)
-        self.assert_return_to_index(response)
+        self.assert_redirect_to_index(response)
 
         # Event added correctly?
         event = Event.objects.get(name="Ev\u0119nt of choic\u0119")
@@ -1005,7 +1003,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
                 "duration": "00:10:00",
             },
         )
-        self.assert_return_to_index(response)
+        self.assert_redirect_to_index(response)
 
         event = Event.objects.get(id=2)
         self.assertEqual(event.name, "New \u20acvent Name")
@@ -1049,7 +1047,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
                 "private": "on",
             },
         )
-        self.assert_return_to_index(response)
+        self.assert_redirect_to_index(response)
 
         event = Event.objects.get(id=2)
         self.assertEqual(event.name, "New \u20acvent Name!")
@@ -1152,7 +1150,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
                 },
             )
 
-        self.assert_return_to_index(response)
+        self.assert_redirect_to_index(response)
 
         event = Event.objects.get(id=2)
         self.assertEqual(event.media.count(), 1)
@@ -1186,7 +1184,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
                 },
             )
 
-        self.assert_return_to_index(response)
+        self.assert_redirect_to_index(response)
 
         event = Event.objects.get(id=2)
         self.assertEqual(event.media.count(), 1)
@@ -1226,7 +1224,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
                     "media_file-clear": "on",
                 },
             )
-            self.assert_return_to_index(response)
+            self.assert_redirect_to_index(response)
 
             event = Event.objects.get(id=2)
             # Media item should be gone:
@@ -1299,7 +1297,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
                     "credit": "All new image credit!",
                 },
             )
-        self.assert_return_to_index(response)
+        self.assert_redirect_to_index(response)
 
     @override_settings(PROGRAMME_COPY_SUMMARY_MAX_CHARS=50)
     def test_post_edit_event_too_much_copy_summary(self):
@@ -1349,7 +1347,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
             },
         )
 
-        self.assert_return_to_index(response)
+        self.assert_redirect_to_index(response)
 
         event = Event.objects.get(id=2)
         self.assertEqual(event.copy_summary, copy_summary_data)
@@ -1473,7 +1471,7 @@ class EditIdeasViewTests(DiaryTestsMixin, TestCase):
             idea.ideas, "An ide\u0113 f\u014d\u0159 some \u20acvent"
         )
 
-        self.assert_return_to_index(response)
+        self.assert_redirect_to_index(response)
 
     def test_post_form_existing_idea(self):
         # Ensure there's something in the DB for Jan 2012:
@@ -1498,7 +1496,7 @@ class EditIdeasViewTests(DiaryTestsMixin, TestCase):
             idea.ideas, "An ide\u0113 f\u014d\u0159 some \u20acvent"
         )
 
-        self.assert_return_to_index(response)
+        self.assert_redirect_to_index(response)
 
     def test_post_inline_existing_idea(self):
         # Ensure there's something in the DB for Jan 2012:
@@ -1681,20 +1679,10 @@ class PreferencesTests(DiaryTestsMixin, TestCase):
         # Get current prefs:
         response = self.client.get(url)
         edit_prefs = self._get_edit_prefs(response)
-        self.assertEqual(edit_prefs["popups"], "true")
-
-        # Set popups false:
-        response = self.client.get(
-            reverse("set_edit_preferences"), data={"popups": "false"}
-        )
-        self.assertEqual(response.status_code, 200)
-
-        # Verify change:
-        response = self.client.get(url)
-        edit_prefs = self._get_edit_prefs(response)
+        # Default to false
         self.assertEqual(edit_prefs["popups"], "false")
 
-        # Back to true:
+        # Set popups true:
         response = self.client.get(
             reverse("set_edit_preferences"), data={"popups": "true"}
         )
@@ -1704,6 +1692,17 @@ class PreferencesTests(DiaryTestsMixin, TestCase):
         response = self.client.get(url)
         edit_prefs = self._get_edit_prefs(response)
         self.assertEqual(edit_prefs["popups"], "true")
+
+        # Back to false:
+        response = self.client.get(
+            reverse("set_edit_preferences"), data={"popups": "false"}
+        )
+        self.assertEqual(response.status_code, 200)
+
+        # Verify change:
+        response = self.client.get(url)
+        edit_prefs = self._get_edit_prefs(response)
+        self.assertEqual(edit_prefs["popups"], "false")
 
     def test_set_get_single_pref(self):
         session_mock = {}
@@ -1759,19 +1758,19 @@ class PreferencesTests(DiaryTestsMixin, TestCase):
 
     def test_redirect_change(self):
         url = reverse("cancel-edit")
-        # default to javscript hackery:
+        # default to 302 to edit list:
         response = self.client.get(url)
-        self.assert_return_to_index(response)
+        self.assert_redirect_to_index(response)
 
-        # Set popup preference false:
+        # Set popup preference true:
         response = self.client.get(
-            reverse("set_edit_preferences"), data={"popups": "false"}
+            reverse("set_edit_preferences"), data={"popups": "true"}
         )
         self.assertEqual(response.status_code, 200)
 
-        # should now 302 to edit list:
+        # should now do javscript hackery:
         response = self.client.get(url)
-        self.assertRedirects(response, reverse("default-edit"))
+        self.assert_return_to_index(response)
 
 
 class EditTagsViewTests(DiaryTestsMixin, TestCase):
