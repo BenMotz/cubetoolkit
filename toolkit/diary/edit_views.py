@@ -363,13 +363,17 @@ class EventDetailView(PermissionRequiredMixin, DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        latest_showing = self.object.showings.latest("start")
+        form_initial_data = {}
+        try:
+            latest_showing = self.object.showings.latest("start")
+            form_initial_data[
+                "clone_start"
+            ] = latest_showing.start + datetime.timedelta(days=1)
+        except Showing.DoesNotExist as err:
+            latest_showing = None
         context["latest_showing"] = latest_showing
         context["form"] = diary_forms.CloneShowingForm(
-            initial={
-                "clone_start": latest_showing.start
-                + datetime.timedelta(days=1)
-            }
+            initial=form_initial_data
         )
         return context
 
