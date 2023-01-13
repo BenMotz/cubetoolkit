@@ -470,7 +470,7 @@ def add_event(request):
             messages.add_message(
                 request,
                 messages.SUCCESS,
-                "Added event '{0}' with showing on {1}".format(
+                "Added event '{0}' with booking on {1}".format(
                     new_event.name,
                     new_showing.start.strftime("%d/%m/%y at %H:%M"),
                 ),
@@ -555,7 +555,7 @@ def edit_showing(request, showing_id=None):
             messages.add_message(
                 request,
                 messages.ERROR,
-                "Can't edit showings that are in the past",
+                "Can't edit bookings that are in the past",
             )
         elif form.is_valid() and rota_form.is_valid():
             if (
@@ -584,7 +584,7 @@ def edit_showing(request, showing_id=None):
                 messages.add_message(
                     request,
                     messages.SUCCESS,
-                    "Updated showing for '{0}' at {1}".format(
+                    "Updated booking for '{0}' at {1}".format(
                         showing.event.name,
                         showing.start.strftime("%H:%M on %d/%m/%y"),
                     ),
@@ -809,7 +809,7 @@ def delete_showing(request, showing_id):
         messages.add_message(
             request,
             messages.ERROR,
-            "Can't delete showings that are in the past",
+            "Can't delete bookings that are in the past",
         )
         return HttpResponseRedirect(
             reverse("edit-showing", kwargs={"showing_id": showing_id})
@@ -823,7 +823,7 @@ def delete_showing(request, showing_id):
         messages.add_message(
             request,
             messages.SUCCESS,
-            "Deleted showing for '{0}' on {1}".format(
+            "Deleted booking for '{0}' on {1}".format(
                 showing.event.name, showing.start.strftime("%d/%m/%y")
             ),
         )
