@@ -4,6 +4,11 @@
 Editing Event types
 {% endblock %}
 
+{% block script %}
+{{ block.super }}
+{{ formset.media }}
+{% endblock %}
+
 {% block css %}
 {{ block.super }}
 <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">

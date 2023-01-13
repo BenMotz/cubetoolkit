@@ -42,6 +42,7 @@ import toolkit.diary.forms as diary_forms
 import toolkit.diary.edit_prefs as edit_prefs
 import toolkit.members.tasks
 from toolkit.util.image import adjust_colour
+from toolkit.diary.form_widgets import ChosenSelectMultiple
 
 # Shared utility method:
 from toolkit.diary.daterange import get_date_range
@@ -890,6 +891,10 @@ def edit_event_templates(request):
         EventTemplate,
         fields=("name", "roles", "tags", "pricing"),
         can_delete=True,
+        widgets={
+            "roles": ChosenSelectMultiple(),
+            "tags": ChosenSelectMultiple(),
+        }
     )
 
     if request.method == "POST":
