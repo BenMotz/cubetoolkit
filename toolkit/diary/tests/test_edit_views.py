@@ -364,6 +364,53 @@ class AddShowingView(DiaryTestsMixin, TestCase):
         self.assertTrue(response.json()["succeeded"])
         self.assertTrue(response.json()["html"].strip().startswith("<tr>"))
 
+    @patch("django.utils.timezone.now")
+    def test_add_showing_no_other_showings(self, now_patch):
+        source_event_id = 6
+        event = Event.objects.get(id=source_event_id)
+        now_patch.return_value = self._fake_now
+
+        url = reverse("add-showing", kwargs={"event_id": event.id})
+        self.assertEqual(0, event.showings.count())
+
+        # do add:
+        response = self.client.post(
+            url,
+            data={
+                "booked_by": "Johnny-come-lately",
+                "clone_start": "13/07/2023 23:59",
+            },
+        )
+
+        showings_after = event.showings.all()
+        self.assertEqual(1, len(showings_after))
+
+        # Get clone:
+        showing = showings_after[0]
+
+        # Check "booked by":
+        self.assertEqual(showing.booked_by, "Johnny-come-lately")
+
+        # Check fields are the defaults:
+        self.assertEqual(showing.event_id, event.id)
+        self.assertIsNone(showing.extra_copy)
+        self.assertIsNone(showing.extra_copy_summary)
+        self.assertFalse(showing.confirmed)
+        self.assertFalse(showing.hide_in_programme)
+        self.assertFalse(showing.cancelled)
+        self.assertFalse(showing.discounted)
+
+        # Check rota matches template:
+        src_rota_ids = set(
+            entry.role_id for entry in showing.rotaentry_set.all()
+        )
+        expected_rota_ids = set(role.id for role in event.template.roles.all())
+        self.assertEqual(src_rota_ids, expected_rota_ids)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTrue(response.json()["succeeded"])
+        self.assertTrue(response.json()["html"].strip().startswith("<tr>"))
+
 
 class EditShowing(DiaryTestsMixin, TestCase):
     def setUp(self):
