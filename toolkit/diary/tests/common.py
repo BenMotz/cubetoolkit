@@ -83,6 +83,27 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
         )
         t3.save()
 
+        # Templates:
+        # One role, one tag, pricing
+        self.tmpl1 = EventTemplate(name="Template 1")
+        self.tmpl1.save()
+        self.tmpl1.roles.set([r1])
+        self.tmpl1.tags.set([t1])
+        self.tmpl1.pricing = "Entry: \u00a35 / \u20ac10"
+        self.tmpl1.save()
+
+        # Two roles, two tags
+        self.tmpl2 = EventTemplate(name="Template 2")
+        self.tmpl2.save()
+        self.tmpl2.roles.set([r1, r2])
+        self.tmpl2.tags.set([t1, t3])
+        self.tmpl2.save()
+
+        # No roles, no tags, no pricing
+        self.tmpl3 = EventTemplate(name="Template 3")
+        self.tmpl3.save()
+
+        # Rooms
         Room(name="Room one", colour="#Ff0000").save()
         self.room_2 = Room(name="Room two", colour="#00abcd")
         self.room_2.save()
@@ -195,6 +216,7 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
             notes="\u0147otes on private/outwide event six",
             outside_hire=True,
             private=True,
+            template=self.tmpl2,
         )
         e6.save()
         e6.tags.set(
@@ -341,26 +363,6 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
             ideas="May 2013 ideas", month=date(year=2013, month=5, day=1)
         )
         i.save()
-
-        # Templates:
-        # One role, one tag, pricing
-        self.tmpl1 = EventTemplate(name="Template 1")
-        self.tmpl1.save()
-        self.tmpl1.roles.set([r1])
-        self.tmpl1.tags.set([t1])
-        self.tmpl1.pricing = "Entry: \u00a35 / \u20ac10"
-        self.tmpl1.save()
-
-        # Two roles, two tags
-        self.tmpl2 = EventTemplate(name="Template 2")
-        self.tmpl2.save()
-        self.tmpl2.roles.set([r1, r2])
-        self.tmpl2.tags.set([t1, t3])
-        self.tmpl2.save()
-
-        # No roles, no tags, no pricing
-        self.tmpl3 = EventTemplate(name="Template 3")
-        self.tmpl3.save()
 
         # Members:
         m1 = Member(
