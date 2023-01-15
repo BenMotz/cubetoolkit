@@ -13,9 +13,7 @@ class ChosenSelectMultiple(forms.SelectMultiple):
         # Define media (CSS & JS) used by this control. To include this
         # automatically the template containing the form must have the
         # {{ form.media }} tag
-        js = (
-            "js/lib/chosen.jquery.js",
-        )
+        js = ("js/lib/chosen.jquery.js",)
         css = {
             "all": ("css/lib/chosen.min.css",),
         }

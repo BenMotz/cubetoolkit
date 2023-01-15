@@ -907,7 +907,7 @@ def edit_event_templates(request):
         widgets={
             "roles": ChosenSelectMultiple(),
             "tags": ChosenSelectMultiple(),
-        }
+        },
     )
 
     if request.method == "POST":

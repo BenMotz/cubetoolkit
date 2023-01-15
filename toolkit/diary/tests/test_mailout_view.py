@@ -594,7 +594,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
                 "error_msg": "Failed connecting to redis to retrieve job status: nope",
                 "sent_count": 0,
                 "progress": 0,
-                "task_id": u"dummy-task-id",
+                "task_id": "dummy-task-id",
             },
             response.json(),
         )

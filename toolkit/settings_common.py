@@ -297,7 +297,7 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 SECURE_BROWSER_XSS_FILTER = True
 
 # Setting DENY breaks iframes in the calendar view:
-X_FRAME_OPTIONS = 'SAMEORIGIN'
+X_FRAME_OPTIONS = "SAMEORIGIN"
 
 # Setting True breaks members mailout, as JS relies on loading the cookie
 # CSRF_COOKIE_HTTPONLY = True
