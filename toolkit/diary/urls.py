@@ -159,11 +159,7 @@ diary_urls = [
     # Edit an event: view event before editing
     url(
         r"^edit/event/id/(?P<pk>\d+)/view/$",
-        permission_required("toolkit.read")(
-            EventDetailView.as_view(
-                model=Event, template_name="view_event_privatedetails.html"
-            )
-        ),
+        permission_required("toolkit.read")(EventDetailView.as_view()),
         name="edit-event-details-view",
     ),
     # Edit an event

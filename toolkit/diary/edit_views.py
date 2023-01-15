@@ -361,6 +361,8 @@ def set_edit_preferences(request):
 
 class EventDetailView(PermissionRequiredMixin, DetailView):
     permission_required = "toolkit.write"
+    model = Event
+    template_name = "view_event_privatedetails.html"
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
