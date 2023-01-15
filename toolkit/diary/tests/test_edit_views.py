@@ -865,6 +865,35 @@ class AddEventView(DiaryTestsMixin, TestCase):
         )
 
 
+class EditDetailView(DiaryTestsMixin, TestCase):
+    def setUp(self) -> None:
+        super().setUp()
+        # Log in:
+        self.client.login(username="admin", password="T3stPassword!")
+
+    def test_load_with_showings(self) -> None:
+        url = reverse("edit-event-details-view", kwargs={"pk": 1})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_event_privatedetails.html")
+        self.assertContains(
+            response,
+            "<tr><td>"
+            '<span title="Showing has started, can\'t edit">'
+            "15/02/2013 18:00</span>"
+            "</td>"
+            "<td>Blah blah</td><td>yes</td><td>yes</td><td>no</td><td>no</td>"
+            "<td>no</td><td>(Past)</td></tr>",
+            html=True,
+        )
+
+    def test_load_no_showings(self) -> None:
+        url = reverse("edit-event-details-view", kwargs={"pk": 6})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_event_privatedetails.html")
+
+
 class EditEventView(DiaryTestsMixin, TestCase):
     def setUp(self):
         super(EditEventView, self).setUp()
