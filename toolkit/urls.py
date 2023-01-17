@@ -59,7 +59,7 @@ urlpatterns = [
         {"document_root": django.conf.settings.MEDIA_ROOT},
     ),
     url(r"^cms/", include(wagtailadmin_urls)),
-    url(r"^documents/", include(wagtaildocs_urls)),
+    url(r"^doc/", include(wagtaildocs_urls)),
     url(r"^pages/", include(wagtail_urls)),
 ]
 
