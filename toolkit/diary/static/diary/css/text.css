@@ -1,6 +1,10 @@
 /* Text
 -------------------------------------------------------------------------------*/
 
+html {
+    font-family: 'Roboto Mono', 'courier new', courier, monospace;
+}
+
 .showing p {
     margin: 1em 0 0 0;
 }
