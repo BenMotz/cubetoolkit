@@ -1,0 +1,18 @@
+/* Base
+-------------------------------------------------------------------------------*/
+
+body {
+    background-color: #fff;
+}
+
+
+body {
+    font-size: 1em;
+    line-height: 1.4;
+    color: #000000;
+}
+
+a {
+    color: #000000;
+    text-decoration: none;
+}

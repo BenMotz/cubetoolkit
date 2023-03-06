@@ -272,11 +272,14 @@ STATICFILES_DIRS = (
 # Where to store messages:
 MESSAGE_STORAGE = "django.contrib.messages.storage.fallback.FallbackStorage"
 
+STATICFILES_STORAGE = 'pipeline.storage.PipelineManifestStorage'
+
 # List of finder classes that know how to find static files in
 # various locations.
 STATICFILES_FINDERS = (
     "django.contrib.staticfiles.finders.FileSystemFinder",
     "django.contrib.staticfiles.finders.AppDirectoriesFinder",
+    'pipeline.finders.PipelineFinder',
     # 'django.contrib.staticfiles.finders.DefaultStorageFinder',
 )
 
@@ -371,6 +374,7 @@ INSTALLED_APPS = (
     "wagtail.contrib.forms",
     "modelcluster",
     "taggit",
+    'pipeline',
     "crispy_forms",
 )
 
@@ -438,4 +442,31 @@ LOGGING = {
     },
     # Don't configure a root logger or any other logging config; each settings
     # file should do that
+}
+
+# The folowing config merges CSS files(main.css, normalize.css)
+# and JavaScript files(app.js, script.js) and compress them using
+# `yuglify` into `css/styles.css` and `js/main.js`
+# NOTE: Pipeline only works when DEBUG is False
+PIPELINE = {
+    'STYLESHEETS': {
+        'programme_css_files': {
+            'source_filenames': (
+                'diary/css/normalise.css',
+                'diary/css/base.css',
+                'diary/css/header.css',
+                'diary/css/sticky_footer.css',
+                'diary/css/grid.css',
+                'diary/css/text.css',
+                'diary/css/list_layout.css',
+                'diary/css/footer.css',
+                'diary/css/media_queries.css',
+            ),
+            'output_filename': 'css/programme.css',
+            'extra_context': {
+                'media': 'screen',
+            },
+        },
+    },
+    "CSS_COMPRESSOR": None
 }

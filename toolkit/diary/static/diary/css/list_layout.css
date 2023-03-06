@@ -1,0 +1,38 @@
+/* List Layout
+-------------------------------------------------------------------------------*/
+.list {
+    display: none;
+}
+.list.active {
+    display: block;
+    position: relative;
+    top: 0;
+    margin: 44px 10px 48px;
+    background: #fff;
+}
+.list p {
+    font-size: 0.7142em;
+    font-weight: 400;
+    line-height: 1.4;
+}
+.list a:hover {
+    text-decoration: underline;
+}
+p.month:first-of-type {
+    margin-top: 0;
+}
+p.month {
+    text-decoration: underline;
+}
+p.day {
+    display: block;
+    padding-left: 58px;
+    text-indent: -58px;
+}
+p.day > span.time {
+    padding-left: 10px;
+}
+p.sameday {
+    display: block;
+    padding-left: 58px;
+}

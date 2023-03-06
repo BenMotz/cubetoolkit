@@ -1,0 +1,14 @@
+
+
+/* Footer
+-------------------------------------------------------------------------------*/
+
+#colophon {
+    display: none;
+    margin: 0 auto;
+    padding-top: 60px;
+    padding-bottom: 60px;
+    background: #B1B2AE;
+    color: rgba(255, 255, 255, .66);
+}
+

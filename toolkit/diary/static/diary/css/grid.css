@@ -1,0 +1,59 @@
+/* Grid
+-------------------------------------------------------------------------------*/
+
+.grid {
+    width: 100%;
+    position: relative;
+    background: #fff;
+
+}
+.programme {
+    position: relative;
+    margin: 44px 5px 48px;
+    margin-left: 1.5625%;
+    margin-right: 1.5625%;
+}
+
+.showing {
+    position: relative;
+    padding: 5px 5px 10px;
+    padding-top: 1.5625%;
+    padding-left: 1.5625%;
+    padding-right: 1.5625%;
+    padding-bottom: 6.25%;
+    margin-bottom: 20px;
+    float: left;
+    overflow: hidden;
+    width: 310px;
+    width: 96.875%;
+    background-color: #fff;
+    border: 0.07142857142857142em solid transparent;
+}
+
+.event_image {
+    position: relative;
+    width: 298px;
+    width: 100%;
+    min-height: 1em;
+    /*background: #1A1A1A;*/
+    /*background-image: repeating-linear-gradient(45deg, transparent 1px, transparent 1px, #cccccc 2px, #cccccc 3px);*/
+}
+
+.event_image img {
+    max-width: 100%;
+    max-height: 300px;
+    height: auto;
+    display: block;
+    position: relative;
+    -webkit-transition: top 0.2s ease-out, left 0.2s ease-out;
+    transition: top 0.2s ease-out, left 0.2s ease-out;
+    /*-webkit-filter: grayscale(1);
+    filter: grayscale(1);*/
+}
+
+.event_image img:hover {
+    /*-webkit-transition: top 0.2s ease-out, left 0.2s ease-out;
+    transition: top 0.2s ease-out, left 0.2s ease-out;
+    -webkit-filter: none;
+    filter: none;*/
+}

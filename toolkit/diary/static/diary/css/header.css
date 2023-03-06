@@ -1,0 +1,190 @@
+/* Header
+-------------------------------------------------------------------------------*/
+
+/* --- Main Menu + Main Search --- */
+.navigation-wrap {
+    position: relative;
+    border-top-width: 0px;
+    border-right-width: 0px;
+    border-bottom-width: 0px;
+    border-left-width: 0px;
+    border-spacing: 0px;
+    padding-top: 37px;
+    padding-right: 0;
+    padding-bottom: 20px;
+    padding-left: 10px;
+}
+.mobile-wrap {
+    position: relative;
+    height: 50px;
+}
+#mobile-menu-btn {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 50px;
+    height: 50px;
+    display: block;
+    text-align: left;
+    z-index: 100;
+}
+#mobile-menu-btn:before {/
+    display: inline-block;
+    -webkit-font-smoothing: antialiased;
+    font: normal 1.3571em;
+    vertical-align: top;
+    width: 50px;
+    height: 50px;
+    padding: 15px 0 0 0;
+    color: #000;
+}
+#mobile-menu-btn span {
+    text-indent: -99999px;
+    display: block;
+}
+.black_overlay {
+    z-index: 20;
+    position: fixed;
+    background: #fff;
+    width: 0;
+    background-size: cover;
+    opacity: 0;
+    height: 100%;
+    top: 0;
+    left: 0;
+    transition: opacity 500ms;
+    -webkit-transition: opacity 500ms;
+}
+.black_overlay.active-search-bg {
+    opacity: .85;
+    left: 240px;
+    width: 100%;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=85)";
+    filter: alpha(opacity=85);
+}
+
+/* --- Sidebar Layout --- */
+#sidebar {
+    display: block;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    min-height: 100%;
+    width: 240px;
+    margin: 0;
+    padding: 0;
+    background-color: #fff;
+    overflow-y: auto;
+}
+.grid.open-sidebar {
+    left: 240px;
+}
+#site-nav {
+    display: block;
+    position: absolute;
+    left: 0px;
+    top: 0px;
+    width: 220px;
+    background: #fff;
+    padding-top: 37px;
+    padding-right: 0px;
+    padding-bottom: 20px;
+    padding-left: 22px;
+}
+.nav-wrap {
+    display: block;
+    position: absolute;
+    left: 0px;
+    width: 220px;
+    border-top-width: 0px;
+    border-right-width: 0px;
+    border-bottom-width: 0px;
+    border-left-width: 0px;
+    border-spacing: 0px;
+    padding-top: 21.7647%;
+    padding-right: 0;
+    padding-bottom: 11.7647%;
+    padding-left: 12.9411%;
+}
+#site-title h1 {
+    display: block;
+    position: relative;
+    font-weight: 400;
+    text-transform: uppercase;
+    padding: 0;
+    margin: 0;
+    font-size: 0.7857em;
+    line-height: 1.4;
+}
+#site-title h1 a {
+    border-bottom: 0.1em solid;
+}
+.site-description h4 {
+    font-size: 0.7857em;
+    font-weight: 400;
+    text-transform: lowercase;
+    line-height: 1.4;
+    color: #000000;
+    margin: 0;
+}
+.grid-switcher {
+    font-size: 0.7857em;
+    font-weight: 400;
+    line-height: 1.4;
+    margin-top: 2em;
+}
+.social-media {
+    font-size: 0.7857em;
+    font-weight: 400;
+    line-height: 1.4;
+    margin-top: 2em;
+}
+.print-media {
+    font-size: 0.7857em;
+    font-weight: 400;
+    line-height: 1.4;
+    margin-top: 2em;
+}
+/* --- Menus --- */
+#site-nav ul {
+    padding: 0;
+}
+#site-nav ul li a {
+    display: block;
+    font-size: 0.7857em;
+    font-weight: 400;
+    line-height: 1.4;
+    padding: 3.5px 0 14px;
+}
+#site-nav ul li a:hover {
+    text-decoration: underline;
+}
+#site-nav ul ul li {
+    padding-left: 0.714em;
+}
+/* --- Sub menu --- */
+#navmenu ul ul {
+    display: none;
+}
+#navmenu ul ul li {
+
+}
+#navmenu ul ul li:last-child {
+
+}
+#navmenu ul ul a {
+    padding: 3.5px 0 14px;
+    display: block;
+    text-indent: -0.886em;
+    padding-left: 0.714em;
+}
+#navmenu ul ul a:before {
+    font-family: FontAwesome;
+    content: "\f105";
+    display: inline-block;
+    padding-right: 10px;
+    vertical-align: baseline;
+}
+#navmenu ul ul a:hover {
+    text-decoration: underline;
+}

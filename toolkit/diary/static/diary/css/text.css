@@ -1,0 +1,113 @@
+/* Text
+-------------------------------------------------------------------------------*/
+
+.showing p {
+    margin: 1em 0 0 0;
+}
+
+.pre_title, .post_title {
+    display: block;
+    font-weight: 400;
+    font-size: 0.7857em;
+    line-height: 1.4;
+    color: #666666;
+    text-transform: none;
+    text-decoration: none;
+    margin: 0;
+    padding: 0;
+}
+
+.showing h3 {
+    font-weight: 400;
+    text-transform: uppercase;
+    padding: 0;
+    margin: 0;
+    font-size: 0.8214em;
+    line-height: 1.4;
+}
+
+.showing h3 a:hover {
+    text-decoration: none;
+    color: #000000;
+    border-bottom: 0.1em solid;
+}
+
+.showing h3 a:visited {
+    color: #000000;
+}
+
+.showing:hover > h3 a {
+    text-decoration: none;
+    color: #000000;
+    border-bottom: 0.1em solid;*/
+}
+
+.showing:hover {
+    border: 0.07142857142857142em solid #cccccc;
+    border: 0.3125% solid #cccccc;
+    background: #F7F7F7;
+    cursor: pointer;
+}
+
+.showing .event_details {
+    /* Stop the paragraph from wrapping below the image (if any): */
+    overflow: hidden;
+}
+
+p.start_and_pricing {
+    font-size: 0.7142em;
+    font-weight: 400;
+    line-height: 1.4;
+    color: #404040;
+    padding: 0;
+    margin: 0;
+}
+.sold_out, .cancelled {
+    text-decoration: line-through;
+}
+abbr.discounted {
+    border-bottom: none !important;
+}
+
+p.copy {
+    font-size: 0.7142em;
+    font-weight: 400;
+    line-height: 1.4;
+    color: #000000;
+    padding: 0;
+}
+
+span.tags {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    text-transform: uppercase;
+    font-weight: 400;
+    font-size: 0.571em;
+    background-color: rgba(107, 107, 107, 0.6);
+
+}
+span.tags a {
+    float: left;
+    text-decoration: none;
+    color: white;
+    line-height: 1.4;
+    text-align: center;
+    vertical-align: middle;
+    padding: 0.071em 0.286em;
+    margin: 0;
+    z-index: 50
+}
+/*
+span.tags .tag_music { color: blue; }
+span.tags .tag_film { color: green; }
+span.tags .tag_party { color: red; }
+span.tags .tag_talk { color: orange; }
+span.tags .tag_cabaret { color: brown; }
+span.tags .tag_bluescreen { color: blue; }
+span.tags .tag_nanoplex { color: #CA678D; }
+span.tags .tag_animation { color: #FFAA00; }
+
+/* Hide film format tags: */
+.tag_dcp, .tag_dvd, .tag_dcp, .tag_ttt, .tag_cheapnight, .tag_usb { display: none; }
+

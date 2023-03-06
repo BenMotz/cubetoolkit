@@ -1,0 +1,12 @@
+/* Sticky Footer
+-------------------------------------------------------------------------------*/
+
+.grid {
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+  }
+  
+  .programme {
+    flex: 1;
+  }
