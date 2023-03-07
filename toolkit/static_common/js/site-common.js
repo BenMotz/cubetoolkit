@@ -1,90 +1,77 @@
 /* Common setup for public content pages */
-function setup_page(index_page) {
-    $(document).ready(function($){
-        var masonry_opts_index = {
-            gutter: '.gutter-sizer',
-            columnWidth: '.showing-sizer',
-            itemSelector: '.showing'
-        };
-        var masonry_opts_other = {
-            percentPosition: true,
-            gutter: '.gutter-sizer',
-            columnWidth: '.grid-sizer',
-            itemSelector: '.grid-item'
-        }
-        var masonry_opts = index_page ? masonry_opts_index : masonry_opts_other;
+function setup_page (index_page) {
+  $(document).ready(function ($) {
+    /* set up small form factor menu --------------------------------------- */
+    $('#mobile-menu-btn').click(function () {
+      var toggle_el = $(this).data('toggle')
+      $(toggle_el).toggleClass('open-sidebar')
+      $('.black_overlay').toggleClass('active-search-bg')
+    })
 
-        /* init Masonry -------------------------------------------------------- */
-        var $grid = $('.programme').masonry(masonry_opts);
+    $('.black_overlay').swipe({
+      swipe: function (
+        event,
+        direction,
+        distance,
+        duration,
+        fingerCount,
+        fingerData
+      ) {
+        $('.grid').removeClass('open-sidebar')
+        $('.black_overlay').removeClass('active-search-bg')
+      },
+      threshold: 0
+    })
 
-        // re-layout Masonry after each image loads
-        $grid.imagesLoaded().progress(function() {
-           $grid.masonry('layout');
-        });
+    /* Set up nav menu ----------------------------------------------------- */
+    $('#navmenu > ul > li:has(ul)').addClass('has-sub')
 
-        /* set up small form factor menu --------------------------------------- */
-        $("#mobile-menu-btn").click(function() {
-            var toggle_el = $(this).data("toggle");
-            $(toggle_el).toggleClass("open-sidebar");
-            $(".black_overlay").toggleClass("active-search-bg");
-        });
+    $('#navmenu > ul > li > a').click(function () {
+      var checkElement = $(this).next()
 
-        $(".black_overlay").swipe({
-            swipe: function(event, direction, distance, duration, fingerCount, fingerData) {
-                $(".grid").removeClass("open-sidebar");
-                $(".black_overlay").removeClass("active-search-bg");
-            },
-            threshold: 0
-        });
+      $('#navmenu li').removeClass('active')
+      $(this)
+        .closest('li')
+        .addClass('active')
 
-        /* Set up nav menu ----------------------------------------------------- */
-        $('#navmenu > ul > li:has(ul)').addClass("has-sub");
+      if (checkElement.is('ul') && checkElement.is(':visible')) {
+        $(this)
+          .closest('li')
+          .removeClass('active')
+        checkElement.slideUp('normal')
+      }
 
-        $('#navmenu > ul > li > a').click(function() {
-            var checkElement = $(this).next();
+      if (checkElement.is('ul') && !checkElement.is(':visible')) {
+        $('#navmenu ul ul:visible').slideUp('normal')
+        checkElement.slideDown('normal')
+      }
 
-            $('#navmenu li').removeClass('active');
-            $(this).closest('li').addClass('active');
+      if (checkElement.is('ul')) {
+        return false
+      } else {
+        return true
+      }
+    })
 
-            if((checkElement.is('ul')) && (checkElement.is(':visible'))) {
-                $(this).closest('li').removeClass('active');
-                checkElement.slideUp('normal');
-            }
+    /* Set up grid/list switcher (event list only) ------------------------- */
+    $('a#listbtn.switcher').click(function () {
+      $('.programme').animate({ opacity: 0 }, function () {
+        $('.programme').hide()
+        $('.list').addClass('active')
+        $('.list.active')
+          .stop()
+          .animate({ opacity: 1 })
+      })
+    })
 
-            if((checkElement.is('ul')) && (!checkElement.is(':visible'))) {
-                $('#navmenu ul ul:visible').slideUp('normal');
-                checkElement.slideDown('normal');
-            }
-
-            if (checkElement.is('ul')) {
-                return false;
-            } else {
-                return true;
-            }
-        });
-
-        /* Set up grid/list switcher (event list only) ------------------------- */
-        $('a#listbtn.switcher').click(function() {
-            $('.programme').animate({opacity: 0},function() {
-                $('.programme').hide();
-                $('.list').addClass('active');
-                $('.list.active').stop().animate({opacity: 1});
-            });
-        });
-
-        $('a#gridbtn.switcher').click(function() {
-            $('.list').animate({opacity:0},function() {
-                $('.list').removeClass('active');
-                $('.programme').show();
-                $('.programme').masonry(masonry_opts);
-                $('.programme').stop().animate({opacity: 1});
-            });
-        });
-    });
-
-    // Belt and braces: do a final masonry layout after all images are
-    // definitely loaded:
-    $(window).load(function() {
-        $('.programme').masonry('layout');
-    });
+    $('a#gridbtn.switcher').click(function () {
+      $('.list').animate({ opacity: 0 }, function () {
+        $('.list').removeClass('active')
+        $('.programme').show()
+        $('.programme')
+          .stop()
+          .animate({ opacity: 1 })
+      })
+    })
+  })
 }

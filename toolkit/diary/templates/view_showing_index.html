@@ -64,8 +64,6 @@ setup_page(true);
 {% block body %}
 {{ block.super }}
 <div class="programme">
-    <div class="showing-sizer"></div>
-    <div class="gutter-sizer"></div>
 {% for event, showings in events.items %}
     <div class="showing" id="event_{{ event.id }}">
 
