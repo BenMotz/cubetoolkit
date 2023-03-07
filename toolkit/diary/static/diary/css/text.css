@@ -115,3 +115,94 @@ span.tags .tag_animation { color: #FFAA00; }
 /* Hide film format tags: */
 .tag_dcp, .tag_dvd, .tag_dcp, .tag_ttt, .tag_cheapnight, .tag_usb { display: none; }
 
+
+@media screen and (min-width: 360px) {
+    /* --- Text --- */
+    #site-title h1, .site-description h4, .grid-switcher, .social-media, .print-media, #site-nav ul li a, .showing h3, .list p {
+        font-size: 0.892754em;
+        line-height: 1.4;
+    }
+    .pre_title, .post_title {
+        font-size: 0.8035em;
+        line-height: 1.4;
+    }
+    #mobile-menu-btn:before {
+        font: normal 1.696375em;
+    }
+    p.start_and_pricing, p.copy, span.tags {
+        font-size: 0.802875em;
+        line-height: 1.4;
+    }
+}
+
+@media screen and (min-width: 475px) {
+
+    /* --- Text --- */
+    #site-title h1, .site-description h4, .grid-switcher, .social-media, .print-media, #site-nav ul li a, .showing h3, .list p {
+        font-size: 0.7142em;
+        line-height: 1.4;
+    }
+    .pre_title, .post_title {
+        font-size: 0.6428em;
+        line-height: 1.4;
+    }
+    p.start_and_pricing, p.copy, span.tags {
+        font-size: 0.571em;
+        line-height: 1.4;
+    }
+}
+
+@media screen and (min-width: 600px) {
+
+    /* --- Text --- */
+    span.tags {
+        font-size: 0.5em;
+        line-height: 1.4;
+    }
+
+}
+
+
+@media screen and (min-width: 1000px) {
+
+    /* --- Text --- */
+    #site-title h1, .site-description h4, .grid-switcher, .social-media, .print-media, #site-nav ul li a {
+        font-size: 0.7142em;
+        line-height: 1.4;
+    }
+    .showing h3, .list p {
+        font-size: 0.7857em;
+        line-height: 1.4;
+    }
+    .pre_title, .post_title {
+        font-size: 0.7142em;
+        line-height: 1.4;
+    }
+    p.start_and_pricing, p.copy {
+        font-size: 0.67857em;
+        line-height: 1.4;
+    }
+    span.tags {
+        font-size: 0.64285em;
+        line-height: 1.4;
+    }
+}
+
+@media screen and (min-width: 1600px) {
+    /* --- Text --- */
+    #site-title h1, .site-description h4, .grid-switcher, .social-media, .print-media, #site-nav ul li a, .showing h3, .list p {
+        font-size: 0.785714286em;
+        line-height: 1.4;
+    }
+    .pre_title, .post_title {
+        font-size: 0.714285714em;
+        line-height: 1.4;
+    }
+    #mobile-menu-btn:before {
+        font: normal 1.696375em;
+    }
+    p.start_and_pricing, p.copy, span.tags {
+        font-size: 0.714285714em;
+        line-height: 1.4;
+    }
+}

@@ -460,7 +460,6 @@ PIPELINE = {
                 'diary/css/text.css',
                 'diary/css/list_layout.css',
                 'diary/css/footer.css',
-                'diary/css/media_queries.css',
             ),
             'output_filename': 'css/programme.css',
             'extra_context': {

@@ -1272,3 +1272,21 @@ p.action {
 
 
 }
+
+@media screen and (min-width: 360px) {
+    /* --- Event Image --- */
+    .event_image img {
+        max-height: 350px;
+    }
+}
+
+@media screen and (min-width: 1000px) {
+    #container {
+        display: block;
+        padding-top: 37px;
+        padding-bottom: 20px;
+        width: 100%;
+        height: 100%;
+        background-color: transparent;
+    }
+}

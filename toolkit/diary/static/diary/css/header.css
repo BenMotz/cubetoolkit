@@ -188,3 +188,205 @@
 #navmenu ul ul a:hover {
     text-decoration: underline;
 }
+
+
+@media screen and (min-width: 360px) {
+    .navigation-wrap {
+        padding-left: 12px;
+    }
+}
+
+@media screen and (min-width: 475px) {
+    .navigation-wrap {
+        padding-left: 14px;
+    }
+}
+
+@media screen and (min-width: 600px) {
+    .navigation-wrap {
+        padding-left: 22px;
+    }
+}
+
+@media screen and (min-width: 1000px) {
+    #container {
+        display: block;
+        padding-top: 37px;
+        padding-bottom: 20px;
+        width: 100%;
+        height: 100%;
+        background-color: transparent;
+    }
+    .navigation-wrap {
+        display: none;
+    }
+    #mobile-menu-btn {
+        display: none;
+    }
+
+    /* --- Sidebar Layout --- */
+    #sidebar {
+        display: block;
+        position: fixed;
+        left: 0px;
+        top: 0px;
+        min-height: 100%;
+        width: 170px;
+        margin: 0;
+        padding: 0;
+        background-color: #fff;
+        overflow-y: hidden;
+    }
+    #site-nav {
+        position: relative;
+        left: 0;
+        top: 0;
+        width: 170px;
+        background: transparent;
+        border-top-width: 0px;
+        border-right-width: 0px;
+        border-bottom-width: 0px;
+        border-left-width: 0px;
+        border-spacing: 0px;
+        padding-top: 0px;
+        padding-right: 0px;
+        padding-bottom: 20px;
+        padding-left: 22px;
+    }
+    .nav-wrap {
+        position: relative;
+        left: 0;
+        width: 170px;
+        border-top-width: 0px;
+        border-right-width: 0px;
+        border-bottom-width: 0px;
+        border-left-width: 0px;
+        border-spacing: 0px;
+        padding-top: 42px;
+        padding-right: 0px;
+        padding-bottom: 0px;
+        padding-left: 22px;
+    }
+    #site-title h1 {
+        font-weight: 400;
+        text-transform: uppercase;
+        padding: 0;
+        margin: 0;
+        font-size: 0.7142em;
+        line-height: 1.4;
+    }
+    #site-title h1 a {
+        border-bottom: 0.1em solid;
+    }
+    .site-description h4 {
+        font-size: 0.7142em;
+        font-weight: 400;
+        text-transform: lowercase;
+        line-height: 1.4;
+        color: #000000;
+        margin: 0;
+    }
+    .grid-switcher {
+        font-size: 0.7142em;
+        line-height: 1.4;
+        margin-top: 2em;
+    }
+    .social-media {
+        font-size: 0.7142em;
+        line-height: 1.4;
+        margin-top: 2em;
+    }
+    .print-media {
+        font-size: 0.7142em;
+        line-height: 1.4;
+        margin-top: 2em;
+    }
+
+    /* --- Menus --- */
+    .mobile-wrap {
+        display: none;
+    }
+    #site-nav {
+        display: block;
+        margin-top: 1em;
+    }
+    #site-nav ul {
+        padding: 0;
+    }
+    #site-nav ul li a {
+        display: block;
+        font-size: 0.7142em;
+        line-height: 1.4;
+        padding: 3.5px 0 7px;
+    }
+    #site-nav ul li a:hover {
+        text-decoration: underline;
+    }
+    #site-nav ul ul li {
+        padding-left: 0.714em;
+    }
+    /* --- Sub menu --- */
+    #navmenu ul ul {
+        display: none;
+    }
+    #navmenu ul ul a {
+        padding: 3.5px 0 7px;
+        display: block;
+        text-indent: -0.886em;
+        padding-left: 0.714em;
+    }
+    #navmenu ul ul a:hover {
+        text-decoration: underline;
+    }
+}
+
+@media screen and (min-width: 1260px) {
+    /* --- Site Nav --- */
+    .mobile-wrap {
+        display: none;
+    }
+
+    /* --- Menus --- */
+    #site-nav ul li a {
+        padding: 3.5px 0;
+    }
+
+    /* --- Sub menu --- */
+    #navmenu ul ul a {
+        padding: 3.5px 0;
+    }
+}
+
+@media screen and (min-width: 1600px) {
+    /* --- Sidebar Layout --- */
+    #sidebar {
+        width: 192px;
+    }
+    #site-nav {
+        width: 192px;
+        padding-bottom: 20px;
+        padding-left: 27px;
+    }
+    .nav-wrap {
+        width: 192px;
+        padding-top: 42px;
+        padding-left: 27px;
+    }
+}
+
+@media screen and (min-width: 1900px) {
+    /* --- Sidebar Layout --- */
+    #sidebar {
+        width: 192px;
+    }
+    #site-nav {
+        width: 192px;
+        padding-bottom: 20px;
+        padding-left: 30px;
+    }
+    .nav-wrap {
+        width: 192px;
+        padding-top: 42px;
+        padding-left: 30px;
+    }
+}
