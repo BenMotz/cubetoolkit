@@ -946,7 +946,6 @@ p.action {
 
     .programme {
         margin: 0px 0px 0px;
-        width: 665px;
     }
     .grid {
         width: 665px;
@@ -1063,7 +1062,7 @@ p.action {
 
     /* --- Grid --- */
     .grid, .programme {
-        width: 865px;
+        width: 100%;
     }
     .grid {
         left: 170px;
@@ -1133,7 +1132,6 @@ p.action {
         left: 192px;
     }
     .programme {
-        width: 1105px;
         margin: 0px 6px 48px;
         display: block;
         position: relative;
@@ -1217,7 +1215,6 @@ p.action {
         left: 192px;
     }
     .programme {
-        width: 1430px;
         margin: 0px 6px 48px;
         display: block;
         position: relative;

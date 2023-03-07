@@ -49,7 +49,7 @@ textarea,
 
   /*TEXT AND BACKGROUND COLOURS*/	
 	
-html, body, #sidebar, .grid-item, .grid, .black_overlay, .showing:nth-child(7n+3) {
+html, body, #sidebar, .grid-item, .grid, .black_overlay, .showing:nth-child(7n+1) {
 color: #082080;
 	background-color: #e3cae3;
 }

@@ -46,13 +46,6 @@ html {
     border-bottom: 0.1em solid;*/
 }
 
-.showing:hover {
-    border: 0.07142857142857142em solid #cccccc;
-    border: 0.3125% solid #cccccc;
-    background: #F7F7F7;
-    cursor: pointer;
-}
-
 .showing .event_details {
     /* Stop the paragraph from wrapping below the image (if any): */
     overflow: hidden;
