@@ -371,7 +371,10 @@ INSTALLED_APPS = (
     "wagtail.contrib.forms",
     "modelcluster",
     "taggit",
+    "crispy_forms",
 )
+
+CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 # Common logging config. Different settings files can tweak this.
 LOGGING = {

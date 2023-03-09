@@ -47,6 +47,8 @@ MIDDLEWARE.append("debug_toolbar.middleware.DebugToolbarMiddleware")
 INSTALLED_APPS = list(INSTALLED_APPS)
 INSTALLED_APPS.append("debug_toolbar")
 
+CRISPY_FAIL_SILENTLY = False
+
 warnings.filterwarnings(
     "error",
     r"DateTimeField received a naive datetime",
