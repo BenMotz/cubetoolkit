@@ -462,11 +462,11 @@ def add_event(request):
             # Set event tags to those from its template:
             new_event.save()
             new_event.reset_tags_to_default()
-            # create number_of_days showings, each offset by one more from the
-            # date/time given in start parameter, and each with rota roles from
-            # the template
+            # create number_of_bookings showings, each offset by one more from
+            # the date/time given in start parameter, and each with rota roles
+            # from the template
             start = form.cleaned_data["start"]
-            for day_count in range(0, form.cleaned_data["number_of_days"]):
+            for day_count in range(0, form.cleaned_data["number_of_bookings"]):
                 day_offset = datetime.timedelta(days=day_count)
                 new_showing = Showing(
                     event=new_event,

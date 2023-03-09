@@ -767,7 +767,7 @@ class AddEventView(DiaryTestsMixin, TestCase):
             data={
                 "start": "02/06/2013 20:00",
                 "duration": "01:30:00",
-                "number_of_days": "3",
+                "number_of_bookings": "3",
                 "event_name": "Ev\u0119nt of choic\u0119",
                 "event_template": "1",
                 "booked_by": "\u015Comeb\u014ddy",
@@ -838,7 +838,7 @@ class AddEventView(DiaryTestsMixin, TestCase):
             data={
                 "start": "30/05/2013 20:00",
                 "duration": "01:30:00",
-                "number_of_days": "3",
+                "number_of_bookings": "3",
                 "event_name": "Ev\u0119nt of choic\u0119",
                 "event_template": "1",
                 "booked_by": "\u015Comeb\u014ddy",
@@ -873,7 +873,7 @@ class AddEventView(DiaryTestsMixin, TestCase):
             data={
                 "start": "",
                 "duration": "",
-                "number_of_days": "",
+                "number_of_bookings": "",
                 "event_name": "",
                 "event_template": "",
                 "booked_by": "",
@@ -899,7 +899,7 @@ class AddEventView(DiaryTestsMixin, TestCase):
             response, "form", "duration", "This field is required."
         )
         self.assertFormError(
-            response, "form", "number_of_days", "This field is required."
+            response, "form", "number_of_bookings", "This field is required."
         )
         self.assertFormError(
             response, "form", "event_name", "This field is required."

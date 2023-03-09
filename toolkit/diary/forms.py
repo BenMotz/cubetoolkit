@@ -271,8 +271,12 @@ class NewEventForm(forms.Form):
         widget=JQueryDateTimePicker(),
     )
     duration = forms.TimeField(required=True, initial=datetime.time(hour=1))
-    number_of_days = forms.IntegerField(
-        min_value=1, max_value=31, required=True, initial=1
+    number_of_bookings = forms.IntegerField(
+        min_value=1,
+        max_value=31,
+        required=True,
+        initial=1,
+        help_text="Bookings will be created with the same start time on consecutive days",
     )
     event_name = forms.CharField(min_length=1, max_length=256, required=True)
     event_template = forms.ModelChoiceField(
