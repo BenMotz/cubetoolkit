@@ -4,6 +4,7 @@ import calendar
 from django import forms
 import django.db.models
 from django.conf import settings
+from crispy_forms.helper import FormHelper
 
 # Custom form widgets:
 from toolkit.diary.form_widgets import (
@@ -261,6 +262,12 @@ class NewEventForm(forms.Form):
         super(NewEventForm, self).__init__(*args, **kwargs)
         if not settings.MULTIROOM_ENABLED:
             del self.fields["room"]
+
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.form_class = "form-horizontal"
+        self.helper.label_class = "col-sm-2"
+        self.helper.field_class = "col-sm-10"
 
     room = forms.ModelChoiceField(
         queryset=toolkit.diary.models.Room.objects.all(), required=True

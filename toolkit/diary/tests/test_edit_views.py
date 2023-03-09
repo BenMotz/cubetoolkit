@@ -726,7 +726,7 @@ class AddEventView(DiaryTestsMixin, TestCase):
         self.assertContains(
             response,
             r'<input id="id_start" name="start" value="02/06/2013 20:00" '
-            r'type="text" required />',
+            r'type="text" required class="jquerydatetimepicker form-control" />',
             html=True,
         )
 
@@ -739,7 +739,7 @@ class AddEventView(DiaryTestsMixin, TestCase):
         self.assertContains(
             response,
             r'<input id="id_start" name="start" value="01/01/1950 20:00" '
-            r'type="text" required />',
+            r'type="text" required class="jquerydatetimepicker form-control" />',
             html=True,
         )
 
