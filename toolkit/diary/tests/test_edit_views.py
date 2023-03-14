@@ -1432,6 +1432,57 @@ class EditEventView(DiaryTestsMixin, TestCase):
         event = Event.objects.get(id=2)
         self.assertEqual(event.copy_summary, copy_summary_data)
 
+    @override_settings(PROGRAMME_EVENT_TERMS_MIN_WORDS=5)
+    def test_post_edit_event_not_enough_terms(self):
+        event = Event.objects.get(id=1)
+        original_terms = event.terms
+        url = reverse("edit-event-details", kwargs={"event_id": 1})
+
+        # Not quite enough term text:
+        response = self.client.post(
+            url,
+            data={
+                "name": "New \u20acvent Name",
+                "duration": "00:10:00",
+                "terms": "One two three four.",
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "form_event.html")
+
+        self.assertFormError(
+            response,
+            "event_form",
+            "terms",
+            "Event terms for confirmed event "
+            f"'{event.name}' are missing or too short. "
+            "Please enter at least 5 words.",
+        )
+
+        event = Event.objects.get(id=1)
+        self.assertEqual(event.terms, original_terms)
+
+    @override_settings(PROGRAMME_EVENT_TERMS_MIN_WORDS=5)
+    def test_post_edit_event_just_enough_terms(self):
+        event = Event.objects.get(id=1)
+        original_terms = event.terms
+        url = reverse("edit-event-details", kwargs={"event_id": 1})
+
+        # Not quite enough term text:
+        response = self.client.post(
+            url,
+            data={
+                "name": "New \u20acvent Name",
+                "duration": "00:10:00",
+                "terms": "One two three four five.",
+            },
+        )
+
+        self.assert_redirect_to_index(response)
+        event = Event.objects.get(id=1)
+        self.assertEqual(event.terms, "One two three four five.")
+
 
 class EditIdeasViewTests(DiaryTestsMixin, TestCase):
     def setUp(self):

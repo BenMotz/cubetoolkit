@@ -681,41 +681,8 @@ class EditEventView(PermissionRequiredMixin, View):
             request.POST, request.FILES, instance=media_item
         )
 
-        # Search fo unconfirmed bookings
-        unconfirmed = [
-            booking
-            for booking in event.showings.all()
-            if not booking.confirmed
-        ]
-        logger.debug(
-            "%s: Unconfirmed bookings: %s" % (event.name, unconfirmed)
-        )
-        terms_ok = True
-        if not unconfirmed:
-            # All bookings are confirmed. Now checking the event terms
-            form.is_valid()  # Ensure we are looking at the correct form
-            if event.terms:
-                terms_word_count = len(event.terms.split())
-            else:
-                terms_word_count = 0
-            logger.debug("Event terms: %s" % event.terms)
-            logger.debug(
-                "Event terms word count: %d (need %d)"
-                % (terms_word_count, settings.PROGRAMME_EVENT_TERMS_MIN_WORDS)
-            )
-            if terms_word_count < settings.PROGRAMME_EVENT_TERMS_MIN_WORDS:
-                terms_ok = False
-                msg = (
-                    "Event terms for confirmed event '{0}' are missing "
-                    "or too short. Please enter at least {1} words.".format(
-                        event.name, settings.PROGRAMME_EVENT_TERMS_MIN_WORDS
-                    )
-                )
-                logger.info(msg)
-                messages.add_message(request, messages.ERROR, msg)
-
         # Validate
-        if terms_ok and form.is_valid() and media_form.is_valid():
+        if form.is_valid() and media_form.is_valid():
             self._save(event, media_item, form, media_form)
             messages.add_message(
                 request,

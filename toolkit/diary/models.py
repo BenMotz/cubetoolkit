@@ -304,6 +304,9 @@ class Event(models.Model):
     def all_showings_in_past(self):
         return all(s.in_past() for s in self.showings.all())
 
+    def all_showings_confirmed(self) -> bool:
+        return all(s.confirmed for s in self.showings.all())
+
     @property
     def copy_html(self):
         """If self.legacy_copy == True, then try to mangle self.copy into

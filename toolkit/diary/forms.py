@@ -128,6 +128,20 @@ class EventForm(forms.ModelForm):
             )
         return copy_summary
 
+    def clean(self):
+        cleaned_data = super().clean()
+        if self.instance.all_showings_confirmed():
+            terms = cleaned_data.get("terms", "")
+            terms_word_count = len(terms.split())
+            if terms_word_count < settings.PROGRAMME_EVENT_TERMS_MIN_WORDS:
+                msg = (
+                    f"Event terms for confirmed event '{self.instance.name}' "
+                    f"are missing or too short. Please enter at least "
+                    f"{settings.PROGRAMME_EVENT_TERMS_MIN_WORDS} words."
+                )
+                self.add_error("terms", msg)
+        return cleaned_data
+
 
 class MediaItemForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
