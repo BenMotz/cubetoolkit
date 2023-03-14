@@ -964,12 +964,14 @@ class EditEventView(DiaryTestsMixin, TestCase):
         self.assertContains(
             response,
             '<input id="id_outside_hire" checked="checked" '
-            'name="outside_hire" type="checkbox" />',
+            'class="checkboxinput custom-control-input" name="outside_hire" '
+            'type="checkbox" />',
             html=True,
         )
         self.assertContains(
             response,
-            '<input id="id_private" name="private" ' 'type="checkbox" />',
+            '<input id="id_private" class="checkboxinput custom-control-input"'
+            'name="private" type="checkbox" />',
             html=True,
         )
         # Blah. It's probably fine. Ahem.
@@ -992,13 +994,15 @@ class EditEventView(DiaryTestsMixin, TestCase):
         self.assertContains(response, "01:30:00")
         self.assertContains(
             response,
-            '<input id="id_outside_hire" name="outside_hire" '
+            '<input id="id_outside_hire" '
+            'class="checkboxinput custom-control-input" name="outside_hire" '
             'type="checkbox" />',
             html=True,
         )
         self.assertContains(
             response,
-            '<input id="id_private" name="private" ' 'type="checkbox" />',
+            '<input id="id_private" name="private" '
+            'class="checkboxinput custom-control-input" type="checkbox" />',
             html=True,
         )
         # It's probably still fine. Cough.
@@ -1048,10 +1052,10 @@ class EditEventView(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_event.html")
 
         self.assertFormError(
-            response, "form", "name", "This field is required."
+            response, "event_form", "name", "This field is required."
         )
         self.assertFormError(
-            response, "form", "duration", "This field is required."
+            response, "event_form", "duration", "This field is required."
         )
 
     def test_post_edit_event_no_media_minimal_data(self):
@@ -1397,7 +1401,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_event.html")
         self.assertFormError(
             response,
-            "form",
+            "event_form",
             "copy_summary",
             "Copy summary must be 50 characters or fewer "
             "(currently 51 characters)",

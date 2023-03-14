@@ -35,6 +35,14 @@ class DiaryIdeaForm(forms.ModelForm):
 
 
 class EventForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.form_class = "form-horizontal"
+        self.helper.label_class = "col-sm-2"
+        self.helper.field_class = "col-sm-10"
+
     class Meta(object):
         model = toolkit.diary.models.Event
         # Ensure soft wrapping is set for textareas:
@@ -122,6 +130,14 @@ class EventForm(forms.ModelForm):
 
 
 class MediaItemForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.form_class = "form-horizontal"
+        self.helper.label_class = "col-sm-2"
+        self.helper.field_class = "col-sm-10"
+
     class Meta(object):
         model = toolkit.diary.models.MediaItem
         widgets = {

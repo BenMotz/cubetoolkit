@@ -1,74 +1,13 @@
 {% extends "form_base.html" %}
+{% load crispy_forms_tags %}
 {% block title %}
 Event Details for {{ event.name }}
 {% endblock %}
 {% block css %}
 {{ block.super }}
-<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
 <style>
-    /* Slightly OTT way to stop bootstrap's fetish box-sizing from breaking
-       the chosen layout. There's probably a better way to do this: */
-    * {
-        box-sizing: content-box;
-    }
-    div#title {
-        background-color: #d0d0d0;
-    }
-    div#title h1 {
-        font-size: 18pt;
-        margin: 0;
-        padding: 5px;
-    }
-    div#title p {
-        margin: 0;
-        padding: 5px;
-    }
-    div#forms {
-        font-size: 11pt;
-    }
-    div#forms p {
-        margin: 0;
-        padding: 5px;
-    }
-    div#forms p:nth-child(odd) {
-        background-color: #d0d0d0;
-    }
-    div#forms p:nth-child(even) {
-        background-color: #c0c0c0;
-    }
-    form label {
-        font-weight: bold;
-        vertical-align: top;
-        text-align: right;
-        padding-right: 5pt;
-        width: 15%;
-    }
-    #media_file-clear_id + label{
-        font-weight: bold;
-        text-align: left;
-        width: auto;
-    }
-    div#forms textarea, form input[type=text], form input[type=url] {
-        width: 80%;
-    }
-    span#image_edit {
-        display: inline-block;
-    }
-    /* Collection of hacky CSS for WYSIHTML5 copy editor: */
-    div.ckeditor_django_wrapper {
-        border: thin solid #d0d0d0;
-        padding-left: 16%;
-        background-color: #d0d0d0;
-    }
-    textarea#id_copy {
-      border: thin solid black;
-      padding: 5px;
-      width: 80%;
-      height: 280px;
-      font-family: Verdana;
-      font-size: 11px;
-    }
-
+    .asteriskField { display: none; }
+    #remaining_chars { font-weight: bold; }
 </style>
 {% endblock %}
 
@@ -80,7 +19,7 @@ var COPY_LIMIT = {{ programme_copy_summary_max_chars }};
 
 $(document).ready(function() {
     var copy_summary = $('#id_copy_summary');
-    var copy_summary_label = copy_summary.prev();
+    var copy_summary_label = $('div#div_id_copy_summary label');
     var count_span;
 
     copy_summary_label.html("Copy summary:<br>(<span id='remaining_chars'></span>)");
@@ -103,8 +42,6 @@ $(document).ready(function() {
 {% endblock %}
 
 {% block body %}
-<h3>{{ VENUE.longname }} Events Diary</h3>
-
 <div id="title">
 <h1>Edit details for "{{ event.name }}"</h1>
 {% include "messages.html" %}
@@ -114,17 +51,15 @@ Booked for: {{ showing.start|date:"H:i d/m/Y"  }} <br>
 {% endfor %}
 </p>
 </div>
+{% if event_form.errors or media_form.errors %}
+<div class="alert alert-danger">Missing or invalid information - see below for errors</div>
+{% endif %}
 <div id="forms">
 <form action="{% url "edit-event-details" event_id=event.id %}" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    {{ form.as_p }}
+    {% crispy event_form %}
+    {% crispy media_form %}
     <p>
-        {{ media_form.media_file.label_tag }}
-        <span id="image_edit">{{ media_form.media_file.errors }} {{ media_form.media_file }}</span>
-    </p>
-    <p>{{media_form.credit.errors }} {{ media_form.credit.label_tag }} {{ media_form.credit }}</p>
-    <p>
-        <input type="submit" value="Update" /> <a href="{% url "edit-event-details-view" pk=event.pk %}">Cancel</a>
+        <button type="submit" class="btn btn-primary">Update</button> <a href="{% url "edit-event-details-view" pk=event.pk %}">Cancel</a>
     </p>
 </form>
 </div>

@@ -727,7 +727,7 @@ class EditEventView(PermissionRequiredMixin, View):
         # Got here if there's a form validation error:
         context = {
             "event": event,
-            "form": form,
+            "event_form": form,
             "media_form": media_form,
             "programme_copy_summary_max_chars": settings.PROGRAMME_COPY_SUMMARY_MAX_CHARS,
         }
@@ -748,7 +748,7 @@ class EditEventView(PermissionRequiredMixin, View):
 
         context = {
             "event": event,
-            "form": form,
+            "event_form": form,
             "media_form": media_form,
             "programme_copy_summary_max_chars": settings.PROGRAMME_COPY_SUMMARY_MAX_CHARS,
         }
