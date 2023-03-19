@@ -46,6 +46,9 @@ Editing {{ event_list_name }}
       white-space: pre-line;
       cursor: pointer;
   }
+  .hidden_date {
+      display: none;
+  }
 </style>
 {% endblock %}
 
@@ -126,6 +129,11 @@ function filter_events() {
             return true;
 
         filter_text = filter_text.toLowerCase();
+        if (filter_text === "") {
+            $(".hidden_date").hide();
+        } else {
+            $(".hidden_date").show();
+        }
 
         const event_rows = $('tr');
 
@@ -223,13 +231,12 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
     {% for showing in showings %}
         <tr>
             <td>
-        {% if forloop.first %}
-            {# First showing of the day, show the date (which has the link to add an event) #}
-            <a href="{% url "add-event" %}?date={{day|date:"j-m-Y"}}">{{ day|date:"D\&\n\b\s\p;j"|safe }}</a>
-        {% else %}
-            {# Subsequent showings for this day #}
-            &nbsp;
+                <a
+        {% if not forloop.first %}
+            {# Second+ showing of the day, default to not showing the date (which has the link to add an event) #}
+                class="hidden_date"
         {% endif %}
+                href="{% url "add-event" %}?date={{day|date:"j-m-Y"}}">{{ day|date:"D\&\n\b\s\p;j"|safe }}</a>
             </td>
         {% with showing.start|localtime as start_localtime %}
             <td>
