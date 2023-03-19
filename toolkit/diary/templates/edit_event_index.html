@@ -54,7 +54,7 @@ Editing {{ event_list_name }}
 <script src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
 <script src="{{ STATIC_URL }}js/lib/jquery.jeditable.mini.js"></script>
 <script>
-var edit_prefs = { {% for p,v in edit_prefs.items %}
+let edit_prefs = { {% for p,v in edit_prefs.items %}
     "{{ p }}" : "{{ v }}"{% if not forloop.last %},{% endif %}
 {% endfor %}};
 $(document).ready(function() {
@@ -72,12 +72,12 @@ $(document).ready(function() {
         prefs_updated(edit_prefs);
 
         // Idea in-place edits
-        var idea_url = '{% url "edit-ideas" year=9999 month=0 %}'.replace("/9999/0", "");
+        const idea_url = '{% url "edit-ideas" year=9999 month=0 %}'.replace("/9999/0", "");
         $('.idea-edit').each(function() {
-            var element = $(this);
-            var date_re = /idea-edit-(\d+)-(\d+)/;
-            var date_match = date_re.exec(element.attr('id'));
-            var year, month;
+            const element = $(this);
+            const date_re = /idea-edit-(\d+)-(\d+)/;
+            const date_match = date_re.exec(element.attr('id'));
+            let year, month;
             if (date_match) {
                 year = date_match[1];
                 month = date_match[2];
@@ -102,18 +102,18 @@ $(document).ready(function() {
         });
 });
 function dateRangeSelected(dateText, inst) {
-    var enddate = $.datepicker.parseDate('dd-mm-yy', dateText);
-    var startdate = new Date({{start.year}}, {{start.month}} - 1, {{start.day}});
+    const enddate = $.datepicker.parseDate('dd-mm-yy', dateText);
+    const startdate = new Date({{start.year}}, {{start.month}} - 1, {{start.day}});
     // Calculate days between those two dates:
-    var days_ahead = Math.ceil((enddate.getTime() - startdate.getTime())/86400000);
+    let days_ahead = Math.ceil((enddate.getTime() - startdate.getTime())/86400000);
     if(days_ahead <= 0) {
         days_ahead = 0;
     }
     window.location.href = "{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=" + days_ahead;
 }
 
-var filter_timer = null;
-var DEBOUNCE_TIMEOUT = 150; // milliseconds
+let filter_timer = null;
+const DEBOUNCE_TIMEOUT = 150; // milliseconds
 function filter_events() {
     // use a timer to 'debounce' input (i.e. wait 150ms to see if the user has
     // stopped typing)
@@ -121,19 +121,19 @@ function filter_events() {
         window.clearTimeout(filter_timer);
     }
     filter_timer = window.setTimeout(function() {
-        var filter_text = $('#id_input_filter').val();
+        let filter_text = $('#id_input_filter').val();
         if(filter_text === undefined)
             return true;
 
         filter_text = filter_text.toLowerCase();
 
-        var event_rows = $('tr');
+        const event_rows = $('tr');
 
         event_rows.each(function(index, el) {
-            var jq_el = $(el);
-            var header_row = jq_el.hasClass("row_month") || jq_el.hasClass("row_year");
+            const jq_el = $(el);
+            const header_row = jq_el.hasClass("row_month") || jq_el.hasClass("row_year");
             if(!header_row) {
-                var name_cell = jq_el.children(':nth-child(3)');
+                let name_cell = jq_el.children(':nth-child(3)');
                 if(name_cell.text().toLowerCase().indexOf(filter_text) !== -1) {
                     // NB: if filter text is "" then this will always match, and
                     //     everything will be shown
