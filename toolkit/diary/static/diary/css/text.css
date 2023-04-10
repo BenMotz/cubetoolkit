@@ -75,6 +75,8 @@ p.copy {
 }
 
 span.tags {
+    display: flex;
+    align-items: center;
     position: absolute;
     left: 0;
     bottom: 0;
@@ -85,14 +87,10 @@ span.tags {
 
 }
 span.tags a {
-    float: left;
     text-decoration: none;
     color: white;
     line-height: 1.4;
-    text-align: center;
-    vertical-align: middle;
     padding: 0.071em 0.286em;
-    margin: 0;
     z-index: 50
 }
 /*
