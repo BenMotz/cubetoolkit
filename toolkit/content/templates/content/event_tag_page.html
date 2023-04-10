@@ -5,16 +5,14 @@
 {% block css %}
     {{ block.super }}
     {% if events %}
-    <link rel="stylesheet" href="{{ STATIC_URL }}diary/css/programme.css" type="text/css">
+        {% load pipeline %}
+        {% stylesheet 'programme_css_files' %}
     {% endif %}
 {% endblock %}
 
 {% block body %}
 {{ block.super }}
-<div class="programme">
-    <div class="grid-sizer"></div>
-    <div class="gutter-sizer"></div>
-
+<div>
     {% if not page.image %}
     {# No image defined #}
 
@@ -49,7 +47,11 @@
 {% for event, showings in events.items %}
     <div class="showing" id="event_{{ event.id }}">
         <div class="event_image">
-        {% with media_item=event.media.all.0 event_slug=event.name|slugify %}{% if media_item %}<a href="{% url "single-event-view-with-slug" event_id=event.id event_slug=event_slug %}"><img src="{{ media_item.media_file|thumbnail_url:'indexview' }}" alt="Picture for event {{ event.name }}"></a>{% endif %}
+            {% with media_item=event.media.all.0 event_slug=event.name|slugify %}{% if media_item %}
+                <a href="{% url "single-event-view-with-slug" event_id=event.id event_slug=event_slug %}">
+                    <img src="{{ media_item.media_file|thumbnail_url:'indexview' }}" alt="Picture for event {{ event.name }}">
+                </a>
+            {% endif %}
             {% if event.tags.all %}<span class="tags">{% for tag in event.tags.all %}<a href="{% url "type-view" tag.slug %}" class="tag_{{tag.name}}">{{tag.name}}</a> {% endfor %}</span>{% endif %}
         </div><!-- div event_image -->
         <a href="{% url "single-event-view-with-slug" event_id=event.id event_slug=event_slug %}">
