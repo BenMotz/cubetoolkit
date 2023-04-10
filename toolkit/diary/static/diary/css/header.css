@@ -28,7 +28,7 @@
     text-align: left;
     z-index: 100;
 }
-#mobile-menu-btn:before {/
+#mobile-menu-btn:before {
     display: inline-block;
     -webkit-font-smoothing: antialiased;
     font: normal 1.3571em;

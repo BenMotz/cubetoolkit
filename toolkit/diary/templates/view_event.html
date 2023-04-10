@@ -7,25 +7,26 @@
 
 {% block css %}
     {{ block.super }}
-    <link rel="stylesheet" href="{{ STATIC_URL }}diary/css/event.css">
+    {% load pipeline %}
+    {% stylesheet 'programme_css_files' %}
 {% endblock %}
 
 {% block body %}
 {{ block.super }}
-<div class="programme{% if all_showings_sold_out %} sold_out{% endif %}{% if all_showings_cancelled %} cancelled{% endif %}">
-    <div class="grid-sizer"></div>
-    <div class="gutter-sizer"></div>
-    <div class="grid-item grid-item--width2 event-image">
-        <div class="event_image">
-        {% with event.media.all.0 as media_item %}
-            {% if media_item %}
-                <a href="{{ media_url }}{{ media_item.media_file }}"><img src="{{ media_item.media_file|thumbnail_url:'eventdetail' }}" alt="Picture for event {{ showing.event.name }}" {% if media_item.credit %}title="Image credit: {{ media_item.credit }}"{% endif %}></a>
-            {% endif %}
-        {% endwith %}
-        </div><!-- end .event_image -->
-    </div><!-- end .grid-item -->
-    <div class="grid-item grid-item--width3">
-        <p>{% if event.pre_title %}<span class="pre_title">{{ event.pre_title }}</span>{% endif %}<h3>{{ event.name|capfirst }}</h3>{% if event.post_title %}<span class="post_title">{{ event.post_title }}</span>{% endif %}</p>
+<div class="event{% if all_showings_sold_out %} sold_out{% endif %}{% if all_showings_cancelled %} cancelled{% endif %}">
+    <div class="event_image">
+    {% with event.media.all.0 as media_item %}
+        {% if media_item %}
+            <a href="{{ media_url }}{{ media_item.media_file }}"><img src="{{ media_item.media_file|thumbnail_url:'eventdetail' }}" alt="Picture for event {{ showing.event.name }}" {% if media_item.credit %}title="Image credit: {{ media_item.credit }}"{% endif %}></a>
+        {% endif %}
+    {% endwith %}
+    </div><!-- end .event_image -->
+    <div class="event_details">
+        <hgroup>
+            {% if event.pre_title %}<p class="pre_title">{{ event.pre_title }}</p>{% endif %}
+            <h3>{{ event.name|capfirst }}</h3>{% if event.post_title %}
+            <p class="post_title">{{ event.post_title }}</p>{% endif %}
+        </hgroup>
         {% if event.film_information %}
         <p class="info">{{ event.film_information }}</p>
         {% endif %}
@@ -54,6 +55,6 @@
         <div class="copy">
             {{ event.copy_html }}
         </div><!-- end .copy -->
-    </div><!-- end .grid-item -->
-</div><!-- end .programme -->
+    </div><!-- end .event-details -->
+</div><!-- end .event -->
 {% endblock %}
