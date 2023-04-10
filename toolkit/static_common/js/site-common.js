@@ -2,13 +2,18 @@
 function setup_page (index_page) {
   $(document).ready(function ($) {
     /* set up small form factor menu --------------------------------------- */
-    $('#mobile-menu-btn').click(function () {
-      var toggle_el = $(this).data('toggle')
-      $(toggle_el).toggleClass('open-sidebar')
-      $('.black_overlay').toggleClass('active-search-bg')
-    })
+    function toggleSidebar () {
+      $('.grid').toggleClass('grid--open-sidebar')
+      $('.sidebar').toggleClass('sidebar--open')
+      $('.programme').attr(
+        'inert',
+        $('.programme').attr('inert') === 'true' ? null : 'true'
+      )
+    }
 
-    $('.black_overlay').swipe({
+    $('#mobile-menu-btn').click(toggleSidebar)
+
+    $('.grid').swipe({
       swipe: function (
         event,
         direction,
@@ -17,8 +22,7 @@ function setup_page (index_page) {
         fingerCount,
         fingerData
       ) {
-        $('.grid').removeClass('open-sidebar')
-        $('.black_overlay').removeClass('active-search-bg')
+        if ($('.grid').hasClass('grid--open-sidebar')) toggleSidebar()
       },
       threshold: 0
     })

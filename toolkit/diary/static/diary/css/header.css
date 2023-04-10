@@ -42,26 +42,6 @@
     text-indent: -99999px;
     display: block;
 }
-.black_overlay {
-    z-index: 20;
-    position: fixed;
-    background: #fff;
-    width: 0;
-    background-size: cover;
-    opacity: 0;
-    height: 100%;
-    top: 0;
-    left: 0;
-    transition: opacity 500ms;
-    -webkit-transition: opacity 500ms;
-}
-.black_overlay.active-search-bg {
-    opacity: .85;
-    left: 240px;
-    width: 100%;
-    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=85)";
-    filter: alpha(opacity=85);
-}
 
 /* --- Sidebar Layout --- */
 #sidebar {
@@ -76,7 +56,8 @@
     background-color: #fff;
     overflow-y: auto;
 }
-.grid.open-sidebar {
+.grid--open-sidebar {
+    opacity: 0.5;
     left: 240px;
 }
 #site-nav {
