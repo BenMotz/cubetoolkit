@@ -1798,7 +1798,7 @@ class PreferencesTests(DiaryTestsMixin, TestCase):
 
     def _get_edit_prefs(self, response):
         match = re.search(
-            r"var\s+edit_prefs\s*=\s*({.*?});",
+            r"let\s+edit_prefs\s*=\s*({.*?});",
             response.content.decode("utf-8"),
             re.DOTALL,
         )
