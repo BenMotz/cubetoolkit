@@ -70,7 +70,7 @@ $(document).ready(function() {
 
 <h2>
   <span class="sub">Booking @</span> {{ showing.start|date:"d/m/Y H:i" }} <span class="sub">for</span>
-  <a href="{% url "edit-event-details-view" pk=showing.event.id %}">{{ showing.event.name }}</a>
+  <a href="{% url "edit-event-details-view" event_id=showing.event.id %}">{{ showing.event.name }}</a>
 </h2>
 
 <p>

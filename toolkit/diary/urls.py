@@ -158,8 +158,8 @@ diary_urls = [
     ),
     # Edit an event: view event before editing
     url(
-        r"^edit/event/id/(?P<pk>\d+)/view/$",
-        permission_required("toolkit.read")(EventDetailView.as_view()),
+        r"^edit/event/id/(?P<event_id>\d+)/view/$",
+        event_detail_view,
         name="edit-event-details-view",
     ),
     # Edit an event

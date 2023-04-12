@@ -59,7 +59,7 @@ Booked for: {{ showing.start|date:"H:i d/m/Y"  }} <br>
     {% crispy event_form %}
     {% crispy media_form %}
     <p>
-        <button type="submit" class="btn btn-primary">Update</button> <a href="{% url "edit-event-details-view" pk=event.pk %}">Cancel</a>
+        <button type="submit" class="btn btn-primary">Update</button> <a href="{% url "edit-event-details-view" event_id=event.pk %}">Cancel</a>
     </p>
 </form>
 </div>

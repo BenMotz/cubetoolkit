@@ -240,13 +240,13 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
             </td>
         {% with showing.start|localtime as start_localtime %}
             <td>
-                <a href="{% url "edit-event-details-view" pk=showing.event.pk %}" {% if start_localtime.hour <= 17 %}class="daytime"{% endif %}>{{ showing.start|date:"H:i" }}</a>
+                <a href="{% url "edit-event-details-view" event_id=showing.event.pk %}" {% if start_localtime.hour <= 17 %}class="daytime"{% endif %}>{{ showing.start|date:"H:i" }}</a>
             </td>
 
         {% for room in rooms %}
             {# if multiroom_enabled is false then rooms will only have one item, so there shouldn't be any repeats! #}
             {% if showing.room == room or not multiroom_enabled %}
-            <td>{{ showing.booked_by }} <a href="{% url "edit-event-details-view" pk=showing.event.pk %}"
+            <td>{{ showing.booked_by }} <a href="{% url "edit-event-details-view" event_id=showing.event.pk %}"
                     class="{{ showing.cancelled|yesno:"cancelled," }}
                            {{ showing.discounted|yesno:"discounted," }}
                            {{ showing.event.private|yesno:"private," }}

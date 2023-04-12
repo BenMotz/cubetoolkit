@@ -263,7 +263,8 @@ def edit_diary_data(request):
             url = reverse("edit-showing", kwargs={"showing_id": showing.pk})
         else:
             url = reverse(
-                "edit-event-details-view", kwargs={"pk": showing.event_id}
+                "edit-event-details-view",
+                kwargs={"event_id": showing.event_id},
             )
         styles = []
 

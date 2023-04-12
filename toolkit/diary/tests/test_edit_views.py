@@ -76,7 +76,7 @@ class ViewSecurity(DiaryTestsMixin, TestCase):
         "year-edit": {"year": "2013"},
         "month-edit": {"year": "2013", "month": "1"},
         "day-edit": {"year": "2013", "month": "1", "day": "1"},
-        "edit-event-details-view": {"pk": "1"},
+        "edit-event-details-view": {"event_id": "1"},
         "cancel-edit": {},
         "view_event_field": {"field": "rota"},
         "set_edit_preferences": {},
@@ -919,7 +919,7 @@ class EditDetailView(DiaryTestsMixin, TestCase):
         self.client.login(username="admin", password="T3stPassword!")
 
     def test_load_with_showings(self) -> None:
-        url = reverse("edit-event-details-view", kwargs={"pk": 1})
+        url = reverse("edit-event-details-view", kwargs={"event_id": 1})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "view_event_privatedetails.html")
@@ -935,7 +935,7 @@ class EditDetailView(DiaryTestsMixin, TestCase):
         )
 
     def test_load_no_showings(self) -> None:
-        url = reverse("edit-event-details-view", kwargs={"pk": 6})
+        url = reverse("edit-event-details-view", kwargs={"event_id": 6})
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "view_event_privatedetails.html")
