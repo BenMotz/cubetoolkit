@@ -409,60 +409,6 @@ def event_detail_view(request, event_id):
 
 
 @permission_required("toolkit.write")
-@require_POST
-def add_showing(request, event_id):
-    # Add a showing to an existing event. Must be called via POST. Uses POSTed
-    # data to create a new showing based on the latest showing for the event,
-    # if available, otherwise use the defaults
-
-    event = get_object_or_404(Event, pk=event_id)
-    try:
-        source_showing = event.showings.latest("start")
-    except Showing.DoesNotExist as err:
-        source_showing = None
-
-    # Create form using submitted data:
-    clone_showing_form = diary_forms.CloneShowingForm(request.POST)
-    if clone_showing_form.is_valid():
-        if source_showing:
-            # Submitted data will have basic time & canceled/private info, but need
-            # to set the event id and rota information manually, so don't commit
-            # the new object immediately:
-            new_showing = toolkit.diary.models.Showing(
-                copy_from=source_showing
-            )
-            new_showing.start = clone_showing_form.cleaned_data["clone_start"]
-            new_showing.booked_by = clone_showing_form.cleaned_data[
-                "booked_by"
-            ]
-            # Need to save showing before cloning the rota, as the rota entries
-            # need the key of the Showing, and that won't get created until the
-            # Showing is saved...
-            new_showing.save()
-            new_showing.clone_rota_from_showing(source_showing)
-        else:
-            new_showing = toolkit.diary.models.Showing(
-                event=event,
-                start=clone_showing_form.cleaned_data["clone_start"],
-                booked_by=clone_showing_form.cleaned_data["booked_by"],
-            )
-            new_showing.save()
-            new_showing.reset_rota_to_default()
-
-        response = {
-            "succeeded": True,
-            "html": render_to_string(
-                "view_event_privatedetails_showingrow.html",
-                {"showing": new_showing},
-                request,
-            ),
-        }
-    else:
-        response = {"succeeded": False, "errors": clone_showing_form.errors}
-    return JsonResponse(response)
-
-
-@permission_required("toolkit.write")
 @require_http_methods(["GET", "POST"])
 def add_event(request):
     # Called GET, with a "date" parameter of the form day-month-year:

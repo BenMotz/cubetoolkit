@@ -14,7 +14,6 @@ from toolkit.diary.edit_views import (
     edit_showing,
     edit_showing_rota_notes,
     edit_ideas,
-    add_showing,
     delete_showing,
     add_event,
     edit_event_templates,
@@ -185,13 +184,6 @@ diary_urls = [
         r"^edit/ideas/(?P<year>\d{4})/(?P<month>\d{1,2})/$",
         edit_ideas,
         name="edit-ideas",
-    ),
-    # Add a new showing (to an existing event) - submission URL for
-    # edit-showing
-    url(
-        r"^edit/event/id/(?P<event_id>\d+)/addshowing$",
-        add_showing,
-        name="add-showing",
     ),
     # Delete a showing
     url(
