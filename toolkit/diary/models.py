@@ -398,6 +398,14 @@ class ShowingQuerySet(QuerySet):
     sets of Showings clearer
     """
 
+    def start_in_future(self):
+        """Filter showings that have a start date in the future"""
+        return self.filter(start__gt=django.utils.timezone.now())
+
+    def start_in_past(self):
+        """Filter showings that have a start date in the past"""
+        return self.exclude(start__gt=django.utils.timezone.now())
+
     def start_in_range(self, startdate, enddate):
         """Filter showings that have a start date in the given range"""
         return self.filter(start__range=[startdate, enddate])
@@ -593,6 +601,12 @@ class Showing(models.Model):
         for rota_entry in source_showing.rotaentry_set.all():
             new_entry = RotaEntry(showing=self, template=rota_entry)
             new_entry.save()
+
+    def clone_or_reset_rota(self, source_showing):
+        if source_showing:
+            self.clone_rota_from_showing(source_showing)
+        else:
+            self.reset_rota_to_default()
 
     def update_rota(self, _rota):
         """Update rota from supplied dict. Dict should be a map of

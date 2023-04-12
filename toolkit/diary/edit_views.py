@@ -360,26 +360,52 @@ def set_edit_preferences(request):
     return HttpResponse(json.dumps(prefs), content_type="application/json")
 
 
-class EventDetailView(PermissionRequiredMixin, DetailView):
-    permission_required = "toolkit.write"
-    model = Event
-    template_name = "view_event_privatedetails.html"
+@permission_required("toolkit.write")
+def event_detail_view(request, event_id):
+    event = get_object_or_404(Event, pk=event_id)
+    showing_query = Showing.objects.filter(event_id=event_id)
+    showings = list(showing_query.all())
+    now = django.utils.timezone.now()
+    historic_showings = [s for s in showings if s.start <= now]
+    latest_showing = None
+    clone_showing_start = None
+    try:
+        latest_showing = showings[-1]
+        clone_showing_start = latest_showing.start + datetime.timedelta(days=1)
+    except IndexError:
+        pass
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        form_initial_data = {}
-        try:
-            latest_showing = self.object.showings.latest("start")
-            form_initial_data[
-                "clone_start"
-            ] = latest_showing.start + datetime.timedelta(days=1)
-        except Showing.DoesNotExist as err:
-            latest_showing = None
-        context["latest_showing"] = latest_showing
-        context["form"] = diary_forms.CloneShowingForm(
-            initial=form_initial_data
+    if request.method == "POST":
+        showing_forms = diary_forms.ShowingFormSet(request.POST)
+        if showing_forms.is_valid():
+            showings = showing_forms.save(commit=False)
+            for showing in showings:
+                # Ensure the showings point to the event before saving:
+                if showing.event_id is None:
+                    showing.event_id = event_id
+                is_new_showing = showing.pk is None
+                showing.save()
+                # If it's a new showing set the initial rota (has to be done
+                # after the showing is saved)
+                if is_new_showing:
+                    showing.clone_or_reset_rota(latest_showing)
+            return HttpResponseRedirect(
+                reverse(
+                    "edit-event-details-view", kwargs={"event_id": event_id}
+                )
+            )
+    else:
+        showing_forms = diary_forms.ShowingFormSet(
+            queryset=showing_query.start_in_future()
         )
-        return context
+    context = {
+        "event": event,
+        "historic_showings": historic_showings,
+        "showing_forms": showing_forms,
+        "clone_showing_start": clone_showing_start,
+    }
+
+    return render(request, "view_event_privatedetails.html", context)
 
 
 @permission_required("toolkit.write")

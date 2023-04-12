@@ -198,6 +198,24 @@ class ShowingForm(forms.ModelForm):
         }
 
 
+ShowingFormSet = forms.modelformset_factory(
+    toolkit.diary.models.Showing,
+    extra=1,
+    fields=(
+        "start",
+        "booked_by",
+        "confirmed",
+        "hide_in_programme",
+        "cancelled",
+        "sold_out",
+        "discounted",
+    ),
+    widgets={
+        "start": JQueryDateTimePicker(),
+    },
+)
+
+
 class ShowingRotaNotesForm(forms.ModelForm):
     class Meta(object):
         model = toolkit.diary.models.Showing

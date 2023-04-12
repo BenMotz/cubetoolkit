@@ -925,12 +925,19 @@ class EditDetailView(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "view_event_privatedetails.html")
         self.assertContains(
             response,
-            "<tr><td>"
-            '<span title="Showing has started, can\'t edit">'
-            "15/02/2013 18:00</span>"
+            "<tr>"
+            "<td>"
+            '    <span title="Showing has started, can\'t edit">'
+            "        15/02/2013 18:00"
+            "    </span>"
             "</td>"
-            "<td>Blah blah</td><td>yes</td><td>yes</td><td>no</td><td>no</td>"
-            "<td>no</td><td>(Past)</td></tr>",
+            "<td>Blah blah</td>"
+            '<td class="centered">yes</td>'
+            '<td class="centered">yes</td>'
+            '<td class="centered">no</td>'
+            '<td class="centered">no</td>'
+            '<td class="centered">no</td>'
+            "<td>(Past)</td>",
             html=True,
         )
 

@@ -6,7 +6,7 @@ import toolkit.diary.feeds
 from toolkit.diary.edit_views import (
     EditEventView,
     EditRotaView,
-    EventDetailView,
+    event_detail_view,
     cancel_edit,
     edit_diary_list,
     edit_diary_calendar,

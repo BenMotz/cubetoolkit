@@ -1,4 +1,5 @@
 {% extends "form_base.html" %}
+{% load tk_crispy_filter %}
 {% load thumbnail_l %}
 {% load static %}
 {% load noprefix_url %}
@@ -23,18 +24,35 @@ Details for: {{ event.name }}
         margin: 1em;
     }
     #form-errors { color: red }
+    .centered {
+        text-align: center;
+    }
+    .hidden {
+        display: none;
+    }
 
 </style>
 {% endblock %}
 
 {% block script %}
 {{ block.super }}
-<script src="{{ STATIC_URL }}diary/js/edit_event.js"></script>
+{{ showing_forms.media }}
 <script>
-$(document).ready(function() { setupPage({
-  "csrfmiddlewaretoken": "{{ csrf_token }}",
-  "add_booking_url": "{% url "add-showing" event_id=event.id %}",
-})});
+   "use strict";
+    function showNewBookingForm() {
+        const showFormButtonRow = document.getElementById("new_booking_button_row");
+        const newBookingRow = document.getElementById("new_booking_row");
+        const whenInput = document.querySelector('#new_booking_row input[type="text"]');
+        {% comment %}
+        Only set the default start time in the 'extra' (new booking) form when
+        the form is displayed: if it's set in the form initialdata then the
+        django logic will always try to save the 'extra' form, which will give
+        an error if the "booked_by" hasn't been set.
+        {% endcomment %}
+        whenInput.value = "{{ clone_showing_start|date:"d/m/Y H:i"|escapejs }}";
+        showFormButtonRow.classList.add('hidden');
+        newBookingRow.classList.remove('hidden');
+    }
 </script>
 {% endblock %}
 
@@ -43,41 +61,83 @@ $(document).ready(function() { setupPage({
     <h1>{{ event.name }}
  </h1>
 
-<div id="bookings">
 <h3>Bookings</h3>
-<form>
+
+<form method="post">
 {% csrf_token %}
-<table class="table">
+{{ showing_forms.management_form }}
+{% if showing_forms.non_form_errors %}
+<div class="alert alert-danger" role="alert">
+    {{ showing_forms.non_form_errors }}
+</div>
+{% endif %}
+<table class="table" id="booking-table">
+    <thead>
+        <tr>
+            <th>When</th>
+            <th>Booked by</th>
+            <th class="centered">Confirmed</th>
+            <th class="centered">Secret</th>
+            <th class="centered">Cancelled</th>
+            <th class="centered">Discounted</th>
+            <th class="centered">Sold-out</th>
+            <th></th>
+        </tr>
+    </thead>
+{% for showing in historic_showings %}
     <tr>
-        <th>When</th>
-        <th>Booked by</th>
-        <th>Confirmed</th>
-        <th>Secret</th>
-        <th>Cancelled</th>
-        <th>Discounted</th>
-        <th>Sold-out</th>
-        <th></th>
+        <td>
+            <span title="Showing has started, can't edit">
+                {{ showing.start|date:"d/m/Y H:i" }}{% if MULTIROOM_ENABLED %} in {{ showing.room }}{% endif %}
+            </span>
+        </td>
+        <td>{{ showing.booked_by }}</td>
+        <td class="centered">{{ showing.confirmed|yesno }}</td>
+        <td class="centered">{{ showing.hide_in_programme|yesno }}</td>
+        <td class="centered">{{ showing.cancelled|yesno }}</td>
+        <td class="centered">{{ showing.discounted|yesno }}</td>
+        <td class="centered">{{ showing.sold_out|yesno }}</td>
+        <td>(Past)</td>
     </tr>
-{% for showing in event.showings.all %}
-    {% include "view_event_privatedetails_showingrow.html" %}
 {% endfor %}
-    <tr id="form-errors">
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
-        <td></td>
+{% for showing_form in showing_forms %}
+    <tr {% if not showing_form.instance.id and not showing_form.errors %}id="new_booking_row" class="hidden"{% endif %}>
+        <td>{{ showing_form.id }}{{ showing_form.start | to_crispy_field }}{% if MULTIROOM_ENABLED %} in {{ showing.room }}{% endif %}</td>
+        <td>
+        {% if showing_form.instance.id %}
+          {{ showing_form.booked_by.value }}
+          <input id="{{ showing_form.booked_by.id_for_label }}" type="hidden" name="{{ showing_form.booked_by.id_for_label|cut:"id_" }}" maxlength="64" value="{{ showing_form.booked_by.value }}">
+        {% else %}
+          {{ showing_form.booked_by | to_crispy_field }}
+        {% endif %}
+        </td>
+        <td class="centered">{{ showing_form.confirmed | to_crispy_field }}</td>
+        <td class="centered">{{ showing_form.hide_in_programme | to_crispy_field }}</td>
+        <td class="centered">{{ showing_form.cancelled | to_crispy_field }}</td>
+        <td class="centered">{{ showing_form.discounted | to_crispy_field }}</td>
+        <td class="centered">{{ showing_form.sold_out | to_crispy_field }}</td>
+        <td>{% if showing_form.instance.id %}<a href="{% url "edit-showing" showing_form.instance.id %}">Edit</a>{% endif %}</td>
     </tr>
+  {% comment %}
+  We don't want to show the "Add a booking" button if the 'extra' form is
+  visible at load time, as it will be if the 'extra' form had errors:
+  {% endcomment %}
+  {% if not showing_form.instance.id and not showing_form.errors %}
+    <tr id="new_booking_button_row">
+        <td class="centered" colspan="8">
+            <button type="button" class="btn btn-info" onclick="showNewBookingForm();">Add a booking</button>
+        </td>
+    </tr>
+  {% endif %}
+{% endfor %}
     <tr>
-        <td>{{ form.clone_start }}</td>
-        <td>{{ form.booked_by }}</td>
-        <td colspan="6"><input type="submit" class="btn btn-primary" value="Add booking" /></td>
+        <td colspan="8">
+            <input type="submit" class="btn btn-primary" value="Save changes to bookings" />
+        </td>
     </tr>
 </table>
 </form>
+<p>
 </div>
 <h3>Details {% if not event.all_showings_in_past %}<a href="{% url "edit-event-details" event.pk %}">[edit]</a>{% endif %}</h3>
     <table class="table">
