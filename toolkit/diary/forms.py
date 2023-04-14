@@ -197,22 +197,20 @@ class ShowingForm(forms.ModelForm):
             "start": JQueryDateTimePicker(),
         }
 
+    def clean_confirmed(self):
+        confirmed = self.cleaned_data["confirmed"]
+        if confirmed and self.instance.event_id and not self.instance.event.terms_long_enough():
+            raise forms.ValidationError(
+                "Cannot confirm booking as the event terms are missing or "
+                "too short. Please add more details."
+            )
+        return confirmed
+
 
 ShowingFormSet = forms.modelformset_factory(
     toolkit.diary.models.Showing,
     extra=1,
-    fields=(
-        "start",
-        "booked_by",
-        "confirmed",
-        "hide_in_programme",
-        "cancelled",
-        "sold_out",
-        "discounted",
-    ),
-    widgets={
-        "start": JQueryDateTimePicker(),
-    },
+    form=ShowingForm,
 )
 
 

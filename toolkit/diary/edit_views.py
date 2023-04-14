@@ -545,38 +545,21 @@ def edit_showing(request, showing_id=None):
                 "Can't edit bookings that are in the past",
             )
         elif form.is_valid() and rota_form.is_valid():
-            if (
-                form.cleaned_data["confirmed"]
-                and not showing.event.terms_long_enough()
-            ):
-                messages.add_message(
-                    request,
-                    messages.ERROR,
-                    (
-                        "Can't confirm showing of '{0}' at {1} as the "
-                        "event terms are missing or too short. "
-                        "Please add more details."
-                    ).format(
-                        showing.event.name,
-                        showing.start.strftime("%H:%M on %d/%m/%y"),
-                    ),
-                )
-            else:
-                # The rota form is separate; first save the updated showing
-                modified_showing = form.save()
-                # Then update the rota with the returned data:
-                rota = rota_form.get_rota()
-                modified_showing.update_rota(rota)
+            # The rota form is separate; first save the updated showing
+            modified_showing = form.save()
+            # Then update the rota with the returned data:
+            rota = rota_form.get_rota()
+            modified_showing.update_rota(rota)
 
-                messages.add_message(
-                    request,
-                    messages.SUCCESS,
-                    "Updated booking for '{0}' at {1}".format(
-                        showing.event.name,
-                        showing.start.strftime("%H:%M on %d/%m/%y"),
-                    ),
-                )
-                return _return_to_editindex(request)
+            messages.add_message(
+                request,
+                messages.SUCCESS,
+                "Updated booking for '{0}' at {1}".format(
+                    showing.event.name,
+                    showing.start.strftime("%H:%M on %d/%m/%y"),
+                ),
+            )
+            return _return_to_editindex(request)
     else:
         form = diary_forms.ShowingForm(instance=showing)
         rota_form = RotaForm()
