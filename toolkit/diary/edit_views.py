@@ -389,6 +389,10 @@ def event_detail_view(request, event_id):
                 # after the showing is saved)
                 if is_new_showing:
                     showing.clone_or_reset_rota(latest_showing)
+            if showings:
+                messages.success(request, f"Updated bookings for {event.name}")
+            else:
+                messages.info(request, "No bookings changed")
             return HttpResponseRedirect(
                 reverse(
                     "edit-event-details-view", kwargs={"event_id": event_id}
