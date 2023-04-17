@@ -27,6 +27,9 @@ Details for: {{ event.name }}
     .centered {
         text-align: center;
     }
+    .align-right {
+        text-align: right;
+    }
     .hidden {
         display: none;
     }
@@ -40,7 +43,7 @@ Details for: {{ event.name }}
 <script>
    "use strict";
     function showNewBookingForm() {
-        const showFormButtonRow = document.getElementById("new_booking_button_row");
+        const showFormButton = document.getElementById("new_booking_button");
         const newBookingRow = document.getElementById("new_booking_row");
         const whenInput = document.querySelector('#new_booking_row input[type="text"]');
         {% comment %}
@@ -50,7 +53,7 @@ Details for: {{ event.name }}
         an error if the "booked_by" hasn't been set.
         {% endcomment %}
         whenInput.value = "{{ clone_showing_start|date:"d/m/Y H:i"|escapejs }}";
-        showFormButtonRow.classList.add('hidden');
+        showFormButton.classList.add('hidden');
         newBookingRow.classList.remove('hidden');
     }
 </script>
@@ -120,21 +123,17 @@ Details for: {{ event.name }}
         <td class="centered">{{ showing_form.sold_out | to_crispy_field }}</td>
         <td>{% if showing_form.instance.id %}<a href="{% url "edit-showing" showing_form.instance.id %}">Edit</a>{% endif %}</td>
     </tr>
-  {% comment %}
-  We don't want to show the "Add a booking" button if the 'extra' form is
-  visible at load time, as it will be if the 'extra' form had errors:
-  {% endcomment %}
-  {% if not showing_form.instance.id and not showing_form.errors %}
-    <tr id="new_booking_button_row">
-        <td class="centered" colspan="8">
-            <button type="button" class="btn btn-info" onclick="showNewBookingForm();">Add a booking</button>
-        </td>
-    </tr>
-  {% endif %}
 {% endfor %}
     <tr>
-        <td colspan="8">
+        <td colspan="4">
             <input type="submit" class="btn btn-primary" value="Save changes to bookings" />
+        </td>
+        <td colspan="4" class="align-right">
+            {% if show_add_a_booking_button %}
+            <button id="new_booking_button" type="button" class="btn btn-info" onclick="showNewBookingForm();">
+                Add a booking
+            </button>
+           {% endif %}
         </td>
     </tr>
 </table>

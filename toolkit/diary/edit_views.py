@@ -369,6 +369,8 @@ def event_detail_view(request, event_id):
     historic_showings = [s for s in showings if s.start <= now]
     latest_showing = None
     clone_showing_start = None
+    show_add_a_booking_button = True
+
     try:
         latest_showing = showings[-1]
         clone_showing_start = latest_showing.start + datetime.timedelta(days=1)
@@ -398,6 +400,11 @@ def event_detail_view(request, event_id):
                     "edit-event-details-view", kwargs={"event_id": event_id}
                 )
             )
+        # if the 'extra' form (aka the "new booking" form has errors then
+        # don't show the "Add a booking" button
+        show_add_a_booking_button = not any(
+            [form.errors and not form.instance.id for form in showing_forms]
+        )
     else:
         showing_forms = diary_forms.ShowingFormSet(
             queryset=showing_query.start_in_future()
@@ -407,6 +414,7 @@ def event_detail_view(request, event_id):
         "historic_showings": historic_showings,
         "showing_forms": showing_forms,
         "clone_showing_start": clone_showing_start,
+        "show_add_a_booking_button": show_add_a_booking_button,
     }
 
     return render(request, "view_event_privatedetails.html", context)
