@@ -223,36 +223,41 @@ class EditShowing(DiaryTestsMixin, TestCase):
         # Edit should have existing values:
         self.assertContains(
             response,
-            '<input id="id_start" name="start" type="text" '
-            'value="09/06/2013 18:00" required />',
+            '<input type="text" name="start" value="09/06/2013 18:00"'
+            'class="jquerydatetimepicker form-control" required id="id_start">',
             html=True,
         )
         self.assertContains(
             response,
-            '<input id="id_booked_by" maxlength="64" name="booked_by" '
-            'type="text" value="\u0102nother \u0170ser" required />',
+            '<input type="text" name="booked_by" value="\u0102nother \u0170ser"'
+            ' maxlength="64" class="textinput textInput form-control"'
+            ' required id="id_booked_by">',
             html=True,
         )
         self.assertContains(
             response,
-            '<input checked="checked" id="id_confirmed" name="confirmed" '
-            'type="checkbox" />',
+            '<input type="checkbox" name="confirmed" class="checkboxinput '
+            'custom-control-input" id="id_confirmed" checked>',
+            html=True,
+            #'<input checked="checked" id="id_confirmed" name="confirmed" '
+            #'type="checkbox" />',
+        )
+        self.assertContains(
+            response,
+            '<input type="checkbox" name="hide_in_programme" class="checkboxinput '
+            'custom-control-input" id="id_hide_in_programme">',
             html=True,
         )
         self.assertContains(
             response,
-            '<input id="id_hide_in_programme" name="hide_in_programme" '
-            'type="checkbox" />',
+            '<input type="checkbox" name="cancelled" class="checkboxinput '
+            'custom-control-input" id="id_cancelled">',
             html=True,
         )
         self.assertContains(
             response,
-            '<input id="id_cancelled" name="cancelled" type="checkbox" />',
-            html=True,
-        )
-        self.assertContains(
-            response,
-            '<input id="id_discounted" name="discounted" type="checkbox" />',
+            '<input type="checkbox" name="discounted" class="checkboxinput '
+            'custom-control-input" id="id_discounted">',
             html=True,
         )
 

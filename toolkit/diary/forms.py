@@ -179,6 +179,11 @@ class ShowingForm(forms.ModelForm):
         super(ShowingForm, self).__init__(*args, **kwargs)
         if not settings.MULTIROOM_ENABLED:
             del self.fields["room"]
+        self.helper = FormHelper()
+        self.helper.form_tag = False
+        self.helper.form_class = "form-horizontal"
+        self.helper.label_class = "col-sm-2"
+        self.helper.field_class = "col-sm-10"
 
     class Meta(object):
         model = toolkit.diary.models.Showing
