@@ -302,7 +302,10 @@ class EditShowing(DiaryTestsMixin, TestCase):
             },
         )
 
-        self.assert_redirect_to_index(response)
+        self.assertRedirects(
+            response,
+            reverse("edit-event-details-view", kwargs={"event_id": 4}),
+        )
 
         # Check showing was updated:
         showing = Showing.objects.get(id=7)

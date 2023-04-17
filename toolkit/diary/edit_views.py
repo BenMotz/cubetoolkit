@@ -559,7 +559,12 @@ def edit_showing(request, showing_id=None):
                     showing.start.strftime("%H:%M on %d/%m/%y"),
                 ),
             )
-            return _return_to_editindex(request)
+            return HttpResponseRedirect(
+                reverse(
+                    "edit-event-details-view",
+                    kwargs={"event_id": showing.event_id},
+                )
+            )
     else:
         form = diary_forms.ShowingForm(instance=showing)
         rota_form = RotaForm()
