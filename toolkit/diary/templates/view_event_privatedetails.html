@@ -56,6 +56,24 @@ Details for: {{ event.name }}
         showFormButton.classList.add('hidden');
         newBookingRow.classList.remove('hidden');
     }
+
+    function hideNewBookingForm() {
+        const showFormButton = document.getElementById("new_booking_button");
+        const newBookingRow = document.getElementById("new_booking_row");
+
+        const textFields = document.querySelectorAll('#new_booking_row input[type="text"]');
+        const checkFields = document.querySelectorAll('#new_booking_row input[type="checkbox"]');
+
+        for (const field of textFields) {
+            field.value = "";
+        }
+        for (const field of checkFields) {
+            field.checked = field.defaultChecked;
+        }
+
+        showFormButton.classList.remove('hidden');
+        newBookingRow.classList.add('hidden');
+    }
 </script>
 {% endblock %}
 
@@ -106,7 +124,9 @@ Details for: {{ event.name }}
     </tr>
 {% endfor %}
 {% for showing_form in showing_forms %}
-    <tr {% if not showing_form.instance.id and not showing_form.errors %}id="new_booking_row" class="hidden"{% endif %}>
+    <tr {% if not showing_form.instance.id %}id="new_booking_row"
+          {% if not showing_form.errors %}class="hidden"{% endif %}
+        {% endif %}>
         <td>{{ showing_form.id }}{{ showing_form.start | to_crispy_field }}{% if MULTIROOM_ENABLED %} in {{ showing.room }}{% endif %}</td>
         <td>
         {% if showing_form.instance.id %}
@@ -121,7 +141,13 @@ Details for: {{ event.name }}
         <td class="centered">{{ showing_form.cancelled | to_crispy_field }}</td>
         <td class="centered">{{ showing_form.discounted | to_crispy_field }}</td>
         <td class="centered">{{ showing_form.sold_out | to_crispy_field }}</td>
-        <td>{% if showing_form.instance.id %}<a href="{% url "edit-showing" showing_form.instance.id %}">Edit</a>{% endif %}</td>
+        <td>
+            {% if showing_form.instance.id %}
+            <a href="{% url "edit-showing" showing_form.instance.id %}">Edit</a>
+            {% else %}
+            <img style="cursor: pointer;" src="{{ STATIC_URL }}img/x-circle.svg" onClick="hideNewBookingForm();">
+            {% endif %}
+        </td>
     </tr>
 {% endfor %}
     <tr>
@@ -129,11 +155,9 @@ Details for: {{ event.name }}
             <input type="submit" class="btn btn-primary" value="Save changes to bookings" />
         </td>
         <td colspan="4" class="align-right">
-            {% if show_add_a_booking_button %}
-            <button id="new_booking_button" type="button" class="btn btn-info" onclick="showNewBookingForm();">
+            <button id="new_booking_button" type="button" class="btn btn-info{% if not show_add_a_booking_button %} hidden{% endif %}" onclick="showNewBookingForm();">
                 Add a booking
             </button>
-           {% endif %}
         </td>
     </tr>
 </table>
