@@ -126,8 +126,8 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
         # e2s5    e2    5/4/13   T          T      T      F     |   F      F
 
         # s2      e3    13/4/13  T          F      F      F     |   F      F
-        # s3      e4    9/6/13   T          F      F      F     |   F      F
-        # s4      e4    14/9/13  F          F      F      F     |   F      F
+        # e4s3    e4    9/6/13   T          F      F      F     |   F      F
+        # e4s4    e4    14/9/13  F          F      F      F     |   F      F
         # s5      e5    14/2/13  T          F      F      F     |   F      T
         # s6      e1    15/2/13  T          T      F      F     |   F      F
 
@@ -176,7 +176,7 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
         )
         e3.save()
 
-        e4 = Event(
+        self.e4 = Event(
             name="Event four titl\u0113",
             copy="Event four C\u014dpy",
             pricing="\u00a3milliion per thing",
@@ -188,15 +188,15 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
             duration="01:00:00",
             notes="\u0147otes on event fou\u0159",
         )
-        e4.save()
-        e4.tags.set(
+        self.e4.save()
+        self.e4.tags.set(
             [
                 t2,
             ]
         )
-        e4.save()
+        self.e4.save()
 
-        e5 = Event(
+        self.e5 = Event(
             name="PRIVATE Event FIVE titl\u0113!",
             copy="PRIVATE Event 5ive C\u014dpy",
             copy_summary="\u010copy five summary",
@@ -205,7 +205,7 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
             notes="\u0147otes on event five",
             private=True,
         )
-        e5.save()
+        self.e5.save()
 
         e6 = Event(
             name="PRIVATE OUTSIDE Event (Six)",
@@ -304,33 +304,33 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
             start=pytz.timezone("Europe/London").localize(
                 datetime(2013, 6, 9, 18, 00)
             ),
-            event=e4,
+            event=self.e4,
             booked_by="\u0102nother \u0170ser",
             confirmed=True,
             rota_notes="Some notes about the Rota!",
         )
         self.e4s3.save(force=True)  # Force start date in the past
 
-        s4 = Showing(
+        self.e4s4 = Showing(
             start=pytz.timezone("Europe/London").localize(
                 datetime(2013, 9, 14, 18, 00)
             ),
-            event=e4,
+            event=self.e4,
             booked_by="User Two",
             hide_in_programme=True,
             confirmed=False,
         )
-        s4.save(force=True)  # Force start date in the past
+        self.e4s4.save(force=True)  # Force start date in the past
 
-        s5 = Showing(
+        self.s5 = Showing(
             start=pytz.timezone("Europe/London").localize(
                 datetime(2013, 2, 14, 18, 00)
             ),
-            event=e5,
+            event=self.e5,
             booked_by="Yet another user",
             confirmed=True,
         )
-        s5.save(force=True)
+        self.s5.save(force=True)
 
         s6 = Showing(
             start=pytz.timezone("Europe/London").localize(

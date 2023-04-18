@@ -4,7 +4,7 @@ import json
 import os.path
 
 import pytz
-from datetime import datetime, date, time
+from datetime import datetime, date, time, timedelta
 import tempfile
 
 from mock import patch
@@ -747,6 +747,120 @@ class EditDetailView(DiaryTestsMixin, TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "view_event_privatedetails.html")
+
+    @patch("django.utils.timezone.now")
+    def test_add_showing(self, now_patch) -> None:
+        now_patch.return_value = self._fake_now
+
+        url = reverse(
+            "edit-event-details-view", kwargs={"event_id": self.e5.pk}
+        )
+        data = {
+            "form-TOTAL_FORMS": 1,
+            "form-INITIAL_FORMS": "0",
+            "form-0-id": "",
+            "form-0-start": self._fake_now + timedelta(days=10),
+            "form-0-booked_by": "wombat",
+            "form-0-confirmed": "on",
+            "form-0-secret": "on",
+        }
+        response = self.client.post(url, data)
+
+        self.assertRedirects(response, url)
+
+        showings = self.e5.showings.all()
+        self.assertEqual(len(showings), 2)
+        self.assertEqual(showings[0], self.s5)
+        new_showing = showings[1]
+        self.assertEqual(new_showing.booked_by, "wombat")
+        self.assertTrue(new_showing.confirmed)
+        self.assertFalse(new_showing.cancelled)
+
+    @patch("django.utils.timezone.now")
+    def test_add_showing_in_past_fails(self, now_patch) -> None:
+        now_patch.return_value = self._fake_now
+
+        url = reverse(
+            "edit-event-details-view", kwargs={"event_id": self.e5.pk}
+        )
+        data = {
+            "form-TOTAL_FORMS": 1,
+            "form-INITIAL_FORMS": "0",
+            "form-0-id": "",
+            "form-0-start": self._fake_now - timedelta(days=10),
+            "form-0-booked_by": "wombat",
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFormsetError(
+            response, "showing_forms", 0, "start", "Must be in the future"
+        )
+        self.assertEqual(self.e5.showings.count(), 1)
+
+    @patch("django.utils.timezone.now")
+    def test_add_showing_no_booked_by_fails(self, now_patch) -> None:
+        now_patch.return_value = self._fake_now
+
+        url = reverse(
+            "edit-event-details-view", kwargs={"event_id": self.e5.pk}
+        )
+        data = {
+            "form-TOTAL_FORMS": 1,
+            "form-INITIAL_FORMS": "0",
+            "form-0-id": "",
+            "form-0-start": self._fake_now + timedelta(days=10),
+            "form-0-booked_by": "",
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+        self.assertFormsetError(
+            response,
+            "showing_forms",
+            0,
+            "booked_by",
+            "This field is required.",
+        )
+        self.assertEqual(self.e5.showings.count(), 1)
+
+    @patch("django.utils.timezone.now")
+    def test_confirm_without_terms(self, now_patch) -> None:
+        now_patch.return_value = self._fake_now
+
+        self.e4.terms = ""
+        self.e4.save()
+        self.e4s3.confirmed = False
+        self.e4s3.save()
+        self.e4s4.event = self.e4
+        self.e4s4.save()
+
+        url = reverse(
+            "edit-event-details-view", kwargs={"event_id": self.e4.pk}
+        )
+        data = {
+            "form-TOTAL_FORMS": 3,
+            "form-INITIAL_FORMS": "2",
+            "form-0-id": self.e4s3.pk,
+            "form-0-start": self.e4s3.start,
+            "form-0-booked_by": self.e4s3.booked_by,
+            "form-0-confirmed": "on",
+            "form-1-id": self.e4s4.pk,
+            "form-1-start": self.e4s4.start,
+            "form-1-booked_by": self.e4s4.booked_by,
+            "form-1-confirmed": "on",
+            "form-2-id": "",
+            "form-2-start": "",
+            "form-2-booked_by": "",
+        }
+        response = self.client.post(url, data)
+        self.assertEqual(response.status_code, 200)
+        for n in (0, 1):
+            self.assertFormsetError(
+                response,
+                "showing_forms",
+                n,
+                "confirmed",
+                "Cannot confirm booking as the event terms are missing or too short. Please add more details.",
+            )
 
 
 class EditEventView(DiaryTestsMixin, TestCase):
