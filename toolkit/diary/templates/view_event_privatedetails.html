@@ -150,6 +150,7 @@ Details for: {{ event.name }}
         </td>
     </tr>
 {% endfor %}
+{% if not all_showings_in_past %}
     <tr>
         <td colspan="4">
             <input type="submit" class="btn btn-primary" value="Save changes to bookings" />
@@ -160,6 +161,7 @@ Details for: {{ event.name }}
             </button>
         </td>
     </tr>
+{% endif %}
 </table>
 </form>
 <p>

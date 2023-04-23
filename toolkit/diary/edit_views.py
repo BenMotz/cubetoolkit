@@ -363,16 +363,16 @@ def set_edit_preferences(request):
 @permission_required("toolkit.write")
 def event_detail_view(request, event_id):
     event = get_object_or_404(Event, pk=event_id)
-    showing_query = Showing.objects.filter(event_id=event_id)
-    showings = list(showing_query.all())
     now = django.utils.timezone.now()
-    historic_showings = [s for s in showings if s.start <= now]
+    event_showings = list(event.showings.all())
+    historic_showings = [s for s in event_showings if s.start <= now]
     latest_showing = None
     clone_showing_start = None
-    show_add_a_booking_button = True
+    all_showings_in_past = event.all_showings_in_past()
+    show_add_a_booking_button = not all_showings_in_past
 
     try:
-        latest_showing = showings[-1]
+        latest_showing = event_showings[-1]
         clone_showing_start = latest_showing.start + datetime.timedelta(days=1)
     except IndexError:
         pass
@@ -407,7 +407,7 @@ def event_detail_view(request, event_id):
         )
     else:
         showing_forms = diary_forms.ShowingFormSet(
-            queryset=showing_query.start_in_future()
+            queryset=event.showings.start_in_future()
         )
     context = {
         "event": event,
@@ -415,6 +415,7 @@ def event_detail_view(request, event_id):
         "showing_forms": showing_forms,
         "clone_showing_start": clone_showing_start,
         "show_add_a_booking_button": show_add_a_booking_button,
+        "all_showings_in_past": all_showings_in_past,
     }
 
     return render(request, "view_event_privatedetails.html", context)
