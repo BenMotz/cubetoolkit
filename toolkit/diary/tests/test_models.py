@@ -50,6 +50,32 @@ class ShowingModelSave(DiaryTestsMixin, NowPatchMixin, TestCase):
         ):
             self.e4s3.save()
 
+
+class ShowingModelDelete(DiaryTestsMixin, NowPatchMixin, TestCase):
+    def test_can_delete_future_showing(self):
+        self.e4s3.delete()
+
+    def test_cannot_delete_historic_showing(self):
+        with self.assertRaisesMessage(
+            django.db.utils.IntegrityError,
+            "Can't delete showings that start in the past"
+        ):
+            self.e2s1.delete()
+
+    def test_cannot_move_date_of_historic_showing_to_delete(self):
+        self.e2s1.start = self._fake_now + timedelta(days=1)
+        with self.assertRaisesMessage(
+            django.db.utils.IntegrityError,
+            "Can't delete showings that start in the past"
+        ):
+            self.e2s1.delete()
+
+    def test_delete_unsaved_instance(self):
+        s = Showing()
+        with self.assertRaises(AssertionError):
+            s.delete()
+
+
 class ShowingModelMethods(DiaryTestsMixin, NowPatchMixin, TestCase):
     def test_in_past_when_future(self):
         self.assertFalse(self.e4s3.in_past())

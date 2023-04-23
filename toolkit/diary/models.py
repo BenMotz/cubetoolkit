@@ -553,15 +553,14 @@ class Showing(models.Model):
         # Don't allow showings to be deleted if they're finished. This isn't a
         # complete fix, as operations on querysets (or just SQL) will bypass
         # this, but this will stop the forms deleting records.
-        if self.start is not None:
-            if self.in_past():
-                logger.error(
-                    "Tried to delete showing {0} with start time "
-                    "{1} in the past".format(self.pk, self.start)
-                )
-                raise django.db.IntegrityError(
-                    "Can't delete showings that start in the past"
-                )
+        if self.in_past() or self.original_start_in_past():
+            logger.error(
+                "Tried to delete showing {0} with start time "
+                "{1} in the past".format(self.pk, self.start)
+            )
+            raise django.db.IntegrityError(
+                "Can't delete showings that start in the past"
+            )
         return super(Showing, self).delete(*args, **kwargs)
 
     # Extra, custom methods:
