@@ -1,7 +1,8 @@
 from __future__ import absolute_import
+from re import I
 
 import pytz
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 from django.test import TestCase
 
@@ -15,7 +16,39 @@ from toolkit.diary.models import (
     Role,
 )
 
-from .common import DiaryTestsMixin
+from .common import DiaryTestsMixin, NowPatchMixin
+
+
+class ShowingModelSave(DiaryTestsMixin, NowPatchMixin, TestCase):
+    def test_can_save_future_showing(self):
+        self.e4s3.save()
+
+    def test_can_amend_future_showing(self):
+        self.e4s3.start = self._fake_now + timedelta(days=1)
+        self.e4s3.save()
+
+    def test_cannot_save_historic_showing(self):
+        with self.assertRaisesMessage(
+            django.db.utils.IntegrityError,
+            "Can't update showings that start in the past",
+        ):
+            self.e2s1.save()
+
+    def test_cannot_move_date_of_historic_showing(self):
+        self.e2s1.start = self._fake_now + timedelta(days=1)
+        with self.assertRaisesMessage(
+            django.db.utils.IntegrityError,
+            "Can't update showings that start in the past",
+        ):
+            self.e2s1.save()
+
+    def test_cannot_move_showing_into_past(self):
+        self.e4s3.start = self._fake_now - timedelta(days=1)
+        with self.assertRaisesMessage(
+            django.db.utils.IntegrityError,
+            "Can't update showings that start in the past",
+        ):
+            self.e4s3.save()
 
 
 class ShowingModelCustomQueryset(DiaryTestsMixin, TestCase):

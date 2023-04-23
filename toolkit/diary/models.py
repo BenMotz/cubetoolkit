@@ -489,6 +489,8 @@ class Showing(models.Model):
 
         super(Showing, self).__init__(*args, **kwargs)
 
+        self._original_start = self.start
+
         if copy_from:
             logger.info(
                 "Cloning showing from existing showing (id {0})".format(
@@ -533,21 +535,18 @@ class Showing(models.Model):
         # Don't allow showings to be edited if they're finished. This isn't a
         # complete fix, as operations on querysets (or just SQL) will bypass
         # this, but this will stop the forms deleting records. (Stored
-        # procedures, anyone?). This also doesn't stop showings having their
-        # start date moved from the past to the future!
+        # procedures, anyone?)
         #
-        # (For the purposes of the import script, if force=True is passed then
-        # this check is bypassed)
+        # (Mostly for tests, if force=True then this check is bypassed)
         force = kwargs.pop("force", False)
-        if self.start is not None:
-            if self.in_past() and not force:
-                logger.error(
-                    "Tried to update showing {0} with start time "
-                    "{1} in the past".format(self.pk, self.start)
-                )
-                raise django.db.IntegrityError(
-                    "Can't update showings that start in the past"
-                )
+        if not force and (self.in_past() or self.original_start_in_past()):
+            logger.error(
+                f"Tried to update showing {self.pk} with start time {self.start}"
+                f" in the past (original start time {self._original_start}"
+            )
+            raise django.db.IntegrityError(
+                "Can't update showings that start in the past"
+            )
         return super(Showing, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
@@ -582,6 +581,12 @@ class Showing(models.Model):
 
     def in_past(self):
         return self.start < django.utils.timezone.now()
+
+    def original_start_in_past(self):
+        return (
+            self._original_start
+            and self._original_start < django.utils.timezone.now()
+        )
 
     def reset_rota_to_default(self):
         """Clear any existing rota entries. If the associated event has an
