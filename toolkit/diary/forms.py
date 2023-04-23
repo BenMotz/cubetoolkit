@@ -211,6 +211,12 @@ class ShowingForm(forms.ModelForm):
             )
         return confirmed
 
+    def clean(self):
+        if self.instance.original_start_in_past():
+            self.cleaned_data["start"] = self.instance.start
+            raise forms.ValidationError("Cannot amend a historic booking")
+        return super().clean()
+
 
 ShowingFormSet = forms.modelformset_factory(
     toolkit.diary.models.Showing,

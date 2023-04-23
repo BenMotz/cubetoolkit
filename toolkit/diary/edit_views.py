@@ -550,13 +550,7 @@ def edit_showing(request, showing_id=None):
         form = diary_forms.ShowingForm(request.POST, instance=showing)
         rota_form = RotaForm(request.POST)
 
-        if showing.in_past():
-            messages.add_message(
-                request,
-                messages.ERROR,
-                "Can't edit bookings that are in the past",
-            )
-        elif form.is_valid() and rota_form.is_valid():
+        if form.is_valid() and rota_form.is_valid():
             # The rota form is separate; first save the updated showing
             modified_showing = form.save()
             # Then update the rota with the returned data:
