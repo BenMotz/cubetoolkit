@@ -2,6 +2,7 @@ import pytz
 from datetime import datetime, date
 import fixtures
 
+from unittest.mock import patch
 import django.contrib.auth.models as auth_models
 import django.contrib.contenttypes as contenttypes
 from django.urls import reverse
@@ -18,11 +19,29 @@ from toolkit.diary.models import (
 )
 from toolkit.members.models import Member, Volunteer
 
+FAKE_NOW = pytz.timezone("Europe/London").localize(
+    datetime(2013, 6, 1, 11, 00)
+)
+
+
+class NowPatchMixin:
+    def setUp(self):
+        self._fake_now = FAKE_NOW
+        self._now_patch = patch("django.utils.timezone.now")
+        self._now_mock = self._now_patch.start()
+        self._now_mock.return_value = self._fake_now
+        return super().setUp()
+
+    def tearDown(self):
+        self._now_patch.stop()
+        return super().tearDown()
+
 
 class DiaryTestsMixin(fixtures.TestWithFixtures):
     def setUp(self):
         self._setup_test_data()
         self.useFixture(ToolkitUsersFixture())
+        return super().setUp()
 
     # Useful method:
     def assert_return_to_index(self, response):
@@ -49,10 +68,7 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
         )
 
     def _setup_test_data(self):
-
-        self._fake_now = pytz.timezone("Europe/London").localize(
-            datetime(2013, 6, 1, 11, 00)
-        )
+        self._fake_now = FAKE_NOW
 
         # Roles:
         r1 = Role(name="Role 1 (standard)", read_only=False, standard=True)
