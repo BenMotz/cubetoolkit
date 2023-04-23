@@ -50,6 +50,17 @@ class ShowingModelSave(DiaryTestsMixin, NowPatchMixin, TestCase):
         ):
             self.e4s3.save()
 
+class ShowingModelMethods(DiaryTestsMixin, NowPatchMixin, TestCase):
+    def test_in_past_when_future(self):
+        self.assertFalse(self.e4s3.in_past())
+
+    def test_in_past_when_past(self):
+        self.assertTrue(self.e2s1.in_past())
+
+    def test_in_past_new_instance(self):
+        s = Showing()
+        self.assertFalse(s.in_past())
+
 
 class ShowingModelCustomQueryset(DiaryTestsMixin, TestCase):
     def test_manager_public(self):

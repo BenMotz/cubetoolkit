@@ -580,7 +580,7 @@ class Showing(models.Model):
         )
 
     def in_past(self):
-        return self.start < django.utils.timezone.now()
+        return self.start and (self.start < django.utils.timezone.now())
 
     def original_start_in_past(self):
         return (
