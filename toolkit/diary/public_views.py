@@ -15,6 +15,7 @@ import django.views.generic as generic
 from toolkit.diary.models import Showing, Event, PrintedProgramme
 from toolkit.diary.daterange import get_date_range
 from toolkit.diary.forms import SearchForm
+from toolkit.content.models import BasicArticlePage
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -23,6 +24,13 @@ logger.setLevel(logging.DEBUG)
 def _view_diary(request, startdate, enddate, tag=None, extra_title=None):
     # Returns public diary view, for given date range, optionally filtered by
     # an event tag.
+
+    # If we're not looking at a tag, retrieve any CMS pages to show:
+    cms_pages = (
+        BasicArticlePage.objects.filter(show_on_programme_page=True)
+        if not tag
+        else []
+    )
 
     # Build query. The select_related() and prefetch_related on the end
     # encourages it to get the associated showing/event data, to reduce the
@@ -44,6 +52,7 @@ def _view_diary(request, startdate, enddate, tag=None, extra_title=None):
         events.setdefault(showing.event, list()).append(showing)
 
     context = {
+        "cms_pages": cms_pages,
         "start": startdate,
         "end": enddate,
         # Make sure user input is escaped:

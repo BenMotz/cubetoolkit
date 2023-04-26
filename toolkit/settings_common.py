@@ -179,6 +179,9 @@ THUMBNAIL_ALIASES = {
             "size": (250, 250),
         },
     },
+    "wagtailimages.Image.file": {
+        "indexview": {"size": (600, 0), "quality": 45},
+    },
 }
 
 # Custom tweaks:

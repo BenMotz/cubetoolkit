@@ -65,6 +65,26 @@ setup_page(true);
 <div class="programme">
     <div class="showing-sizer"></div>
     <div class="gutter-sizer"></div>
+{% for cms_page in cms_pages %}
+    <div class="showing">
+        <div class="event_image">
+        {% if cms_page.image %}
+            <a href="{{ cms_page.url }}">
+                <img src="{{ cms_page.image.file|thumbnail_url:'indexview' }}" alt="Picture for page {{ cms_page.title }}">
+            </a>
+        {% endif %}
+        </div>
+        <a href="{{ cms_page.url }}">
+            <p>
+            <h3>{{ cms_page.title }}</h3>
+        </a>
+        <div class="event_details">
+            <p class="copy">
+                {{ cms_page.body|striptags|truncatewords:16 }} [<a class="more" href="{{ cms_page.url }}">more</a>]
+            </p>
+        </div>
+    </div>
+{% endfor %}
 {% for event, showings in events.items %}
     <div class="showing" id="event_{{ event.id }}">
 
