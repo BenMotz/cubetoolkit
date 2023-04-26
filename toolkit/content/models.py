@@ -40,6 +40,11 @@ class BasicArticlePage(Page):
     image_alignment = models.CharField(
         max_length=3, choices=IMAGE_ALIGNMENTS, default=LEFT
     )
+    show_on_programme_page = models.BooleanField(
+        verbose_name="show on programme pages",
+        default=False,
+        help_text="Whether a link to this page will appear alongside the main public programme listings",
+    )
 
     content_panels = Page.content_panels + [
         FieldPanel("body"),
@@ -47,6 +52,9 @@ class BasicArticlePage(Page):
         ImageChooserPanel("image"),
     ]
     settings_panels = None
+    promote_panels = Page.promote_panels + [
+        MultiFieldPanel([FieldPanel("show_on_programme_page")])
+    ]
 
 
 class WidthBlock(blocks.StructBlock):
