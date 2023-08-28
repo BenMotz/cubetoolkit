@@ -58,7 +58,7 @@ class ShowingModelDelete(DiaryTestsMixin, NowPatchMixin, TestCase):
     def test_cannot_delete_historic_showing(self):
         with self.assertRaisesMessage(
             django.db.utils.IntegrityError,
-            "Can't delete showings that start in the past"
+            "Can't delete showings that start in the past",
         ):
             self.e2s1.delete()
 
@@ -66,7 +66,7 @@ class ShowingModelDelete(DiaryTestsMixin, NowPatchMixin, TestCase):
         self.e2s1.start = self._fake_now + timedelta(days=1)
         with self.assertRaisesMessage(
             django.db.utils.IntegrityError,
-            "Can't delete showings that start in the past"
+            "Can't delete showings that start in the past",
         ):
             self.e2s1.delete()
 

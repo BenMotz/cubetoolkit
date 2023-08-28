@@ -204,7 +204,11 @@ class ShowingForm(forms.ModelForm):
 
     def clean_confirmed(self):
         confirmed = self.cleaned_data["confirmed"]
-        if confirmed and self.instance.event_id and not self.instance.event.terms_long_enough():
+        if (
+            confirmed
+            and self.instance.event_id
+            and not self.instance.event.terms_long_enough()
+        ):
             raise forms.ValidationError(
                 "Cannot confirm booking as the event terms are missing or "
                 "too short. Please add more details."
