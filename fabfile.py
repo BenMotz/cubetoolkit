@@ -1,124 +1,133 @@
 import os
 import os.path
+import sys
 
-from fabric.api import require, env, run, cd, local, put, lcd, get, task
-from fabric.context_managers import settings
-from fabric import utils
-from fabric.contrib import console
+from fabric import task
+from invoke.exceptions import Exit
 
 IMAGE_REPOSITORY = "toolkit"
 IMAGE_BUILD_DIR = "tmp_toolkit_deploy_{}"
 
-
-def _assert_target_set():
-    # utility method to check that target is defined:
-    require(
-        "site_root",
-        provided_by=(
-            "cube_staging",
-            "cube_production",
-        ),
-    )
+DEFAULT_HOST = "cubecinema.com"
 
 
-def _assert_docker_available():
-    result = run("docker version", quiet=True, warn_only=True, pty=False)
+def _assert_target_set(c):
+    if not hasattr(c.config, "site_root"):
+        raise Exit("Target not specified - e.g. 'fab cube_staging deploy'")
+
+
+def _assert_docker_available(c):
+    # print(f"ADA c type: {type(c)}\n\n")
+    result = c.run("docker version", hide=True, warn=True, pty=False)
     if result.failed:
-        utils.abort("Docker not available or user does not have permission")
+        raise Exit("Docker not available or user does not have permission")
 
 
-@task
-def cube_staging():
+def _confirm(question, default=True):
+    prompt = f"{question} [{'Y/n' if default else 'y/N'}]"
+    while True:
+        response = input(prompt).lower().strip()
+        if not response:
+            return default
+        elif response in ["y", "yes"]:
+            return True
+        elif response in ["n", "no"]:
+            return False
+        else:
+            print("Enter'(y)es' or '(n)o'", file=sys.stderr)
+
+
+@task(hosts=[DEFAULT_HOST])
+def cube_staging(c):
     """Configure to deploy to staging on cubecinema.com"""
-    env.target = "staging"
-    env.site_root = "/home/staging/site"
-    env.media = "/home/staging/site/media/"
-    env.hosts = ["cubecinema.com"]
-    env.docker_image_tag = "staging"
-    env.docker_compose_file = "docker-compose-staging.yml"
-    env.docker_compose_project = "toolkit_staging"
-    env.media_user = "staging"
+    c.config.target = "staging"
+    c.config.site_root = "/home/staging/site"
+    c.config.media = "/home/staging/site/media/"
+    c.config.docker_image_tag = "staging"
+    c.config.docker_compose_file = "docker-compose-staging.yml"
+    c.config.docker_compose_project = "toolkit_staging"
+    c.config.media_user = "staging"
 
 
-@task
-def cube_production():
+@task(hosts=[DEFAULT_HOST])
+def cube_production(c):
     """Configure to deploy live on cubecinema.com"""
-    env.target = "production"
-    env.site_root = "/home/toolkit/site"
-    env.media = "/home/toolkit/site/media/"
-    env.hosts = ["cubecinema.com"]
-    env.docker_image_tag = "production"
-    env.docker_compose_file = "docker-compose-production.yml"
-    env.docker_compose_project = "toolkit_production"
-    env.media_user = "toolkit"
+    c.config.target = "production"
+    c.config.site_root = "/home/toolkit/site"
+    c.config.media = "/home/toolkit/site/media/"
+    c.config.docker_image_tag = "production"
+    c.config.docker_compose_file = "docker-compose-production.yml"
+    c.config.docker_compose_project = "toolkit_production"
+    c.config.media_user = "toolkit"
 
 
-def _image_build_dir(build_root):
-    return os.path.join(build_root, IMAGE_BUILD_DIR.format(env.target))
+def _image_build_dir(build_root, target):
+    return os.path.join(build_root, IMAGE_BUILD_DIR.format(target))
 
 
-@task
-def build_remote_image():
+@task(hosts=[DEFAULT_HOST])
+def build_remote_image(c):
     """Upload git HEAD snapshot to target and build the image"""
 
-    _assert_target_set()
-    _assert_docker_available()
+    _assert_target_set(c)
+    _assert_docker_available(c)
 
-    build_root = run("echo $HOME", quiet=True)
+    build_root = c.run("echo $HOME", hide=True).stdout.strip()
 
     # Create tar of (local) git HEAD using the hash as the filename
-    archive = "tk-snapshot-%s.tgz" % local(
-        "git rev-parse --short=10 HEAD", capture=True
-    )
+    git_rev = c.local(
+        "git rev-parse --short=10 HEAD", hide=True
+    ).stdout.strip()
+    archive = f"tk-snapshot-{git_rev}.tgz"
     local_root = os.path.dirname(__file__)
-    utils.puts("Changing to {0}".format(local_root))
-    with lcd(local_root):
-        # (we need to be in the site root to create the tgz correctly)
-        utils.puts("Creating site tgz")
-        local("git archive --format=tgz HEAD > {0}".format(archive))
 
-        # Upload to remote:
-        utils.puts("Uploading to remote")
-        put(archive, build_root)
+    print("Creating site tgz")
+    # we need to be in the site root to create the tgz correctly:
+    c.local(f"cd {local_root} && git archive --format=tgz HEAD > {archive}")
 
-        image_build_dir = _image_build_dir(build_root)
+    # Upload to remote:
+    print("Uploading to remote")
+    c.put(archive, build_root)
 
-        # Delete old build directory
-        utils.puts("Deleting and recreating {0}".format(image_build_dir))
-        run("rm -rf {0}".format(image_build_dir))
-        run("mkdir {0}".format(image_build_dir))
+    image_build_dir = _image_build_dir(build_root, target=c.config.target)
 
-        with cd(image_build_dir):
-            # Extract:
-            utils.puts("Extracting {0}".format(archive))
-            # Untar with -m to avoid trying to utime /media directories that
-            # may be owned by the webserver (which then fails)
-            run("tar -m -xzf ../{0}".format(archive))
+    # Delete old build directory
+    print(f"Deleting and recreating {format(image_build_dir)}")
+    c.run(f"rm -rf {image_build_dir}")
+    c.run(f"mkdir {image_build_dir}")
 
-            utils.puts("Building image")
-            run(
-                "docker build --pull --tag {0}:{1} .".format(
-                    IMAGE_REPOSITORY, env.docker_image_tag
-                )
-            )
+    # Extract:
+    print(f"Extracting {archive}")
+    # Untar with -m to avoid trying to utime /media directories that
+    # may be owned by the webserver (which then fails)
+    c.run(f"cd {image_build_dir} && tar -m -xzf ../{archive}")
+
+    print("Building image")
+    c.run(
+        f"cd {image_build_dir} && docker build --pull --tag {IMAGE_REPOSITORY}:{c.config.docker_image_tag} ."
+    )
 
 
-@task
-def docker_compose_up():
-    build_root = run("echo $HOME", quiet=True)
-    image_build_dir = _image_build_dir(build_root)
-    compose_file = os.path.join(image_build_dir, env.docker_compose_file)
-    with cd(image_build_dir):
-        utils.puts("Bringing up docker-compose")
-        run(
-            "docker-compose --project-name {0} --file {1} up --detach --no-build".format(
-                env.docker_compose_project, compose_file
-            )
-        )
+@task(hosts=[DEFAULT_HOST])
+def docker_compose_up(c):
+    build_root = c.run("echo $HOME", hide=True).stdout.strip()
+    image_build_dir = _image_build_dir(build_root, target=c.config.target)
+    compose_file = os.path.join(image_build_dir, c.config.docker_compose_file)
+
+    print("Bringing up docker-compose")
+    c.run(
+        f"cd {image_build_dir} && "
+        f"docker-compose "
+        f"--project-name {c.config.docker_compose_project} "
+        f"--file {compose_file} "
+        f"up "
+        f"--detach "
+        f"--no-build"
+    )
 
 
-@task
-def set_media_permissions():
+@task(hosts=[DEFAULT_HOST])
+def set_media_permissions(c):
     """Set media directories to g+w"""
     media_dirs = [
         "media/diary",
@@ -129,74 +138,78 @@ def set_media_permissions():
         "media/documents",
     ]
 
-    with cd(env.site_root):
-        for media_dir in media_dirs:
-            path = os.path.join(env.site_root, media_dir)
-            run("chmod g+w {0}".format(path))
+    c.close()
+    old_user = c.user
+    c.user = c.config.media_user
+    print("Setting media permissions")
+    for media_dir in media_dirs:
+        path = os.path.join(c.config.site_root, media_dir)
+        c.run(f"chmod g+w {path}")
+    c.close()
+    c.user = old_user
 
 
-@task
-def get_media():
+@task(hosts=[DEFAULT_HOST])
+def get_media(c):
     """Rsync media content from a production server to your development environment"""
 
-    _assert_target_set()
+    _assert_target_set(c)
 
-    local(
-        "rsync -av --delete --exclude=thumbnails {0}@{1}:{2}/ media/".format(
-            env.user, env.hosts[0], env.media
-        )
+    c.local(
+        f"rsync -av --delete --exclude=thumbnails {c.config.user}@{DEFAULT_HOST}:{c.config.media}/ media/",
+        echo=True,
     )
 
 
-@task
-def sync_media_from_production_to_staging():
+@task(hosts=[DEFAULT_HOST])
+def sync_media_from_production_to_staging(c):
     """Rsync media content from the production server to the staging server. Invoke as fab cube_staging sync_media_from_production_to_staging"""
 
     # TODO define explicitly
-    _assert_target_set()
+    _assert_target_set(c)
 
-    with cd(env.site_root):
-        run(
-            "rsync -av --delete --exclude=thumbnails /home/toolkit/site/media/ {0}".format(
-                env.media
-            )
-        )
+    c.run(
+        f"cd {c.config.site_root} && "
+        f"rsync -av --delete --exclude=thumbnails /home/toolkit/site/media/ {c.config.media}",
+        echo=True,
+    )
 
 
-@task
-def fetch_database_dump(dump_filename="database_dump.sql"):
+@task(hosts=[DEFAULT_HOST])
+def fetch_database_dump(c, dump_filename="database_dump.sql"):
     dump_file_gz = dump_filename + ".gz"
     if os.path.exists(dump_filename) or os.path.exists(dump_file_gz):
-        utils.abort(f"Local file {dump_filename} already exists")
+        raise Exit(f"Local file {dump_filename} already exists")
 
-    utils.puts("Generating remote database dump")
+    print("Generating remote database dump")
 
     # Ask manage.py in the toolkit container for the mysqldump command to run
     # (which will include the DB name, user and password)
-    dump_command = run(
-        f"docker exec {env.docker_compose_project}_toolkit_1 "
+    dump_command = c.run(
+        f"docker exec {c.config.docker_compose_project}_toolkit_1 "
         "./manage.py mysqldump_database --print-command STDOUT",
-        quiet=True,
-    )
+        hide=True,
+    ).stdout.strip()
 
-    run(f"{dump_command} | gzip > {dump_file_gz}", quiet=True)
-    get(dump_file_gz, local_path=dump_file_gz)
-    run(f"rm {dump_file_gz}")
+    c.run(f"{dump_command} | gzip > {dump_file_gz}", hide=True)
 
-    local(f"gunzip {dump_file_gz}")
+    print("Downloading database dump")
+    c.get(dump_file_gz, local=dump_file_gz)
+    c.run(f"rm {dump_file_gz}")
+
+    c.local(f"gunzip {dump_file_gz}")
 
 
-@task
-def deploy():
+@task(hosts=[DEFAULT_HOST])
+def deploy(c):
     """Upload code, build image, bring docker-compose up"""
 
-    _assert_target_set()
+    _assert_target_set(c)
 
-    if env.target == "production":
-        if not console.confirm("Uploading to live site: sure?", default=False):
-            utils.abort("User aborted")
+    if c.config.target == "production":
+        if not _confirm("Uploading to live site: sure?", default=False):
+            raise Exit("User aborted")
 
-    build_remote_image()
-    with settings(user=env.media_user):
-        set_media_permissions()
-    docker_compose_up()
+    build_remote_image(c)
+    set_media_permissions(c)
+    docker_compose_up(c)
