@@ -12,6 +12,7 @@
         </ul>
     </li>
     {% for top_level_child in current_site.root_page.get_children.live.in_menu %}
+      {% if top_level_child.content_type.model == "sectionrootwithlinks" %}
     {# Don't actually link to the top_level_child content (as there isn't any!) #}
     <li><a href="#">{{ top_level_child.seo_title|default:top_level_child.title }}</a>
         <ul class="sub-menu">
@@ -24,5 +25,8 @@
             {% endfor %}
         </ul>
     </li>
+      {% else %}
+    <li><a href="{% pageurl top_level_child %}">{{ top_level_child.seo_title|default:top_level_child.title }}</a>
+      {% endif %}
     {% endfor %}
 </ul>
