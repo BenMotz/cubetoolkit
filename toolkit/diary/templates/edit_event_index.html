@@ -145,7 +145,9 @@ function filter_events() {
             const header_row = jq_el.hasClass("row_month") || jq_el.hasClass("row_year");
             if(!header_row) {
                 let name_cell = jq_el.children(':nth-child(3)');
-                if(name_cell.text().toLowerCase().indexOf(filter_text) !== -1) {
+                let booker_cell = jq_el.children(':nth-child(4)');
+                if(name_cell.text().toLowerCase().indexOf(filter_text) !== -1 ||
+                   booker_cell.text().toLowerCase().indexOf(filter_text) !== -1) {
                     // NB: if filter text is "" then this will always match, and
                     //     everything will be shown
                     jq_el.show();
@@ -216,18 +218,19 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
 {% for room in rooms %}
     <th>{{ room.name|default:"<!-- No Room -->" }}</th>
 {% endfor %}
+   <td></td>
 </tr>
 {% endif %}
 {% for day, showings in dates.items %}
     {% ifchanged %}
         <tr class="row_month">
-            <td colspan="{{ room_columns|add:2 }}"><h2>{{ day|date:"F Y" }}</h2></td>
+            <td colspan="{{ room_columns|add:3 }}"><h2>{{ day|date:"F Y" }}</h2></td>
         </tr>
     {% endifchanged %}
     {% if day in ideas %}
         <tr>
             <td><a href="{% url "edit-ideas" year=day.year month=day.month %}">IDEAS</a></td>
-            <td colspan="{{ room_columns|add:1 }}" class="ideas"><div class="idea-edit" id="idea-edit-{{day.year}}-{{day.month}}">{{ ideas|lookup:day }}</div></td>
+            <td colspan="{{ room_columns|add:2 }}" class="ideas"><div class="idea-edit" id="idea-edit-{{day.year}}-{{day.month}}">{{ ideas|lookup:day }}</div></td>
         </tr>
     {% endif %}
 
@@ -249,7 +252,8 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
         {% for room in rooms %}
             {# if multiroom_enabled is false then rooms will only have one item, so there shouldn't be any repeats! #}
             {% if showing.room == room or not multiroom_enabled %}
-            <td>{{ showing.booked_by }} <a href="{% url "edit-event-details-view" event_id=showing.event.pk %}"
+            <td>
+              <a href="{% url "edit-event-details-view" event_id=showing.event.pk %}"
                     class="{{ showing.cancelled|yesno:"cancelled," }}
                            {{ showing.discounted|yesno:"discounted," }}
                            {{ showing.event.private|yesno:"private," }}
@@ -270,13 +274,14 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
                 <td>&nbsp;</td>
             {% endif %}
         {% endfor %}
+            <td>{{ showing.booked_by }} {% if not showing.confirmed %}{{ showing.created_at|date:"(d-m-y)" }}{% endif %}</td>
         </tr>
         {% endwith %}
     {% empty %}
         {# No showings on this day, but show the day anyway (with a link to add an event) #}
         <tr>
             <td><a href="{% url "add-event" %}?date={{day|date:"j-m-Y"}}">{{ day|date:"D j"}}</a></td>
-            <td colspan="{{ room_columns|add:1 }}"></td>
+            <td colspan="{{ room_columns|add:2 }}"></td>
         </tr>
     {% endfor %}
 {% endfor %}
