@@ -25,6 +25,9 @@ Editing {{ event_list_name }}
   .unconfirmed {
       text-decoration: underline wavy black;
   }
+  .confirmed {
+      text-transform: uppercase;
+  }
   .daytime {
       background-color: #FFFF99;
   }
@@ -189,7 +192,7 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
 <b>Key:</b>
 <p>
 <span class="unconfirmed">unconfirmed are lower case and wiggly underlined</span><br>
-<span class="confirmed">CONFIRMED ARE UPPER CASE</span><br>
+<span class="confirmed">Confirmed are upper case</span><br>
 <span class="private">Private events are in italics</span><br>
 <span class="external">Outside hires are bolded</span><br>
 <span class="discounted">Discounted events (like cheap night) are magenta and have an *</span><br>
@@ -254,7 +257,7 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
                            {{ showing.confirmed|yesno:"confirmed,unconfirmed" }}
                            {% if start_localtime.hour <= 17 %}daytime{% endif %}">
                 {% if showing.confirmed %}
-                    {{ showing.event.pre_title|upper }} {{ showing.event.name|upper }} {{ showing.event.post_title|upper }}
+                    {{ showing.event.pre_title }} {{ showing.event.name }} {{ showing.event.post_title }}
                 {% else %}
                     {{ showing.event.name }}
                 {% endif %}
