@@ -13,11 +13,32 @@
     h1 { font-size: 13pt; }
     h2 { font-size: 11pt; }
     p { font-size: 10pt; }
+    input[type=number] { width: 3.5em; }
+    input[type=submit] { font-size: 60%; }
 </style>
 {% endblock %}
 
+{% block script %}
+{{ block.super }}
+<script>
+$(document).ready(function() {
+  $('input[type=submit]').hide();
+  $('#id_daysahead').on("change", function (ev) {
+      if (ev.target.value != "{{ days_ahead }}") {
+          $('input[type=submit]').show();
+      } else {
+          $('input[type=submit]').hide();
+      }
+  })
+})
+</script>
+{% endblock %}
+
 {% block body %}
-<h1>{{ VENUE.longname }} rota roles that need filling in the next {{ days_ahead }} days</h1>
+<form method="GET">
+    <h1><label for="id_daysahead">{{ VENUE.longname }} rota roles that need filling in the next</label>  <input type="number" id="id_daysahead" name="daysahead" min="0" value="{{ days_ahead }}"> days <input type="submit" value="Update"></h1>
+</form>
+
 <p><i>See the <a href="{{ rota_edit_url }}">full rota</a> at {{ rota_edit_url}}</i></p>
 <div id="missing_list">
 {% for showing, vacant_roles in showings_vacant_roles.items %}

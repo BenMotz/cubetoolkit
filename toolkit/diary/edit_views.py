@@ -970,7 +970,13 @@ def printed_programme_edit(request, operation):
 
 @permission_required("diary.change_rotaentry")
 def view_rota_vacancies(request):
-    days_ahead = 30
+    try:
+        days_ahead = int(request.GET.get("daysahead"))
+    except (ValueError, TypeError):
+        days_ahead = None
+    if not days_ahead or days_ahead < 1 or days_ahead > 60:
+        days_ahead = 30
+
     start = timezone.now()
     end_date = start + datetime.timedelta(days=days_ahead)
     showings = (
