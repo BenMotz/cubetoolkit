@@ -31,6 +31,9 @@ Editing {{ event_list_name }}
   .daytime {
       background-color: #FFFF99;
   }
+  .pencilled-at {
+      color: gray;
+  }
   a {
       color: #2a00ff;
   }
@@ -274,7 +277,7 @@ Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">t
                 <td>&nbsp;</td>
             {% endif %}
         {% endfor %}
-            <td>{{ showing.booked_by }} {% if not showing.confirmed %}{{ showing.created_at|date:"(d-m-y)" }}{% endif %}</td>
+            <td>{{ showing.booked_by }}{% if not showing.confirmed %} <span class="pencilled-at" title="Pencilled in on {{ showing.created_at|date:"d-m-y" }}">(&#x270f;&#xfe0f;{{ showing.created_at|date:"d-m-y" }})</span>{% endif %}</td>
         </tr>
         {% endwith %}
     {% empty %}
