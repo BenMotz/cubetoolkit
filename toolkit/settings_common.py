@@ -14,7 +14,6 @@ VENUE = {
     "url": "https://www.cubecinema.com",
     "contact_page": "/pages/about/directions/",
     "piwik_id": 3,
-    "twitter": "https://twitter.com/cubecinema",
     "facebook": "https://www.facebook.com/cubecinema/",
     "instagram": "https://www.instagram.com/cubemicroplex/",
     "flickr": "https://flickr.com/groups/cubemicroplex/",
