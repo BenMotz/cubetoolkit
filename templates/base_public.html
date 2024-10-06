@@ -14,8 +14,6 @@
 <link rel="stylesheet" href="{{ STATIC_URL }}css/fontawesome/css/fontawesome.css">
 <link rel="stylesheet" href="{{ STATIC_URL }}css/fontawesome/css/solid.css">
 <link rel="stylesheet" href="{{ STATIC_URL }}css/fontawesome/css/brands.css">
-<!-- support fontawesome v4 icon references/syntax -->
-<link rel="stylesheet" href="{{ STATIC_URL }}css/fontawesome/css/v4-font-face.css" />
 <meta name="viewport" content="width=device-width, initial-scale=1">
 {% endblock css %}
 
@@ -65,7 +63,7 @@
         <div class="black_overlay"></div>
         <div class="navigation-wrap">
             <div class="mobile-wrap">
-              <a href="#nav-mobile" data-toggle=".grid" id="mobile-menu-btn"><i class="fa fa-bars"></i><span>Menu</span></a>
+              <a href="#nav-mobile" data-toggle=".grid" id="mobile-menu-btn"><i class="fa-solid fa-bars"></i><span>Menu</span></a>
             </div><!-- end #mobile-wrap -->
             <div id="site-title" class="clearfix">
                 {% retrieve navmenu-title %}
