@@ -39,8 +39,8 @@ setup_page(true);
 {% block navmenu-footer %}
 <div class="grid-switcher">
   <p>View:</p>
-  <a href="#" id="listbtn" class="switcher"><i class="fa fa-list"></i>&nbsp;List</a>
-  <a href="#" id="gridbtn" class="switcher"><i class="fa fa-grip"></i>&nbsp;Grid</a>
+  <a href="#" id="listbtn" class="switcher"><i class="fa-solid fa-list"></i>&nbsp;List</a>
+  <a href="#" id="gridbtn" class="switcher"><i class="fa-solid fa-grip"></i>&nbsp;Grid</a>
 </div><!-- end .grid-switcher -->
 {{ block.super }}
 <div class="print-media">
@@ -48,14 +48,14 @@ setup_page(true);
         <p>Print:</p>
         {% for printed_programme in printed_programmes %}
             <a href="{{ printed_programme.programme.url }}" title="Printed programme for {{ printed_programme.month|date:"M Y" }}">
-            <i class="fa fa-file"></i></a>
+            <i class="fa-solid fa-file"></i></a>
         {% endfor %}
     {% endif %}
 </div><!-- end .print-media -->
 <div class="print-media">
    <p>RSS:</p>
    <a href="{% url "view-diary-rss" %}" title="Programme RSS feed">
-       <span class="fa fa-rss-square fa-lg"></span></a>
+       <span class="fa-solid fa-square-rss fa-lg"></span></a>
 </div>
 
 {% endblock navmenu-footer %}
