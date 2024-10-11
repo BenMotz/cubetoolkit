@@ -48,7 +48,7 @@ setup_page(true);
         <p>Print:</p>
         {% for printed_programme in printed_programmes %}
             <a href="{{ printed_programme.programme.url }}" title="Printed programme for {{ printed_programme.month|date:"M Y" }}">
-            <i class="fa-solid fa-file"></i></a>
+            <i class="fa fa-file"></i></a>
         {% endfor %}
     {% endif %}
 </div><!-- end .print-media -->
