@@ -1,4 +1,4 @@
-from django.conf.urls import include, url
+from django.urls import re_path, include
 import django.conf
 import django.views.generic as generic
 from django.views.generic.base import RedirectView
@@ -19,44 +19,44 @@ import toolkit.diary.urls
 from toolkit.index.models import IndexLink
 
 urlpatterns = [
-    url(r"^toolkit/admin/", admin.site.urls),
-    url(r"^programme/", include(toolkit.diary.urls.programme_urls)),
-    url(r"^diary/", include(toolkit.diary.urls.diary_urls)),
-    url(r"^members/", include(toolkit.members.urls.member_urls)),
-    url(r"^volunteers/", include(toolkit.members.urls.volunteer_urls)),
-    url(r"^auth/", include(toolkit.toolkit_auth.urls.urlpatterns)),
-    url(r"^toolkit/index/", include(toolkit.index.urls.urlpatterns)),
-    url(r"^$", toolkit.diary.urls.view_diary, name="default-view"),
-    url(
+    re_path(r"^toolkit/admin/", admin.site.urls),
+    re_path(r"^programme/", include(toolkit.diary.urls.programme_urls)),
+    re_path(r"^diary/", include(toolkit.diary.urls.diary_urls)),
+    re_path(r"^members/", include(toolkit.members.urls.member_urls)),
+    re_path(r"^volunteers/", include(toolkit.members.urls.volunteer_urls)),
+    re_path(r"^auth/", include(toolkit.toolkit_auth.urls.urlpatterns)),
+    re_path(r"^toolkit/index/", include(toolkit.index.urls.urlpatterns)),
+    re_path(r"^$", toolkit.diary.urls.view_diary, name="default-view"),
+    re_path(
         r"^id/(?P<event_id>\d+)/$",
         toolkit.diary.urls.view_event,
         name="single-event-view",
     ),
-    url(
+    re_path(
         r"^robots\.txt$",
         generic.TemplateView.as_view(
             template_name="robots.txt", content_type="text/plain"
         ),
     ),
     # Archive Star and Shadow
-    url(
+    re_path(
         r"^on/(today|thisweek|thismonth|nextweek|nextmonth)/(.*)$",
         RedirectView.as_view(url="/", permanent=True),
         name="default-view",
     ),
-    url(
+    re_path(
         r"^on/(?P<year>[0-9]{4})/(.*)$",
         toolkit.diary.public_views.redirect_legacy_year,
         name="redirect-legacy-year",
     ),
-    url(
+    re_path(
         r"^on/(?P<event_type>\w+)/(?P<legacy_id>\d+)/$",
         toolkit.diary.public_views.redirect_legacy_event,
         name="redirect-legacy-event",
     ),
     # Main index page: requires logging in, even though some other parts
     # (eg diary index) don't.
-    url(
+    re_path(
         r"^toolkit/$",
         login_required(
             generic.list.ListView.as_view(
@@ -67,26 +67,26 @@ urlpatterns = [
     ),
     # Static content, only used when running in the development server
     # (django.views.static.serve only works when DEBUG=True)
-    url(
+    re_path(
         r"^static/(.*)$",
         django.views.static.serve,
         {"document_root": django.conf.settings.STATIC_ROOT},
     ),
-    url(
+    re_path(
         r"^media/(.*)$",
         django.views.static.serve,
         {"document_root": django.conf.settings.MEDIA_ROOT},
     ),
-    url(r"^toolkit/cms/", include(wagtailadmin_urls)),
-    url(r"^documents/", include(wagtaildocs_urls)),
+    re_path(r"^toolkit/cms/", include(wagtailadmin_urls)),
+    re_path(r"^documents/", include(wagtaildocs_urls)),
     # For anything not caught by a more specific rule above, hand over to
     # Wagtail's serving mechanism
-    url(r"", include(wagtail_urls)),
+    re_path(r"", include(wagtail_urls)),
 ]
 
 if settings.DEBUG:
     import debug_toolbar
 
     urlpatterns = [
-        url(r"^__debug__/", include(debug_toolbar.urls)),
+        re_path(r"^__debug__/", include(debug_toolbar.urls)),
     ] + urlpatterns

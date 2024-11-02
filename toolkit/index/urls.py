@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import re_path
 import django.utils.functional as functional
 import django.views.generic.edit as generic_edit
 from django.contrib.auth.decorators import permission_required
@@ -10,7 +10,7 @@ write_decorator = permission_required("toolkit.write")
 
 urlpatterns = [
     # Link edit:
-    url(
+    re_path(
         r"^create/link$",
         write_decorator(
             generic_edit.CreateView.as_view(
@@ -24,7 +24,7 @@ urlpatterns = [
         ),
         name="create-index-link",
     ),
-    url(
+    re_path(
         r"^update/link/(?P<pk>\d+)$",
         write_decorator(
             generic_edit.UpdateView.as_view(
@@ -36,7 +36,7 @@ urlpatterns = [
         ),
         name="update-index-link",
     ),
-    url(
+    re_path(
         r"^delete/link/(?P<pk>\d+)$",
         write_decorator(
             generic_edit.DeleteView.as_view(
@@ -48,7 +48,7 @@ urlpatterns = [
         name="delete-index-link",
     ),
     # Category edit:
-    url(
+    re_path(
         r"^create/category$",
         write_decorator(
             generic_edit.CreateView.as_view(
@@ -60,7 +60,7 @@ urlpatterns = [
         ),
         name="create-index-category",
     ),
-    url(
+    re_path(
         r"^update/category/(?P<pk>\d+)$",
         write_decorator(
             generic_edit.UpdateView.as_view(

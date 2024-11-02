@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import re_path
 
 from toolkit.members.volunteer_views import (
     view_volunteer_list,
@@ -31,66 +31,66 @@ from toolkit.members.member_views import (
 
 # Volunteers:
 volunteer_urls = [
-    url(r"^$", view_volunteer_list),
-    url(
+    re_path(r"^$", view_volunteer_list),
+    re_path(
         r"^add/$",
         edit_volunteer,
         name="add-volunteer",
         kwargs={"volunteer_id": None, "create_new": True},
     ),
-    url(
+    re_path(
         r"^add-training/(?P<volunteer_id>\d+)/$",
         add_volunteer_training_record,
         name="add-volunteer-training-record",
     ),
-    url(
+    re_path(
         r"^delete-training/(?P<training_record_id>\d+)/$",
         delete_volunteer_training_record,
         name="delete-volunteer-training-record",
     ),
-    url(
+    re_path(
         r"^add-training-group/$",
         add_volunteer_training_group_record,
         name="add-volunteer-training-group-record",
     ),
-    url(r"^view/$", view_volunteer_list, name="view-volunteer-list"),
-    url(
+    re_path(r"^view/$", view_volunteer_list, name="view-volunteer-list"),
+    re_path(
         r"^view/summary/$",
         view_volunteer_summary,
         name="view-volunteer-summary",
     ),
-    url(
+    re_path(
         r"^view/rolereport/$",
         view_volunteer_role_report,
         name="view-volunteer-role-report",
     ),
-    url(
+    re_path(
         r"^view/trainingreport/$",
         view_volunteer_training_records,
         name="view-volunteer-training-report",
     ),
-    url(
+    re_path(
         r"^view/export/$",
         export_volunteers_as_csv,
         name="view-volunteer-export",
     ),
-    url(
+    re_path(
         r"^retire/select$",
         select_volunteer,
         name="retire-select-volunteer",
         kwargs={"action": "retire"},
     ),
-    url(
+    re_path(
         r"^unretire/select$",
         select_volunteer,
         name="unretire-select-volunteer",
         kwargs={"action": "unretire", "active": False},
     ),
-    url(
+    re_path(
         r"^(?P<volunteer_id>\d+)/edit$", edit_volunteer, name="edit-volunteer"
     ),
-    url(r"^unretire$", activate_volunteer, name="activate-volunteer"),
-    url(
+    re_path(r"^unretire$", activate_volunteer, name="activate-volunteer"),
+    re_path(
         r"^retire$",
         activate_volunteer,
         name="inactivate-volunteer",
@@ -101,26 +101,28 @@ volunteer_urls = [
 # Members:
 member_urls = [
     # Internal:
-    url(r"^add/$", add_member, name="add-member"),
-    url(r"^search/$", search, name="search-members"),
-    url(r"^(?P<member_id>\d+)$", view, name="view-member"),
-    url(r"^(?P<member_id>\d+)/edit/$", edit_member, name="edit-member"),
-    url(r"^(?P<member_id>\d+)/delete/$", delete_member, name="delete-member"),
-    url(r"^statistics/$", member_statistics, name="member-statistics"),
-    url(r"^duplicates/$", member_duplicates, name="member-duplicates"),
+    re_path(r"^add/$", add_member, name="add-member"),
+    re_path(r"^search/$", search, name="search-members"),
+    re_path(r"^(?P<member_id>\d+)$", view, name="view-member"),
+    re_path(r"^(?P<member_id>\d+)/edit/$", edit_member, name="edit-member"),
+    re_path(
+        r"^(?P<member_id>\d+)/delete/$", delete_member, name="delete-member"
+    ),
+    re_path(r"^statistics/$", member_statistics, name="member-statistics"),
+    re_path(r"^duplicates/$", member_duplicates, name="member-duplicates"),
     # External:
-    url(r"^homepages/$", member_homepages, name="member-homepages"),
+    re_path(r"^homepages/$", member_homepages, name="member-homepages"),
     # Semi-external (see member_views.py for details)
-    url(
+    re_path(
         r"^(?P<member_id>\d+)/unsubscribe/$",
         unsubscribe_member,
         name="unsubscribe-member",
     ),
-    url(
+    re_path(
         r"^(?P<member_id>\d+)/unsubscribe-now/$",
         unsubscribe_member_right_now,
         name="unsubscribe-member-right-now",
     ),
-    url(r"^(?P<member_id>\d+)/opt-in/$", opt_in, name="opt_in"),
-    url(r"^goodbye/$", goodbye, name="goodbye"),
+    re_path(r"^(?P<member_id>\d+)/opt-in/$", opt_in, name="opt_in"),
+    re_path(r"^goodbye/$", goodbye, name="goodbye"),
 ]

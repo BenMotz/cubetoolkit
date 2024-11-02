@@ -1,4 +1,4 @@
-from django.conf.urls import url
+from django.urls import re_path
 from toolkit.diary.models import Event
 from django.contrib.auth.decorators import permission_required
 
@@ -50,62 +50,68 @@ from toolkit.diary.mailout_views import (
 
 programme_urls = [
     # View lists of event for various time/dates
-    url(r"^(?:view/)?$", view_diary, name="programme-view"),
-    url(r"^view/(?P<year>\d{4})/?$", view_diary, name="year-view"),
-    url(
+    re_path(r"^(?:view/)?$", view_diary, name="programme-view"),
+    re_path(r"^view/(?P<year>\d{4})/?$", view_diary, name="year-view"),
+    re_path(
         r"^view/(?P<year>\d{4})/(?P<month>\d{1,2})/?$",
         view_diary,
         name="month-view",
     ),
-    url(
+    re_path(
         r"^view/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})/?$",
         view_diary,
         name="day-view",
     ),
-    url(r"^view/this_week$", view_diary_this_week, name="view-this-week"),
-    url(r"^view/next_week$", view_diary_next_week, name="view-next-week"),
-    url(r"^view/this_month$", view_diary_this_month, name="view-this-month"),
-    url(r"^view/next_month$", view_diary_next_month, name="view-next-month"),
+    re_path(r"^view/this_week$", view_diary_this_week, name="view-this-week"),
+    re_path(r"^view/next_week$", view_diary_next_week, name="view-next-week"),
+    re_path(
+        r"^view/this_month$", view_diary_this_month, name="view-this-month"
+    ),
+    re_path(
+        r"^view/next_month$", view_diary_next_month, name="view-next-month"
+    ),
     # View for events by tag. This needs to come *after* the year view, to
     # avoid years being parsed as tags:
-    url(r"^view/(?P<event_type>[\w-]+)/$", view_diary, name="type-view"),
+    re_path(r"^view/(?P<event_type>[\w-]+)/$", view_diary, name="type-view"),
     # View individual showing
-    url(
+    re_path(
         r"^showing/id/(?P<showing_id>\d+)/$",
         view_showing,
         name="single-showing-view",
     ),
     # All showings for a given event
-    url(
+    re_path(
         r"^event/id/(?P<event_id>\d+)/$", view_event, name="single-event-view"
     ),
-    url(
+    re_path(
         r"^event/(?P<event_slug>[\w\-_]*),(?P<event_id>\d+)/$",
         view_event,
         name="single-event-view-with-slug",
     ),
     # As above, for legacy event ID:
-    url(
+    re_path(
         r"^event/oldid/(?P<legacy_id>\d+)/$",
         view_event,
         name="single-event-view-legacyid",
     ),
     # Archive:
-    url(r"^archive/$", ArchiveIndex.as_view(), name="archive-view-index"),
-    url(
+    re_path(r"^archive/$", ArchiveIndex.as_view(), name="archive-view-index"),
+    re_path(
         r"^archive/(?P<year>\d{4})/$",
         ArchiveYear.as_view(),
         name="archive-view-year",
     ),
-    url(
+    re_path(
         r"^archive/(?P<year>\d{4})/(?P<month>\d{1,2})/$",
         ArchiveMonth.as_view(),
         name="archive-view-month",
     ),
     # Search
-    url(r"^archive/search/$", ArchiveSearch.as_view(), name="archive-search"),
+    re_path(
+        r"^archive/search/$", ArchiveSearch.as_view(), name="archive-search"
+    ),
     # RSS feed
-    url(
+    re_path(
         r"^rss/$",
         toolkit.diary.feeds.BasicWhatsOnFeed(),
         name="view-diary-rss",
@@ -114,100 +120,102 @@ programme_urls = [
 
 diary_urls = [
     # Used for cancelling an edit action:
-    url(
+    re_path(
         r"^edit/cancel/?$",
         cancel_edit,
         name="cancel-edit",
     ),
     # View lists of events for editing:
-    url(
+    re_path(
         r"^edit/?$",
         edit_diary_list,
         name="default-edit",
     ),
-    url(r"^edit/calendar/?$", edit_diary_calendar, name="diary-edit-calendar"),
-    url(
+    re_path(
+        r"^edit/calendar/?$", edit_diary_calendar, name="diary-edit-calendar"
+    ),
+    re_path(
         r"^edit/calendar/(?P<year>\d{4})/(?P<month>\d{1,2})/?$",
         edit_diary_calendar,
     ),
-    url(
+    re_path(
         r"^edit/calendar/(?P<year>\d{4})/(?P<month>\d{1,2})/"
         r"(?P<day>\d{1,2})/?$",
         edit_diary_calendar,
     ),
-    url(
+    re_path(
         r"^edit/json/$",
         edit_diary_data,
         name="edit-diary-data",
     ),
-    url(
+    re_path(
         r"^edit/(?P<year>\d{4})/?$",
         edit_diary_list,
         name="year-edit",
     ),
-    url(
+    re_path(
         r"^edit/(?P<year>\d{4})/(?P<month>\d{1,2})/?$",
         edit_diary_list,
         name="month-edit",
     ),
-    url(
+    re_path(
         r"^edit/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})",
         edit_diary_list,
         name="day-edit",
     ),
     # Edit an event: view event before editing
-    url(
+    re_path(
         r"^edit/event/id/(?P<event_id>\d+)/view/$",
         event_detail_view,
         name="edit-event-details-view",
     ),
     # Edit an event
-    url(
+    re_path(
         r"^edit/event/id/(?P<event_id>\d+)/$",
         EditEventView.as_view(),
         name="edit-event-details",
     ),
     # Edit a showing (includes delete / add a new showing)
-    url(
+    re_path(
         r"^edit/showing/id/(?P<showing_id>\d+)/$",
         edit_showing,
         name="edit-showing",
     ),
     # Edit rota notes for a showing
-    url(
+    re_path(
         r"^edit/showing/id/(?P<showing_id>\d+)/rota_notes/$",
         edit_showing_rota_notes,
         name="edit-showing-rota-notes",
     ),
     # Edit ideas
-    url(
+    re_path(
         r"^edit/ideas/(?P<year>\d{4})/(?P<month>\d{1,2})/$",
         edit_ideas,
         name="edit-ideas",
     ),
     # Delete a showing
-    url(
+    re_path(
         r"^edit/showing/id/(?P<showing_id>\d+)/delete$",
         delete_showing,
         name="delete-showing",
     ),
     # Add a new event + showing
-    url(r"^edit/event/add$", add_event, name="add-event"),
+    re_path(r"^edit/event/add$", add_event, name="add-event"),
     # Edit event types
-    url(
+    re_path(
         r"^edit/eventtemplates/",
         edit_event_templates,
         name="edit_event_templates",
     ),
-    url(r"^edit/eventtags/", edit_event_tags, name="edit_event_tags"),
+    re_path(r"^edit/eventtags/", edit_event_tags, name="edit_event_tags"),
     # Edit event roles
-    url(r"^edit/roles/", edit_roles, name="edit_roles"),
+    re_path(r"^edit/roles/", edit_roles, name="edit_roles"),
     # The slightly OTT regex in the following will match:
     # "rota" "rota/" "rota/2001/01" "rota/2001/01/" "rota/2001/1/02"
     # "rota/2001/1/2/"
     # (ie needs at least year/month, not just a year)
     # View rota
-    url(
+    re_path(
         r"^(?P<field>rota|copy|terms|copy_summary)(/|/(?P<year>\d{4})/"
         r"(?P<month>\d{1,2})/?(?P<day>(?<=/)\d{0,2})?/?)?$",
         view_event_field,
@@ -217,36 +225,42 @@ diary_urls = [
     # "edit/rota" "edit/rota/" "edit/rota/2001/01" "edit/rota/2001/01/"
     # "edit/rota/2001/1/02" "edit/rota/2001/1/2/"
     # (ie needs at least year/month, not just a year)
-    url(
+    re_path(
         r"^edit/rota(/|/(?P<year>\d{4})/"
         r"(?P<month>\d{1,2})/?(?P<day>(?<=/)\d{0,2})?/?)?$$",
         EditRotaView.as_view(),
         name="rota-edit",
     ),
-    url(r"^rota/vacancies$", view_rota_vacancies, name="view-rota-vacancies"),
+    re_path(
+        r"^rota/vacancies$", view_rota_vacancies, name="view-rota-vacancies"
+    ),
     # Ajax calls:
-    url("^edit/setprefs$", set_edit_preferences, name="set_edit_preferences"),
-    url("^messages$", get_messages, name="get-messages"),
+    re_path(
+        "^edit/setprefs$", set_edit_preferences, name="set_edit_preferences"
+    ),
+    re_path("^messages$", get_messages, name="get-messages"),
     # Printed programme archive edit/upload:
-    url(
+    re_path(
         "^printedprogrammes$",
         printed_programme_edit,
         name="edit-printed-programmes",
         kwargs={"operation": "edit"},
     ),
-    url(
+    re_path(
         "^printedprogrammes/add$",
         printed_programme_edit,
         name="add-printed-programme",
         kwargs={"operation": "add"},
     ),
     # Force a 500 error, to test error emailing
-    url(r"error/$", view_force_error),
+    re_path(r"error/$", view_force_error),
 ]
 
 diary_urls += [
-    url("^mailout/$", mailout, name="members-mailout"),
-    url("^mailout/send$", exec_mailout, name="exec-mailout"),
-    url("^mailout/send/progress$", mailout_progress, name="mailout-progress"),
-    url("^mailout/test$", mailout_test_send, name="mailout-test-send"),
+    re_path("^mailout/$", mailout, name="members-mailout"),
+    re_path("^mailout/send$", exec_mailout, name="exec-mailout"),
+    re_path(
+        "^mailout/send/progress$", mailout_progress, name="mailout-progress"
+    ),
+    re_path("^mailout/test$", mailout_test_send, name="mailout-test-send"),
 ]
