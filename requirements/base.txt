@@ -1,7 +1,7 @@
 # Fix versions of django and directly related components:
-Django<4.0,>=3.2.25
+Django<4.1,>=4
 celery[redis]>5,<5.3
-easy_thumbnails==2.7.2
+easy_thumbnails==2.9
 django-crispy-forms<1.13
 # Functionality introduced at these versions is required:
 python-magic>=0.4.0
