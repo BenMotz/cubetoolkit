@@ -1,6 +1,6 @@
 from __future__ import absolute_import
-import pytz
 from datetime import datetime, timedelta
+import zoneinfo
 
 from mock import patch
 
@@ -9,6 +9,8 @@ from django.urls import reverse, resolve
 import django.http
 
 from .common import DiaryTestsMixin
+
+uktz = zoneinfo.ZoneInfo("Europe/London")
 
 
 class PublicDiaryViews(DiaryTestsMixin, TestCase):
@@ -30,9 +32,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
     def test_view_empty_slug(self, now_patch):
         # When an event has a name that results in a slugified event name of
         # ""
-        now_patch.return_value = pytz.timezone("Europe/London").localize(
-            datetime(2013, 4, 1, 11, 00)
-        )
+        now_patch.return_value = datetime(2013, 4, 1, 11, 00, tzinfo=uktz)
 
         self.e2.name = "?"
         self.e2.save()
@@ -118,9 +118,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
 
     @patch("django.utils.timezone.now")
     def test_view_this_week(self, now_patch):
-        now_patch.return_value = pytz.timezone("Europe/London").localize(
-            datetime(2013, 4, 1, 11, 00)
-        )
+        now_patch.return_value = datetime(2013, 4, 1, 11, 00, tzinfo=uktz)
 
         url = reverse("view-this-week")
         response = self.client.get(url)
@@ -130,9 +128,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
 
     @patch("django.utils.timezone.now")
     def test_view_this_month(self, now_patch):
-        now_patch.return_value = pytz.timezone("Europe/London").localize(
-            datetime(2013, 4, 1, 11, 00)
-        )
+        now_patch.return_value = datetime(2013, 4, 1, 11, 00, tzinfo=uktz)
 
         url = reverse("view-this-month")
         response = self.client.get(url)
@@ -149,9 +145,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
 
     @patch("django.utils.timezone.now")
     def test_view_next_week(self, now_patch):
-        now_patch.return_value = pytz.timezone("Europe/London").localize(
-            datetime(2013, 4, 1, 11, 00)
-        )
+        now_patch.return_value = datetime(2013, 4, 1, 11, 00, tzinfo=uktz)
 
         url = reverse("view-next-week")
         response = self.client.get(url)
@@ -166,9 +160,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
 
     @patch("django.utils.timezone.now")
     def test_view_next_month(self, now_patch):
-        now_patch.return_value = pytz.timezone("Europe/London").localize(
-            datetime(2013, 3, 1, 11, 00)
-        )
+        now_patch.return_value = datetime(2013, 3, 1, 11, 00, tzinfo=uktz)
 
         url = reverse("view-next-month")
         response = self.client.get(url)

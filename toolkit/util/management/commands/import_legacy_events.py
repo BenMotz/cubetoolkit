@@ -24,7 +24,7 @@ I used d4e9757916fdf0b9aee0c907fd9aee08da922b19
 
 import datetime
 import os
-import pytz
+import zoneinfo
 import shutil
 
 from django.core.management.base import BaseCommand
@@ -150,7 +150,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        timezone = pytz.timezone("Europe/London")
+        timezone = zoneinfo.ZoneInfo("Europe/London")
         db = self._conn_to_archive_database()
         cursor = db.cursor()
 
@@ -291,7 +291,7 @@ class Command(BaseCommand):
 
                 s.full_clean()
                 # Store datetime with timezone information
-                s.start = timezone.localize(startDateAsaTime)
+                s.start = startDateAsaTime.replace(tzinfo=timezone)
                 # Force, to allow saving of showing with start in past
                 s.save(force=True)
 

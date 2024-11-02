@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 from re import I
 
-import pytz
+import zoneinfo
 from datetime import datetime, date, timedelta
 
 from django.test import TestCase
@@ -17,6 +17,8 @@ from toolkit.diary.models import (
 )
 
 from .common import DiaryTestsMixin, NowPatchMixin
+
+UTC = zoneinfo.ZoneInfo("UTC")
 
 
 class ShowingModelSave(DiaryTestsMixin, NowPatchMixin, TestCase):
@@ -127,8 +129,8 @@ class ShowingModelCustomQueryset(DiaryTestsMixin, TestCase):
             self.assertTrue(showing.confirmed)
 
     def test_manager_date_range(self):
-        start = pytz.utc.localize(datetime(2013, 4, 2, 12, 0))
-        end = pytz.utc.localize(datetime(2013, 4, 4, 12, 0))
+        start = datetime(2013, 4, 2, 12, 0, tzinfo=UTC)
+        end = datetime(2013, 4, 4, 12, 0, tzinfo=UTC)
         records = list(Showing.objects.start_in_range(start, end))
         # Expect 2 showings in this date range:
         self.assertEqual(len(records), 2)
@@ -137,8 +139,8 @@ class ShowingModelCustomQueryset(DiaryTestsMixin, TestCase):
             self.assertTrue(showing.start > start)
 
     def test_queryset_chaining(self):
-        start = pytz.utc.localize(datetime(2000, 4, 2, 12, 0))
-        end = pytz.utc.localize(datetime(2013, 9, 1, 12, 0))
+        start = datetime(2000, 4, 2, 12, 0, tzinfo=UTC)
+        end = datetime(2013, 9, 1, 12, 0, tzinfo=UTC)
         records = list(
             Showing.objects.all()
             .public()

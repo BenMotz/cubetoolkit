@@ -1,6 +1,6 @@
-import pytz
 from datetime import datetime, date
 import fixtures
+import zoneinfo
 
 from unittest.mock import patch
 import django.contrib.auth.models as auth_models
@@ -19,9 +19,9 @@ from toolkit.diary.models import (
 )
 from toolkit.members.models import Member, Volunteer
 
-FAKE_NOW = pytz.timezone("Europe/London").localize(
-    datetime(2013, 6, 1, 11, 00)
-)
+UKTZ = zoneinfo.ZoneInfo("Europe/London")
+
+FAKE_NOW = datetime(2013, 6, 1, 11, 00, tzinfo=UKTZ)
 
 
 class NowPatchMixin:
@@ -244,9 +244,7 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
 
         # Showings:
         self.e2s1 = Showing(  # pk :1
-            start=pytz.timezone("Europe/London").localize(
-                datetime(2013, 4, 1, 19, 00)
-            ),
+            start=datetime(2013, 4, 1, 19, 00, tzinfo=UKTZ),
             event=self.e2,
             booked_by="User",
             confirmed=False,
@@ -256,9 +254,7 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
         )
         self.e2s1.save(force=True)
         self.e2s2 = Showing(  # pk :2
-            start=pytz.timezone("Europe/London").localize(
-                datetime(2013, 4, 2, 19, 00)
-            ),
+            start=datetime(2013, 4, 2, 19, 00, tzinfo=UKTZ),
             event=self.e2,
             booked_by="User",
             confirmed=True,
@@ -268,9 +264,7 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
         )
         self.e2s2.save(force=True)
         e2s3 = Showing(  # pk :3
-            start=pytz.timezone("Europe/London").localize(
-                datetime(2013, 4, 3, 19, 00)
-            ),
+            start=datetime(2013, 4, 3, 19, 00, tzinfo=UKTZ),
             event=self.e2,
             booked_by="User",
             confirmed=True,
@@ -280,9 +274,7 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
         )
         e2s3.save(force=True)
         e2s4 = Showing(  # pk :4
-            start=pytz.timezone("Europe/London").localize(
-                datetime(2013, 4, 4, 19, 00)
-            ),
+            start=datetime(2013, 4, 4, 19, 00, tzinfo=UKTZ),
             event=self.e2,
             booked_by="User",
             confirmed=True,
@@ -292,9 +284,7 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
         )
         e2s4.save(force=True)
         e2s5 = Showing(  # pk :5
-            start=pytz.timezone("Europe/London").localize(
-                datetime(2013, 4, 5, 19, 00)
-            ),
+            start=datetime(2013, 4, 5, 19, 00, tzinfo=UKTZ),
             event=self.e2,
             booked_by="User",
             confirmed=True,
@@ -305,9 +295,7 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
         e2s5.save(force=True)
 
         s2 = Showing(
-            start=pytz.timezone("Europe/London").localize(
-                datetime(2013, 4, 13, 18, 00)
-            ),
+            start=datetime(2013, 4, 13, 18, 00, tzinfo=UKTZ),
             event=e3,
             booked_by="User Two",
             confirmed=True,
@@ -317,9 +305,7 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
         # When the clock is patched to claim that it's 1/6/2013, this showing
         # will be in the future:
         self.e4s3 = Showing(
-            start=pytz.timezone("Europe/London").localize(
-                datetime(2013, 6, 9, 18, 00)
-            ),
+            start=datetime(2013, 6, 9, 18, 00, tzinfo=UKTZ),
             event=self.e4,
             booked_by="\u0102nother \u0170ser",
             confirmed=True,
@@ -328,9 +314,7 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
         self.e4s3.save(force=True)  # Force start date in the past
 
         self.e4s4 = Showing(
-            start=pytz.timezone("Europe/London").localize(
-                datetime(2013, 9, 14, 18, 00)
-            ),
+            start=datetime(2013, 9, 14, 18, 00, tzinfo=UKTZ),
             event=self.e4,
             booked_by="User Two",
             hide_in_programme=True,
@@ -339,9 +323,7 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
         self.e4s4.save(force=True)  # Force start date in the past
 
         self.s5 = Showing(
-            start=pytz.timezone("Europe/London").localize(
-                datetime(2013, 2, 14, 18, 00)
-            ),
+            start=datetime(2013, 2, 14, 18, 00, tzinfo=UKTZ),
             event=self.e5,
             booked_by="Yet another user",
             confirmed=True,
@@ -349,9 +331,7 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
         self.s5.save(force=True)
 
         s6 = Showing(
-            start=pytz.timezone("Europe/London").localize(
-                datetime(2013, 2, 15, 18, 00)
-            ),
+            start=datetime(2013, 2, 15, 18, 00, tzinfo=UKTZ),
             event=e1,
             booked_by="Blah blah",
             confirmed=True,

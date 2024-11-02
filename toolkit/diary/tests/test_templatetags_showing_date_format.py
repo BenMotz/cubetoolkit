@@ -2,7 +2,7 @@ from __future__ import absolute_import
 
 from datetime import datetime
 
-import pytz
+import zoneinfo
 from mock import Mock
 from django.test import TestCase
 
@@ -11,14 +11,14 @@ from toolkit.diary.templatetags.showing_date_format import format_showing_dates
 
 class TestShowingDateFormatFilter(TestCase):
     def setUp(self):
-        self.tz = pytz.timezone("Europe/London")
+        self.tz = zoneinfo.ZoneInfo("Europe/London")
 
     def _run_filter_on_dates(self, date_list):
         mock_showings = [Mock(start=d) for d in date_list]
         return format_showing_dates(mock_showings)
 
     def _test_equiv(self, date_tuple_list, expected):
-        date_list = [self.tz.localize(datetime(*t)) for t in date_tuple_list]
+        date_list = [datetime(*t, tzinfo=self.tz) for t in date_tuple_list]
         self.assertEqual(expected, self._run_filter_on_dates(date_list))
 
     def test_no_showings(self):

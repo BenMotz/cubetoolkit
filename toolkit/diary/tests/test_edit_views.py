@@ -3,7 +3,7 @@ import re
 import json
 import os.path
 
-import pytz
+import zoneinfo
 from datetime import datetime, date, time, timedelta
 import tempfile
 
@@ -46,9 +46,10 @@ TINY_VALID_JPEG = bytearray(
     b"\xff\xda\x00\x08\x01\x01\x00\x00?\x00T\xdf\xff\xd9"
 )
 
+UTC = zoneinfo.ZoneInfo("UTC")
+
 
 class ViewSecurity(DiaryTestsMixin, TestCase):
-
     """Basic test that the private diary pages require the correct
     permissions"""
 
@@ -310,7 +311,7 @@ class EditShowing(DiaryTestsMixin, TestCase):
         # Check showing was updated:
         showing = Showing.objects.get(id=7)
         self.assertEqual(
-            showing.start, pytz.utc.localize(datetime(2013, 8, 15, 18, 30))
+            showing.start, datetime(2013, 8, 15, 18, 30, tzinfo=UTC)
         )
         self.assertEqual(showing.booked_by, "Yet \u0102nother \u0170ser")
         self.assertEqual(showing.confirmed, True)
@@ -593,13 +594,13 @@ class AddEventView(DiaryTestsMixin, TestCase):
         # Showings should have been added over 3 days. Time specified was BST,
         # so should be 7pm in UTC:
         self.assertEqual(
-            showings[0].start, pytz.utc.localize(datetime(2013, 6, 2, 19, 0))
+            showings[0].start, datetime(2013, 6, 2, 19, 0, tzinfo=UTC)
         )
         self.assertEqual(
-            showings[1].start, pytz.utc.localize(datetime(2013, 6, 3, 19, 0))
+            showings[1].start, datetime(2013, 6, 3, 19, 0, tzinfo=UTC)
         )
         self.assertEqual(
-            showings[2].start, pytz.utc.localize(datetime(2013, 6, 4, 19, 0))
+            showings[2].start, datetime(2013, 6, 4, 19, 0, tzinfo=UTC)
         )
 
         role_1 = Role.objects.get(id=1)

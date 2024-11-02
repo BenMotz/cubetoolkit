@@ -227,13 +227,18 @@ def _adjust_colour_historic(colour):
 def edit_diary_data(request):
     date_format = "%Y-%m-%d"
 
+    current_tz = timezone.get_current_timezone()
     try:
         start_raw = request.GET.get("start", None)
         end_raw = request.GET.get("end", None)
         start_raw = start_raw.partition("T")[0] if start_raw else None
         end_raw = end_raw.partition("T")[0] if end_raw else None
-        start = datetime.datetime.strptime(start_raw, date_format)
-        end = datetime.datetime.strptime(end_raw, date_format)
+        start = datetime.datetime.strptime(start_raw, date_format).replace(
+            tzinfo=current_tz
+        )
+        end = datetime.datetime.strptime(end_raw, date_format).replace(
+            tzinfo=current_tz
+        )
     except (ValueError, TypeError):
         logger.error(
             "Invalid value in date range, one of start '{0}' or end, '{1}'".format(
@@ -242,12 +247,8 @@ def edit_diary_data(request):
         )
         raise Http404("Invalid request")
 
-    current_tz = timezone.get_current_timezone()
-    start_in_tz = current_tz.localize(start)
-    end_in_tz = current_tz.localize(end)
-
     showings = (
-        Showing.objects.start_in_range(start_in_tz, end_in_tz)
+        Showing.objects.start_in_range(start, end)
         .order_by("start")
         .select_related()
     )
@@ -510,14 +511,13 @@ def add_event(request):
             date = [int(n, 10) for n in date]
             time = [int(n, 10) for n in time]
             duration = datetime.timedelta(seconds=int(duration, 10))
-            event_start = timezone.get_current_timezone().localize(
-                datetime.datetime(
-                    hour=time[0],
-                    minute=time[1],
-                    day=date[0],
-                    month=date[1],
-                    year=date[2],
-                )
+            event_start = datetime.datetime(
+                hour=time[0],
+                minute=time[1],
+                day=date[0],
+                month=date[1],
+                year=date[2],
+                tzinfo=timezone.get_current_timezone(),
             )
             if settings.MULTIROOM_ENABLED and room:
                 room = Room.objects.get(id=room)
@@ -1022,8 +1022,8 @@ class EditRotaView(PermissionRequiredMixin, View):
         )
         # Create a new local time with hour/min/sec set to zero:
         current_tz = django.utils.timezone.get_current_timezone()
-        today_local_date = current_tz.localize(
-            datetime.datetime(now_local.year, now_local.month, now_local.day)
+        today_local_date = datetime.datetime(
+            now_local.year, now_local.month, now_local.day, tzinfo=current_tz
         )
         yesterday_local_date = today_local_date - datetime.timedelta(days=1)
 

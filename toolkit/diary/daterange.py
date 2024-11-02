@@ -1,7 +1,7 @@
 """Code shared between both public and editing sets of diary views"""
 import calendar
 import logging
-import datetime
+from datetime import datetime
 import django.utils.timezone
 
 logger = logging.getLogger(__name__)
@@ -35,15 +35,13 @@ def get_date_range(year, month, day, user_days_ahead, default_days_ahead=365):
 
     try:
         if day:
-            startdate = current_tz.localize(
-                datetime.datetime(year, month, day)
-            )
+            startdate = datetime(year, month, day, tzinfo=current_tz)
             days_ahead = 1
         elif month:
-            startdate = current_tz.localize(datetime.datetime(year, month, 1))
+            startdate = datetime(year, month, 1, tzinfo=current_tz)
             days_ahead = calendar.monthrange(year, month)[1]
         elif year:
-            startdate = current_tz.localize(datetime.datetime(year, 1, 1))
+            startdate = datetime(year, 1, 1, tzinfo=current_tz)
             days_ahead = 365
             if calendar.isleap(year):
                 days_ahead += 1
@@ -54,10 +52,11 @@ def get_date_range(year, month, day, user_days_ahead, default_days_ahead=365):
                 django.utils.timezone.now()
             )
             # Create a new local time with hour/min/sec set to zero:
-            startdate = current_tz.localize(
-                datetime.datetime(
-                    now_local.year, now_local.month, now_local.day
-                )
+            startdate = datetime(
+                now_local.year,
+                now_local.month,
+                now_local.day,
+                tzinfo=current_tz,
             )
 
             days_ahead = int(default_days_ahead)

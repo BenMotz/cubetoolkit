@@ -1,7 +1,7 @@
 from __future__ import absolute_import, unicode_literals
 from datetime import timedelta, datetime
 
-import pytz
+import zoneinfo
 from mock import patch
 
 from django.test import TestCase
@@ -354,8 +354,8 @@ class ViewRotaVacancies(DiaryTestsMixin, TestCase):
 
     @patch("django.utils.timezone.now")
     def test_get(self, now_patch):
-        now_patch.return_value = pytz.timezone("Europe/London").localize(
-            datetime(2013, 4, 12, 11, 00)
+        now_patch.return_value = datetime(
+            2013, 4, 12, 11, 00, tzinfo=zoneinfo.ZoneInfo("Europe/London")
         )
         url = reverse("view-rota-vacancies")
         response = self.client.get(url)
