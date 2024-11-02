@@ -74,7 +74,7 @@ class ShowingModelDelete(DiaryTestsMixin, NowPatchMixin, TestCase):
 
     def test_delete_unsaved_instance(self):
         s = Showing()
-        with self.assertRaises(AssertionError):
+        with self.assertRaises(ValueError):
             s.delete()
 
 
