@@ -153,7 +153,7 @@ class SectionLink(Orderable):
     page = ParentalKey(SectionRootWithLinks, related_name="links")
 
     text = models.CharField(max_length=1024, blank=True, null=False)
-    # This is a link (rather than a URLField) to allow relative links
+    # This is a CharField, rather than a URLField, to allow relative links:
     link = models.CharField(max_length=1024, blank=False, null=False)
 
     panels = [
