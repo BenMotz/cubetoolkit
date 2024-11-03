@@ -264,6 +264,8 @@ class Volunteer(models.Model):
         )
 
     def latest_general_training_record(self):
+        if self.pk is None:
+            return None
         records = self.training_records.filter(
             training_type=TrainingRecord.GENERAL_TRAINING
         ).order_by("-training_date")[:1]

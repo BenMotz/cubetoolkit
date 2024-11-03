@@ -8,7 +8,7 @@ from django.test.utils import override_settings
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
 
-from toolkit.members.models import TrainingRecord
+from toolkit.members.models import TrainingRecord, Member, Volunteer
 
 from .common import MembersTestsMixin
 
@@ -103,3 +103,25 @@ class TestTrainingRecord(MembersTestsMixin, TestCase):
             training_date=datetime.date(year=2010, month=1, day=6),
         )
         self.assertFalse(record.has_expired())
+
+
+class TestVolunteerModel(MembersTestsMixin, TestCase):
+    def test_latest_general_training_record_unsaved(self):
+        v = Volunteer(member=self.mem_1)
+        self.assertIsNone(v.latest_general_training_record())
+
+    def test_latest_general_training_record_saved(self):
+        self.assertIsNone(self.vol_1.latest_general_training_record())
+
+        record = TrainingRecord(
+            training_type=TrainingRecord.GENERAL_TRAINING,
+            volunteer=self.vol_1,
+            role=None,
+            trainer="Adidas, I guess?",
+            notes="440Hz",
+            training_date=datetime.date(year=2020, month=4, day=20),
+        )
+        record.clean()
+        record.save()
+
+        self.assertEqual(record, self.vol_1.latest_general_training_record())
