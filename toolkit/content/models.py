@@ -81,7 +81,9 @@ class ComplexArticlePage(Page):
     content = StreamField(
         [
             ("content_block", WidthBlock()),
-        ]
+        ],
+        # ref; https://docs.wagtail.org/en/stable/releases/3.0.html#use-json-field-argument-added-to-streamfield
+        use_json_field=True,
     )
     content_panels = Page.content_panels + [
         FieldPanel("content"),
