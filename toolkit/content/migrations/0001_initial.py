@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-import wagtail.core.fields
+import wagtail.fields
 import django.db.models.deletion
 import modelcluster.fields
 
@@ -29,7 +29,7 @@ class Migration(migrations.Migration):
                         on_delete=models.CASCADE,
                     ),
                 ),
-                ("body", wagtail.core.fields.RichTextField()),
+                ("body", wagtail.fields.RichTextField()),
                 (
                     "image_alignment",
                     models.CharField(
@@ -99,8 +99,8 @@ class Migration(migrations.Migration):
                         on_delete=models.CASCADE,
                     ),
                 ),
-                ("intro_text", wagtail.core.fields.RichTextField(blank=True)),
-                ("footer_text", wagtail.core.fields.RichTextField(blank=True)),
+                ("intro_text", wagtail.fields.RichTextField(blank=True)),
+                ("footer_text", wagtail.fields.RichTextField(blank=True)),
             ],
             options={
                 "abstract": False,

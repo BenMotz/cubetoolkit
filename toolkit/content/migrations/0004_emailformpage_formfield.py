@@ -2,7 +2,7 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-import wagtail.core.fields
+import wagtail.fields
 import django.db.models.deletion
 import modelcluster.fields
 
@@ -51,10 +51,10 @@ class Migration(migrations.Migration):
                         max_length=255, verbose_name="subject", blank=True
                     ),
                 ),
-                ("intro", wagtail.core.fields.RichTextField(blank=True)),
+                ("intro", wagtail.fields.RichTextField(blank=True)),
                 (
                     "thank_you_text",
-                    wagtail.core.fields.RichTextField(blank=True),
+                    wagtail.fields.RichTextField(blank=True),
                 ),
                 (
                     "image",

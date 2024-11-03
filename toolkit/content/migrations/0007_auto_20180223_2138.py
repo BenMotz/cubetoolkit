@@ -3,8 +3,8 @@
 from __future__ import unicode_literals
 
 from django.db import migrations, models
-import wagtail.core.blocks
-import wagtail.core.fields
+import wagtail.blocks
+import wagtail.fields
 import wagtail.images.blocks
 
 
@@ -27,15 +27,15 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name="complexarticlepage",
             name="content",
-            field=wagtail.core.fields.StreamField(
+            field=wagtail.fields.StreamField(
                 (
                     (
                         "content_block",
-                        wagtail.core.blocks.StructBlock(
+                        wagtail.blocks.StructBlock(
                             (
                                 (
                                     "width",
-                                    wagtail.core.blocks.IntegerBlock(
+                                    wagtail.blocks.IntegerBlock(
                                         help_text="How many grid columns to occupy in rendered template",
                                         max_value=5,
                                         min_value=1,
@@ -43,15 +43,15 @@ class Migration(migrations.Migration):
                                 ),
                                 (
                                     "content",
-                                    wagtail.core.blocks.StreamBlock(
+                                    wagtail.blocks.StreamBlock(
                                         (
                                             (
                                                 "rich_text",
-                                                wagtail.core.blocks.RichTextBlock(),
+                                                wagtail.blocks.RichTextBlock(),
                                             ),
                                             (
                                                 "raw_html",
-                                                wagtail.core.blocks.RawHTMLBlock(),
+                                                wagtail.blocks.RawHTMLBlock(),
                                             ),
                                             (
                                                 "image",
