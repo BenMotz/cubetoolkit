@@ -146,6 +146,13 @@ WAGTAILADMIN_PERMITTED_LANGUAGES = [("en", "English")]
 # down :-(
 WAGTAIL_USER_TIME_ZONES = ["Europe/London"]
 
+# This is the base URL used by the Wagtail admin site. It is typically used for
+# generating URLs to include in notification emails.
+#
+# If this setting is not present, Wagtail will try to fall back to
+# request.site.root_url or to the request’s host name.
+WAGTAILADMIN_BASE_URL = "https://cubecinema.com/cms"
+
 ###############################################################################
 #
 # Celery settings
