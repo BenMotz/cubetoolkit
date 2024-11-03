@@ -1,5 +1,5 @@
 # Fix versions of django and directly related components:
-Django<4.1,>=4
+Django<4.2,>=4.1.13
 celery[redis]>5,<5.3
 easy_thumbnails==2.9
 django-crispy-forms<1.13
