@@ -1,5 +1,5 @@
 from django.db import models
-from django.http import Http404
+from django.http import Http404, HttpResponse
 
 from wagtail.fields import RichTextField, StreamField
 from wagtail.models import Page, Orderable
@@ -137,6 +137,13 @@ class SectionRootWithLinks(Page):
     def serve(self, request):
         # For now, don't actually serve anything for this page:
         raise Http404("Page not found")
+
+    def serve_preview(self, request, mode_name):
+        return HttpResponse(
+            b"<html><p>This is not a real page, and does not have "
+            b"any content: it's just a collection of links to go in "
+            b"the site menu</p>"
+        )
 
 
 class SectionLink(Orderable):

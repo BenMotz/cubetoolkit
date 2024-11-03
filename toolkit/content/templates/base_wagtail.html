@@ -3,3 +3,14 @@
 {% block title %}
 {{ VENUE.longname }}: {{ page.seo_title|default:page.title }}
 {% endblock %}
+
+{% block meta %}
+{% comment %}
+Ensure links in the wagtail edit preview work properly
+(https://docs.wagtail.org/en/stable/releases/4.0.html#opening-links-within-the-live-preview-panel)
+{% endcomment %}
+{{ block.super }}
+{% if request.in_preview_panel %}
+    <base target="_blank">
+{% endif %}
+{% endblock %}
