@@ -8,9 +8,7 @@ from wagtail.admin.edit_handlers import (
     InlinePanel,
     MultiFieldPanel,
     FieldRowPanel,
-    StreamFieldPanel,
 )
-from wagtail.images.edit_handlers import ImageChooserPanel
 from wagtail.contrib.forms.models import AbstractEmailForm, AbstractFormField
 from wagtail.contrib.forms.edit_handlers import FormSubmissionsPanel
 from wagtail.core import blocks
@@ -49,7 +47,7 @@ class BasicArticlePage(Page):
     content_panels = Page.content_panels + [
         FieldPanel("body"),
         FieldPanel("image_alignment"),
-        ImageChooserPanel("image"),
+        FieldPanel("image"),
     ]
     settings_panels = None
     promote_panels = Page.promote_panels + [
@@ -81,7 +79,7 @@ class ComplexArticlePage(Page):
         ]
     )
     content_panels = Page.content_panels + [
-        StreamFieldPanel("content"),
+        FieldPanel("content"),
     ]
 
 
@@ -106,7 +104,7 @@ class ImageGalleryImage(Orderable):
     caption = models.CharField(blank=True, max_length=255)
 
     panels = [
-        ImageChooserPanel("image"),
+        FieldPanel("image"),
         FieldPanel("caption"),
     ]
 
@@ -166,7 +164,7 @@ class EmailFormPage(AbstractEmailForm):
         FieldPanel("intro"),
         InlinePanel("form_fields", label="Form fields"),
         FieldPanel("thank_you_text"),
-        ImageChooserPanel("image"),
+        FieldPanel("image"),
         MultiFieldPanel(
             [
                 FieldRowPanel(
