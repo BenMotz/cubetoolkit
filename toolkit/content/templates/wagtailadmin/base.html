@@ -1,13 +1,5 @@
 {% extends "wagtailadmin/base.html" %}
 
 {% block branding_logo %}
-{# Mobile-only logo: #}
-<div class="u-hidden@sm">
-    <img src="{{ VENUE.wagtale_admin_img }}" style="width: 30px"/>
-</div>
-
-{# Desktop logo: #}
-<div class="u-hidden@xs" data-animated-logo-container>
-    <img src="{{ VENUE.wagtale_admin_img }}" style="height: 80px"/>
-</div>
+<img src="{{ VENUE.wagtale_admin_img }}" style="height: 82px"/>
 {% endblock %}
