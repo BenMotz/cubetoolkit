@@ -1,3 +1,8 @@
 {% extends "wagtailadmin/login.html" %}
 
 {% block branding_login %}Login required{% endblock %}
+{% block branding_logo %}
+<div class="login-logo">
+    <img src="{{ VENUE.wagtale_admin_img }}" alt=""/>
+</div>
+{% endblock %}
