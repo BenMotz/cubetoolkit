@@ -17,6 +17,8 @@ from modelcluster.fields import ParentalKey
 
 
 class BasicArticlePage(Page):
+    page_description = "Page with a block of text and a single image"
+
     LEFT = "L"
     CENTRE = "C"
     RIGHT = "R"
@@ -73,6 +75,9 @@ class WidthBlock(blocks.StructBlock):
 
 
 class ComplexArticlePage(Page):
+    page_description = (
+        "Page with a sequence of multiple text blocks and images"
+    )
     content = StreamField(
         [
             ("content_block", WidthBlock()),
@@ -84,6 +89,7 @@ class ComplexArticlePage(Page):
 
 
 class ImageGalleryPage(Page):
+    page_description = "An image gallery"
     intro_text = RichTextField(blank=True)
 
     footer_text = RichTextField(blank=True)
@@ -110,6 +116,7 @@ class ImageGalleryImage(Orderable):
 
 
 class SectionRootWithLinks(Page):
+    page_description = "Not a real page! Does not have any content, just a bunch of links to go in the site menu"
     content_panels = Page.content_panels + [
         InlinePanel("links", label="Links"),
     ]
@@ -148,6 +155,7 @@ class FormField(AbstractFormField):
 
 
 class EmailFormPage(AbstractEmailForm):
+    page_description = "A page with text, an image, and a (configurable) form"
     intro = RichTextField(blank=True)
     thank_you_text = RichTextField(blank=True)
 
