@@ -128,6 +128,9 @@ class SectionRootWithLinks(Page):
         MultiFieldPanel(
             [
                 FieldPanel("show_in_menus"),
+                # Remove the following when we get to Wagtail 5.2.4
+                # (https://github.com/wagtail/wagtail/issues/11442)
+                FieldPanel("slug"),
             ],
             "Common page configuration",
         )
