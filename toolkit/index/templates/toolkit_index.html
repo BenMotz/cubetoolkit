@@ -14,6 +14,19 @@
     .index-edit a {
         color: #a3a3a3;
     }
+    #logout-form {
+      display: inline;
+    }
+    #logout-form button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      color: #007bff;
+    }
+    #logout-form button:hover {
+        text-decoration: underline;
+    }
 </style>
 {% endblock %}
 
@@ -89,7 +102,6 @@
 </ul>
 <hr>
 <p>You logged in as {{ user }} at {{ user.last_login }}</p>
-<p>
 {% if user.is_superuser %}
     <a href="{% url "create-index-link" %}">Add link</a> &#xb7;
     <a href="{% url "create-index-category" %}">Add link group</a> &#xb7;
@@ -97,7 +109,10 @@
 {% if VENUE.show_user_management %}
     <a href="{% url "password_change" %}">Change password</a> &#xb7;
 {% endif %}
-<a href="{% url "logout" %}">Log out</a>
-</p>
+<form id="logout-form" method="post" action="{% url 'logout' %}">
+  {% csrf_token %}
+  <button type="submit">Log out</button>
+</form>
+<p>
 
 {% endblock %}

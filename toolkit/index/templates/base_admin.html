@@ -15,6 +15,13 @@
 body {
   padding: 5rem 1.4rem;
 }
+#base-admin-logout-form {
+  display: inline;
+}
+#base-admin-logout-form button {
+  background: none;
+  border: none;
+}
 </style>
 {% endblock %}
 
@@ -89,7 +96,10 @@ body {
             </li>
           {% endif %}
           <li class="nav-item">
-            <a class="nav-link" href="{% url "logout" %}">Log out</a>
+            <form id="base-admin-logout-form" method="post" action="{% url 'logout' %}">
+              {% csrf_token %}
+              <button class="nav-link" type="submit">Log out</button>
+            </form>
           </li>
         </ul>
         {% block header-navbar-extra-post %}{% endblock %}
