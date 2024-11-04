@@ -27,7 +27,7 @@ fi
 
 case "$COMMAND" in
     celery)
-        exec /usr/local/bin/celery --app=toolkit worker --loglevel=INFO --concurrency=1
+        exec /venv/bin/celery --app=toolkit worker --loglevel=INFO --concurrency=1
         ;;
     gunicorn)
         echo "Running database migrations"
