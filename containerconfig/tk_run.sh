@@ -31,8 +31,8 @@ case "$COMMAND" in
         ;;
     gunicorn)
         echo "Running database migrations"
-        /site/manage.py migrate
-        exec /usr/local/bin/gunicorn wsgi --bind 0.0.0.0:8000 --chdir /site
+        /venv/bin/python3 /site/manage.py migrate
+        exec /venv/bin/gunicorn wsgi --bind 0.0.0.0:8000 --chdir /site
         ;;
     *)
         echo "Unknown option; expected gunicorn or celery"
