@@ -16,7 +16,6 @@ class Command(BaseCommand):
     )
 
     can_import_settings = True
-    requires_system_checks = True
 
     def add_arguments(self, parser):
         parser.add_argument("output_file", type=str)
