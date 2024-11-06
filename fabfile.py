@@ -187,7 +187,7 @@ def fetch_database_dump(c, dump_filename="database_dump.sql"):
     # (which will include the DB name, user and password)
     dump_command = c.run(
         f"docker exec {c.config.docker_compose_project}_toolkit_1 "
-        "./manage.py mysqldump_database --print-command STDOUT",
+        "/venv/bin/python3 manage.py mysqldump_database --print-command STDOUT",
         hide=True,
     ).stdout.strip()
 
