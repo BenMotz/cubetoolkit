@@ -14,7 +14,6 @@ uktz = zoneinfo.ZoneInfo("Europe/London")
 
 
 class PublicDiaryViews(DiaryTestsMixin, TestCase):
-
     """Basic test that all the public diary pages load"""
 
     def test_view_default(self):
@@ -328,7 +327,6 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
 
 
 class UrlTests(DiaryTestsMixin, TestCase):
-
     """Test the regular expressions in urls.py"""
 
     def test_diary_urls(self):

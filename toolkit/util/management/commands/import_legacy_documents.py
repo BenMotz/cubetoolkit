@@ -7,6 +7,7 @@ Create the document types as categories and create the wordpress users with
 matching names.
 
 """
+
 import subprocess
 
 from django.core.management.base import BaseCommand

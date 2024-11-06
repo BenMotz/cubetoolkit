@@ -718,9 +718,9 @@ class TestAddTraining(MembersTestsMixin, TestCase):
             "training-notes": notes,
         }
         if is_general:
-            post_data[
-                "training-training_type"
-            ] = TrainingRecord.GENERAL_TRAINING
+            post_data["training-training_type"] = (
+                TrainingRecord.GENERAL_TRAINING
+            )
             post_data["training-role"] = ""
         else:
             post_data["training-training_type"] = TrainingRecord.ROLE_TRAINING
@@ -736,9 +736,9 @@ class TestAddTraining(MembersTestsMixin, TestCase):
             "notes": notes.strip(),
         }
         if is_general:
-            expected[
-                "training_description"
-            ] = TrainingRecord.GENERAL_TRAINING_DESC
+            expected["training_description"] = (
+                TrainingRecord.GENERAL_TRAINING_DESC
+            )
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), expected)
 

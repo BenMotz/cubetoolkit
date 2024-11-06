@@ -227,7 +227,7 @@ def main():
     subscriberlist.sort()
 
     # print the subscribers list
-    for (email, name) in subscriberlist:
+    for email, name in subscriberlist:
         if nomail and nomails[email] == "off":
             continue
         if not fullnames or name == "":

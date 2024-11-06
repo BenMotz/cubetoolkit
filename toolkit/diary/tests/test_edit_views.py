@@ -163,7 +163,6 @@ class ViewSecurity(DiaryTestsMixin, TestCase):
 
 
 class EditDiaryViews(DiaryTestsMixin, TestCase):
-
     """Basic test that various private diary pages load"""
 
     def setUp(self):

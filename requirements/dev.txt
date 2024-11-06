@@ -8,7 +8,7 @@ fixtures<4
 extras
 
 # Formatter
-black==22.3.0
+black==24.10.0
 
 # For deploying
 fabric~=3.2.1
