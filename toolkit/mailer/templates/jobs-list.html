@@ -1,0 +1,40 @@
+{% extends "base_admin.html" %}
+
+{% block title %}
+Mailer jobs
+{% endblock %}
+
+{% block body %}
+<h1>Mailer jobs</h1>
+<table class="table">
+    <tr>
+        <th>Job ID</th>
+        <th>Created</th>
+        <th>Send at</th>
+        <th>State</th>
+        <th>Last update</th>
+        <th>% complete</th>
+        <th> </th>
+    </tr>
+{% for job in jobs %}
+<tr>
+    <td>{{ job.pk }}</td>
+    <td>{{ job.created_at | date:"j M y, g:i A" }}</td>
+    <td>{{ job.send_at | date:"j M y, g:i A" }}</td>
+    <td>{{ job.state }}<br>{{ job.status }}</td>
+    <td>{{ job.updated_at | date:"d-m-y g:i:s" }}</td>
+    <td>{{ job.progress_pct }}%</td>
+    <td>
+        {% if job.cancellable %}
+        <form action="{% url "job-delete" job.pk %}" method="POST">
+        {% csrf_token %}
+        <button class="btn btn-primary">Cancel</button>
+        </form>
+        {% endif %}
+    </td>
+</tr>
+{% endfor %}
+</table>
+
+{% endblock %}
+
