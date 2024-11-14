@@ -1407,7 +1407,7 @@ class EditIdeasViewTests(DiaryTestsMixin, TestCase):
 
     def test_get_form_no_existing_ideas(self):
         # Confirm no ideas in the database for Jan 2012:
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             DiaryIdea.objects.all().filter(month=date(2012, 1, 1)), []
         )
 
@@ -1424,7 +1424,7 @@ class EditIdeasViewTests(DiaryTestsMixin, TestCase):
 
     def test_get_json_no_existing_ideas(self):
         # Confirm no ideas in the database for Jan 2012:
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             DiaryIdea.objects.all().filter(month=date(2012, 1, 1)), []
         )
 
@@ -1497,7 +1497,7 @@ class EditIdeasViewTests(DiaryTestsMixin, TestCase):
 
     def test_post_form_no_existing_idea(self):
         # Confirm no ideas in the database for Jan 2012:
-        self.assertQuerysetEqual(
+        self.assertQuerySetEqual(
             DiaryIdea.objects.all().filter(month=date(2012, 1, 1)), []
         )
 
