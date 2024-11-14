@@ -52,8 +52,7 @@ class AddPrintedProgrammeTests(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_printedprogramme_archive.html")
         self.assertFormError(
-            response,
-            "new_programme_form",
+            response.context["new_programme_form"],
             "programme",
             "This field is required.",
         )
@@ -78,8 +77,7 @@ class AddPrintedProgrammeTests(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_printedprogramme_archive.html")
         self.assertFormError(
-            response,
-            "new_programme_form",
+            response.context["new_programme_form"],
             "programme",
             "The submitted file is empty.",
         )
@@ -109,8 +107,7 @@ class AddPrintedProgrammeTests(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_printedprogramme_archive.html")
         self.assertFormError(
-            response,
-            "new_programme_form",
+            response.context["new_programme_form"],
             "form_month",
             "Printed programme with this month/year already exists.",
         )

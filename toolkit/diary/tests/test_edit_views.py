@@ -357,7 +357,7 @@ class EditShowing(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_showing.html")
         self.assertFormError(
-            response, "form", None, "Cannot amend a historic booking"
+            response.context["form"], None, "Cannot amend a historic booking"
         )
 
     @patch("django.utils.timezone.now")
@@ -378,10 +378,10 @@ class EditShowing(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_showing.html")
 
         self.assertFormError(
-            response, "form", "start", "This field is required."
+            response.context["form"], "start", "This field is required."
         )
         self.assertFormError(
-            response, "form", "booked_by", "This field is required."
+            response.context["form"], "booked_by", "This field is required."
         )
 
     @patch("django.utils.timezone.now")
@@ -402,7 +402,7 @@ class EditShowing(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_showing.html")
 
         self.assertFormError(
-            response, "form", "start", "Must be in the future"
+            response.context["form"], "start", "Must be in the future"
         )
 
     @patch("django.utils.timezone.now")
@@ -423,7 +423,7 @@ class EditShowing(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_showing.html")
 
         self.assertFormError(
-            response, "form", "start", "Enter a valid date/time."
+            response.context["form"], "start", "Enter a valid date/time."
         )
 
     @patch("django.utils.timezone.now")
@@ -659,7 +659,7 @@ class AddEventView(DiaryTestsMixin, TestCase):
 
         # Check error was as expected:
         self.assertFormError(
-            response, "form", "start", "Must be in the future"
+            response.context["form"], "start", "Must be in the future"
         )
 
     @patch("django.utils.timezone.now")
@@ -694,22 +694,22 @@ class AddEventView(DiaryTestsMixin, TestCase):
 
         # Check errors as expected:
         self.assertFormError(
-            response, "form", "start", "This field is required."
+            response.context["form"], "start", "This field is required."
         )
         self.assertFormError(
-            response, "form", "duration", "This field is required."
+            response.context["form"], "duration", "This field is required."
         )
         self.assertFormError(
-            response, "form", "number_of_bookings", "This field is required."
+            response.context["form"], "number_of_bookings", "This field is required."
         )
         self.assertFormError(
-            response, "form", "event_name", "This field is required."
+            response.context["form"], "event_name", "This field is required."
         )
         self.assertFormError(
-            response, "form", "booked_by", "This field is required."
+            response.context["form"], "booked_by", "This field is required."
         )
         self.assertFormError(
-            response, "form", "event_template", "This field is required."
+            response.context["form"], "event_template", "This field is required."
         )
 
 
@@ -792,8 +792,8 @@ class EditDetailView(DiaryTestsMixin, TestCase):
         }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200)
-        self.assertFormsetError(
-            response, "showing_forms", 0, "start", "Must be in the future"
+        self.assertFormSetError(
+            response.context["showing_forms"], 0, "start", "Must be in the future"
         )
         self.assertEqual(self.e5.showings.count(), 1)
 
@@ -813,9 +813,8 @@ class EditDetailView(DiaryTestsMixin, TestCase):
         }
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200)
-        self.assertFormsetError(
-            response,
-            "showing_forms",
+        self.assertFormSetError(
+            response.context["showing_forms"],
             0,
             "booked_by",
             "This field is required.",
@@ -854,9 +853,8 @@ class EditDetailView(DiaryTestsMixin, TestCase):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200)
         for n in (0, 1):
-            self.assertFormsetError(
-                response,
-                "showing_forms",
+            self.assertFormSetError(
+                response.context["showing_forms"],
                 n,
                 "confirmed",
                 "Cannot confirm booking as the event terms are missing or too short. Please add more details.",
@@ -974,10 +972,10 @@ class EditEventView(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_event.html")
 
         self.assertFormError(
-            response, "event_form", "name", "This field is required."
+            response.context["event_form"], "name", "This field is required."
         )
         self.assertFormError(
-            response, "event_form", "duration", "This field is required."
+            response.context["event_form"], "duration", "This field is required."
         )
 
     def test_post_edit_event_no_media_minimal_data(self):
@@ -1089,8 +1087,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_event.html")
         self.assertFormError(
-            response,
-            "media_form",
+            response.context["media_form"],
             "media_file",
             "The submitted file is empty.",
         )
@@ -1120,8 +1117,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
             )
 
         self.assertFormError(
-            response,
-            "media_form",
+            response.context["media_form"],
             "media_file",
             "Upload a valid image. The file you uploaded was either "
             "not an image or a corrupted image.",
@@ -1264,8 +1260,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_event.html")
         self.assertFormError(
-            response,
-            "media_form",
+            response.context["media_form"],
             "media_file",
             "Media file must be 1 MB or less (uploaded file is 1.00 MB)",
         )
@@ -1322,8 +1317,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_event.html")
         self.assertFormError(
-            response,
-            "event_form",
+            response.context["event_form"],
             "copy_summary",
             "Copy summary must be 50 characters or fewer "
             "(currently 51 characters)",
@@ -1374,8 +1368,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_event.html")
 
         self.assertFormError(
-            response,
-            "event_form",
+            response.context["event_form"],
             "terms",
             "Event terms for confirmed event "
             f"'{event.name}' are missing or too short. "

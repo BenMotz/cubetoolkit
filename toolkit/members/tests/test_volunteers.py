@@ -357,7 +357,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
 
         # The only mandatory field (!)
         self.assertFormError(
-            response, "mem_form", "name", "This field is required."
+            response.context["mem_form"], "name", "This field is required."
         )
 
     def test_post_edit_vol_minimal_data(self):
@@ -487,7 +487,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
 
         # The only mandatory field (!)
         self.assertFormError(
-            response, "mem_form", "name", "This field is required."
+            response.context["mem_form"], "name", "This field is required."
         )
 
     def test_post_update_vol_invalid_vol_id(self):
@@ -984,8 +984,7 @@ class TestAddGroupTraining(MembersTestsMixin, TestCase):
 
         # It's not the ideal error message, I grant you:
         self.assertFormError(
-            response,
-            "form",
+            response.context["form"],
             "volunteers",
             "Select a valid choice. %d is not one of the available choices."
             % (volunteers[1].member.id),
@@ -1002,19 +1001,19 @@ class TestAddGroupTraining(MembersTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_group_training.html")
 
         self.assertFormError(
-            response, "form", "type", "This field is required."
+            response.context["form"], "type", "This field is required."
         )
         # 'role' isn't requireed unless 'type' is selected
         # self.assertFormError(response, 'form', 'role',
         #                     u'This field is required.')
         self.assertFormError(
-            response, "form", "training_date", "This field is required."
+            response.context["form"], "training_date", "This field is required."
         )
         self.assertFormError(
-            response, "form", "trainer", "This field is required."
+            response.context["form"], "trainer", "This field is required."
         )
         self.assertFormError(
-            response, "form", "volunteers", "This field is required."
+            response.context["form"], "volunteers", "This field is required."
         )
 
     def test_add_group_record_missing_role(self):
@@ -1037,7 +1036,7 @@ class TestAddGroupTraining(MembersTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_group_training.html")
 
         self.assertFormError(
-            response, "form", "role", "This field is required."
+            response.context["form"], "role", "This field is required."
         )
 
 

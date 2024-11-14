@@ -300,10 +300,10 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_mailout.html")
 
         self.assertFormError(
-            response, "form", "subject", "This field is required."
+            response.context["form"], "subject", "This field is required."
         )
         self.assertFormError(
-            response, "form", "body_text", "This field is required."
+            response.context["form"], "body_text", "This field is required."
         )
 
     @override_settings(HTML_MAILOUT_ENABLED=True)
@@ -315,10 +315,10 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_mailout.html")
 
         self.assertFormError(
-            response, "form", "subject", "This field is required."
+            response.context["form"], "subject", "This field is required."
         )
         self.assertFormError(
-            response, "form", "body_text", "This field is required."
+            response.context["form"], "body_text", "This field is required."
         )
 
     def test_invalid_method(self):

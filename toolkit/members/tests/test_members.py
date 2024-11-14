@@ -279,7 +279,7 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_new_member.html")
 
         self.assertFormError(
-            response, "form", "name", "This field is required."
+            response.context["form"], "name", "This field is required."
         )
 
         self.assertEqual(count_before, Member.objects.count())
@@ -818,7 +818,7 @@ class TestEditMemberViewNotLoggedIn(MembersTestsMixin, TestCase):
         self.assertTemplateUsed(response, "form_member.html")
 
         self.assertFormError(
-            response, "form", "email", "Enter a valid email address."
+            response.context["form"], "email", "Enter a valid email address."
         )
 
         member = Member.objects.get(pk=2)
@@ -842,7 +842,7 @@ class TestEditMemberViewNotLoggedIn(MembersTestsMixin, TestCase):
 
         # Only mandatory field is "name":
         self.assertFormError(
-            response, "form", "name", "This field is required."
+            response.context["form"], "name", "This field is required."
         )
 
         member = Member.objects.get(pk=2)
@@ -986,7 +986,7 @@ class TestEditMemberViewLoggedIn(MembersTestsMixin, TestCase):
 
         # Only mandatory field is "name":
         self.assertFormError(
-            response, "form", "name", "This field is required."
+            response.context["form"], "name", "This field is required."
         )
 
         member = Member.objects.get(pk=2)
