@@ -1,4 +1,13 @@
+import warnings
 from toolkit.devserver_settings import *
+
+# At v2.8 the easy_thumbnails library sprouted an optional dependency on
+# svglib. Since there's no pressing need to support thumbnailing SVGs, and I
+# have a mild allergy to extra dependencies, suppress the slightly annoying
+# warning when running tests:
+warnings.filterwarnings(
+    action="ignore", message=r"^Could not import VIL for SVG image support: .*"
+)
 
 DATABASES = {
     "default": {
