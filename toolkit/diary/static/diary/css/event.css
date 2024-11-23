@@ -501,7 +501,7 @@ a {
     padding-left: 0.714em;
 }
 #navmenu ul ul a:before {
-    font-family: FontAwesome;
+    font-family: "Font Awesome 6 Free";
     content: "\f105";
     display: inline-block;
     padding-right: 10px;
