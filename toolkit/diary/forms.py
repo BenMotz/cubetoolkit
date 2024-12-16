@@ -212,8 +212,8 @@ class ShowingForm(forms.ModelForm):
             and self.instance.event.terms_required()
         ):
             raise forms.ValidationError(
-                "Cannot confirm booking as the event terms are missing or "
-                "too short. Please add more details."
+                "Non-meeting events require terms information. "
+                "Please add more details."
             )
         return confirmed
 
