@@ -380,6 +380,11 @@ class Event(models.Model):
         word_count = len(self.terms.split())
         return word_count >= settings.PROGRAMME_EVENT_TERMS_MIN_WORDS
 
+    def terms_required(self):
+        if self.tags.filter(name="meeting").exists():
+            return False
+        else:
+            return True
 
 class Room(models.Model):
     name = models.CharField(max_length=64)

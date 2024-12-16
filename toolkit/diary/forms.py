@@ -132,8 +132,9 @@ class EventForm(forms.ModelForm):
         cleaned_data = super().clean()
         if self.instance.all_showings_confirmed():
             terms = cleaned_data.get("terms", "")
+            no_terms_event = cleaned_data.get("tags").filter(name='meeting').exists()
             terms_word_count = len(terms.split())
-            if terms_word_count < settings.PROGRAMME_EVENT_TERMS_MIN_WORDS:
+            if terms_word_count < settings.PROGRAMME_EVENT_TERMS_MIN_WORDS and not no_terms_event:
                 msg = (
                     f"Event terms for confirmed event '{self.instance.name}' "
                     f"are missing or too short. Please enter at least "
@@ -208,6 +209,7 @@ class ShowingForm(forms.ModelForm):
             confirmed
             and self.instance.event_id
             and not self.instance.event.terms_long_enough()
+            and self.instance.event.terms_required()
         ):
             raise forms.ValidationError(
                 "Cannot confirm booking as the event terms are missing or "
