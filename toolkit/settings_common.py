@@ -17,6 +17,7 @@ VENUE = {
     "facebook": "https://www.facebook.com/cubecinema/",
     "instagram": "https://www.instagram.com/cubemicroplex/",
     "mastodon": "https://mastodon.world/@cubecinema",
+    "bluesky": "https://bsky.app/profile/cubecinema.com",
     "flickr": "https://flickr.com/groups/cubemicroplex/",
     "vimeo": "https://vimeo.com/cubemicroplex/",
     "youtube": "https://www.youtube.com/user/cubelog",
