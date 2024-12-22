@@ -459,7 +459,7 @@ class EditShowing(DiaryTestsMixin, TestCase):
 
         self.assertContains(
             response,
-            "event terms are missing or too short. Please add more details.",
+            "Non-meeting events require terms information. "
         )
 
 
@@ -857,7 +857,7 @@ class EditDetailView(DiaryTestsMixin, TestCase):
                 response.context["showing_forms"],
                 n,
                 "confirmed",
-                "Cannot confirm booking as the event terms are missing or too short. Please add more details.",
+                "Non-meeting events require terms information. Please add more details."
             )
 
 
