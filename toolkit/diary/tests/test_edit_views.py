@@ -860,6 +860,37 @@ class EditDetailView(DiaryTestsMixin, TestCase):
                 "Non-meeting events require terms information. Please add more details."
             )
 
+    @patch("django.utils.timezone.now")
+    def test_confirm_meeting_without_terms(self, now_patch) -> None:
+        # Starting check: event has an unconfirmed showing
+        self.assertEqual(self.e7.all_showings_confirmed(), False)
+
+        now_patch.return_value = self._fake_now
+        # generate the URL
+        url = reverse(
+            "edit-event-details-view", kwargs={"event_id": self.e7.pk}
+        )
+
+        # construct dict for form POST
+        data = {
+            "form-TOTAL_FORMS": 2,
+            "form-INITIAL_FORMS": "1",
+            "form-0-id": self.e7s1.pk,
+            "form-0-start": self.e7s1.start,
+            "form-0-booked_by": self.e7s1.booked_by,
+            "form-0-confirmed": "on", # changed param
+            "form-1-id": "",
+            "form-1-start": "",
+            "form-1-booked_by": "",
+        }
+        # POST
+        response = self.client.post(url, data)
+
+        # Assess results
+        # Successful post results in (successful) 302 back to form page
+        self.assertRedirects(response, url)
+#       # Check all showings for event confirmed
+        self.assertEqual(self.e7.all_showings_confirmed(), True)
 
 class EditEventView(DiaryTestsMixin, TestCase):
     def setUp(self):
