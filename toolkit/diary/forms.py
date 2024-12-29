@@ -133,10 +133,14 @@ class EventForm(forms.ModelForm):
         if self.instance.all_showings_confirmed():
             terms = cleaned_data.get("terms", "")
             terms_word_count = len(terms.split())
-            no_terms_event = cleaned_data.get("tags").filter(name='meeting').exists()
+
+            terms_required = True
+            if cleaned_data.get("tags").filter(name="meeting").exists():
+                terms_required = False
+
             if (
                 terms_word_count < settings.PROGRAMME_EVENT_TERMS_MIN_WORDS
-                and not no_terms_event
+                and terms_required
             ):
                 msg = (
                     f"Event terms for confirmed event '{self.instance.name}' "

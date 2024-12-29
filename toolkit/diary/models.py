@@ -386,6 +386,7 @@ class Event(models.Model):
         else:
             return True
 
+
 class Room(models.Model):
     name = models.CharField(max_length=64)
     colour = models.CharField(max_length=9, default="#33CC33")

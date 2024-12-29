@@ -458,8 +458,7 @@ class EditShowing(DiaryTestsMixin, TestCase):
         self.assertFalse(self.e4s3.confirmed)
 
         self.assertContains(
-            response,
-            "Non-meeting events require terms information. "
+            response, "Non-meeting events require terms information. "
         )
 
 
@@ -700,7 +699,9 @@ class AddEventView(DiaryTestsMixin, TestCase):
             response.context["form"], "duration", "This field is required."
         )
         self.assertFormError(
-            response.context["form"], "number_of_bookings", "This field is required."
+            response.context["form"],
+            "number_of_bookings",
+            "This field is required.",
         )
         self.assertFormError(
             response.context["form"], "event_name", "This field is required."
@@ -709,7 +710,9 @@ class AddEventView(DiaryTestsMixin, TestCase):
             response.context["form"], "booked_by", "This field is required."
         )
         self.assertFormError(
-            response.context["form"], "event_template", "This field is required."
+            response.context["form"],
+            "event_template",
+            "This field is required.",
         )
 
 
@@ -793,7 +796,10 @@ class EditDetailView(DiaryTestsMixin, TestCase):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200)
         self.assertFormSetError(
-            response.context["showing_forms"], 0, "start", "Must be in the future"
+            response.context["showing_forms"],
+            0,
+            "start",
+            "Must be in the future",
         )
         self.assertEqual(self.e5.showings.count(), 1)
 
@@ -857,7 +863,7 @@ class EditDetailView(DiaryTestsMixin, TestCase):
                 response.context["showing_forms"],
                 n,
                 "confirmed",
-                "Non-meeting events require terms information. Please add more details."
+                "Non-meeting events require terms information. Please add more details.",
             )
 
     @patch("django.utils.timezone.now")
@@ -878,7 +884,7 @@ class EditDetailView(DiaryTestsMixin, TestCase):
             "form-0-id": self.e7s1.pk,
             "form-0-start": self.e7s1.start,
             "form-0-booked_by": self.e7s1.booked_by,
-            "form-0-confirmed": "on", # changed param
+            "form-0-confirmed": "on",  # changed param
             "form-1-id": "",
             "form-1-start": "",
             "form-1-booked_by": "",
@@ -889,8 +895,9 @@ class EditDetailView(DiaryTestsMixin, TestCase):
         # Assess results
         # Successful post results in (successful) 302 back to form page
         self.assertRedirects(response, url)
-#       # Check all showings for event confirmed
+        #       # Check all showings for event confirmed
         self.assertEqual(self.e7.all_showings_confirmed(), True)
+
 
 class EditEventView(DiaryTestsMixin, TestCase):
     def setUp(self):
@@ -1006,7 +1013,9 @@ class EditEventView(DiaryTestsMixin, TestCase):
             response.context["event_form"], "name", "This field is required."
         )
         self.assertFormError(
-            response.context["event_form"], "duration", "This field is required."
+            response.context["event_form"],
+            "duration",
+            "This field is required.",
         )
 
     def test_post_edit_event_no_media_minimal_data(self):
@@ -1440,13 +1449,14 @@ class EditEventView(DiaryTestsMixin, TestCase):
                 "name": "New \u20acvent Name",
                 "duration": "00:10:00",
                 "terms": "Not Required",
-                "tags": "4"
+                "tags": "4",
             },
         )
 
         self.assert_redirect_to_index(response)
         event = Event.objects.get(id=1)
         self.assertEqual(event.terms, "Not Required")
+
 
 class EditIdeasViewTests(DiaryTestsMixin, TestCase):
     def setUp(self):

@@ -1007,7 +1007,9 @@ class TestAddGroupTraining(MembersTestsMixin, TestCase):
         # self.assertFormError(response, 'form', 'role',
         #                     u'This field is required.')
         self.assertFormError(
-            response.context["form"], "training_date", "This field is required."
+            response.context["form"],
+            "training_date",
+            "This field is required.",
         )
         self.assertFormError(
             response.context["form"], "trainer", "This field is required."
