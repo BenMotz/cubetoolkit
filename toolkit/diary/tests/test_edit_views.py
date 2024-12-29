@@ -1429,6 +1429,24 @@ class EditEventView(DiaryTestsMixin, TestCase):
         event = Event.objects.get(id=1)
         self.assertEqual(event.terms, "One two three four five.")
 
+    @override_settings(PROGRAMME_EVENT_TERMS_MIN_WORDS=5)
+    def test_post_edit_meeting_event_no_terms_required(self):
+        event = Event.objects.get(id=1)
+        url = reverse("edit-event-details", kwargs={"event_id": 1})
+
+        response = self.client.post(
+            url,
+            data={
+                "name": "New \u20acvent Name",
+                "duration": "00:10:00",
+                "terms": "Not Required",
+                "tags": "4"
+            },
+        )
+
+        self.assert_redirect_to_index(response)
+        event = Event.objects.get(id=1)
+        self.assertEqual(event.terms, "Not Required")
 
 class EditIdeasViewTests(DiaryTestsMixin, TestCase):
     def setUp(self):
