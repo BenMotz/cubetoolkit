@@ -700,7 +700,9 @@ class AddEventView(DiaryTestsMixin, TestCase):
             response.context["form"], "duration", "This field is required."
         )
         self.assertFormError(
-            response.context["form"], "number_of_bookings", "This field is required."
+            response.context["form"],
+            "number_of_bookings",
+            "This field is required.",
         )
         self.assertFormError(
             response.context["form"], "event_name", "This field is required."
@@ -709,7 +711,9 @@ class AddEventView(DiaryTestsMixin, TestCase):
             response.context["form"], "booked_by", "This field is required."
         )
         self.assertFormError(
-            response.context["form"], "event_template", "This field is required."
+            response.context["form"],
+            "event_template",
+            "This field is required.",
         )
 
 
@@ -793,7 +797,10 @@ class EditDetailView(DiaryTestsMixin, TestCase):
         response = self.client.post(url, data)
         self.assertEqual(response.status_code, 200)
         self.assertFormSetError(
-            response.context["showing_forms"], 0, "start", "Must be in the future"
+            response.context["showing_forms"],
+            0,
+            "start",
+            "Must be in the future",
         )
         self.assertEqual(self.e5.showings.count(), 1)
 
@@ -975,7 +982,9 @@ class EditEventView(DiaryTestsMixin, TestCase):
             response.context["event_form"], "name", "This field is required."
         )
         self.assertFormError(
-            response.context["event_form"], "duration", "This field is required."
+            response.context["event_form"],
+            "duration",
+            "This field is required.",
         )
 
     def test_post_edit_event_no_media_minimal_data(self):
