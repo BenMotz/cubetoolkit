@@ -134,9 +134,11 @@ class EventForm(forms.ModelForm):
             terms = cleaned_data.get("terms", "")
             terms_word_count = len(terms.split())
 
-            terms_required = True
-            if cleaned_data.get("tags").filter(name="meeting").exists():
-                terms_required = False
+            terms_required = (
+                not cleaned_data.get("tags")
+                .filter(name__in=settings.TAGS_WITHOUT_TERMS)
+                .exists()
+            )
 
             if (
                 terms_word_count < settings.PROGRAMME_EVENT_TERMS_MIN_WORDS
@@ -218,8 +220,10 @@ class ShowingForm(forms.ModelForm):
             and self.instance.event.terms_required()
             and not self.instance.event.terms_long_enough()
         ):
+
             raise forms.ValidationError(
-                "Non-meeting events require terms information. "
+                "Events require terms information "
+                f'(unless they are tagged with {",".join(settings.TAGS_WITHOUT_TERMS)}). '
                 "Please add more details."
             )
         return confirmed

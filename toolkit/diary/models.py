@@ -381,10 +381,9 @@ class Event(models.Model):
         return word_count >= settings.PROGRAMME_EVENT_TERMS_MIN_WORDS
 
     def terms_required(self):
-        if self.tags.filter(name="meeting").exists():
-            return False
-        else:
-            return True
+        return not self.tags.filter(
+            name__in=settings.TAGS_WITHOUT_TERMS
+        ).exists()
 
 
 class Room(models.Model):
