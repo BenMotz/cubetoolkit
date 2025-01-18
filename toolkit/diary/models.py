@@ -137,12 +137,23 @@ class MediaItem(models.Model):
             )
 
 
+class EventTagQuerySet(QuerySet):
+    def contains_tag_to_not_need_terms(self) -> bool:
+        """
+        Do any of the tags match the list of tags which mean terms text is not
+        required for an event?
+        """
+        return self.filter(name__in=settings.TAGS_WITHOUT_TERMS).exists()
+
+
 class EventTag(models.Model):
     name = models.CharField(max_length=32, unique=True)
     slug = models.SlugField(max_length=50, unique=True)  # allow_unicode=True?
     read_only = models.BooleanField(default=False, editable=False)
     promoted = models.BooleanField(default=False)
     sort_order = models.IntegerField(null=True, blank=True, editable=True)
+
+    objects = EventTagQuerySet.as_manager()
 
     class Meta:
         db_table = "EventTags"
@@ -381,10 +392,7 @@ class Event(models.Model):
         return word_count >= settings.PROGRAMME_EVENT_TERMS_MIN_WORDS
 
     def terms_required(self):
-        if self.tags.filter(name="meeting").exists():
-            return False
-        else:
-            return True
+        return not self.tags.contains_tag_to_not_need_terms()
 
 
 class Room(models.Model):
