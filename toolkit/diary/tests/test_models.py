@@ -117,7 +117,7 @@ class ShowingModelCustomQueryset(DiaryTestsMixin, TestCase):
     def test_manager_not_cancelled(self):
         records = list(Showing.objects.not_cancelled())
         # From the fixtures, there are 7 showings that aren't cancelled
-        self.assertEqual(len(records), 8)
+        self.assertEqual(len(records), 9)
         for showing in records:
             self.assertFalse(showing.cancelled)
 

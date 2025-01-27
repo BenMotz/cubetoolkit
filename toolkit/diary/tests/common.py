@@ -98,6 +98,13 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
             read_only=False,
         )
         t3.save()
+        t4 = EventTag(
+            name="meeting",
+            slug="meeting",
+            sort_order=3,
+            read_only=False,
+        )
+        t4.save()
 
         # Templates:
         # One role, one tag, pricing
@@ -132,6 +139,7 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
         # e4     False          False    t2
         # e5     False          True
         # e6     True           True     t3
+        # e7     False          True     t4
 
         # Showing Event  Date    Confirmed  Hiddn  Cnclld  Dscnt|E: oside pvate
         # ------------------------------------------------------|--------------
@@ -146,6 +154,7 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
         # e4s4    e4    14/9/13  F          F      F      F     |   F      F
         # s5      e5    14/2/13  T          F      F      F     |   F      T
         # s6      e1    15/2/13  T          T      F      F     |   F      F
+        # e7s1    e7    29/5/15  F          F      F      D     |   F      T
 
         # Events:
         e1 = Event(
@@ -241,6 +250,20 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
             ]
         )
         e6.save()
+
+        self.e7 = Event(
+            name="Meeting Event 7",
+            terms="",
+            duration="2:00:00",
+            private=True,
+        )
+        self.e7.save()
+        self.e7.tags.set(
+            [
+                t4,
+            ]
+        )
+        self.e7.save()
 
         # Showings:
         self.e2s1 = Showing(  # pk :1
@@ -338,6 +361,15 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
             hide_in_programme=True,
         )
         s6.save(force=True)
+
+        self.e7s1 = Showing(
+            start=datetime(2015, 5, 29, 14, 00, tzinfo=UKTZ),
+            event=self.e7,
+            booked_by="Meeting Person",
+            confirmed=False,
+            hide_in_programme=True,
+        )
+        self.e7s1.save(force=True)
 
         # Rota items:
         RotaEntry(showing=self.e2s1, role=r2, rank=1).save()

@@ -459,7 +459,7 @@ class EditShowing(DiaryTestsMixin, TestCase):
 
         self.assertContains(
             response,
-            "event terms are missing or too short. Please add more details.",
+            "Events require terms information (unless they are tagged with meeting).",
         )
 
 
@@ -864,8 +864,40 @@ class EditDetailView(DiaryTestsMixin, TestCase):
                 response.context["showing_forms"],
                 n,
                 "confirmed",
-                "Cannot confirm booking as the event terms are missing or too short. Please add more details.",
+                "Events require terms information (unless they are tagged with meeting). Please add more details.",
             )
+
+    @patch("django.utils.timezone.now")
+    def test_confirm_meeting_without_terms(self, now_patch) -> None:
+        # Starting check: event has an unconfirmed showing
+        self.assertEqual(self.e7.all_showings_confirmed(), False)
+
+        now_patch.return_value = self._fake_now
+        # generate the URL
+        url = reverse(
+            "edit-event-details-view", kwargs={"event_id": self.e7.pk}
+        )
+
+        # construct dict for form POST
+        data = {
+            "form-TOTAL_FORMS": 2,
+            "form-INITIAL_FORMS": "1",
+            "form-0-id": self.e7s1.pk,
+            "form-0-start": self.e7s1.start,
+            "form-0-booked_by": self.e7s1.booked_by,
+            "form-0-confirmed": "on",  # changed param
+            "form-1-id": "",
+            "form-1-start": "",
+            "form-1-booked_by": "",
+        }
+        # POST
+        response = self.client.post(url, data)
+
+        # Assess results
+        # Successful post results in (successful) 302 back to form page
+        self.assertRedirects(response, url)
+        #       # Check all showings for event confirmed
+        self.assertEqual(self.e7.all_showings_confirmed(), True)
 
 
 class EditEventView(DiaryTestsMixin, TestCase):
@@ -1406,6 +1438,25 @@ class EditEventView(DiaryTestsMixin, TestCase):
         self.assert_redirect_to_index(response)
         event = Event.objects.get(id=1)
         self.assertEqual(event.terms, "One two three four five.")
+
+    @override_settings(PROGRAMME_EVENT_TERMS_MIN_WORDS=5)
+    def test_post_edit_meeting_event_no_terms_required(self):
+        event = Event.objects.get(id=1)
+        url = reverse("edit-event-details", kwargs={"event_id": 1})
+
+        response = self.client.post(
+            url,
+            data={
+                "name": "New \u20acvent Name",
+                "duration": "00:10:00",
+                "terms": "Not Required",
+                "tags": "4",
+            },
+        )
+
+        self.assert_redirect_to_index(response)
+        event = Event.objects.get(id=1)
+        self.assertEqual(event.terms, "Not Required")
 
 
 class EditIdeasViewTests(DiaryTestsMixin, TestCase):
