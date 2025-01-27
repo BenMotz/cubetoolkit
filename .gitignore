@@ -8,3 +8,4 @@ toolkit/settings.py
 ./static
 .tox
 tk-snapshot-*.tgz
+.vscode
