@@ -459,7 +459,7 @@ class EditShowing(DiaryTestsMixin, TestCase):
 
         self.assertContains(
             response,
-            "Events require terms information (unless they are tagged with meeting).",
+            "Events require terms information (unless they are tagged with one of meeting/training).",
         )
 
 
@@ -864,7 +864,7 @@ class EditDetailView(DiaryTestsMixin, TestCase):
                 response.context["showing_forms"],
                 n,
                 "confirmed",
-                "Events require terms information (unless they are tagged with meeting). Please add more details.",
+                "Events require terms information (unless they are tagged with one of meeting/training). Please add more details.",
             )
 
     @patch("django.utils.timezone.now")

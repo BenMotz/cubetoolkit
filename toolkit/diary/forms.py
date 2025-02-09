@@ -221,7 +221,7 @@ class ShowingForm(forms.ModelForm):
 
             raise forms.ValidationError(
                 "Events require terms information "
-                f'(unless they are tagged with {",".join(settings.TAGS_WITHOUT_TERMS)}). '
+                f'(unless they are tagged with one of {"/".join(sorted(settings.TAGS_WITHOUT_TERMS))}). '
                 "Please add more details."
             )
         return confirmed
