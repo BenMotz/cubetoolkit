@@ -62,7 +62,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             "Sun 9th / 6pm\n"
             "Tickets: \u00a3milliion per thing\n"
             "\n"
-            "Event four C\u014dpy\n"
+            "\u010copy four summary\n"
         )
         # Urgh
         self.expected_mailout_event_html = """
@@ -93,7 +93,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             Sun 9th / 6pm
             </p><p>
             Tickets: \u00a3milliion per thing<br></p>
-            Event four C\u014dpy
+            \u010copy four summary
             <hr><p>
             For complete and up to date listings, please visit:
             <a href="https://www.cubecinema.com/programme/">

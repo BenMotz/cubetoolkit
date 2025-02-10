@@ -31,7 +31,7 @@ https://cubecinema.com/programme/
 {% if showing.event.pricing %}Tickets: {{ showing.event.pricing }}{% endif %}
 {% if showing.event.ticket_link %}Advance tickets: {{ showing.event.ticket_link }}{% endif %}
 
-{{ showing.event.copy_plaintext }}
+{{ showing.event.copy_summary }}
 {% endifchanged %}
 {% endfor %}
 
