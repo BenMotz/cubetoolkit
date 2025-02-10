@@ -93,7 +93,9 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             Sun 9th / 6pm
             </p><p>
             Tickets: \u00a3milliion per thing<br></p>
+            <p>
             \u010copy four summary
+            </p>
             <hr><p>
             For complete and up to date listings, please visit:
             <a href="https://www.cubecinema.com/programme/">
