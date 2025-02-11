@@ -1,6 +1,4 @@
 from django.urls import re_path
-from toolkit.diary.models import Event
-from django.contrib.auth.decorators import permission_required
 
 import toolkit.diary.feeds
 from toolkit.diary.edit_views import (
