@@ -23,18 +23,6 @@
     }
 </style>
 {% endblock %}
-{% block script %}
-{{ block.super }}
-<script type="text/javascript">
-$(document).ready(function() {
-        // Change edit links to open in a new window:
-        $('.terms a').click(function(e) {
-            window.open(e.currentTarget.href,"edit_form","height=800,width=800,scrollbars,resizable,toolbar");
-            return false;
-        });
-});
-</script>
-{% endblock %}
 
 {% block body %}
 {{ block.super }}
