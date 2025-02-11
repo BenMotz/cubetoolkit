@@ -1,5 +1,6 @@
 """Code shared between both public and editing sets of diary views"""
 
+from typing import Optional, Tuple, Union
 import calendar
 import logging
 from datetime import datetime
@@ -8,7 +9,13 @@ import django.utils.timezone
 logger = logging.getLogger(__name__)
 
 
-def get_date_range(year, month, day, user_days_ahead, default_days_ahead=365):
+def get_date_range(
+    year: Optional[int],
+    month: Optional[int],
+    day: Optional[int],
+    user_days_ahead: Optional[int],
+    default_days_ahead: int = 365,
+) -> Union[Tuple[datetime, int], Tuple[None, str]]:
     """Support method to take fields read from HTTP request and return a tuple
     (datetime, number_of_days)
     If month or day are blank, they default to 1. If all three are blank it
@@ -35,10 +42,10 @@ def get_date_range(year, month, day, user_days_ahead, default_days_ahead=365):
     current_tz = django.utils.timezone.get_current_timezone()
 
     try:
-        if day:
+        if year and month and day:
             startdate = datetime(year, month, day, tzinfo=current_tz)
             days_ahead = 1
-        elif month:
+        elif year and month:
             startdate = datetime(year, month, 1, tzinfo=current_tz)
             days_ahead = calendar.monthrange(year, month)[1]
         elif year:
