@@ -26,13 +26,15 @@
 
 {% block body %}
 {{ block.super }}
-<h3>{{ VENUE.name }} programme of events - terms report</h3>
+<h1>{{ VENUE.name }} programme of events - terms report</h1>
+<h2><a href="{% url "view_terms_report_csv" year=start_date.date.year month=start_date.date.month day=start_date.date.day %}?daysahead={{ days_ahead }}">Download as CSV</a></h2>
+<p>
+<div class="terms">
 <form id="form_search">
     <input type="text" name="search" {% if search %}value="{{ search }}"{% endif %}>
     <input type="submit" value="Search">
     <input type="hidden" value="{{ days_ahead }}" name="daysahead">
 </form>
-<div class="terms">
 {% for showing in showings %}
 {% spaceless %}
 {% ifchanged %}<h1 class="pad">{{ showing.start|date:"Y" }}</h1>{% endifchanged %}

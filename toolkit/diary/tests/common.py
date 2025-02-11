@@ -157,7 +157,7 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
         # e7s1    e7    29/5/15  F          F      F      D     |   F      T
 
         # Events:
-        e1 = Event(
+        self.e1 = Event(
             name="Event one title",
             pricing="PRICING_ONE",
             copy="Event one copy",
@@ -168,7 +168,7 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
             duration="01:30:00",
             outside_hire=True,
         )
-        e1.save()
+        self.e1.save()
 
         self.e2 = Event(
             name="Event two title",
@@ -355,7 +355,7 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
 
         s6 = Showing(
             start=datetime(2013, 2, 15, 18, 00, tzinfo=UKTZ),
-            event=e1,
+            event=self.e1,
             booked_by="Blah blah",
             confirmed=True,
             hide_in_programme=True,

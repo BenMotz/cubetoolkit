@@ -1,4 +1,4 @@
-from django.urls import re_path
+from django.urls import re_path, path
 
 import toolkit.diary.feeds
 from toolkit.diary.edit_views import (
@@ -23,6 +23,7 @@ from toolkit.diary.edit_views import (
     get_messages,
     printed_programme_edit,
     view_force_error,
+    view_terms_report_csv,
 )
 from toolkit.diary.public_views import (
     ArchiveIndex,
@@ -218,6 +219,11 @@ diary_urls = [
         r"(?P<month>\d{1,2})/?(?P<day>(?<=/)\d{0,2})?/?)?$",
         view_event_field,
         name="view_event_field",
+    ),
+    path(
+        "terms/csv/<int:year>/<int:month>/<int:day>",
+        view_terms_report_csv,
+        name="view_terms_report_csv",
     ),
     # As above, will match:
     # "edit/rota" "edit/rota/" "edit/rota/2001/01" "edit/rota/2001/01/"

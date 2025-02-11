@@ -81,6 +81,7 @@ class ViewSecurity(DiaryTestsMixin, TestCase):
         "view_event_field": {"field": "rota"},
         "set_edit_preferences": {},
         "edit-printed-programmes": {},
+        "view_terms_report_csv": {"year": "2020", "month": "2", "day": "3"},
     }
 
     rota_edit_required = {
@@ -1763,6 +1764,62 @@ class ViewEventFieldTests(DiaryTestsMixin, TestCase):
 
         self.assertNotContains(response, "EVENT THREE TITLE")
         self.assertNotContains(response, "EVENT FOUR TITL\u0112")
+
+
+class ViewTermsReportCsvTests(DiaryTestsMixin, TestCase):
+    def setUp(self):
+        super().setUp()
+        # Log in:
+        self.client.login(username="admin", password="T3stPassword!")
+
+    def test_bad_dates(self):
+        url = reverse(
+            "view_terms_report_csv",
+            kwargs={"year": "2020", "month": "100", "day": "15"},
+        )
+        url += "?daysahead=365"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    def test_no_showings(self):
+        url = reverse(
+            "view_terms_report_csv",
+            kwargs={"year": "1900", "month": "1", "day": "15"},
+        )
+        url += "?daysahead=365"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.headers["content-type"], "text/csv; charset=utf-8"
+        )
+        self.assertEqual(
+            response.headers["content-disposition"],
+            'attachment; filename="terms-1900-01-15.csv"',
+        )
+        self.assertEqual(
+            response.content.decode("utf-8"), "date,time,title,terms\r\n"
+        )
+
+    def test_showings(self):
+        url = reverse(
+            "view_terms_report_csv",
+            kwargs={"year": "2013", "month": "2", "day": "14"},
+        )
+        url += "?daysahead=2"
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(
+            response.headers["content-disposition"],
+            'attachment; filename="terms-2013-02-14.csv"',
+        )
+        # Check that missing terms work as expected;
+        self.assertIsNone(self.e1.terms)
+        self.assertEqual(
+            response.content.decode("utf-8"),
+            "date,time,title,terms\r\n"
+            f"2013-02-14,18:00,{self.e5.name},{self.e5.terms}\r\n"
+            f"2013-02-15,18:00,{self.e1.name},\r\n",
+        )
 
 
 class PreferencesTests(DiaryTestsMixin, TestCase):

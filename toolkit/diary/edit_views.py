@@ -1,6 +1,7 @@
 import json
 import datetime
 import logging
+import csv
 
 from collections import OrderedDict
 
@@ -779,6 +780,46 @@ def delete_showing(request, showing_id):
         showing.delete()
 
     return _return_to_editindex(request)
+
+
+@permission_required("toolkit.read")
+def view_terms_report_csv(
+    request, year: int, month: int, day: int
+) -> HttpResponse:
+    query_days_ahead = request.GET.get("daysahead", None)
+    start_date, days_ahead = get_date_range(year, month, day, query_days_ahead)
+    if start_date is None:
+        raise Http404(days_ahead)
+
+    end_date = start_date + datetime.timedelta(days=int(days_ahead))
+
+    showings = (
+        Showing.objects.not_cancelled()
+        .confirmed()
+        .start_in_range(start_date, end_date)
+        .order_by("start")
+        .select_related()
+    )
+
+    response = HttpResponse(
+        content_type="text/csv; charset=utf-8",
+        headers={
+            "Content-Disposition": f'attachment; filename="terms-{start_date.date().isoformat()}.csv"'
+        },
+    )
+    writer = csv.writer(response)
+    writer.writerow(["date", "time", "title", "terms"])
+    for showing in showings:
+        writer.writerow(
+            [
+                showing.start.date().isoformat(),
+                showing.start.time().isoformat(timespec="minutes"),
+                showing.event.name,
+                showing.event.terms,
+            ]
+        )
+
+    return response
 
 
 @permission_required("toolkit.read")
