@@ -94,7 +94,9 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             </p><p>
             Tickets: \u00a3milliion per thing<br></p>
             <p>
+            <em>
             \u010copy four summary
+            </em>
             </p>
             <hr><p>
             For complete and up to date listings, please visit:
