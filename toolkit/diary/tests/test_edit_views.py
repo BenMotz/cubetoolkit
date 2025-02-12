@@ -1784,7 +1784,7 @@ class ViewTermsReportCsvTests(DiaryTestsMixin, TestCase):
     def test_no_showings(self):
         url = reverse(
             "view_terms_report_csv",
-            kwargs={"year": "1900", "month": "1", "day": "15"},
+            kwargs={"year": "1990", "month": "1", "day": "15"},
         )
         url += "?daysahead=365"
         response = self.client.get(url)
@@ -1794,7 +1794,7 @@ class ViewTermsReportCsvTests(DiaryTestsMixin, TestCase):
         )
         self.assertEqual(
             response.headers["content-disposition"],
-            'attachment; filename="terms-1900-01-15.csv"',
+            'attachment; filename="terms-1990-01-15.csv"',
         )
         self.assertEqual(
             response.content.decode("utf-8"), "date,time,title,terms\r\n"

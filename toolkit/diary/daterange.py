@@ -36,8 +36,8 @@ def get_date_range(
         )
         return (None, "Invalid values")
 
-    # logger.debug("Range: day %s, month %s, year %s, span %s days",
-    #             str(day), str(month), str(year), str(user_days_ahead))
+    if year and (year > 2100 or year < 1990):
+        return (None, "Invalid values")
 
     current_tz = django.utils.timezone.get_current_timezone()
 
@@ -68,7 +68,7 @@ def get_date_range(
             )
 
             days_ahead = int(default_days_ahead)
-    except ValueError as vale:
+    except (OverflowError, ValueError) as vale:
         logger.error(
             "Invalid something requested in date range: {0}".format(vale)
         )
@@ -78,6 +78,8 @@ def get_date_range(
         try:
             days_ahead = int(user_days_ahead)
             days_ahead = 0 if days_ahead < 0 else days_ahead
+            # Three years should be enough for anyone, right?
+            days_ahead = 1095 if days_ahead > 1095 else days_ahead
         except (ValueError, TypeError):
             pass
 
