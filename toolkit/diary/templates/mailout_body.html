@@ -85,7 +85,11 @@
     {% endif %}
 {% endwith %}
 
-{{ showing.event.copy|safe }}
+<p>
+<em>
+{{ showing.event.copy_summary }}
+</em>
+</p>
 
 {% endifchanged %}
 {% endfor %}

@@ -180,16 +180,6 @@ class EventModelNonLegacyCopy(TestCase):
     def test_html_copy(self):
         self.assertEqual(self.event.copy_html, self.sample_copy)
 
-    def test_plaintext_copy(self):
-        expected = (
-            "Simple & tidy HTML/unicode \u00a9\u014dpy \n\n"
-            "With a link!: http://example.com/foo/\n\n"
-            "And another! link!: https://example.com/bar/"
-            " and some equivalent things; \u00a3 \u00a3 \u00a3  \n\n"
-        )
-        self.assertEqual(self.event.copy_plaintext, expected)
-
-
 class EventModelLegacyCopy(TestCase):
     def setUp(self):
         self.sample_copy = (
@@ -219,17 +209,6 @@ class EventModelLegacyCopy(TestCase):
             " and <this> \"'<troublemaker>'\""
         )
         self.assertEqual(self.event.copy_html, expected)
-
-    def test_plaintext_copy(self):
-        expected = (
-            "Simple & tidy legacy \u00a9\u014dpy\n\n"
-            "With an unardorned link: http://example.com/foo/"
-            " https://example.com/foo/"
-            " and some equivalent things; \u00a3 \u00a3 \u00a3..."
-            " and <this> \"'<troublemaker>'\""
-        )
-        self.assertEqual(self.event.copy_plaintext, expected)
-
 
 class PrintedProgrammeModelTests(TestCase):
     def test_month_ok(self):

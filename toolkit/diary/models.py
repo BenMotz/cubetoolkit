@@ -354,37 +354,6 @@ class Event(models.Model):
     # flags option to re.sub() wasn't added until python 2.7
     _plaintext_re = re.compile(r"\[(.*?)\]\((https?://.*?)\)", flags=re.DOTALL)
 
-    @property
-    def copy_plaintext(self):
-        """Return copy suitable for text only use (i.e. member's mailout)"""
-
-        if self.legacy_copy:
-            # Don't do a general HTML conversion, but convert any entities to
-            # unicode:
-            text = html.unescape(self.copy)
-        else:
-            # Use html2text library to do a quick and happy conversion to
-            # plain text; http://www.aaronsw.com/2002/html2text/
-            # Now let's set some options for html2text ...
-
-            # 0 for no wrapping - let the email clients do the wrapping:
-            html2text.BODY_WIDTH = 0
-            # Don't try to substitute ASCII characters for unicode ones:
-            html2text.UNICODE_SNOB = True
-            # **Bold** and _italics_ doesn't look great in members mailout, so
-            # don't do it
-            html2text.IGNORE_EMPHASIS = True
-
-            # TODO Make email links render to
-            # dest@thing.cubecinema.com rather than
-            # [dest@thing.cubecinema.com](mailto:dest@thing.cubecinema.com)
-
-            text = html2text.html2text(self.copy)
-            # Convert links from markdown format to just the URL:
-            text = self._plaintext_re.sub(r"\1: \2", text)
-
-        return mark_safe(text)
-
     def terms_long_enough(self):
         if not self.terms:
             return False
