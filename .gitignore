@@ -9,3 +9,4 @@ toolkit/settings.py
 .tox
 tk-snapshot-*.tgz
 .vscode
+.DS_Store
