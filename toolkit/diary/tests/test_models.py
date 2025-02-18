@@ -1,5 +1,4 @@
 from __future__ import absolute_import
-from re import I
 
 import zoneinfo
 from datetime import datetime, date, timedelta

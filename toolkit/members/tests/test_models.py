@@ -8,7 +8,7 @@ from django.test.utils import override_settings
 from django.db import IntegrityError
 from django.core.exceptions import ValidationError
 
-from toolkit.members.models import TrainingRecord, Member, Volunteer
+from toolkit.members.models import TrainingRecord, Volunteer
 
 from .common import MembersTestsMixin
 

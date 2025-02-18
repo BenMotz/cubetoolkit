@@ -9,15 +9,13 @@ from django.http import (
     HttpResponse,
     Http404,
     HttpResponseRedirect,
-    JsonResponse,
 )
 from django.shortcuts import get_object_or_404, render
-from django.template.loader import render_to_string
 from django.urls import reverse
 from django.conf import settings
 from django.forms.models import modelformset_factory
 from django.contrib import messages
-from django.views.generic import View, DetailView
+from django.views.generic import View
 import django.template
 import django.db
 from django.db.models import Q
@@ -41,7 +39,6 @@ from toolkit.diary.models import (
 )
 import toolkit.diary.forms as diary_forms
 import toolkit.diary.edit_prefs as edit_prefs
-import toolkit.members.tasks
 from toolkit.util.image import adjust_colour
 from toolkit.diary.form_widgets import ChosenSelectMultiple
 

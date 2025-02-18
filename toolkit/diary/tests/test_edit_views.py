@@ -1423,7 +1423,6 @@ class EditEventView(DiaryTestsMixin, TestCase):
     @override_settings(PROGRAMME_EVENT_TERMS_MIN_WORDS=5)
     def test_post_edit_event_just_enough_terms(self):
         event = Event.objects.get(id=1)
-        original_terms = event.terms
         url = reverse("edit-event-details", kwargs={"event_id": 1})
 
         # Not quite enough term text:
