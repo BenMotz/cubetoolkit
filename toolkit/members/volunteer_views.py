@@ -39,6 +39,7 @@ def view_volunteer_list(request):
         Volunteer.objects.order_by("member__name")
         .select_related()
         .prefetch_related("roles")
+        .prefetch_related("member")
         .prefetch_related(
             Prefetch(
                 "training_records", queryset=qs, to_attr="general_training"
@@ -114,13 +115,17 @@ def view_volunteer_summary(request):
     order = request.GET.get("order", "name")
 
     if "name" in order:
-        volunteers = Volunteer.objects.filter(active=True).order_by(
-            "member__name"
+        volunteers = (
+            Volunteer.objects.filter(active=True)
+            .order_by("member__name")
+            .prefetch_related("member")
         )
         sort_type = "name"
     else:
-        volunteers = Volunteer.objects.filter(active=True).order_by(
-            "-member__created_at"
+        volunteers = (
+            Volunteer.objects.filter(active=True)
+            .order_by("-member__created_at")
+            .prefetch_related("member")
         )
         sort_type = "induction date"
 
