@@ -50,6 +50,8 @@ def _render_mailout_subject_and_body(days_ahead, copy_days_ahead):
     showings_once_per_event = []
     show_cheap_night_key = False
     for s in showings.public().start_in_range(start_date, copy_end_date):
+        if s.sold_out:
+            continue
         if s.event_id not in event_ids:
             showings_once_per_event.append(s)
             event_ids.add(s.event_id)
