@@ -116,6 +116,18 @@ CALENDAR_DEFAULT_COLOUR = "#33CC33"
 CALENDAR_HISTORIC_LIGHTER = 0.75
 CALENDAR_HISTORIC_SHADIER = 1.0
 
+
+###############################################################################
+# Mailman integration settings
+MAILMAN_INTEGRATION = False
+MAILMAN_URL = "http://localhost:8001/3.1"
+MAILMAN_API_USER = "restadmin"
+MAILMAN_API_KEY = None
+MAILMAN_TIMEOUT_SECONDS = 5
+
+MAILMAN_VOLUNTEER_LIST = "volunteers@cubecinema.com"
+
+
 ###############################################################################
 
 # Enable/disable some lumps of functionality that the Cube doesn't (currently)
