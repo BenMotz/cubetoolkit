@@ -11,6 +11,8 @@ html2text==3.200.3
 # CMS:
 wagtail==6.3.8
 monthdelta
+# Mailman integration
+mailmanclient~=3.3.5
 
 # The MySQL-python library requires a C build chain (gcc, etc.) and the mysql
 # library headers to be installed, which isn't desirable on deployment hosts.
