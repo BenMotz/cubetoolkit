@@ -3,6 +3,7 @@ import os.path
 import tempfile
 import binascii
 import datetime
+from unittest.mock import patch
 
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -110,6 +111,17 @@ class TestActivateDeactivateVolunteer(MembersTestsMixin, TestCase):
         self.assertTrue(
             self.client.login(username="admin", password="T3stPassword!")
         )
+        self.subscribe_patch = patch(
+            "toolkit.members.mailman.subscribe_volunteer"
+        )
+        self.subscribe_mock = self.subscribe_patch.start()
+        self.addCleanup(self.subscribe_patch.stop)
+
+        self.unsubscribe_patch = patch(
+            "toolkit.members.mailman.unsubscribe_volunteer"
+        )
+        self.unsubscribe_mock = self.unsubscribe_patch.start()
+        self.addCleanup(self.unsubscribe_patch.stop)
 
     def test_load_select_form_retire(self):
         url = reverse("retire-select-volunteer")
@@ -140,6 +152,8 @@ class TestActivateDeactivateVolunteer(MembersTestsMixin, TestCase):
 
     def test_retire(self):
         vol = Volunteer.objects.get(id=2)
+        vol.member.email = "something@example.com"
+        vol.member.save()
         self.assertTrue(vol.active)
 
         url = reverse("inactivate-volunteer")
@@ -151,6 +165,32 @@ class TestActivateDeactivateVolunteer(MembersTestsMixin, TestCase):
         self.assertFalse(vol.active)
 
         self.assertContains(response, "Retired volunteer Volunteer Two")
+
+        self.unsubscribe_mock.assert_called_once_with(email=vol.member.email)
+
+    def test_retire_mailman_fails(self):
+        vol = Volunteer.objects.get(id=2)
+        vol.member.email = "something@example.com"
+        vol.member.save()
+        self.assertTrue(vol.active)
+
+        self.unsubscribe_mock.return_value = "Nope!"
+
+        url = reverse("inactivate-volunteer")
+        response = self.client.post(url, data={"volunteer": "2"}, follow=True)
+
+        self.assertRedirects(response, reverse("view-volunteer-list"))
+
+        vol = Volunteer.objects.get(id=2)
+        self.assertFalse(vol.active)
+
+        self.assertContains(response, "Retired volunteer Volunteer Two")
+        self.assertContains(
+            response,
+            f"Failed updating volunteers@cubecinema.com for {vol.member.email}: Nope!",
+        )
+
+        self.unsubscribe_mock.assert_called_once_with(email=vol.member.email)
 
     def test_retire_bad_vol_id(self):
         url = reverse("inactivate-volunteer")
@@ -175,6 +215,9 @@ class TestActivateDeactivateVolunteer(MembersTestsMixin, TestCase):
         self.assertTrue(vol.active)
 
         self.assertContains(response, "Unretired volunteer Volunteer Four")
+        self.subscribe_mock.assert_called_once_with(
+            name=vol.member.name, email=vol.member.email
+        )
 
     def test_unretire_bad_vol_id(self):
         url = reverse("activate-volunteer")
@@ -194,6 +237,11 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
             self.client.login(username="admin", password="T3stPassword!")
         )
         self.files_in_use = []
+        self.subscribe_patch = patch(
+            "toolkit.members.mailman.subscribe_volunteer"
+        )
+        self.subscribe_mock = self.subscribe_patch.start()
+        self.addCleanup(self.subscribe_patch.stop)
 
     def tearDown(self):
         for filename in self.files_in_use:
@@ -251,18 +299,19 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         init_vol_count = Volunteer.objects.count()
         init_mem_count = Member.objects.count()
 
+        name = "New Volunteer, called \u0187hri\u01a8topher"
+
         url = reverse("add-volunteer")
         response = self.client.post(
             url,
-            data={"mem-name": "New Volunteer, called \u0187hri\u01a8topher"},
+            data={"mem-name": name},
             follow=True,
         )
         self.assertRedirects(response, reverse("view-volunteer-summary"))
 
         self.assertContains(
             response,
-            '<li class="success">Created volunteer &#x27;New Volunteer, '
-            "called \u0187hri\u01a8topher&#x27;</li>",
+            f'<li class="success">Created volunteer &#x27;{name}&#x27;</li>',
             html=True,
         )
 
@@ -271,22 +320,66 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertEqual(Member.objects.count(), init_mem_count + 1)
 
         # New things:
-        new_member = Member.objects.get(
-            name="New Volunteer, called \u0187hri\u01a8topher"
-        )
+        new_member = Member.objects.get(name=name)
         # Implicitly check Volunteer record exists:
         self.assertTrue(new_member.volunteer.active)
+
+        # We shouldn't have tried to sign them up, as there's no email
+        self.subscribe_mock.assert_not_called()
+
+    def test_post_new_vol_mailman_fails(self):
+
+        self.subscribe_mock.return_value = "Didn't work"
+
+        init_vol_count = Volunteer.objects.count()
+        init_mem_count = Member.objects.count()
+
+        name = "Nameio"
+        email = "emailio@example.com"
+
+        url = reverse("add-volunteer")
+        response = self.client.post(
+            url,
+            data={"mem-name": name, "mem-email": email},
+            follow=True,
+        )
+        # Should succeeed but point out subscription failed:
+        self.assertContains(
+            response,
+            f'<li class="success">Created volunteer &#x27;{name}&#x27;</li>',
+            html=True,
+        )
+        self.assertContains(
+            response,
+            f'<li class="error">Failed to subscribe {name} to volunteers@cubecinema.com: Didn&#x27;t work</li>',
+            html=True,
+        )
+
+        # one more of each:
+        self.assertEqual(Volunteer.objects.count(), init_vol_count + 1)
+        self.assertEqual(Member.objects.count(), init_mem_count + 1)
+
+        # New things:
+        new_member = Member.objects.get(name=name)
+        # Implicitly check Volunteer record exists:
+        self.assertTrue(new_member.volunteer.active)
+
+        # We shouldn't have tried to sign them up, as there's no email
+        self.subscribe_mock.assert_called_once_with(name=name, email=email)
 
     def test_post_new_vol_all_data(self):
         init_vol_count = Volunteer.objects.count()
         init_mem_count = Member.objects.count()
 
+        name = "Another New Volunteer"
+        email = "snoo@example.com"
+
         url = reverse("add-volunteer")
         response = self.client.post(
             url,
             data={
-                "mem-name": "Another New Volunteer",
-                "mem-email": "snoo@whatver.com",
+                "mem-name": name,
+                "mem-email": email,
                 "mem-address": "somewhere over the rainbow, I guess",
                 "mem-posttown": "Town Town Town!",
                 "mem-postcode": "< Sixteen chars?",
@@ -307,8 +400,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
 
         self.assertContains(
             response,
-            '<li class="success">Created volunteer &#x27;Another New '
-            "Volunteer&#x27;</li>",
+            f'<li class="success">Created volunteer &#x27;{name}&#x27;</li>',
             html=True,
         )
 
@@ -317,8 +409,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertEqual(Member.objects.count(), init_mem_count + 1)
 
         # New things:
-        new_member = Member.objects.get(name="Another New Volunteer")
-        self.assertEqual(new_member.email, "snoo@whatver.com")
+        new_member = Member.objects.get(name=name)
+        self.assertEqual(new_member.email, email)
         self.assertEqual(
             new_member.address, "somewhere over the rainbow, I guess"
         )
@@ -346,6 +438,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertEqual(roles[0].id, 2)
         self.assertEqual(roles[1].id, 3)
 
+        self.subscribe_mock.assert_called_once_with(name=name, email=email)
+
     def test_post_new_vol_invalid_missing_data(self):
         url = reverse("add-volunteer")
         response = self.client.post(url)
@@ -356,6 +450,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertFormError(
             response.context["mem_form"], "name", "This field is required."
         )
+        self.subscribe_mock.assert_not_called()
 
     def test_post_edit_vol_minimal_data(self):
         init_vol_count = Volunteer.objects.count()
@@ -404,6 +499,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertEqual(member.volunteer.portrait, "/tmp/path/to/portrait")
 
         self.assertEqual(member.volunteer.roles.count(), 0)
+
+        self.subscribe_mock.assert_not_called()
 
     def test_post_edit_vol_all_data(self):
         init_vol_count = Volunteer.objects.count()
@@ -475,6 +572,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertEqual(len(roles), 2)
         self.assertEqual(roles[0].id, 2)
         self.assertEqual(roles[1].id, 3)
+
+        self.subscribe_mock.assert_not_called()
 
     def test_post_update_vol_invalid_missing_data(self):
         url = reverse("edit-volunteer", kwargs={"volunteer_id": 1})

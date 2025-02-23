@@ -77,10 +77,10 @@ def subscribe_volunteer(name: str, email: str) -> Optional[str]:
         logger.info(
             f"Mailman is unexpectedly waiting for confirmation for subscription request for {email}: {response}"
         )
-        return "Subscription witing for approval and/or email verification"
+        return "Subscription waiting for approval and/or email verification"
 
     logger.info(
-        f"Susbcribed {name} <{email}> to {settings.MAILMAN_VOLUNTEER_LIST}"
+        f"Subscribed {name} <{email}> to {settings.MAILMAN_VOLUNTEER_LIST}"
     )
     return None
 
@@ -109,5 +109,5 @@ def unsubscribe_volunteer(email: str) -> Optional[str]:
         )
         return f"Failed unsubscribing volunteer from the volunteer's list: {email} is not subscribed"
 
-    logger.info(f"Unsusbcribed {email} from {settings.MAILMAN_VOLUNTEER_LIST}")
+    logger.info(f"Unsubscribed {email} from {settings.MAILMAN_VOLUNTEER_LIST}")
     return None

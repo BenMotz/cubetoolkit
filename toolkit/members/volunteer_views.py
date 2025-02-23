@@ -227,23 +227,33 @@ def activate_volunteer(request, set_active=True):
         messages.SUCCESS,
         f"{'Unretired' if set_active else 'Retired'} volunteer {vol.member.name}",
     )
-    if set_active:
-        _signup_volunteer_to_list(
+    list_error = None
+    if set_active and vol.member.email:
+        list_error = _signup_volunteer_to_list(
             req_user=request.user.last_name,
             email=vol.member.email,
             name=vol.member.name,
         )
-    else:
-        _unsignup_volunteer_to_list(
+    elif vol.member.email:
+        list_error = _unsignup_volunteer_to_list(
             req_user=request.user.last_name,
             email=vol.member.email,
             name=vol.member.name,
+        )
+
+    if list_error:
+        messages.add_message(
+            request,
+            messages.ERROR,
+            f"Failed updating {settings.MAILMAN_VOLUNTEER_LIST} for {vol.member.email}: {list_error}",
         )
 
     return HttpResponseRedirect(reverse("view-volunteer-list"))
 
 
-def _email_volunteer_list_admin(req_user: str, name: str, email: str, verb: str) -> None:
+def _email_volunteer_list_admin(
+    req_user: str, name: str, email: str, verb: str
+) -> None:
     message_body = (
         f"I'm delighted to inform you that {req_user} has just {verb}ed "
         "volunteer\n\n"
@@ -271,10 +281,7 @@ def _signup_volunteer_to_list(
         )
     else:
         _email_volunteer_list_admin(
-            req_user=req_user,
-            name=name,
-            email=email,
-            verb="add"
+            req_user=req_user, name=name, email=email, verb="add"
         )
         return None
 
@@ -286,10 +293,7 @@ def _unsignup_volunteer_to_list(
         return mailman.unsubscribe_volunteer(email=email)
     else:
         _email_volunteer_list_admin(
-            req_user=req_user,
-            name=name,
-            email=email,
-            verb="remove"
+            req_user=req_user, name=name, email=email, verb="remove"
         )
         return None
 
@@ -340,7 +344,7 @@ def edit_volunteer(request, volunteer_id, create_new=False):
                 f"{'Created' if create_new else 'Updated'} volunteer '{member.name}'",
             )
 
-            if create_new:
+            if create_new and volunteer.member.email:
                 error = _signup_volunteer_to_list(
                     req_user=request.user.last_name,
                     name=volunteer.member.name,
@@ -350,7 +354,7 @@ def edit_volunteer(request, volunteer_id, create_new=False):
                     messages.add_message(
                         request,
                         messages.ERROR,
-                        f"Failed to subcsribe {volunteer.member.name} to {settings.MAILMAN_VOLUNTEER_LIST}",
+                        f"Failed to subscribe {volunteer.member.name} to {settings.MAILMAN_VOLUNTEER_LIST}: {error}",
                     )
 
             # Go to the volunteer list view:

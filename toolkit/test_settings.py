@@ -30,6 +30,9 @@ PASSWORD_HASHERS = (
     "django.contrib.auth.hashers.MD5PasswordHasher",
 )
 
+MAILMAN_INTEGRATION = True
+MAILMAN_API_KEY = "X"
+
 # Minimal logging configuration, that should eat almost everything
 LOGGING = {
     "version": 1,
