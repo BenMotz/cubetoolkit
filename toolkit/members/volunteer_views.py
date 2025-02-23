@@ -1,5 +1,6 @@
 import logging
 from datetime import datetime
+from typing import Optional
 
 from django.http import HttpResponse, HttpResponseRedirect, JsonResponse
 from django.shortcuts import get_object_or_404, render
@@ -21,6 +22,7 @@ from toolkit.members.forms import (
 )
 from toolkit.members.models import Member, Volunteer, TrainingRecord
 from toolkit.diary.models import Role
+from . import mailman
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -266,6 +268,23 @@ def _email_volunteer_list_admin(req_user: str, name: str, email: str) -> None:
     )
 
 
+def _signup_volunteer_to_list(
+    req_user: str, name: str, email: str
+) -> Optional[str]:
+    if settings.MAILMAN_INTEGRATION:
+        return mailman.subscribe_volunteer(
+            name=name,
+            email=email,
+        )
+    else:
+        _email_volunteer_list_admin(
+            req_user=req_user,
+            name=name,
+            email=email,
+        )
+        return None
+
+
 @permission_required("toolkit.write")
 def edit_volunteer(request, volunteer_id, create_new=False):
     # If called from the "add" url, then create_new will be True. If called
@@ -313,11 +332,17 @@ def edit_volunteer(request, volunteer_id, create_new=False):
             )
 
             if create_new:
-                _email_volunteer_list_admin(
+                error = _signup_volunteer_to_list(
                     req_user=request.user.last_name,
                     name=volunteer.member.name,
                     email=volunteer.member.email,
                 )
+                if error:
+                    messages.add_message(
+                        request,
+                        messages.ERROR,
+                        f"Failed to subcsribe {volunteer.member.name} to {settings.MAILMAN_VOLUNTEER_LIST}",
+                    )
 
             # Go to the volunteer list view:
             return HttpResponseRedirect(reverse("view-volunteer-summary"))
