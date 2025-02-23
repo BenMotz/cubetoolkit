@@ -57,7 +57,7 @@ def subscribe_volunteer(name: str, email: str) -> Optional[str]:
         volunteer_list = get_volunteer_list()
     except MailmanError as me:
         logger.error(f"Failed connecting to mailman: {me}")
-        return "Failed connecting to Mailman"
+        return "could not connect to Mailman"
 
     try:
         response = volunteer_list.subscribe(
@@ -71,7 +71,7 @@ def subscribe_volunteer(name: str, email: str) -> Optional[str]:
         logger.error(
             f"Failed telling Mailman to subscribe {email} to {settings.MAILMAN_VOLUNTEER_LIST}: {err}"
         )
-        return "Failed subscribing volunteer to list"
+        return "subscribe operation failed"
 
     if not isinstance(response, Member):
         logger.info(
@@ -90,7 +90,7 @@ def unsubscribe_volunteer(email: str) -> Optional[str]:
         volunteer_list = get_volunteer_list()
     except MailmanError as me:
         logger.error(f"Failed connecting to mailman: {me}")
-        return "Failed connecting to Mailman"
+        return "could not connect to Mailman"
 
     try:
         volunteer_list.unsubscribe(
@@ -102,12 +102,12 @@ def unsubscribe_volunteer(email: str) -> Optional[str]:
         logger.error(
             f"Failed telling Mailman to unsubscribe {email} to {settings.MAILMAN_VOLUNTEER_LIST}: {err}"
         )
-        return "Failed unsubscribing volunteer from the volunteer's list"
+        return f"unsubscribe operation failed"
     except ValueError as ve:
         logger.error(
             f"Failed telling Mailman to unsubscribe {email} to {settings.MAILMAN_VOLUNTEER_LIST}: {ve}"
         )
-        return f"Failed unsubscribing volunteer from the volunteer's list: {email} is not subscribed"
+        return f"{email} is not subscribed"
 
     logger.info(f"Unsubscribed {email} from {settings.MAILMAN_VOLUNTEER_LIST}")
     return None
