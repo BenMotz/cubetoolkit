@@ -247,6 +247,25 @@ def activate_volunteer(request, set_active=True):
     return HttpResponseRedirect(reverse("view-volunteer-list"))
 
 
+def _email_volunteer_list_admin(req_user: str, name: str, email: str) -> None:
+    # Email admin
+    message_body = (
+        f"I'm delighted to inform you that {req_user} has just added "
+        f"new volunteer\n\n"
+        f"{name} <{email}>\n\n"
+        f"to the toolkit.\n\n"
+        f"Please add them to the volunteers mailing list "
+        f"at your earliest convenience."
+    )
+    send_mail(
+        subject=f"[{settings.VENUE['longname']}] New volunteer {name}",
+        message=message_body,
+        from_email=settings.VENUE["mailout_from_address"],
+        recipient_list=settings.VENUE["vols_admin_address"],
+        fail_silently=False,
+    )
+
+
 @permission_required("toolkit.write")
 def edit_volunteer(request, volunteer_id, create_new=False):
     # If called from the "add" url, then create_new will be True. If called
@@ -294,24 +313,12 @@ def edit_volunteer(request, volunteer_id, create_new=False):
             )
 
             if create_new:
-                # Email admin
-                admin_body = (
-                    f"I'm delighted to inform you that {request.user.last_name} has just added "
-                    f"new volunteer\n\n"
-                    f"{volunteer.member.name} <{volunteer.member.email}>\n\n"
-                    f"to the toolkit.\n\n"
-                    f"Please add them to the volunteers mailing list "
-                    f"at your earliest convenience."
+                _email_volunteer_list_admin(
+                    req_user=request.user.last_name,
+                    name=volunteer.member.name,
+                    email=volunteer.member.email,
                 )
-                send_mail(
-                    (
-                        f"[{settings.VENUE['longname']}] New volunteer {volunteer.member.name}"
-                    ),
-                    admin_body,
-                    settings.VENUE["mailout_from_address"],
-                    settings.VENUE["vols_admin_address"],
-                    fail_silently=False,
-                )
+
             # Go to the volunteer list view:
             return HttpResponseRedirect(reverse("view-volunteer-summary"))
     else:
