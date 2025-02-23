@@ -227,40 +227,33 @@ def activate_volunteer(request, set_active=True):
         messages.SUCCESS,
         f"{'Unretired' if set_active else 'Retired'} volunteer {vol.member.name}",
     )
-    # email admin with the news
-    admin_body = (
-        f"I'm delighted to inform you that {request.user.last_name} has updated the "
-        f"status of volunteer\n\n"
-        f"{vol.member.name} <{vol.member.email}>\n\n"
-        f"to {'unretired' if set_active else 'retired'}.\n\n"
-        f"Please amend the volunteers mailing list "
-        f"at your earliest convenience."
-    )
-    send_mail(
-        (
-            f"[{settings.VENUE['longname']}] Change in volunteer status {vol.member.name}"
-        ),
-        admin_body,
-        settings.VENUE["mailout_from_address"],
-        settings.VENUE["vols_admin_address"],
-        fail_silently=False,
-    )
+    if set_active:
+        _signup_volunteer_to_list(
+            req_user=request.user.last_name,
+            email=vol.member.email,
+            name=vol.member.name,
+        )
+    else:
+        _unsignup_volunteer_to_list(
+            req_user=request.user.last_name,
+            email=vol.member.email,
+            name=vol.member.name,
+        )
 
     return HttpResponseRedirect(reverse("view-volunteer-list"))
 
 
-def _email_volunteer_list_admin(req_user: str, name: str, email: str) -> None:
-    # Email admin
+def _email_volunteer_list_admin(req_user: str, name: str, email: str, verb: str) -> None:
     message_body = (
-        f"I'm delighted to inform you that {req_user} has just added "
-        f"new volunteer\n\n"
+        f"I'm delighted to inform you that {req_user} has just {verb}ed "
+        "volunteer\n\n"
         f"{name} <{email}>\n\n"
-        f"to the toolkit.\n\n"
-        f"Please add them to the volunteers mailing list "
-        f"at your earliest convenience."
+        "in the toolkit.\n\n"
+        "Please {verb} them in the volunteers mailing list "
+        "at your earliest convenience."
     )
     send_mail(
-        subject=f"[{settings.VENUE['longname']}] New volunteer {name}",
+        subject=f"[{settings.VENUE['longname']}] {verb.capitalize()}ed volunteer {name}",
         message=message_body,
         from_email=settings.VENUE["mailout_from_address"],
         recipient_list=settings.VENUE["vols_admin_address"],
@@ -281,6 +274,22 @@ def _signup_volunteer_to_list(
             req_user=req_user,
             name=name,
             email=email,
+            verb="add"
+        )
+        return None
+
+
+def _unsignup_volunteer_to_list(
+    req_user: str, name: str, email: str
+) -> Optional[str]:
+    if settings.MAILMAN_INTEGRATION:
+        return mailman.unsubscribe_volunteer(email=email)
+    else:
+        _email_volunteer_list_admin(
+            req_user=req_user,
+            name=name,
+            email=email,
+            verb="remove"
         )
         return None
 
