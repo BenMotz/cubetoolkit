@@ -179,6 +179,7 @@ class EventModelNonLegacyCopy(TestCase):
     def test_html_copy(self):
         self.assertEqual(self.event.copy_html, self.sample_copy)
 
+
 class EventModelLegacyCopy(TestCase):
     def setUp(self):
         self.sample_copy = (
@@ -208,6 +209,7 @@ class EventModelLegacyCopy(TestCase):
             " and <this> \"'<troublemaker>'\""
         )
         self.assertEqual(self.event.copy_html, expected)
+
 
 class PrintedProgrammeModelTests(TestCase):
     def test_month_ok(self):

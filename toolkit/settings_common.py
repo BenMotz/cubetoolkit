@@ -61,9 +61,7 @@ Additional Info -"""
 
 # If an event has a tag matching one of those in this set then the
 # PROGRAMME_EVENT_TERMS_MIN_WORDS check will be ignored
-TAGS_WITHOUT_TERMS = {
-    "meeting", "training"
-}
+TAGS_WITHOUT_TERMS = {"meeting", "training"}
 
 
 EDIT_INDEX_DEFAULT_DAYS_AHEAD = 365
