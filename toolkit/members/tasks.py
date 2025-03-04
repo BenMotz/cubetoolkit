@@ -253,18 +253,22 @@ def send_mailout(subject, body_text, body_html):
     where error is True if an error occurred.
     """
 
-    recipients = Member.objects.mailout_recipients()
-    count = recipients.count()
+    try:
+        recipients = Member.objects.mailout_recipients()
+        count = recipients.count()
 
-    if count == 0:
-        logger.error("No recipients found")
-        return (True, 0, "No recipients found")
+        if count == 0:
+            logger.error("No recipients found")
+            return (True, 0, "No recipients found")
 
-    return send_mailout_to(
-        subject,
-        body_text,
-        body_html,
-        recipients,
-        task=current_task,
-        report_to=settings.VENUE["mailout_delivery_report_to"],
-    )
+        return send_mailout_to(
+            subject,
+            body_text,
+            body_html,
+            recipients,
+            task=current_task,
+            report_to=settings.VENUE["mailout_delivery_report_to"],
+        )
+    except Exception as exc:
+        logger.exception("Mailout job failed, '{0}'".format(exc))
+        return (True, 0, "Mailout job died: '{0}'".format(exc))
