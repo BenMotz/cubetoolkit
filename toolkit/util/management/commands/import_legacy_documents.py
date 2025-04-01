@@ -7,6 +7,7 @@ Create the document types as categories and create the wordpress users with
 matching names.
 
 """
+
 import datetime
 import os
 import subprocess

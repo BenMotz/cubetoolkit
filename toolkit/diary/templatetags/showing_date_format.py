@@ -1,6 +1,7 @@
 """
 Filter to format a list of showings as a human readable date range
 """
+
 import datetime
 
 from django import template

@@ -334,9 +334,9 @@ def edit_diary_calendar(request, year=None, month=None, day=None):
         "display_time": display_time,
         "defaultView": defaultView,
         "settings": settings,
-        "rooms_and_colours": rooms_and_colours
-        if settings.MULTIROOM_ENABLED
-        else {},
+        "rooms_and_colours": (
+            rooms_and_colours if settings.MULTIROOM_ENABLED else {}
+        ),
         "default_confirmed_past": _adjust_colour_historic(
             settings.CALENDAR_DEFAULT_COLOUR
         ),

@@ -1,4 +1,5 @@
 """Code shared between both public and editing sets of diary views"""
+
 import calendar
 import logging
 import datetime

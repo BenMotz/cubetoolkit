@@ -48,7 +48,6 @@ TINY_VALID_JPEG = bytearray(
 
 
 class ViewSecurity(DiaryTestsMixin, TestCase):
-
     """Basic test that the private diary pages require the correct
     permissions"""
 
@@ -163,7 +162,6 @@ class ViewSecurity(DiaryTestsMixin, TestCase):
 
 
 class EditDiaryViews(DiaryTestsMixin, TestCase):
-
     """Basic test that various private diary pages load"""
 
     def setUp(self):
