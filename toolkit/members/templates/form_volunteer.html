@@ -108,6 +108,7 @@ $(document).ready(function() {
         <img src="{{ default_mugshot }}" id="photo" alt="No photo yet" width="75"><br>
         {% endif %}
         <button id="enablecapturebutton">Take photo using webcam</button>
+        <b id="webcamerror"></b>
         <canvas id="canvas"></canvas>
         {{ vol_form.image_data }}
     </td></tr>

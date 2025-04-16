@@ -34,6 +34,18 @@ var setupPage = function() {
     photo.setAttribute("src", originalPhotoSrc);
   }
 
+  function showPreview() {
+      document.getElementById('webcampreview').style.display = 'initial';
+  }
+
+  function hidePreview() {
+      document.getElementById('webcampreview').style.display = 'none';
+  }
+
+  function setError(msg) {
+      document.getElementById('webcamerror').textContent = msg;
+  }
+
   // Capture a photo by fetching the current contents of the video
   // and drawing it into a canvas, then converting that to a PNG
   // format data URL. By drawing it on an offscreen canvas and then
@@ -63,7 +75,12 @@ var setupPage = function() {
         video.play();
       })
       .catch((err) => {
-        console.error(`An error occurred: ${err}`);
+          if (err.name === "NotFoundError") {
+            setError(`No suitable camera found!`);
+          } else {
+            setError(`An error occurred: ${err}`);
+          }
+          hidePreview();
       });
 
     video.addEventListener(
@@ -103,7 +120,7 @@ var setupPage = function() {
 
   enablecapturebutton.addEventListener('click', function(ev) {
       ev.preventDefault();
-      document.getElementById('webcampreview').style.display = 'initial';
+      showPreview();
       enablecapturebutton.style.display = 'none';
       startCapture();
   });
