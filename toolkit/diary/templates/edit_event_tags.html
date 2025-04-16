@@ -12,7 +12,7 @@ Editing Event Tags
   body {
       background: lightgray;
   }
-  form {
+  form#tags {
       border: thin dotted gray;
       padding: 5px;
       margin: 2%;
@@ -161,7 +161,7 @@ function updateOrdering() {
 order they appear in the site navigation menu.</p>
 {% include "messages.html" %}
 </div>
-<form method="post">
+<form id="tags" method="post">
 {{ formset.management_form }}
 {% csrf_token %}
 <input type="submit" value="Save all changes" />
