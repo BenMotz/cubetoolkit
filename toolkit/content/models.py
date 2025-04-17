@@ -67,7 +67,7 @@ class WidthBlock(blocks.StructBlock):
         [
             ("rich_text", blocks.RichTextBlock()),
             ("raw_html", blocks.RawHTMLBlock()),
-            ("image", image_blocks.ImageChooserBlock()),
+            ("image", image_blocks.ImageBlock()),
         ],
         min_num=1,
         max_num=1,
