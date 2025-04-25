@@ -237,9 +237,6 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 # system time zone.
 TIME_ZONE = "Europe/London"
 
-# Enable timezone support
-USE_TZ = True
-
 # Language code for this installation. All choices can be found here:
 # http://www.i18nguy.com/unicode/language-identifiers.html
 LANGUAGE_CODE = "en-gb"
@@ -247,10 +244,6 @@ LANGUAGE_CODE = "en-gb"
 # If you set this to False, Django will make some optimizations so as not
 # to load the internationalization machinery.
 USE_I18N = False  # True
-
-# If you set this to False, Django will not format dates, numbers and
-# calendars according to the current locale
-USE_L10N = True
 
 # Following are defined in settings_*.py
 # Absolute filesystem path to the directory that will hold user-uploaded files.
