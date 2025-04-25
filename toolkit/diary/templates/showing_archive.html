@@ -5,7 +5,7 @@
 
 {% block archive_body %}
 <h3>{{ VENUE.longname }} programme archive</h3>
-    <form action="{% url "archive-search" %}"><input id="archive_search_input" type="text" name="search_term" placeholder="Search"/> <input type="submit" value="Search" /></form>
+    <form action="{% url "archive-search" %}"><input id="archive_search_input" type="search" name="search_term" placeholder="Search"/> <input type="submit" value="Search" /></form>
 <ul>
     {% for date in date_list.reverse %}
     <li><a href="{% url "archive-view-year" year=date.year %}">{{ date|date:"Y" }}</a></li>

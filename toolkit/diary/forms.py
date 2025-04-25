@@ -415,7 +415,9 @@ class MailoutTestForm(forms.Form):
 
 
 class SearchForm(forms.Form):
-    search_term = forms.CharField(label="Search for", required=False)
+    search_term = forms.CharField(
+        label="Search for", required=False, widget=forms.widgets.SearchInput()
+    )
     start_date = forms.DateTimeField(label="Search from", required=False)
     end_date = forms.DateTimeField(label="Search to", required=False)
     search_in_descriptions = forms.BooleanField(
