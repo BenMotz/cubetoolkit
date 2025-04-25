@@ -44,7 +44,7 @@ class SecurityTests(MembersTestsMixin, TestCase):
         """Assert that given URLs 302 redirect to the login page"""
         for view_name, kwargs in views_to_test.items():
             url = reverse(view_name, kwargs=kwargs)
-            expected_redirect = "{0}?next={1}".format(reverse("login"), url)
+            expected_redirect = reverse("login", query={"next": url})
             # Test GET:
             response = self.client.get(url)
             self.assertRedirects(response, expected_redirect)
@@ -98,7 +98,7 @@ class SecurityTests(MembersTestsMixin, TestCase):
         # First try without a key:
         for view_name in views_to_test:
             url = reverse(view_name, kwargs={"member_id": member.id})
-            expected_redirect = "{0}?next={1}".format(reverse("login"), url)
+            expected_redirect = reverse("login", query={"next": url})
 
             # Test GET:
             response = self.client.get(url)

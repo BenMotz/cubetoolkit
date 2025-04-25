@@ -48,7 +48,7 @@ class TestVolunteerListViews(MembersTestsMixin, TestCase):
         self._test_list_page_common(url, include_retired=False)
 
     def test_list_page_loads_include_inactive(self):
-        url = reverse("view-volunteer-list") + "?show-retired=true"
+        url = reverse("view-volunteer-list", query={"show-retired": "true"})
         self._test_list_page_common(url, include_retired=True)
 
     def test_role_report_loads(self):

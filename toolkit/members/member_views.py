@@ -51,7 +51,10 @@ def add_member(request):
                     "%s already in members' database" % instance.email,
                 )
                 return HttpResponseRedirect(
-                    reverse("search-members") + "?email=%s&q=" % instance.email
+                    reverse(
+                        "search-members",
+                        query={"email": instance.email, "q": ""},
+                    )
                 )
 
             # Form is valid, save data:

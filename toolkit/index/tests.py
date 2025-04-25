@@ -22,7 +22,7 @@ class SecurityTests(TestCase):
         }
         for view_name, kwargs in views_to_test.items():
             url = reverse(view_name, kwargs=kwargs)
-            expected_redirect = "{0}?next={1}".format(reverse("login"), url)
+            expected_redirect = reverse("login", query={"next": url})
 
             # Test GET:
             response = self.client.get(url)
