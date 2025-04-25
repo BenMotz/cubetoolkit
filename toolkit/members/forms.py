@@ -36,6 +36,10 @@ class MemberForm(forms.ModelForm):
     class Meta(object):
         model = toolkit.members.models.Member
         exclude = ()
+        widgets = {
+            "phone": forms.TelInput(),
+            "altphone": forms.TelInput(),
+        }
 
 
 class MemberFormWithoutNotes(forms.ModelForm):
@@ -52,6 +56,10 @@ class MemberFormWithoutNotes(forms.ModelForm):
             "membership_expires",
             "gdpr_opt_in",
         )
+        widgets = {
+            "phone": forms.TelInput(),
+            "altphone": forms.TelInput(),
+        }
 
 
 class VolunteerForm(forms.ModelForm):
