@@ -94,7 +94,7 @@ $(document).ready(function() {
   <ul class="rota">
         {% for rota_entry in rota_form %}
             {% if rota_entry.name != "other_roles" %}
-    <li>{{rota_entry.errors }} {{ rota_entry.label_tag }} {{ rota_entry }}</li>
+    <li>{{ rota_entry.as_field_group }}</li>
             {% endif %}
         {% endfor %}
   </ul>

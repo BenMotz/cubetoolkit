@@ -188,9 +188,9 @@ order they appear in the site navigation menu.</p>
             {% if form.instance.read_only or not form.id.value%}
                 {{ form.id }}
             {% else %}
-                <span class="tag-delete">{{ form.DELETE.label_tag }} {{ form.DELETE }}{{ form.id }}</span>
+                <span class="tag-delete">{{ form.DELETE.as_field_group }} {{ form.id }}</span>
             {% endif %}
-            <label for="{{ form.promoted.id_for_label }}">In menu</label>: {{ form.promoted }}
+            {{ form.promoted.as_field_group }}
         </span>
         {{ form.sort_order.as_hidden }}
     </li>
