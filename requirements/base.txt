@@ -1,5 +1,5 @@
 # Fix versions of django and directly related components:
-Django<5.2,>=5.1
+Django<5.3,>=5.2.1
 celery[redis]>5,<5.3
 easy_thumbnails==2.10
 django-crispy-forms<1.13
@@ -10,7 +10,7 @@ python-dateutil
 # For generating non-html copy for mailout etc:
 html2text==3.200.3
 # CMS:
-wagtail==6.3.3
+wagtail==6.3.4
 monthdelta
 
 # The MySQL-python library requires a C build chain (gcc, etc.) and the mysql
