@@ -841,7 +841,7 @@ class MailoutTestSendViewTests(TestCase, fixtures.TestWithFixtures):
             response.content.decode("utf-8"),
             {
                 "errors": "body_html: "
-                '<ul class="errorlist"><li>This field is required.</li></ul>',
+                '<ul class="errorlist" id="id_body_html_error"><li>This field is required.</li></ul>',
                 "status": "error",
             },
         )
@@ -923,7 +923,7 @@ class MailoutTestSendViewTests(TestCase, fixtures.TestWithFixtures):
             response.content.decode("utf-8"),
             {
                 "status": "error",
-                "errors": 'address: <ul class="errorlist"><li>'
+                "errors": 'address: <ul class="errorlist" id="id_address_error"><li>'
                 "Enter a valid email address.</li></ul>",
             },
         )
