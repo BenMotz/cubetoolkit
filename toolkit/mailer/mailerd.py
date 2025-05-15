@@ -265,12 +265,7 @@ def run_job(job: MailoutJob) -> None:
 
 def poll_for_pending() -> List[MailoutJob]:
     return list(
-        MailoutJob.objects.filter(
-            state__in=(
-                MailoutJob.SendState.PENDING,
-                MailoutJob.SendState.SENDING,
-            )
-        )
+        MailoutJob.objects.filter(state=MailoutJob.SendState.PENDING)
         .filter(send_at__lte=timezone.now())
         .order_by("created_at")
     )
