@@ -1,0 +1,35 @@
+<table 
+    {% if poll_for_updates %}
+    hx-get="{% url "mailer:jobs-table" %}"
+    hx-trigger="every 1s" 
+    hx-include='input[type="checkbox"]'
+    {% endif %}
+    id="jobs-table" class="table">
+    <tr>
+        <th>Job ID</th>
+        <th>Created</th>
+        <th>Send at</th>
+        <th>State</th>
+        <th>Last update</th>
+        <th>% complete</th>
+        <th> </th>
+    </tr>
+{% for job in jobs %}
+<tr>
+    <td>{{ job.pk }}</td>
+    <td>{{ job.created_at | date:"j M y, g:i A" }}</td>
+    <td>{{ job.send_at | date:"j M y, g:i A" }}</td>
+    <td>{{ job.state }}<br>{{ job.status }}</td>
+    <td>{{ job.updated_at | date:"d-m-y g:i:s" }}</td>
+    <td>{% if job.state != "PENDING" %}{{ job.progress_pct }}%{% endif %}</td>
+    <td>
+        {% if job.cancellable %}
+        <form action="{% url "mailer:job-delete" job.pk %}" method="POST">
+        {% csrf_token %}
+        <button class="btn btn-primary">Cancel</button>
+        </form>
+        {% endif %}
+    </td>
+</tr>
+{% endfor %}
+</table>

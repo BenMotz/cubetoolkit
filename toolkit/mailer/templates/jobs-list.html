@@ -6,66 +6,40 @@ Mailer jobs
 
 {% block script %}
 {{ block.super }}
-<script>
-
-function optionsChanged() {
-    const showCompleted = document.getElementById("show-completed").checked;
-    const showFailed = document.getElementById("show-failed").checked;
-    const url = "{% url "mailer:jobs-list" %}?show-completed=" + showCompleted + "&show-failed=" + showFailed;
-    window.location = url;
-}
-
-$(document).ready(function() {
-    const controls = $(".form-check-input");
-    controls.change(optionsChanged);
-});
-
-</script>
+<script src="{{ STATIC_URL }}js/lib/htmx.min.js"></script>
 {% endblock %}
 
 {% block body %}
 <h1>Mailer jobs</h1>
 
+<div class="form-check">
+  <label class="form-check-label">
+    <input name="poll-for-updates"
+           hx-get="{% url "mailer:jobs-table" %}" hx-target="#jobs-table" hx-swap="outerHTML" hx-include='input[type="checkbox"]'
+           class="form-check-input" type="checkbox" {{ poll_for_updates|yesno:"checked," }}>
+    Update this page automatically
+  </label>
+</div>
+<div class="form-check">
+  <label class="form-check-label">
+    <input name="show-completed"
+           hx-get="{% url "mailer:jobs-table" %}" hx-target="#jobs-table" hx-swap="outerHTML" hx-include='input[type="checkbox"]'
+           class="form-check-input" type="checkbox" {{ show_completed|yesno:"checked," }}>
+  Show Completed
+  </label>
+</div>
+<div class="form-check">
+  <label class="form-check-label">
+    <input name="show-failed"
+           hx-get="{% url "mailer:jobs-table" %}" hx-target="#jobs-table" hx-swap="outerHTML" hx-include='input[type="checkbox"]'
+           class="form-check-input" type="checkbox" {{ show_failed|yesno:"checked," }}>
+    Show Failed
+  </label>
+</div>
+
 <p>
-<div class="form-check">
-  <input id="show-completed" class="form-check-input" type="checkbox" {{ show_completed|yesno:"checked," }}>
-  <label for="show-completed" class="form-check-label">Show Completed</label>
-</div>
-<div class="form-check">
-  <input id="show-failed" class="form-check-input" type="checkbox" {{ show_failed|yesno:"checked," }}>
-  <label for="show-failed" class="form-check-label">Show Failed</label>
-</div>
-</p>
 
 
-<table class="table">
-    <tr>
-        <th>Job ID</th>
-        <th>Created</th>
-        <th>Send at</th>
-        <th>State</th>
-        <th>Last update</th>
-        <th>% complete</th>
-        <th> </th>
-    </tr>
-{% for job in jobs %}
-<tr>
-    <td>{{ job.pk }}</td>
-    <td>{{ job.created_at | date:"j M y, g:i A" }}</td>
-    <td>{{ job.send_at | date:"j M y, g:i A" }}</td>
-    <td>{{ job.state }}<br>{{ job.status }}</td>
-    <td>{{ job.updated_at | date:"d-m-y g:i:s" }}</td>
-    <td>{% if job.state != "PENDING" %}{{ job.progress_pct }}%{% endif %}</td>
-    <td>
-        {% if job.cancellable %}
-        <form action="{% url "mailer:job-delete" job.pk %}" method="POST">
-        {% csrf_token %}
-        <button class="btn btn-primary">Cancel</button>
-        </form>
-        {% endif %}
-    </td>
-</tr>
-{% endfor %}
-</table>
+{% include "jobs-list-table.html" %}
 
 {% endblock %}
