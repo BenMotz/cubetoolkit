@@ -1,8 +1,10 @@
 import logging
 import time
+import signal
 import smtplib
 import email.errors
-from typing import List, Tuple
+from typing import List, Optional, Tuple
+from types import FrameType
 
 from django.core.mail import (
     get_connection,
@@ -292,7 +294,16 @@ def clean_up():
 def run() -> None:
     logger.info("Starting mailerd")
     clean_up()
-    while True:
+    keep_running = True
+
+    def term_handler(signo: int, frame: Optional[FrameType]) -> None:
+        nonlocal keep_running
+        keep_running = False
+        logger.info(f"Received signal {signal.Signals(signo).name}")
+    signal.signal(signal.SIGINT, term_handler)
+    signal.signal(signal.SIGTERM, term_handler)
+
+    while keep_running:
         time.sleep(POLL_PERIOD_S)
         pending_jobs = poll_for_pending()
         for idx, job in enumerate(pending_jobs):
