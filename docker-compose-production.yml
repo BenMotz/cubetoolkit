@@ -23,3 +23,17 @@ services:
       - type: bind
         source: /home/toolkit/settings_docker_production.py
         target: /site/toolkit/settings.py
+  mailer:
+    user: "1001:1001"
+    networks:
+      - toolkit_production
+    image: toolkit:production
+    command: ["tk_run", "mailerd"]
+    restart: on-failure
+    volumes:
+      - type: bind
+        source: /var/run/mysqld/mysqld.sock
+        target: /var/run/mysqld/mysqld.sock
+      - type: bind
+        source: /home/toolkit/settings_docker_production.py
+        target: /site/toolkit/settings.py

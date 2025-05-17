@@ -1,12 +1,7 @@
 #!/bin/bash
 set -eu
 
-export REDIS_URL=${REDIS_URL:-redis://redis:6379/0}
-
-COMMAND=$1
-
-redis_suffix=${REDIS_URL#redis://}
-redis_host_port=${redis_suffix%%/*}
+COMMAND=${1:-}
 
 echo "Running as: $(id)"
 
@@ -20,19 +15,17 @@ elif ! [[ -S /var/run/mysqld/mysqld.sock ]] ; then
   exit 3
 fi
 
-if [[ ${NO_REDIS:-false} != "true" && -n $redis_host_port ]] && ! wait-for-it $redis_host_port --timeout=360 ; then
-  echo "Redis not available"
-  exit 4
-fi
-
 case "$COMMAND" in
     gunicorn)
         echo "Running database migrations"
         /venv/bin/python3 /site/manage.py migrate
         exec /venv/bin/gunicorn wsgi --bind 0.0.0.0:8000 --chdir /site
         ;;
+    mailerd)
+        exec /venv/bin/python3 /site/manage.py mailerd
+        ;;
     *)
-        echo "Unknown option; expected gunicorn"
+        echo "Unknown option; expected gunicorn or mailerd"
         exit 5
         ;;
 esac
