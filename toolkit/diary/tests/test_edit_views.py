@@ -63,9 +63,6 @@ class ViewSecurity(DiaryTestsMixin, TestCase):
         "edit_event_tags": {},
         "edit_roles": {},
         "members-mailout": {},
-        "exec-mailout": {},
-        "mailout-progress": {},
-        "mailout-test-send": {},
         "add-printed-programme": {},
     }
 

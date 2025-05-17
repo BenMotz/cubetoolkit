@@ -33,24 +33,19 @@
     <input type="number" id="id_copydaysahead" name="copydaysahead" min="0" value="{{ copy_days_ahead }}">
     <input type="submit" value="Regenerate mailout (lose any edits)"></p>
 </form>
-<p>Total of <b>{{ email_count }}</b> member emails to send from {{ VENUE.name }}</p>
 <form method="POST">
     {% csrf_token %}
-    {% if form.html_mailout_enabled %}
     <p>{{ form.send_html.as_field_group }}<br>
     <b>Note:</b> The plain text mailout will always be sent, as fall-back content for recipients who cannot or do not want to read the HTML version</p>
-    {% endif %}
     <p>{{ form.subject.as_field_group }}</p>
     <h3><label for="{{ form.body_text.id_for_label }}">Body of email</label></h3>
     {{ form.body_text.errors }}
     {{ form.body_text }}
-    {% if form.html_mailout_enabled %}
     <h3><label for="{{ form.body_html.id_for_label }}">Body of HTML email</label></h3>
     {{ form.body_html.errors }}
     {{ form.body_html }}
-    {% endif %}
     <p>
     <p>
-    <input class="btn btn-primary" type="submit" value="Send Mailout">
+    <input class="btn btn-primary" type="submit" value="Preview Mailout">
 </form>
 {% endblock %}

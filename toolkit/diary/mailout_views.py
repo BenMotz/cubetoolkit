@@ -1,24 +1,25 @@
-import json
 import datetime
 import logging
 
-from django.http import HttpResponse
+from django.urls import reverse
+
+from django.http import HttpResponseRedirect
 from django.shortcuts import render
 import django.template
 import django.db
 import django.utils.timezone as timezone
 from django.contrib.auth.decorators import permission_required
 from django.views.decorators.http import (
-    require_GET,
-    require_POST,
     require_http_methods,
+    require_POST,
 )
 from django.conf import settings
 
 from toolkit.diary.models import Showing
 from toolkit.members.models import Member
+import toolkit.mailer.forms as mailer_forms
 import toolkit.diary.forms as diary_forms
-import toolkit.members.tasks
+from toolkit.mailer.models import MailoutJob
 
 # Shared utility method:
 
@@ -100,16 +101,7 @@ def _render_mailout_form(request, body_text, body_html, subject_text, context):
             "body_html": body_html,
         },
     )
-    email_count = (
-        toolkit.members.models.Member.objects.mailout_recipients().count()
-    )
-    context.update(
-        {
-            "form": form,
-            "email_count": email_count,
-        }
-    )
-
+    context["form"] = form
     return render(request, "form_mailout.html", context)
 
 
@@ -157,3 +149,28 @@ def mailout(request):
             "form": mailer_forms.JobForm(job_data),
             "email_count": Member.objects.mailout_recipients().count(),
         })
+
+
+@permission_required("toolkit.write")
+@require_POST
+def queue_mailout(request):
+    # If we have a query parameter "send_at=now" then we'll fiddle the send_at
+    # from the form data to be right now:
+    send_right_now = request.GET.get("send_at") == "now"
+
+    form_data = request.POST.copy()
+    if send_right_now:
+        form_data["send_at"] = timezone.now() + datetime.timedelta(seconds=2)
+
+    form = mailer_forms.JobForm(form_data)
+    if not form.is_valid():
+        logger.error(f"Create mailout job failed: {repr(form.errors)}")
+        return render(request, "mailout_send.html", context = {
+            "form": form,
+            "email_count": Member.objects.mailout_recipients().count(),
+        })
+    logger.info(
+        f"Queueing mailout job, send_at: {form.cleaned_data['send_at']}, subject: {form.cleaned_data['subject']}"
+    )
+    form.save()
+    return HttpResponseRedirect(reverse("mailer:jobs-list"))

@@ -24,7 +24,7 @@ urlpatterns = [
     re_path(r"^volunteers/", include(toolkit.members.urls.volunteer_urls)),
     re_path(r"^auth/", include(toolkit.toolkit_auth.urls.urlpatterns)),
     re_path(r"^index/", include(toolkit.index.urls.urlpatterns)),
-    re_path(r"^mailout/", include(toolkit.mailer.urls.urlpatterns)),
+    re_path(r"^mailout/", include(toolkit.mailer.urls)),
     re_path(r"^$", toolkit.diary.urls.view_diary, name="default-view"),
     re_path(
         r"^id/(?P<event_id>\d+)/$",

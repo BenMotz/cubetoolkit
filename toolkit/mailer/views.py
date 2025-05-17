@@ -25,20 +25,32 @@ def job_cancel(request: HttpRequest, job_id: int) -> HttpResponse:
     job = get_object_or_404(MailoutJob, pk=job_id)
     job.do_cancel()
     job.save()
-    return HttpResponseRedirect(reverse("jobs-list"))
+    return HttpResponseRedirect(reverse("mailer:jobs-list"))
 
 
 @permission_required("toolkit.read")
 def jobs_list(request) -> HttpResponse:
-    show_completed = bool(request.GET.get("show-completed", False))
+    show_completed = request.GET.get("show-completed") == "true"
+    show_failed = request.GET.get("show-failed", "true") == "true"
 
-    jobs = MailoutJob.objects.all()
+    jobs = MailoutJob.objects.all().order_by("-id")
+
     if not show_completed:
         jobs = jobs.exclude(
             state__in=(
                 MailoutJob.SendState.SENT,
-                MailoutJob.SendState.FAILED,
                 MailoutJob.SendState.CANCELLED,
             )
         )
-    return render(request, "jobs-list.html", context={"jobs": jobs})
+        if not show_failed:
+            jobs = jobs.exclude(state=MailoutJob.SendState.FAILED)
+
+    return render(
+        request,
+        "jobs-list.html",
+        context={
+            "jobs": jobs,
+            "show_completed": show_completed,
+            "show_failed": show_failed,
+        },
+    )

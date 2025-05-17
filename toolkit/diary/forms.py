@@ -395,25 +395,6 @@ class MailoutForm(forms.Form):
     )
 
 
-class MailoutTestForm(forms.Form):
-    def __init__(self, *args, **kwargs):
-        self.html_mailout_enabled = kwargs.pop("html_mailout_enabled")
-        super(MailoutTestForm, self).__init__(*args, **kwargs)
-        if not self.html_mailout_enabled:
-            del self.fields["send_html"]
-            del self.fields["body_html"]
-
-    address = forms.EmailField(required=True)
-
-    send_html = forms.BooleanField(required=False)
-
-    subject = forms.CharField(max_length=128, required=True)
-
-    body_text = forms.CharField(required=True)
-
-    body_html = forms.CharField()
-
-
 class SearchForm(forms.Form):
     search_term = forms.CharField(
         label="Search for", required=False, widget=forms.widgets.SearchInput()

@@ -26,49 +26,58 @@ Mailout dispatch
     p.label {
         margin-bottom: 0;
     }
+
+    .send-form {
+        border-left: thin solid gray;
+        border-right: thin solid gray;
+        margin: 20px;
+        text-align: center;
+    }
 </style>
 {% endblock %}
 
 {% block script %}
 {{ block.super }}
-<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}diary/js/mailout.js"></script>
-<script type="text/javascript">
-$(document).ready(function() {
-    var subject = "{{ subject|safe|escapejs }}";
-    var send_html = {{ send_html|yesno:"true,false" }};
-    var body_text = "{{ body_text|safe|escapejs }}";
-    var body_html = "{{ body_html|safe|escapejs }}";
-    mailoutController({
-        progressURL: "{% url "mailout-progress" %}",
-        execURL: "{% url "exec-mailout" %}",
-        testURL: "{% url "mailout-test-send" %}",
-        progressBarId: "progress",
-        jQuery: $,
-        subject: subject,
-        body_text: body_text,
-        body_html: body_html,
-        send_html: send_html
-    });
-});
-</script>
+{{ form.media }}
 {% endblock %}
 
 {% block body %}
 <h1>Mailout: confirm</h1>
-<p id="status">Please wait, page loading...</p>
-<p id="progress"></p>
-<p id="test">Optionally, <span id="test_send">send</span> the email to a
-<label for="id_test_email">single recipient
-(</label><input id="id_test_email" type="email" placeholder="something@example.com">*),
-to test everything is working as expected. (* must be a cube member!)</p>
+
+
+<p>Total of <b>{{ email_count }}</b> member emails to send from {{ VENUE.name }}</p>
+<p>Please check the preview below looks correct then, when you are satisfied, one of: </p>
+<div class="container">
+<div class="row">
+  <div class="send-form col-md-2">
+    <form method="POST" action="{% url "queue-members-mailout" %}?send_at=now">
+    {% csrf_token %}
+    {{ form.send_html }}
+    {{ form.subject }}
+    {{ form.body_text }}
+    {{ form.body_html }}
+    <input class="btn btn-success" type="submit" value="Send now">
+    </form>
+  </div>
+
+  <div class="send-form col-md-4">
+    <form method="POST" action="{% url "queue-members-mailout" %}">
+    {% csrf_token %}
+    {{ form }}
+    <input class="btn btn-primary" type="submit" value="Schedule">
+    </form>
+  </div>
+</div>
+</div>
+
+
 <p class="label">Subject:</p>
-<p class="mail" id="subject">{{ subject }}</p>
+<p class="mail" id="subject">{{ form.subject.data }}</p>
 <p class="label">Body:</p>
-<p class="mail" id="body_text">{{ body_text }}</p>
-{% if send_html %}
+<p class="mail" id="body_text">{{ form.body_text.data }}</p>
+{% if form.send_html.data %}
 <p class="label">HTML Body:</p>
-<p class="mail" id="body_html">{{ body_html }}</p>
+<p class="mail" id="body_html">{{ form.body_html.data }}</p>
 {% endif %}
 
 {% endblock %}

@@ -1,9 +1,10 @@
 from django import forms
 
-from toolkit.diary.form_widgets import HtmlTextarea
-
 from .models import MailoutJob
 
+from ..diary.form_widgets import (
+    JQueryDateTimePicker,
+)
 
 class JobForm(forms.ModelForm):
     class Meta:
@@ -14,12 +15,11 @@ class JobForm(forms.ModelForm):
             "subject",
             "body_text",
             "body_html",
-            "recipient_filter",
         )
         widgets = {
-            "subject": forms.TextInput(),
-            "body_text": forms.Textarea(attrs={"wrap": "soft", "cols": 80}),
-            "body_html": HtmlTextarea(
-                enable_tables=True, enable_iframes=False, height="120ex"
-            ),
+            "send_at": JQueryDateTimePicker(),
+            "send_html": forms.HiddenInput(),
+            "subject": forms.HiddenInput(),
+            "body_text": forms.HiddenInput(),
+            "body_html": forms.HiddenInput(),
         }

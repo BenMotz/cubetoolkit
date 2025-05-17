@@ -90,6 +90,11 @@ class MailoutJob(models.Model):
             self.state = MailoutJob.SendState.CANCELLED
         elif self.state == MailoutJob.SendState.SENDING:
             self.state = MailoutJob.SendState.CANCELLING
+        elif self.state in (
+            MailoutJob.SendState.CANCELLED,
+            MailoutJob.SendState.CANCELLING,
+        ):
+            pass
         else:
             raise MailoutStateError(f"Cannot cancel in state {self.state}")
         self.status = "cancelled"

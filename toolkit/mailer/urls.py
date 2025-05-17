@@ -1,5 +1,7 @@
-from django.urls import path, re_path
+from django.urls import path
 from .views import job_create, job_cancel, jobs_list
+
+app_name = "mailer"
 
 urlpatterns = [
     # Create a mailout job

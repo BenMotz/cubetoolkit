@@ -4,8 +4,40 @@
 Mailer jobs
 {% endblock %}
 
+{% block script %}
+{{ block.super }}
+<script>
+
+function optionsChanged() {
+    const showCompleted = document.getElementById("show-completed").checked;
+    const showFailed = document.getElementById("show-failed").checked;
+    const url = "{% url "mailer:jobs-list" %}?show-completed=" + showCompleted + "&show-failed=" + showFailed;
+    window.location = url;
+}
+
+$(document).ready(function() {
+    const controls = $(".form-check-input");
+    controls.change(optionsChanged);
+});
+
+</script>
+{% endblock %}
+
 {% block body %}
 <h1>Mailer jobs</h1>
+
+<p>
+<div class="form-check">
+  <input id="show-completed" class="form-check-input" type="checkbox" {{ show_completed|yesno:"checked," }}>
+  <label for="show-completed" class="form-check-label">Show Completed</label>
+</div>
+<div class="form-check">
+  <input id="show-failed" class="form-check-input" type="checkbox" {{ show_failed|yesno:"checked," }}>
+  <label for="show-failed" class="form-check-label">Show Failed</label>
+</div>
+</p>
+
+
 <table class="table">
     <tr>
         <th>Job ID</th>
@@ -23,10 +55,10 @@ Mailer jobs
     <td>{{ job.send_at | date:"j M y, g:i A" }}</td>
     <td>{{ job.state }}<br>{{ job.status }}</td>
     <td>{{ job.updated_at | date:"d-m-y g:i:s" }}</td>
-    <td>{{ job.progress_pct }}%</td>
+    <td>{% if job.state != "PENDING" %}{{ job.progress_pct }}%{% endif %}</td>
     <td>
         {% if job.cancellable %}
-        <form action="{% url "job-delete" job.pk %}" method="POST">
+        <form action="{% url "mailer:job-delete" job.pk %}" method="POST">
         {% csrf_token %}
         <button class="btn btn-primary">Cancel</button>
         </form>
@@ -37,4 +69,3 @@ Mailer jobs
 </table>
 
 {% endblock %}
-

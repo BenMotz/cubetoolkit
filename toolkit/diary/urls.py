@@ -39,12 +39,7 @@ from toolkit.diary.public_views import (
     view_event,
 )
 
-from toolkit.diary.mailout_views import (
-    mailout,
-    exec_mailout,
-    mailout_progress,
-    mailout_test_send,
-)
+from toolkit.diary.mailout_views import mailout, queue_mailout
 
 
 programme_urls = [
@@ -261,10 +256,6 @@ diary_urls = [
 ]
 
 diary_urls += [
-    re_path("^mailout/$", mailout, name="members-mailout"),
-    re_path("^mailout/send$", exec_mailout, name="exec-mailout"),
-    re_path(
-        "^mailout/send/progress$", mailout_progress, name="mailout-progress"
-    ),
-    re_path("^mailout/test$", mailout_test_send, name="mailout-test-send"),
+    path("mailout/", mailout, name="members-mailout"),
+    path("mailout/queue/", queue_mailout, name="queue-members-mailout"),
 ]
