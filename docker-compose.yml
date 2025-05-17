@@ -30,17 +30,6 @@ services:
       - type: volume
         source: media_data
         target: /site/media/
-  celery:
-    networks:
-      - toolkit_dev
-    image: toolkit:latest
-    command: ["tk_run", "celery"]
-    restart: on-failure
-    environment: *commonEnv
-  redis:
-    networks:
-      - toolkit_dev
-    image: redis:7-bullseye
   mariadb:
     networks:
       - toolkit_dev

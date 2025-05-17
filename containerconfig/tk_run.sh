@@ -26,16 +26,13 @@ if [[ ${NO_REDIS:-false} != "true" && -n $redis_host_port ]] && ! wait-for-it $r
 fi
 
 case "$COMMAND" in
-    celery)
-        exec /venv/bin/celery --app=toolkit worker --loglevel=INFO --concurrency=1
-        ;;
     gunicorn)
         echo "Running database migrations"
         /venv/bin/python3 /site/manage.py migrate
         exec /venv/bin/gunicorn wsgi --bind 0.0.0.0:8000 --chdir /site
         ;;
     *)
-        echo "Unknown option; expected gunicorn or celery"
+        echo "Unknown option; expected gunicorn"
         exit 5
         ;;
 esac
