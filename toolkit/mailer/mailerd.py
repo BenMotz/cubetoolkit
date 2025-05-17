@@ -11,6 +11,7 @@ from django.core.mail import (
     EmailMessage,
     EmailMultiAlternatives,
 )
+from django.core.mail.backends.base import BaseEmailBackend
 from django.conf import settings
 from django.db.models import QuerySet
 from django.urls import reverse
@@ -25,7 +26,13 @@ logger = logging.getLogger(__name__)
 POLL_PERIOD_S = 1
 
 
-def _send_email(email_conn, destination, subject, body_text, body_html):
+def _send_email(
+    email_conn: BaseEmailBackend,
+    destination: str,
+    subject: str,
+    body_text: str,
+    body_html: Optional[str],
+) -> Optional[str]:
     error = None
 
     msg_class = EmailMultiAlternatives if body_html else EmailMessage
@@ -58,8 +65,13 @@ def _send_email(email_conn, destination, subject, body_text, body_html):
 
 
 def send_mailout_report(
-    email_conn, report_to, sent, err_list, subject, body_text
-):
+    email_conn: BaseEmailBackend,
+    report_to: str,
+    sent: int,
+    err_list: List[str],
+    subject: str,
+    body_text: str,
+) -> None:
     # All done? Send report:
     report_text = (
         "%d copies of the following were sent out on %s members"
@@ -79,7 +91,7 @@ def send_mailout_report(
     _send_email(email_conn, report_to, subject, report_text, None)
 
 
-def _get_text_preamble_signature(recipient) -> Tuple[str, str]:
+def _get_text_preamble_signature(recipient: Member) -> Tuple[str, str]:
     preamble_template = "Dear {0},\n\n"
     signature_template = (
         "\n"
@@ -110,14 +122,10 @@ def send_mailout_to(
     job: MailoutJob,
     recipients: QuerySet[Member],
     report_to=None,
-):
+) -> None:
     """
     Sends email with supplied subject/body to supplied set of recipients.
     Requires subject and body to be unicode.
-
-    returns a tuple:
-    (error, sent_count, error_message)
-    where error is True if an error occurred.
     """
 
     count = recipients.count()
@@ -241,10 +249,6 @@ def run_job(job: MailoutJob) -> None:
 
     Also sends an email to settings.VENUE['mailout_delivery_report_to'] when
     done.
-
-    returns a tuple:
-    (error, sent_count, error_message)
-    where error is True if an error occurred.
     """
 
     recipients = Member.objects.mailout_recipients()
@@ -273,7 +277,7 @@ def poll_for_pending() -> List[MailoutJob]:
     )
 
 
-def clean_up():
+def clean_up() -> None:
     interrupted_jobs = MailoutJob.objects.filter(
         state=MailoutJob.SendState.SENDING
     )
@@ -300,6 +304,7 @@ def run() -> None:
         nonlocal keep_running
         keep_running = False
         logger.info(f"Received signal {signal.Signals(signo).name}")
+
     signal.signal(signal.SIGINT, term_handler)
     signal.signal(signal.SIGTERM, term_handler)
 
