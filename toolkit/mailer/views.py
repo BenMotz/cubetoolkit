@@ -4,19 +4,7 @@ from django.urls import reverse
 from django.views.decorators.http import require_POST, require_GET
 from django.shortcuts import get_object_or_404, render
 
-from .forms import JobForm
 from .models import MailoutJob
-
-
-@permission_required("toolkit.write")
-@require_POST
-def job_create(request: HttpRequest) -> HttpResponse:
-    job_form = JobForm(request.POST)
-    if job_form.is_valid():
-        job = job_form.save()
-        return HttpResponse(f"<p>Created job {job.pk}</p>")
-    else:
-        return HttpResponse("No")
 
 
 @permission_required("toolkit.write")
@@ -46,7 +34,7 @@ def _query_jobs(show_completed: bool, show_failed: bool):
 
 @permission_required("toolkit.read")
 @require_GET
-def jobs_list(request) -> HttpResponse:
+def jobs_list(request: HttpRequest) -> HttpResponse:
     show_completed = False
     show_failed = True
     jobs = _query_jobs(show_completed=show_completed, show_failed=show_failed)
@@ -75,7 +63,7 @@ def jobs_list(request) -> HttpResponse:
 
 @permission_required("toolkit.read")
 @require_GET
-def jobs_table(request) -> HttpResponse:
+def jobs_table(request: HttpRequest) -> HttpResponse:
     show_completed = request.GET.get("show-completed") == "on"
     show_failed = request.GET.get("show-failed", "true") == "on"
     poll_for_updates = request.GET.get("poll-for-updates") == "on"
