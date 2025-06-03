@@ -182,7 +182,7 @@ def send_mailout_to(
             # Build final email, still in unicode:
             mail_body_text = text_pre + job.body_text + text_post
 
-            if job.body_html:
+            if job.send_html and job.body_html:
                 html_mail_context.update(
                     {
                         "member_name": recipient.name,
