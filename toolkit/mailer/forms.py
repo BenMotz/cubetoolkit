@@ -6,6 +6,7 @@ from ..diary.form_widgets import (
     JQueryDateTimePicker,
 )
 
+
 class JobForm(forms.ModelForm):
     class Meta:
         model = MailoutJob

@@ -44,7 +44,6 @@ def _query_jobs(show_completed: bool, show_failed: bool):
     return jobs
 
 
-
 @permission_required("toolkit.read")
 @require_GET
 def jobs_list(request) -> HttpResponse:

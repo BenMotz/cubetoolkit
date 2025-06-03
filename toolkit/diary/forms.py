@@ -389,10 +389,21 @@ class MailoutForm(forms.Form):
     )
 
     body_html = forms.CharField(
+        required=False,
         widget=HtmlTextarea(
             enable_tables=True, enable_iframes=False, height="120ex"
-        )
+        ),
     )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        send_html = cleaned_data.get("send_html")
+        body_html = cleaned_data.get("body_html")
+        if send_html and not body_html:
+            raise forms.ValidationError(
+                "HTML body is empty. "
+                "If you do not want to send an HTML email unset the 'Send HTML Mailout' option"
+            )
 
 
 class SearchForm(forms.Form):

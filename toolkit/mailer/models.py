@@ -52,7 +52,8 @@ class MailoutJob(models.Model):
     send_html = models.BooleanField()
     subject = models.TextField()
     body_text = models.TextField()
-    body_html = models.TextField()
+    # blank means "don't send an HTML email, even if send_html is True"
+    body_html = models.TextField(blank=True)
     recipient_filter = models.CharField(blank=True, max_length=255)
 
     created_at = models.DateTimeField(auto_now_add=True)

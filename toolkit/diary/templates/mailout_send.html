@@ -75,7 +75,7 @@ Mailout dispatch
 <p class="mail" id="subject">{{ form.subject.data }}</p>
 <p class="label">Body:</p>
 <p class="mail" id="body_text">{{ form.body_text.data }}</p>
-{% if form.send_html.data %}
+{% if html_enabled and form.send_html.data %}
 <p class="label">HTML Body:</p>
 <p class="mail" id="body_html">{{ form.body_html.data }}</p>
 {% endif %}

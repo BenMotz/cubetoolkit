@@ -1,17 +1,13 @@
 from __future__ import absolute_import
 
 from mock import patch
-import fixtures
 
 from django.test import TestCase
 from django.urls import reverse
 from django.test.utils import override_settings
 
-import kombu.exceptions
-import redis.exceptions
 
-from toolkit.members.models import Member
-from .common import DiaryTestsMixin, ToolkitUsersFixture
+from .common import DiaryTestsMixin
 
 
 class MailoutTests(DiaryTestsMixin, TestCase):
@@ -66,8 +62,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         )
         # Urgh
         self.expected_mailout_event_html = """
-            <textarea name="body_html" id="id_body_html" rows="10" cols="40"
-            required>
+            <textarea name="body_html" id="id_body_html" rows="10" cols="40">
             <p><a href="https://www.cubecinema.com/programme/">
             Cube Cinema Programme</a></p><table><tr>
             <td colspan="3">
@@ -237,7 +232,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
                 "subject": "Yet another member's mailout",
                 "body_text": "Let the bodies hit the floor\netc.",
                 "body_html": "<h1>Should not be ignored</h1>",
-                "send_html": True,
+                "send_html": "on",
             },
         )
 
@@ -266,7 +261,6 @@ class MailoutTests(DiaryTestsMixin, TestCase):
                 "subject": "Yet another member's mailout",
                 "body_text": "Let the bodies hit the floor\netc.",
                 "body_html": "<h1>Should be ignored</h1>",
-                "send_html": False,
             },
         )
 
@@ -285,7 +279,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
                 "subject": "Yet another member's mailout",
                 "body_text": "Let the bodies hit the floor\netc.",
                 "body_html": "<h1>Should be ignored</h1>",
-                "send_html": True,
+                "send_html": "on",
             },
         )
 

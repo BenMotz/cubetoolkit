@@ -35,15 +35,18 @@
 </form>
 <form method="POST">
     {% csrf_token %}
+    {{ form.non_field_errors }}
     <p>{{ form.send_html.as_field_group }}<br>
     <b>Note:</b> The plain text mailout will always be sent, as fall-back content for recipients who cannot or do not want to read the HTML version</p>
     <p>{{ form.subject.as_field_group }}</p>
     <h3><label for="{{ form.body_text.id_for_label }}">Body of email</label></h3>
     {{ form.body_text.errors }}
     {{ form.body_text }}
+    {% if form.html_mailout_enabled %}
     <h3><label for="{{ form.body_html.id_for_label }}">Body of HTML email</label></h3>
     {{ form.body_html.errors }}
     {{ form.body_html }}
+    {% endif %}
     <p>
     <p>
     <input class="btn btn-primary" type="submit" value="Preview Mailout">

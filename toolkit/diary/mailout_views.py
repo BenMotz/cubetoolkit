@@ -6,7 +6,6 @@ from django.urls import reverse
 from django.http import HttpResponseRedirect
 from django.shortcuts import render
 import django.template
-import django.db
 import django.utils.timezone as timezone
 from django.contrib.auth.decorators import permission_required
 from django.views.decorators.http import (
@@ -19,7 +18,6 @@ from toolkit.diary.models import Showing
 from toolkit.members.models import Member
 import toolkit.mailer.forms as mailer_forms
 import toolkit.diary.forms as diary_forms
-from toolkit.mailer.models import MailoutJob
 
 # Shared utility method:
 
@@ -136,19 +134,29 @@ def mailout(request):
             request, body_text, body_html, subject_text, context
         )
     elif request.method == "POST":
+        html_mailout_setting = settings.HTML_MAILOUT_ENABLED
         form = diary_forms.MailoutForm(
-            request.POST, html_mailout_enabled=settings.HTML_MAILOUT_ENABLED
+            request.POST, html_mailout_enabled=html_mailout_setting
         )
         if not form.is_valid():
             return render(request, "form_mailout.html", {"form": form})
 
+        send_html = request.POST.get("send_html") == "on"
+
         job_data = request.POST.copy()
         job_data["send_at"] = timezone.now() + datetime.timedelta(minutes=5)
+        if not html_mailout_setting or not send_html:
+            job_data["body_html"] = ""
 
-        return render(request, "mailout_send.html", context = {
-            "form": mailer_forms.JobForm(job_data),
-            "email_count": Member.objects.mailout_recipients().count(),
-        })
+        return render(
+            request,
+            "mailout_send.html",
+            context={
+                "html_enabled": html_mailout_setting,
+                "form": mailer_forms.JobForm(job_data),
+                "email_count": Member.objects.mailout_recipients().count(),
+            },
+        )
 
 
 @permission_required("toolkit.write")
@@ -165,10 +173,14 @@ def queue_mailout(request):
     form = mailer_forms.JobForm(form_data)
     if not form.is_valid():
         logger.error(f"Create mailout job failed: {repr(form.errors)}")
-        return render(request, "mailout_send.html", context = {
-            "form": form,
-            "email_count": Member.objects.mailout_recipients().count(),
-        })
+        return render(
+            request,
+            "mailout_send.html",
+            context={
+                "form": form,
+                "email_count": Member.objects.mailout_recipients().count(),
+            },
+        )
     logger.info(
         f"Queueing mailout job, send_at: {form.cleaned_data['send_at']}, subject: {form.cleaned_data['subject']}"
     )
