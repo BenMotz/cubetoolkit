@@ -63,6 +63,7 @@ class ViewSecurity(DiaryTestsMixin, TestCase):
         "edit_event_tags": {},
         "edit_roles": {},
         "members-mailout": {},
+        "queue-members-mailout": {},
         "add-printed-programme": {},
     }
 

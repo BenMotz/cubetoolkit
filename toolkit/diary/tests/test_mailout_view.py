@@ -1,13 +1,99 @@
-from __future__ import absolute_import
+from datetime import datetime, timezone, timedelta
 
 from mock import patch
 
+import fixtures
 from django.test import TestCase
 from django.urls import reverse
 from django.test.utils import override_settings
+from .common import ToolkitUsersFixture, FAKE_NOW
+from ...mailer.models import MailoutJob
 
 
 from .common import DiaryTestsMixin
+
+
+class QueueMailoutTests(TestCase, fixtures.TestWithFixtures):
+    def setUp(self):
+        self.useFixture(ToolkitUsersFixture())
+        # Log in:
+        self.client.login(username="admin", password="T3stPassword!")
+        # Fake "now()" function to return a fixed time:
+        self.time_patch = patch("django.utils.timezone.now")
+        self.time_mock = self.time_patch.start()
+        self.time_mock.return_value = FAKE_NOW
+
+    def test_get_denied(self) -> None:
+        url = reverse("queue-members-mailout")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 405)
+
+    def test_valid_delayed_send(self) -> None:
+        url = reverse("queue-members-mailout")
+        self.assertEqual(0, MailoutJob.objects.count())
+        data = {
+            "subject": "Yet another member's mailout",
+            "body_text": "Let the bodies hit the floor\netc.",
+            "body_html": "<h1>Should not be ignored</h1>",
+            "send_at": "01/06/2025 22:11",
+            "send_html": "on",
+        }
+        response = self.client.post(url, data=data)
+
+        self.assertRedirects(response, reverse("mailer:jobs-list"))
+
+        self.assertEqual(1, MailoutJob.objects.count())
+        job = MailoutJob.objects.all()[0]
+        self.assertEqual(data["subject"], job.subject)
+        self.assertEqual(data["body_text"], job.body_text)
+        self.assertEqual(data["body_html"], job.body_html)
+        self.assertEqual(True, job.send_html)
+        self.assertEqual(
+            job.send_at,
+            datetime(2025, 6, 1, 21, 11, tzinfo=timezone.utc),
+        )
+
+    def test_valid_send_now(self) -> None:
+        url = reverse("queue-members-mailout", query={"send_at": "now"})
+        self.assertEqual(0, MailoutJob.objects.count())
+        data = {
+            "subject": "Yet another member's mailout",
+            "body_text": "Let the bodies hit the floor\netc.",
+            "body_html": "<h1>Should not be ignored</h1>",
+            "send_at": "01/06/1901 12:00",
+            "send_html": "on",
+        }
+        response = self.client.post(url, data=data)
+        self.assertRedirects(response, reverse("mailer:jobs-list"))
+
+        self.assertEqual(1, MailoutJob.objects.count())
+        job = MailoutJob.objects.all()[0]
+        self.assertEqual(data["subject"], job.subject)
+        self.assertEqual(data["body_text"], job.body_text)
+        self.assertEqual(data["body_html"], job.body_html)
+        self.assertEqual(True, job.send_html)
+        self.assertEqual(job.send_at, FAKE_NOW + timedelta(seconds=2))
+
+    def test_invalid_date_in_past(self) -> None:
+        url = reverse("queue-members-mailout")
+        data = {
+            "subject": "Yet another member's mailout",
+            "body_text": "Let the bodies hit the floor\netc.",
+            "body_html": "<h1>Should not be ignored</h1>",
+            "send_at": (FAKE_NOW - timedelta(seconds=1)).strftime(
+                "%d/%m/%Y %H:%M"
+            ),
+            "send_html": "on",
+        }
+        response = self.client.post(url, data=data)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "mailout_send.html")
+        self.assertFormError(
+            response.context["form"], "send_at", "Must be in the future"
+        )
+
+        self.assertEqual(0, MailoutJob.objects.count())
 
 
 class MailoutTests(DiaryTestsMixin, TestCase):
