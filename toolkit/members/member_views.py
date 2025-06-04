@@ -463,6 +463,7 @@ def opt_in(request, member_id):
     )
 
 
+@permission_required('toolkit.read')
 @require_safe
 def member_statistics(request):
     # View for the 'statistics' page of the 'membership database'
