@@ -65,7 +65,7 @@ def jobs_list(request: HttpRequest) -> HttpResponse:
 @require_GET
 def jobs_table(request: HttpRequest) -> HttpResponse:
     show_completed = request.GET.get("show-completed") == "on"
-    show_failed = request.GET.get("show-failed", "true") == "on"
+    show_failed = request.GET.get("show-failed") == "on"
     poll_for_updates = request.GET.get("poll-for-updates") == "on"
 
     jobs = _query_jobs(show_completed=show_completed, show_failed=show_failed)
