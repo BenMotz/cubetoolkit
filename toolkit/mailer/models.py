@@ -71,7 +71,7 @@ class MailoutJob(models.Model):
         return self.state == MailoutJob.SendState.SENDING
 
     def do_sending(self, sent: int, total: int) -> bool:
-        progress_pct = int((100.0 * sent) / total) + 1
+        progress_pct = int((100.0 * sent) / total) + 1 if total else 100
         if self.state not in (
             MailoutJob.SendState.PENDING,
             MailoutJob.SendState.SENDING,
