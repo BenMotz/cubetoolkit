@@ -19,13 +19,6 @@ SUMMARY_RECIPIENT = "cubeadmin@example.com"
 
 
 class TestSendMailoutTo(MembersTestsMixin, TestCase):
-
-    def setUp(self):
-        super().setUp()
-        self.assertTrue(
-            self.client.login(username="admin", password="T3stPassword!")
-        )
-
     def _assert_mail_as_expected(
         self,
         msgstr: str,
