@@ -2,8 +2,6 @@ from __future__ import unicode_literals
 import re
 import logging
 
-import html2text
-import html
 import datetime
 
 from django.db import models
