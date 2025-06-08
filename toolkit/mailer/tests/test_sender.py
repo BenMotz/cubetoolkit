@@ -11,7 +11,7 @@ import django.utils.timezone
 
 from ...members.tests.common import MembersTestsMixin
 from ...members.models import Member
-from ..mailerd import send_mailout_to
+from ..sender import send_mailout_to
 from ..models import MailoutJob
 
 
@@ -151,7 +151,7 @@ class TestSendMailoutTo(MembersTestsMixin, TestCase):
         self._test_send(subject, body, body_html, send_html=True)
         self._assert_mail_sent(subject, body, body_html, True)
 
-    @patch("toolkit.mailer.mailerd.get_connection")
+    @patch("toolkit.mailer.sender.get_connection")
     def test_connect_fail(self, connection_mock: Mock) -> None:
         connection_mock.return_value.open.side_effect = (
             smtplib.SMTPConnectError(101, "Blah")
@@ -184,7 +184,7 @@ class TestSendMailoutTo(MembersTestsMixin, TestCase):
         self.assertEqual(MailoutJob.SendState.SENT, job.state)
         self.assertEqual("Complete", job.status)
 
-    @patch("toolkit.mailer.mailerd.get_connection")
+    @patch("toolkit.mailer.sender.get_connection")
     def test_send_fail(self, connection_mock: Mock) -> None:
         exception = smtplib.SMTPException("Something failed")
         connection_mock.return_value.send_messages.side_effect = exception
@@ -203,7 +203,7 @@ class TestSendMailoutTo(MembersTestsMixin, TestCase):
         expected = "6 errors:\n" + "\n".join([str(exception)] * 6)
         self.assertIn(expected, report.body)
 
-    @patch("toolkit.mailer.mailerd.get_connection")
+    @patch("toolkit.mailer.sender.get_connection")
     def test_send_fail_disconnected(self, connection_mock: Mock) -> None:
         connection_mock.return_value.send_messages.side_effect = (
             smtplib.SMTPServerDisconnected("Something failed")
@@ -217,7 +217,7 @@ class TestSendMailoutTo(MembersTestsMixin, TestCase):
         self.assertEqual(MailoutJob.SendState.FAILED, job.state)
         self.assertEqual("Mailout job died: 'Something failed'", job.status)
 
-    @patch("toolkit.mailer.mailerd.get_connection")
+    @patch("toolkit.mailer.sender.get_connection")
     def test_random_error(self, connection_mock: Mock) -> None:
         # Test a non SMTP error
         connection_mock.return_value.send_messages.side_effect = IOError(
