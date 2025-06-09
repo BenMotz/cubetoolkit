@@ -13,7 +13,7 @@ from .sender import send_mailout_to
 
 logger = logging.getLogger(__name__)
 
-POLL_PERIOD_S = 1
+POLL_PERIOD_S = 5
 
 
 def run_job(job: MailoutJob) -> None:
