@@ -1,4 +1,3 @@
-import os.path
 import logging
 import binascii
 import datetime
@@ -32,8 +31,8 @@ class MemberManager(models.Manager):
         )
 
     # A few hard-coded SQL queries to get some of the more complex statistics:
-    def get_stat_popular_email_domains(self):
-        # Get 10 most popular email domains
+    def get_stat_popular_email_domains(self) -> dict[str, int]:
+        # Get 10 most popular email domains amongst active subscribers
         with django.db.connection.cursor() as cursor:
             cursor.execute(
                 "SELECT "
@@ -41,12 +40,13 @@ class MemberManager(models.Manager):
                 " COUNT(1) AS num "
                 "FROM Members "
                 "WHERE email != '' "
+                "AND mailout_failed = FALSE "
+                "AND mailout = TRUE "
                 "GROUP BY domain "
                 "ORDER BY num DESC "
                 "LIMIT 10"
             )
-            email_stats = [row for row in cursor.fetchall()]
-        return email_stats
+            return dict(cursor.fetchall())
 
     def get_stat_popular_postcode_prefixes(self):
         # Get 10 most popular postcode prefixes

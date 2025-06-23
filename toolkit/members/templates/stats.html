@@ -6,11 +6,11 @@
 
 <h2>Statistics of members</h2>
 
-<h3>Top email domains</h3>
+<h3>Top email domains with subscribed (non-failed) members</h3>
 <table class="table">
-    <th align=left>Rank</th><th align=left>Domain</th><th align=left>Members</th>
-    {% for row in email_stats %}
-        <tr><td>{{ forloop.counter }}</td><td><a href="http://{{ row.0 }}/">{{ row.0 }}</a></td><td>{{ row.1 }}</td></tr>
+    <tr><th align=left>Rank</th><th align=left>Domain</th><th align=left>Members</th></tr>
+    {% for domain, count in email_stats.items %}
+        <tr><td>{{ forloop.counter }}</td><td><a href="http://{{ domain }}/">{{ domain }}</a></td><td>{{ count }}</td></tr>
     {% endfor %}
 </table>
 
