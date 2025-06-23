@@ -1,3 +1,4 @@
+import os
 import logging
 import binascii
 import datetime
@@ -229,17 +230,13 @@ class Volunteer(models.Model):
             # Delete old image:
             if self.__original_portrait:
                 logging.info(
-                    "Deleting old volunteer portrait '{0}'".format(
-                        self.__original_portrait
-                    )
+                    f"Deleting old volunteer portrait '{self.__original_portrait}'"
                 )
                 try:
                     os.unlink(self.__original_portrait)
                 except (IOError, OSError) as err:
                     logging.error(
-                        "Failed deleting old volunteer portrait '{0}': {1}".format(
-                            self.__original_portrait, err
-                        )
+                        f"Failed deleting old volunteer portrait '{self.__original_portrait}': {err}"
                     )
                 self.__original_portrait = None
 
@@ -307,15 +304,8 @@ class TrainingRecord(models.Model):
 
     def __repr__(self):
         return (
-            "TrainingRecord(volunteer=%d, type=%s, role=%s, date=%s "
-            "trainer=%s)"
-            % (
-                self.volunteer_id,
-                self.training_type,
-                self.role_id,
-                self.training_date,
-                self.trainer,
-            )
+            f"TrainingRecord(volunteer={self.volunteer_id}, type={self.training_type}, "
+            f"role={self.role_id}, date={self.training_date} trainer={Self.trainer})"
         )
 
     def clean(self):

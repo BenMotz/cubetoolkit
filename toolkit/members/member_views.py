@@ -43,12 +43,12 @@ def add_member(request):
                 and Member.objects.filter(email=instance.email).exists()
             ):
                 logger.info(
-                    "Member with email %s already in database", instance.email
+                    f"Member with email {instance.email} already in database"
                 )
                 messages.add_message(
                     request,
                     messages.WARNING,
-                    "%s already in members' database" % instance.email,
+                    f"{instance.email} already in members' database",
                 )
                 return HttpResponseRedirect(
                     reverse(
@@ -58,16 +58,14 @@ def add_member(request):
                 )
 
             # Form is valid, save data:
-            logger.info(
-                "Adding member '%s <%s>'", instance.name, instance.email
-            )
+            logger.info(f"Adding member '{instance.name} <{instance.email}>'")
             member = form.save(commit=False)
             member.gdpr_opt_in = timezone.now()
             member.save()
             # Member added ok, new blank form:
             form = NewMemberForm()
             messages.add_message(
-                request, messages.SUCCESS, "Added member: %s" % instance.number
+                request, messages.SUCCESS, f"Added member: {instance.number}"
             )
             return HttpResponseRedirect(reverse("add-member"))
     elif request.method == "GET":
@@ -163,8 +161,7 @@ def delete_member(request, member_id):
         # get a special message:
         if access_using_key:
             logger.info(
-                "Futile attempt by active volunteer %s "
-                "<%s> to delete themselves" % (member.name, member.email)
+                f"Futile attempt by active volunteer {member.name} <{member.email}> to delete themselves"
             )
             # TODO send mail to admins
             return render(request, "email_admin.html")
@@ -172,12 +169,10 @@ def delete_member(request, member_id):
             messages.add_message(
                 request,
                 messages.ERROR,
-                "Can't delete active volunteer %s "
-                "(%s). Retire them first." % (member.name, member.number),
+                f"Can't delete active volunteer {member.name} ({member.number}). Retire them first.",
             )
             logger.info(
-                "Attempt to delete active volunteer %s %s <%s>"
-                % (member.number, member.name, member.email)
+                f"Attempt to delete active volunteer {member.number} {member.name} <{member.email}>"
             )
             return HttpResponseRedirect(reverse("search-members"))
     # Logged in, and not following an email link, so just delete:
@@ -185,11 +180,10 @@ def delete_member(request, member_id):
         messages.add_message(
             request,
             messages.SUCCESS,
-            "Deleted member: %s (%s)" % (member.number, member.name),
+            f"Deleted member: {member.number} ({member.name})",
         )
         logger.info(
-            "Member %s %s <%s> deleted by admin"
-            % (member.number, member.name, member.email)
+            f"Member {member.number} {member.name} <{member.email}> deleted by admin"
         )
         member.delete()  # This will delete associated volunteer record, if any
         return HttpResponseRedirect(reverse("search-members"))
@@ -199,10 +193,7 @@ def delete_member(request, member_id):
         confirmed = request.GET.get("confirmed", "no")
         if confirmed == "yes":
             logger.info(
-                "Member %s %s <%s> self-deleted",
-                member.number,
-                member.name,
-                member.email,
+                f"Member {member.number} {member.name} <{member.email}> self-deleted"
             )
             member.delete()
             return HttpResponseRedirect(reverse("goodbye"))
@@ -297,15 +288,11 @@ def edit_member(request, member_id):
         )
         if form.is_valid():
             logger.info(
-                "Saving changes to member '{0}' (id: {1})".format(
-                    member.name, member.pk
-                )
+                f"Saving changes to member '{member.name}' (id: {member.pk})"
             )
             form.save()
             messages.add_message(
-                request,
-                messages.SUCCESS,
-                "Member {0} updated".format(member.number),
+                request, messages.SUCCESS, f"Member {member.number} updated"
             )
             if request.user.has_perm("toolkit.write"):
                 return HttpResponseRedirect(reverse("search-members"))
@@ -348,14 +335,12 @@ def unsubscribe_member(request, member_id):
             member.mailout = action == "subscribe"
             member.save()
             logger.info(
-                "{0} member '{1}' (id: {2}) from mailing list".format(
-                    action, member.name, member.pk
-                )
+                f"{action} member '{member.name}' (id: {member.pk}) from mailing list"
             )
             messages.add_message(
                 request,
                 messages.SUCCESS,
-                "Member {0} {1}d".format(member.number, action),
+                f"Member {member.number} {action}d",
             )
 
     action = "unsubscribe" if member.mailout else "subscribe"
@@ -391,14 +376,10 @@ def unsubscribe_member_right_now(request, member_id):
     member.mailout = False
     member.save()
     logger.info(
-        "{0} member '{1}' (id: {2}) from mailing list".format(
-            action, member.name, member.pk
-        )
+        f"{action} member '{member.name}' (id: {member.pk}) from mailing list"
     )
     messages.add_message(
-        request,
-        messages.SUCCESS,
-        "Member {0} {1}d".format(member.number, action),
+        request, messages.SUCCESS, f"Member {member.number} {action}d"
     )
 
     return render(
@@ -430,8 +411,8 @@ def opt_in(request, member_id):
                 messages.add_message(
                     request,
                     messages.SUCCESS,
-                    "Thank you %s for opting in to continue to "
-                    "receive our emails" % member.name,
+                    f"Thank you {member.name} for opting in to continue to "
+                    "receive our emails",
                 )
             else:  # opt-out
                 member.gdpr_opt_in = None
@@ -445,13 +426,7 @@ def opt_in(request, member_id):
             member.save()
 
             logger.info(
-                "Member '{0}' (id: {1}) <{2}>: {3} on {4}".format(
-                    member.name,
-                    member.pk,
-                    member.email,
-                    action,
-                    member.gdpr_opt_in,
-                )
+                f"Member '{member.name}' (id: {member.pk}) <{member.email}>: {action} on {member.gdpr_opt_in}"
             )
 
     action = "opt-out" if member.gdpr_opt_in else "opt-in"
