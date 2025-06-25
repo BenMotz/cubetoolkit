@@ -116,7 +116,7 @@ class MediaItem(models.Model):
         if self.media_file and self.media_file.name != "":
             try:
                 self.mimetype = imagetools.get_mimetype(self.media_file.file)
-            except IOError:
+            except OSError:
                 logger.error(
                     f"Failed to determine mimetype of file {self.media_file.name}"
                 )

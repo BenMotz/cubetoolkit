@@ -223,7 +223,7 @@ class Volunteer(models.Model):
         # Save the model.
         try:
             current_portrait_file = self.portrait.file.name
-        except (IOError, OSError, ValueError):
+        except (OSError, ValueError):
             current_portrait_file = None
 
         if current_portrait_file != self.__original_portrait:
@@ -234,7 +234,7 @@ class Volunteer(models.Model):
                 )
                 try:
                     os.unlink(self.__original_portrait)
-                except (IOError, OSError) as err:
+                except OSError as err:
                     logging.error(
                         f"Failed deleting old volunteer portrait '{self.__original_portrait}': {err}"
                     )
@@ -250,7 +250,7 @@ class Volunteer(models.Model):
             self.__original_portrait = (
                 self.portrait.file.name if self.portrait else None
             )
-        except (IOError, OSError, ValueError):
+        except (OSError, ValueError):
             self.__original_portrait = None
 
     def is_old(self):
