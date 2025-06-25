@@ -305,7 +305,7 @@ class TrainingRecord(models.Model):
     def __repr__(self):
         return (
             f"TrainingRecord(volunteer={self.volunteer_id}, type={self.training_type}, "
-            f"role={self.role_id}, date={self.training_date} trainer={Self.trainer})"
+            f"role={self.role_id}, date={self.training_date} trainer={self.trainer})"
         )
 
     def clean(self):
