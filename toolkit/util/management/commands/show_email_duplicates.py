@@ -30,15 +30,12 @@ class Command(BaseCommand):
 
         for member in members:
             self.stdout.write(
-                "%s <%s> joined %s"
-                % (member.name, member.email, member.created_at)
+                f"{member.name} <{member.email}> joined {member.created_at}"
             )
             # member.delete()
 
         self.stdout.write(
-            self.style.SUCCESS("\nFound %d email duplicates" % len(dupes))
+            self.style.SUCCESS(f"\nFound {len(dupes)} email duplicates")
         )
 
-        self.stdout.write(
-            self.style.SUCCESS("from %d members\n" % len(members))
-        )
+        self.stdout.write(self.style.SUCCESS(f"from {len(members)} members\n"))

@@ -33,7 +33,7 @@ class AddMemberIPAuth(TestCase):
         # Issue the request
         response = member_views.add_member(self.request)
 
-        expected_redirect = "{0}?next={1}".format(reverse("login"), self.url)
+        expected_redirect = f"{reverse('login')}?next={self.url}"
         self.assertEqual(response.status_code, 302)
         self.assertEqual(response["Location"], expected_redirect)
 
@@ -228,9 +228,7 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
         else:
             self.assertIsNone(member.membership_expires)
 
-        self.assertContains(
-            response, "Added member: {0}".format(member.number)
-        )
+        self.assertContains(response, f"Added member: {member.number}")
 
     @override_settings(MEMBERSHIP_EXPIRY_ENABLED=False)
     @patch("toolkit.members.models.timezone_now")
@@ -265,9 +263,7 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
         self.assertEqual(member.postcode, "")
         self.assertEqual(member.is_member, False)
 
-        self.assertContains(
-            response, "Added member: {0}".format(member.number)
-        )
+        self.assertContains(response, f"Added member: {member.number}")
 
     def test_post_form_invalid_data_missing(self):
         count_before = Member.objects.count()
@@ -303,7 +299,7 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
         # the search term:
         expected_url = reverse("search-members")
         self.assertRedirects(
-            response, expected_url + "?email=%s&q=" % self.mem_1.email
+            response, f"{expected_url}?email={self.mem_1.email}&q="
         )
 
         self.assertTemplateUsed(response, "search_members_results.html")
@@ -507,7 +503,7 @@ class TestDeleteMemberViewLoggedIn(MembersTestsMixin, TestCase):
 
         self.assertRedirects(response, reverse("search-members"))
         self.assertContains(
-            response, "Can&#x27;t delete active volunteer %s" % mem.name
+            response, f"Can&#x27;t delete active volunteer {mem.name}"
         )
 
         self.assertTrue(Member.objects.filter(id=mem.id).exists())
@@ -1154,7 +1150,7 @@ class TestUnsubscribeMemberView(MembersTestsMixin, TestCase):
         response = self.client.post(
             url,
             data={
-                "k": member.mailout_key + "x",
+                "k": f"{member.mailout_key}x",
                 "action": "unsubscribe",
                 "confirm": "yes",
             },

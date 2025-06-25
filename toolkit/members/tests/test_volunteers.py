@@ -239,9 +239,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         # Should have default mugshot:
         self.assertContains(
             response,
-            '<img id="photo" alt="No photo yet" src="{0}" width="75">'.format(
-                settings.DEFAULT_MUGSHOT
-            ),
+            f'<img id="photo" alt="No photo yet" src="{settings.DEFAULT_MUGSHOT}" width="75">',
             html=True,
         )
 
@@ -614,7 +612,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
             data={
                 "mem-name": "Pictureless Person",
                 "vol-image_data": (
-                    "data:image/png;base64,%s" % TINY_VALID_BASE64_PNG
+                    f"data:image/png;base64,{TINY_VALID_BASE64_PNG}"
                 ),
             },
         )
@@ -648,7 +646,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
             data={
                 "mem-name": "Pictureless Person",
                 "vol-image_data": (
-                    "data:image/jpeg;base64,%s" % TINY_VALID_BASE64_PNG
+                    f"data:image/jpeg;base64,{TINY_VALID_BASE64_PNG}"
                 ),
             },
         )
@@ -669,12 +667,12 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         self.assertNotEqual(initial_portrait, None)
 
         url = reverse("edit-volunteer", kwargs={"volunteer_id": 1})
-        INVALID_PNG = "Spinach" + TINY_VALID_BASE64_PNG
+        INVALID_PNG = f"Spinach{TINY_VALID_BASE64_PNG}"
         response = self.client.post(
             url,
             data={
                 "mem-name": "Pictureless Person",
-                "vol-image_data": "data:image/png;base64,%s" % INVALID_PNG,
+                "vol-image_data": f"data:image/png;base64,{INVALID_PNG}",
             },
         )
 

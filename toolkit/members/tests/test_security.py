@@ -109,7 +109,7 @@ class SecurityTests(MembersTestsMixin, TestCase):
 
         # Now try with the key:
         for view_name in views_to_test:
-            url = "{0}?k={1}".format(
+            url = "{}?k={}".format(
                 reverse(view_name, kwargs={"member_id": member.id}),
                 member.mailout_key,
             )

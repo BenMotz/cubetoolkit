@@ -22,11 +22,10 @@ class Command(BaseCommand):
 
         for member in dead_wood:
             self.stdout.write(
-                "%s <%s> joined %s"
-                % (member.name, member.email, member.created_at)
+                f"{member.name} <{member.email}> joined {member.created_at}"
             )
             member.delete()
 
         self.stdout.write(
-            self.style.SUCCESS("\nDeleted %d non-members\n" % len(dead_wood))
+            self.style.SUCCESS(f"\nDeleted {len(dead_wood)} non-members\n")
         )

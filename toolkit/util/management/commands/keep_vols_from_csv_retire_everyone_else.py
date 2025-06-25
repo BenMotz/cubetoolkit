@@ -48,7 +48,7 @@ class Command(BaseCommand):
         except Volunteer.MultipleObjectsReturned:
             self.stdout.write(
                 self.style.WARNING(
-                    "Multiple volunteers with the same name: {0}".format(name)
+                    f"Multiple volunteers with the same name: {name}"
                 )
             )
             return None
@@ -61,8 +61,7 @@ class Command(BaseCommand):
         except Volunteer.MultipleObjectsReturned:
             self.stdout.write(
                 self.style.WARNING(
-                    "Multiple volunteers with the same email address: %s"
-                    % email
+                    f"Multiple volunteers with the same email address: {email}"
                 )
             )
         except Volunteer.DoesNotExist:
@@ -72,18 +71,18 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
 
         now = datetime.now().strftime("%d %B %Y")
-        dateStr = "\n\n%s:\n" % now
-        retireStr = "Bulk retired %s" % now
+        dateStr = f"\n\n{now}:\n"
+        retireStr = f"Bulk retired {now}"
 
         if options["dryRun"]:
             verb = "Would"
         else:
             verb = "Will"
 
-        self.stdout.write("Trying to read {0}".format(FILENAME))
+        self.stdout.write(f"Trying to read {FILENAME}")
         desired_vols = load_data(FILENAME)
         self.stdout.write(
-            self.style.SUCCESS("Loaded %d volunteers\n" % len(desired_vols))
+            self.style.SUCCESS(f"Loaded {len(desired_vols)} volunteers\n")
         )
 
         volsToRetire = Volunteer.objects.filter(active=True).order_by(
@@ -92,18 +91,18 @@ class Command(BaseCommand):
 
         self.stdout.write(
             self.style.SUCCESS(
-                "\nBeginning with %d active volunteers" % len(volsToRetire)
+                f"\nBeginning with {len(volsToRetire)} active volunteers"
             )
         )
 
         for idx, vol in enumerate(desired_vols):
             if idx == 0:
                 continue  # Skip header row
-            self.stdout.write("\n%s <%s>" % (vol[1], vol[2]))
+            self.stdout.write(f"\n{vol[1]} <{vol[2]}>")
             matched_vol = self.try_get_volunteer_by_email(vol[2])
             if matched_vol:
                 self.stdout.write(
-                    self.style.SUCCESS("Matching email %s found" % vol[2])
+                    self.style.SUCCESS(f"Matching email {vol[2]} found")
                 )
                 volsToRetire = volsToRetire.exclude(
                     member__volunteer=matched_vol
@@ -112,7 +111,7 @@ class Command(BaseCommand):
                 matched_vol = self.try_get_volunteer_by_name(vol[1])
                 if matched_vol:
                     self.stdout.write(
-                        self.style.SUCCESS("Matching name %s found" % vol[1])
+                        self.style.SUCCESS(f"Matching name {vol[1]} found")
                     )
                     volsToRetire = volsToRetire.exclude(
                         member__volunteer=matched_vol
@@ -132,20 +131,18 @@ class Command(BaseCommand):
             else:
                 self.stdout.write(
                     self.style.WARNING(
-                        "Confusing situation with regard to %s <%s>"
-                        % (vol[1], vol[2])
+                        f"Confusing situation with regard to {vol[1]} <{vol[2]}>"
                     )
                 )
 
         self.stdout.write(
             self.style.WARNING(
-                "\n%s be retiring the following %d volunteers\n"
-                % (verb, len(volsToRetire))
+                f"\n{verb} be retiring the following {len(volsToRetire)} volunteers\n"
             )
         )
 
         for vol in volsToRetire:
-            self.stdout.write("%s <%s>" % (vol.member.name, vol.member.email))
+            self.stdout.write(f"{vol.member.name} <{vol.member.email}>")
             if not options["dryRun"]:
                 if vol.member.volunteer.notes:
                     seperator = "\n\n"

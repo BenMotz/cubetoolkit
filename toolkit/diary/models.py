@@ -55,13 +55,11 @@ class Role(models.Model):
 
     def save(self, *args, **kwargs):
         if self._original_read_only and self._original_name != self.name:
-            logger.error("Tried to edit read-only role {0}".format(self.name))
+            logger.error(f"Tried to edit read-only role {self.name}")
             return
         elif self._original_read_only and not self.read_only:
             # TODO: Unit test!
-            logger.error(
-                "Tried to unprotect read-only role {0}".format(self.name)
-            )
+            logger.error(f"Tried to unprotect read-only role {self.name}")
             return
         else:
             return super(Role, self).save(*args, **kwargs)
@@ -69,9 +67,7 @@ class Role(models.Model):
     def delete(self, *args, **kwargs):
         # Don't allow read_only roles to be deleted
         if self.pk and self.read_only:
-            logger.error(
-                "Tried to delete read-only role {0}".format(self.name)
-            )
+            logger.error(f"Tried to delete read-only role {self.name}")
             return False
         else:
             return super(Role, self).delete(*args, **kwargs)
@@ -102,7 +98,7 @@ class MediaItem(models.Model):
         db_table = "MediaItems"
 
     def __str__(self):
-        return "{0}: {1}".format(self.pk, self.media_file)
+        return f"{self.pk}: {self.media_file}"
 
     # Overloaded Django ORM method:
 
@@ -123,15 +119,11 @@ class MediaItem(models.Model):
                 self.mimetype = imagetools.get_mimetype(self.media_file.file)
             except IOError:
                 logger.error(
-                    "Failed to determine mimetype of file {0}".format(
-                        self.media_file.name
-                    )
+                    f"Failed to determine mimetype of file {self.media_file.name}"
                 )
                 self.mimetype = "application/octet-stream"
             logger.debug(
-                "Mime type for {0} detected as {1}".format(
-                    self.media_file.name, self.mimetype
-                )
+                f"Mime type for {self.media_file.name} detected as {self.mimetype}"
             )
 
 
@@ -259,7 +251,7 @@ class Event(models.Model):
             self.pricing = kwargs["template"].pricing
 
     def __str__(self):
-        return "{0} ({1})".format(self.name, self.id)
+        return f"{self.name} ({self.id})"
 
     def reset_tags_to_default(self):
         if self.template:
@@ -276,11 +268,7 @@ class Event(models.Model):
         if self.media.count() == 0:
             return
         media_item = self.media.all()[0]
-        logger.info(
-            "Removing media file {0} from event {1}".format(
-                media_item, self.pk
-            )
-        )
+        logger.info(f"Removing media file {media_item} from event {self.pk}")
         self.media.remove(media_item)
         # # If the media item isn't associated with any events, delete it:
         # # ACTUALLY: let's keep it. Disk space is cheap, etc.
@@ -289,9 +277,7 @@ class Event(models.Model):
 
     def set_main_mediaitem(self, media_file):
         self.clear_main_mediaitem()
-        logger.info(
-            "Adding media file {0} to event {1}".format(media_file, self.pk)
-        )
+        logger.info(f"Adding media file {media_file} to event {self.pk}")
         self.media.add(media_file)
 
     def get_main_mediaitem(self):
@@ -474,9 +460,7 @@ class Showing(models.Model):
 
         if copy_from:
             logger.info(
-                "Cloning showing from existing showing (id {0})".format(
-                    copy_from.pk
-                )
+                f"Cloning showing from existing showing (id {copy_from.pk})"
             )
             # Manually copy fields, rather than using things from copy library,
             # as don't want to copy the rota (as that would make db writes)
@@ -536,8 +520,8 @@ class Showing(models.Model):
         # this, but this will stop the forms deleting records.
         if self.in_past() or self.original_start_in_past():
             logger.error(
-                "Tried to delete showing {0} with start time "
-                "{1} in the past".format(self.pk, self.start)
+                f"Tried to delete showing {self.pk} with start time "
+                f"{self.start} in the past"
             )
             raise django.db.IntegrityError(
                 "Can't delete showings that start in the past"
@@ -617,19 +601,13 @@ class Showing(models.Model):
             existing_entries = rota_entries_by_id.pop(role_id, [])
             # delete highest ranked instances
             while count < len(existing_entries):
-                logger.info(
-                    "Removing role {0} from showing {1}".format(
-                        role_id, self.pk
-                    )
-                )
+                logger.info(f"Removing role {role_id} from showing {self.pk}")
                 highest_ranked = max(existing_entries, key=lambda re: re.rank)
                 highest_ranked.delete()
                 existing_entries.remove(highest_ranked)
             # add required entries
             while count > len(existing_entries):
-                logger.info(
-                    "Adding role {0} to showing {1}".format(role_id, self.pk)
-                )
+                logger.info(f"Adding role {role_id} to showing {self.pk}")
                 # add rotaentries
                 new_re = RotaEntry(role_id=role_id, showing=self)
                 if len(existing_entries) > 0:
@@ -651,7 +629,7 @@ class DiaryIdea(models.Model):
         db_table = "DiaryIdeas"
 
     def __str__(self):
-        return "{0}/{1}".format(self.month.month, self.month.year)
+        return f"{self.month.month}/{self.month.year}"
 
 
 class EventTemplate(models.Model):
@@ -696,7 +674,7 @@ class RotaEntry(models.Model):
         ordering = ["role", "rank"]
 
     def __str__(self):
-        return "{0} {1}".format(str(self.role), self.rank)
+        return f"{str(self.role)} {self.rank}"
 
     def __init__(self, *args, **kwargs):
         # Allow a template keyword arg to be supplied. If it is, copy rota
@@ -717,7 +695,7 @@ class RotaEntry(models.Model):
             self.rank = template.rank
             logger.info(
                 "Cloning rota entry from existing rota entry with "
-                "role_id {0}".format(template.role.pk)
+                f"role_id {template.role.pk}"
             )
 
 
@@ -749,9 +727,7 @@ class PrintedProgramme(models.Model):
         db_table = "PrintedProgrammes"
 
     def __str__(self):
-        return "Printed programme for {0}/{1}".format(
-            self.month.month, self.month.year
-        )
+        return f"Printed programme for {self.month.month}/{self.month.year}"
 
     def save(self, *args, **kwargs):
         # Enforce month column always being a date for the first of the month:

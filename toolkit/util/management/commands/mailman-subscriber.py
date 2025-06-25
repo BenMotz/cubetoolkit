@@ -196,7 +196,7 @@ def main():
             nomail = True
     if len(args) != 3:
         usage(2)
-    member_url = "https://%s/mailman/admin/%s/members" % (args[0], args[1])
+    member_url = f"https://{args[0]}/mailman/admin/{args[1]}/members"
     p = {"adminpw": args[2]}
 
     # login, picking up the cookie

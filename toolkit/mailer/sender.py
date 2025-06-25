@@ -48,15 +48,15 @@ def _send_email(
     try:
         msg.send()
     except email.errors.MessageParseError as hpe:
-        error = "Failed sending to '{0}': {1}".format(destination, hpe)
+        error = f"Failed sending to '{destination}': {hpe}"
         logger.error(error)
     except smtplib.SMTPServerDisconnected as ssd:
-        logger.error("Failed sending to '{0}': {1}".format(destination, ssd))
+        logger.error(f"Failed sending to '{destination}': {ssd}")
         # don't handle this:
         raise
     except smtplib.SMTPException as smtpe:
         error = str(smtpe)
-        logger.error("Failed sending to '{0}': {1}".format(destination, smtpe))
+        logger.error(f"Failed sending to '{destination}': {smtpe}")
 
     return error
 
@@ -130,7 +130,7 @@ def send_mailout_to(
     one_percent = count // 100 or 1
     start_time = time.monotonic()
 
-    logger.info("Sending mailout to {0} recipients".format(count))
+    logger.info(f"Sending mailout to {count} recipients")
 
     html_mail_template = django.template.loader.get_template(
         "mailout_wrapper.html"
@@ -151,7 +151,7 @@ def send_mailout_to(
     try:
         email_conn.open()
     except Exception as exc:
-        msg = "Failed to connect to SMTP server: {0}".format(exc)
+        msg = f"Failed to connect to SMTP server: {exc}"
         logger.error(msg)
         job.do_fail(msg)
         job.save()

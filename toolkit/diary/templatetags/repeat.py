@@ -25,7 +25,7 @@ def do_capture(parser, token):
         tag_name, capture_name = token.split_contents()
     except ValueError:
         raise template.TemplateSyntaxError(
-            "%r tag requires a single argument" % token.contents.split()[0]
+            f"{token.contents.split()[0]!r} tag requires a single argument"
         )
     nodelist = parser.parse(("endcapture",))
     parser.delete_first_token()
@@ -61,15 +61,14 @@ def do_retrieve(parser, token):
         tag_name, capture_name = token.split_contents()
     except ValueError:
         raise template.TemplateSyntaxError(
-            "%r tag requires a single argument" % token.contents.split()[0]
+            f"{token.contents.split()[0]!r} tag requires a single argument"
         )
 
     try:
         capturing_node = parser._captured[capture_name]
     except KeyError:
         raise template.TemplateSyntaxError(
-            "'%s' tag trying to retrieve non-existent capture '%s'"
-            % (tag_name, capture_name)
+            f"'{tag_name}' tag trying to retrieve non-existent capture '{capture_name}'"
         )
 
     return CaptureRetrieverNode(capturing_node)

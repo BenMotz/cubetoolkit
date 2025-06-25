@@ -18,12 +18,11 @@ class Command(BaseCommand):
         path, filename = os.path.split(__file__)
 
         server = input(
-            "Enter name of server that mailman is running on [%s]: "
-            % server_default
+            f"Enter name of server that mailman is running on [{server_default}]: "
         )
         if not server:
             server = server_default
-        vol_list = input("Enter name of mailman list [%s]: " % list_default)
+        vol_list = input(f"Enter name of mailman list [{list_default}]: ")
         if not vol_list:
             vol_list = list_default
         list_pass = input("Enter mailing list password: ")
@@ -33,8 +32,8 @@ class Command(BaseCommand):
             )
             return vols
 
-        args = "%s %s %s" % (server, vol_list, list_pass)
-        shebang = "python2 %s %s" % (os.path.join(path, mailman_api), args)
+        args = f"{server} {vol_list} {list_pass}"
+        shebang = f"python2 {os.path.join(path, mailman_api)} {args}"
 
         try:
             out = subprocess.check_output(
@@ -47,12 +46,12 @@ class Command(BaseCommand):
                 # self.stdout.write(self.style.SUCCESS(line))
                 vols.append(urllib.parse.unquote_plus(line.rstrip()))
             self.stdout.write(
-                self.style.SUCCESS("\n%d vols found in mailman" % len(vols))
+                self.style.SUCCESS(f"\n{len(vols)} vols found in mailman")
             )
             return vols
         except subprocess.CalledProcessError as e:
             self.stdout.write(
-                self.style.ERROR("%s\n%s" % (shebang, str(e.output, "utf-8")))
+                self.style.ERROR(f"{shebang}\n{str(e.output, 'utf-8')}")
             )
 
     def _readfile(self, filename):
@@ -87,7 +86,7 @@ class Command(BaseCommand):
         vols = Volunteer.objects.filter(active=True).order_by("member__name")
 
         self.stdout.write(
-            self.style.SUCCESS("%d active volunteers to check\n" % len(vols))
+            self.style.SUCCESS(f"{len(vols)} active volunteers to check\n")
         )
 
         self.stdout.write(
@@ -98,13 +97,12 @@ class Command(BaseCommand):
             if vol.member.email.lower() in mmvols:
                 if options["verbose"]:
                     self.stdout.write(
-                        self.style.SUCCESS("%s found in mailman" % vol.member)
+                        self.style.SUCCESS(f"{vol.member} found in mailman")
                     )
             else:
                 self.stdout.write(
                     self.style.WARNING(
-                        "%s <%s> not found in mailman"
-                        % (vol.member, vol.member.email)
+                        f"{vol.member} <{vol.member.email}> not found in mailman"
                     )
                 )
 
@@ -120,18 +118,17 @@ class Command(BaseCommand):
                 if len(matched) > 1:
                     self.stdout.write(
                         self.style.WARNING(
-                            "Duplicate entry in vols database found for %s"
-                            % mmvol
+                            f"Duplicate entry in vols database found for {mmvol}"
                         )
                     )
                     for match in matched:
                         self.stdout.write(
-                            "%s <%s>" % (match.member.name, match.member.email)
+                            f"{match.member.name} <{match.member.email}>"
                         )
             else:
                 self.stdout.write(
                     self.style.WARNING(
-                        "%s not found in volunteers database" % mmvol
+                        f"{mmvol} not found in volunteers database"
                     )
                 )
                 # Try again, to see if retired
@@ -140,7 +137,7 @@ class Command(BaseCommand):
                     self.stdout.write("Found retired volunteer")
                     for match in matched:
                         self.stdout.write(
-                            "%s <%s>" % (match.member.name, match.member.email)
+                            f"{match.member.name} <{match.member.email}>"
                         )
 
         self.stdout.write(self.style.SUCCESS("\nChecks complete\n"))

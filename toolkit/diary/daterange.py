@@ -69,9 +69,7 @@ def get_date_range(
 
             days_ahead = int(default_days_ahead)
     except (OverflowError, ValueError) as vale:
-        logger.error(
-            "Invalid something requested in date range: {0}".format(vale)
-        )
+        logger.error(f"Invalid something requested in date range: {vale}")
         return (None, "Invalid date")
 
     if user_days_ahead:

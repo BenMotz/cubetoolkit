@@ -12,7 +12,7 @@ class BasicWhatsOnFeed(Feed):
     # Generate a, err, basic "What's on" feed. Defines various methods that
     # hook into the django magic...
     DAYS_AHEAD = 7
-    title = "%s cinema forthcoming events" % settings.VENUE["name"]
+    title = f"{settings.VENUE['name']} cinema forthcoming events"
     description = "Events at the %s cinema over the next %d days. E&OE." % (
         settings.VENUE["cinemaname"],
         DAYS_AHEAD,

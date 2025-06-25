@@ -32,20 +32,20 @@ class Command(BaseCommand):
 
     def _conn_to_archive_database(self):
         try:
-            self.stdout.write("Connecting to database %s..." % dbdb)
+            self.stdout.write(f"Connecting to database {dbdb}...")
             db = MySQLdb.connect(
                 "localhost", dbuser, dbpass, dbdb, charset="utf8"
             )
             return db
         except MySQLdb.Error as e:
             self.stdout.write(
-                self.style.ERROR("Failed to connect to database %s" % dbdb)
+                self.style.ERROR(f"Failed to connect to database {dbdb}")
             )
 
     def _read_archive_db(self, cursor, table):
 
         # ORDER BY `startDate` DESC"
-        sql = "SELECT * FROM `%s`" % table
+        sql = f"SELECT * FROM `{table}`"
         # sql = "SELECT * FROM `%s` WHERE `id` = 164" % table
         # sql = "SELECT * FROM `%s`"#  LIMIT 10" % table
         # sql = "SELECT * FROM `%s` ORDER BY `created` DESC LIMIT 10 OFFSET 10" % table
@@ -144,7 +144,7 @@ class Command(BaseCommand):
                     para = " ".join(para.splitlines())
                 if para:
                     # print('Paragraph %d\n\n%s\n' % (idx, para))
-                    newbody = "%s\n\n%s" % (newbody, para)
+                    newbody = f"{newbody}\n\n{para}"
             # print(newbody)
 
             shebang = (
@@ -182,7 +182,7 @@ class Command(BaseCommand):
                     for line in out.splitlines():
                         print(line)
                 except subprocess.CalledProcessError as e:
-                    print("%s: %s" % (shebang, str(e.output, "utf-8")))
+                    print(f"{shebang}: {str(e.output, 'utf-8')}")
                     fail_count = fail_count + 1
                     failed_docs.append(doc_str)
                     continue
@@ -208,14 +208,14 @@ class Command(BaseCommand):
                         self.stdout.write(
                             "\nParagraph %d\n\n%s\n" % (idx, para)
                         )
-                    newbody = "%s\n\n%s" % (newbody, para)
+                    newbody = f"{newbody}\n\n{para}"
 
-            self.stdout.write("doc types: %s" % doc_types)
-            self.stdout.write("Authors: %s" % sorted(authors))
+            self.stdout.write(f"doc types: {doc_types}")
+            self.stdout.write(f"Authors: {sorted(authors)}")
 
             for author in authors:
                 first_name = author.split(" ")[0].lower()
-                made_up_email = "%s@bogus-domain.org" % first_name
+                made_up_email = f"{first_name}@bogus-domain.org"
                 # print(made_up_email)
                 # wp user create bob bob@example.com --role=author
                 shebang = (
@@ -225,7 +225,7 @@ class Command(BaseCommand):
                     --path=%s --url=%s'
                     % (author, made_up_email, wordpress_path, url)
                 )
-                self.stdout.write("Creating user %s" % author)
+                self.stdout.write(f"Creating user {author}")
                 try:
                     out = subprocess.check_output(
                         shebang, shell=True, stderr=subprocess.STDOUT
@@ -235,7 +235,7 @@ class Command(BaseCommand):
                     for line in out.splitlines():
                         print(line)
                 except subprocess.CalledProcessError as e:
-                    print("%s: %s" % (shebang, str(e.output, "utf-8")))
+                    print(f"{shebang}: {str(e.output, 'utf-8')}")
                     continue
 
             for doc_type in doc_types:
@@ -245,7 +245,7 @@ class Command(BaseCommand):
                     --path=%s --url=%s'
                     % (doc_type, wordpress_path, url)
                 )
-                self.stdout.write("Creating category %s" % doc_type)
+                self.stdout.write(f"Creating category {doc_type}")
                 try:
                     out = subprocess.check_output(
                         shebang, shell=True, stderr=subprocess.STDOUT
@@ -255,12 +255,12 @@ class Command(BaseCommand):
                     for line in out.splitlines():
                         print(line)
                 except subprocess.CalledProcessError as e:
-                    print("%s: %s" % (shebang, str(e.output, "utf-8")))
+                    print(f"{shebang}: {str(e.output, 'utf-8')}")
                     continue
 
         else:
             self.stdout.write(
-                self.style.SUCCESS("%d documents considered" % len(documents))
+                self.style.SUCCESS(f"{len(documents)} documents considered")
             )
             if fail_count:
                 self.stdout.write(

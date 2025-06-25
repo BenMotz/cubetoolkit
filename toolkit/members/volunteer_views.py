@@ -64,13 +64,13 @@ def view_volunteer_list(request):
 @require_safe
 def export_volunteers_as_csv(request):
     # TODO use settings.DAWN_OF_TOOLKIT with export
-    logger.info("User %s requested a volunteer CSV export" % request.user)
+    logger.info(f"User {request.user} requested a volunteer CSV export")
     now = datetime.now().strftime("%d %b %Y %I-%M %p")
-    file_name = "%s Volunteers %s.csv" % (settings.VENUE["name"], now)
-    logger.info('Exported CSV filename: "%s"' % file_name)
+    file_name = f"{settings.VENUE['name']} Volunteers {now}.csv"
+    logger.info(f'Exported CSV filename: "{file_name}"')
 
     response = HttpResponse(content_type="text/csv")
-    response["Content-Disposition"] = 'attachment; filename="%s"' % file_name
+    response["Content-Disposition"] = f'attachment; filename="{file_name}"'
     writer = csv.writer(response)
     writer.writerow(
         [
@@ -218,36 +218,25 @@ def activate_volunteer(request, set_active=True):
     vol.save()
 
     logger.info(
-        "{0} set active to {1} for volunteer {2}".format(
-            request.user.last_name, str(set_active), vol.member.name
-        )
+        f"{request.user.last_name} set active to {str(set_active)} for volunteer {vol.member.name}"
     )
     messages.add_message(
         request,
         messages.SUCCESS,
-        "{0} volunteer {1}".format(
-            "Unretired" if set_active else "Retired", vol.member.name
-        ),
+        f"{'Unretired' if set_active else 'Retired'} volunteer {vol.member.name}",
     )
     # email admin with the news
     admin_body = (
-        "I'm delighted to inform you that %s has updated the "
-        "status of volunteer\n\n"
-        "%s <%s>\n\n"
-        "to %s.\n\n"
-        "Please amend the volunteers mailing list "
-        "at your earliest convenience."
-        % (
-            request.user.last_name,
-            vol.member.name,
-            vol.member.email,
-            "unretired" if set_active else "retired",
-        )
+        f"I'm delighted to inform you that {request.user.last_name} has updated the "
+        f"status of volunteer\n\n"
+        f"{vol.member.name} <{vol.member.email}>\n\n"
+        f"to {'unretired' if set_active else 'retired'}.\n\n"
+        f"Please amend the volunteers mailing list "
+        f"at your earliest convenience."
     )
     send_mail(
         (
-            "[%s] Change in volunteer status %s"
-            % (settings.VENUE["longname"], vol.member.name)
+            f"[{settings.VENUE['longname']}] Change in volunteer status {vol.member.name}"
         ),
         admin_body,
         settings.VENUE["mailout_from_address"],
@@ -295,38 +284,28 @@ def edit_volunteer(request, volunteer_id, create_new=False):
             vol_form.save()
 
             logger.info(
-                "Saving changes to volunteer '{0}' (id: {1})".format(
-                    volunteer.member.name, str(volunteer.pk)
-                )
+                f"Saving changes to volunteer '{volunteer.member.name}' (id: {str(volunteer.pk)})"
             )
 
             messages.add_message(
                 request,
                 messages.SUCCESS,
-                "{0} volunteer '{1}'".format(
-                    "Created" if create_new else "Updated", member.name
-                ),
+                f"{'Created' if create_new else 'Updated'} volunteer '{member.name}'",
             )
 
             if create_new:
                 # Email admin
                 admin_body = (
-                    "I'm delighted to inform you that %s has just added "
-                    "new volunteer\n\n"
-                    "%s <%s>\n\n"
-                    "to the toolkit.\n\n"
-                    "Please add them to the volunteers mailing list "
-                    "at your earliest convenience."
-                    % (
-                        request.user.last_name,
-                        volunteer.member.name,
-                        volunteer.member.email,
-                    )
+                    f"I'm delighted to inform you that {request.user.last_name} has just added "
+                    f"new volunteer\n\n"
+                    f"{volunteer.member.name} <{volunteer.member.email}>\n\n"
+                    f"to the toolkit.\n\n"
+                    f"Please add them to the volunteers mailing list "
+                    f"at your earliest convenience."
                 )
                 send_mail(
                     (
-                        "[%s] New volunteer %s"
-                        % (settings.VENUE["longname"], volunteer.member.name)
+                        f"[{settings.VENUE['longname']}] New volunteer {volunteer.member.name}"
                     ),
                     admin_body,
                     settings.VENUE["mailout_from_address"],
@@ -376,9 +355,7 @@ def add_volunteer_training_record(request, volunteer_id):
     elif record_form.is_valid():
         record_form.save()
         logger.info(
-            "Added training record {0} for volunteer '{1}'".format(
-                new_record.id, volunteer.member.name
-            )
+            f"Added training record {new_record.id} for volunteer '{volunteer.member.name}'"
         )
 
         if new_record.training_type == TrainingRecord.ROLE_TRAINING:
@@ -416,9 +393,7 @@ def delete_volunteer_training_record(request, training_record_id):
         )
 
     logger.info(
-        "Deleting training_record '{0}' for volunteer '{1}'".format(
-            record.id, record.volunteer.member.name
-        )
+        f"Deleting training_record '{record.id}' for volunteer '{record.volunteer.member.name}'"
     )
     record.delete()
     return HttpResponse("OK", content_type="text/plain")
@@ -494,8 +469,8 @@ def add_volunteer_training_group_record(request):
             trainer = form.cleaned_data["trainer"]
             members = form.cleaned_data["volunteers"]
             logger.info(
-                "Bulk add training records, type %s, role '%s', trainer '%s', "
-                " members '%s'" % (training_type, role, trainer, members)
+                f"Bulk add training records, type {training_type}, role '{role}', trainer '{trainer}', "
+                f" members '{members}'"
             )
 
             for member in members:
@@ -517,21 +492,13 @@ def add_volunteer_training_group_record(request):
                 messages.add_message(
                     request,
                     messages.SUCCESS,
-                    "Added %d training records for %s"
-                    % (
-                        len(form.cleaned_data["volunteers"]),
-                        form.cleaned_data["role"],
-                    ),
+                    f"Added {len(form.cleaned_data['volunteers'])} training records for {form.cleaned_data['role']}",
                 )
             elif training_type == TrainingRecord.GENERAL_TRAINING:
                 messages.add_message(
                     request,
                     messages.SUCCESS,
-                    "Added %d %s records"
-                    % (
-                        len(form.cleaned_data["volunteers"]),
-                        TrainingRecord.GENERAL_TRAINING_DESC,
-                    ),
+                    "Added {len(form.cleaned_data['volunteers'])} {TrainingRecord.GENERAL_TRAINING_DESC} records",
                 )
             return HttpResponseRedirect(
                 reverse("add-volunteer-training-group-record")

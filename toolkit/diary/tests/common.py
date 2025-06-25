@@ -63,9 +63,7 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
         self.assertRedirects(response, reverse("default-edit"))
 
     def assert_has_message(self, response, msg, level):
-        self.assertContains(
-            response, '<li class="{0}">{1}</li>'.format(level, msg)
-        )
+        self.assertContains(response, f'<li class="{level}">{msg}</li>')
 
     def _setup_test_data(self):
         self._fake_now = FAKE_NOW

@@ -51,26 +51,22 @@ def _output_month(year, month, day_list, d_time):
             # seen) end of the sequence
             if seq_len == 1:
                 # Only two items in the sequence: output a list
-                op.append(", {0}".format(_format_day(d)))
+                op.append(f", {_format_day(d)}")
             elif seq_len == 2:
                 # Only two items in the sequence: output a list
-                op.append(
-                    ", {0}, {1}".format(_format_day(prev), _format_day(d))
-                )
+                op.append(f", {_format_day(prev)}, {_format_day(d)}")
             else:
                 # > 2 items in the sequence, output a range
-                op.append(
-                    "\u2013{0}, {1}".format(_format_day(prev), _format_day(d))
-                )
+                op.append(f"\u2013{_format_day(prev)}, {_format_day(d)}")
             # (In both cases, also output the start of the next sequence)
             seq_len = 1
             prev = d
 
     # Finish off: if seq_len == 1 then no output is needed
     if seq_len == 2:
-        op.append(", {0}".format(_format_day(prev)))
+        op.append(f", {_format_day(prev)}")
     elif seq_len > 2:
-        op.append("\u2013{0}".format(_format_day(prev)))
+        op.append(f"\u2013{_format_day(prev)}")
 
     # Print the start time. Only show the minutes when the start isn't on the
     # hour:
@@ -79,7 +75,7 @@ def _output_month(year, month, day_list, d_time):
     else:
         time_string = d_time.strftime("%-I:%M%p")
 
-    return "{0} / {1}".format("".join(op), time_string.lower())
+    return "{} / {}".format("".join(op), time_string.lower())
 
 
 def _pretty_print_dateset(dates):

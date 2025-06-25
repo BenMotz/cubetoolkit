@@ -6,7 +6,7 @@ from toolkit.members.models import Member
 
 
 def boolean_input(question, default=None):
-    result = input("%s " % question)
+    result = input(f"{question} ")
     if not result and default is not None:
         return default
     while len(result) < 1 or result[0].lower() not in "yn":
@@ -38,5 +38,5 @@ class Command(BaseCommand):
                 member.delete()
 
             self.stdout.write(
-                self.style.SUCCESS("\nDeleted %d members\n" % len(members))
+                self.style.SUCCESS(f"\nDeleted {len(members)} members\n")
             )

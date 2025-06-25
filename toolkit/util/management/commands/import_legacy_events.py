@@ -56,14 +56,14 @@ class Command(BaseCommand):
 
     def _conn_to_archive_database(self):
         try:
-            self.stdout.write("Connecting to database %s..." % dbdb)
+            self.stdout.write(f"Connecting to database {dbdb}...")
             db = MySQLdb.connect(
                 "localhost", dbuser, dbpass, dbdb, charset="utf8"
             )
             return db
         except MySQLdb.Error as e:
             self.stdout.write(
-                self.style.ERROR("Failed to connect to database %s" % dbdb)
+                self.style.ERROR(f"Failed to connect to database {dbdb}")
             )
 
     def _find_programmer(self, cursor, programmer_id):
@@ -121,17 +121,17 @@ class Command(BaseCommand):
                 if os.path.isfile(dest_picture_with_path):
                     self.stdout.write(
                         self.style.WARNING(
-                            "%s already exists" % dest_picture_with_path
+                            f"{dest_picture_with_path} already exists"
                         )
                     )
                 else:
-                    self.stdout.write("Copying %s" % dest_picture_with_path)
+                    self.stdout.write(f"Copying {dest_picture_with_path}")
                     shutil.copyfile(
                         picture_file_with_path, dest_picture_with_path
                     )
             else:
                 self.stdout.write(
-                    self.style.ERROR("Can't find %s" % picture_file_with_path)
+                    self.style.ERROR(f"Can't find {picture_file_with_path}")
                 )
                 picture_file = ""
         return picture_file, dest_picture
@@ -237,7 +237,7 @@ class Command(BaseCommand):
                 e.legacy_id = legacy_id
                 e.name = title
                 if website:
-                    e.copy = "%s\n\n%s" % (body, website) or ""
+                    e.copy = f"{body}\n\n{website}" or ""
                 else:
                     e.copy = body or ""
                 e.copy_summary = summary or ""
@@ -253,7 +253,7 @@ class Command(BaseCommand):
                     )
                 else:
                     e.notes = notes
-                e.notes = "%s\n\nImported from %s" % (e.notes, table)
+                e.notes = f"{e.notes}\n\nImported from {table}"
                 if duration is not None and duration != "":
                     e.duration = duration
                 else:
@@ -296,9 +296,7 @@ class Command(BaseCommand):
                 s.save(force=True)
 
             self.stdout.write(
-                self.style.SUCCESS(
-                    "%s %d events imported" % (table, len(events))
-                )
+                self.style.SUCCESS(f"{table} {len(events)} events imported")
             )
 
         # return  # FIXME
@@ -309,7 +307,7 @@ class Command(BaseCommand):
         cursor.execute(sql)  # returns number of rows
         films = cursor.fetchall()
 
-        self.stdout.write("Found %d films" % len(films))
+        self.stdout.write(f"Found {len(films)} films")
 
         for film in films:
             legacy_id = film[0]
@@ -363,23 +361,19 @@ class Command(BaseCommand):
             e.copy = body or ""
             e.copy_summary = summary or ""
             if director:
-                e.film_information = "Dir. %s" % director
+                e.film_information = f"Dir. {director}"
             if language:
-                e.film_information += ", %s" % language
+                e.film_information += f", {language}"
             if country:
-                e.film_information += ", %s" % country
+                e.film_information += f", {country}"
             if year:
-                e.film_information += ", %s" % year
+                e.film_information += f", {year}"
             e.legacy_copy = False
             if programmerEmail is not None and programmerEmail.strip() != "":
-                e.notes = "%s\n\nBooked by %s <%s>" % (
-                    notes,
-                    programmerName,
-                    programmerEmail,
-                )
+                e.notes = f"{notes}\n\nBooked by {programmerName} <{programmerEmail}>"
             else:
                 e.notes = notes
-            e.notes = "%s\n\nImported from %s" % (e.notes, "programming_film")
+            e.notes = f"{e.notes}\n\nImported from programming_film"
             # e.template = EventTemplate.objects.filter(name='Film (DVD)').first()
             # TODO consider duration, but it's hellishly complicated, due to
             # multiple formats and multiple films
@@ -394,7 +388,7 @@ class Command(BaseCommand):
             e.tags.add(EventTag.objects.filter(name="film").first())
 
             if picture_file:
-                self.stdout.write("Adding picture %s" % picture_file)
+                self.stdout.write(f"Adding picture {picture_file}")
                 image_path = os.path.join(EVENT_IMAGES_PATH, dest_picture)
                 media_item = MediaItem(media_file=image_path, credit=title)
                 media_item.full_clean()
@@ -426,7 +420,7 @@ class Command(BaseCommand):
             s.save(force=True)
 
         self.stdout.write(
-            self.style.SUCCESS("%d legacy films imported" % len(films))
+            self.style.SUCCESS(f"{len(films)} legacy films imported")
         )
 
         db.close()

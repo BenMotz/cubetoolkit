@@ -31,9 +31,7 @@ class Command(BaseCommand):
         except Member.MultipleObjectsReturned:
             self.stdout.write(
                 self.style.WARNING(
-                    "Multiple members with the same email address: {0}".format(
-                        email
-                    )
+                    f"Multiple members with the same email address: {email}"
                 )
             )
             return Member.objects.filter(email__iexact=email).first()
@@ -43,14 +41,14 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        self.stdout.write("Trying to read {0}".format(FILENAME))
+        self.stdout.write(f"Trying to read {FILENAME}")
         member_list = self._load_data(FILENAME)
         new_member_count = 0
 
         for member in member_list:
             first_name = member[1].strip()
             second_name = member[0].strip()
-            full_name = "%s %s" % (first_name, second_name)
+            full_name = f"{first_name} {second_name}"
             full_name = full_name.title().strip()
             email = member[2]
             # self.stdout.write('Considering %s <%s>' % (
@@ -59,19 +57,17 @@ class Command(BaseCommand):
             if mem:
                 self.stdout.write(
                     self.style.SUCCESS(
-                        "%s <%s> already in database" % (mem.name, mem.email)
+                        f"{mem.name} <{mem.email}> already in database"
                     )
                 )
             else:
                 if not full_name:
                     self.stdout.write(
-                        self.style.WARNING(
-                            "Not adding <%s> as no name" % email
-                        )
+                        self.style.WARNING(f"Not adding <{email}> as no name")
                     )
                     continue
                 else:
-                    self.stdout.write("Adding %s <%s>" % (full_name, email))
+                    self.stdout.write(f"Adding {full_name} <{email}>")
                     new_member = Member()
                     new_member.name = full_name
                     new_member.email = email

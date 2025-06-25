@@ -243,27 +243,23 @@ def redirect_legacy_event(request, event_type=None, legacy_id=None):
     "Imported from programming_name_of_table"
     Expecting event type to be one of
     season, film, gig, event, festival, meeting"""
-    logger.debug(
-        "Given legacy url %s, %s, %s" % (request.path, event_type, legacy_id)
-    )
-    legacy_table = "programming_" + event_type
+    logger.debug(f"Given legacy url {request.path}, {event_type}, {legacy_id}")
+    legacy_table = f"programming_{event_type}"
     try:
         events = Event.objects.filter(
             legacy_id=legacy_id, notes__contains=legacy_table
         )
         event = events.first()  # Only expecting one event
         if event:
-            logger.debug('found: %s: "%s"' % (event.id, event.name))
+            logger.debug(f'found: {event.id}: "{event.name}"')
         else:
             logger.debug(
-                "Could not find anything matching %s and %s"
-                % (legacy_id, legacy_table)
+                f"Could not find anything matching {legacy_id} and {legacy_table}"
             )
             raise Http404("Event not found")
     except IndexError:
         logger.debug(
-            "Could not find anything matching %s and %s"
-            % (legacy_id, legacy_table)
+            f"Could not find anything matching {legacy_id} and {legacy_table}"
         )
         raise Http404("Event not found")
     return redirect("single-event-view", event_id=event.id)
@@ -277,9 +273,7 @@ def redirect_legacy_year(request, year=None):
     /on/2016/03/25/feed/
     /on/2011/w20/
     but for the meantime at least capture the year and use that"""
-    logger.debug(
-        "Given legacy url %s, just using year %s" % (request.path, year)
-    )
+    logger.debug(f"Given legacy url {request.path}, just using year {year}")
     return redirect("archive-view-year", year=year)
 
 

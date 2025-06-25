@@ -59,9 +59,8 @@ def _render_mailout_subject_and_body(days_ahead, copy_days_ahead):
         first_event_date = showings[0].start.strftime(" commencing %A %-d %B")
     except IndexError:  # Corner case for no events
         first_event_date = ""
-    subject_text = "%s forthcoming events%s" % (
-        settings.VENUE["longname"],
-        first_event_date,
+    subject_text = (
+        f"{settings.VENUE['longname']} forthcoming events{first_event_date}"
     )
 
     # Render into mail templates

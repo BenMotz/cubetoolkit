@@ -117,7 +117,7 @@ class MembersTestsMixin(object):
         self.vol_1 = Volunteer(
             member=self.mem_4,
             notes="Likes the $, the \u00a3 and the \u20ac",
-            portrait=settings.MEDIA_ROOT + "/path/to/portrait",
+            portrait=f"{settings.MEDIA_ROOT}/path/to/portrait",
         )
         self.vol_1.save()
         self.vol_1.roles.set([r1, r3])

@@ -22,12 +22,8 @@ class Command(BaseCommand):
 
         for vol in vols:
             if options["names"]:
-                self.stdout.write(
-                    "%s <%s>" % (vol.member.name, vol.member.email)
-                )
+                self.stdout.write(f"{vol.member.name} <{vol.member.email}>")
             else:
-                self.stdout.write("%s" % vol.member.email)
+                self.stdout.write(f"{vol.member.email}")
 
-        self.stdout.write(
-            self.style.SUCCESS("\n%d active members" % len(vols))
-        )
+        self.stdout.write(self.style.SUCCESS(f"\n{len(vols)} active members"))

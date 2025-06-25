@@ -53,7 +53,7 @@ class EventForm(forms.ModelForm):
             "terms": forms.Textarea(
                 attrs={
                     "wrap": "soft",
-                    "placeholder": "e.g " + settings.DEFAULT_TERMS_TEXT,
+                    "placeholder": f"e.g {settings.DEFAULT_TERMS_TEXT}",
                 }
             ),
             "notes": forms.Textarea(
@@ -81,10 +81,9 @@ class EventForm(forms.ModelForm):
                 attrs={
                     "placeholder": (
                         (
-                            "Text displayed before / above the event"
-                            "name, e.g. '%s presents'"
+                            f"Text displayed before / above the event"
+                            f"name, e.g. '{settings.VENUE['name']} presents'"
                         )
-                        % settings.VENUE["name"]
                     ),
                 }
             ),
@@ -120,11 +119,8 @@ class EventForm(forms.ModelForm):
         copy_summary = self.cleaned_data.get("copy_summary", "")
         if len(copy_summary) > settings.PROGRAMME_COPY_SUMMARY_MAX_CHARS:
             raise forms.ValidationError(
-                "Copy summary must be {0} characters or fewer (currently {1} "
-                "characters)".format(
-                    settings.PROGRAMME_COPY_SUMMARY_MAX_CHARS,
-                    len(copy_summary),
-                )
+                f"Copy summary must be {settings.PROGRAMME_COPY_SUMMARY_MAX_CHARS} "
+                f"characters or fewer (currently {len(copy_summary)} characters)"
             )
         return copy_summary
 
@@ -176,8 +172,8 @@ class MediaItemForm(forms.ModelForm):
             max_MB = settings.PROGRAMME_MEDIA_MAX_SIZE_MB
             if size_MB > max_MB:
                 raise forms.ValidationError(
-                    "Media file must be {0} MB or less "
-                    "(uploaded file is {1:.2f} MB)".format(max_MB, size_MB)
+                    f"Media file must be {max_MB} MB or less "
+                    f"(uploaded file is {size_MB:.2f} MB)"
                 )
         return media_file
 
@@ -275,7 +271,7 @@ def rota_form_factory(showing):
         _role_ids.append(role.pk)
         if role.standard:
             # For each "standard" role, add an Integer field;
-            members["role_{0}".format(role.pk)] = forms.IntegerField(
+            members[f"role_{role.pk}"] = forms.IntegerField(
                 min_value=0,
                 max_value=settings.MAX_COUNT_PER_ROLE,
                 required=True,

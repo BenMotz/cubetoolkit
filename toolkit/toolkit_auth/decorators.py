@@ -40,7 +40,7 @@ def user_logged_in_callback(sender, request, user, **kwargs):
     # to cover more complex cases:
     # http://stackoverflow.com/questions/4581789/how-do-i-get-user-ip-address-in-django
     ip = request.META.get("REMOTE_ADDR")
-    logger.info("{user} logged in from {ip}".format(user=user, ip=ip))
+    logger.info(f"{user} logged in from {ip}")
 
 
 @receiver(user_logged_out)
@@ -48,7 +48,7 @@ def user_logged_out_callback(sender, request, user, **kwargs):
 
     ip = request.META.get("REMOTE_ADDR")
 
-    logger.info("{user} logged out from {ip}".format(user=user, ip=ip))
+    logger.info(f"{user} logged out from {ip}")
 
 
 @receiver(user_login_failed)
@@ -56,9 +56,4 @@ def user_login_failed_callback(sender, request, credentials, **kwargs):
 
     ip = request.META.get("REMOTE_ADDR")
 
-    logger.warning(
-        "login failed for: {credentials} from {ip}".format(
-            credentials=credentials,
-            ip=ip,
-        )
-    )
+    logger.warning(f"login failed for: {credentials} from {ip}")

@@ -115,6 +115,4 @@ class Command(BaseCommand):
                 fail_silently=False,
             )
 
-        self.stdout.write(
-            self.style.SUCCESS("\nEmailed %d vols\n" % len(vols))
-        )
+        self.stdout.write(self.style.SUCCESS(f"\nEmailed {len(vols)} vols\n"))

@@ -39,16 +39,14 @@ class Command(BaseCommand):
     def _dump_to_file(self, out_file, log_file):
         if not os.path.isfile(MYSQLDUMP_BINARY):
             raise CommandError(
-                "Couldn't find mysqldump binary (looked for {0}".format(
-                    MYSQLDUMP_BINARY
-                )
+                f"Couldn't find mysqldump binary (looked for {MYSQLDUMP_BINARY}"
             )
 
-        print("Dumping to '{0}'".format(out_file.name), file=log_file)
+        print(f"Dumping to '{out_file.name}'", file=log_file)
         returncode = subprocess.call(self._dump_command(), stdout=out_file)
 
         if returncode != 0:
-            raise CommandError("Failed (code {0})".format(returncode))
+            raise CommandError(f"Failed (code {returncode})")
 
         print("Done", file=log_file)
 
@@ -75,7 +73,7 @@ class Command(BaseCommand):
             self._dump_to_file(sys.stdout, log_file=sys.stderr)
         elif os.path.exists(output_filename):
             raise CommandError(
-                "Dump destination '{0}' already exists".format(output_filename)
+                f"Dump destination '{output_filename}' already exists"
             )
         else:
             with open(output_filename, "w") as out_file:

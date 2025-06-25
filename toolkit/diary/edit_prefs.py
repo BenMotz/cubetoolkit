@@ -13,7 +13,7 @@ KNOWN_PREFS = {
 
 def get_preferences(session):
     edit_prefs = dict(
-        (pref, session.get("editpref_" + pref, default))
+        (pref, session.get(f"editpref_{pref}", default))
         for pref, default in KNOWN_PREFS.items()
     )
     return edit_prefs
@@ -22,7 +22,7 @@ def get_preferences(session):
 def get_preference(session, name):
     value = None
     if name in KNOWN_PREFS:
-        value = session.get("editpref_" + name, KNOWN_PREFS[name])
+        value = session.get(f"editpref_{name}", KNOWN_PREFS[name])
     return value
 
 
@@ -33,6 +33,6 @@ def set_preferences(session, prefs_requested):
 
 def set_preference(session, name, value):
     if name in KNOWN_PREFS:
-        logger.debug("Set pref {0} to '{1}'".format(name, value))
+        logger.debug(f"Set pref {name} to '{value}'")
         value = str(value)[:10]  # limit length of stored value
-        session["editpref_" + name] = value
+        session[f"editpref_{name}"] = value

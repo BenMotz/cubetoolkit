@@ -12,9 +12,7 @@ def _get_password(use):
     check_password = None
 
     while check_password != password:
-        password = getpass.getpass(
-            "Please enter password for {0}: ".format(use)
-        )
+        password = getpass.getpass(f"Please enter password for {use}: ")
         check_password = getpass.getpass("Please re-enter for confirmation: ")
         if check_password != password:
             print("Passwords don't match; please try again...")
@@ -29,7 +27,7 @@ def _create_or_update_user(
         password = _get_password(name)
         user = auth_models.User.objects.create_user(name, email, password)
     else:
-        print("User '{0}' exists: not changing password".format(name))
+        print(f"User '{name}' exists: not changing password")
         user = auth_models.User.objects.get(username=name)
 
     # Remove all permissions:

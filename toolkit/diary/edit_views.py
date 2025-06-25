@@ -127,7 +127,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
     local_now = timezone.localtime(timezone.now())
     if startdate < local_now.date():
         # Redirect to page with today as the start date:
-        new_url = "{0}?daysahead={1}".format(
+        new_url = "{}?daysahead={}".format(
             reverse(
                 "day-edit",
                 kwargs={
@@ -198,7 +198,7 @@ def edit_diary_list(request, year=None, day=None, month=None):
     context["ideas"] = ideas
     context["dates"] = dates
     # Page title:
-    context["event_list_name"] = "Diary for {0} to {1}".format(
+    context["event_list_name"] = "Diary for {} to {}".format(
         startdatetime.strftime("%d-%m-%Y"), enddatetime.strftime("%d-%m-%Y")
     )
     context["start"] = startdatetime
@@ -239,9 +239,7 @@ def edit_diary_data(request):
         )
     except (ValueError, TypeError):
         logger.error(
-            "Invalid value in date range, one of start '{0}' or end, '{1}'".format(
-                start_raw, end_raw
-            )
+            f"Invalid value in date range, one of start '{start_raw}' or end, '{end_raw}'"
         )
         raise Http404("Invalid request")
 
@@ -323,7 +321,7 @@ def edit_diary_calendar(request, year=None, month=None, day=None):
         else:
             display_time = timezone.localtime(timezone.now()).date()
     except ValueError as ve:
-        logger.error("Bad calendar date: %s" % ve)
+        logger.error(f"Bad calendar date: {ve}")
         raise Http404("Bad calendar date")
 
     rooms_and_colours = OrderedDict()
@@ -469,7 +467,7 @@ def add_event(request):
             messages.add_message(
                 request,
                 messages.SUCCESS,
-                "Added event '{0}' with booking on {1}".format(
+                "Added event '{}' with booking on {}".format(
                     new_event.name,
                     new_showing.start.strftime("%d/%m/%y at %H:%M"),
                 ),
@@ -559,7 +557,7 @@ def edit_showing(request, showing_id=None):
             messages.add_message(
                 request,
                 messages.SUCCESS,
-                "Updated booking for '{0}' at {1}".format(
+                "Updated booking for '{}' at {}".format(
                     showing.event.name,
                     showing.start.strftime("%H:%M on %d/%m/%y"),
                 ),
@@ -637,9 +635,7 @@ class EditEventView(PermissionRequiredMixin, View):
         media_item = event.get_main_mediaitem() or MediaItem()
 
         logger.info(
-            "{0} updated booking {1} for event '{2}'".format(
-                request.user.last_name, event_id, event.name
-            )
+            f"{request.user.last_name} updated booking {event_id} for event '{event.name}'"
         )
         # Create and populate forms:
         form = diary_forms.EventForm(request.POST, instance=event)
@@ -653,7 +649,7 @@ class EditEventView(PermissionRequiredMixin, View):
             messages.add_message(
                 request,
                 messages.SUCCESS,
-                "Updated details for event '{0}'".format(event.name),
+                f"Updated details for event '{event.name}'",
             )
             return _return_to_editindex(request)
 
@@ -717,7 +713,7 @@ def edit_ideas(request, year=None, month=None):
                 messages.add_message(
                     request,
                     messages.SUCCESS,
-                    "Updated ideas for {0}/{1}".format(month, year),
+                    f"Updated ideas for {month}/{year}",
                 )
                 return _return_to_editindex(request)
     else:
@@ -750,8 +746,8 @@ def delete_showing(request, showing_id):
     showing = Showing.objects.get(pk=showing_id)
     if showing.in_past():
         logger.error(
-            "Attempted to delete showing id {0} that has already "
-            "started/finished".format(showing_id)
+            f"Attempted to delete showing id {showing_id} that has already "
+            "started/finished"
         )
         messages.add_message(
             request,
@@ -763,16 +759,12 @@ def delete_showing(request, showing_id):
         )
     else:
         logging.info(
-            "Deleting showing id {0} (for event id {1})".format(
-                showing_id, showing.event_id
-            )
+            f"Deleting showing id {showing_id} (for event id {showing.event_id})"
         )
         messages.add_message(
             request,
             messages.SUCCESS,
-            "Deleted booking for '{0}' on {1}".format(
-                showing.event.name, showing.start.strftime("%d/%m/%y")
-            ),
+            f"Deleted booking for '{showing.event.name}' on {showing.start.strftime('%d/%m/%y')}",
         )
         showing.delete()
 
@@ -847,11 +839,11 @@ def view_event_field(request, field, year=None, month=None, day=None):
 
     search = request.GET.get("search")
     if search:
-        logging.info("Search term: {0}".format(search))
+        logging.info(f"Search term: {search}")
         # Note slightly sneaky use of **; this effectively results in a method
         # call like: showings.filter(event__copy__icontains=search)
         showings = showings.filter(
-            Q(**{"event__" + field + "__icontains": search})
+            Q(**{f"event__{field}__icontains": search})
             | Q(event__name__icontains=search)
         )
 
@@ -864,7 +856,7 @@ def view_event_field(request, field, year=None, month=None, day=None):
         "search": search,
     }
 
-    return render(request, "view_{0}.html".format(field), context)
+    return render(request, f"view_{field}.html", context)
 
 
 @permission_required("toolkit.write")
