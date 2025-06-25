@@ -1,4 +1,3 @@
-from __future__ import print_function
 import getpass
 import django.contrib.auth.models as auth_models
 import django.contrib.contenttypes as contenttypes

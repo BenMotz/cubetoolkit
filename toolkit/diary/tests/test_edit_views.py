@@ -1,4 +1,3 @@
-from __future__ import absolute_import, unicode_literals
 import re
 import json
 import os.path
@@ -7,7 +6,7 @@ import zoneinfo
 from datetime import datetime, date, time, timedelta
 import tempfile
 
-from mock import patch
+from unittest.mock import patch
 
 from django.test import TestCase
 from django.test.utils import override_settings
@@ -165,7 +164,7 @@ class EditDiaryViews(DiaryTestsMixin, TestCase):
     """Basic test that various private diary pages load"""
 
     def setUp(self):
-        super(EditDiaryViews, self).setUp()
+        super().setUp()
 
         self.client.login(username="admin", password="T3stPassword!")
 
@@ -206,7 +205,7 @@ class EditDiaryViews(DiaryTestsMixin, TestCase):
 
 class EditShowing(DiaryTestsMixin, TestCase):
     def setUp(self):
-        super(EditShowing, self).setUp()
+        super().setUp()
         # Log in:
         self.client.login(username="admin", password="T3stPassword!")
 
@@ -464,7 +463,7 @@ class EditShowing(DiaryTestsMixin, TestCase):
 
 class DeleteShowing(DiaryTestsMixin, TestCase):
     def setUp(self):
-        super(DeleteShowing, self).setUp()
+        super().setUp()
         # Log in:
         self.client.login(username="admin", password="T3stPassword!")
 
@@ -510,7 +509,7 @@ class DeleteShowing(DiaryTestsMixin, TestCase):
 
 class AddEventView(DiaryTestsMixin, TestCase):
     def setUp(self):
-        super(AddEventView, self).setUp()
+        super().setUp()
         # Log in:
         self.client.login(username="admin", password="T3stPassword!")
 
@@ -901,7 +900,7 @@ class EditDetailView(DiaryTestsMixin, TestCase):
 
 class EditEventView(DiaryTestsMixin, TestCase):
     def setUp(self):
-        super(EditEventView, self).setUp()
+        super().setUp()
         # Log in:
         self.client.login(username="admin", password="T3stPassword!")
 
@@ -1459,7 +1458,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
 
 class EditIdeasViewTests(DiaryTestsMixin, TestCase):
     def setUp(self):
-        super(EditIdeasViewTests, self).setUp()
+        super().setUp()
         # Log in:
         self.client.login(username="admin", password="T3stPassword!")
 
@@ -1632,7 +1631,7 @@ class EditIdeasViewTests(DiaryTestsMixin, TestCase):
 
 class ViewEventFieldTests(DiaryTestsMixin, TestCase):
     def setUp(self):
-        super(ViewEventFieldTests, self).setUp()
+        super().setUp()
         # Log in:
         self.client.login(username="admin", password="T3stPassword!")
 
@@ -1821,7 +1820,7 @@ class ViewTermsReportCsvTests(DiaryTestsMixin, TestCase):
 
 class PreferencesTests(DiaryTestsMixin, TestCase):
     def setUp(self):
-        super(PreferencesTests, self).setUp()
+        super().setUp()
         # Log in:
         self.client.login(username="admin", password="T3stPassword!")
 
@@ -1935,7 +1934,7 @@ class PreferencesTests(DiaryTestsMixin, TestCase):
 
 class EditTagsViewTests(DiaryTestsMixin, TestCase):
     def setUp(self):
-        super(EditTagsViewTests, self).setUp()
+        super().setUp()
         self.client.login(username="admin", password="T3stPassword!")
 
     def tearDown(self):
@@ -1950,7 +1949,7 @@ class EditTagsViewTests(DiaryTestsMixin, TestCase):
 
 class DiaryCalendarViewTests(DiaryTestsMixin, TestCase):
     def setUp(self):
-        super(DiaryCalendarViewTests, self).setUp()
+        super().setUp()
         self.client.login(username="admin", password="T3stPassword!")
 
     def _get_room_list(self, response):
@@ -2019,7 +2018,7 @@ class DiaryCalendarViewTests(DiaryTestsMixin, TestCase):
 
 class DiaryDataViewTests(DiaryTestsMixin, TestCase):
     def setUp(self):
-        super(DiaryDataViewTests, self).setUp()
+        super().setUp()
         self.client.login(username="admin", password="T3stPassword!")
 
     def test_missing_params(self):

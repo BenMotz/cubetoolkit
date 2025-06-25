@@ -1,8 +1,7 @@
-from __future__ import absolute_import, unicode_literals
 from datetime import timedelta, datetime
 
 import zoneinfo
-from mock import patch
+from unittest.mock import patch
 
 from django.test import TestCase
 from django.urls import reverse
@@ -16,7 +15,7 @@ class EditRotaViewGet(DiaryTestsMixin, TestCase):
     """Test that rota edit view loads"""
 
     def setUp(self):
-        super(EditRotaViewGet, self).setUp()
+        super().setUp()
         self.assertTrue(
             self.client.login(
                 username="rota_editor", password="T3stPassword!3"
@@ -64,7 +63,7 @@ class EditRotaViewGet(DiaryTestsMixin, TestCase):
         now_patch.return_value = self._fake_now
 
         url = reverse("rota-edit")
-        url = "{0}/{1}/{2:02}/{3:02}?daysahead=10".format(
+        url = "{}/{}/{:02}/{:02}?daysahead=10".format(
             url,
             self._fake_now.year,
             self._fake_now.month,
@@ -97,7 +96,7 @@ class EditRotaViewPost(DiaryTestsMixin, TestCase):
     """Test of rota edit posting"""
 
     def setUp(self):
-        super(EditRotaViewPost, self).setUp()
+        super().setUp()
         self.assertTrue(
             self.client.login(
                 username="rota_editor", password="T3stPassword!3"
@@ -233,7 +232,7 @@ class EditRotaNotes(DiaryTestsMixin, TestCase):
     """Test of editing per-showing rota notes"""
 
     def setUp(self):
-        super(EditRotaNotes, self).setUp()
+        super().setUp()
         self.assertTrue(
             self.client.login(
                 username="rota_editor", password="T3stPassword!3"
@@ -332,7 +331,7 @@ class ViewRotaVacancies(DiaryTestsMixin, TestCase):
     """Test of view of upcoming vacancies"""
 
     def setUp(self):
-        super(ViewRotaVacancies, self).setUp()
+        super().setUp()
         self.assertTrue(
             self.client.login(
                 username="rota_editor", password="T3stPassword!3"
