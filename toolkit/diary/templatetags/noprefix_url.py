@@ -11,12 +11,12 @@ logger = logging.getLogger(__name__)
 
 class NoPrefixURLNode(URLNode):
     def __init__(self, url_node):
-        super(NoPrefixURLNode, self).__init__(
+        super().__init__(
             url_node.view_name, url_node.args, url_node.kwargs, url_node.asvar
         )
 
     def render(self, context):
-        text = super(NoPrefixURLNode, self).render(context)
+        text = super().render(context)
         prefix = get_script_prefix()
 
         parts = urllib.parse.urlsplit(text)

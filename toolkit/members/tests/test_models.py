@@ -14,7 +14,7 @@ from .common import MembersTestsMixin
 
 class TestTrainingRecord(MembersTestsMixin, TestCase):
     def setUp(self):
-        super(TestTrainingRecord, self).setUp()
+        super().setUp()
 
     def test_clean_ok(self):
         record = TrainingRecord(

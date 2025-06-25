@@ -23,7 +23,7 @@ TINY_VALID_BASE64_PNG = (
 
 class TestVolunteerListViews(MembersTestsMixin, TestCase):
     def setUp(self):
-        super(TestVolunteerListViews, self).setUp()
+        super().setUp()
         self.assertTrue(
             self.client.login(username="admin", password="T3stPassword!")
         )
@@ -65,7 +65,7 @@ class TestVolunteerListViews(MembersTestsMixin, TestCase):
 
 class TestVolunteerEditViews(MembersTestsMixin, TestCase):
     def setUp(self):
-        super(TestVolunteerEditViews, self).setUp()
+        super().setUp()
 
         self.assertTrue(
             self.client.login(username="admin", password="T3stPassword!")
@@ -106,7 +106,7 @@ class TestVolunteerEditViews(MembersTestsMixin, TestCase):
 
 class TestActivateDeactivateVolunteer(MembersTestsMixin, TestCase):
     def setUp(self):
-        super(TestActivateDeactivateVolunteer, self).setUp()
+        super().setUp()
         self.assertTrue(
             self.client.login(username="admin", password="T3stPassword!")
         )
@@ -189,7 +189,7 @@ class TestActivateDeactivateVolunteer(MembersTestsMixin, TestCase):
 
 class TestVolunteerEdit(MembersTestsMixin, TestCase):
     def setUp(self):
-        super(TestVolunteerEdit, self).setUp()
+        super().setUp()
         self.assertTrue(
             self.client.login(username="admin", password="T3stPassword!")
         )
@@ -688,7 +688,7 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
 
 class TestAddTraining(MembersTestsMixin, TestCase):
     def setUp(self):
-        super(TestAddTraining, self).setUp()
+        super().setUp()
         self.assertTrue(
             self.client.login(username="admin", password="T3stPassword!")
         )
@@ -829,7 +829,7 @@ class TestAddTraining(MembersTestsMixin, TestCase):
 
 class TestDeleteTraining(MembersTestsMixin, TestCase):
     def setUp(self):
-        super(TestDeleteTraining, self).setUp()
+        super().setUp()
         self.assertTrue(
             self.client.login(username="admin", password="T3stPassword!")
         )
@@ -889,7 +889,7 @@ class TestDeleteTraining(MembersTestsMixin, TestCase):
 
 class TestAddGroupTraining(MembersTestsMixin, TestCase):
     def setUp(self):
-        super(TestAddGroupTraining, self).setUp()
+        super().setUp()
         self.assertTrue(
             self.client.login(username="admin", password="T3stPassword!")
         )
@@ -1041,7 +1041,7 @@ class TestAddGroupTraining(MembersTestsMixin, TestCase):
 
 class TestViewVolunteerTraining(MembersTestsMixin, TestCase):
     def setUp(self):
-        super(TestViewVolunteerTraining, self).setUp()
+        super().setUp()
         self.assertTrue(
             self.client.login(username="admin", password="T3stPassword!")
         )

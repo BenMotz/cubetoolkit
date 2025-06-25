@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 
-class ip_or_permission_required(object):
+class ip_or_permission_required:
     """
     Decorator that requires a request to either originate from one of a fixed
     set of IP addresses, or for the request to originate from a logged in user

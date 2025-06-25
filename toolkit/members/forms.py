@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 
 class NewMemberForm(forms.ModelForm):
-    class Meta(object):
+    class Meta:
         model = toolkit.members.models.Member
         fields = ("name", "email", "postcode", "is_member")
         widgets = {
@@ -24,7 +24,7 @@ class NewMemberForm(forms.ModelForm):
 class MemberForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         hide_internal_fields = kwargs.pop("hide_internal_fields", True)
-        super(MemberForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         if not settings.MEMBERSHIP_EXPIRY_ENABLED or hide_internal_fields:
             del self.fields["membership_expires"]
@@ -33,7 +33,7 @@ class MemberForm(forms.ModelForm):
             del self.fields["mailout_failed"]
         del self.fields["gdpr_opt_in"]
 
-    class Meta(object):
+    class Meta:
         model = toolkit.members.models.Member
         exclude = ()
         widgets = {
@@ -47,7 +47,7 @@ class MemberFormWithoutNotes(forms.ModelForm):
     # VolunteerForm
     prefix = "mem"
 
-    class Meta(object):
+    class Meta:
         model = toolkit.members.models.Member
         exclude = (
             "is_member",
@@ -74,14 +74,14 @@ class VolunteerForm(forms.ModelForm):
     prefix = "vol"
 
     def __init__(self, *args, **kwargs):
-        super(VolunteerForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         # Force ordering of roles list to be by "standard" role type, then name
         self.fields["roles"].queryset = self.fields["roles"].queryset.order_by(
             "-standard", "name"
         )
 
-    class Meta(object):
+    class Meta:
         model = toolkit.members.models.Volunteer
         fields = ("portrait", "notes", "roles")
         widgets = {
@@ -113,7 +113,7 @@ class VolunteerForm(forms.ModelForm):
         # ignored. This is intentional, as the photo is harder to replace than
         # the uploaded image, if someone's managed to do both.
 
-        cleaned_data = super(VolunteerForm, self).clean()
+        cleaned_data = super().clean()
 
         image_data_uri = cleaned_data["image_data"]
 
@@ -131,7 +131,7 @@ class VolunteerForm(forms.ModelForm):
 
 
 class TrainingRecordForm(forms.ModelForm):
-    class Meta(object):
+    class Meta:
         model = TrainingRecord
         fields = ("training_type", "role", "trainer", "training_date", "notes")
 
@@ -160,7 +160,7 @@ class GroupTrainingForm(forms.Form):
     )
 
     def clean(self):
-        super(GroupTrainingForm, self).clean()
+        super().clean()
         if (
             self.cleaned_data.get("type") == TrainingRecord.ROLE_TRAINING
             and self.cleaned_data.get("role") is None

@@ -7,12 +7,12 @@ from toolkit.members.models import Member, Volunteer
 from toolkit.diary.models import Role
 
 
-class MembersTestsMixin(object):
+class MembersTestsMixin:
     def setUp(self):
         self._setup_test_data()
         self._setup_test_users()
 
-        return super(MembersTestsMixin, self).setUp()
+        return super().setUp()
 
     def _setup_test_data(self):
         # Roles:

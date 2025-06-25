@@ -98,7 +98,7 @@ class QueueMailoutTests(TestCase, fixtures.TestWithFixtures):
 
 class MailoutTests(DiaryTestsMixin, TestCase):
     def setUp(self):
-        super(MailoutTests, self).setUp()
+        super().setUp()
         # Log in:
         self.client.login(username="admin", password="T3stPassword!")
 

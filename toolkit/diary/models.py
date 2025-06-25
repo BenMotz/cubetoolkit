@@ -46,7 +46,7 @@ class Role(models.Model):
         return self.name
 
     def __init__(self, *args, **kwargs):
-        super(Role, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # Store original value of name, so it can't be edited for
         # read only roles
         self._original_name = self.name
@@ -61,7 +61,7 @@ class Role(models.Model):
             logger.error(f"Tried to unprotect read-only role {self.name}")
             return
         else:
-            return super(Role, self).save(*args, **kwargs)
+            return super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         # Don't allow read_only roles to be deleted
@@ -69,7 +69,7 @@ class Role(models.Model):
             logger.error(f"Tried to delete read-only role {self.name}")
             return False
         else:
-            return super(Role, self).delete(*args, **kwargs)
+            return super().delete(*args, **kwargs)
 
 
 class MediaItem(models.Model):
@@ -107,7 +107,7 @@ class MediaItem(models.Model):
         # overwritten)
         self.autoset_mimetype()
 
-        return super(MediaItem, self).save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     # Extra, custom methods:
     def autoset_mimetype(self):
@@ -149,7 +149,7 @@ class EventTag(models.Model):
         ordering = ["sort_order", "name"]
 
     def __init__(self, *args, **kwargs):
-        super(EventTag, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # Store original value of read_only, so we can tell when the flag has
         # been set after load, and name/slug so we can enforce they haven't
         # changed:
@@ -173,13 +173,13 @@ class EventTag(models.Model):
             self.read_only = self._read_only_at_load
             self.name = self._name_at_load
             self.slug = self._slug_at_load
-        return super(EventTag, self).save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         if self.pk and self.read_only:
             return False
         else:
-            return super(EventTag, self).delete(*args, **kwargs)
+            return super().delete(*args, **kwargs)
 
 
 class Event(models.Model):
@@ -244,7 +244,7 @@ class Event(models.Model):
         db_table = "Events"
 
     def __init__(self, *args, **kwargs):
-        super(Event, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # Set field from template (if specified):
         if "template" in kwargs and not self.pricing:
             self.pricing = kwargs["template"].pricing
@@ -453,7 +453,7 @@ class Showing(models.Model):
         if start_offset and copy_from is None:
             raise ValueError("start_offset supplied with no copy_from")
 
-        super(Showing, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         self._original_start = self.start
 
@@ -511,7 +511,7 @@ class Showing(models.Model):
             raise django.db.IntegrityError(
                 "Can't update showings that start in the past"
             )
-        return super(Showing, self).save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         # Don't allow showings to be deleted if they're finished. This isn't a
@@ -525,7 +525,7 @@ class Showing(models.Model):
             raise django.db.IntegrityError(
                 "Can't delete showings that start in the past"
             )
-        return super(Showing, self).delete(*args, **kwargs)
+        return super().delete(*args, **kwargs)
 
     # Extra, custom methods:
 
@@ -683,7 +683,7 @@ class RotaEntry(models.Model):
         else:
             template = None
 
-        super(RotaEntry, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
         if template:
             # Only use the showing from the template if one hasn't been set yet
@@ -736,4 +736,4 @@ class PrintedProgramme(models.Model):
                 " of the month"
             )
             self.month = datetime.date(self.month.year, self.month.month, 1)
-        return super(PrintedProgramme, self).save(*args, **kwargs)
+        return super().save(*args, **kwargs)

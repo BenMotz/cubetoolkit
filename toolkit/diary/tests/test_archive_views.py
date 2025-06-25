@@ -8,7 +8,7 @@ from .common import DiaryTestsMixin
 
 class ArchiveViews(DiaryTestsMixin, TestCase):
     def setUp(self):
-        super(ArchiveViews, self).setUp()
+        super().setUp()
 
         self.time_patch = patch("django.utils.timezone.now")
         time_mock = self.time_patch.start()

@@ -14,7 +14,7 @@ from .common import DiaryTestsMixin
 
 class AddPrintedProgrammeTests(DiaryTestsMixin, TestCase):
     def setUp(self):
-        super(AddPrintedProgrammeTests, self).setUp()
+        super().setUp()
         self.client.login(username="admin", password="T3stPassword!")
         self.test_upload = None
 
@@ -152,7 +152,7 @@ class AddPrintedProgrammeTests(DiaryTestsMixin, TestCase):
 
 class EditPrintedProgrammeTests(DiaryTestsMixin, TestCase):
     def setUp(self):
-        super(EditPrintedProgrammeTests, self).setUp()
+        super().setUp()
         self.client.login(username="admin", password="T3stPassword!")
         self.test_upload = None
         self._add_data()

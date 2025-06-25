@@ -175,7 +175,7 @@ class TestMemberModel(TestCase):
 
 class TestAddMemberView(MembersTestsMixin, TestCase):
     def setUp(self):
-        super(TestAddMemberView, self).setUp()
+        super().setUp()
 
         self.assertTrue(
             self.client.login(username="admin", password="T3stPassword!")
@@ -314,7 +314,7 @@ class TestAddMemberView(MembersTestsMixin, TestCase):
 
 class TestSearchMemberView(MembersTestsMixin, TestCase):
     def setUp(self):
-        super(TestSearchMemberView, self).setUp()
+        super().setUp()
 
         self.assertTrue(
             self.client.login(username="admin", password="T3stPassword!")
@@ -635,7 +635,7 @@ class TestDeleteMemberViewNotLoggedIn(MembersTestsMixin, TestCase):
 
 class TestEditMemberViewNotLoggedIn(MembersTestsMixin, TestCase):
     def setUp(self):
-        super(TestEditMemberViewNotLoggedIn, self).setUp()
+        super().setUp()
 
     def _assert_redirect_to_login(self, response, url, extra_parameters=""):
         expected_redirect = (
@@ -875,7 +875,7 @@ class TestEditMemberViewNotLoggedIn(MembersTestsMixin, TestCase):
 
 class TestEditMemberViewLoggedIn(MembersTestsMixin, TestCase):
     def setUp(self):
-        super(TestEditMemberViewLoggedIn, self).setUp()
+        super().setUp()
         self.assertTrue(
             self.client.login(username="admin", password="T3stPassword!")
         )
@@ -996,7 +996,7 @@ class TestEditMemberViewLoggedIn(MembersTestsMixin, TestCase):
 
 class TestUnsubscribeMemberView(MembersTestsMixin, TestCase):
     def setUp(self):
-        super(TestUnsubscribeMemberView, self).setUp()
+        super().setUp()
 
     def _assert_redirect_to_login(self, response, url, extra_parameters=""):
         expected_redirect = (
@@ -1167,7 +1167,7 @@ class TestUnsubscribeMemberView(MembersTestsMixin, TestCase):
 
 class TestMemberMiscViews(MembersTestsMixin, TestCase):
     def setUp(self):
-        super(TestMemberMiscViews, self).setUp()
+        super().setUp()
 
         self.assertTrue(
             self.client.login(username="admin", password="T3stPassword!")

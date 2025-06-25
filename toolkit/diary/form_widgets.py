@@ -9,7 +9,7 @@ class ChosenSelectMultiple(forms.SelectMultiple):
 
     template_name = "widgets/chosenselectmultiple.html"
 
-    class Media(object):
+    class Media:
         # Define media (CSS & JS) used by this control. To include this
         # automatically the template containing the form must have the
         # {{ form.media }} tag
@@ -20,12 +20,10 @@ class ChosenSelectMultiple(forms.SelectMultiple):
 
     def __init__(self, *args, **kwargs):
         self.width = kwargs.pop("width", None)
-        super(ChosenSelectMultiple, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def get_context(self, name, value, attrs):
-        context = super(ChosenSelectMultiple, self).get_context(
-            name, value, attrs
-        )
+        context = super().get_context(name, value, attrs)
         context["widget"].update(
             {
                 "width": self.width,
@@ -41,7 +39,7 @@ class HtmlTextarea(forms.Textarea):
 
     template_name = "widgets/htmltextarea.html"
 
-    class Media(object):
+    class Media:
         # Define media (CSS & JS) used by this control. To include this
         # automatically the template containing the form must have the
         # {{ form.media }} tag
@@ -51,10 +49,10 @@ class HtmlTextarea(forms.Textarea):
         self.enable_tables = kwargs.pop("enable_tables", False)
         self.enable_iframes = kwargs.pop("enable_iframes", True)
         self.height = kwargs.pop("height", None)
-        super(HtmlTextarea, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def get_context(self, name, value, attrs):
-        context = super(HtmlTextarea, self).get_context(name, value, attrs)
+        context = super().get_context(name, value, attrs)
         context["widget"]["enable_tables"] = self.enable_tables
         context["widget"]["enable_iframes"] = self.enable_iframes
         if self.height:
@@ -76,9 +74,9 @@ class JQueryDateTimePicker(forms.DateTimeInput):
         if "format" not in kwargs:
             kwargs["format"] = "%d/%m/%Y %H:%M"
 
-        super(JQueryDateTimePicker, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
-    class Media(object):
+    class Media:
         css = {
             "all": (
                 "css/lib/smoothness/jquery-ui.css",

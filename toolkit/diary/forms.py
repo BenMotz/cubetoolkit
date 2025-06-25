@@ -20,7 +20,7 @@ from toolkit.diary.validators import validate_in_future
 
 
 class RoleForm(forms.ModelForm):
-    class Meta(object):
+    class Meta:
         model = toolkit.diary.models.Role
         fields = (
             "name",
@@ -29,7 +29,7 @@ class RoleForm(forms.ModelForm):
 
 
 class DiaryIdeaForm(forms.ModelForm):
-    class Meta(object):
+    class Meta:
         model = toolkit.diary.models.DiaryIdea
         fields = ("ideas",)
 
@@ -43,7 +43,7 @@ class EventForm(forms.ModelForm):
         self.helper.label_class = "col-sm-2"
         self.helper.field_class = "col-sm-10"
 
-    class Meta(object):
+    class Meta:
         model = toolkit.diary.models.Event
         # Ensure soft wrapping is set for textareas:
         widgets = {
@@ -156,7 +156,7 @@ class MediaItemForm(forms.ModelForm):
         self.helper.label_class = "col-sm-2"
         self.helper.field_class = "col-sm-10"
 
-    class Meta(object):
+    class Meta:
         model = toolkit.diary.models.MediaItem
         widgets = {
             "media_file": forms.ClearableFileInput(
@@ -180,7 +180,7 @@ class MediaItemForm(forms.ModelForm):
 
 class ShowingForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
-        super(ShowingForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if not settings.MULTIROOM_ENABLED:
             del self.fields["room"]
         self.helper = FormHelper()
@@ -189,7 +189,7 @@ class ShowingForm(forms.ModelForm):
         self.helper.label_class = "col-sm-2"
         self.helper.field_class = "col-sm-10"
 
-    class Meta(object):
+    class Meta:
         model = toolkit.diary.models.Showing
         fields = (
             "room",
@@ -237,7 +237,7 @@ ShowingFormSet = forms.modelformset_factory(
 
 
 class ShowingRotaNotesForm(forms.ModelForm):
-    class Meta(object):
+    class Meta:
         model = toolkit.diary.models.Showing
         fields = ("rota_notes",)
 
@@ -327,7 +327,7 @@ class CloneShowingForm(forms.Form):
 
 class NewEventForm(forms.Form):
     def __init__(self, *args, **kwargs):
-        super(NewEventForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if not settings.MULTIROOM_ENABLED:
             del self.fields["room"]
 
@@ -368,7 +368,7 @@ class NewEventForm(forms.Form):
 class MailoutForm(forms.Form):
     def __init__(self, *args, **kwargs):
         self.html_mailout_enabled = kwargs.pop("html_mailout_enabled")
-        super(MailoutForm, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         if not self.html_mailout_enabled:
             del self.fields["send_html"]
             del self.fields["body_html"]
@@ -413,7 +413,7 @@ class SearchForm(forms.Form):
     )
 
     def clean(self):
-        cleaned_data = super(SearchForm, self).clean()
+        cleaned_data = super().clean()
 
         # Check that either a search term or a search start or end date is
         # supplied:
@@ -450,12 +450,12 @@ class NewPrintedProgrammeForm(forms.ModelForm):
         initial=datetime.date.today().month,
     )
 
-    class Meta(object):
+    class Meta:
         model = toolkit.diary.models.PrintedProgramme
         fields = ("form_month", "year", "programme", "designer", "notes")
 
     def clean(self):
-        cleaned_data = super(NewPrintedProgrammeForm, self).clean()
+        cleaned_data = super().clean()
 
         # Sets the "month" field on the model from the form data
         try:

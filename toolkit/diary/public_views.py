@@ -317,7 +317,7 @@ class ArchiveSearch(generic.list.ListView, generic.edit.FormMixin):
 
     def get_context_data(self, **kwargs):
         # Put the form in the context data sent to the template
-        context = super(ArchiveSearch, self).get_context_data(**kwargs)
+        context = super().get_context_data(**kwargs)
         context.update(
             {
                 "form": self.form,
@@ -366,4 +366,4 @@ class ArchiveSearch(generic.list.ListView, generic.edit.FormMixin):
         self.form = self.get_form()
 
         # Rely on functionality from the generic view...
-        return super(ArchiveSearch, self).get(request)
+        return super().get(request)

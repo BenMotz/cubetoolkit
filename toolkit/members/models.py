@@ -141,7 +141,7 @@ class Member(models.Model):
         return self.name
 
     def __init__(self, *args, **kwargs):
-        super(Member, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
 
     def save(self, *args, **kwargs):
         # If a user number hasn't been set, save a placeholder, then re-save
@@ -151,7 +151,7 @@ class Member(models.Model):
             set_number = True
             self.number = "?"
 
-        result = super(Member, self).save(*args, **kwargs)
+        result = super().save(*args, **kwargs)
 
         if set_number:
             self.number = self._generate_membership_number()
@@ -240,10 +240,10 @@ class Volunteer(models.Model):
                     )
                 self.__original_portrait = None
 
-        return super(Volunteer, self).save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     def __init__(self, *args, **kwargs):
-        super(Volunteer, self).__init__(*args, **kwargs)
+        super().__init__(*args, **kwargs)
         # Store current filename of portrait (if any) so that, at save, changes
         # can be detected and the old image deleted:
         try:
@@ -332,7 +332,7 @@ class TrainingRecord(models.Model):
             raise django.db.IntegrityError(
                 "role not defined but training_type is role"
             )
-        return super(TrainingRecord, self).save(*args, **kwargs)
+        return super().save(*args, **kwargs)
 
     def has_expired(self, expiry_age=None):
         # Don't use settings. in declaration, as it makes it impossible to mock
