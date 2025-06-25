@@ -1,6 +1,6 @@
 import datetime
 
-from mock import patch
+from unittest.mock import patch
 import urllib
 
 from django.test import TestCase

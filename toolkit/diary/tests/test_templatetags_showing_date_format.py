@@ -1,7 +1,7 @@
 from datetime import datetime
 
 import zoneinfo
-from mock import Mock
+from unittest.mock import Mock
 from django.test import TestCase
 
 from toolkit.diary.templatetags.showing_date_format import format_showing_dates

@@ -3,7 +3,6 @@
 django-debug-toolbar==5.1.0
 
 # For running tests
-mock
 fixtures<4
 extras
 

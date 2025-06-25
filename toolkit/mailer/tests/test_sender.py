@@ -2,7 +2,7 @@ import email.parser
 import email.header
 import smtplib
 from datetime import timedelta
-from mock import patch, Mock
+from unittest.mock import patch, Mock
 
 from django.core import mail
 from django.conf import settings

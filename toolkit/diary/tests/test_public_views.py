@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 import zoneinfo
 
-from mock import patch
+from unittest.mock import patch
 
 from django.test import TestCase
 from django.urls import reverse, resolve

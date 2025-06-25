@@ -1,6 +1,6 @@
 from datetime import datetime, timezone, timedelta
 
-from mock import patch
+from unittest.mock import patch
 
 import fixtures
 from django.test import TestCase

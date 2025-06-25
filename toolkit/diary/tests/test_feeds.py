@@ -2,7 +2,7 @@ import datetime
 import urllib
 import xml.etree.ElementTree as ElementTree
 
-from mock import patch
+from unittest.mock import patch
 
 from django.test import TestCase
 from django.urls import reverse

@@ -1,4 +1,4 @@
-from mock import patch
+from unittest.mock import patch
 from datetime import timedelta
 
 from django.test import TestCase
