@@ -128,7 +128,7 @@ def send_mailout_to(
     count = recipients.count()
     sent = 0
     one_percent = count // 100 or 1
-    start_time = time.monotonic()
+    last_poll_for_cancel = time.monotonic()
 
     logger.info(f"Sending mailout to {count} recipients")
 
@@ -161,13 +161,15 @@ def send_mailout_to(
 
     try:
         for recipient in recipients:
+            now_m = time.monotonic()
             if sent % one_percent == 0 or (
-                time.monotonic() - start_time > POLL_FOR_CANCEL_PERIOD_S
+                now_m - last_poll_for_cancel > POLL_FOR_CANCEL_PERIOD_S
             ):
                 job.refresh_from_db()
                 if job.keep_sending():
                     job.do_sending(sent, count)
                     job.save()
+                last_poll_for_cancel = now_m
 
             if not job.keep_sending():
                 logger.info(f"Aborting job: {job}")
