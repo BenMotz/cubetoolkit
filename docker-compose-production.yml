@@ -2,6 +2,7 @@ services:
   mariadb:
     image: mariadb:10
     container_name: toolkit-${ENV}-mariadb
+    restart: unless-stopped
     environment:
       MARIADB_DATABASE: "${DB_NAME}"
       MARIADB_USER: "${DB_USER}"
@@ -18,7 +19,7 @@ services:
   toolkit:
     image: toolkit:${ENV}
     container_name: toolkit-${ENV}-app
-    restart: on-failure
+    restart: unless-stopped
     ports:
       - "127.0.0.1:8002:8000"
     environment:
@@ -41,7 +42,7 @@ services:
     image: toolkit:${ENV}
     container_name: toolkit-${ENV}-mailerd
     command: ["mailerd"]  ## override default CMD value in Dockerfile
-    restart: on-failure
+    restart: unless-stopped
     environment:
       DB_NAME: "${DB_NAME}"
       DB_USER: "${DB_USER}"
