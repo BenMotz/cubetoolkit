@@ -1,8 +1,6 @@
 import os
 from toolkit.settings_common import *
 
-# environment values are passed in from docker
-
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.mysql",
@@ -43,16 +41,12 @@ ADMINS = (
 
 SERVER_EMAIL = "toolkit_staging_errors@cubecinema.com"
 
-SESSION_COOKIE_AGE = 3600
-SESSION_EXPIRE_AT_BROWSER_CLOSE = False
-SESSION_SAVE_EVERY_REQUEST = True
-
-HTML_MAILOUT_ENABLED = True
-
 # SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
 CSRF_COOKIE_SECURE = True
-X_FRAME_OPTIONS = "DENY"
+# This breaks the calendar
+# See https://docs.djangoproject.com/en/1.11/ref/clickjacking/ for a fix
+# X_FRAME_OPTIONS = 'DENY'
 
 EMAIL_HOST = os.environ.get("EMAIL_HOST")
 EMAIL_PORT = os.environ.get("EMAIL_PORT")
@@ -62,3 +56,7 @@ EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD")
 CSRF_TRUSTED_ORIGINS = [
     "https://staging.cubecinema.com",
 ]
+
+SESSION_COOKIE_AGE = 3600
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
+SESSION_SAVE_EVERY_REQUEST = True

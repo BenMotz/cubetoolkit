@@ -1,3 +1,4 @@
+import os
 from toolkit.settings_common import *
 
 DATABASES = {
@@ -14,9 +15,6 @@ DATABASES = {
         },
     }
 }
-
-CELERY_BROKER_URL = "redis://redis:6379/0"
-CELERY_RESULT_BACKEND = "redis://redis:6379/0"
 
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = os.environ["SECRET_KEY"]
@@ -42,8 +40,6 @@ ADMINS = (
 )
 
 SERVER_EMAIL = "toolkit_errors@cubecinema.com"
-
-MAX_COUNT_PER_ROLE = 16
 
 # SECURE_SSL_REDIRECT = True
 SESSION_COOKIE_SECURE = True
