@@ -28,6 +28,11 @@ def run_job(job: MailoutJob) -> None:
     """
 
     recipients = Member.objects.mailout_recipients()
+
+    recipient_filter = str(job.recipient_filter).strip()
+    if recipient_filter:
+        recipients = recipients.filter(email__icontains=recipient_filter)
+
     count = recipients.count()
 
     if count == 0:
