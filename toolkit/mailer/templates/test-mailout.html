@@ -1,0 +1,79 @@
+{% extends "base_admin.html" %}
+
+{% block title %}
+Test Mailout Job Creator
+{% endblock %}
+
+{% block script %}
+{{ block.super }}
+{{ form.media }}
+{% endblock %}
+
+{% block body %}
+<h1>Test Mailout Job Creator</h1>
+
+<p>This form allows you to create a test mailout job directly.</p>
+
+<form method="post">
+  {% csrf_token %}
+  
+  <div class="form-group">
+    <label for="{{ form.send_at.id_for_label }}">{{ form.send_at.label }}</label>
+    {{ form.send_at }}
+    {% if form.send_at.errors %}
+      <div class="alert alert-danger">
+        {{ form.send_at.errors }}
+      </div>
+    {% endif %}
+    <small class="form-text text-muted">When to send the mailout (must be in the future)</small>
+  </div>
+
+  <div class="form-group">
+    <label for="{{ form.subject.id_for_label }}">{{ form.subject.label }}</label>
+    {{ form.subject }}
+    {% if form.subject.errors %}
+      <div class="alert alert-danger">
+        {{ form.subject.errors }}
+      </div>
+    {% endif %}
+  </div>
+
+  <div class="form-group">
+    <label for="{{ form.body_text.id_for_label }}">{{ form.body_text.label }}</label>
+    {{ form.body_text }}
+    {% if form.body_text.errors %}
+      <div class="alert alert-danger">
+        {{ form.body_text.errors }}
+      </div>
+    {% endif %}
+    <small class="form-text text-muted">Plain text email body</small>
+  </div>
+
+  <div class="form-group">
+    <label for="{{ form.recipient_filter.id_for_label }}">{{ form.recipient_filter.label }}</label>
+    {{ form.recipient_filter }}
+    {% if form.recipient_filter.errors %}
+      <div class="alert alert-danger">
+        {{ form.recipient_filter.errors }}
+      </div>
+    {% endif %}
+    <small class="form-text text-muted">Email address of the recipient: must be a current mailout recipient</small>
+  </div>
+
+  <div class="container">
+    <div class="row">
+      <div class="col-md-2">
+        <button type="submit" formaction="{% url 'mailer:test-mailout-create' %}?send_at=now" class="btn btn-success">Send now</button>
+      </div>
+      <div class="col-md-2">
+        <button type="submit" class="btn btn-primary">Schedule</button>
+      </div>
+      <div class="col-md-2">
+        <a href="{% url 'mailer:jobs-list' %}" class="btn btn-secondary">Cancel</a>
+      </div>
+    </div>
+  </div>
+
+</form>
+
+{% endblock %}

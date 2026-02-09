@@ -1,10 +1,14 @@
+import datetime
+
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import permission_required
 from django.urls import reverse
 from django.views.decorators.http import require_POST, require_GET
 from django.shortcuts import get_object_or_404, render
+import django.utils.timezone as timezone
 
 from .models import MailoutJob
+from .forms import TestMailoutJobForm
 
 
 @permission_required("toolkit.write")
@@ -78,5 +82,40 @@ def jobs_table(request: HttpRequest) -> HttpResponse:
             "poll_for_updates": poll_for_updates,
             "show_completed": show_completed,
             "show_failed": show_failed,
+        },
+    )
+
+
+@permission_required("toolkit.write")
+def test_mailout_create(request: HttpRequest) -> HttpResponse:
+    """Test view to create mailout jobs directly"""
+    if request.method == "POST":
+        # Check if we should send right now
+        send_right_now = request.GET.get("send_at") == "now"
+
+        form_data = request.POST.copy()
+        if send_right_now:
+            # Set send_at to 2 seconds from now for immediate sending
+            form_data["send_at"] = timezone.now() + datetime.timedelta(
+                seconds=2
+            )
+
+        form = TestMailoutJobForm(form_data)
+        if form.is_valid():
+            # Create and save the mailout job
+            job = form.save(commit=False)
+            # Set send_html to False for simplicity
+            job.send_html = False
+            job.body_html = ""
+            job.save()
+            return HttpResponseRedirect(reverse("mailer:jobs-list"))
+    else:
+        form = TestMailoutJobForm()
+
+    return render(
+        request,
+        "test-mailout.html",
+        context={
+            "form": form,
         },
     )

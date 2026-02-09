@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import job_cancel, jobs_list, jobs_table
+from .views import job_cancel, jobs_list, jobs_table, test_mailout_create
 
 app_name = "mailer"
 
@@ -10,4 +10,6 @@ urlpatterns = [
     path("jobs/", jobs_list, name="jobs-list"),
     # Retrieve job table fragment
     path("job-table/", jobs_table, name="jobs-table"),
+    # Test page to create mailout jobs
+    path("test/", test_mailout_create, name="test-mailout-create"),
 ]
