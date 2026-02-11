@@ -405,16 +405,6 @@ LOGGING = {
             # Args:
             "stream": sys.stderr,
         },
-        "file": {
-            "level": "DEBUG",
-            "class": "logging.handlers.RotatingFileHandler",  # really?
-            "formatter": "verbose",
-            # Args:
-            "filename": "debug.log",  # overridden in other settings files
-            "mode": "a",
-            "maxBytes": 10485760,
-            "backupCount": 5,
-        },
         "mail_admins": {
             "level": "ERROR",
             "filters": ["require_debug_false"],
@@ -432,7 +422,7 @@ LOGGING = {
             "level": "INFO",
         },
         "toolkit": {
-            "handlers": ["console", "file"],
+            "handlers": ["console"],
             "level": "DEBUG",
         },
     },

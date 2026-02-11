@@ -19,13 +19,9 @@ DATABASES = {
 # Make this unique, and don't share it with anybody.
 SECRET_KEY = os.environ["SECRET_KEY"]
 
-# Disable the log file
-del LOGGING["handlers"]["file"]
-LOGGING["loggers"]["toolkit"]["handlers"] = ["console"]
-
 LOGGING["loggers"]["PIL"] = {"level": "INFO"}
 
-# Instead enable logging to the console (configured in settings_common.py)
+# Enable logging to the console (configured in settings_common.py)
 LOGGING["root"] = {
     "handlers": ["console", "mail_admins"],
     "level": "DEBUG",

@@ -24,14 +24,6 @@ SECRET_KEY = os.environ.get(
     "SECRET_KEY", "*@t05l5a7+uos5*9=c7ph1t#s(l*tlcdx(n(isztw^4w2c&mu-"
 )
 
-LOGGING["handlers"]["file"]["filename"] = "django_test.log"
-
-# Enable logging of *everything* to the console:
-LOGGING["root"] = {
-    "handlers": ["console"],
-    "level": "DEBUG",
-}
-
 # Override setting in settings_common
 VENUE["email_unsubcribe_host"] = "localhost:8000"
 
