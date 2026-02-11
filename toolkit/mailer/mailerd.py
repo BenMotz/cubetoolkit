@@ -78,6 +78,10 @@ def clean_up() -> None:
 
 def run() -> None:
     logger.info("Starting mailerd")
+    logger.info(f"SMTP host: {settings.EMAIL_HOST}")
+    logger.info(f"SMTP port: {settings.EMAIL_PORT}")
+    logger.info(f"SMTP user: {settings.EMAIL_HOST_USER}")
+
     clean_up()
     keep_running = True
 
