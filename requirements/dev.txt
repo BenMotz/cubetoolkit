@@ -3,7 +3,7 @@
 django-debug-toolbar==5.1.0
 
 # For running tests
-fixtures<4
+fixtures<5
 extras
 
 # Formatter
