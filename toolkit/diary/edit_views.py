@@ -1159,9 +1159,7 @@ def edit_showing_rota_notes(request, showing_id):
             "Unknown error", status=500, content_type="text/plain"
         )
 
-    response = escape(showing.rota_notes)
-
-    return HttpResponse(escape(response), content_type="text/plain")
+    return HttpResponse(escape(showing.rota_notes), content_type="text/plain")
 
 
 # Doesn't need permission check, as will only return messages for the current

@@ -60,6 +60,17 @@ function edit_rota(jQuery, rota_edit_base_url, edit_rota_notes_url_prefix, vol_e
         });
     }
 
+    function unEscape(text) {
+        // The inverse of the python stdlib html.escape
+        return text
+            .replace(/&amp;/g,  '&')
+            .replace(/&lt;/g,   '<')
+            .replace(/&gt;/g,   '>')
+            .replace(/&quot;/g, '"')
+            .replace(/&#39;/g,  "'")
+            .replace(/&#x27;/g, "'");
+    }
+
     function configureRotaNotesEditInPlaceControls() {
         var showing_id_re = /showing_rota_notes_(\d+)/;
 
@@ -81,7 +92,15 @@ function edit_rota(jQuery, rota_edit_base_url, edit_rota_notes_url_prefix, vol_e
                         submit: 'Save',
                         submitdata: {
                             csrfmiddlewaretoken: CSRF_TOKEN
-                        }
+                        },
+                        // So, this is confusing.
+                        // 1. The template populates the notes with escaped text (&amp; etc.)
+                        // 2. The user clicks 'edit'. Before displaying the DOM node in the edit control,
+                        //    this function is called to un-escape most entities that people use
+                        // 3. The user edits beautiful clear text, happily adding ampersands, and clicks "save"
+                        // 4. The unescaped text is sent to the server, saved, and returned escaped (back to &amp;)
+                        // 5. The escaped text is inserted into the DOM, and the cycle continues
+                        data: unEscape
                     }
                 );
             }
