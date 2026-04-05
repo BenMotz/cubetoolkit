@@ -1,21 +1,17 @@
 """Process member's mailing list email bounces by logging into the mail server
 mailbox which receives the bounces, inspecting the bounced mails,
-and unsubcribing the members associated with the bounced mails.
+and unsubscribing the members associated with the bounced mails.
 Also deletes over-quota and holiday replies from the mailbox.
-invoke with python2 mailoutomatic.py
+invoke with python3 mailoutomatic.py
 """
 import os
 import sys
 import datetime
 import imaplib
 import email
-import string
-import random
-import StringIO
-import rfc822
 import re
-from urllib import urlopen
 import logging
+from urllib.request import urlopen
 
 """
 File: imaplib-example-1.py
@@ -29,7 +25,6 @@ http://code.activestate.com/recipes/52560/
 http://python.about.com/od/pythonstandardlibrary/ss/email_whitelist_5.htm
 
 TODO
-* Rewrite for python3
 * Cope with Re: in subject line
 * Unacceptable Mail Content
 * spam detected
@@ -77,14 +72,10 @@ GoneAway = "Mailbox disabled|mailbox unavailable|Mailbox is inactive|This is a p
 GoneAway += "|Unrouteable address|recipient rejected|unknown or illegal alias"
 GoneAway += "|The email account that you tried to reach does not exist"
 GoneAway += "|This user doesn't have a .* account|Address rejected"
-GoneAway += (
-    "|Rcpt .* does not exist|recipient.*known|Recipient address rejected"
-)
+GoneAway += "|Rcpt .* does not exist|recipient.*known|Recipient address rejected"
 GoneAway += "|unable to validate recipient|Invalid recipient"
 GoneAway += "|account has been disabled or discontinued"
-GoneAway += (
-    "|User unknown|Unknown user|User is unknown|account has been disabled"
-)
+GoneAway += "|User unknown|Unknown user|User is unknown|account has been disabled"
 GoneAway += "|No such user|Recipient address rejected|User does not exist"
 GoneAway += "|No such recipient|no mailbox|No such mailbox"
 GoneAway += "|Delivery.*failed|inactive user"
@@ -125,36 +116,27 @@ NameServerError = "name service error"
 
 LOG_DIR = "/var/log/cubetoolkit"
 LOG_FILENAME = "mailoutomatic-%s.log" % datetime.datetime.now().strftime(
-    "%d-%b-%Y-%H:%m:%S"
+    "%d-%b-%Y-%H:%M:%S"
 )
 
-"""logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s %(levelname)s %(message)s',
-                    filename=LOG_FILENAME,
-                    filemode='w')
-"""
-# https://docs.python.org/2/howto/logging.html
-# create logger
+# https://docs.python.org/3/howto/logging.html
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
 
-# create console handler and set level to debug
+# Console handler
 ch = logging.StreamHandler()
 ch.setLevel(logging.INFO)
 
-# create formatter
 formatter = logging.Formatter(
     "%(asctime)s - %(levelname)s - %(message)s", datefmt="%I:%M:%S %p"
 )
-# add formatter to ch
 ch.setFormatter(formatter)
-# add ch to logger
 logger.addHandler(ch)
 
 handler = logging.FileHandler(os.path.join(LOG_DIR, LOG_FILENAME), mode="w")
 handler.setFormatter(formatter)
 handler.setLevel(logging.INFO)
-logger.addHandler(handler)  # add the handlers to the logger
+logger.addHandler(handler)
 
 
 REMOVELIST = [
@@ -165,24 +147,24 @@ REMOVELIST = [
     "returned mail",
     "delivery status",
     "problems",
-]  # removed returned
+]
 
 DELETEON = ["auto", "office", "vacation", "away", "warning", "maternity"]
 
-mailserver = raw_input("Enter name of mail server [%s]: " % mailserver_default)
+mailserver = input("Enter name of mail server [%s]: " % mailserver_default)
 if not mailserver:
     mailserver = mailserver_default
-user = raw_input("Enter mail user name [%s]: " % user_default)
+user = input("Enter mail user name [%s]: " % user_default)
 if not user:
     user = user_default
-mailbox = raw_input("Enter mailbox name [%s]: " % mailbox_default)
+mailbox = input("Enter mailbox name [%s]: " % mailbox_default)
 if not mailbox:
     mailbox = mailbox_default
-password = raw_input("Enter mail password for user %s: " % user)
+password = input("Enter mail password for user %s: " % user)
 
 removeCount = 0
 overQuotaCount = 0
-nameErrorCount = 0  # TODO
+nameErrorCount = 0
 SPFErrorCount = 0
 spamCount = 0
 manualUnsubscribeCnt = 0
@@ -194,255 +176,148 @@ See https://regex101.com/
 """
 removeStr = r"https:\/\/%s\/members\/(\d+)\/unsubscribe\/\?k=(.+)" % site
 
-# connect to server
-server = imaplib.IMAP4(mailserver)
+# connect to server securely
+server = imaplib.IMAP4_SSL(mailserver, 993)
 
 # login
-msg_str = 'Logging in to mail server "%s" as user "%s"...' % (mailserver, user)
-logging.info(msg_str)
-
+logging.info('Logging in to mail server "%s" as user "%s"...', mailserver, user)
 response = server.login(user, password)
 logging.info(response)
 
 # Select a mailbox. Returned data is the count of messages in mailbox
 # (EXISTS response). The default mailbox is 'INBOX'. If the readonly flag is
 # set, modifications to the mailbox are not allowed.
-# Status should be string 'OK'
+(status, msg_cnt) = server.select(f'"{mailbox}"')
+logging.info('Mailbox "%s" contains %d mails', mailbox, int(msg_cnt[0]))
 
-(status, msg_cnt) = server.select(mailbox)
-
-msg_str = 'Mailbox "%s" contains %d mails' % (mailbox, int(msg_cnt[0]))
-logging.info(msg_str)
-
-# list items on server
-# resp, items = server.search(None, "ALL")
-# resp should be the string 'OK', items is list, the first item of which is a
-# string containing the matching messages
-
-# sys.exit(0)
-
-msg_str = "Processing matches from Delete list ..."
-logging.info(msg_str)
+logging.info("Processing matches from Delete list ...")
 
 for keyWord in DELETEON:
-    resp, items = server.search(None, "SUBJECT", keyWord)
+    resp, items = server.search(None, "SUBJECT", f'"{keyWord}"')
 
-    # msg_ids is str of matching ids
-    # resp, [msg_ids] = server.search(None, 'SUBJECT', SEARCHON)
+    # In Python 3, items[0] is bytes
+    item_list = items[0].split()
 
-    items = string.split(items[0])  # doesn't do anything ??
-
-    msg_str = '    %d messages matching "%s" found' % (len(items), keyWord)
-    logging.info(msg_str)
+    logging.info('    %d messages matching "%s" found', len(item_list), keyWord)
 
     if deleteStuff:
-        for id in items:
-            # What are the current flags?
-            # if verbose:
-            #     typ, response = server.fetch(id, '(FLAGS)')
-            #     print 'msg id %s: %s' % (id, response)
+        for msg_id in item_list:
+            server.store(msg_id, "+FLAGS", r"(\Deleted)")
 
-            # Change the Deleted flag
-            typ, response = server.store(id, "+FLAGS", r"(\Deleted)")
+        logging.info('    deleted %d messages with subject "%s"', len(item_list), keyWord)
 
-            # typ, response = server.fetch(id, '(FLAGS)')
-            # print 'msg id %s: %s' % (id, response)
-
-        msg_str = '    deleted %d messages with subject "%s"' % (
-            len(items),
-            keyWord,
-        )
-        logging.info(msg_str)
-
-msg_str = "Processing matches from Remove list ..."
-logging.info(msg_str)
+logging.info("Processing matches from Remove list ...")
 
 for keyWord in REMOVELIST:
-    # Header checks
-    resp, items = server.search(None, "SUBJECT", keyWord)
-    items = string.split(items[0])
-    msg_str = '    %d messages matching "%s" found' % (len(items), keyWord)
-    logging.info(msg_str)
+    resp, items = server.search(None, "SUBJECT", f'"{keyWord}"')
+    item_list = items[0].split()
+    logging.info('    %d messages matching "%s" found', len(item_list), keyWord)
 
-    # TODO Calculate the missing messages
-
-    # Fetch the message for body checks
-    for id in items:
-        if int(id) < maxMesgNo:
-            msg_str = "        Inspecting message %s" % id
-            logging.info(msg_str)
-            typ, msg_data = server.fetch(id, "(RFC822)")
+    for msg_id in item_list:
+        if int(msg_id) < maxMesgNo:
+            logging.info("        Inspecting message %s", msg_id)
+            typ, msg_data = server.fetch(msg_id, "(RFC822)")
             for response_part in msg_data:
                 if isinstance(response_part, tuple):
-                    msg = email.message_from_string(response_part[1])
-                    if False:
-                        for header in ["subject", "to", "from"]:
-                            print(
-                                "    %-8s: %s" % (header.upper(), msg[header])
-                            )
-                    # if msg.is_multipart():
-                    #     # TODO
-                    #     out = msg.get_payload()
-                    #     for i in out:
-                    #         msgText =out[i].as_string()
-                    # else:
+                    # In Python 3, response_part[1] is bytes
+                    msg = email.message_from_bytes(response_part[1])
                     msgText = msg.as_string()
 
                     m = re.search(OverQuota, msgText, re.I)
-                    if bool(m):
-                        u = m.group(0)
-                        msg_str = '        "%s" found' % u
-                        logging.info(msg_str)
+                    if m:
+                        logging.info('        "%s" found', m.group(0))
                         overQuotaCount += 1
-                        # Delete over quota mails
                         if deleteStuff:
-                            typ, response = server.store(
-                                id, "+FLAGS", r"(\Deleted)"
-                            )
-                            # TODO use response
+                            server.store(msg_id, "+FLAGS", r"(\Deleted)")
 
                     else:  # Not over quota - continue
                         # Check for SPF error
                         m = re.search(SPF, msgText, re.I)
-                        if bool(m):
-                            u = m.group(0)
-                            msg_str = '        "%s" found' % u
+                        if m:
+                            logging.info('        "%s" found', m.group(0))
                             SPFErrorCount += 1
-                            # Delete over quota mails
                             if deleteStuff:
-                                typ, response = server.store(
-                                    id, "+FLAGS", r"(\Deleted)"
-                                )
-                                # TODO use response
+                                server.store(msg_id, "+FLAGS", r"(\Deleted)")
 
                         # Check for name server error
                         m = re.search(NameServerError, msgText, re.I)
-                        if bool(m):
-                            u = m.group(0)
-                            msg_str = '        "%s" found' % u
+                        if m:
+                            logging.info('        "%s" found', m.group(0))
                             nameErrorCount += 1
-                            # TODO break from here?
 
-                        # Check fo message flagged as spam
+                        # Check for message flagged as spam
                         m = re.search(SpamAlleged, msgText, re.I)
-                        if bool(m):
-                            u = m.group(0)
-                            msg_str = '        "%s" found' % u
+                        if m:
+                            logging.info('        "%s" found', m.group(0))
                             spamCount += 1
-                            # TODO break from here?
 
                         # Check if the email has bounced
                         m = re.search(GoneAway, msgText, re.I)
-                        if bool(m):
-                            u = m.group(0)
-                            msg_str = '            "%s" found' % u
-                            logging.info(msg_str)
+                        if m:
+                            logging.info('            "%s" found', m.group(0))
 
                             # Now see if we can find the unsubscribe string
-                            # ignoring case
                             m = re.search(removeStr, msgText, re.I)
-                            if bool(m):
+                            if m:
                                 u = m.group(0).strip()
-                                msg_str = "            %s found" % u
-                                logging.info(msg_str)
-                                removeCount = removeCount + 1
-
-                                # u1 = re.sub('unsubscribe', 'unsubscribe-now', u)
-                                # print u1; logging.info(u1)
+                                logging.info("            %s found", u)
+                                removeCount += 1
 
                                 if unsubscribe:
-
                                     # Get the email address of who we are unsubscribing
                                     u_info = re.sub("unsubscribe", "edit", u)
-                                    reply = urlopen(u_info).read()
-                                    m = re.search(
-                                        r"name=\"email\" value=\"(.*)\" id=\"id_email",
+                                    reply = urlopen(u_info).read().decode("utf-8")
+                                    m2 = re.search(
+                                        r'name="email" value="(.*)" id="id_email',
                                         reply,
                                     )
-                                    if bool(m):
-                                        punter = m.group(1)
-                                    else:
-                                        punter = "unknown"
+                                    punter = m2.group(1) if m2 else "unknown"
 
-                                    u_now = re.sub(
-                                        "unsubscribe", "unsubscribe-now", u
-                                    )
-                                    reply = urlopen(u_now).read()
-                                    # TODO check for class="success"
+                                    u_now = re.sub("unsubscribe", "unsubscribe-now", u)
+                                    reply = urlopen(u_now).read().decode("utf-8")
                                     logging.debug(reply)
-                                    msg_str = (
-                                        "            unsubscribed %s" % punter
-                                    )
-                                    logging.info(msg_str)
+                                    logging.info("            unsubscribed %s", punter)
 
-                                    # strip the user to get the email domain
-                                    # removedMails.append(removedMail)
-                                    if True:
-                                        m = re.search(r"\@.*", punter)
-                                        if bool(m):
-                                            domain = m.group(0)[
-                                                1:
-                                            ]  # discard the leading @
-                                            emailHits(
-                                                domain, removedDomains
-                                            )  # store the domain
+                                    # Strip the user to get the email domain
+                                    m2 = re.search(r"\@.*", punter)
+                                    if m2:
+                                        domain = m2.group(0)[1:]  # discard the leading @
+                                        emailHits(domain, removedDomains)
 
                                     # Now delete the email
-                                    typ, response = server.store(
-                                        id, "+FLAGS", r"(\Deleted)"
-                                    )
-                                    # TODO check response
-                                    # msg_str = response
-                                    # logging.info(msg_str)
+                                    server.store(msg_id, "+FLAGS", r"(\Deleted)")
 
                             else:
-                                msg_str = "    unsubscribe string not found"
-                                logging.info(msg_str)
+                                logging.info("    unsubscribe string not found")
                                 manualUnsubscribeCnt += 1
-                                # TODO print the email address
 
                         else:
-                            msg_str = "            bounce string not found"
-                            logging.info(msg_str)
+                            logging.info("            bounce string not found")
 
 # Really delete the messages
 if expunge:
     typ, response = server.expunge()
-    msg_str = "Expunged %d mails" % len(response)
-    logging.info(msg_str)
+    logging.info("Expunged %d mails", len(response))
 
-(status, msg_cnt) = server.select(mailbox)
-msg_str = 'Mailbox "%s" now contains %d mails' % (mailbox, int(msg_cnt[0]))
-logging.info(msg_str)
+(status, msg_cnt) = server.select(f'"{mailbox}"')
+logging.info('Mailbox "%s" now contains %d mails', mailbox, int(msg_cnt[0]))
 
-# server.close()   # TODO
-msg_str = server.logout()
-logging.info(msg_str)
+server.logout()
 
-msg_str = "%d over quota reports" % overQuotaCount
-logging.info(msg_str)
-
-msg_str = "%d message flagged as spam" % spamCount
-logging.info(msg_str)
-
-msg_str = "%d name server errors" % nameErrorCount
-logging.info(msg_str)
+logging.info("%d over quota reports", overQuotaCount)
+logging.info("%d message flagged as spam", spamCount)
+logging.info("%d name server errors", nameErrorCount)
 
 if unsubscribe:
-    msg_str = "%d subscribers removed" % removeCount
+    logging.info("%d subscribers removed", removeCount)
 else:
-    msg_str = "%d subscribers would have been removed" % removeCount
-logging.info(msg_str)
+    logging.info("%d subscribers would have been removed", removeCount)
 
-msg_str = "%d subscribers will need removing manually" % manualUnsubscribeCnt
-logging.info(msg_str)
+logging.info("%d subscribers will need removing manually", manualUnsubscribeCnt)
 
 if unsubscribe:
-    msg_str = "Removed these domains: "
-    logging.info(msg_str)
-
-    for key in removedDomains:
-        msg_str = "%s -> %s" % (key, removedDomains[key])
-        logging.info(msg_str)
+    logging.info("Removed these domains:")
+    for key, val in removedDomains.items():
+        logging.info("%s -> %s", key, val)
 
 sys.exit(0)
