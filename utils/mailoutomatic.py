@@ -115,9 +115,7 @@ SPF = "SPF verification failed for host"
 NameServerError = "name service error"
 
 LOG_DIR = "/var/log/cubetoolkit"
-LOG_FILENAME = "mailoutomatic-%s.log" % datetime.datetime.now().strftime(
-    "%d-%b-%Y-%H:%M:%S"
-)
+LOG_FILENAME = f"mailoutomatic-{datetime.datetime.now().strftime('%d-%b-%Y-%H:%M:%S')}.log"
 
 # https://docs.python.org/3/howto/logging.html
 logger = logging.getLogger()
@@ -151,16 +149,16 @@ REMOVELIST = [
 
 DELETEON = ["auto", "office", "vacation", "away", "warning", "maternity"]
 
-mailserver = input("Enter name of mail server [%s]: " % mailserver_default)
+mailserver = input(f"Enter name of mail server [{mailserver_default}]: ")
 if not mailserver:
     mailserver = mailserver_default
-user = input("Enter mail user name [%s]: " % user_default)
+user = input(f"Enter mail user name [{user_default}]: ")
 if not user:
     user = user_default
-mailbox = input("Enter mailbox name [%s]: " % mailbox_default)
+mailbox = input(f"Enter mailbox name [{mailbox_default}]: ")
 if not mailbox:
     mailbox = mailbox_default
-password = input("Enter mail password for user %s: " % user)
+password = input(f"Enter mail password for user {user}: ")
 
 removeCount = 0
 overQuotaCount = 0
@@ -174,13 +172,13 @@ removedDomains = {}
 http://cubecinema.com/members/19999/unsubscribe/?k=T4EL2xJnHLrR63H4fhm8rRj7IU6WA1Pa
 See https://regex101.com/
 """
-removeStr = r"https:\/\/%s\/members\/(\d+)\/unsubscribe\/\?k=(.+)" % site
+removeStr = rf"https:\/\/{site}\/members\/(\d+)\/unsubscribe\/\?k=(.+)"
 
-# connect to server securely
+# connect to server securely on port 993
 server = imaplib.IMAP4_SSL(mailserver, 993)
 
 # login
-logging.info('Logging in to mail server "%s" as user "%s"...', mailserver, user)
+logging.info(f'Logging in to mail server "{mailserver}" as user "{user}"...')
 response = server.login(user, password)
 logging.info(response)
 
@@ -188,7 +186,7 @@ logging.info(response)
 # (EXISTS response). The default mailbox is 'INBOX'. If the readonly flag is
 # set, modifications to the mailbox are not allowed.
 (status, msg_cnt) = server.select(f'"{mailbox}"')
-logging.info('Mailbox "%s" contains %d mails', mailbox, int(msg_cnt[0]))
+logging.info(f'Mailbox "{mailbox}" contains {int(msg_cnt[0])} mails')
 
 logging.info("Processing matches from Delete list ...")
 
@@ -198,24 +196,24 @@ for keyWord in DELETEON:
     # In Python 3, items[0] is bytes
     item_list = items[0].split()
 
-    logging.info('    %d messages matching "%s" found', len(item_list), keyWord)
+    logging.info(f'    {len(item_list)} messages matching "{keyWord}" found')
 
     if deleteStuff:
         for msg_id in item_list:
             server.store(msg_id, "+FLAGS", r"(\Deleted)")
 
-        logging.info('    deleted %d messages with subject "%s"', len(item_list), keyWord)
+        logging.info(f'    deleted {len(item_list)} messages with subject "{keyWord}"')
 
 logging.info("Processing matches from Remove list ...")
 
 for keyWord in REMOVELIST:
     resp, items = server.search(None, "SUBJECT", f'"{keyWord}"')
     item_list = items[0].split()
-    logging.info('    %d messages matching "%s" found', len(item_list), keyWord)
+    logging.info(f'    {len(item_list)} messages matching "{keyWord}" found')
 
     for msg_id in item_list:
         if int(msg_id) < maxMesgNo:
-            logging.info("        Inspecting message %s", msg_id)
+            logging.info(f"        Inspecting message {msg_id.decode()}")
             typ, msg_data = server.fetch(msg_id, "(RFC822)")
             for response_part in msg_data:
                 if isinstance(response_part, tuple):
@@ -225,7 +223,7 @@ for keyWord in REMOVELIST:
 
                     m = re.search(OverQuota, msgText, re.I)
                     if m:
-                        logging.info('        "%s" found', m.group(0))
+                        logging.info(f'        "{m.group(0)}" found')
                         overQuotaCount += 1
                         if deleteStuff:
                             server.store(msg_id, "+FLAGS", r"(\Deleted)")
@@ -234,7 +232,7 @@ for keyWord in REMOVELIST:
                         # Check for SPF error
                         m = re.search(SPF, msgText, re.I)
                         if m:
-                            logging.info('        "%s" found', m.group(0))
+                            logging.info(f'        "{m.group(0)}" found')
                             SPFErrorCount += 1
                             if deleteStuff:
                                 server.store(msg_id, "+FLAGS", r"(\Deleted)")
@@ -242,25 +240,25 @@ for keyWord in REMOVELIST:
                         # Check for name server error
                         m = re.search(NameServerError, msgText, re.I)
                         if m:
-                            logging.info('        "%s" found', m.group(0))
+                            logging.info(f'        "{m.group(0)}" found')
                             nameErrorCount += 1
 
                         # Check for message flagged as spam
                         m = re.search(SpamAlleged, msgText, re.I)
                         if m:
-                            logging.info('        "%s" found', m.group(0))
+                            logging.info(f'        "{m.group(0)}" found')
                             spamCount += 1
 
                         # Check if the email has bounced
                         m = re.search(GoneAway, msgText, re.I)
                         if m:
-                            logging.info('            "%s" found', m.group(0))
+                            logging.info(f'            "{m.group(0)}" found')
 
                             # Now see if we can find the unsubscribe string
                             m = re.search(removeStr, msgText, re.I)
                             if m:
                                 u = m.group(0).strip()
-                                logging.info("            %s found", u)
+                                logging.info(f"            {u} found")
                                 removeCount += 1
 
                                 if unsubscribe:
@@ -276,7 +274,7 @@ for keyWord in REMOVELIST:
                                     u_now = re.sub("unsubscribe", "unsubscribe-now", u)
                                     reply = urlopen(u_now).read().decode("utf-8")
                                     logging.debug(reply)
-                                    logging.info("            unsubscribed %s", punter)
+                                    logging.info(f"            unsubscribed {punter}")
 
                                     # Strip the user to get the email domain
                                     m2 = re.search(r"\@.*", punter)
@@ -297,27 +295,27 @@ for keyWord in REMOVELIST:
 # Really delete the messages
 if expunge:
     typ, response = server.expunge()
-    logging.info("Expunged %d mails", len(response))
+    logging.info(f"Expunged {len(response)} mails")
 
 (status, msg_cnt) = server.select(f'"{mailbox}"')
-logging.info('Mailbox "%s" now contains %d mails', mailbox, int(msg_cnt[0]))
+logging.info(f'Mailbox "{mailbox}" now contains {int(msg_cnt[0])} mails')
 
 server.logout()
 
-logging.info("%d over quota reports", overQuotaCount)
-logging.info("%d message flagged as spam", spamCount)
-logging.info("%d name server errors", nameErrorCount)
+logging.info(f"{overQuotaCount} over quota reports")
+logging.info(f"{spamCount} message flagged as spam")
+logging.info(f"{nameErrorCount} name server errors")
 
 if unsubscribe:
-    logging.info("%d subscribers removed", removeCount)
+    logging.info(f"{removeCount} subscribers removed")
 else:
-    logging.info("%d subscribers would have been removed", removeCount)
+    logging.info(f"{removeCount} subscribers would have been removed")
 
-logging.info("%d subscribers will need removing manually", manualUnsubscribeCnt)
+logging.info(f"{manualUnsubscribeCnt} subscribers will need removing manually")
 
 if unsubscribe:
     logging.info("Removed these domains:")
     for key, val in removedDomains.items():
-        logging.info("%s -> %s", key, val)
+        logging.info(f"{key} -> {val}")
 
 sys.exit(0)
