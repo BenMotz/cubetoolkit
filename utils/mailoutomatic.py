@@ -116,6 +116,7 @@ mailbox is full
 Over quota"""
 
 OverQuota = "over quota|mailbox.*full|overquota|too many messages|quota exceeded|user has exhausted allowed storage space|full mailbox|temporarily deferred"
+OverQuota += "|Access denied"
 
 SPF = "SPF verification failed for host"
 
