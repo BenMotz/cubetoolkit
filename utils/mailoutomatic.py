@@ -4,6 +4,7 @@ and unsubscribing the members associated with the bounced mails.
 Also deletes over-quota and holiday replies from the mailbox.
 invoke with python3 mailoutomatic.py
 """
+
 import os
 import sys
 import datetime
@@ -41,9 +42,7 @@ verbose = True
 deleteStuff = True  # Delete processed mails from mailbox
 unsubscribe = True  # Unsubscribe members from toolkit
 expunge = True  # Expunge mailbox on completion
-maxMesgNo = (
-    10000  # Max number of mails to process. Use a lower number for testing
-)
+maxMesgNo = 10000  # Max number of mails to process. Use a lower number for testing
 
 
 def emailHits(domain, domains):
@@ -68,7 +67,9 @@ unable to validate recipient  (virgin/blueyonder)
 Delivery has failed
 """
 
-GoneAway = "Mailbox disabled|mailbox unavailable|Mailbox is inactive|This is a permanent error"
+GoneAway = (
+    "Mailbox disabled|mailbox unavailable|Mailbox is inactive|This is a permanent error"
+)
 GoneAway += "|Unrouteable address|recipient rejected|unknown or illegal alias"
 GoneAway += "|The email account that you tried to reach does not exist"
 GoneAway += "|This user doesn't have a .* account|Address rejected"
@@ -115,7 +116,9 @@ SPF = "SPF verification failed for host"
 NameServerError = "name service error"
 
 LOG_DIR = "/var/log/cubetoolkit"
-LOG_FILENAME = f"mailoutomatic-{datetime.datetime.now().strftime('%d-%b-%Y-%H:%M:%S')}.log"
+LOG_FILENAME = (
+    f"mailoutomatic-{datetime.datetime.now().strftime('%d-%b-%Y-%H:%M:%S')}.log"
+)
 
 # https://docs.python.org/3/howto/logging.html
 logger = logging.getLogger()
@@ -279,7 +282,9 @@ for keyWord in REMOVELIST:
                                     # Strip the user to get the email domain
                                     m2 = re.search(r"\@.*", punter)
                                     if m2:
-                                        domain = m2.group(0)[1:]  # discard the leading @
+                                        domain = m2.group(0)[
+                                            1:
+                                        ]  # discard the leading @
                                         emailHits(domain, removedDomains)
 
                                     # Now delete the email
