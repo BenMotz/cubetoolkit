@@ -129,7 +129,7 @@ ch = logging.StreamHandler()
 ch.setLevel(logging.INFO)
 
 formatter = logging.Formatter(
-    "%(asctime)s - %(levelname)s - %(message)s", datefmt="%I:%M:%S %p"
+    "%(asctime)s - %(levelname)s - %(lineno)d - %(message)s", datefmt="%I:%M:%S %p"
 )
 ch.setFormatter(formatter)
 logger.addHandler(ch)
@@ -176,6 +176,46 @@ http://cubecinema.com/members/19999/unsubscribe/?k=T4EL2xJnHLrR63H4fhm8rRj7IU6WA
 See https://regex101.com/
 """
 removeStr = rf"https:\/\/{site}\/members\/(\d+)\/unsubscribe\/\?k=(.+)"
+
+
+def process_unsubscribe(server, msg_id, msgText, reason):
+    """Attempt to unsubscribe a member from a bounced email.
+    Returns True if an unsubscribe link was found, False otherwise."""
+    global removeCount, manualUnsubscribeCnt
+
+    m = re.search(removeStr, msgText, re.I)
+    if m:
+        u = m.group(0).strip()
+        logging.info(f"            {u} found")
+        removeCount += 1
+
+        if unsubscribe:
+            # Get the email address of who we are unsubscribing
+            u_info = re.sub("unsubscribe", "edit", u)
+            reply = urlopen(u_info).read().decode("utf-8")
+            m2 = re.search(r'name="email" value="(.*)" id="id_email', reply)
+            punter = m2.group(1) if m2 else "unknown"
+
+            u_now = re.sub("unsubscribe", "unsubscribe-now", u)
+            reply = urlopen(u_now).read().decode("utf-8")
+            logging.debug(reply)
+            logging.info(f"            unsubscribed {punter} (reason: {reason})")
+
+            # Strip the user to get the email domain
+            m2 = re.search(r"\@.*", punter)
+            if m2:
+                domain = m2.group(0)[1:]  # discard the leading @
+                emailHits(domain, removedDomains)
+
+            # Now delete the email
+            server.store(msg_id, "+FLAGS", r"(\Deleted)")
+
+        return True
+    else:
+        logging.info("    unsubscribe string not found")
+        manualUnsubscribeCnt += 1
+        return False
+
 
 # connect to server securely on port 993
 server = imaplib.IMAP4_SSL(mailserver, 993)
@@ -245,6 +285,7 @@ for keyWord in REMOVELIST:
                         if m:
                             logging.info(f'        "{m.group(0)}" found')
                             nameErrorCount += 1
+                            process_unsubscribe(server, msg_id, msgText, "name server error")
 
                         # Check for message flagged as spam
                         m = re.search(SpamAlleged, msgText, re.I)
@@ -256,43 +297,7 @@ for keyWord in REMOVELIST:
                         m = re.search(GoneAway, msgText, re.I)
                         if m:
                             logging.info(f'            "{m.group(0)}" found')
-
-                            # Now see if we can find the unsubscribe string
-                            m = re.search(removeStr, msgText, re.I)
-                            if m:
-                                u = m.group(0).strip()
-                                logging.info(f"            {u} found")
-                                removeCount += 1
-
-                                if unsubscribe:
-                                    # Get the email address of who we are unsubscribing
-                                    u_info = re.sub("unsubscribe", "edit", u)
-                                    reply = urlopen(u_info).read().decode("utf-8")
-                                    m2 = re.search(
-                                        r'name="email" value="(.*)" id="id_email',
-                                        reply,
-                                    )
-                                    punter = m2.group(1) if m2 else "unknown"
-
-                                    u_now = re.sub("unsubscribe", "unsubscribe-now", u)
-                                    reply = urlopen(u_now).read().decode("utf-8")
-                                    logging.debug(reply)
-                                    logging.info(f"            unsubscribed {punter}")
-
-                                    # Strip the user to get the email domain
-                                    m2 = re.search(r"\@.*", punter)
-                                    if m2:
-                                        domain = m2.group(0)[
-                                            1:
-                                        ]  # discard the leading @
-                                        emailHits(domain, removedDomains)
-
-                                    # Now delete the email
-                                    server.store(msg_id, "+FLAGS", r"(\Deleted)")
-
-                            else:
-                                logging.info("    unsubscribe string not found")
-                                manualUnsubscribeCnt += 1
+                            process_unsubscribe(server, msg_id, msgText, "gone away")
 
                         else:
                             logging.info("            bounce string not found")
