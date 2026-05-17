@@ -256,13 +256,18 @@ for keyWord in REMOVELIST:
 
     for msg_id in item_list:
         if int(msg_id) < maxMesgNo:
-            logging.info(f"        Inspecting message {msg_id.decode()}")
             typ, msg_data = server.fetch(msg_id, "(RFC822)")
             for response_part in msg_data:
                 if isinstance(response_part, tuple):
                     # In Python 3, response_part[1] is bytes
                     msg = email.message_from_bytes(response_part[1])
                     msgText = msg.as_string()
+                    logging.info(
+                        f"        Inspecting message {msg_id.decode()}"
+                        f" | From: {msg.get('From', 'unknown')}"
+                        f" | Subject: {msg.get('Subject', 'unknown')}"
+                        f" | Date: {msg.get('Date', 'unknown')}"
+                    )
 
                     m = re.search(OverQuota, msgText, re.I)
                     if m:
