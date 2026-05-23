@@ -3,6 +3,8 @@ services:
     image: mariadb:10
     container_name: toolkit-${ENV}-mariadb
     restart: unless-stopped
+    networks:
+      - toolkit
     environment:
       MARIADB_DATABASE: "${DB_NAME}"
       MARIADB_USER: "${DB_USER}"
@@ -20,6 +22,8 @@ services:
     image: toolkit:${ENV}
     container_name: toolkit-${ENV}-app
     restart: unless-stopped
+    networks:
+      - toolkit
     ports:
       - "127.0.0.1:8003:8000"
     environment:
@@ -37,3 +41,12 @@ services:
       - type: bind
         source: "/opt/stacks/toolkit-${ENV}/data/media/"
         target: /site/media/
+
+networks:
+  toolkit:
+    name: "toolkit-${ENV}"
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/24

@@ -3,6 +3,8 @@ services:
     image: mariadb:10
     container_name: toolkit-${ENV}-mariadb
     restart: unless-stopped
+    networks:
+      - toolkit
     environment:
       MARIADB_DATABASE: "${DB_NAME}"
       MARIADB_USER: "${DB_USER}"
@@ -20,6 +22,8 @@ services:
     image: toolkit:${ENV}
     container_name: toolkit-${ENV}-app
     restart: unless-stopped
+    networks:
+      - toolkit
     ports:
       - "127.0.0.1:8002:8000"
     environment:
@@ -43,6 +47,8 @@ services:
     container_name: toolkit-${ENV}-mailerd
     command: ["mailerd"]  ## override default CMD value in Dockerfile
     restart: unless-stopped
+    networks:
+      - toolkit
     environment:
       DB_NAME: "${DB_NAME}"
       DB_USER: "${DB_USER}"
@@ -54,3 +60,12 @@ services:
       EMAIL_PORT: "${EMAIL_PORT}"
       EMAIL_HOST_USER: "${EMAIL_HOST_USER}"
       EMAIL_HOST_PASSWORD: "${EMAIL_HOST_PASSWORD}"
+
+networks:
+  toolkit:
+    name: "toolkit-${ENV}"
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.23.0.0/24
