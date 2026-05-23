@@ -24,6 +24,7 @@ services:
     restart: unless-stopped
     networks:
       - toolkit
+      - mailman
     ports:
       - "127.0.0.1:8002:8000"
     environment:
@@ -37,6 +38,7 @@ services:
       EMAIL_PORT: "${EMAIL_PORT}"
       EMAIL_HOST_USER: "${EMAIL_HOST_USER}"
       EMAIL_HOST_PASSWORD: "${EMAIL_HOST_PASSWORD}"
+      MAILMAN_API_KEY: "${MAILMAN_API_KEY}"
     volumes:
       - type: bind
         source: "/opt/stacks/toolkit-${ENV}/data/media/"
@@ -62,6 +64,8 @@ services:
       EMAIL_HOST_PASSWORD: "${EMAIL_HOST_PASSWORD}"
 
 networks:
+  mailman:
+    external: true
   toolkit:
     name: "toolkit-${ENV}"
     driver: bridge

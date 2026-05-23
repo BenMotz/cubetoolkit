@@ -119,11 +119,12 @@ CALENDAR_HISTORIC_SHADIER = 1.0
 
 ###############################################################################
 # Mailman integration settings
-MAILMAN_INTEGRATION = False
-MAILMAN_URL = "http://localhost:8001/3.1"
+MAILMAN_URL = "http://mailman-core:8001/3.1"
 MAILMAN_API_USER = "restadmin"
-MAILMAN_API_KEY = None
+MAILMAN_API_KEY = os.environ.get("MAILMAN_API_KEY")
 MAILMAN_TIMEOUT_SECONDS = 5
+# Enable/disable integration:
+MAILMAN_INTEGRATION = MAILMAN_API_KEY is not None
 
 MAILMAN_VOLUNTEER_LIST = "volunteers@cubecinema.com"
 
