@@ -9,7 +9,7 @@ python-dateutil
 # For generating non-html copy for mailout etc:
 html2text==3.200.3
 # CMS:
-wagtail==6.3.8
+wagtail==7.0.7
 monthdelta
 # Mailman integration
 mailmanclient~=3.3.5
