@@ -435,6 +435,7 @@ LOGGING = {
             "level": "INFO",
         },
         "toolkit": {
+            "propagate": False,
             "handlers": ["console"],
             "level": "DEBUG",
         },
