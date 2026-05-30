@@ -240,11 +240,8 @@ class Command(BaseCommand):
 
             for doc_type in doc_types:
                 # wp term create category Apple
-                shebang = (
-                    'sudo -u adelayde wp term create category "%s" \
-                    --path=%s --url=%s'
-                    % (doc_type, wordpress_path, url)
-                )
+                shebang = 'sudo -u adelayde wp term create category "%s" \
+                    --path=%s --url=%s' % (doc_type, wordpress_path, url)
                 self.stdout.write(f"Creating category {doc_type}")
                 try:
                     out = subprocess.check_output(

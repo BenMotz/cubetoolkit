@@ -66,8 +66,8 @@ class EventForm(forms.ModelForm):
             "pricing": forms.TextInput(
                 attrs={
                     "placeholder": (
-                        "e.g. '\u00A30 Full / \u00A30 Concession' "
-                        "or '\u00A30 advance, \u00A30 on the door'"
+                        "e.g. '\u00a30 Full / \u00a30 Concession' "
+                        "or '\u00a30 advance, \u00a30 on the door'"
                     ),
                 }
             ),

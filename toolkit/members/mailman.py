@@ -5,7 +5,6 @@ import urllib.error
 from django.conf import settings
 from mailmanclient import Client, MailmanConnectionError, Member, MailingList
 
-
 logger = logging.getLogger(__name__)
 
 

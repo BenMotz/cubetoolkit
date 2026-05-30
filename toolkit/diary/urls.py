@@ -41,7 +41,6 @@ from toolkit.diary.public_views import (
 
 from toolkit.diary.mailout_views import mailout, queue_mailout
 
-
 programme_urls = [
     # View lists of event for various time/dates
     re_path(r"^(?:view/)?$", view_diary, name="programme-view"),

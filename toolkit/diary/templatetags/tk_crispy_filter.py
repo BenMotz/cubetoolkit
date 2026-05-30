@@ -1,7 +1,6 @@
 from django.template import Library, Context
 from django.template.loader import get_template
 
-
 register = Library()
 
 

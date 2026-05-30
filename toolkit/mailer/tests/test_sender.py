@@ -14,7 +14,6 @@ from ...members.models import Member
 from ..sender import send_mailout_to
 from ..models import MailoutJob
 
-
 SUMMARY_RECIPIENT = "cubeadmin@example.com"
 
 

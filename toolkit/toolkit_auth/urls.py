@@ -12,7 +12,6 @@ from django.contrib.auth.views import (
     PasswordResetCompleteView,
 )
 
-
 urlpatterns = [
     re_path(
         r"^login/$",

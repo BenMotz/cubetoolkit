@@ -569,7 +569,7 @@ class AddEventView(DiaryTestsMixin, TestCase):
                 "number_of_bookings": "3",
                 "event_name": "Ev\u0119nt of choic\u0119",
                 "event_template": "1",
-                "booked_by": "\u015Comeb\u014ddy",
+                "booked_by": "\u015comeb\u014ddy",
                 "private": "on",
                 "outside_hire": "",
                 "discounted": "on",
@@ -602,7 +602,7 @@ class AddEventView(DiaryTestsMixin, TestCase):
 
         role_1 = Role.objects.get(id=1)
         for s in showings:
-            self.assertEqual(s.booked_by, "\u015Comeb\u014ddy")
+            self.assertEqual(s.booked_by, "\u015comeb\u014ddy")
             # self.assertEqual(s.confirmed, True)
             self.assertEqual(s.hide_in_programme, False)
             self.assertEqual(s.cancelled, False)
@@ -640,7 +640,7 @@ class AddEventView(DiaryTestsMixin, TestCase):
                 "number_of_bookings": "3",
                 "event_name": "Ev\u0119nt of choic\u0119",
                 "event_template": "1",
-                "booked_by": "\u015Comeb\u014ddy",
+                "booked_by": "\u015comeb\u014ddy",
                 "private": "on",
                 "outside_hire": "",
                 "confirmed": "on",
@@ -1078,7 +1078,7 @@ class EditEventView(DiaryTestsMixin, TestCase):
                 "copy_summary": "Copy summary blah",
                 "pre_title": "The thing that will be",
                 "post_title": "The thing that was",
-                "pricing": "Full \u00A35",
+                "pricing": "Full \u00a35",
                 "film_information": "Blah blah films",
                 "terms": "Always term time",
                 "notes": "This is getting\n boring",
