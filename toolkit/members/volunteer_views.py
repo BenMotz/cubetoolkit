@@ -245,7 +245,7 @@ def activate_volunteer(request, set_active=True):
         messages.add_message(
             request,
             messages.ERROR,
-            f"Failed updating {settings.MAILMAN_VOLUNTEER_LIST} for {vol.member.email}: {list_error}",
+            f"Failed updating lists {', '.join(settings.MAILMAN_VOLUNTEER_LISTS)} for {vol.member.email}: {list_error}",
         )
 
     return HttpResponseRedirect(reverse("view-volunteer-list"))
@@ -354,7 +354,7 @@ def edit_volunteer(request, volunteer_id, create_new=False):
                     messages.add_message(
                         request,
                         messages.ERROR,
-                        f"Failed to subscribe {volunteer.member.name} to {settings.MAILMAN_VOLUNTEER_LIST}: {error}",
+                        f"Failed to subscribe {volunteer.member.name} to lists {', '.join(settings.MAILMAN_VOLUNTEER_LISTS)}: {error}",
                     )
 
             # Go to the volunteer list view:

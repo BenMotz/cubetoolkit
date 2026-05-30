@@ -126,7 +126,10 @@ MAILMAN_TIMEOUT_SECONDS = 5
 # Enable/disable integration:
 MAILMAN_INTEGRATION = MAILMAN_API_KEY is not None
 
-MAILMAN_VOLUNTEER_LIST = "volunteers@cubecinema.com"
+MAILMAN_VOLUNTEER_LISTS = [
+    "volunteers@cubecinema.com",
+    "rota@cubecinema.com",
+]
 
 
 ###############################################################################

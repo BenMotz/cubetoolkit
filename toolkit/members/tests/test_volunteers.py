@@ -187,7 +187,8 @@ class TestActivateDeactivateVolunteer(MembersTestsMixin, TestCase):
         self.assertContains(response, "Retired volunteer Volunteer Two")
         self.assertContains(
             response,
-            f"Failed updating volunteers@cubecinema.com for {vol.member.email}: Nope!",
+            f"Failed updating lists volunteers@cubecinema.com, rota@cubecinema.com "
+            f"for {vol.member.email}: Nope!",
         )
 
         self.unsubscribe_mock.assert_called_once_with(email=vol.member.email)
@@ -351,7 +352,8 @@ class TestVolunteerEdit(MembersTestsMixin, TestCase):
         )
         self.assertContains(
             response,
-            f'<li class="error">Failed to subscribe {name} to volunteers@cubecinema.com: Didn&#x27;t work</li>',
+            f'<li class="error">Failed to subscribe {name} to lists '
+            "volunteers@cubecinema.com, rota@cubecinema.com: Didn&#x27;t work</li>",
             html=True,
         )
 
