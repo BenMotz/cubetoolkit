@@ -40,6 +40,7 @@ Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
       <a class="dropdown-item" href="{% url "view-volunteer-summary" %}?order=inducted">Order by induction date (most recent first)</a>
   </div>
 </div>
+<a href="?order={{ sort_type }}&include_mailout_status=y" class="btn btn-secondary">Load Mailout Status</a><p>
 
 <table class="table table-sm table-striped">
     <thead>
@@ -53,6 +54,14 @@ Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
         <th>
             Inducted
         </th>
+        {% if include_mailout_status %}
+        <th>
+            On Volunteer list
+        </th>
+        <th>
+            On Rota list
+        </th>
+        {% endif %}
       </tr>
     </thead>
 
@@ -72,6 +81,14 @@ Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
                         {{ volunteer.created_at|date:"d/m/Y" }}
                     {% endif %}
                 </td>
+                {% if include_mailout_status %}
+                <td>
+                    {{ volunteer.volunteers_subscribed | yesno:"&#9989,&#10060;" | safe }}
+                </td>
+                <td>
+                    {{ volunteer.rota_subscribed | yesno:"&#9989,&#10060;" | safe }}
+                </td>
+                {% endif %}
             </tr>
         {% endwith %}
     {% endfor %}

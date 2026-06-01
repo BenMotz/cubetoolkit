@@ -52,6 +52,17 @@ def get_lists(client: Client) -> dict[str, MailingList]:
     return lists
 
 
+def get_lists_members() -> dict[str, set[str]]:
+    # Returns a map of list_name to the set of subscribed email addresses
+    client = try_connect()
+    lists = get_lists(client)
+
+    return {
+        list_name: set(member.email for member in list_data.members if member)
+        for list_name, list_data in lists.items()
+    }
+
+
 def subscribe_volunteer(name: str, email: str) -> Optional[str]:
     lists: dict[str, MailingList] = {}
     errors: list[str] = []
