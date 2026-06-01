@@ -2,6 +2,7 @@ import datetime
 
 from django.http import HttpRequest, HttpResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import permission_required
+from django.core.paginator import Paginator, Page
 from django.urls import reverse
 from django.views.decorators.http import require_POST, require_GET
 from django.shortcuts import get_object_or_404, render
@@ -9,6 +10,8 @@ import django.utils.timezone as timezone
 
 from .models import MailoutJob
 from .forms import TestMailoutJobForm
+
+JOBS_PER_PAGE = 10
 
 
 @permission_required("toolkit.write")
@@ -20,29 +23,11 @@ def job_cancel(request: HttpRequest, job_id: int) -> HttpResponse:
     return HttpResponseRedirect(reverse("mailer:jobs-list"))
 
 
-def _query_jobs(show_completed: bool, show_failed: bool):
-    jobs = MailoutJob.objects.all().order_by("-id")
-
-    if not show_completed:
-        jobs = jobs.exclude(
-            state__in=(
-                MailoutJob.SendState.SENT,
-                MailoutJob.SendState.CANCELLED,
-            )
-        )
-        if not show_failed:
-            jobs = jobs.exclude(state=MailoutJob.SendState.FAILED)
-
-    return jobs
-
-
 @permission_required("toolkit.read")
 @require_GET
 def jobs_list(request: HttpRequest) -> HttpResponse:
-    show_completed = False
-    show_failed = True
-    jobs = _query_jobs(show_completed=show_completed, show_failed=show_failed)
-
+    jobs = MailoutJob.objects.all().order_by("-id")
+    job_page = Paginator(jobs, JOBS_PER_PAGE).get_page(request.GET.get("page"))
     poll_for_updates = any(
         job.state
         in (
@@ -50,17 +35,15 @@ def jobs_list(request: HttpRequest) -> HttpResponse:
             MailoutJob.SendState.SENDING,
             MailoutJob.SendState.CANCELLING,
         )
-        for job in jobs
+        for job in job_page
     )
 
     return render(
         request,
         "jobs-list.html",
         context={
-            "jobs": jobs,
+            "job_page": job_page,
             "poll_for_updates": poll_for_updates,
-            "show_completed": show_completed,
-            "show_failed": show_failed,
         },
     )
 
@@ -68,20 +51,17 @@ def jobs_list(request: HttpRequest) -> HttpResponse:
 @permission_required("toolkit.read")
 @require_GET
 def jobs_table(request: HttpRequest) -> HttpResponse:
-    show_completed = request.GET.get("show-completed") == "on"
-    show_failed = request.GET.get("show-failed") == "on"
     poll_for_updates = request.GET.get("poll-for-updates") == "on"
 
-    jobs = _query_jobs(show_completed=show_completed, show_failed=show_failed)
+    jobs = MailoutJob.objects.all().order_by("-id")
+    job_page = Paginator(jobs, JOBS_PER_PAGE).get_page(request.GET.get("page"))
 
     return render(
         request,
         "jobs-list-table.html",
         context={
-            "jobs": jobs,
+            "job_page": job_page,
             "poll_for_updates": poll_for_updates,
-            "show_completed": show_completed,
-            "show_failed": show_failed,
         },
     )
 

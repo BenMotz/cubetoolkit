@@ -15,25 +15,9 @@ Mailer jobs
 <div class="form-check">
   <label class="form-check-label">
     <input name="poll-for-updates"
-           hx-get="{% url "mailer:jobs-table" %}" hx-target="#jobs-table" hx-swap="outerHTML" hx-include='input[type="checkbox"]'
+           hx-get="{% url "mailer:jobs-table" %}" hx-target="#jobs-table" hx-swap="outerHTML" hx-include='input[type="checkbox"], input[type="hidden"]'
            class="form-check-input" type="checkbox" {{ poll_for_updates|yesno:"checked," }}>
     Update this page automatically
-  </label>
-</div>
-<div class="form-check">
-  <label class="form-check-label">
-    <input name="show-completed"
-           hx-get="{% url "mailer:jobs-table" %}" hx-target="#jobs-table" hx-swap="outerHTML" hx-include='input[type="checkbox"]'
-           class="form-check-input" type="checkbox" {{ show_completed|yesno:"checked," }}>
-  Show Completed
-  </label>
-</div>
-<div class="form-check">
-  <label class="form-check-label">
-    <input name="show-failed"
-           hx-get="{% url "mailer:jobs-table" %}" hx-target="#jobs-table" hx-swap="outerHTML" hx-include='input[type="checkbox"]'
-           class="form-check-input" type="checkbox" {{ show_failed|yesno:"checked," }}>
-    Show Failed
   </label>
 </div>
 

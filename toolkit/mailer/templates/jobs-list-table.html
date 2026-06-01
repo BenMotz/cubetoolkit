@@ -1,10 +1,11 @@
-<table 
+<div id="jobs-table"
     {% if poll_for_updates %}
-    hx-get="{% url "mailer:jobs-table" %}"
-    hx-trigger="every 1s" 
+    hx-get="{% url "mailer:jobs-table" %}?page={{ job_page.number }}"
+    hx-trigger="every 1s"
     hx-include='input[type="checkbox"]'
-    {% endif %}
-    id="jobs-table" class="table">
+    hx-swap="outerHTML"
+    {% endif %}>
+<table class="table">
     <tr>
         <th>Job ID</th>
         <th>Created</th>
@@ -14,13 +15,13 @@
         <th>% complete</th>
         <th> </th>
     </tr>
-{% for job in jobs %}
-<tr>
+{% for job in job_page %}
+<tr class="table-{{ job.vibe }}">
     <td>{{ job.pk }}</td>
-    <td>{{ job.created_at | date:"j M y, g:i A" }}</td>
-    <td>{{ job.send_at | date:"j M y, g:i A" }}</td>
-    <td>{{ job.state }}<br>{{ job.status }}</td>
-    <td>{{ job.updated_at | date:"d-m-y g:i:s" }}</td>
+    <td>{{ job.created_at | date:"d-m-y H:i" }}</td>
+    <td>{{ job.send_at | date:"D j M y, H:i" }}</td>
+    <td>{{ job.state }}: {{ job.status }}</td>
+    <td>{{ job.updated_at | date:"d-m-y H:i:s" }}</td>
     <td>{% if job.state != "PENDING" %}{{ job.progress_pct }}%{% endif %}</td>
     <td>
         {% if job.cancellable %}
@@ -33,3 +34,38 @@
 </tr>
 {% endfor %}
 </table>
+<input type="hidden" name="page" value="{{ job_page.number }}">
+{% if job_page.paginator.num_pages > 1 %}
+<nav>
+  <ul class="pagination">
+    {% if job_page.has_previous %}
+    <li class="page-item">
+      <a class="page-link" href="#"
+         hx-get="{% url "mailer:jobs-table" %}?page={{ job_page.previous_page_number }}"
+         hx-target="#jobs-table" hx-swap="outerHTML"
+         hx-include='input[type="checkbox"]'>&laquo; Previous</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled">
+      <span class="page-link">&laquo; Previous</span>
+    </li>
+    {% endif %}
+    <li class="page-item disabled">
+      <span class="page-link">Page {{ job_page.number }} of {{ job_page.paginator.num_pages }}</span>
+    </li>
+    {% if job_page.has_next %}
+    <li class="page-item">
+      <a class="page-link" href="#"
+         hx-get="{% url "mailer:jobs-table" %}?page={{ job_page.next_page_number }}"
+         hx-target="#jobs-table" hx-swap="outerHTML"
+         hx-include='input[type="checkbox"]'>Next &raquo;</a>
+    </li>
+    {% else %}
+    <li class="page-item disabled">
+      <span class="page-link">Next &raquo;</span>
+    </li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}
+</div>

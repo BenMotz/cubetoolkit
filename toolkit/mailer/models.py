@@ -67,6 +67,25 @@ class MailoutJob(models.Model):
             MailoutJob.SendState.SENDING,
         )
 
+    def vibe(self) -> str | None:
+        # By "vibe", I mean "bootstrap table row class"
+        if self.state in (
+            MailoutJob.SendState.PENDING,
+            MailoutJob.SendState.SENDING,
+        ):
+            return None
+        elif self.state in (
+            MailoutJob.SendState.CANCELLING,
+            MailoutJob.SendState.CANCELLED,
+        ):
+            return "warning"
+        elif self.state == MailoutJob.SendState.SENT:
+            return "success"
+        elif self.state == MailoutJob.SendState.FAILED:
+            return "danger"
+        else:
+            return None
+
     def keep_sending(self) -> bool:
         return self.state == MailoutJob.SendState.SENDING
 

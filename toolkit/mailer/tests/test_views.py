@@ -91,62 +91,38 @@ class TestListJobView(TestCase, fixtures.TestWithFixtures):
         self.assertTemplateUsed(response, "jobs-list.html")
         self.assertTemplateUsed(response, "jobs-list-table.html")
 
-    def _create_jobs(self) -> None:
-        self.pending = MailoutJob(
+    def _job(self) -> MailoutJob:
+        return MailoutJob(
             send_at=django.utils.timezone.now() + timedelta(days=1),
             send_html=True,
             subject="subject",
             body_text="Body",
             body_html="<p>Body</p>",
         )
-        self.pending.save()
-        self.sending = MailoutJob(
-            send_at=django.utils.timezone.now() + timedelta(days=1),
-            send_html=True,
-            subject="subject",
-            body_text="Body",
-            body_html="<p>Body</p>",
-        )
-        self.sending.do_sending(sent=0, total=100)
-        self.sending.save()
-        self.cancelling = MailoutJob(
-            send_at=django.utils.timezone.now() + timedelta(days=1),
-            send_html=True,
-            subject="subject",
-            body_text="Body",
-            body_html="<p>Body</p>",
-        )
-        self.cancelling.do_sending(sent=0, total=100)
-        self.cancelling.do_cancel()
-        self.cancelling.save()
-        self.sent = MailoutJob(
-            send_at=django.utils.timezone.now() + timedelta(days=1),
-            send_html=True,
-            subject="subject",
-            body_text="Body",
-            body_html="<p>Body</p>",
-        )
-        self.sent.do_sending(sent=0, total=100)
-        self.sent.do_complete(sent=0x100)
-        self.sent.save()
-        self.failed = MailoutJob(
-            send_at=django.utils.timezone.now() + timedelta(days=1),
-            send_html=True,
-            subject="subject",
-            body_text="Body",
-            body_html="<p>Body</p>",
-        )
-        self.failed.do_fail(status="borked")
-        self.failed.save()
-        self.cancelled = MailoutJob(
-            send_at=django.utils.timezone.now() + timedelta(days=1),
-            send_html=True,
-            subject="subject",
-            body_text="Body",
-            body_html="<p>Body</p>",
-        )
-        self.cancelled.do_cancel()
-        self.cancelled.save()
+
+    def _create_jobs(self, extra_pending=0) -> list[MailoutJob]:
+        jobs = [self._job() for _ in range(6 + extra_pending)]
+        # 0 - pending
+        # 1 - sending
+        jobs[1].do_sending(sent=0, total=100)
+        # 2 - cancelling
+
+        jobs[2].do_sending(sent=0, total=100)
+        jobs[2].do_cancel()
+        # 3 - sent
+        jobs[3].do_sending(sent=0, total=100)
+        jobs[3].do_complete(sent=0x100)
+
+        # 4 - failed
+        jobs[4].do_fail(status="borked")
+
+        # 5 - cancelled
+        jobs[5].do_cancel()
+
+        for job in jobs:
+            job.save()
+
+        return jobs
 
     def test_all_jobs(self) -> None:
         self._create_jobs()
@@ -156,24 +132,10 @@ class TestListJobView(TestCase, fixtures.TestWithFixtures):
         self.assertTemplateUsed(response, "jobs-list.html")
         self.assertTemplateUsed(response, "jobs-list-table.html")
 
-        expected = [
-            self.pending.pk,
-            self.sending.pk,
-            self.cancelling.pk,
-            self.failed.pk,
-        ]
-        unexpected = [
-            self.cancelled.pk,
-            self.sent.pk,
-        ]
-        for job_pk in expected:
-            self.assertContains(response, f"<td>{job_pk}</td>", html=True)
-        for job_pk in unexpected:
-            self.assertNotContains(response, f"<td>{job_pk}</td>", html=True)
+        for job in MailoutJob.objects.all():
+            self.assertContains(response, f"<td>{job.pk}</td>", html=True)
 
-        self.assertContains(
-            response, f"<td>FAILED<br>{self.failed.status}</td>", html=True
-        )
+        self.assertContains(response, f"<td>FAILED: borked</td>", html=True)
 
     def test_table_fragment_no_jobs(self) -> None:
         url = reverse("mailer:jobs-table")
@@ -188,64 +150,12 @@ class TestListJobView(TestCase, fixtures.TestWithFixtures):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "jobs-list-table.html")
-        expected = [
-            self.pending.pk,
-            self.sending.pk,
-            self.cancelling.pk,
-        ]
-        unexpected = [
-            self.cancelled.pk,
-            self.failed.pk,
-            self.sent.pk,
-        ]
-        for job_pk in expected:
-            self.assertContains(response, f"<td>{job_pk}</td>", html=True)
-        for job_pk in unexpected:
-            self.assertNotContains(response, f"<td>{job_pk}</td>", html=True)
-
-        self.assertNotContains(response, 'hx-trigger="every 1s"')
-
-    def test_table_fragment_show_completed(self) -> None:
-        self._create_jobs()
-
-        url = reverse("mailer:jobs-table", query={"show-completed": "on"})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "jobs-list-table.html")
 
         for job in MailoutJob.objects.all():
-            self.assertContains(response, f"<td>{job.pk}</td>")
+            self.assertContains(response, f"<td>{job.pk}</td>", html=True)
 
-        self.assertContains(
-            response, f"<td>FAILED<br>{self.failed.status}</td>", html=True
-        )
-
-    def test_table_fragment_show_failed(self) -> None:
-        self._create_jobs()
-
-        url = reverse("mailer:jobs-table", query={"show-failed": "on"})
-        response = self.client.get(url)
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "jobs-list-table.html")
-
-        expected = [
-            self.pending.pk,
-            self.sending.pk,
-            self.cancelling.pk,
-            self.failed.pk,
-        ]
-        unexpected = [
-            self.cancelled.pk,
-            self.sent.pk,
-        ]
-        for job_pk in expected:
-            self.assertContains(response, f"<td>{job_pk}</td>", html=True)
-        for job_pk in unexpected:
-            self.assertNotContains(response, f"<td>{job_pk}</td>", html=True)
-
-        self.assertContains(
-            response, f"<td>FAILED<br>{self.failed.status}</td>", html=True
-        )
+        self.assertContains(response, f"<td>FAILED: borked</td>", html=True)
+        self.assertNotContains(response, 'hx-trigger="every 1s"')
 
     def test_table_fragment_polling_enabled(self) -> None:
         self._create_jobs()
@@ -256,3 +166,63 @@ class TestListJobView(TestCase, fixtures.TestWithFixtures):
         self.assertTemplateUsed(response, "jobs-list-table.html")
 
         self.assertContains(response, 'hx-trigger="every 1s"')
+
+    def test_no_pagination_nav_single_page(self) -> None:
+        self._create_jobs()
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        # Six jobs fit on a single page: no pagination controls.
+        self.assertNotContains(response, "Page 1 of")
+
+    def test_pagination_first_page(self) -> None:
+        jobs = self._create_jobs(extra_pending=9)
+
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Page 1 of 2")
+        # Newest 10 (highest pks) shown, oldest 5 not.
+        for job in jobs[10:]:
+            self.assertContains(response, f"<td>{job.pk}</td>", html=True)
+        for job in jobs[:5]:
+            self.assertNotContains(response, f"<td>{job.pk}</td>", html=True)
+        self.assertContains(response, "?page=2")
+
+    def test_pagination_second_page(self) -> None:
+        jobs = self._create_jobs(extra_pending=9)
+
+        url = reverse("mailer:jobs-list", query={"page": "2"})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Page 2 of 2")
+        # Oldest 5 (lowest pks) shown on the second page.
+        for job in jobs[:5]:
+            self.assertContains(response, f"<td>{job.pk}</td>", html=True)
+        for job in jobs[10:]:
+            self.assertNotContains(response, f"<td>{job.pk}</td>", html=True)
+
+    def test_pagination_out_of_range_page(self) -> None:
+        self._create_jobs(extra_pending=9)
+        # An out-of-range page falls back to the last page, not a 404.
+        url = reverse("mailer:jobs-list", query={"page": "999"})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Page 2 of 2")
+
+    def test_pagination_invalid_page(self) -> None:
+        jobs = self._create_jobs(extra_pending=9)
+        # A non-numeric page falls back to the first page, not a 404.
+        url = reverse("mailer:jobs-list", query={"page": "not-a-number"})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertContains(response, "Page 1 of 2")
+
+    def test_table_fragment_pagination(self) -> None:
+        jobs = self._create_jobs(extra_pending=9)
+
+        url = reverse("mailer:jobs-table", query={"page": "2"})
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "jobs-list-table.html")
+        self.assertContains(response, "Page 2 of 2")
+        for job in jobs[:5]:
+            self.assertContains(response, f"<td>{job.pk}</td>", html=True)
