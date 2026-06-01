@@ -58,7 +58,7 @@ def get_lists_members() -> dict[str, set[str]]:
     lists = get_lists(client)
 
     return {
-        list_name: set(member.email for member in list_data.members if member)
+        list_name: set(member.email.lower() for member in list_data.members if member)
         for list_name, list_data in lists.items()
     }
 

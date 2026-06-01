@@ -153,7 +153,7 @@ def view_volunteer_summary(request):
             list_attr = f"{list_name.partition('@')[0]}_subscribed"
             for volunteer in volunteers:
                 setattr(
-                    volunteer, list_attr, volunteer.member.email in members
+                    volunteer, list_attr, volunteer.member.email.lower() in members
                 )
 
     active_count = volunteers.count()
