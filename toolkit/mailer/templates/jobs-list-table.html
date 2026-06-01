@@ -13,6 +13,7 @@
         <th>State</th>
         <th>Last update</th>
         <th>% complete</th>
+        <th>Emails sent</th>
         <th> </th>
     </tr>
 {% for job in job_page %}
@@ -23,6 +24,7 @@
     <td>{{ job.state }}: {{ job.status }}</td>
     <td>{{ job.updated_at | date:"d-m-y H:i:s" }}</td>
     <td>{% if job.state != "PENDING" %}{{ job.progress_pct }}%{% endif %}</td>
+    <td>{% if job.state != "PENDING" %}{{ job.send_count }}{% endif %}</td>
     <td>
         {% if job.cancellable %}
         <form action="{% url "mailer:job-delete" job.pk %}" method="POST">
