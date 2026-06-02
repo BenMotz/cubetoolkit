@@ -40,7 +40,7 @@ Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
       <a class="dropdown-item" href="{% url "view-volunteer-summary" %}?order=inducted">Order by induction date (most recent first)</a>
   </div>
 </div>
-<a href="?order={{ sort_type }}&include_mailout_status=y" class="btn btn-secondary">Load Mailout Status</a><p>
+<a href="?order={{ sort_type }}&include_maillist_status=y" class="btn btn-secondary">Load Mailing list Status</a><p>
 {% if surprise_recipients %}<p><a href="#mailing-list-unmatched-recipients">Jump to list of mailing list recipients who are not obviously volunteers</a></p>{% endif %}
 
 <table class="table table-sm table-striped">
@@ -55,7 +55,7 @@ Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
         <th>
             Inducted
         </th>
-        {% if include_mailout_status %}
+        {% if include_maillist_status %}
         <th>
             On Volunteer list
         </th>
@@ -82,7 +82,7 @@ Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
                         {{ volunteer.created_at|date:"d/m/Y" }}
                     {% endif %}
                 </td>
-                {% if include_mailout_status %}
+                {% if include_maillist_status %}
                 <td>
                     {{ volunteer.volunteers_subscribed | yesno:"&#9989,&#10060;" | safe }}
                 </td>

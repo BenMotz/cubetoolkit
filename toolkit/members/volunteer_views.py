@@ -115,7 +115,7 @@ def export_volunteers_as_csv(request):
 def view_volunteer_summary(request):
 
     order = request.GET.get("order", "name")
-    include_mailout_status = request.GET.get("include_mailout_status") == "y"
+    include_maillist_status = request.GET.get("include_maillist_status") == "y"
 
     if "name" in order:
         volunteers = (
@@ -132,10 +132,10 @@ def view_volunteer_summary(request):
         )
         sort_type = "induction date"
 
-    list_members = {}
     surprise_recipients = {}
 
-    if include_mailout_status:
+    if include_maillist_status:
+        list_members = {}
         try:
             list_members = mailman.get_lists_members()
         except mailman.MailmanError as mme:
@@ -168,8 +168,7 @@ def view_volunteer_summary(request):
         "active_count": active_count,
         "sort_type": sort_type,
         "dawn_of_toolkit": settings.DAWN_OF_TOOLKIT,
-        "include_mailout_status": include_mailout_status,
-        "list_names": settings.MAILMAN_VOLUNTEER_LISTS,
+        "include_maillist_status": include_maillist_status,
         "surprise_recipients": surprise_recipients,
     }
     return render(request, "volunteer_summary.html", context)
