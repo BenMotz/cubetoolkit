@@ -12,6 +12,18 @@
 <![endif]-->
 <link rel="stylesheet" href="{{ STATIC_URL }}css/lib/bootstrap.min.css">
 <style>
+:root {
+  /* We used to use Bootstrap 4 and liked how it looked, so override the Bootstrap 5 font list
+     with the BS4 one: */
+  --bs-body-font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+}
+/* Likewise, go back to the BS4 anchor formatting: */
+a {
+  text-decoration: none;
+}
+a:hover {
+  text-decoration: underline;
+}
 body {
   padding: 5rem 1.4rem;
 }
