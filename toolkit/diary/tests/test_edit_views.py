@@ -228,14 +228,14 @@ class EditShowing(DiaryTestsMixin, TestCase):
         self.assertContains(
             response,
             '<input type="text" name="booked_by" value="\u0102nother \u0170ser"'
-            ' maxlength="64" class="textinput textInput form-control"'
+            ' maxlength="64" class="textinput form-control"'
             ' required id="id_booked_by">',
             html=True,
         )
         self.assertContains(
             response,
             '<input type="checkbox" name="confirmed" class="checkboxinput '
-            'custom-control-input" id="id_confirmed" checked>',
+            'form-check-input" id="id_confirmed" checked>',
             html=True,
             #'<input checked="checked" id="id_confirmed" name="confirmed" '
             #'type="checkbox" />',
@@ -243,19 +243,19 @@ class EditShowing(DiaryTestsMixin, TestCase):
         self.assertContains(
             response,
             '<input type="checkbox" name="hide_in_programme" class="checkboxinput '
-            'custom-control-input" id="id_hide_in_programme">',
+            'form-check-input" id="id_hide_in_programme">',
             html=True,
         )
         self.assertContains(
             response,
             '<input type="checkbox" name="cancelled" class="checkboxinput '
-            'custom-control-input" id="id_cancelled">',
+            'form-check-input" id="id_cancelled">',
             html=True,
         )
         self.assertContains(
             response,
             '<input type="checkbox" name="discounted" class="checkboxinput '
-            'custom-control-input" id="id_discounted">',
+            'form-check-input" id="id_discounted">',
             html=True,
         )
 
@@ -921,13 +921,13 @@ class EditEventView(DiaryTestsMixin, TestCase):
         self.assertContains(
             response,
             '<input id="id_outside_hire" checked="checked" '
-            'class="checkboxinput custom-control-input" name="outside_hire" '
+            'class="checkboxinput form-check-input" name="outside_hire" '
             'type="checkbox" />',
             html=True,
         )
         self.assertContains(
             response,
-            '<input id="id_private" class="checkboxinput custom-control-input"'
+            '<input id="id_private" class="checkboxinput form-check-input"'
             'name="private" type="checkbox" />',
             html=True,
         )
@@ -952,14 +952,14 @@ class EditEventView(DiaryTestsMixin, TestCase):
         self.assertContains(
             response,
             '<input id="id_outside_hire" '
-            'class="checkboxinput custom-control-input" name="outside_hire" '
+            'class="checkboxinput form-check-input" name="outside_hire" '
             'type="checkbox" />',
             html=True,
         )
         self.assertContains(
             response,
             '<input id="id_private" name="private" '
-            'class="checkboxinput custom-control-input" type="checkbox" />',
+            'class="checkboxinput form-check-input" type="checkbox" />',
             html=True,
         )
         # It's probably still fine. Cough.

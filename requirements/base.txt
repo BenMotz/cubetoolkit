@@ -1,7 +1,8 @@
 # Fix versions of django and directly related components:
 Django<5.3,>=5.2.13
 easy_thumbnails==2.10
-django-crispy-forms<1.13
+django-crispy-forms==2.6
+crispy-bootstrap5==2026.3
 # Functionality introduced at these versions is required:
 python-magic>=0.4.0
 # These should (!) have stable APIs, so let upgrades happen

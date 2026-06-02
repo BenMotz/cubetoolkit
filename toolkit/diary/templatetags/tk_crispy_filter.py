@@ -6,7 +6,7 @@ register = Library()
 
 @register.filter(name="to_crispy_field")
 def to_crispy_field(field):
-    template = get_template("bootstrap4/field.html")
+    template = get_template("bootstrap5/field.html")
     return template.render(
         Context(
             {
