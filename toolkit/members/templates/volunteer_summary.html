@@ -31,9 +31,9 @@
 <br>
 Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
 
-<div class="btn-group dropright">
-  <button type="button" class="btn btn-secondary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-      Order by <span class="caret"></span>
+<div class="btn-group dropend">
+  <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+      Order by
   </button>
   <div class="dropdown-menu">
       <a class="dropdown-item" href="{% url "view-volunteer-summary" %}">Order by name</a>
