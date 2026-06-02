@@ -41,6 +41,7 @@ Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
   </div>
 </div>
 <a href="?order={{ sort_type }}&include_mailout_status=y" class="btn btn-secondary">Load Mailout Status</a><p>
+{% if surprise_recipients %}<p><a href="#mailing-list-unmatched-recipients">Jump to list of mailing list recipients who are not obviously volunteers</a></p>{% endif %}
 
 <table class="table table-sm table-striped">
     <thead>
@@ -94,6 +95,22 @@ Active {{ VENUE.name }} volunteers: {{ active_count }}</p>
     {% endfor %}
     </tbody>
 </table><!-- table -->
+{% if surprise_recipients %}
+<a name="mailing-list-unmatched-recipients"></a>
+<h3>Mailing list recipients who are not obviously volunteers</h3>
+<div class="row">
+{% for list_name, recipients in surprise_recipients.items %}
+    <div class="col">
+        <h4>{{ list_name }}</h4>
+        <ul>
+        {% for recipient in recipients %}
+          <li><a href="mailto:{{ recipient }}">{{ recipient }}</a></li>
+        {% endfor %}
+        </ul>
+    </div>
+{% endfor %}
+</div>
+{% endif %}
 
 <h4>The volunteer role report can now be found <a href="{% url "view-volunteer-role-report" %}">here</a>.</h4>
 <h4>The volunteer training report can now be found <a href="{% url "view-volunteer-training-report" %}">here</a>.</h4>

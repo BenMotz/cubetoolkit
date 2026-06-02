@@ -133,6 +133,7 @@ def view_volunteer_summary(request):
         sort_type = "induction date"
 
     list_members = {}
+    surprise_recipients = {}
 
     if include_mailout_status:
         try:
@@ -151,10 +152,15 @@ def view_volunteer_summary(request):
             )
         for list_name, members in list_members.items():
             list_attr = f"{list_name.partition('@')[0]}_subscribed"
+            leftovers = set(members)
             for volunteer in volunteers:
                 setattr(
-                    volunteer, list_attr, volunteer.member.email.lower() in members
+                    volunteer,
+                    list_attr,
+                    volunteer.member.email.lower() in members,
                 )
+                leftovers.discard(volunteer.member.email.lower())
+            surprise_recipients[list_name] = sorted(leftovers)
 
     active_count = volunteers.count()
     context = {
@@ -164,6 +170,7 @@ def view_volunteer_summary(request):
         "dawn_of_toolkit": settings.DAWN_OF_TOOLKIT,
         "include_mailout_status": include_mailout_status,
         "list_names": settings.MAILMAN_VOLUNTEER_LISTS,
+        "surprise_recipients": surprise_recipients,
     }
     return render(request, "volunteer_summary.html", context)
 
