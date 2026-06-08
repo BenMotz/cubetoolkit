@@ -1,54 +1,54 @@
 {% extends "showing_archive_base.html" %}
 {% block title %}
-{{ VENUE.longname }} Archive: Search{% if search_term %} for "{{ search_term }}"{% endif %}
+  {{ VENUE.longname }} Archive: Search{% if search_term %} for "{{ search_term }}"{% endif %}
 {% endblock %}
 
 {% block script %}
-<script src="{{ STATIC_URL }}js/lib/jquery-3.5.1.min.js"></script>
-<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
-<script type="text/javascript">
-$(document).ready(function() {
+  <script src="{{ STATIC_URL }}js/lib/jquery-3.5.1.min.js"></script>
+  <script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
         $('#id_start_date').datepicker({ dateFormat : 'dd/mm/yy' });
         $('#id_end_date').datepicker({ dateFormat : 'dd/mm/yy' });
-});
-</script>
+    });
+  </script>
 {% endblock %}
 {% block archive_body %}
-<h3>{{ VENUE.longname }} programme archive: Search {% if search_term %}results for "{{ search_term }}"{% endif %}</h3>
+  <h3>{{ VENUE.longname }} programme archive: Search {% if search_term %}results for "{{ search_term }}"{% endif %}</h3>
 
-<form class="search_form" action="{% url "archive-search" %}">
-<ul>
-{{ form.as_ul }}
-    <input type="submit" value="Search" />
-</ul>
-</form>
-<br />
-{% if search_submitted %} {# Don't show the 'Results: 0' if no search was performed: #}
+  <form class="search_form" action="{% url "archive-search" %}">
+    <ul>
+      {{ form.as_ul }}
+      <input type="submit" value="Search" />
+    </ul>
+  </form>
+  <br />
+  {% if search_submitted %} {# Don't show the 'Results: 0' if no search was performed: #}
     <h3>{{ showing_list|length }} Result{{ showing_list|length|pluralize }}</h3>
 
     {% spaceless %}
-    {% regroup showing_list by start.day as showing_by_start %}
-    <ul>
-    {% for date_showings in showing_by_start %}
-        {% for showing in date_showings.list %}
+      {% regroup showing_list by start.day as showing_by_start %}
+      <ul>
+        {% for date_showings in showing_by_start %}
+          {% for showing in date_showings.list %}
             {% if forloop.first %}
-        <li> {{showing.start|date:"D d" }}
-            <span class="resultdate">
-                <a href="{% url "archive-view-month" year=showing.start.year month=showing.start.month %}">{{showing.start|date:"N" }} </a>
-                <a href="{% url "archive-view-year" year=showing.start.year %}">{{showing.start|date:"y"}}</a>
-            </span>
-            <ul>
+              <li> {{showing.start|date:"D d" }}
+                <span class="resultdate">
+                  <a href="{% url "archive-view-month" year=showing.start.year month=showing.start.month %}">{{showing.start|date:"N" }} </a>
+                  <a href="{% url "archive-view-year" year=showing.start.year %}">{{showing.start|date:"y"}}</a>
+                </span>
+                <ul>
             {% endif %}
-                <li>{{ showing.start|date:"H:i" }}
+                  <li>{{ showing.start|date:"H:i" }}
                     <a href="{% url "single-event-view" event_id=showing.event_id %}" {% if showing.cancelled %}class="cancelled"{% endif %} >{{ showing.event.name }}</a>
                     {% if showing.cancelled and not "cancelled" in showing.event.name.lower %}(Cancelled){% endif %}
-                </li>
+                  </li>
+          {% endfor %}
+                </ul>
+              </li>
         {% endfor %}
-            </ul>
-        </li>
-    {% endfor %}
-    </ul>
+      </ul>
     {% endspaceless %}
 
-{% endif %}
+  {% endif %}
 {% endblock archive_body%}

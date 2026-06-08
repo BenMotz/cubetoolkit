@@ -1,18 +1,18 @@
 {% extends "base_admin.html" %}
 
 {% block title %}
-Editing Event types
+  Editing Event types
 {% endblock %}
 
 {% block script %}
-{{ block.super }}
-{{ formset.media }}
+  {{ block.super }}
+  {{ formset.media }}
 {% endblock %}
 
 {% block css %}
-{{ block.super }}
-<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
-<style type="text/css">
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
+  <style type="text/css">
   body {
       background: lightgray;
   }
@@ -45,31 +45,31 @@ Editing Event types
       color: red;
       list-style: none url("{{ STATIC_URL }}img/message_error.png") inside;
   }
-</style>
+  </style>
 {% endblock %}
 
 {% block body %}
-<div class="header">
-<h1>Event templates</h1>
-<p>These templates are applied when an event is created: editing them will <b>not</b> affect existing events</p>
-<p>To add a new template, edit the blank template at the bottom of the page</p>
-<p class="warn">Changes cannot be automatically undone, please take care</p>
-{% include "messages.html" %}
-</div>
+  <div class="header">
+    <h1>Event templates</h1>
+    <p>These templates are applied when an event is created: editing them will <b>not</b> affect existing events</p>
+    <p>To add a new template, edit the blank template at the bottom of the page</p>
+    <p class="warn">Changes cannot be automatically undone, please take care</p>
+    {% include "messages.html" %}
+  </div>
 
-<form method="post">
-{% csrf_token %}
-{{ formset.management_form }}
-{% for form in formset %}
-<div class="template_form {% if not form.id.value %}new_template{% endif %}">
-    <h2>{{ form.name.value|default_if_none:"New event template" }}</h2>
-<table>
-{{ form.as_table }}
-</table>
-<input type="submit" value="Save all changes to all templates" />
-</div>
-{% endfor %}
-</form>
+  <form method="post">
+    {% csrf_token %}
+    {{ formset.management_form }}
+    {% for form in formset %}
+      <div class="template_form {% if not form.id.value %}new_template{% endif %}">
+        <h2>{{ form.name.value|default_if_none:"New event template" }}</h2>
+        <table>
+        {{ form.as_table }}
+        </table>
+        <input type="submit" value="Save all changes to all templates" />
+      </div>
+    {% endfor %}
+  </form>
 
 {% endblock %}
 

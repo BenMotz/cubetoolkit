@@ -2,12 +2,12 @@
 {% load showing_date_format %}
 
 {% block title %}
-{{ VENUE.name }} programme of events - copy summary report
+  {{ VENUE.name }} programme of events - copy summary report
 {% endblock %}
 
 {% block css %}
-{{ block.super }}
-<style type="text/css">
+  {{ block.super }}
+  <style type="text/css">
     body {
         font-size: 100%;
     }
@@ -45,11 +45,11 @@
     p.film_info {
         padding-top: 0.05em;
     }
-</style>
+  </style>
 {% endblock %}
 {% block script %}
-{{ block.super }}
-<script type="text/javascript">
+  {{ block.super }}
+  <script type="text/javascript">
 $(document).ready(function() {
         // Change edit links to open in a new window:
         $('.copy a').click(function(e) {
@@ -65,38 +65,38 @@ $(document).ready(function() {
             index_visible = !index_visible;
         });
 });
-</script>
+  </script>
 {% endblock %}
 
 {% block body %}
-{{ block.super }}
-<h3>{{ VENUE.name }} programme of events - copy summary report</h3>
-<p>[<a href="#" id="hide_index">Hide index</a>]</p>
-<div class="index">
-{% for showing in showings %}
-    {% ifchanged %}<h2>{{ showing.start|date:"F Y" }}</h2>{% endifchanged %}
-    {% ifchanged %}<p>{{ showing.start|date:"D"}} {{ showing.start|date:"d" }}{% else %}
-    <p>      {% endifchanged %} {{showing.start|date:"H:i"}} .... {% if showing.hide_in_programme or showing.event.private %}Closed for private event.{% else %}{% if showing.event.pre_title %}{{ showing.event.pre_title.strip }} {% endif %}{{ showing.event.name.strip }}{% if showing.event.post_title.strip %} {{ showing.event.post_title }}{% endif %}{% if showing.cancelled %} (CANCELLED){% endif %}{% if showing.discounted %} *{% endif %}{% endif %}</p>
-{% endfor %}
-<p>&nbsp;</p>
-<p>* cheap night</p>
-</div>
-<div class="copy">
+  {{ block.super }}
+  <h3>{{ VENUE.name }} programme of events - copy summary report</h3>
+  <p>[<a href="#" id="hide_index">Hide index</a>]</p>
+  <div class="index">
+    {% for showing in showings %}
+      {% ifchanged %}<h2>{{ showing.start|date:"F Y" }}</h2>{% endifchanged %}
+      {% ifchanged %}<p>{{ showing.start|date:"D"}} {{ showing.start|date:"d" }}{% else %}
+      <p>      {% endifchanged %} {{showing.start|date:"H:i"}} .... {% if showing.hide_in_programme or showing.event.private %}Closed for private event.{% else %}{% if showing.event.pre_title %}{{ showing.event.pre_title.strip }} {% endif %}{{ showing.event.name.strip }}{% if showing.event.post_title.strip %} {{ showing.event.post_title }}{% endif %}{% if showing.cancelled %} (CANCELLED){% endif %}{% if showing.discounted %} *{% endif %}{% endif %}</p>
+    {% endfor %}
+    <p>&nbsp;</p>
+    <p>* cheap night</p>
+  </div>
+  <div class="copy">
 
-{% for showing in showings %}
-{% if not showing.event.private and not showing.hide_in_programme %}
-{% ifchanged %}
-<p>------------------------------------------------------------------------------</p>
-{% if showing.event.pre_title %}<p class="pre_title">{{ showing.event.pre_title }}</p>{% endif %}
-<p class="title">{{ showing.event.name }}</p>
-{% if showing.event.post_title %}<p class="post_title">{{ showing.event.post_title }}</p>{% endif %}
-<p class="start_times">{{ showing.event.showings.public|showingdates }}{% if showing.event.pricing %} / {{ showing.event.pricing }}{% endif %}</p>
-{% if showing.event.film_information %}<p class="film_info">{{ showing.event.film_information }}</p>{% endif %}
-<p class="copy_summary">{{ showing.event.copy_summary}}</p>
-<p><a href="{% url "edit-event-details" showing.event.id %}">[edit]</a></p>
-{% endifchanged %}
-{% endif %}
-{% endfor %}
+    {% for showing in showings %}
+      {% if not showing.event.private and not showing.hide_in_programme %}
+        {% ifchanged %}
+          <p>------------------------------------------------------------------------------</p>
+          {% if showing.event.pre_title %}<p class="pre_title">{{ showing.event.pre_title }}</p>{% endif %}
+          <p class="title">{{ showing.event.name }}</p>
+          {% if showing.event.post_title %}<p class="post_title">{{ showing.event.post_title }}</p>{% endif %}
+          <p class="start_times">{{ showing.event.showings.public|showingdates }}{% if showing.event.pricing %} / {{ showing.event.pricing }}{% endif %}</p>
+          {% if showing.event.film_information %}<p class="film_info">{{ showing.event.film_information }}</p>{% endif %}
+          <p class="copy_summary">{{ showing.event.copy_summary}}</p>
+          <p><a href="{% url "edit-event-details" showing.event.id %}">[edit]</a></p>
+        {% endifchanged %}
+      {% endif %}
+    {% endfor %}
 
-</div>
+  </div>
 {% endblock %}

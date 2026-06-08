@@ -1,54 +1,54 @@
 {% extends "showing_archive_base.html" %}
 {% block title %}
-{{ VENUE.longname }} Archival listings for {{ month|date:"F Y" }}
+  {{ VENUE.longname }} Archival listings for {{ month|date:"F Y" }}
 {% endblock %}
 
 {% block archive_body %}
-<h3>{{ VENUE.longname }} archive: {{ month|date:"F Y" }}</h3>
-    <form action="{% url "archive-search" %}">
-        <input id="archive_search_input" type="text" name="search_term" placeholder="Search within {{ month|date:"F Y" }}"/>
-        <input type="submit" value="Search" />
-        <input type="hidden" name="search_in_descriptions" value="on">
-        <input type="hidden" name="start_date" value="{{ month|date:"d/m/Y" }}">
-        <input type="hidden" name="end_date" value="{{ next_month|date:"d/m/Y" }}">
-    </form>
-    <p>
+  <h3>{{ VENUE.longname }} archive: {{ month|date:"F Y" }}</h3>
+  <form action="{% url "archive-search" %}">
+    <input id="archive_search_input" type="text" name="search_term" placeholder="Search within {{ month|date:"F Y" }}"/>
+    <input type="submit" value="Search" />
+    <input type="hidden" name="search_in_descriptions" value="on">
+    <input type="hidden" name="start_date" value="{{ month|date:"d/m/Y" }}">
+    <input type="hidden" name="end_date" value="{{ next_month|date:"d/m/Y" }}">
+  </form>
+  <p>
     {% if previous_month %}
-    <a href="{% url "archive-view-month" year=previous_month.year month=previous_month.month %}">← Previous month ({{ previous_month|date:"F" }})</a>
+      <a href="{% url "archive-view-month" year=previous_month.year month=previous_month.month %}">← Previous month ({{ previous_month|date:"F" }})</a>
     {% endif %}
     <a href="{% url "archive-view-year" year=month.year %}">↑ {{ month|date:"Y" }}</a>
     {% if next_month %}
-    <a href="{% url "archive-view-month" year=next_month.year month=next_month.month %}">Next month ({{ next_month|date:"F" }}) →</a>
+      <a href="{% url "archive-view-month" year=next_month.year month=next_month.month %}">Next month ({{ next_month|date:"F" }}) →</a>
     {% endif %}
-    </p>
-    {% spaceless %}
+  </p>
+  {% spaceless %}
     {% regroup showing_list by start.day as showing_by_start %}
     <ul>
-    {% for date_showings in showing_by_start %}
+      {% for date_showings in showing_by_start %}
         {% for showing in date_showings.list %}
-            {% if forloop.first %}
-        <li>{{showing.start|date:"D d N y" }}
-            <ul>
-            {% endif %}
+          {% if forloop.first %}
+            <li>{{showing.start|date:"D d N y" }}
+              <ul>
+          {% endif %}
                 <li>{{ showing.start|date:"H:i" }}
-                    <a href="{% url "single-event-view" event_id=showing.event_id %}" {% if showing.cancelled %}class="cancelled"{% endif %} >{{ showing.event.name }}</a>
-                    {% if showing.cancelled and not "cancelled" in showing.event.name.lower %}(Cancelled){% endif %}
+                  <a href="{% url "single-event-view" event_id=showing.event_id %}" {% if showing.cancelled %}class="cancelled"{% endif %} >{{ showing.event.name }}</a>
+                  {% if showing.cancelled and not "cancelled" in showing.event.name.lower %}(Cancelled){% endif %}
                 </li>
         {% endfor %}
-            </ul>
-        </li>
-    {% endfor %}
+              </ul>
+            </li>
+      {% endfor %}
     </ul>
-    {% endspaceless %}
+  {% endspaceless %}
 
-    <p>
+  <p>
     {% if previous_month %}
-    <a href="{% url "archive-view-month" year=previous_month.year month=previous_month.month %}">← Previous month ({{ previous_month|date:"F" }})</a>
+      <a href="{% url "archive-view-month" year=previous_month.year month=previous_month.month %}">← Previous month ({{ previous_month|date:"F" }})</a>
     {% endif %}
     <a href="{% url "archive-view-year" year=month.year %}">↑ {{ month|date:"Y" }}</a>
     {% if next_month %}
-    <a href="{% url "archive-view-month" year=next_month.year month=next_month.month %}">Next month ({{ next_month|date:"F" }}) →</a>
+      <a href="{% url "archive-view-month" year=next_month.year month=next_month.month %}">Next month ({{ next_month|date:"F" }}) →</a>
     {% endif %}
-    </p>
+  </p>
 
 {% endblock archive_body%}

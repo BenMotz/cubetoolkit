@@ -1,19 +1,19 @@
 {% extends "form_base.html" %}
 {% load crispy_forms_tags %}
 {% block title %}
-Event Details for {{ event.name }}
+  Event Details for {{ event.name }}
 {% endblock %}
 {% block css %}
-{{ block.super }}
-<style>
+  {{ block.super }}
+  <style>
     .asteriskField { display: none; }
     #remaining_chars { font-weight: bold; }
-</style>
+  </style>
 {% endblock %}
 
 {% block script %}
-{{ block.super }}
-<script>
+  {{ block.super }}
+  <script>
 
 var COPY_LIMIT = {{ programme_copy_summary_max_chars }};
 
@@ -38,31 +38,31 @@ $(document).ready(function() {
     copy_summary.bind('input propertychange', update_character_count);
     update_character_count();
 });
-</script>
+  </script>
 {% endblock %}
 
 {% block body %}
-<div id="title">
-<h1>Edit details for "{{ event.name }}"</h1>
-{% include "messages.html" %}
-<p>
-{% for showing in event.showings.all %}
-Booked for: {{ showing.start|date:"H:i d/m/Y"  }} <br>
-{% endfor %}
-</p>
-</div>
-{% if event_form.errors or media_form.errors %}
-<div class="alert alert-danger">Missing or invalid information - see below for errors</div>
-{% endif %}
-<div id="forms">
-<form action="{% url "edit-event-details" event_id=event.id %}" method="post" enctype="multipart/form-data">
-    {% crispy event_form %}
-    {% crispy media_form %}
+  <div id="title">
+    <h1>Edit details for "{{ event.name }}"</h1>
+    {% include "messages.html" %}
     <p>
-        <button type="submit" class="btn btn-primary">Update</button> <a href="{% url "edit-event-details-view" event_id=event.pk %}">Cancel</a>
+    {% for showing in event.showings.all %}
+      Booked for: {{ showing.start|date:"H:i d/m/Y"  }} <br>
+    {% endfor %}
     </p>
-</form>
-</div>
+  </div>
+  {% if event_form.errors or media_form.errors %}
+    <div class="alert alert-danger">Missing or invalid information - see below for errors</div>
+  {% endif %}
+  <div id="forms">
+    <form action="{% url "edit-event-details" event_id=event.id %}" method="post" enctype="multipart/form-data">
+      {% crispy event_form %}
+      {% crispy media_form %}
+      <p>
+        <button type="submit" class="btn btn-primary">Update</button> <a href="{% url "edit-event-details-view" event_id=event.pk %}">Cancel</a>
+      </p>
+    </form>
+  </div>
 
 {% endblock %}
 

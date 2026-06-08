@@ -1,12 +1,12 @@
 {% extends "base_view_eventfield.html" %}
 
 {% block title %}
-{{ VENUE.name }} programme of events - terms report
+  {{ VENUE.name }} programme of events - terms report
 {% endblock %}
 
 {% block css %}
-{{ block.super }}
-<style type="text/css">
+  {{ block.super }}
+  <style type="text/css">
     p, h1, h2{
         font-family: monospace;
     }
@@ -21,31 +21,31 @@
     .flags {
         font-weight: bold;
     }
-</style>
+  </style>
 {% endblock %}
 
 {% block body %}
-{{ block.super }}
-<h1>{{ VENUE.name }} programme of events - terms report</h1>
-<h2><a href="{% url "view_terms_report_csv" year=start_date.date.year month=start_date.date.month day=start_date.date.day %}?daysahead={{ days_ahead }}">Download as CSV</a></h2>
-<p>
-<div class="terms">
-<form id="form_search">
-    <input type="text" name="search" {% if search %}value="{{ search }}"{% endif %}>
-    <input type="submit" value="Search">
-    <input type="hidden" value="{{ days_ahead }}" name="daysahead">
-</form>
-{% for showing in showings %}
-{% spaceless %}
-{% ifchanged %}<h1 class="pad">{{ showing.start|date:"Y" }}</h1>{% endifchanged %}
-{% ifchanged %}<h2 class="pad">{{ showing.start|date:"F"|upper }}</h2>{% endifchanged %}
-{% ifchanged %}<p class="day">{{ showing.start|date:"D"}} {{ showing.start|date:"d" }}{% else %} <p>      {% endifchanged %} {{showing.start|date:"H:i"}} .... {{ showing.event.name|capfirst }}</p>
-<p>{{ showing.event.name|upper }}</p>
-<p class="flags">{% if showing.cancelled %}CANCELLED / {% endif %}{% if showing.event.outside_hire %}External event{% else %}Cube event{% endif %} / {% if showing.event.private or showing.hide_in_programme %}Private event{% else %}Public event{% endif %} / {% if showing.confirmed %}Confirmed{% else %}Unconfirmed{% endif %}{% if showing.discounted %} / Discounted{% endif %}</p>
-<p class="terms">{{ showing.event.terms.strip }}</p>
-{% endspaceless %}
+  {{ block.super }}
+  <h1>{{ VENUE.name }} programme of events - terms report</h1>
+  <h2><a href="{% url "view_terms_report_csv" year=start_date.date.year month=start_date.date.month day=start_date.date.day %}?daysahead={{ days_ahead }}">Download as CSV</a></h2>
+  <p>
+  <div class="terms">
+    <form id="form_search">
+      <input type="text" name="search" {% if search %}value="{{ search }}"{% endif %}>
+      <input type="submit" value="Search">
+      <input type="hidden" value="{{ days_ahead }}" name="daysahead">
+    </form>
+    {% for showing in showings %}
+      {% spaceless %}
+        {% ifchanged %}<h1 class="pad">{{ showing.start|date:"Y" }}</h1>{% endifchanged %}
+        {% ifchanged %}<h2 class="pad">{{ showing.start|date:"F"|upper }}</h2>{% endifchanged %}
+        {% ifchanged %}<p class="day">{{ showing.start|date:"D"}} {{ showing.start|date:"d" }}{% else %} <p>      {% endifchanged %} {{showing.start|date:"H:i"}} .... {{ showing.event.name|capfirst }}</p>
+        <p>{{ showing.event.name|upper }}</p>
+        <p class="flags">{% if showing.cancelled %}CANCELLED / {% endif %}{% if showing.event.outside_hire %}External event{% else %}Cube event{% endif %} / {% if showing.event.private or showing.hide_in_programme %}Private event{% else %}Public event{% endif %} / {% if showing.confirmed %}Confirmed{% else %}Unconfirmed{% endif %}{% if showing.discounted %} / Discounted{% endif %}</p>
+        <p class="terms">{{ showing.event.terms.strip }}</p>
+      {% endspaceless %}
 
-{% endfor %}
+    {% endfor %}
 
-</div>
+  </div>
 {% endblock %}

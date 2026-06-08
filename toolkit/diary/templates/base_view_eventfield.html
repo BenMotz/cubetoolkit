@@ -1,21 +1,21 @@
 {% extends "base_admin.html" %}
 
 {% block css %}
-{{ block.super }}
-<style type="text/css">
+  {{ block.super }}
+  <style type="text/css">
     @import url('{{ STATIC_URL }}css/lib/smoothness/jquery-ui.css');
     a#{{ event_field }}_link {
         font-weight: bold;
         color: black;
         text-decoration: none;
     }
-</style>
+  </style>
 {% endblock %}
 {% block script %}
-{{ block.super }}
-<script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
-<script type="text/javascript">
-$(document).ready(function() {
+  {{ block.super }}
+  <script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
+  <script type="text/javascript">
+    $(document).ready(function() {
         // Add date picker:
         $('#id_from_date').datepicker({
             dateFormat : 'dd-mm-yy',
@@ -29,38 +29,38 @@ $(document).ready(function() {
             dateRangeSelected();
             return false;
         }
-});
-function parse_date_from_control(control_id) {
-    var text = $(control_id)[0].value;
-    return $.datepicker.parseDate('dd-mm-yy', text);
-}
-function dateRangeSelected(dateText, inst) {
-    var from_date = parse_date_from_control('#id_from_date');
-    var to_date = parse_date_from_control('#id_to_date');
-    // Calculate days between those two dates:
-    var days_ahead = Math.ceil((to_date.getTime() - from_date.getTime())/86400000);
-    if(days_ahead <= 0) {
-        days_ahead = 0;
+    });
+    function parse_date_from_control(control_id) {
+        var text = $(control_id)[0].value;
+        return $.datepicker.parseDate('dd-mm-yy', text);
     }
-    window.location.href = "{% url "view_event_field" event_field %}/" +
-        (from_date.getYear() + 1900) + "/" + (from_date.getMonth() + 1) + "/" +
-        from_date.getDate() + "?daysahead=" + days_ahead {% if search %} +
-        "&search={{ search|urlencode }}"{% endif %};
-}
-</script>
+    function dateRangeSelected(dateText, inst) {
+        var from_date = parse_date_from_control('#id_from_date');
+        var to_date = parse_date_from_control('#id_to_date');
+        // Calculate days between those two dates:
+        var days_ahead = Math.ceil((to_date.getTime() - from_date.getTime())/86400000);
+        if(days_ahead <= 0) {
+            days_ahead = 0;
+        }
+        window.location.href = "{% url "view_event_field" event_field %}/" +
+            (from_date.getYear() + 1900) + "/" + (from_date.getMonth() + 1) + "/" +
+            from_date.getDate() + "?daysahead=" + days_ahead {% if search %} +
+            "&search={{ search|urlencode }}"{% endif %};
+    }
+  </script>
 {% endblock %}
 
 {% block body %}
-<div id='eventfield_header'>
-<form id='daterange'>
-<p align='center'><label for="id_from_date">{{ event_field|capfirst }} from </label><input type="text" name="from_date" value="{{ start_date|date:'j-m-Y'}}" id="id_from_date" />
-<label for="id_to_date"> to </label><input type="text" name="to_date" value="{{ end_date|date:'j-m-Y'}}" id="id_to_date" />
-</p>
-<p align='center'>
-<a id="copy_link" href="{% url "view_event_field" field="copy" %}/{{ start_date.year }}/{{ start_date.month }}/{{ start_date.day }}/?daysahead={{ days_ahead }}">Copy Report</a> |
-<a id="terms_link" href="{% url "view_event_field" field="terms" %}/{{ start_date.year }}/{{ start_date.month }}/{{ start_date.day }}/?daysahead={{ days_ahead }}">Terms Report</a> |
-<a id="copy_summary_link" href="{% url "view_event_field" field="copy_summary" %}/{{ start_date.year }}/{{ start_date.month }}/{{ start_date.day }}/?daysahead={{ days_ahead }}">Copy Summary Report</a></p>
-</form>
-</div>
+  <div id='eventfield_header'>
+    <form id='daterange'>
+      <p align='center'><label for="id_from_date">{{ event_field|capfirst }} from </label><input type="text" name="from_date" value="{{ start_date|date:'j-m-Y'}}" id="id_from_date" />
+      <label for="id_to_date"> to </label><input type="text" name="to_date" value="{{ end_date|date:'j-m-Y'}}" id="id_to_date" />
+      </p>
+      <p align='center'>
+      <a id="copy_link" href="{% url "view_event_field" field="copy" %}/{{ start_date.year }}/{{ start_date.month }}/{{ start_date.day }}/?daysahead={{ days_ahead }}">Copy Report</a> |
+      <a id="terms_link" href="{% url "view_event_field" field="terms" %}/{{ start_date.year }}/{{ start_date.month }}/{{ start_date.day }}/?daysahead={{ days_ahead }}">Terms Report</a> |
+      <a id="copy_summary_link" href="{% url "view_event_field" field="copy_summary" %}/{{ start_date.year }}/{{ start_date.month }}/{{ start_date.day }}/?daysahead={{ days_ahead }}">Copy Summary Report</a></p>
+    </form>
+  </div>
 {% endblock %}
 

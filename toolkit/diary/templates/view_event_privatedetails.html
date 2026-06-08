@@ -4,99 +4,99 @@
 {% load static %}
 {% load noprefix_url %}
 {% block title %}
-Details for: {{ event.name }}
+  Details for: {{ event.name }}
 {% endblock %}
 {% block css %}
-{{ block.super }}
-<style type="text/css">
+  {{ block.super }}
+  <style type="text/css">
     p {
     }
     .copy {
-        padding: 0.5em;
+      padding: 0.5em;
     }
     p.image_caption {
-        font-style: italic;
+      font-style: italic;
     }
     .pre {
-        white-space: pre-wrap;
+      white-space: pre-wrap;
     }
     p#cancel {
-        margin: 1em;
+      margin: 1em;
     }
     #form-errors { color: red }
     .centered {
-        text-align: center;
+      text-align: center;
     }
     .align-right {
-        text-align: right;
+      text-align: right;
     }
     .hidden {
-        display: none;
+      display: none;
     }
 
-</style>
+  </style>
 {% endblock %}
 
 {% block script %}
-{{ block.super }}
-{{ showing_forms.media }}
-<script>
-   "use strict";
+  {{ block.super }}
+  {{ showing_forms.media }}
+  <script>
+    "use strict";
     function showNewBookingForm() {
-        const showFormButton = document.getElementById("new_booking_button");
-        const newBookingRow = document.getElementById("new_booking_row");
-        const whenInput = document.querySelector('#new_booking_row input[type="text"]');
-        {% comment %}
-        Only set the default start time in the 'extra' (new booking) form when
-        the form is displayed: if it's set in the form initialdata then the
-        django logic will always try to save the 'extra' form, which will give
-        an error if the "booked_by" hasn't been set.
-        {% endcomment %}
-        whenInput.value = "{{ clone_showing_start|date:"d/m/Y H:i"|escapejs }}";
-        showFormButton.classList.add('hidden');
-        newBookingRow.classList.remove('hidden');
+      const showFormButton = document.getElementById("new_booking_button");
+      const newBookingRow = document.getElementById("new_booking_row");
+      const whenInput = document.querySelector('#new_booking_row input[type="text"]');
+      {% comment %}
+      Only set the default start time in the 'extra' (new booking) form when
+      the form is displayed: if it's set in the form initialdata then the
+      django logic will always try to save the 'extra' form, which will give
+      an error if the "booked_by" hasn't been set.
+      {% endcomment %}
+      whenInput.value = "{{ clone_showing_start|date:"d/m/Y H:i"|escapejs }}";
+      showFormButton.classList.add('hidden');
+      newBookingRow.classList.remove('hidden');
     }
 
     function hideNewBookingForm() {
-        const showFormButton = document.getElementById("new_booking_button");
-        const newBookingRow = document.getElementById("new_booking_row");
+      const showFormButton = document.getElementById("new_booking_button");
+      const newBookingRow = document.getElementById("new_booking_row");
 
-        const textFields = document.querySelectorAll('#new_booking_row input[type="text"]');
-        const checkFields = document.querySelectorAll('#new_booking_row input[type="checkbox"]');
+      const textFields = document.querySelectorAll('#new_booking_row input[type="text"]');
+      const checkFields = document.querySelectorAll('#new_booking_row input[type="checkbox"]');
 
-        for (const field of textFields) {
-            field.value = "";
-        }
-        for (const field of checkFields) {
-            field.checked = field.defaultChecked;
-        }
+      for (const field of textFields) {
+        field.value = "";
+      }
+      for (const field of checkFields) {
+        field.checked = field.defaultChecked;
+      }
 
-        showFormButton.classList.remove('hidden');
-        newBookingRow.classList.add('hidden');
+      showFormButton.classList.remove('hidden');
+      newBookingRow.classList.add('hidden');
     }
-</script>
+  </script>
 {% endblock %}
 
 {% block body %}
-<div id="booking">
+  <div id="booking">
     <h1>{{ event.name }}
- </h1>
+    </h1>
 
-{% include "bs_messages.html" %}
+    {% include "bs_messages.html" %}
 
-<h3>Bookings</h3>
+    <h3>Bookings</h3>
 
-<form method="post">
-{% csrf_token %}
-{{ showing_forms.management_form }}
-{% if showing_forms.non_form_errors %}
-<div class="alert alert-danger" role="alert">
-    {{ showing_forms.non_form_errors }}
-</div>
-{% endif %}
-<table class="table" id="booking-table">
-    <thead>
-        <tr>
+    <form method="post">
+      {% csrf_token %}
+      {{ showing_forms.management_form }}
+      {% if showing_forms.non_form_errors %}
+        <div class="alert alert-danger" role="alert">
+          {{ showing_forms.non_form_errors }}
+        </div>
+      {% endif %}
+      <table class="table" id="booking-table">
+        <thead>
+          <tr>
             <th>When</th>
             <th>Booked by</th>
             <th class="centered">Confirmed</th>
@@ -105,69 +105,69 @@ Details for: {{ event.name }}
             <th class="centered">Discounted</th>
             <th class="centered">Sold&nbsp;out</th>
             <th></th>
-        </tr>
-    </thead>
-{% for showing in historic_showings %}
-    <tr>
-        <td>
-            <span title="Showing has started, can't edit">
+          </tr>
+        </thead>
+        {% for showing in historic_showings %}
+          <tr>
+            <td>
+              <span title="Showing has started, can't edit">
                 {{ showing.start|date:"d/m/Y H:i" }}{% if MULTIROOM_ENABLED %} in {{ showing.room }}{% endif %}
-            </span>
-        </td>
-        <td>{{ showing.booked_by }}</td>
-        <td class="centered">{{ showing.confirmed|yesno }}</td>
-        <td class="centered">{{ showing.hide_in_programme|yesno }}</td>
-        <td class="centered">{{ showing.cancelled|yesno }}</td>
-        <td class="centered">{{ showing.discounted|yesno }}</td>
-        <td class="centered">{{ showing.sold_out|yesno }}</td>
-        <td>(Past)</td>
-    </tr>
-{% endfor %}
-{% for showing_form in showing_forms %}
-    <tr {% if not showing_form.instance.id %}id="new_booking_row"
-          {% if not showing_form.errors %}class="hidden"{% endif %}
-        {% endif %}>
-        <td>{{ showing_form.id }}{{ showing_form.start | to_crispy_field }}{% if MULTIROOM_ENABLED %} in {{ showing.room }}{% endif %}</td>
-        <td>
-        {% if showing_form.instance.id %}
-          {{ showing_form.booked_by.value }}
-          <input id="{{ showing_form.booked_by.id_for_label }}" type="hidden" name="{{ showing_form.booked_by.id_for_label|cut:"id_" }}" maxlength="64" value="{{ showing_form.booked_by.value }}">
-        {% else %}
-          {{ showing_form.booked_by | to_crispy_field }}
-        {% endif %}
-        </td>
-        <td class="centered">{{ showing_form.confirmed | to_crispy_field }}</td>
-        <td class="centered">{{ showing_form.hide_in_programme | to_crispy_field }}</td>
-        <td class="centered">{{ showing_form.cancelled | to_crispy_field }}</td>
-        <td class="centered">{{ showing_form.discounted | to_crispy_field }}</td>
-        <td class="centered">{{ showing_form.sold_out | to_crispy_field }}</td>
-        <td>
+              </span>
+            </td>
+            <td>{{ showing.booked_by }}</td>
+            <td class="centered">{{ showing.confirmed|yesno }}</td>
+            <td class="centered">{{ showing.hide_in_programme|yesno }}</td>
+            <td class="centered">{{ showing.cancelled|yesno }}</td>
+            <td class="centered">{{ showing.discounted|yesno }}</td>
+            <td class="centered">{{ showing.sold_out|yesno }}</td>
+            <td>(Past)</td>
+          </tr>
+        {% endfor %}
+        {% for showing_form in showing_forms %}
+          <tr {% if not showing_form.instance.id %}id="new_booking_row"
+                {% if not showing_form.errors %}class="hidden"{% endif %}
+              {% endif %}>
+            <td>{{ showing_form.id }}{{ showing_form.start | to_crispy_field }}{% if MULTIROOM_ENABLED %} in {{ showing.room }}{% endif %}</td>
+            <td>
             {% if showing_form.instance.id %}
-            <a href="{% url "edit-showing" showing_form.instance.id %}">Edit</a>
+              {{ showing_form.booked_by.value }}
+              <input id="{{ showing_form.booked_by.id_for_label }}" type="hidden" name="{{ showing_form.booked_by.id_for_label|cut:"id_" }}" maxlength="64" value="{{ showing_form.booked_by.value }}">
             {% else %}
-            <img style="cursor: pointer;" src="{{ STATIC_URL }}img/x-circle.svg" onClick="hideNewBookingForm();">
+              {{ showing_form.booked_by | to_crispy_field }}
             {% endif %}
-        </td>
-    </tr>
-{% endfor %}
-{% if not all_showings_in_past %}
-    <tr>
-        <td colspan="4">
-            <input type="submit" class="btn btn-primary" value="Save changes to bookings" />
-        </td>
-        <td colspan="4" class="align-right">
-            <button id="new_booking_button" type="button" class="btn btn-info{% if not show_add_a_booking_button %} hidden{% endif %}" onclick="showNewBookingForm();">
+            </td>
+            <td class="centered">{{ showing_form.confirmed | to_crispy_field }}</td>
+            <td class="centered">{{ showing_form.hide_in_programme | to_crispy_field }}</td>
+            <td class="centered">{{ showing_form.cancelled | to_crispy_field }}</td>
+            <td class="centered">{{ showing_form.discounted | to_crispy_field }}</td>
+            <td class="centered">{{ showing_form.sold_out | to_crispy_field }}</td>
+            <td>
+              {% if showing_form.instance.id %}
+              <a href="{% url "edit-showing" showing_form.instance.id %}">Edit</a>
+              {% else %}
+              <img style="cursor: pointer;" src="{{ STATIC_URL }}img/x-circle.svg" onClick="hideNewBookingForm();">
+              {% endif %}
+            </td>
+          </tr>
+        {% endfor %}
+        {% if not all_showings_in_past %}
+          <tr>
+            <td colspan="4">
+              <input type="submit" class="btn btn-primary" value="Save changes to bookings" />
+            </td>
+            <td colspan="4" class="align-right">
+              <button id="new_booking_button" type="button" class="btn btn-info{% if not show_add_a_booking_button %} hidden{% endif %}" onclick="showNewBookingForm();">
                 Add a booking
-            </button>
-        </td>
-    </tr>
-{% endif %}
-</table>
-</form>
-<p>
-</div>
-<h3>Details {% if not event.all_showings_in_past %}<a href="{% url "edit-event-details" event.pk %}">[edit]</a>{% endif %}</h3>
-    <table class="table">
+              </button>
+            </td>
+          </tr>
+        {% endif %}
+      </table>
+    </form>
+    <p>
+  </div>
+  <h3>Details {% if not event.all_showings_in_past %}<a href="{% url "edit-event-details" event.pk %}">[edit]</a>{% endif %}</h3>
+  <table class="table">
     <tr><td>Pre-title</td><td>{{event.pre_title }}</td></tr>
     <tr><td>Name</td><td>{{ event.name }}</td></tr>
     <tr><td>Post-title</td><td>{{event.post_title }}</td></tr>
@@ -186,24 +186,24 @@ Details for: {{ event.name }}
     {% endcomment %}
     <tr><td>Event image</td><td>
 
-{% with event.media.all.0 as media_item %}
-{% if media_item %}
-<a href="{% get_media_prefix %}{{ media_item.media_file }}"><img src="{{ media_item.media_file|thumbnail_url:'editpreview' }}" alt="Picture for event {{ event.name }}"></a>
-{% if media_item.credit %}
-<p class="image_caption">Image by: {{ media_item.credit }}</p>
-{% endif %}
-{% else %}
-<i>no image yet</i>
-{% endif %}
-{% endwith %}
- </td></tr>
+    {% with event.media.all.0 as media_item %}
+    {% if media_item %}
+      <a href="{% get_media_prefix %}{{ media_item.media_file }}"><img src="{{ media_item.media_file|thumbnail_url:'editpreview' }}" alt="Picture for event {{ event.name }}"></a>
+      {% if media_item.credit %}
+        <p class="image_caption">Image by: {{ media_item.credit }}</p>
+      {% endif %}
+    {% else %}
+      <i>no image yet</i>
+    {% endif %}
+    {% endwith %}
+    </td></tr>
 
- <tr><td>Copy (for event web page)</td><td><div class="copy">{{event.copy_html}}</div></td></tr>
- <tr><td>Copy summary (for web index and printed programme)</td><td>
- <p class="pre">{{event.copy_summary}}</p></td></tr>
- <tr><td>Terms</td><td><p class="pre">{{event.terms}}</p></td></tr>
-</table>
-<p id="cancel"><a href="{% url "cancel-edit" %}">Back to diary</a></p>
+    <tr><td>Copy (for event web page)</td><td><div class="copy">{{event.copy_html}}</div></td></tr>
+    <tr><td>Copy summary (for web index and printed programme)</td><td>
+    <p class="pre">{{event.copy_summary}}</p></td></tr>
+    <tr><td>Terms</td><td><p class="pre">{{event.terms}}</p></td></tr>
+  </table>
+  <p id="cancel"><a href="{% url "cancel-edit" %}">Back to diary</a></p>
 
 {% endblock %}
 

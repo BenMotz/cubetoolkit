@@ -1,30 +1,30 @@
 {% extends "showing_archive_base.html" %}
 {% block title %}
-{{ VENUE.longname }} Programme Archival listings for {{ year|date:"Y" }}
+  {{ VENUE.longname }} Programme Archival listings for {{ year|date:"Y" }}
 {% endblock %}
 
 {% block archive_body %}
-<h3>{{ VENUE.longname }} programme archive: {{ year|date:"Y" }}</h3>
-    <form action="{% url "archive-search" %}">
-        <input id="archive_search_input" type="text" name="search_term" placeholder="Search {{ year|date:"Y" }}"/>
-        <input type="submit" value="Search" />
-        <input type="hidden" name="start_date" value="{{ year|date:"m/d/Y" }}">
-        <input type="hidden" name="end_date" value="{{ next_year|date:"m/d/Y" }}">
-    </form>
-<ul>
+  <h3>{{ VENUE.longname }} programme archive: {{ year|date:"Y" }}</h3>
+  <form action="{% url "archive-search" %}">
+    <input id="archive_search_input" type="text" name="search_term" placeholder="Search {{ year|date:"Y" }}"/>
+    <input type="submit" value="Search" />
+    <input type="hidden" name="start_date" value="{{ year|date:"m/d/Y" }}">
+    <input type="hidden" name="end_date" value="{{ next_year|date:"m/d/Y" }}">
+  </form>
+  <ul>
     <p>
-    {% if previous_year %}
-    <a href="{% url "archive-view-year" year=previous_year.year %}">← {{ previous_year|date:"Y" }}</a>
-    {% endif %}
+      {% if previous_year %}
+        <a href="{% url "archive-view-year" year=previous_year.year %}">← {{ previous_year|date:"Y" }}</a>
+      {% endif %}
 
-    <a href="{% url "archive-view-index" %}">↑ Index</a>
-    {% if next_year %}
-    <a href="{% url "archive-view-year" year=next_year.year %}">{{ next_year|date:"Y" }} →</a>
-    {% endif %}
+      <a href="{% url "archive-view-index" %}">↑ Index</a>
+      {% if next_year %}
+        <a href="{% url "archive-view-year" year=next_year.year %}">{{ next_year|date:"Y" }} →</a>
+      {% endif %}
     </p>
     {% for date in date_list %}
-    <li><a href="{% url "archive-view-month" year=date.year month=date.month %}">{{ date|date:"F Y" }}</a></li>
+      <li><a href="{% url "archive-view-month" year=date.year month=date.month %}">{{ date|date:"F Y" }}</a></li>
     {% endfor %}
-</ul>
+  </ul>
 {% endblock archive_body %}
 

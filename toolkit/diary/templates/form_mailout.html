@@ -1,39 +1,39 @@
 {% extends "form_base.html" %}
 {% block css %}
-{{ block.super }}
-<style type="text/css">
+  {{ block.super }}
+  <style type="text/css">
     textarea {
-        height: 120ex;
-        font-family: monospace;
-        resize: both;
+      height: 120ex;
+      font-family: monospace;
+      resize: both;
     }
     form input[type=text] {
-        width: 90ex;
-        display: block;
-        font-family: monospace;
+      width: 90ex;
+      display: block;
+      font-family: monospace;
     }
     form input[type=number] {
-        width: 4em;
+      width: 4em;
     }
 
-</style>
-{{ form.media }}
+  </style>
+  {{ form.media }}
 {% endblock %}
 
 {% block title %}
-{{VENUE.name }} Member's Mailout
+  {{VENUE.name }} Member's Mailout
 {% endblock %}
 
 {% block body %}
-<h3>{{VENUE.name }} Member's Mailout</h3>
-<form method="GET">
+  <h3>{{VENUE.name }} Member's Mailout</h3>
+  <form method="GET">
     <p><label for="id_daysahead">Days of listings: </label>
     <input type="number" id="id_daysahead" name="daysahead" min="0" value="{{ days_ahead }}">
     <label for="id_copydaysahead">Days of copy: </label>
     <input type="number" id="id_copydaysahead" name="copydaysahead" min="0" value="{{ copy_days_ahead }}">
     <input type="submit" value="Regenerate mailout (lose any edits)"></p>
-</form>
-<form method="POST">
+  </form>
+  <form method="POST">
     {% csrf_token %}
     {{ form.non_field_errors }}
     <p>{{ form.send_html.as_field_group }}<br>
@@ -43,12 +43,12 @@
     {{ form.body_text.errors }}
     {{ form.body_text }}
     {% if form.html_mailout_enabled %}
-    <h3><label for="{{ form.body_html.id_for_label }}">Body of HTML email</label></h3>
-    {{ form.body_html.errors }}
-    {{ form.body_html }}
+      <h3><label for="{{ form.body_html.id_for_label }}">Body of HTML email</label></h3>
+      {{ form.body_html.errors }}
+      {{ form.body_html }}
     {% endif %}
     <p>
     <p>
     <input class="btn btn-primary" type="submit" value="Preview Mailout">
-</form>
+  </form>
 {% endblock %}

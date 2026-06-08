@@ -2,16 +2,16 @@
 {% load noprefix_url %}
 
 {% block meta %}
-<meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 {% endblock %}
 
 {% block title %}
-{{ VENUE.longname }} role rota
+  {{ VENUE.longname }} role rota
 {% endblock %}
 
 {% block css %}
-{{ block.super }}
-<style type="text/css">
+  {{ block.super }}
+  <style type="text/css">
     @import url('{{ STATIC_URL }}css/lib/smoothness/jquery-ui.css');
     .na {
         color: lightgray;
@@ -71,54 +71,54 @@
           width: 35%;
         }
     }
-</style>
+  </style>
 {% endblock %}
 
 {% block script %}
-{{ block.super }}
-<script src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
-<script src="{{ STATIC_URL }}js/lib/jquery.jeditable.mini.js"></script>
-<script src="{{ STATIC_URL }}diary/js/edit_rota.js"> </script>
-<script>
-edit_rota(
-    jQuery,
-    "{% url "rota-edit" %}",
-    "{{ edit_showing_notes_url_prefix }}",
-    "{{ VENUE.vols_email }}",
-    "{{ csrf_token }}"
-);
-</script>
+  {{ block.super }}
+  <script src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
+  <script src="{{ STATIC_URL }}js/lib/jquery.jeditable.mini.js"></script>
+  <script src="{{ STATIC_URL }}diary/js/edit_rota.js"> </script>
+  <script>
+    edit_rota(
+        jQuery,
+        "{% url "rota-edit" %}",
+        "{{ edit_showing_notes_url_prefix }}",
+        "{{ VENUE.vols_email }}",
+        "{{ csrf_token }}"
+    );
+  </script>
 {% endblock %}
 
 {% block body %}
-<div class="rota-wrapper">
+  <div class="rota-wrapper">
     <form id='daterange'>
-    <p align='center'><label for="id_from_date">{{ VENUE.longname }} Rota from </label><input type="text" name="from_date" value="{{ start_date|date:'j-m-Y'}}" id="id_from_date" />
-    <label for="id_to_date"> to </label><input type="text" name="to_date" value="{{ end_date|date:'j-m-Y'}}" id="id_to_date" />
-    </p>
+      <p align='center'><label for="id_from_date">{{ VENUE.longname }} Rota from </label><input type="text" name="from_date" value="{{ start_date|date:'j-m-Y'}}" id="id_from_date" />
+      <label for="id_to_date"> to </label><input type="text" name="to_date" value="{{ end_date|date:'j-m-Y'}}" id="id_to_date" />
+      </p>
     </form>
 
     {% with placeholder_text="<span class='na'>Click to edit</span>" %}
     {% for showing in showings %}
-        {% ifchanged %}<h2>{{ showing.start|date:"F Y" }}</h2>{% endifchanged %}
-        <h3 class="showing_title{% if showing.in_past %} past_showing{% endif %}">
-            {{ showing.start|date:"D j H:i"}}
-            <a href="{% noprefix_url "single-showing-view" showing.pk %}">{{ showing.event.name.upper }}</a>
-        </h3>
-        <ul class="rota">
+      {% ifchanged %}<h2>{{ showing.start|date:"F Y" }}</h2>{% endifchanged %}
+      <h3 class="showing_title{% if showing.in_past %} past_showing{% endif %}">
+        {{ showing.start|date:"D j H:i"}}
+        <a href="{% noprefix_url "single-showing-view" showing.pk %}">{{ showing.event.name.upper }}</a>
+      </h3>
+      <ul class="rota">
         {% for rota_entry in showing.rotaentry_set.all %}
-            <li>
-            <span class="rota_role">{{ rota_entry.role.name }}-{{ rota_entry.rank }}</span>
-            &nbsp;
-            {% if showing.in_past %}
-                {{ rota_entry.name }}
-            {% else %}
-                <span class="rota_name" id="{{ rota_entry.pk }}">{{ rota_entry.name|default:placeholder_text }}</span>
-            {% endif %}
-            </li>
+          <li>
+          <span class="rota_role">{{ rota_entry.role.name }}-{{ rota_entry.rank }}</span>
+          &nbsp;
+          {% if showing.in_past %}
+            {{ rota_entry.name }}
+          {% else %}
+            <span class="rota_name" id="{{ rota_entry.pk }}">{{ rota_entry.name|default:placeholder_text }}</span>
+          {% endif %}
+          </li>
         {% endfor %}
-        </ul>
-        <p class="{% if showing.in_past %}past_{% endif %}showing_rota_notes"><span id="showing_rota_notes_{{ showing.pk }}">{{ showing.rota_notes }}</span></p>
+      </ul>
+      <p class="{% if showing.in_past %}past_{% endif %}showing_rota_notes"><span id="showing_rota_notes_{{ showing.pk }}">{{ showing.rota_notes }}</span></p>
     {% endfor %}
     {% endwith %}
     </div>

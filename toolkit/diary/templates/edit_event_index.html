@@ -2,296 +2,296 @@
 {% load hash_filter tz %}
 
 {% block title %}
-Editing {{ event_list_name }}
+  Editing {{ event_list_name }}
 {% endblock %}
 
 {% block css %}
-{{ block.super }}
-<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
-<style type="text/css">
-  @import url('{{ STATIC_URL }}css/lib/smoothness/jquery-ui.css');
-  .private {
-      font-style: italic;
-  }
-  .external {
-      font-weight: bold;
-  }
-  .discounted {
-      color: #a000FF;
-  }
-  .cancelled {
-      color: red;
-  }
-  .unconfirmed {
-      text-decoration: underline wavy black;
-  }
-  .confirmed {
-      text-transform: uppercase;
-  }
-  .daytime {
-      background-color: #FFFF99;
-  }
-  .pencilled-at {
-      color: gray;
-  }
-  a {
-      color: #2a00ff;
-  }
-  td:first-child {
-      text-align: right;
-  }
-  #controls {
-      border: thick solid black;
-      padding: 10px;
-      float: right;
-      position: absolute;
-      top: 5rem;
-      right: 10px;
-  }
-  .ideas {
-      white-space: pre-line;
-      cursor: pointer;
-  }
-  .hidden_date {
-      display: none;
-  }
-</style>
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
+  <style type="text/css">
+    @import url('{{ STATIC_URL }}css/lib/smoothness/jquery-ui.css');
+    .private {
+        font-style: italic;
+    }
+    .external {
+        font-weight: bold;
+    }
+    .discounted {
+        color: #a000FF;
+    }
+    .cancelled {
+        color: red;
+    }
+    .unconfirmed {
+        text-decoration: underline wavy black;
+    }
+    .confirmed {
+        text-transform: uppercase;
+    }
+    .daytime {
+        background-color: #FFFF99;
+    }
+    .pencilled-at {
+        color: gray;
+    }
+    a {
+        color: #2a00ff;
+    }
+    td:first-child {
+        text-align: right;
+    }
+    #controls {
+        border: thick solid black;
+        padding: 10px;
+        float: right;
+        position: absolute;
+        top: 5rem;
+        right: 10px;
+    }
+    .ideas {
+        white-space: pre-line;
+        cursor: pointer;
+    }
+    .hidden_date {
+        display: none;
+    }
+  </style>
 {% endblock %}
 
 {% block script %}
-{{ block.super }}
-<script src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
-<script src="{{ STATIC_URL }}js/lib/jquery.jeditable.mini.js"></script>
-<script>
-let edit_prefs = { {% for p,v in edit_prefs.items %}
-    "{{ p }}" : "{{ v }}"{% if not forloop.last %},{% endif %}
-{% endfor %}};
-$(document).ready(function() {
-        // Add date picker:
-        $('#id_lookahead_to').datepicker({
-            dateFormat : 'dd-mm-yy',
-            onSelect : dateRangeSelected,
-            minDate : 0,
-        });
+  {{ block.super }}
+  <script src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
+  <script src="{{ STATIC_URL }}js/lib/jquery.jeditable.mini.js"></script>
+  <script>
+    let edit_prefs = { {% for p,v in edit_prefs.items %}
+        "{{ p }}" : "{{ v }}"{% if not forloop.last %},{% endif %}
+    {% endfor %}};
+    $(document).ready(function() {
+            // Add date picker:
+            $('#id_lookahead_to').datepicker({
+                dateFormat : 'dd-mm-yy',
+                onSelect : dateRangeSelected,
+                minDate : 0,
+            });
 
-        // Filter widget:
-        $('#id_input_filter').keyup(filter_events);
-        filter_events();
+            // Filter widget:
+            $('#id_input_filter').keyup(filter_events);
+            filter_events();
 
-        prefs_updated(edit_prefs);
+            prefs_updated(edit_prefs);
 
-        // Idea in-place edits
-        const idea_url = '{% url "edit-ideas" year=9999 month=0 %}'.replace("/9999/0", "");
-        $('.idea-edit').each(function() {
-            const element = $(this);
-            const date_re = /idea-edit-(\d+)-(\d+)/;
-            const date_match = date_re.exec(element.attr('id'));
-            let year, month;
-            if (date_match) {
-                year = date_match[1];
-                month = date_match[2];
-                element.editable(
-                    idea_url + year + "/" + month + "/",
-                    {
-                        width: "5cm",
-                        name: 'ideas',
-                        placeholder: 'Click to add ideas',
-                        submit: "Save",
-                        type: 'textarea',
-                        rows: 5,
-                        width: "auto",
-                        submitdata: {
-                            csrfmiddlewaretoken: "{{ csrf_token }}",
-                            source: 'inline',
+            // Idea in-place edits
+            const idea_url = '{% url "edit-ideas" year=9999 month=0 %}'.replace("/9999/0", "");
+            $('.idea-edit').each(function() {
+                const element = $(this);
+                const date_re = /idea-edit-(\d+)-(\d+)/;
+                const date_match = date_re.exec(element.attr('id'));
+                let year, month;
+                if (date_match) {
+                    year = date_match[1];
+                    month = date_match[2];
+                    element.editable(
+                        idea_url + year + "/" + month + "/",
+                        {
+                            width: "5cm",
+                            name: 'ideas',
+                            placeholder: 'Click to add ideas',
+                            submit: "Save",
+                            type: 'textarea',
+                            rows: 5,
+                            width: "auto",
+                            submitdata: {
+                                csrfmiddlewaretoken: "{{ csrf_token }}",
+                                source: 'inline',
+                            }
                         }
-                    }
-                );
-            }
-
-        });
-});
-function dateRangeSelected(dateText, inst) {
-    const enddate = $.datepicker.parseDate('dd-mm-yy', dateText);
-    const startdate = new Date({{start.year}}, {{start.month}} - 1, {{start.day}});
-    // Calculate days between those two dates:
-    let days_ahead = Math.ceil((enddate.getTime() - startdate.getTime())/86400000);
-    if(days_ahead <= 0) {
-        days_ahead = 0;
-    }
-    window.location.href = "{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=" + days_ahead;
-}
-
-let filter_timer = null;
-const DEBOUNCE_TIMEOUT = 150; // milliseconds
-function filter_events() {
-    // use a timer to 'debounce' input (i.e. wait 150ms to see if the user has
-    // stopped typing)
-    if(filter_timer !== null) {
-        window.clearTimeout(filter_timer);
-    }
-    filter_timer = window.setTimeout(function() {
-        let filter_text = $('#id_input_filter').val();
-        if(filter_text === undefined)
-            return true;
-
-        filter_text = filter_text.toLowerCase();
-        if (filter_text === "") {
-            $(".hidden_date").hide();
-        } else {
-            $(".hidden_date").show();
-        }
-
-        const event_rows = $('tr');
-
-        event_rows.each(function(index, el) {
-            const jq_el = $(el);
-            const header_row = jq_el.hasClass("row_month") || jq_el.hasClass("row_year");
-            if(!header_row) {
-                let name_cell = jq_el.children(':nth-child(3)');
-                let booker_cell = jq_el.children(':nth-child(4)');
-                if(name_cell.text().toLowerCase().indexOf(filter_text) !== -1 ||
-                   booker_cell.text().toLowerCase().indexOf(filter_text) !== -1) {
-                    // NB: if filter text is "" then this will always match, and
-                    //     everything will be shown
-                    jq_el.show();
-                } else {
-                    jq_el.hide();
+                    );
                 }
+
+            });
+    });
+    function dateRangeSelected(dateText, inst) {
+        const enddate = $.datepicker.parseDate('dd-mm-yy', dateText);
+        const startdate = new Date({{start.year}}, {{start.month}} - 1, {{start.day}});
+        // Calculate days between those two dates:
+        let days_ahead = Math.ceil((enddate.getTime() - startdate.getTime())/86400000);
+        if(days_ahead <= 0) {
+            days_ahead = 0;
+        }
+        window.location.href = "{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=" + days_ahead;
+    }
+
+    let filter_timer = null;
+    const DEBOUNCE_TIMEOUT = 150; // milliseconds
+    function filter_events() {
+        // use a timer to 'debounce' input (i.e. wait 150ms to see if the user has
+        // stopped typing)
+        if(filter_timer !== null) {
+            window.clearTimeout(filter_timer);
+        }
+        filter_timer = window.setTimeout(function() {
+            let filter_text = $('#id_input_filter').val();
+            if(filter_text === undefined)
+                return true;
+
+            filter_text = filter_text.toLowerCase();
+            if (filter_text === "") {
+                $(".hidden_date").hide();
+            } else {
+                $(".hidden_date").show();
             }
-        });
-    }, DEBOUNCE_TIMEOUT);
-}
-function set_edit_pref(pref, value) {
-    if(edit_prefs[pref] !== value) {
-        edit_prefs[pref] = value;
-        $.getJSON('{% url "set_edit_preferences" %}', edit_prefs, prefs_updated);
+
+            const event_rows = $('tr');
+
+            event_rows.each(function(index, el) {
+                const jq_el = $(el);
+                const header_row = jq_el.hasClass("row_month") || jq_el.hasClass("row_year");
+                if(!header_row) {
+                    let name_cell = jq_el.children(':nth-child(3)');
+                    let booker_cell = jq_el.children(':nth-child(4)');
+                    if(name_cell.text().toLowerCase().indexOf(filter_text) !== -1 ||
+                       booker_cell.text().toLowerCase().indexOf(filter_text) !== -1) {
+                        // NB: if filter text is "" then this will always match, and
+                        //     everything will be shown
+                        jq_el.show();
+                    } else {
+                        jq_el.hide();
+                    }
+                }
+            });
+        }, DEBOUNCE_TIMEOUT);
     }
-}
-function prefs_updated(data) {
-    edit_prefs = data;
-    if(edit_prefs['popups'] === 'false') {
-        $('#set_inline').replaceWith('<b id="set_inline">this window</b>');
-        $('#set_popups').replaceWith('<a id="set_popups" href="#">pop-ups</a>');
-        $('#set_popups').click(function() { set_edit_pref('popups',true); });
-        // Clear click handlers on links in table
-        $('table a').off('click');
-    } else {
-        $('#set_inline').replaceWith('<a id="set_inline" href="#">this window</a>');
-        $('#set_inline').click(function() { set_edit_pref('popups',false); });
-        $('#set_popups').replaceWith('<b id="set_popups">pop-ups</b>');
-        // Change links in table to open in a new window:
-        $('table a').click(function(e) {
-            window.open(e.currentTarget.href,"edit_form","height=800,width=800,scrollbars,resizable,toolbar");
-            return false;
-        });
+    function set_edit_pref(pref, value) {
+        if(edit_prefs[pref] !== value) {
+            edit_prefs[pref] = value;
+            $.getJSON('{% url "set_edit_preferences" %}', edit_prefs, prefs_updated);
+        }
     }
-}
-</script>
+    function prefs_updated(data) {
+        edit_prefs = data;
+        if(edit_prefs['popups'] === 'false') {
+            $('#set_inline').replaceWith('<b id="set_inline">this window</b>');
+            $('#set_popups').replaceWith('<a id="set_popups" href="#">pop-ups</a>');
+            $('#set_popups').click(function() { set_edit_pref('popups',true); });
+            // Clear click handlers on links in table
+            $('table a').off('click');
+        } else {
+            $('#set_inline').replaceWith('<a id="set_inline" href="#">this window</a>');
+            $('#set_inline').click(function() { set_edit_pref('popups',false); });
+            $('#set_popups').replaceWith('<b id="set_popups">pop-ups</b>');
+            // Change links in table to open in a new window:
+            $('table a').click(function(e) {
+                window.open(e.currentTarget.href,"edit_form","height=800,width=800,scrollbars,resizable,toolbar");
+                return false;
+            });
+        }
+    }
+  </script>
 {% endblock %}
 
 {% block body %}
-<p id="controls">
-Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">this window</a></p>
+  <p id="controls">
+  Edit in: <a id="set_popups" href="#">pop-ups</a> | <a id="set_inline" href="#">this window</a></p>
 
-<p><a name="top"></a></p>
-<b>Key:</b>
-<p>
-<span class="unconfirmed">unconfirmed are lower case and wiggly underlined</span><br>
-<span class="confirmed">Confirmed are upper case</span><br>
-<span class="private">Private events are in italics</span><br>
-<span class="external">Outside hires are bolded</span><br>
-<span class="discounted">Discounted events (like cheap night) are magenta and have an *</span><br>
-<span class="cancelled">Cancelled events are red</span><br>
-<span class="daytime">Daytime (before 6pm) events have a light background</span></p>
+  <p><a name="top"></a></p>
+  <b>Key:</b>
+  <p>
+  <span class="unconfirmed">unconfirmed are lower case and wiggly underlined</span><br>
+  <span class="confirmed">Confirmed are upper case</span><br>
+  <span class="private">Private events are in italics</span><br>
+  <span class="external">Outside hires are bolded</span><br>
+  <span class="discounted">Discounted events (like cheap night) are magenta and have an *</span><br>
+  <span class="cancelled">Cancelled events are red</span><br>
+  <span class="daytime">Daytime (before 6pm) events have a light background</span></p>
 
-<div class="programme">
-<p align='center'>See: <a href="{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=183">6 months</a> |
-<a href="{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=365">1 year</a> |
-<a href="{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=730">2 years</a> |
-<label>until: <input type="text" name="lookahead_to" value="{{ end|date:'j-m-Y'}}" id="id_lookahead_to"></label><br>
-<label>Filter events: <input type="text" placeholder="by title/booker column" id="id_input_filter" autofocus></label></p>
+  <div class="programme">
+    <p align='center'>See: <a href="{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=183">6 months</a> |
+    <a href="{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=365">1 year</a> |
+    <a href="{% url "day-edit" year=start.year day=start.day month=start.month %}?daysahead=730">2 years</a> |
+    <label>until: <input type="text" name="lookahead_to" value="{{ end|date:'j-m-Y'}}" id="id_lookahead_to"></label><br>
+    <label>Filter events: <input type="text" placeholder="by title/booker column" id="id_input_filter" autofocus></label></p>
 
-{% include "messages.html" %}
+    {% include "messages.html" %}
 
-{% with room_columns=rooms|length %}
-<p><a href="{% url "add-event" %}">New event</a></p>
-<table class="table table-striped">
-{% if multiroom_enabled %}
-<tr><td colspan="2"></td>
-{% for room in rooms %}
-    <th>{{ room.name|default:"<!-- No Room -->" }}</th>
-{% endfor %}
-   <td></td>
-</tr>
-{% endif %}
-{% for day, showings in dates.items %}
-    {% ifchanged %}
-        <tr class="row_month">
+    {% with room_columns=rooms|length %}
+    <p><a href="{% url "add-event" %}">New event</a></p>
+    <table class="table table-striped">
+      {% if multiroom_enabled %}
+      <tr><td colspan="2"></td>
+        {% for room in rooms %}
+          <th>{{ room.name|default:"<!-- No Room -->" }}</th>
+        {% endfor %}
+         <td></td>
+      </tr>
+      {% endif %}
+      {% for day, showings in dates.items %}
+        {% ifchanged %}
+          <tr class="row_month">
             <td colspan="{{ room_columns|add:3 }}"><h2>{{ day|date:"F Y" }}</h2></td>
-        </tr>
-    {% endifchanged %}
-    {% if day in ideas %}
-        <tr>
+          </tr>
+        {% endifchanged %}
+        {% if day in ideas %}
+          <tr>
             <td><a href="{% url "edit-ideas" year=day.year month=day.month %}">IDEAS</a></td>
             <td colspan="{{ room_columns|add:2 }}" class="ideas"><div class="idea-edit" id="idea-edit-{{day.year}}-{{day.month}}">{{ ideas|lookup:day }}</div></td>
-        </tr>
-    {% endif %}
-
-    {% for showing in showings %}
-        <tr>
-            <td>
-                <a
-        {% if not forloop.first %}
-            {# Second+ showing of the day, default to not showing the date (which has the link to add an event) #}
-                class="hidden_date"
+          </tr>
         {% endif %}
-                href="{% url "add-event" %}?date={{day|date:"j-m-Y"}}">{{ day|date:"D\&\n\b\s\p;j"|safe }}</a>
-            </td>
-        {% with showing.start|localtime as start_localtime %}
+
+        {% for showing in showings %}
+          <tr>
             <td>
-                <a href="{% url "edit-event-details-view" event_id=showing.event.pk %}" {% if start_localtime.hour <= 17 %}class="daytime"{% endif %}>{{ showing.start|date:"H:i" }}</a>
+              <a
+              {% if not forloop.first %}
+                {# Second+ showing of the day, default to not showing the date (which has the link to add an event) #}
+                class="hidden_date"
+              {% endif %}
+              href="{% url "add-event" %}?date={{day|date:"j-m-Y"}}">{{ day|date:"D\&\n\b\s\p;j"|safe }}</a>
+            </td>
+            {% with showing.start|localtime as start_localtime %}
+            <td>
+              <a href="{% url "edit-event-details-view" event_id=showing.event.pk %}" {% if start_localtime.hour <= 17 %}class="daytime"{% endif %}>{{ showing.start|date:"H:i" }}</a>
             </td>
 
-        {% for room in rooms %}
-            {# if multiroom_enabled is false then rooms will only have one item, so there shouldn't be any repeats! #}
-            {% if showing.room == room or not multiroom_enabled %}
-            <td>
-              <a href="{% url "edit-event-details-view" event_id=showing.event.pk %}"
-                    class="{{ showing.cancelled|yesno:"cancelled," }}
-                           {{ showing.discounted|yesno:"discounted," }}
-                           {{ showing.event.private|yesno:"private," }}
-                           {{ showing.event.outside_hire|yesno:"external," }}
-                           {{ showing.confirmed|yesno:"confirmed,unconfirmed" }}
-                           {% if start_localtime.hour <= 17 %}daytime{% endif %}">
-                {% if showing.confirmed %}
+            {% for room in rooms %}
+              {# if multiroom_enabled is false then rooms will only have one item, so there shouldn't be any repeats! #}
+              {% if showing.room == room or not multiroom_enabled %}
+              <td>
+                <a href="{% url "edit-event-details-view" event_id=showing.event.pk %}"
+                      class="{{ showing.cancelled|yesno:"cancelled," }}
+                             {{ showing.discounted|yesno:"discounted," }}
+                             {{ showing.event.private|yesno:"private," }}
+                             {{ showing.event.outside_hire|yesno:"external," }}
+                             {{ showing.confirmed|yesno:"confirmed,unconfirmed" }}
+                             {% if start_localtime.hour <= 17 %}daytime{% endif %}">
+                  {% if showing.confirmed %}
                     {{ showing.event.pre_title }} {{ showing.event.name }} {{ showing.event.post_title }}
-                {% else %}
+                  {% else %}
                     {{ showing.event.name }}
-                {% endif %}
-                {{ showing.discounted|yesno:"*," }}
-                {{ showing.cancelled|yesno:"(CANCELLED)," }}
+                  {% endif %}
+                  {{ showing.discounted|yesno:"*," }}
+                  {{ showing.cancelled|yesno:"(CANCELLED)," }}
                 </a>
                 {{ showing.sold_out|yesno:"(marked SOLD OUT)," }}
-            </td>
-            {% else %}
+              </td>
+              {% else %}
                 <td>&nbsp;</td>
-            {% endif %}
-        {% endfor %}
+              {% endif %}
+            {% endfor %}
             <td>{{ showing.booked_by }}{% if not showing.confirmed %} <span class="pencilled-at" title="Pencilled in on {{ showing.created_at|date:"d-m-y" }}">(&#x270f;&#xfe0f;{{ showing.created_at|date:"d-m-y" }})</span>{% endif %}</td>
-        </tr>
-        {% endwith %}
-    {% empty %}
-        {# No showings on this day, but show the day anyway (with a link to add an event) #}
-        <tr>
+          </tr>
+          {% endwith %}
+        {% empty %}
+          {# No showings on this day, but show the day anyway (with a link to add an event) #}
+          <tr>
             <td><a href="{% url "add-event" %}?date={{day|date:"j-m-Y"}}">{{ day|date:"D j"}}</a></td>
             <td colspan="{{ room_columns|add:2 }}"></td>
-        </tr>
-    {% endfor %}
-{% endfor %}
-</table>
-</div>
+          </tr>
+        {% endfor %}
+      {% endfor %}
+    </table>
+  </div>
 
-{% endwith %}
+  {% endwith %}
 
 {% endblock %}
 

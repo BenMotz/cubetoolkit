@@ -1,12 +1,12 @@
 {% extends "base_view_eventfield.html" %}
 
 {% block title %}
-CUBE role rota
+  CUBE role rota
 {% endblock %}
 
 {% block css %}
-{{ block.super }}
-<style type="text/css">
+  {{ block.super }}
+  <style type="text/css">
     body {font-family:Arial,Helvetica,sans-serif; }
     h1, h2 { margin: 1mm; }
     h1 { font-size: 16pt; }
@@ -51,34 +51,34 @@ CUBE role rota
             display: none;
         }
     }
-</style>
+  </style>
 {% endblock %}
 
 {% block body %}
-{{ block.super }}
-<h1>Rota from {{ start_date|date:"D d/m/y" }} to {{ end_date|date:"D d/m/y" }}</h1>
-<table>
+  {{ block.super }}
+  <h1>Rota from {{ start_date|date:"D d/m/y" }} to {{ end_date|date:"D d/m/y" }}</h1>
+  <table>
     <tbody>
 
-{% for showing in showings %}
-    {% ifchanged %}<tr><td colspan="6"><h2>{{ showing.start|date:"F Y" }}</h2></td></tr>{% endifchanged %}
-    <tr class="event_head"><td>{{ showing.start|date:"D j H:i"}}</td><td colspan="2">{{ showing.event.name }} </td><td> </td></tr>
-    {% for rota_entry in showing.rotaentry_set.all %}
-        {% if forloop.counter|divisibleby:2 %}
+      {% for showing in showings %}
+        {% ifchanged %}<tr><td colspan="6"><h2>{{ showing.start|date:"F Y" }}</h2></td></tr>{% endifchanged %}
+        <tr class="event_head"><td>{{ showing.start|date:"D j H:i"}}</td><td colspan="2">{{ showing.event.name }} </td><td> </td></tr>
+        {% for rota_entry in showing.rotaentry_set.all %}
+          {% if forloop.counter|divisibleby:2 %}
             <td class="rota_box">   {{ rota_entry.name }}</td><td> {{ rota_entry.role.name }}-{{ rota_entry.rank }} </td></tr>
-        {% else %}
+          {% else %}
             <tr><td class="right"> {{ rota_entry.role.name }}-{{ rota_entry.rank }} </td><td class="rota_box">{{ rota_entry.name }}</td>
             {% if forloop.last %}
-            <td></td><td></td></tr>
+              <td></td><td></td></tr>
             {% endif %}
+          {% endif %}
+        {% endfor %}
+        {% if showing.rota_notes %}
+          <tr><td class="right">Notes: </td><td class="rota_notes" colspan="2">{{ showing.rota_notes }}</td><td> </td></tr>
         {% endif %}
-    {% endfor %}
-    {% if showing.rota_notes %}
-        <tr><td class="right">Notes: </td><td class="rota_notes" colspan="2">{{ showing.rota_notes }}</td><td> </td></tr>
-    {% endif %}
-{% endfor %}
+      {% endfor %}
     </tbody>
-</table>
+  </table>
 
 {% endblock %}
 

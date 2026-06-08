@@ -1,22 +1,22 @@
 {% extends "form_base.html" %}
 
 {% block title %}
-Edit ideas for {{ month|date:"F Y"}}
+  Edit ideas for {{ month|date:"F Y"}}
 {% endblock %}
 {% block css %}
-{{ block.super }}
-<style>
+  {{ block.super }}
+  <style>
     textarea { width: 90%;}
-</style>
+  </style>
 {% endblock css %}
 
 {% block body %}
-<h1>Programming ideas for {{month|date:"F Y"}}</h1>
-{{ form.name_of_field.errors }}
-<form action="{% url "edit-ideas" month=month.month year=month.year %}" method="post">
+  <h1>Programming ideas for {{month|date:"F Y"}}</h1>
+  {{ form.name_of_field.errors }}
+  <form action="{% url "edit-ideas" month=month.month year=month.year %}" method="post">
     {% csrf_token %}
     {{ form.as_p }}
     <input type="submit" value="Update" /> <a href="{% url "cancel-edit" %}">Cancel</a>
-</form>
+  </form>
 
 {% endblock %}

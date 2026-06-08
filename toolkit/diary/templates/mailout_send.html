@@ -1,12 +1,12 @@
 {% extends "base_admin.html" %}
 
 {% block title %}
-Mailout dispatch
+  Mailout dispatch
 {% endblock %}
 
 {% block css %}
-{{ block.super }}
-<style type="text/css">
+  {{ block.super }}
+  <style type="text/css">
     @import url('{{ STATIC_URL }}css/lib/smoothness/jquery-ui.css');
     p.mail {
         border: thin solid black;
@@ -33,52 +33,52 @@ Mailout dispatch
         margin: 20px;
         text-align: center;
     }
-</style>
+  </style>
 {% endblock %}
 
 {% block script %}
-{{ block.super }}
-{{ form.media }}
+  {{ block.super }}
+  {{ form.media }}
 {% endblock %}
 
 {% block body %}
-<h1>Mailout: confirm</h1>
+  <h1>Mailout: confirm</h1>
 
 
-<p>Total of <b>{{ email_count }}</b> member emails to send from {{ VENUE.name }}</p>
-<p>Please check the preview below looks correct then, when you are satisfied, one of: </p>
-<div class="container">
-<div class="row">
-  <div class="send-form col-md-2">
-    <form method="POST" action="{% url "queue-members-mailout" %}?send_at=now">
-    {% csrf_token %}
-    {{ form.send_html }}
-    {{ form.subject }}
-    {{ form.body_text }}
-    {{ form.body_html }}
-    <input class="btn btn-success" type="submit" value="Send now">
-    </form>
+  <p>Total of <b>{{ email_count }}</b> member emails to send from {{ VENUE.name }}</p>
+  <p>Please check the preview below looks correct then, when you are satisfied, one of: </p>
+  <div class="container">
+    <div class="row">
+      <div class="send-form col-md-2">
+        <form method="POST" action="{% url "queue-members-mailout" %}?send_at=now">
+          {% csrf_token %}
+          {{ form.send_html }}
+          {{ form.subject }}
+          {{ form.body_text }}
+          {{ form.body_html }}
+          <input class="btn btn-success" type="submit" value="Send now">
+        </form>
+      </div>
+
+      <div class="send-form col-md-4">
+        <form method="POST" action="{% url "queue-members-mailout" %}">
+          {% csrf_token %}
+          {{ form }}
+          <input class="btn btn-primary" type="submit" value="Schedule">
+        </form>
+      </div>
+    </div>
   </div>
 
-  <div class="send-form col-md-4">
-    <form method="POST" action="{% url "queue-members-mailout" %}">
-    {% csrf_token %}
-    {{ form }}
-    <input class="btn btn-primary" type="submit" value="Schedule">
-    </form>
-  </div>
-</div>
-</div>
 
-
-<p class="label">Subject:</p>
-<p class="mail" id="subject">{{ form.subject.data }}</p>
-<p class="label">Body:</p>
-<p class="mail" id="body_text">{{ form.body_text.data }}</p>
-{% if html_enabled and form.send_html.data %}
-<p class="label">HTML Body:</p>
-<p class="mail" id="body_html">{{ form.body_html.data }}</p>
-{% endif %}
+  <p class="label">Subject:</p>
+  <p class="mail" id="subject">{{ form.subject.data }}</p>
+  <p class="label">Body:</p>
+  <p class="mail" id="body_text">{{ form.body_text.data }}</p>
+  {% if html_enabled and form.send_html.data %}
+    <p class="label">HTML Body:</p>
+    <p class="mail" id="body_html">{{ form.body_html.data }}</p>
+  {% endif %}
 
 {% endblock %}
 

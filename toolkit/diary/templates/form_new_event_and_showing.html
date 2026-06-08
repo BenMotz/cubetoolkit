@@ -1,24 +1,24 @@
 {% extends "form_base.html" %}
 {% load crispy_forms_tags %}
 {% block title %}
-Add a new event
+  Add a new event
 {% endblock %}
 {% block css %}
-{{ block.super }}
-<style>
+  {{ block.super }}
+  <style>
     .asteriskField { display: none; }
-</style>
+  </style>
 {% endblock %}
 
 {% block body %}
-<h1>New Event</h1>
+  <h1>New Event</h1>
 
-<form action="{% url "add-event" %}" method="post">
+  <form action="{% url "add-event" %}" method="post">
     {% crispy form %}
     <p>
-        <button type="submit" class="btn btn-primary" value="Add">Add Event and Booking</button>
-        <a href="{% url "cancel-edit" %}">Cancel</a>
+      <button type="submit" class="btn btn-primary" value="Add">Add Event and Booking</button>
+      <a href="{% url "cancel-edit" %}">Cancel</a>
     </p>
-</form>
+  </form>
 
 {% endblock %}

@@ -1,89 +1,89 @@
 {% extends "base_admin.html" %}
 
 {% block title %}
-Editing Event roles
+  Editing Event roles
 {% endblock %}
 
 {% block css %}
-{{ block.super }}
-<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
-<link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}diary/css/edit_form.css">
-<style type="text/css">
-  body {
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
+  <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}diary/css/edit_form.css">
+  <style type="text/css">
+    body {
       background: lightgray;
-  }
-  form#roles {
+    }
+    form#roles {
       border: thin dotted gray;
       padding: 5px;
       margin: 2%;
       width: 400px;
       display: inline-block;
       background: white;
-  }
-  .header {
+    }
+    .header {
       background: white;
       margin: 2% 2% 5px 2%;
       padding: 5px 10px 5px 10px;
-  }
-  .warn {
+    }
+    .warn {
       color: red;
-  }
-  .new_role input {
+    }
+    .new_role input {
       background: yellow;
-  }
-  select {
+    }
+    select {
       width: 330px;
-  }
-  tr.form_errors {
+    }
+    tr.form_errors {
       color: red;
       border-top: thin solid black;
-  }
-  tr.form_errors + tr {
+    }
+    tr.form_errors + tr {
       color: red;
       background-color: red;
-  }
-  .form_errors td {
+    }
+    .form_errors td {
       border-top: thin solid black;
-  }
+    }
 
-</style>
+  </style>
 {% endblock %}
 
 {% block body %}
-<div class="header">
-<h1>Roles</h1>
-<p class="warn">Deleting roles cannot be undone, please take care</p>
-<p>(Events marked as "Standard Event Roles" will be shown at the top of the role selection list for events.)</p>
-<p>Add new roles at the end of the list</p>
-{% include "messages.html" %}
-</div>
+  <div class="header">
+    <h1>Roles</h1>
+    <p class="warn">Deleting roles cannot be undone, please take care</p>
+    <p>(Events marked as "Standard Event Roles" will be shown at the top of the role selection list for events.)</p>
+    <p>Add new roles at the end of the list</p>
+    {% include "messages.html" %}
+  </div>
 
-<form id="roles" method="post">
-{{ formset.management_form }}
-{% csrf_token %}
-<input type="submit" value="Save changes" />
-<table>
-    <tr><th>Role name</th><th>Standard event role<th><th>Delete</th></tr>
-{% for form in formset %}
-{% if form.errors %}
-<tr class="form_errors"><td>Error: {{ form.name.errors.as_text }}</td><td>{{ form.standard.errors.as_text }}</td><td>{{ form.DELETE.errors.as_text }}</tr></tr>
-{% endif %}
-<tr{% if not form.id.value %} class="new_role"{% endif %}>
-{% if form.instance.read_only %}
-    <td>{{ form.name.as_hidden }}{{ form.name.value }}</td>
-    {# Model on the back end enforces the read_only flag, so no integrity/security worries about the hidden field... #}
-    <td>{{ form.standard }}</td>
-    <td>{{ form.id }}</td>
-{% else %}
-    <td>{{ form.name }}</td>
-    <td>{{ form.standard }}</td>
-    <td>{{ form.DELETE }}{{ form.id }}</td>
-{% endif %}
-</tr>
-{% endfor %}
-</table>
-<input type="submit" value="Save changes to all roles" />
-</form>
+  <form id="roles" method="post">
+    {{ formset.management_form }}
+    {% csrf_token %}
+    <input type="submit" value="Save changes" />
+    <table>
+      <tr><th>Role name</th><th>Standard event role<th><th>Delete</th></tr>
+      {% for form in formset %}
+        {% if form.errors %}
+          <tr class="form_errors"><td>Error: {{ form.name.errors.as_text }}</td><td>{{ form.standard.errors.as_text }}</td><td>{{ form.DELETE.errors.as_text }}</tr></tr>
+        {% endif %}
+        <tr{% if not form.id.value %} class="new_role"{% endif %}>
+          {% if form.instance.read_only %}
+            <td>{{ form.name.as_hidden }}{{ form.name.value }}</td>
+            {# Model on the back end enforces the read_only flag, so no integrity/security worries about the hidden field... #}
+            <td>{{ form.standard }}</td>
+            <td>{{ form.id }}</td>
+          {% else %}
+            <td>{{ form.name }}</td>
+            <td>{{ form.standard }}</td>
+            <td>{{ form.DELETE }}{{ form.id }}</td>
+          {% endif %}
+        </tr>
+      {% endfor %}
+    </table>
+    <input type="submit" value="Save changes to all roles" />
+  </form>
 
 {% endblock %}
 

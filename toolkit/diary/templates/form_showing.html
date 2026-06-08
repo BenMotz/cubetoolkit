@@ -1,39 +1,39 @@
 {% extends "form_base.html" %}
 {% load crispy_forms_tags %}
 {% block title %}
-Details for: {{ showing.event.name }}
+  Details for: {{ showing.event.name }}
 {% endblock %}
 {% block script %}
-{{ block.super }}
-{{ rota_form.media }}
-<script type="text/javascript">
-$(document).ready(function() {
-        $('#delete_form').bind("submit", function() {
-            return confirm("Delete this booking: are you sure?\nThis cannot be undone!\nMaybe you want to mark it as cancelled?");
-        });
-        $('input.rota_count').spinner({ min: 0, max: {{ max_role_assignment_count }}});
-});
-</script>
+  {{ block.super }}
+  {{ rota_form.media }}
+  <script type="text/javascript">
+    $(document).ready(function() {
+      $('#delete_form').bind("submit", function() {
+        return confirm("Delete this booking: are you sure?\nThis cannot be undone!\nMaybe you want to mark it as cancelled?");
+      });
+      $('input.rota_count').spinner({ min: 0, max: {{ max_role_assignment_count }}});
+    });
+  </script>
 {% endblock %}
 {% block css %}
-{{ block.super }}
-<style>
+  {{ block.super }}
+  <style>
     @import url('{{ STATIC_URL }}css/lib/ui.spinner.css');
     .asteriskField { display: none; }
     span.sub {
-        color: gray;
+      color: gray;
     }
     input.rota_count {
-        width: 40px;
+      width: 40px;
     }
     select {
-        height: 120pt;
-        width: 70%
+      height: 120pt;
+      width: 70%
     }
     #rota span.helptext {
-        display: block;
-        float: right;
-        width: 70%;
+      display: block;
+      float: right;
+      width: 70%;
     }
     ul.rota li{
       list-style-type: none;
@@ -46,64 +46,64 @@ $(document).ready(function() {
       font-size: 90%;
     }
     @media screen and (min-width: 640px) {
-        ul.rota {
-            display: flex;
-            flex-flow: row wrap;
-        }
-        ul.rota li{
-            width: 50%;
-        }
+      ul.rota {
+        display: flex;
+        flex-flow: row wrap;
+      }
+      ul.rota li{
+        width: 50%;
+      }
     }
     @media screen and (min-width: 800px) {
-        .rota_role {
-          width: 35%;
+      .rota_role {
+        width: 35%;
     }
-</style>
+  </style>
 {% endblock %}
 
 {% block body %}
-{% if messages %}
-<ul class="messages">
-    {% for message in messages %}
-    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-    {% endfor %}
-</ul>
-{% endif %}
+  {% if messages %}
+    <ul class="messages">
+      {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
 
-<h2>
-  <span class="sub">Booking @</span> {{ showing.start|date:"d/m/Y H:i" }} <span class="sub">for</span>
-  <a href="{% url "edit-event-details-view" event_id=showing.event.id %}">{{ showing.event.name }}</a>
-</h2>
+  <h2>
+    <span class="sub">Booking @</span> {{ showing.start|date:"d/m/Y H:i" }} <span class="sub">for</span>
+    <a href="{% url "edit-event-details-view" event_id=showing.event.id %}">{{ showing.event.name }}</a>
+  </h2>
 
-<p>
-<form id="delete_form" action="{% url "delete-showing" showing_id=showing.id %}" method="post">
-  {% csrf_token %}
-  <input class="btn btn-danger" type="submit" value="Delete Booking" />
-</form>
-</p>
-
-<form action="{% url "edit-showing" showing_id=showing.id %}" method="post">
-  {% csrf_token %}
-  <table class="table">
-  {% crispy form %}
-  </table>
   <p>
-  <input class="btn btn-primary" type="submit" value="Update" />
+  <form id="delete_form" action="{% url "delete-showing" showing_id=showing.id %}" method="post">
+    {% csrf_token %}
+    <input class="btn btn-danger" type="submit" value="Delete Booking" />
+  </form>
   </p>
-  <h3>Rota</h3>
-  <ul class="rota">
-        {% for rota_entry in rota_form %}
-            {% if rota_entry.name != "other_roles" %}
-    <li>{{ rota_entry.as_field_group }}</li>
-            {% endif %}
-        {% endfor %}
-  </ul>
-  <h4>{{ rota_form.other_roles.label_tag }}</h4>
 
-  <p>{{ rota_form.other_roles }}</p>
-  <p>
-  <input class="btn btn-primary" type="submit" value="Update" />
-  </p>
-</form>
+  <form action="{% url "edit-showing" showing_id=showing.id %}" method="post">
+    {% csrf_token %}
+    <table class="table">
+    {% crispy form %}
+    </table>
+    <p>
+    <input class="btn btn-primary" type="submit" value="Update" />
+    </p>
+    <h3>Rota</h3>
+    <ul class="rota">
+      {% for rota_entry in rota_form %}
+        {% if rota_entry.name != "other_roles" %}
+          <li>{{ rota_entry.as_field_group }}</li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+    <h4>{{ rota_form.other_roles.label_tag }}</h4>
+
+    <p>{{ rota_form.other_roles }}</p>
+    <p>
+    <input class="btn btn-primary" type="submit" value="Update" />
+    </p>
+  </form>
 {% endblock %}
 
