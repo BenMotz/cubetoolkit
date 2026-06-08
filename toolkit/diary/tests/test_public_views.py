@@ -441,3 +441,18 @@ class UrlTests(DiaryTestsMixin, TestCase):
             self.assertEqual(match.func.__name__, "view_event_field")
             for k, v in response.items():
                 self.assertEqual(match.kwargs[k], v)
+
+    def test_event_view_with_comma_redirect(self):
+        url = reverse(
+            "single-event-view-with-slug-comma",
+            kwargs={"event_slug": "slug-slog-slig", "event_id": 4},
+        )
+        urls_to_test = {
+            "/programme/event/,2/": "/programme/event//2/",
+            "/programme/event/slug,3/": "/programme/event/slug/3/",
+            "/programme/event/slug-slog-slig,4/": "/programme/event/slug-slog-slig/4/",
+        }
+        for url, expected in urls_to_test.items():
+            with self.subTest(url=url):
+                response = self.client.get(url)
+                self.assertRedirects(response, expected, status_code=301)

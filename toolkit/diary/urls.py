@@ -1,4 +1,5 @@
-from django.urls import re_path, path
+from django.urls import re_path, path, reverse
+from django.http import HttpResponsePermanentRedirect
 
 import toolkit.diary.feeds
 from toolkit.diary.edit_views import (
@@ -82,8 +83,20 @@ programme_urls = [
         view_event,
         name="single-event-view-legacyid",
     ),
+    # We used to use URLs like event/{slug},{id}/ however the comma caused problems, so
+    # we switched to event/{slug}/{id}/. To avoid breaking old links support both;
     re_path(
-        r"^event/(?P<event_slug>[\w\-_]*)[/,](?P<event_id>\d+)/$",
+        r"^event/(?P<event_slug>[\w\-_]*),(?P<event_id>\d+)/$",
+        lambda _, event_slug, event_id: HttpResponsePermanentRedirect(
+            reverse(
+                "single-event-view-with-slug",
+                kwargs={"event_slug": event_slug, "event_id": event_id},
+            )
+        ),
+        name="single-event-view-with-slug-comma",
+    ),
+    re_path(
+        r"^event/(?P<event_slug>[\w\-_]*)/(?P<event_id>\d+)/$",
         view_event,
         name="single-event-view-with-slug",
     ),
