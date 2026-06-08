@@ -42,7 +42,7 @@ class PublicDiaryViews(DiaryTestsMixin, TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertContains(
             response,
-            r'<a href="/programme/event/,2/">'
+            r'<a href="/programme/event//2/">'
             r'<p><span class="pre_title"></span></p>'
             r"<h3>?</h3>"
             r'<span class="post_title"></span>'

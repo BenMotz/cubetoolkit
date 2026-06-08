@@ -76,16 +76,16 @@ programme_urls = [
     re_path(
         r"^event/id/(?P<event_id>\d+)/$", view_event, name="single-event-view"
     ),
-    re_path(
-        r"^event/(?P<event_slug>[\w\-_]*),(?P<event_id>\d+)/$",
-        view_event,
-        name="single-event-view-with-slug",
-    ),
     # As above, for legacy event ID:
     re_path(
         r"^event/oldid/(?P<legacy_id>\d+)/$",
         view_event,
         name="single-event-view-legacyid",
+    ),
+    re_path(
+        r"^event/(?P<event_slug>[\w\-_]*)[/,](?P<event_id>\d+)/$",
+        view_event,
+        name="single-event-view-with-slug",
     ),
     # Archive:
     re_path(r"^archive/$", ArchiveIndex.as_view(), name="archive-view-index"),
