@@ -166,7 +166,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             <a href="https://www.cubecinema.com/programme/">
             Cube Cinema Programme</a></p><hr><p>
             Pretitle four:<br><strong><a
-            href="https://www.cubecinema.com/programme/event/,4/">EVENT
+            href="https://www.cubecinema.com/programme/event/event-four-title,4/">EVENT
             FOUR TITL\u0112</a></strong><br>
             Posttitle four
             </p><p>
