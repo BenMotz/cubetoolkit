@@ -34,7 +34,7 @@ $(document).ready(function() {
         }
     }
 
-    copy_summary.bind('input propertychange', update_character_count);
+    copy_summary.on('input', update_character_count);
     update_character_count();
 });
   </script>

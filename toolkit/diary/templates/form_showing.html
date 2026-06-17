@@ -8,7 +8,7 @@
   {{ rota_form.media }}
   <script type="text/javascript">
     $(document).ready(function() {
-      $('#delete_form').bind("submit", function() {
+      $('#delete_form').on("submit", function() {
         return confirm("Delete this booking: are you sure?\nThis cannot be undone!\nMaybe you want to mark it as cancelled?");
       });
       $('input.rota_count').spinner({ min: 0, max: {{ max_role_assignment_count }}});
