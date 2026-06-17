@@ -39,7 +39,7 @@ function init_calendar_view(jQuery, CSRF_TOKEN, defaultView, defaultDate, django
                 $('#ideas').html(edit_control_html);
 
                 // XXX: This isn't currently enforced server-side!
-                if (!historic) {
+                if(!historic) {
                     $('#' + edit_control_id).editable(
                         django_urls["edit-ideas"] + monthMoment.format("YYYY/M/"),
                         {

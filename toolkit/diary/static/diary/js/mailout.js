@@ -1,4 +1,4 @@
-var mailoutController = function (options) {
+var mailoutController = function(options) {
     "use strict";
 
     const POLL_PERIOD = 1000; // milliseconds
@@ -49,7 +49,7 @@ var mailoutController = function (options) {
             for(let i = 0; i < cookies.length; i++) {
                 const cookie = cookies[i].trim();
                 // Does this cookie string begin with the name we want?
-                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                if(cookie.substring(0, name.length + 1) === (name + '=')) {
                     cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
                     break;
                 }
@@ -63,11 +63,11 @@ var mailoutController = function (options) {
     }
 
     function mail_send_progress_poll(data) {
-        if (!data) {
+        if(!data) {
             return;
         }
 
-        if (data.complete !== true) {
+        if(data.complete !== true) {
             update_progress(data.progress);
             window.setTimeout(function() {
                 jQuery.getJSON(
@@ -76,14 +76,14 @@ var mailoutController = function (options) {
                 );
             }, POLL_PERIOD);
         } else {
-            if (data.error === true) {
+            if(data.error === true) {
                 set_state(S_ERROR);
-                if (data.error_msg) {
+                if(data.error_msg) {
                     jQuery('#error_msg').html(data.error_msg);
                 }
             } else {
                 set_state(S_COMPLETE);
-                if (data.sent_count) {
+                if(data.sent_count) {
                     jQuery('#sent_stats').html("(" + data.sent_count + " emails sent)");
                 }
             }
@@ -148,8 +148,8 @@ var mailoutController = function (options) {
             'cache': false,
             'data': data,
             'dataType': 'json',
-            'error': function (jqXHR, textStatus, errorThrown) {
-                jQuery('#test').html("Failed sending one copy to '" + email  +
+            'error': function(jqXHR, textStatus, errorThrown) {
+                jQuery('#test').html("Failed sending one copy to '" + email +
                     "': " + textStatus + " " + errorThrown);
             },
             'success': function(data) {

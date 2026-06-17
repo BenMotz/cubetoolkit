@@ -19,7 +19,7 @@ function setup_page(index_page) {
 
         // re-layout Masonry after each image loads
         $grid.imagesLoaded().progress(function() {
-           $grid.masonry('layout');
+            $grid.masonry('layout');
         });
 
         /* set up small form factor menu --------------------------------------- */
@@ -56,7 +56,7 @@ function setup_page(index_page) {
                 checkElement.slideDown('normal');
             }
 
-            if (checkElement.is('ul')) {
+            if(checkElement.is('ul')) {
                 return false;
             } else {
                 return true;
@@ -65,7 +65,7 @@ function setup_page(index_page) {
 
         /* Set up grid/list switcher (event list only) ------------------------- */
         $('a#listbtn.switcher').click(function() {
-            $('.programme').animate({opacity: 0},function() {
+            $('.programme').animate({opacity: 0}, function() {
                 $('.programme').hide();
                 $('.list').addClass('active');
                 $('.list.active').stop().animate({opacity: 1});
@@ -73,7 +73,7 @@ function setup_page(index_page) {
         });
 
         $('a#gridbtn.switcher').click(function() {
-            $('.list').animate({opacity:0},function() {
+            $('.list').animate({opacity: 0}, function() {
                 $('.list').removeClass('active');
                 $('.programme').show();
                 $('.programme').masonry(masonry_opts);

@@ -41,7 +41,7 @@ function edit_rota(jQuery, rota_edit_base_url, edit_rota_notes_url_prefix, vol_e
     }
 
     function nameEditedCallback(value) {
-        if (value === "" && this.revert !== "") {
+        if(value === "" && this.revert !== "") {
             window.alert("Rota entry cleared.\nPlease consider emailing " +
                          vol_email +
                          " to say that the shift needs covering.");
