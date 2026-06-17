@@ -11,7 +11,7 @@ function init_calendar_view(jQuery, CSRF_TOKEN, defaultView, defaultDate, django
 
     let clearMessageTimer = null;
 
-    const resources_enabled = resources.length > 0 ? true : false;
+    const resources_enabled = resources.length > 0;
 
     function onEventClick(calEvent, jsEvent, view) {
         const fb_target = $("#fb_target");
@@ -84,7 +84,7 @@ function init_calendar_view(jQuery, CSRF_TOKEN, defaultView, defaultDate, django
             }
             $(".messages ul").html(message_html);
 
-            message_div.show()
+            message_div.show();
 
             if(clearMessageTimer !== null) {
                 window.clearTimeout(clearMessageTimer);
@@ -150,7 +150,7 @@ function init_calendar_view(jQuery, CSRF_TOKEN, defaultView, defaultDate, django
             const newUrl = django_urls['diary-edit-calendar'] + '/' + newDate.year()
                          + '/' + (newDate.month() + 1) + '/';
 
-            if(!currentDate.isSame(newDate, 'month') || (currentView != view.name)) {
+            if(!currentDate.isSame(newDate, 'month') || (currentView !== view.name)) {
                 history.replaceState(null, document.title, newUrl);
             }
         } else if(view.name === "agendaWeek" || view.name === "agendaThreeDay") {
@@ -158,7 +158,7 @@ function init_calendar_view(jQuery, CSRF_TOKEN, defaultView, defaultDate, django
                          + '/' + (newDate.month() + 1)
                          + '/' + newDate.date();
 
-            if(!currentDate.isSame(newDate, 'day') || (currentView != view.name)) {
+            if(!currentDate.isSame(newDate, 'day') || (currentView !== view.name)) {
                 history.replaceState(null, document.title, newUrl);
             }
         }

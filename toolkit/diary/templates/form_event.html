@@ -15,19 +15,18 @@
   {{ block.super }}
   <script>
 
-var COPY_LIMIT = {{ programme_copy_summary_max_chars }};
+const COPY_LIMIT = {{ programme_copy_summary_max_chars }};
 
 $(document).ready(function() {
-    var copy_summary = $('#id_copy_summary');
-    var copy_summary_label = $('div#div_id_copy_summary label');
-    var count_span;
+    const copy_summary = $('#id_copy_summary');
+    const copy_summary_label = $('div#div_id_copy_summary label');
 
     copy_summary_label.html("Copy summary:<br>(<span id='remaining_chars'></span>)");
-    count_span = $('#remaining_chars');
+    const count_span = $('#remaining_chars');
 
     function update_character_count() {
-        var used = copy_summary.val().length;
-        var remaining = COPY_LIMIT - used;
+        const used = copy_summary.val().length;
+        const remaining = COPY_LIMIT - used;
         if(remaining < 0) {
             count_span.html(used + " characters, " + (used - COPY_LIMIT) + " over limit");
         } else {

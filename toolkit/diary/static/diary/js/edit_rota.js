@@ -18,7 +18,7 @@ function edit_rota(jQuery, rota_edit_base_url, edit_rota_notes_url_prefix, vol_e
             days_ahead = 0;
         }
         window.location.href = rota_edit_base_url + "/" +
-            (from_date.getYear() + 1900) + "/" + (from_date.getMonth() + 1) +
+            from_date.getFullYear() + "/" + (from_date.getMonth() + 1) +
             "/" + from_date.getDate() + "?daysahead=" + days_ahead;
     }
 

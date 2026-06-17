@@ -1,5 +1,5 @@
 "use strict";
-var setupTraining = function(options) {
+function setupTraining(options) {
     const GENERAL_TRAINING_VALUE = "general";
 
     set_field_links();
@@ -101,12 +101,12 @@ var setupTraining = function(options) {
             $('#form-errors').show();
             const field_map = {'role': 0, 'training_date': 1, 'trainer': 2};
             for(const field in data.errors) {
-                let messages;
-                if(data.errors.hasOwnProperty(field)) {
-                    messages = data.errors[field].join(', ');
+                if(!Object.prototype.hasOwnProperty.call(data.errors, field)) {
+                    continue;
                 }
+                const messages = data.errors[field].join(', ');
                 $('#form-errors').children().eq(field_map[field]).text(messages);
             }
         }
     }
-};
+}

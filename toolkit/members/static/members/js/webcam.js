@@ -1,5 +1,5 @@
 "use strict";
-var setupPage = function() {
+function setupPage() {
     /* 'Derived' from:
      * https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Taking_still_photos
      */
@@ -76,7 +76,7 @@ var setupPage = function() {
             })
             .catch((err) => {
                 if(err.name === "NotFoundError") {
-                    setError(`No suitable camera found!`);
+                    setError("No suitable camera found!");
                 } else {
                     setError(`An error occurred: ${err}`);
                 }
@@ -92,7 +92,7 @@ var setupPage = function() {
                     // Firefox currently has a bug where the height can't be read
                     // from the video, so we will make assumptions if this happens.
 
-                    if(isNaN(height)) {
+                    if(Number.isNaN(height)) {
                         height = width / (4 / 3);
                     }
 
@@ -124,4 +124,4 @@ var setupPage = function() {
         enableCaptureButton.style.display = 'none';
         startCapture();
     });
-};
+}

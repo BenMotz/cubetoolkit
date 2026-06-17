@@ -23,7 +23,7 @@ function get_date_in_future(days_ahead) {
 }
 
 function format_date(d) {
-    return d.getDate() + "/" + (d.getMonth() + 1) + "/" + (1900 + d.getYear());
+    return d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear();
 }
 
 $(document).ready(function() {

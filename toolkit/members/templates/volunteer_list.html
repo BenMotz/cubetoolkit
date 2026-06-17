@@ -45,21 +45,19 @@
 <script>
 $(document).ready(function() {
     function filter_volunteers() {
-        var filter_text = $('#id_input_filter')[0].value;
-        filter_text = filter_text.toLowerCase();
+        const filter_text = $('#id_input_filter')[0].value.toLowerCase();
         $('.volunteer').each(function(i, el) {
-            var name = $(el).find('p.name').text();
-            name = name.toLowerCase();
+            const name = $(el).find('p.name').text().toLowerCase();
             if(name.indexOf(filter_text) !== -1) {
-                $(el).removeClass("filtered");;
+                $(el).removeClass("filtered");
             } else {
-                $(el).addClass("filtered");;
+                $(el).addClass("filtered");
             }
         });
-    };
+    }
     function show_retired_changed() {
         // undefined if element isn't present:
-        var show_retired = $('#id_show_retired').prop("checked");
+        const show_retired = $('#id_show_retired').prop("checked");
         if(show_retired === true) {
             $(".inactive").removeClass("inactive_hidden");
         } else if(show_retired === false) {

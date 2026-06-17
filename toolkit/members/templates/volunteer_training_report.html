@@ -27,10 +27,10 @@ label {
 <script src="{{ STATIC_URL}}js/lib/chosen.jquery.js"></script>
 <script>
 function update_role_display() {
-    var selected = $('#id_role_select').val();
+    const selected = $('#id_role_select').val();
     $('.role_info').hide();
     if(selected !== null) {
-        for(var i = 0; i < selected.length; i++) {
+        for(let i = 0; i < selected.length; i++) {
             $('#id_role_info_' + selected[i]).show();
         }
     }
@@ -38,19 +38,19 @@ function update_role_display() {
 }
 
 function update_outdated_highlights() {
-    var max_age_months = +$('#id_age_highlight').val();
-    var max_age_date = new Date();
+    const max_age_months = +$('#id_age_highlight').val();
+    const max_age_date = new Date();
 
-    var show_all = $('#id_show_all')[0].checked;
-    var show_current = $('#id_show_current')[0].checked;
-    var show_expired = $('#id_show_expired')[0].checked;
+    const show_all = $('#id_show_all')[0].checked;
+    const show_current = $('#id_show_current')[0].checked;
+    const show_expired = $('#id_show_expired')[0].checked;
 
     max_age_date.setMonth(max_age_date.getMonth() - max_age_months);
 
-    var max_age_s_since_epoch = max_age_date.getTime() / 1000;
+    const max_age_s_since_epoch = max_age_date.getTime() / 1000;
 
-    var records = $('.training_record');
-    for(var i = 0; i < records.length; i++) {
+    const records = $('.training_record');
+    for(let i = 0; i < records.length; i++) {
         if(records[i].dataset.trainingTime < max_age_s_since_epoch) {
             // expired
             records[i].classList.add("outdated");

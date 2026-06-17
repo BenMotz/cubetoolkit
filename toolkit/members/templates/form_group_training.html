@@ -24,7 +24,7 @@
 {{ form.media }}
 <script >
 function setupForTrainingType() {
-    var selected = $('#id_type').val();
+    const selected = $('#id_type').val();
     switch(selected) {
     case 'G':
         $('#id_role').removeAttr('required').attr('disabled', true);
