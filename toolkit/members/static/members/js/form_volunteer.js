@@ -61,7 +61,6 @@ var setupTraining = function(options) {
             'training-training_date': $('#id_training-training_date').val(),
             'training-notes': $('#id_training-notes').val(),
         };
-        console.log("data:", data);
         $('#form-errors').hide();
         $('#form-errors').children().text('');
         $.post(
