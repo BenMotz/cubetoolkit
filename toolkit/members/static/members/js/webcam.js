@@ -21,7 +21,7 @@ var setupPage = function() {
   }
 
   if (navigator.mediaDevices !== undefined) {
-    enablecapturebutton.style.display = 'initial';
+    enableCaptureButton.style.display = 'initial';
   } else {
     console.log("WebRTC not supported");
     return;
@@ -118,10 +118,10 @@ var setupPage = function() {
     clearphoto();
   }
 
-  enablecapturebutton.addEventListener('click', function(ev) {
+  enableCaptureButton.addEventListener('click', function(ev) {
       ev.preventDefault();
       showPreview();
-      enablecapturebutton.style.display = 'none';
+      enableCaptureButton.style.display = 'none';
       startCapture();
   });
 };
