@@ -1,20 +1,20 @@
 function edit_rota(jQuery, rota_edit_base_url, edit_rota_notes_url_prefix, vol_email, CSRF_TOKEN) {
     "use strict";
-    var $ = jQuery;
+    const $ = jQuery;
 
     function parse_date_from_control(control_id) {
-        var text = $(control_id)[0].value;
+        const text = $(control_id)[0].value;
         return $.datepicker.parseDate('dd-mm-yy', text);
     }
 
     function dateRangeSelected() {
-        var from_date = parse_date_from_control('#id_from_date'),
-            to_date = parse_date_from_control('#id_to_date'),
-            // Calculate days between those two dates:
-            days_ahead = Math.ceil(
-                (to_date.getTime() - from_date.getTime()) / 86400000
-            );
-        if (days_ahead <= 0) {
+        const from_date = parse_date_from_control('#id_from_date'),
+            to_date = parse_date_from_control('#id_to_date');
+        // Calculate days between those two dates:
+        let days_ahead = Math.ceil(
+            (to_date.getTime() - from_date.getTime()) / 86400000
+        );
+        if(days_ahead <= 0) {
             days_ahead = 0;
         }
         window.location.href = rota_edit_base_url + "/" +
@@ -72,15 +72,14 @@ function edit_rota(jQuery, rota_edit_base_url, edit_rota_notes_url_prefix, vol_e
     }
 
     function configureRotaNotesEditInPlaceControls() {
-        var showing_id_re = /showing_rota_notes_(\d+)/;
+        const showing_id_re = /showing_rota_notes_(\d+)/;
 
-        $('.showing_rota_notes span').each(function () {
-            var showing_id,
-                element = $(this),
+        $('.showing_rota_notes span').each(function() {
+            const element = $(this),
                 showing_id_match = showing_id_re.exec(element.attr('id'));
 
-            if (showing_id_match) {
-                showing_id = showing_id_match[1];
+            if(showing_id_match) {
+                const showing_id = showing_id_match[1];
                 element.editable(
                     edit_rota_notes_url_prefix + showing_id + "/rota_notes/",
                     {

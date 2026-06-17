@@ -107,14 +107,12 @@ function processInputFields(fn) {
     /* call supplied function with all input tags (other than those in the
      * "new tag" form).
      */
-    var list_items = document.getElementById("sortable")
+    const list_items = document.getElementById("sortable")
                              .getElementsByTagName("li");
-    var i, j;
-    var input_fields;
-    for(i = 0; i < list_items.length; i++) {
+    for(let i = 0; i < list_items.length; i++) {
         if(!list_items[i].classList.contains("new_tag")) {
-            input_fields = list_items[i].getElementsByTagName("input");
-            for(j = 0; j < input_fields.length; j++) {
+            const input_fields = list_items[i].getElementsByTagName("input");
+            for(let j = 0; j < input_fields.length; j++) {
                 /* Pass current <input>, current <li> and index in form list */
                 fn(input_fields[j], list_items[i], i);
             }

@@ -1,33 +1,31 @@
 var mailoutController = function (options) {
     "use strict";
 
-    var POLL_PERIOD = 1000; // milliseconds
+    const POLL_PERIOD = 1000; // milliseconds
 
     // Configured by setupPage:
-    var mail_subject;
-    var mail_body_text;
-    var mail_body_html;
-    var mail_send_html;
-    var progressURL;
-    var execURL;
-    var testURL;
-    var progressBar;
-    var csrftoken;
-    var jQuery;
+    let mail_subject;
+    let mail_body_text;
+    let mail_body_html;
+    let mail_send_html;
+    let progressURL;
+    let execURL;
+    let testURL;
+    let progressBar;
+    let csrftoken;
+    let jQuery;
 
     // States that page can be in:
-    var S_READY = 0;
-    var S_SENDING = 1;
-    var S_COMPLETE = 2;
-    var S_ABORTED = 3;
-    var S_ERROR = 4;
+    const S_READY = 0;
+    const S_SENDING = 1;
+    const S_COMPLETE = 2;
+    const S_ABORTED = 3;
+    const S_ERROR = 4;
 
     // State:
-    var send_xhr;
+    let send_xhr;
 
     function setupPage(options) {
-        var progressBarId;
-
         mail_subject = options.subject;
         mail_body_text = options.body_text;
         mail_body_html = options.body_html;
@@ -36,7 +34,7 @@ var mailoutController = function (options) {
         progressURL = options.progressURL;
         execURL = options.execURL;
         testURL = options.testURL;
-        progressBarId = options.progressBarId;
+        const progressBarId = options.progressBarId;
         jQuery = options.jQuery;
 
         progressBar = jQuery("#" + progressBarId).progressbar(0);
@@ -45,11 +43,11 @@ var mailoutController = function (options) {
     }
 
     function getCookie(name) {
-        var cookieValue = null, cookies, cookie, i;
-        if (document.cookie) {
-            cookies = document.cookie.split(';');
-            for (i = 0; i < cookies.length; i++) {
-                cookie = jQuery.trim(cookies[i]);
+        let cookieValue = null;
+        if(document.cookie) {
+            const cookies = document.cookie.split(';');
+            for(let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
                 // Does this cookie string begin with the name we want?
                 if (cookie.substring(0, name.length + 1) === (name + '=')) {
                     cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
@@ -97,15 +95,15 @@ var mailoutController = function (options) {
     }
 
     function start_send() {
-        var data;
-
         set_state(S_SENDING);
 
-        data = 'csrfmiddlewaretoken=' + encodeURIComponent(csrftoken) +
-               '&subject=' +  encodeURIComponent(mail_subject) +
-               '&body_text=' + encodeURIComponent(mail_body_text) +
-               '&body_html=' + encodeURIComponent(mail_body_html) +
-               '&send_html=' + encodeURIComponent(mail_send_html);
+        const data = jQuery.param({
+            csrfmiddlewaretoken: csrftoken,
+            subject: mail_subject,
+            body_text: mail_body_text,
+            body_html: mail_body_html,
+            send_html: mail_send_html
+        });
 
         send_xhr = jQuery.ajax(execURL, {
             'type': 'POST',
@@ -124,8 +122,8 @@ var mailoutController = function (options) {
     }
 
     function test_send() {
-        var email = jQuery('#id_test_email').val();
-        var email_regex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
+        const email = jQuery('#id_test_email').val();
+        const email_regex = /^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$/;
         if(email === "") {
             return;
         }
@@ -136,12 +134,14 @@ var mailoutController = function (options) {
 
         jQuery('#test').html("Sending one copy to '" + email + "'");
 
-        var data = 'csrfmiddlewaretoken=' + encodeURIComponent(csrftoken) +
-               '&address=' + encodeURIComponent(email) +
-               '&subject=' +  encodeURIComponent(mail_subject) +
-               '&body_text=' + encodeURIComponent(mail_body_text) +
-               '&body_html=' + encodeURIComponent(mail_body_html) +
-               '&send_html=' + encodeURIComponent(mail_send_html);
+        const data = jQuery.param({
+            csrfmiddlewaretoken: csrftoken,
+            address: email,
+            subject: mail_subject,
+            body_text: mail_body_text,
+            body_html: mail_body_html,
+            send_html: mail_send_html
+        });
 
         send_xhr = jQuery.ajax(testURL, {
             'type': 'POST',

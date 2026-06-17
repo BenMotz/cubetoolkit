@@ -1,20 +1,20 @@
 function init_calendar_view(jQuery, CSRF_TOKEN, defaultView, defaultDate, django_urls, resources) {
     "use strict";
-    var $ = jQuery;
+    const $ = jQuery;
 
-    var FLASH_MESSAGE_DISPLAY_TIME = 3000;
-    var FLASH_MESSAGE_FADE_TIME = 1500;
+    const FLASH_MESSAGE_DISPLAY_TIME = 3000;
+    const FLASH_MESSAGE_FADE_TIME = 1500;
 
     // state to detect when things have changed
-    var currentView = defaultView;
-    var currentDate = $.fullCalendar.moment(defaultDate);
+    let currentView = defaultView;
+    let currentDate = $.fullCalendar.moment(defaultDate);
 
-    var clearMessageTimer = null;
+    let clearMessageTimer = null;
 
-    var resources_enabled = resources.length > 0 ? true : false;
+    const resources_enabled = resources.length > 0 ? true : false;
 
     function onEventClick(calEvent, jsEvent, view) {
-        var fb_target = $("#fb_target");
+        const fb_target = $("#fb_target");
         fb_target.attr('href', calEvent.url);
         fb_target.click();
         return false;
@@ -25,10 +25,10 @@ function init_calendar_view(jQuery, CSRF_TOKEN, defaultView, defaultDate, django
             function(data) {
                 // Data is available from intervalStart in the context, but
                 // pull it from the response anyway.
-                var monthMoment = moment(data.month, "YYYY-MM-DD");
-                var historic = monthMoment.isBefore(moment(), 'month');
-                var edit_control_id = 'ideas-' + monthMoment.format("YYYY-M");
-                var edit_control_html = '<h3>Ideas for '
+                const monthMoment = moment(data.month, "YYYY-MM-DD");
+                const historic = monthMoment.isBefore(moment(), 'month');
+                const edit_control_id = 'ideas-' + monthMoment.format("YYYY-M");
+                const edit_control_html = '<h3>Ideas for '
                     + monthMoment.format("MMMM YYYY")
                     + ':</h3> <div class="idea'
                     + (historic ? '-historic' : '')
@@ -65,15 +65,15 @@ function init_calendar_view(jQuery, CSRF_TOKEN, defaultView, defaultDate, django
     function showMessages() {
         // Get 'flash' messages, put thim in a div, show them for a few seconds
         $.getJSON(django_urls["get-messages"], function(data) {
-            var message_html = '';
-            var message_div = $("div.messages");
+            let message_html = '';
+            const message_div = $("div.messages");
 
             if(data.length === 0) {
                 return;
             }
 
             try {
-                for(var i = 0; i < data.length; i++) {
+                for(let i = 0; i < data.length; i++) {
                     message_html += '<li class="' + data[i].tags + '">'
                                     + data[i].message + '</li>';
                 }
@@ -102,8 +102,8 @@ function init_calendar_view(jQuery, CSRF_TOKEN, defaultView, defaultDate, django
     }
 
     function onDayClick(date, jsEvent, view, resource) {
-        var url = django_urls["add-event"] + "?date=" + date.format("D-M-YYYY");
-        var fb_target = $("#fb_target");
+        let url = django_urls["add-event"] + "?date=" + date.format("D-M-YYYY");
+        const fb_target = $("#fb_target");
         if(date.isBefore(moment())) {
             return;
         }
@@ -121,9 +121,9 @@ function init_calendar_view(jQuery, CSRF_TOKEN, defaultView, defaultDate, django
     }
 
     function onSelect(start, end, jsEvent, view, resource) {
-        var url = django_urls["add-event"] + "?date=" + start.format("D-M-YYYY");
-        var calendar = $('#calendar');
-        var fb_target = $("#fb_target");
+        let url = django_urls["add-event"] + "?date=" + start.format("D-M-YYYY");
+        const calendar = $('#calendar');
+        const fb_target = $("#fb_target");
         // Don't allow new events in the past. This is also enforced
         // server-side.
         if(start.isBefore(moment())) {
@@ -144,17 +144,17 @@ function init_calendar_view(jQuery, CSRF_TOKEN, defaultView, defaultDate, django
     }
 
     function onViewRender(view, element) {
-        var calendar = $('#calendar');
-        var newDate = calendar.fullCalendar('getDate');
+        const calendar = $('#calendar');
+        const newDate = calendar.fullCalendar('getDate');
         if(view.name === 'month' || view.name === 'timelineMonth') {
-            var newUrl = django_urls['diary-edit-calendar'] + '/' + newDate.year()
+            const newUrl = django_urls['diary-edit-calendar'] + '/' + newDate.year()
                          + '/' + (newDate.month() + 1) + '/';
 
             if(!currentDate.isSame(newDate, 'month') || (currentView != view.name)) {
                 history.replaceState(null, document.title, newUrl);
             }
         } else if(view.name === "agendaWeek" || view.name === "agendaThreeDay") {
-            var newUrl = django_urls['diary-edit-calendar'] + '/' + newDate.year()
+            const newUrl = django_urls['diary-edit-calendar'] + '/' + newDate.year()
                          + '/' + (newDate.month() + 1)
                          + '/' + newDate.date();
 
@@ -168,8 +168,8 @@ function init_calendar_view(jQuery, CSRF_TOKEN, defaultView, defaultDate, django
     }
 
     function init_fancybox() {
-        var calendar = $('#calendar');
-        var fb_target = $("#fb_target");
+        const calendar = $('#calendar');
+        const fb_target = $("#fb_target");
         fb_target.fancybox({
             openEffect: 'none',
             closeEffect: 'none',
@@ -185,10 +185,10 @@ function init_calendar_view(jQuery, CSRF_TOKEN, defaultView, defaultDate, django
     }
 
     function init_calendar() {
-        var calendar = $('#calendar');
+        const calendar = $('#calendar');
         currentDate = $.fullCalendar.moment(defaultDate);
 
-        var calendar_options = {
+        const calendar_options = {
             header: {
                 left: 'prev,next today',
                 center: 'title',
@@ -247,14 +247,12 @@ function init_calendar_view(jQuery, CSRF_TOKEN, defaultView, defaultDate, django
     }
 
     $(document).ready(function() {
-        var fb_target;
-
         init_fancybox();
         init_calendar();
 
-        fb_target = $("#fb_target");
+        const fb_target = $("#fb_target");
 
-        $('#new-booking-link').click(function(){
+        $('#new-booking-link').click(function() {
             fb_target.attr('href', django_urls["add-event"]);
             fb_target.click();
             return false;

@@ -1,21 +1,21 @@
 /* Common setup for public content pages */
 function setup_page(index_page) {
-    $(document).ready(function($){
-        var masonry_opts_index = {
+    $(document).ready(function($) {
+        const masonry_opts_index = {
             gutter: '.gutter-sizer',
             columnWidth: '.showing-sizer',
             itemSelector: '.showing'
         };
-        var masonry_opts_other = {
+        const masonry_opts_other = {
             percentPosition: true,
             gutter: '.gutter-sizer',
             columnWidth: '.grid-sizer',
             itemSelector: '.grid-item'
-        }
-        var masonry_opts = index_page ? masonry_opts_index : masonry_opts_other;
+        };
+        const masonry_opts = index_page ? masonry_opts_index : masonry_opts_other;
 
         /* init Masonry -------------------------------------------------------- */
-        var $grid = $('.programme').masonry(masonry_opts);
+        const $grid = $('.programme').masonry(masonry_opts);
 
         // re-layout Masonry after each image loads
         $grid.imagesLoaded().progress(function() {
@@ -24,7 +24,7 @@ function setup_page(index_page) {
 
         /* set up small form factor menu --------------------------------------- */
         $("#mobile-menu-btn").click(function() {
-            var toggle_el = $(this).data("toggle");
+            const toggle_el = $(this).data("toggle");
             $(toggle_el).toggleClass("open-sidebar");
             $(".black_overlay").toggleClass("active-search-bg");
         });
@@ -41,7 +41,7 @@ function setup_page(index_page) {
         $('#navmenu > ul > li:has(ul)').addClass("has-sub");
 
         $('#navmenu > ul > li > a').click(function() {
-            var checkElement = $(this).next();
+            const checkElement = $(this).next();
 
             $('#navmenu li').removeClass('active');
             $(this).closest('li').addClass('active');

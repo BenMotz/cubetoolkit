@@ -1,20 +1,20 @@
 "use strict";
 var setupPage = function(options) {
-    var bookings_form = $("#bookings form");
+    const bookings_form = $("#bookings form");
     bookings_form.submit(submit_new_showing_form);
     $('#form-errors').hide();
 
     // Add a showing
     function submit_new_showing_form() {
-        var url = options.add_booking_url;
-        var data = {
+        const url = options.add_booking_url;
+        const data = {
             'csrfmiddlewaretoken': options.csrfmiddlewaretoken,
             'clone_start': $('#id_clone_start').val(),
             'booked_by': $('#id_booked_by').val(),
         };
         $('#form-errors').hide();
         $('#form-errors').children().text('');
-        jQuery.post(
+        $.post(
             url,
             data,
             showing_add_complete,
@@ -31,11 +31,11 @@ var setupPage = function(options) {
             $('#form-errors').before(data.html);
         } else {
             $('#form-errors').show();
-            var field_map = {'clone_start': 0, 'booked_by': 1};
-            for (var field in data.errors) {
-                var i;
-                if (data.errors.hasOwnProperty(field)) {
-                    var messages = data.errors[field].join(', ');
+            const field_map = {'clone_start': 0, 'booked_by': 1};
+            for(const field in data.errors) {
+                let messages;
+                if(data.errors.hasOwnProperty(field)) {
+                    messages = data.errors[field].join(', ');
                 }
                 $('#form-errors').children().eq(field_map[field]).text(messages);
             }

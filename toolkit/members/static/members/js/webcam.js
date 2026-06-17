@@ -3,15 +3,15 @@ var setupPage = function() {
     /* 'Derived' from:
      * https://developer.mozilla.org/en-US/docs/Web/API/WebRTC_API/Taking_still_photos
      */
-    var streaming        = false;
-    var video            = document.getElementById('video');
-    var canvas           = document.getElementById('canvas');
-    var photo            = document.getElementById('photo');
-    var originalPhotoSrc = photo.getAttribute('src');
-    var captureButton    = document.getElementById('capturebutton');
-    var enableCaptureButton = document.getElementById('enablecapturebutton');
-    var width = 320;
-    var height = 0;
+    let streaming        = false;
+    const video            = document.getElementById('video');
+    const canvas           = document.getElementById('canvas');
+    const photo            = document.getElementById('photo');
+    const originalPhotoSrc = photo.getAttribute('src');
+    const captureButton    = document.getElementById('capturebutton');
+    const enableCaptureButton = document.getElementById('enablecapturebutton');
+    const width = 320;
+    let height = 0;
 
   if (window.self !== window.top) {
     // If our document is in a frame we won't be able to request permission

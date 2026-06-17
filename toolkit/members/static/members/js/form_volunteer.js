@@ -1,5 +1,6 @@
+"use strict";
 var setupTraining = function(options) {
-    var GENERAL_TRAINING_VALUE = "general";
+    const GENERAL_TRAINING_VALUE = "general";
 
     set_field_links();
     $("#training-record form").submit(submit_training_form);
@@ -18,18 +19,18 @@ var setupTraining = function(options) {
     }
 
     function set_field_links() {
-        $("a.toggle-notes").off().click(function () {
-            var note_row = $(this).closest('tr').next('.training-notes');
-            var new_text = note_row.is(":visible") ? "(+)" : "(-)";
+        $("a.toggle-notes").off().click(function() {
+            const note_row = $(this).closest('tr').next('.training-notes');
+            const new_text = note_row.is(":visible") ? "(+)" : "(-)";
             note_row.toggle();
             $(this).text(new_text);
             return false;
         });
-        $("a.delete-training").off().click(function () {
-            var a = $(this);
-            var confirmed = confirm("Delete training record - are you sure?\nThis cannot be undone");
+        $("a.delete-training").off().click(function() {
+            const a = $(this);
+            const confirmed = confirm("Delete training record - are you sure?\nThis cannot be undone");
             if(confirmed) {
-                jQuery.post(
+                $.post(
                     $(this)[0].href,
                     {'csrfmiddlewaretoken': options.csrf_token},
                     function() { delete_complete(a); },
@@ -43,16 +44,16 @@ var setupTraining = function(options) {
 
     // Add a training record:
     function submit_training_form() {
-        var url = options.add_training_record_url;
-        var training_type;
-        var role = $('#id_training-role').val();
-        if (role === GENERAL_TRAINING_VALUE) {
+        const url = options.add_training_record_url;
+        let training_type;
+        let role = $('#id_training-role').val();
+        if(role === GENERAL_TRAINING_VALUE) {
             role = null;
             training_type = 'G';
         } else {
             training_type = 'R';
         }
-        var data = {
+        const data = {
             'csrfmiddlewaretoken': options.csrf_token,
             'training-role': role,
             'training-training_type': training_type,
@@ -63,7 +64,7 @@ var setupTraining = function(options) {
         console.log("data:", data);
         $('#form-errors').hide();
         $('#form-errors').children().text('');
-        jQuery.post(
+        $.post(
             url,
             data,
             record_add_complete,
@@ -99,11 +100,11 @@ var setupTraining = function(options) {
             set_field_links();
         } else {
             $('#form-errors').show();
-            var field_map = {'role': 0, 'training_date': 1, 'trainer': 2};
-            for (var field in data.errors) {
-                var i;
-                if (data.errors.hasOwnProperty(field)) {
-                    var messages = data.errors[field].join(', ');
+            const field_map = {'role': 0, 'training_date': 1, 'trainer': 2};
+            for(const field in data.errors) {
+                let messages;
+                if(data.errors.hasOwnProperty(field)) {
+                    messages = data.errors[field].join(', ');
                 }
                 $('#form-errors').children().eq(field_map[field]).text(messages);
             }

@@ -31,14 +31,14 @@
         }
     });
     function parse_date_from_control(control_id) {
-        var text = $(control_id)[0].value;
+        const text = $(control_id)[0].value;
         return $.datepicker.parseDate('dd-mm-yy', text);
     }
     function dateRangeSelected(dateText, inst) {
-        var from_date = parse_date_from_control('#id_from_date');
-        var to_date = parse_date_from_control('#id_to_date');
+        const from_date = parse_date_from_control('#id_from_date');
+        const to_date = parse_date_from_control('#id_to_date');
         // Calculate days between those two dates:
-        var days_ahead = Math.ceil((to_date.getTime() - from_date.getTime())/86400000);
+        let days_ahead = Math.ceil((to_date.getTime() - from_date.getTime())/86400000);
         if(days_ahead <= 0) {
             days_ahead = 0;
         }
