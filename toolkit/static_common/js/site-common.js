@@ -85,8 +85,8 @@ function setup_page(index_page) {
     });
 
     // Belt and braces: do a final masonry layout after all images are
-    // definitely loaded:
-    $(window).load(function() {
+    // definitely loaded.
+    $(window).on('load', function() {
         $('.programme').masonry('layout');
     });
 }
