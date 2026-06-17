@@ -15,6 +15,7 @@
   {{ block.super }}
   <script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
   <script type="text/javascript">
+    "use strict";
     $(document).ready(function() {
         // Add date picker:
         $('#id_from_date').datepicker({

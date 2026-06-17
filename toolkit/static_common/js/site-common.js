@@ -1,5 +1,7 @@
 /* Common setup for public content pages */
 function setup_page(index_page) {
+    "use strict";
+
     $(document).ready(function($) {
         const masonry_opts_index = {
             gutter: '.gutter-sizer',
