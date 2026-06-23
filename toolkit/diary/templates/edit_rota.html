@@ -12,7 +12,7 @@
 {% block css %}
   {{ block.super }}
   <style type="text/css">
-    @import url('{{ STATIC_URL }}css/lib/smoothness/jquery-ui.css');
+    @import url('{{ STATIC_URL }}css/lib/flatpickr.min.css');
     .na {
         color: lightgray;
         cursor: pointer;
@@ -76,7 +76,7 @@
 
 {% block script %}
   {{ block.super }}
-  <script src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
+  <script src="{{ STATIC_URL }}js/lib/flatpickr.js"></script>
   <script src="{{ STATIC_URL }}js/lib/jquery.jeditable.mini.js"></script>
   <script src="{{ STATIC_URL }}diary/js/edit_rota.js"> </script>
   <script>

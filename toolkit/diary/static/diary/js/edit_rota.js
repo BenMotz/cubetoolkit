@@ -1,38 +1,39 @@
 function edit_rota(jQuery, rota_edit_base_url, edit_rota_notes_url_prefix, vol_email, CSRF_TOKEN) {
     "use strict";
     const $ = jQuery;
-
-    function parse_date_from_control(control_id) {
-        const text = $(control_id)[0].value;
-        return $.datepicker.parseDate('dd-mm-yy', text);
-    }
+    let fromDatePicker;
+    let toDatePicker;
 
     function dateRangeSelected() {
-        const from_date = parse_date_from_control('#id_from_date'),
-            to_date = parse_date_from_control('#id_to_date');
+        const fromDate = fromDatePicker.selectedDates[0];
+        const toDate = toDatePicker.selectedDates[0];
+        if(!fromDate || !toDate) {
+            console.error("fromDate or toDate is null", fromDate, toDate);
+	    return;
+        }
         // Calculate days between those two dates:
-        let days_ahead = Math.ceil(
-            (to_date.getTime() - from_date.getTime()) / 86400000
+        let daysAhead = Math.ceil(
+            (toDate.getTime() - fromDate.getTime()) / 86400000
         );
-        if(days_ahead <= 0) {
-            days_ahead = 0;
+        if(daysAhead <= 0) {
+            daysAhead = 0;
         }
         window.location.href = rota_edit_base_url + "/" +
-            from_date.getFullYear() + "/" + (from_date.getMonth() + 1) +
-            "/" + from_date.getDate() + "?daysahead=" + days_ahead;
+            fromDate.getFullYear() + "/" + (fromDate.getMonth() + 1) +
+            "/" + fromDate.getDate() + "?daysahead=" + daysAhead;
     }
 
     function configureDatePickerControls() {
         // Add date picker:
-        $('#id_from_date').datepicker({
-            dateFormat : 'dd-mm-yy',
-            onSelect : dateRangeSelected,
-            minDate : 0
+        fromDatePicker = flatpickr('#id_from_date', {
+           dateFormat: 'd-m-Y',
+           onChange: dateRangeSelected,
+           minDate: 'today',
         });
-        $('#id_to_date').datepicker({
-            dateFormat : 'dd-mm-yy',
-            onSelect : dateRangeSelected,
-            minDate : 0
+        toDatePicker = flatpickr('#id_to_date', {
+            dateFormat: 'd-m-Y',
+            onChange: dateRangeSelected,
+            minDate: 'today',
         });
         $('#daterange')[0].onsubmit = function() {
             dateRangeSelected();
