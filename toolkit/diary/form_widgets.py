@@ -60,34 +60,6 @@ class HtmlTextarea(forms.Textarea):
         return context
 
 
-class JQueryDateTimePicker(forms.DateTimeInput):
-    """
-    Override DateTimeInput form widget to automatically use the JQueryUI
-    control
-    """
-
-    template_name = "widgets/jquerydatetimepicker.html"
-
-    def __init__(self, *args, **kwargs):
-        # Change the default date/time format to match that used by the
-        # jquery widget (which is also the more conventional UK format)
-        if "format" not in kwargs:
-            kwargs["format"] = "%d/%m/%Y %H:%M"
-
-        super().__init__(*args, **kwargs)
-
-    class Media:
-        css = {
-            "all": (
-                "css/lib/smoothness/jquery-ui.css",
-                "css/lib/timepicker.css",
-            ),
-        }
-        js = (
-            "js/lib/jquery-ui.min.js",
-            "js/lib/jquery-ui-timepicker-addon.js",
-        )
-
 class FlatpickrDateTimePicker(forms.DateTimeInput):
     """
     Override DateTimeInput form widget to automatically use the Flatpickr
