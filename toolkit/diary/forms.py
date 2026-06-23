@@ -9,8 +9,8 @@ from crispy_forms.helper import FormHelper
 # Custom form widgets:
 from toolkit.diary.form_widgets import (
     HtmlTextarea,
-    JQueryDateTimePicker,
     ChosenSelectMultiple,
+    FlatpickrDateTimePicker,
 )
 
 import toolkit.diary.models
@@ -203,7 +203,7 @@ class ShowingForm(forms.ModelForm):
         )
 
         widgets = {
-            "start": JQueryDateTimePicker(),
+            "start": FlatpickrDateTimePicker(),
         }
 
     def clean_confirmed(self):
@@ -320,7 +320,7 @@ class CloneShowingForm(forms.Form):
     clone_start = forms.DateTimeField(
         required=True,
         validators=[validate_in_future],
-        widget=JQueryDateTimePicker(),
+        widget=FlatpickrDateTimePicker(),
     )
     booked_by = forms.CharField(min_length=1, max_length=128, required=True)
 
@@ -343,7 +343,7 @@ class NewEventForm(forms.Form):
     start = forms.DateTimeField(
         required=True,
         validators=[validate_in_future],
-        widget=JQueryDateTimePicker(),
+        widget=FlatpickrDateTimePicker(),
     )
     duration = forms.TimeField(required=True, initial=datetime.time(hour=1))
     number_of_bookings = forms.IntegerField(

@@ -3,9 +3,7 @@ from django.core.validators import validate_email
 
 from .models import MailoutJob
 
-from ..diary.form_widgets import (
-    JQueryDateTimePicker,
-)
+from ..diary.form_widgets import FlatpickrDateTimePicker
 
 
 class JobForm(forms.ModelForm):
@@ -19,7 +17,7 @@ class JobForm(forms.ModelForm):
             "body_html",
         )
         widgets = {
-            "send_at": JQueryDateTimePicker(),
+            "send_at": FlatpickrDateTimePicker(),
             "send_html": forms.HiddenInput(),
             "subject": forms.HiddenInput(),
             "body_text": forms.HiddenInput(),
@@ -39,7 +37,7 @@ class TestMailoutJobForm(forms.ModelForm):
             "recipient_filter",
         )
         widgets = {
-            "send_at": JQueryDateTimePicker(),
+            "send_at": FlatpickrDateTimePicker(),
             "subject": forms.TextInput(attrs={"class": "form-control"}),
             "body_text": forms.Textarea(
                 attrs={"class": "form-control", "rows": 10}
