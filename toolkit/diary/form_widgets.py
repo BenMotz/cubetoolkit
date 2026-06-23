@@ -87,3 +87,25 @@ class JQueryDateTimePicker(forms.DateTimeInput):
             "js/lib/jquery-ui.min.js",
             "js/lib/jquery-ui-timepicker-addon.js",
         )
+
+class FlatpickrDateTimePicker(forms.DateTimeInput):
+    """
+    Override DateTimeInput form widget to automatically use the Flatpickr
+    control
+    """
+
+    template_name = "widgets/flatpickrdatetimepicker.html"
+
+    def __init__(self, *args, **kwargs):
+        # Change the default date/time format to match that used by the
+        # flatpickr widget (which is also the more conventional UK format)
+        if "format" not in kwargs:
+            kwargs["format"] = "%d/%m/%Y %H:%M"
+
+        super().__init__(*args, **kwargs)
+
+    class Media:
+        css = {
+            "all": ("css/lib/flatpickr.min.css",),
+        }
+        js = ("js/lib/flatpickr.js",)
