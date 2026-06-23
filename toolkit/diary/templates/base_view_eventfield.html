@@ -3,7 +3,7 @@
 {% block css %}
   {{ block.super }}
   <style type="text/css">
-    @import url('{{ STATIC_URL }}css/lib/smoothness/jquery-ui.css');
+    @import url('{{ STATIC_URL }}css/lib/flatpickr.min.css');
     a#{{ event_field }}_link {
         font-weight: bold;
         color: black;
@@ -13,39 +13,41 @@
 {% endblock %}
 {% block script %}
   {{ block.super }}
-  <script type="text/javascript" src="{{ STATIC_URL }}js/lib/jquery-ui.min.js"></script>
+  <script src="{{ STATIC_URL }}js/lib/flatpickr.js"></script>
   <script type="text/javascript">
     "use strict";
+    let fromDatePicker, toDatePicker;
     $(document).ready(function() {
+	    console.log("Configuring date picker controls");
         // Add date picker:
-        $('#id_from_date').datepicker({
-            dateFormat : 'dd-mm-yy',
-            onSelect : dateRangeSelected,
+        fromDatePicker = flatpickr('#id_from_date', {
+            dateFormat : 'd-m-Y',
+            onChange : dateRangeSelected,
         });
-        $('#id_to_date').datepicker({
-            dateFormat : 'dd-mm-yy',
-            onSelect : dateRangeSelected,
+        toDatePicker = flatpickr('#id_to_date', {
+            dateFormat : 'd-m-Y',
+            onChange : dateRangeSelected,
         });
         $('#daterange')[0].onsubmit = function() {
             dateRangeSelected();
             return false;
         }
     });
-    function parse_date_from_control(control_id) {
-        const text = $(control_id)[0].value;
-        return $.datepicker.parseDate('dd-mm-yy', text);
-    }
     function dateRangeSelected(dateText, inst) {
-        const from_date = parse_date_from_control('#id_from_date');
-        const to_date = parse_date_from_control('#id_to_date');
+        const fromDate = fromDatePicker.selectedDates[0];
+        const toDate = toDatePicker.selectedDates[0];
+        if(!fromDate || !toDate) {
+            console.error("fromDate or toDate is null", fromDate, toDate);
+	    return;
+        }
         // Calculate days between those two dates:
-        let days_ahead = Math.ceil((to_date.getTime() - from_date.getTime())/86400000);
-        if(days_ahead <= 0) {
-            days_ahead = 0;
+        let daysAhead = Math.ceil((toDate.getTime() - fromDate.getTime())/86400000);
+        if(daysAhead <= 0) {
+            daysAhead = 0;
         }
         window.location.href = "{% url "view_event_field" event_field %}/" +
-            (from_date.getYear() + 1900) + "/" + (from_date.getMonth() + 1) + "/" +
-            from_date.getDate() + "?daysahead=" + days_ahead {% if search %} +
+            (fromDate.getYear() + 1900) + "/" + (fromDate.getMonth() + 1) + "/" +
+            fromDate.getDate() + "?daysahead=" + daysAhead {% if search %} +
             "&search={{ search|urlencode }}"{% endif %};
     }
   </script>
