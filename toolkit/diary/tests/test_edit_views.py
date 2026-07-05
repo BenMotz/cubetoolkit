@@ -222,7 +222,7 @@ class EditShowing(DiaryTestsMixin, TestCase):
         self.assertContains(
             response,
             '<input type="text" name="start" value="09/06/2013 18:00"'
-            'class="jquerydatetimepicker form-control" required id="id_start">',
+            'class="flatpickrdatetimepicker form-control" required id="id_start">',
             html=True,
         )
         self.assertContains(
@@ -525,7 +525,7 @@ class AddEventView(DiaryTestsMixin, TestCase):
         self.assertContains(
             response,
             r'<input id="id_start" name="start" value="02/06/2013 20:00" '
-            r'type="text" required class="jquerydatetimepicker form-control" />',
+            r'type="text" required class="flatpickrdatetimepicker form-control" />',
             html=True,
         )
 
@@ -538,7 +538,7 @@ class AddEventView(DiaryTestsMixin, TestCase):
         self.assertContains(
             response,
             r'<input id="id_start" name="start" value="01/01/1950 20:00" '
-            r'type="text" required class="jquerydatetimepicker form-control" />',
+            r'type="text" required class="flatpickrdatetimepicker form-control" />',
             html=True,
         )
 
