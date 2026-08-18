@@ -149,9 +149,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
         # Urgh
         self.expected_mailout_event_html = """
             <textarea name="body_html" id="id_body_html" rows="10" cols="40">
-            <p><a href="https://www.cubecinema.com/programme/">
-            Cube Cinema Programme</a></p><table><tr>
-            <td colspan="3">
+            <p><a href="https://www.cubecinema.com/programme/">Cube Cinema Programme</a></p><table><tr><td colspan="3">
             2013
             </td></tr><tr><td colspan="3">
             JUNE
@@ -163,26 +161,19 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             Event four titl\u0113
             </td></tr></table><p>For complete listings
             including all future events, please visit:
-            <a href="https://www.cubecinema.com/programme/">
-            Cube Cinema Programme</a></p><hr><p>
-            Pretitle four:<br><strong><a
-            href="https://www.cubecinema.com/programme/event/event-four-title/4/">EVENT
-            FOUR TITL\u0112</a></strong><br>
+            <a href="https://www.cubecinema.com/programme/">Cube Cinema Programme</a></p><hr><p>
+            Pretitle four:<br><strong><a href="https://www.cubecinema.com/programme/event/event-four-title/4/">
+            EVENT FOUR TITL\u0112</a></strong><br>
             Posttitle four
             </p><p>
             Film info for four<br>
             Sun 9th / 6pm
             </p><p>
-            Tickets: \u00a3milliion per thing<br></p>
-            <p>
-            <em>
+            Tickets: \u00a3milliion per thing<br></p><p><em>
             \u010copy four summary
-            </em>
-            </p>
-            <hr><p>
+            </em></p><hr><p>
             For complete and up to date listings, please visit:
-            <a href="https://www.cubecinema.com/programme/">
-            Cube Cinema Programme</a></p><p>Cube Microplex
+            <a href="https://www.cubecinema.com/programme/">Cube Cinema Programme</a></p><p>Cube Microplex
             Cinema is located at:<br>
             Dove Street South<br>
             Bristol<br>
@@ -191,9 +182,7 @@ class MailoutTests(DiaryTestsMixin, TestCase):
             4 Princess Row<br>
             Bristol<br>
             BS2 8NQ
-            </p><p><a href="https://www.cubecinema.com">
-            www.cubecinema.com</a></p>
-            <p>tel: 0117 907 4190</p>
+            </p><p><a href="https://www.cubecinema.com">www.cubecinema.com</a></p><p>tel: 0117 907 4190</p>
             </textarea>"""
 
     def tearDown(self):
