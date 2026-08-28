@@ -409,11 +409,6 @@ class Showing(models.Model):
 
     booked_by = models.CharField(max_length=64)
 
-    extra_copy = models.TextField(max_length=4096, null=True, blank=True)
-    extra_copy_summary = models.TextField(
-        max_length=4096, null=True, blank=True
-    )
-
     confirmed = models.BooleanField(default=False)
     hide_in_programme = models.BooleanField(default=False)
     cancelled = models.BooleanField(default=False)
@@ -467,7 +462,6 @@ class Showing(models.Model):
                 "event",
                 "start",
                 "booked_by",
-                "extra_copy",
                 "confirmed",
                 "hide_in_programme",
                 "cancelled",
