@@ -26,6 +26,7 @@ from toolkit.diary.edit_views import (
     printed_programme_edit,
     view_force_error,
     view_terms_report_csv,
+    view_historic_showing,
 )
 from toolkit.diary.public_views import (
     ArchiveIndex,
@@ -175,6 +176,12 @@ diary_urls = [
         "history/",
         view_diary_history,
         name="view-diary-history",
+    ),
+    # View a historical showing (allows editing of post-showing notes)
+    path(
+        "history/showing/id/<int:showing_id>/",
+        view_historic_showing,
+        name="view-historic-showing",
     ),
     # Edit an event: view event before editing
     re_path(

@@ -251,6 +251,33 @@ def view_diary_history(request: HttpRequest) -> HttpResponse:
     return render(request, "view_diary_history.html", context)
 
 
+@permission_required("toolkit.read")
+def view_historic_showing(
+    request: HttpRequest, showing_id: int
+) -> HttpResponse:
+    showing = get_object_or_404(Showing, pk=showing_id)
+
+    if not showing.in_past():
+        raise Http404("Showing is not in the past")
+
+    other_showings_query = (
+        Showing.objects.filter(event_id=showing.event_id)
+        .exclude(id=showing_id)
+        .order_by("start")
+    )
+
+    now = django.utils.timezone.now()
+    other_showings = [(s, s.start > now) for s in other_showings_query]
+
+    context = {
+        "showing": showing,
+        "event": showing.event,
+        "other_showings": other_showings,
+    }
+
+    return render(request, "view_historic_showing.html", context)
+
+
 def _adjust_colour_historic(colour):
     return adjust_colour(
         colour,

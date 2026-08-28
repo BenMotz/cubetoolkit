@@ -1,0 +1,106 @@
+{% extends "form_base.html" %}
+{% load thumbnail_l %}
+{% load static %}
+{% load noprefix_url %}
+{% block title %}
+  Details for: {{ event.name }}
+{% endblock %}
+{% block css %}
+  {{ block.super }}
+  <style type="text/css">
+    p {
+    }
+    .copy {
+      padding: 0.5em;
+    }
+    p.image_caption {
+      font-style: italic;
+    }
+    .pre {
+      white-space: pre-wrap;
+    }
+    h1 { color: lightgray; }
+    #t_name {
+        color: green;
+    }
+    #t_start {
+        color: gray;
+    }
+
+  </style>
+{% endblock %}
+
+{% block body %}
+  <h1><span id="t_name">{{ event.name }}</span> @ <span id="t_start">{{ showing.start|date:"d/m/Y H:i" }}</span></h1>
+  {% include "bs_messages.html" %}
+
+  <table class="table">
+    <tr><td>Pre-title</td><td>{{event.pre_title }}</td></tr>
+    <tr><td>Name</td><td>{{ event.name }}</td></tr>
+    <tr><td>Post-title</td><td>{{event.post_title }}</td></tr>
+    <tr><td>Tags</td><td>{{ event.tags.all|join:", " }}</td></tr>
+    <tr><td>Public programme link</td><td>{% if event.showings.public and not event.private %}<a href="{% noprefix_url "single-event-view" event.pk %}">{% noprefix_url "single-event-view" event.pk %}</a>{% else %}
+    Event not visible in online programme: {% if event.private %}It's marked private.{% endif %} {% if not event.showings.public %}Bookings are all unconfirmed or hidden in programme.{% endif %}
+    {% endif %}</td></tr>
+    <tr><td>Pricing</td><td>{{ event.pricing }}</td></tr>
+    {% if event.ticket_link %}<tr><td>Online tickets</td><td><a href="{{ event.ticket_link }}">{{ event.ticket_link }}</a></td></tr>{% endif %}
+    <tr><td>Film information</td><td>{{ event.film_information }}</td></tr>
+    <tr><td>Programmer's notes</td><td>{{event.notes}}</td></tr>
+    <tr><td>Event image</td><td>
+
+    {% with event.media.all.0 as media_item %}
+    {% if media_item %}
+      <a href="{% get_media_prefix %}{{ media_item.media_file }}"><img src="{{ media_item.media_file|thumbnail_url:'editpreview' }}" alt="Picture for event {{ event.name }}"></a>
+      {% if media_item.credit %}
+        <p class="image_caption">Image by: {{ media_item.credit }}</p>
+      {% endif %}
+    {% else %}
+      <i>no image</i>
+    {% endif %}
+    {% endwith %}
+    </td></tr>
+
+    <tr><td>Copy (for event web page)</td><td><div class="copy">{{event.copy_html}}</div></td></tr>
+    <tr><td>Copy summary (for web index and printed programme)</td><td>
+    <p class="pre">{{event.copy_summary}}</p></td></tr>
+    <tr><td>Terms</td><td><p class="pre">{{event.terms}}</p></td></tr>
+  </table>
+
+  {% if other_showings %}
+  <div id="booking">
+      <h3>Other Bookings for {{ event.name }}</h3>
+      <table class="table" id="booking-table">
+        <thead>
+          <tr>
+            <th>When</th>
+            <th>Booked by</th>
+            <th class="centered">Confirmed</th>
+            <th class="centered">Secret</th>
+            <th class="centered">Cancelled</th>
+            <th class="centered">Discounted</th>
+            <th class="centered">Sold&nbsp;out</th>
+          </tr>
+        </thead>
+        {% for other_showing, future in other_showings %}
+          <tr>
+            <td>
+                <a href=
+                   {% if future %}"{% url "edit-showing" other_showing.pk %}"{% else %}"{% url "view-historic-showing" other_showing.pk %}"{% endif %}>
+                    {{ other_showing.start|date:"d/m/Y H:i" }}
+                </a> {% if future %}(future){% endif %}
+            </td>
+            <td>{{ other_showing.booked_by }}</td>
+            <td class="centered">{{ other_showing.confirmed|yesno }}</td>
+            <td class="centered">{{ other_showing.hide_in_programme|yesno }}</td>
+            <td class="centered">{{ other_showing.cancelled|yesno }}</td>
+            <td class="centered">{{ other_showing.discounted|yesno }}</td>
+            <td class="centered">{{ other_showing.sold_out|yesno }}</td>
+          </tr>
+        {% endfor %}
+      </table>
+  </div>
+  {% endif %}
+  <p id="Back"><a href="{% url "view-diary-history" %}">Back to diary history</a></p>
+
+{% endblock %}
+

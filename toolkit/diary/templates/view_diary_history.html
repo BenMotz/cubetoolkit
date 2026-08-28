@@ -71,7 +71,7 @@
               {{ showing.start|date:"H:i" }}
             </td>
              <td>
-               <a href="{% url "edit-showing" showing_id=showing.pk %}"
+               <a href="{% url "view-historic-showing" showing_id=showing.pk %}"
                      class="{{ showing.cancelled|yesno:"cancelled," }}
                             {{ showing.confirmed|yesno:",unconfirmed" }}">
                  {% if showing.confirmed %}
