@@ -6,6 +6,7 @@ import csv
 from collections import OrderedDict
 
 from django.http import (
+    HttpRequest,
     HttpResponse,
     Http404,
     HttpResponseRedirect,
@@ -16,7 +17,6 @@ from django.conf import settings
 from django.forms.models import modelformset_factory
 from django.contrib import messages
 from django.views.generic import View
-import django.template
 import django.db
 from django.db.models import Q
 import django.utils.timezone as timezone
@@ -216,6 +216,39 @@ def edit_diary_list(request, year=None, day=None, month=None):
         "multiroom_enabled": settings.MULTIROOM_ENABLED,
     }
     return render(request, "edit_event_index.html", context)
+
+
+@permission_required("toolkit.read")
+def view_diary_history(request: HttpRequest) -> HttpResponse:
+    query_days_behind_qs = request.GET.get("daysbehind", None)
+    query_days_behind = 30
+
+    try:
+        query_days_behind = int(query_days_behind_qs)
+    except (ValueError, TypeError):
+        pass
+
+    end = timezone.now()
+    start = end - datetime.timedelta(days=query_days_behind)
+    # round back to the start of the day;
+    start = start.replace(hour=0, minute=0, second=0, microsecond=0)
+
+    showings = (
+        Showing.objects.start_in_range(start, end)
+        .order_by("start", "room", "created_at")
+        .select_related()
+    )
+
+    dates = OrderedDict(
+        ((start + datetime.timedelta(days=days)).date(), [])
+        for days in range(query_days_behind, -1, -1)
+    )
+
+    for showing in showings:
+        dates[showing.start.date()].append(showing)
+
+    context = {"dates": dates, "days_behind": query_days_behind}
+    return render(request, "view_diary_history.html", context)
 
 
 def _adjust_colour_historic(colour):

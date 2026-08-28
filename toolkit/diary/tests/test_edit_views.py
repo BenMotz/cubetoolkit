@@ -73,6 +73,7 @@ class ViewSecurity(DiaryTestsMixin, TestCase):
         "default-edit": {},
         "diary-edit-calendar": {},
         "edit-diary-data": {},
+        "view-diary-history": {},
         "year-edit": {"year": "2013"},
         "month-edit": {"year": "2013", "month": "1"},
         "day-edit": {"year": "2013", "month": "1", "day": "1"},
@@ -204,6 +205,18 @@ class EditDiaryViews(DiaryTestsMixin, TestCase):
         response = self.client.get(url)
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "form_edit_roles.html")
+
+
+class ViewDiaryHistoryView(DiaryTestsMixin, TestCase):
+    def setUp(self):
+        super().setUp()
+        self.client.login(username="admin", password="T3stPassword!")
+
+    def test_view_diary_history(self):
+        url = reverse("view-diary-history")
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_diary_history.html")
 
 
 class EditDiaryListRoomsTests(DiaryTestsMixin, NowPatchMixin, TestCase):

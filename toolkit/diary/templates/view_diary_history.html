@@ -1,0 +1,100 @@
+{% extends "base_admin.html" %}
+
+{% block title %}
+  Event Diary History
+{% endblock %}
+
+{% block css %}
+  {{ block.super }}
+  <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/messages.css">
+  <link rel="stylesheet" type="text/css" href="{{ STATIC_URL }}css/lib/flatpickr.min.css">
+  <style type="text/css">
+    .unconfirmed {
+        color: darkgray;
+    }
+    .cancelled {
+        text-decoration: line-through;
+        color: gray;
+    }
+    td:first-child {
+        text-align: right;
+    }
+  </style>
+{% endblock %}
+
+{% block script %}
+  {{ block.super }}
+  <script src="{{ STATIC_URL }}js/lib/flatpickr.js"></script>
+  <script>
+    $(document).ready(function() {
+            flatpickr('#id_look_back_to', {
+                dateFormat: 'd-m-Y',
+                allowInput: true,
+                onChange: dateRangeSelected,
+                maxDate:  'today',
+            });
+    });
+    function dateRangeSelected(selectedDates, dateText, inst) {
+        const endDate = new Date();
+        const startDate = selectedDates[0];
+        if(!startDate) { return true; }
+        const timeDiff = endDate.getTime() - startDate.getTime();
+        let daysBehind = Math.ceil(timeDiff / (1000 * 3600 * 24));
+        if(daysBehind < 1) { daysBehind = 1; }
+        window.location.href = "{% url "view-diary-history" %}?daysbehind=" + daysBehind;
+    }
+  </script>
+{% endblock %}
+
+{% block body %}
+  <h1>What happened?</h1>
+  <div class="programme">
+    <p align='center'>
+    <label>Back to: <input type="text" name="look_back_to" value="{{ end|date:'j-m-Y'}}" id="id_look_back_to"></label><br>
+    {% include "messages.html" %}
+
+    <table class="table table-striped">
+      {% for day, showings in dates.items %}
+        {% ifchanged %}
+          <tr class="row_month">
+            <td colspan="3"><h2>{{ day|date:"F Y" }}</h2></td>
+          </tr>
+        {% endifchanged %}
+        {% for showing in showings %}
+          <tr>
+            <td>
+              {% if forloop.first %}
+                {{ day|date:"D j"}}
+              {% endif %}
+            </td>
+            <td>
+              {{ showing.start|date:"H:i" }}
+            </td>
+             <td>
+               <a href="{% url "edit-showing" showing_id=showing.pk %}"
+                     class="{{ showing.cancelled|yesno:"cancelled," }}
+                            {{ showing.confirmed|yesno:",unconfirmed" }}">
+                 {% if showing.confirmed %}
+                   {{ showing.event.pre_title }} {{ showing.event.name }} {{ showing.event.post_title }}
+                 {% else %}
+                   {{ showing.event.name }} (unconfirmed)
+                 {% endif %}
+                 {{ showing.discounted|yesno:"*," }}
+                 {{ showing.cancelled|yesno:"(CANCELLED)," }}
+               </a>
+             </td>
+          </tr>
+        {% empty %}
+          <tr>
+            <td>{{ day|date:"D j"}}</td>
+            <td colspan="2"></td>
+          </tr>
+        {% endfor %}
+      {% endfor %}
+    </table>
+  </div>
+
+  <p id="end"><a class="btn btn-primary" href="{% url "view-diary-history" %}?daysbehind={{ days_behind|add:"30" }}#end">Load more...</a></p>
+
+{% endblock %}
+

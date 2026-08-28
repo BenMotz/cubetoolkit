@@ -18,6 +18,7 @@ from toolkit.diary.edit_views import (
     edit_event_templates,
     edit_event_tags,
     edit_roles,
+    view_diary_history,
     view_event_field,
     view_rota_vacancies,
     set_edit_preferences,
@@ -168,6 +169,12 @@ diary_urls = [
         r"^edit/(?P<year>\d{4})/(?P<month>\d{1,2})/(?P<day>\d{1,2})",
         edit_diary_list,
         name="day-edit",
+    ),
+    # View event history
+    path(
+        "history/",
+        view_diary_history,
+        name="view-diary-history",
     ),
     # Edit an event: view event before editing
     re_path(
