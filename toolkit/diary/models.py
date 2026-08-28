@@ -434,44 +434,9 @@ class Showing(models.Model):
         ordering = ["start"]
 
     def __init__(self, *args, **kwargs):
-        # Allow "copy_from" and "start_offset" keyword args to be supplied.
-        # If "copy_from" is supplied, all showing details except for rota
-        # items (which require DB writes) are copied from the supplied Showing
-        # object.
-        # If "start_offset" is passed and "copy_from" is also passed then the
-        # given TimeDelta is added to copy_from.start
-        # (If start_offset is defined but copy_from is not then a ValueError is
-        # raised)
-
-        copy_from = kwargs.pop("copy_from", None)
-        start_offset = kwargs.pop("start_offset", None)
-        if start_offset and copy_from is None:
-            raise ValueError("start_offset supplied with no copy_from")
-
         super().__init__(*args, **kwargs)
-
         self._original_start = self.start
 
-        if copy_from:
-            logger.info(
-                f"Cloning showing from existing showing (id {copy_from.pk})"
-            )
-            # Manually copy fields, rather than using things from copy library,
-            # as don't want to copy the rota (as that would make db writes)
-            attributes_to_copy = (
-                "event",
-                "start",
-                "booked_by",
-                "confirmed",
-                "hide_in_programme",
-                "cancelled",
-                "discounted",
-                "room",
-            )
-            for attribute in attributes_to_copy:
-                setattr(self, attribute, getattr(copy_from, attribute))
-            if start_offset:
-                self.start += start_offset
 
     def __str__(self):
         if (
