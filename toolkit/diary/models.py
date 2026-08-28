@@ -415,6 +415,10 @@ class Showing(models.Model):
     discounted = models.BooleanField(default=False)
     sold_out = models.BooleanField(default=False)
 
+    post_showing_notes = models.TextField(
+        max_length=4096, blank=True, verbose_name="Post-showing notes"
+    )
+
     # sales tables?
 
     # Rota entries
@@ -436,7 +440,6 @@ class Showing(models.Model):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._original_start = self.start
-
 
     def __str__(self):
         if (
