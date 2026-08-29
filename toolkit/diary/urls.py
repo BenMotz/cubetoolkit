@@ -12,6 +12,7 @@ from toolkit.diary.edit_views import (
     edit_diary_data,
     edit_showing,
     edit_showing_rota_notes,
+    edit_showing_post_showing_notes,
     edit_ideas,
     delete_showing,
     add_event,
@@ -200,6 +201,11 @@ diary_urls = [
         r"^edit/showing/id/(?P<showing_id>\d+)/$",
         edit_showing,
         name="edit-showing",
+    ),
+    path(
+        "edit/showing/id/<int:showing_id>/post-showing-notes",
+        edit_showing_post_showing_notes,
+        name="edit-post-showing-notes",
     ),
     # Edit rota notes for a showing
     re_path(

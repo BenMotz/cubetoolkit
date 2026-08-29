@@ -67,6 +67,7 @@ class ViewSecurity(DiaryTestsMixin, TestCase):
         "members-mailout": {},
         "queue-members-mailout": {},
         "add-printed-programme": {},
+        "edit-post-showing-notes": {"showing_id": "1"},
     }
 
     only_read_required = {
@@ -2041,6 +2042,154 @@ class ViewEventFieldTests(DiaryTestsMixin, TestCase):
 
         self.assertNotContains(response, "EVENT THREE TITLE")
         self.assertNotContains(response, "EVENT FOUR TITL\u0112")
+
+
+class ViewHistoricShowingTests(DiaryTestsMixin, TestCase):
+    def setUp(self):
+        super().setUp()
+        # Log in:
+        self.client.login(username="admin", password="T3stPassword!")
+
+    def test_get_ok(self):
+        url = reverse(
+            "view-historic-showing",
+            kwargs={"showing_id": self.e4s3.id},
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_historic_showing.html")
+
+        self.assertContains(response, self.e4.name, html=True)
+        self.assertContains(response, self.e4.copy, html=True)
+        self.assertContains(response, self.e4.pricing, html=True)
+        self.assertContains(response, self.e4.copy_summary, html=True)
+
+    def test_get_not_found(self):
+        url = reverse(
+            "view-historic-showing",
+            kwargs={"showing_id": 10000},
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 404)
+
+    @patch("django.utils.timezone.now")
+    def test_future_showing(self, now_patch):
+        now_patch.return_value = self._fake_now
+        url = reverse(
+            "view-historic-showing",
+            kwargs={"showing_id": self.e4s3.id},
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(
+            response.content.decode("utf-8"), "Showing is not in the past"
+        )
+
+
+class EditShowingPostShowingNotesTests(DiaryTestsMixin, TestCase):
+    def setUp(self):
+        super().setUp()
+        # Log in:
+        self.client.login(username="admin", password="T3stPassword!")
+
+    def test_get_not_allowed(self):
+        url = reverse(
+            "edit-post-showing-notes",
+            kwargs={"showing_id": self.e4s3.id},
+        )
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, 405)
+
+    def test_post_not_found(self):
+        url = reverse(
+            "edit-post-showing-notes",
+            kwargs={"showing_id": 10000},
+        )
+        response = self.client.post(url, data={"post_showing_notes": "Notes"})
+        self.assertEqual(response.status_code, 404)
+
+    def test_post_updates_notes_and_redirects(self):
+        new_notes = "Line 1\nLine 2\n ...etc. (\u01d4\u01cbcode!)"
+
+        url = reverse(
+            "edit-post-showing-notes",
+            kwargs={"showing_id": self.e4s3.id},
+        )
+        response = self.client.post(
+            url, data={"post_showing_notes": new_notes}, follow=True
+        )
+
+        self.assertRedirects(
+            response,
+            reverse(
+                "view-historic-showing",
+                kwargs={"showing_id": self.e4s3.id},
+                fragment="notes",
+            ),
+        )
+        self.assertContains(response, "Post-showing notes updated.")
+
+        showing = Showing.objects.get(pk=self.e4s3.id)
+        self.assertEqual(showing.post_showing_notes, new_notes)
+
+    def test_post_clear_notes(self):
+        url = reverse(
+            "edit-post-showing-notes",
+            kwargs={"showing_id": self.e4s3.id},
+        )
+        response = self.client.post(url, data={"post_showing_notes": ""})
+        self.assertEqual(response.status_code, 302)
+
+        showing = Showing.objects.get(pk=self.e4s3.id)
+        self.assertEqual(showing.post_showing_notes, "")
+
+    def test_post_clear_notes_no_data(self):
+        url = reverse(
+            "edit-post-showing-notes",
+            kwargs={"showing_id": self.e4s3.id},
+        )
+        response = self.client.post(url, data={})
+        self.assertEqual(response.status_code, 302)
+
+        showing = Showing.objects.get(pk=self.e4s3.id)
+        self.assertEqual(showing.post_showing_notes, "")
+
+    def test_post_max_length_notes(self):
+        new_notes = "x" * 4096
+
+        url = reverse(
+            "edit-post-showing-notes",
+            kwargs={"showing_id": self.e4s3.id},
+        )
+        response = self.client.post(
+            url, data={"post_showing_notes": new_notes}
+        )
+        self.assertEqual(response.status_code, 302)
+
+        showing = Showing.objects.get(pk=self.e4s3.id)
+        self.assertEqual(showing.post_showing_notes, new_notes)
+
+    def test_post_over_max_length_notes_rejected(self):
+        original_notes = self.e4s3.post_showing_notes
+        too_long_notes = "x" * 4097
+
+        url = reverse(
+            "edit-post-showing-notes",
+            kwargs={"showing_id": self.e4s3.id},
+        )
+        response = self.client.post(
+            url, data={"post_showing_notes": too_long_notes}
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "view_historic_showing.html")
+        self.assertFormError(
+            response.context["post_showing_notes_form"],
+            "post_showing_notes",
+            "Ensure this value has at most 4096 characters (it has 4097).",
+        )
+
+        showing = Showing.objects.get(pk=self.e4s3.id)
+        self.assertEqual(showing.post_showing_notes, original_notes)
 
 
 class ViewTermsReportCsvTests(DiaryTestsMixin, TestCase):

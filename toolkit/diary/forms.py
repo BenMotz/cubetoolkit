@@ -250,6 +250,24 @@ class ShowingRotaNotesForm(forms.ModelForm):
         fields = ("rota_notes",)
 
 
+class ShowingPostShowingNotesForm(forms.ModelForm):
+
+    class Meta:
+        model = toolkit.diary.models.Showing
+        fields = ("post_showing_notes",)
+        widgets = {
+            "post_showing_notes": forms.Textarea(
+                attrs={
+                    "class": "textarea form-control",
+                    "rows": 20,
+                    "wrap": "soft",
+                    "placeholder": "Use this space to record any notes about the booking after it has taken place\n"
+                    "e.g. terms that should have been entered before the event",
+                },
+            )
+        }
+
+
 def rota_form_factory(showing):
     # Dynamically generate a form to edit the rota for the given showing
 

@@ -9,6 +9,7 @@ from django.http import (
     HttpRequest,
     HttpResponse,
     Http404,
+    HttpResponseBadRequest,
     HttpResponseRedirect,
 )
 from django.shortcuts import get_object_or_404, render
@@ -258,7 +259,7 @@ def view_historic_showing(
     showing = get_object_or_404(Showing, pk=showing_id)
 
     if not showing.in_past():
-        raise Http404("Showing is not in the past")
+        return HttpResponseBadRequest(b"Showing is not in the past")
 
     other_showings_query = (
         Showing.objects.filter(event_id=showing.event_id)
@@ -273,9 +274,45 @@ def view_historic_showing(
         "showing": showing,
         "event": showing.event,
         "other_showings": other_showings,
+        "post_showing_notes_form": diary_forms.ShowingPostShowingNotesForm(
+            instance=showing
+        ),
     }
 
     return render(request, "view_historic_showing.html", context)
+
+
+@permission_required("toolkit.write")
+@require_POST
+def edit_showing_post_showing_notes(
+    request: HttpRequest, showing_id: int
+) -> HttpResponse:
+    showing = get_object_or_404(Showing, pk=showing_id)
+    form = diary_forms.ShowingPostShowingNotesForm(
+        request.POST, instance=showing
+    )
+    if form.is_valid():
+        showing = form.save(commit=False)
+        # Without 'force' we can't save changes to historic showings;
+        showing.save(force=True)
+        messages.success(request, "Post-showing notes updated.")
+        return HttpResponseRedirect(
+            reverse(
+                "view-historic-showing",
+                fragment="notes",
+                kwargs={"showing_id": showing_id},
+            )
+        )
+    else:
+        return render(
+            request,
+            "view_historic_showing.html",
+            {
+                "showing": showing,
+                "event": showing.event,
+                "post_showing_notes_form": form,
+            },
+        )
 
 
 def _adjust_colour_historic(colour):
