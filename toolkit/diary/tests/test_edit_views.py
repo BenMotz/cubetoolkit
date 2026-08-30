@@ -2127,7 +2127,7 @@ class EditShowingPostShowingNotesTests(DiaryTestsMixin, TestCase):
                 fragment="notes",
             ),
         )
-        self.assertContains(response, "Post-showing notes updated.")
+        self.assertContains(response, "Post-booking notes updated.")
 
         showing = Showing.objects.get(pk=self.e4s3.id)
         self.assertEqual(showing.post_showing_notes, new_notes)

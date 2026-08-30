@@ -47,14 +47,13 @@
 {% endblock %}
 
 {% block body %}
-  <h1>Past event: <span id="t_name">{{ event.name }}</span> @ <span id="t_start">{{ showing.start|date:"d/m/Y H:i" }}</span></h1>
+  <h1>Past booking: <span id="t_name">{{ event.name }}</span> @ <span id="t_start">{{ showing.start|date:"d/m/Y H:i" }}</span></h1>
   {% include "bs_messages.html" %}
-
   <ul class="nav nav-tabs" id="showing-tabs" role="tablist">
     <li class="nav-item" role="presentation"><button class="nav-link active" id="event-tab" data-bs-toggle="tab" data-bs-target="#event-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="true">Event information</button></li>
     <li class="nav-item" role="presentation"><button class="nav-link" id="showing-tab" data-bs-toggle="tab" data-bs-target="#showing-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="false">Booking information</button></li>
     <li class="nav-item" role="presentation"><button class="nav-link" id="notes-tab" data-bs-toggle="tab" data-bs-target="#notes-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="false">Edit post-booking notes</button></li>
-    {% if other_showing %}<li class="nav-item" role="presentation"><button class="nav-link" id="bookings-tab" data-bs-toggle="tab" data-bs-target="#bookings-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="false" >Other bookings</button></li>disabled{% endif %}
+    <li class="nav-item" role="presentation"><button class="nav-link" id="bookings-tab" data-bs-toggle="tab" data-bs-target="#bookings-tab-pane" type="button" role="tab" aria-controls="home-tab-pane" aria-selected="false"{% if not other_showings %} disabled{% endif %}>Other bookings</button></li>
   </ul>
 
   <div class="tab-content" id="showing-tabs-content">
@@ -107,6 +106,9 @@
    </div>
 
    <div class="tab-pane fade" id="notes-tab-pane">
+     {% if other_showings %}
+     <p>NB: These notes are only for this booking - the other bookings for this event each have their own notes</p>
+     {% endif %}
     <form method="post" action="{% url 'edit-post-showing-notes' showing.pk %}">
      {% csrf_token %}
      <p>
@@ -121,7 +123,7 @@
    <div class="tab-pane fade" id="bookings-tab-pane">
     {% if other_showings %}
     <div id="booking">
-        <h3>Other Bookings for {{ event.name }}</h3>
+        <h3>All Bookings for {{ event.name }}</h3>
         <table class="table" id="booking-table">
           <thead>
             <tr>
@@ -134,13 +136,17 @@
               <th class="centered">Sold&nbsp;out</th>
             </tr>
           </thead>
-          {% for other_showing, future in other_showings %}
+          {% for other_showing, future in event_showings %}
             <tr>
               <td>
-                  <a href=
-                     {% if future %}"{% url "edit-showing" other_showing.pk %}"{% else %}"{% url "view-historic-showing" other_showing.pk %}"{% endif %}>
-                      {{ other_showing.start|date:"d/m/Y H:i" }}
-                  </a> {% if future %}(future){% endif %}
+               {% if other_showing.pk == showing.pk %}
+                   {{ other_showing.start|date:"d/m/Y H:i" }} (this booking)
+               {% else %}
+               <a href=
+                  {% if future %}"{% url "edit-showing" other_showing.pk %}"{% else %}"{% url "view-historic-showing" other_showing.pk %}#showing"{% endif %}>
+                   {{ other_showing.start|date:"d/m/Y H:i" }}
+               </a> {% if future %}(future){% endif %}
+               {% endif %}
               </td>
               <td>{{ other_showing.booked_by }}</td>
               <td class="centered">{{ other_showing.confirmed|yesno }}</td>

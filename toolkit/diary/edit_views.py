@@ -261,18 +261,15 @@ def view_historic_showing(
     if not showing.in_past():
         return HttpResponseBadRequest(b"Showing is not in the past")
 
-    other_showings_query = (
-        Showing.objects.filter(event_id=showing.event_id)
-        .exclude(id=showing_id)
-        .order_by("start")
-    )
 
     now = django.utils.timezone.now()
-    other_showings = [(s, s.start > now) for s in other_showings_query]
+    event_showings = [(s, s.start > now) for s in showing.event.showings.order_by("start")]
+    other_showings = len(event_showings) > 1
 
     context = {
         "showing": showing,
         "event": showing.event,
+        "event_showings": event_showings,
         "other_showings": other_showings,
         "post_showing_notes_form": diary_forms.ShowingPostShowingNotesForm(
             instance=showing
@@ -295,7 +292,7 @@ def edit_showing_post_showing_notes(
         showing = form.save(commit=False)
         # Without 'force' we can't save changes to historic showings;
         showing.save(force=True)
-        messages.success(request, "Post-showing notes updated.")
+        messages.success(request, "Post-booking notes updated.")
         return HttpResponseRedirect(
             reverse(
                 "view-historic-showing",
