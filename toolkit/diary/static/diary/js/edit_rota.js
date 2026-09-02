@@ -57,7 +57,8 @@ function edit_rota(jQuery, rota_edit_base_url, edit_rota_notes_url_prefix, vol_e
             submitdata: {
                 csrfmiddlewaretoken: CSRF_TOKEN
             },
-            callback: nameEditedCallback
+            callback: nameEditedCallback,
+            data: unEscape // see comment in configureRotaNotesEditInPlaceControls, below
         });
     }
 
