@@ -13,6 +13,7 @@ from django.contrib.auth.models import User
 from django.test import TestCase
 from django.test.utils import override_settings
 from django.urls import reverse
+from django.utils.html import escape
 
 from toolkit.diary.models import (
     Showing,
@@ -67,7 +68,6 @@ class ViewSecurity(DiaryTestsMixin, TestCase):
         "members-mailout": {},
         "queue-members-mailout": {},
         "add-printed-programme": {},
-        "edit-post-showing-notes": {"showing_id": "1"},
     }
 
     only_read_required = {
@@ -90,6 +90,7 @@ class ViewSecurity(DiaryTestsMixin, TestCase):
         "rota-edit": {},
         "edit-showing-rota-notes": {"showing_id": "1"},
         "view-rota-vacancies": {},
+        "edit-post-showing-notes": {"showing_id": "1"},
     }
 
     def _assert_need_login(self, views_to_test):
@@ -2131,6 +2132,47 @@ class EditShowingPostShowingNotesTests(DiaryTestsMixin, TestCase):
 
         showing = Showing.objects.get(pk=self.e4s3.id)
         self.assertEqual(showing.post_showing_notes, new_notes)
+
+    def test_post_updates_notes_and_returns_inline(self):
+        new_notes = "Line 1\nLine 2\n ...etc. (\u01d4\u01cbcode!)"
+
+        url = reverse(
+            "edit-post-showing-notes",
+            kwargs={"showing_id": self.e4s3.id},
+            query={"inline-edit": "true"},
+        )
+        response = self.client.post(
+            url, data={"post_showing_notes": new_notes}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "text/plain")
+        self.assertEqual(response.content.decode("utf-8"), escape(new_notes))
+
+        showing = Showing.objects.get(pk=self.e4s3.id)
+        self.assertEqual(showing.post_showing_notes, new_notes)
+
+    def test_post_invalid_notes_inline_edit_returns_error(self):
+        original_notes = self.e4s3.post_showing_notes
+        too_long_notes = "x" * 4097
+
+        url = reverse(
+            "edit-post-showing-notes",
+            kwargs={"showing_id": self.e4s3.id},
+            query={"inline-edit": "true"},
+        )
+        response = self.client.post(
+            url, data={"post_showing_notes": too_long_notes}
+        )
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response["Content-Type"], "text/plain")
+        self.assertEqual(
+            response.content.decode("utf-8"), "Error saving notes"
+        )
+
+        showing = Showing.objects.get(pk=self.e4s3.id)
+        self.assertEqual(showing.post_showing_notes, original_notes)
 
     def test_post_clear_notes(self):
         url = reverse(

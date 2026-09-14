@@ -27,7 +27,7 @@
     .showing_title a:hover {
         text-decoration: underline;
     }
-    .showing_rota_notes, .past_showing_rota_notes {
+    .showing_rota_notes, .past_showing_rota_notes, .post_showing_notes {
         border-top: thin dashed lightgray;
         border-bottom: thin solid lightgray;
         width: 90%;
@@ -41,7 +41,7 @@
     .showing_rota_notes span {
         cursor: pointer;
     }
-    .past_showing, .past_showing a, .past_showing a:visited {
+    .past_showing, .past_showing a, .past_showing a:visited, .past_showing_rota_notes {
        color: darkgray;
     }
     ul.rota li{
@@ -84,6 +84,7 @@
         jQuery,
         "{% url "rota-edit" %}",
         "{{ edit_showing_notes_url_prefix }}",
+        "{{ edit_post_showing_notes_url_prefix }}",
         "{{ VENUE.vols_email }}",
         "{{ csrf_token }}"
     );
@@ -118,7 +119,14 @@
           </li>
         {% endfor %}
       </ul>
-      <p class="{% if showing.in_past %}past_{% endif %}showing_rota_notes"><span id="showing_rota_notes_{{ showing.pk }}">{{ showing.rota_notes }}</span></p>
+      {% if showing.in_past %}
+      Post-showing notes (click to edit):
+      <p class="post_showing_notes"><span id="post_showing_notes_{{ showing.pk }}">{{ showing.post_showing_notes }}</span></p>
+      General notes (locked):
+      <p class="past_showing_rota_notes"><span id="showing_rota_notes_{{ showing.pk }}">{{ showing.rota_notes }}</span></p>
+      {% else %}
+      <p class="showing_rota_notes"><span id="showing_rota_notes_{{ showing.pk }}">{{ showing.rota_notes }}</span></p>
+      {% endif %}
     {% endfor %}
     {% endwith %}
     </div>

@@ -1,4 +1,4 @@
-function edit_rota(jQuery, rota_edit_base_url, edit_rota_notes_url_prefix, vol_email, CSRF_TOKEN) {
+function edit_rota(jQuery, rota_edit_base_url, edit_rota_notes_url_prefix, edit_post_showing_notes_url_prefix, vol_email, CSRF_TOKEN) {
     "use strict";
     const $ = jQuery;
     let fromDatePicker;
@@ -108,9 +108,50 @@ function edit_rota(jQuery, rota_edit_base_url, edit_rota_notes_url_prefix, vol_e
         });
     }
 
+    function configureShowingEditInPlaceControls({id_re, selector, url_prefix, url_suffix, form_field, placeholder}) {
+        $(selector + ' span').each(function() {
+            const element = $(this),
+                showing_id_match = id_re.exec(element.attr('id'));
+
+            if(showing_id_match) {
+                const showing_id = showing_id_match[1];
+                element.editable(
+                    url_prefix + showing_id + url_suffix,
+                    {
+                        name: form_field,
+                        type: 'textarea',
+                        rows: 5,
+                        width: '90%',
+                        placeholder: placeholder,
+                        submit: 'Save',
+                        submitdata: {
+                            csrfmiddlewaretoken: CSRF_TOKEN
+                        },
+                        data: unEscape // see note above
+                    }
+                );
+            }
+        });
+    }
     $(document).ready(function() {
         configureDatePickerControls();
         configureRotaNameEditInPlaceControls();
-        configureRotaNotesEditInPlaceControls();
+
+        configureShowingEditInPlaceControls({
+            id_re: /showing_rota_notes_(\d+)/,
+            selector: '.showing_rota_notes',
+            url_prefix: edit_rota_notes_url_prefix,
+            url_suffix: '/rota_notes/',
+            form_field: 'rota_notes',
+            placeholder: '<span class="na">General notes (click to edit)</span>'
+        });
+        configureShowingEditInPlaceControls({
+            id_re: /post_showing_notes_(\d+)/,
+            selector: '.post_showing_notes',
+            url_prefix: edit_post_showing_notes_url_prefix,
+            url_suffix: '/post-showing-notes/?inline-edit=true',
+            form_field: 'post_showing_notes',
+            placeholder: '<span class="na">Notes from the night (click to edit)</span>'
+        });
     });
 }

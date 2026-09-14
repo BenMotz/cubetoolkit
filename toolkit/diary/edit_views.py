@@ -261,9 +261,10 @@ def view_historic_showing(
     if not showing.in_past():
         return HttpResponseBadRequest(b"Showing is not in the past")
 
-
     now = django.utils.timezone.now()
-    event_showings = [(s, s.start > now) for s in showing.event.showings.order_by("start")]
+    event_showings = [
+        (s, s.start > now) for s in showing.event.showings.order_by("start")
+    ]
     other_showings = len(event_showings) > 1
 
     context = {
@@ -279,7 +280,7 @@ def view_historic_showing(
     return render(request, "view_historic_showing.html", context)
 
 
-@permission_required("toolkit.write")
+@permission_required("diary.change_rotaentry")
 @require_POST
 def edit_showing_post_showing_notes(
     request: HttpRequest, showing_id: int
@@ -292,24 +293,39 @@ def edit_showing_post_showing_notes(
         showing = form.save(commit=False)
         # Without 'force' we can't save changes to historic showings;
         showing.save(force=True)
-        messages.success(request, "Post-booking notes updated.")
-        return HttpResponseRedirect(
-            reverse(
-                "view-historic-showing",
-                fragment="notes",
-                kwargs={"showing_id": showing_id},
+
+    inline_edit_q = request.GET.get("inline-edit", None)
+    inline_edit = inline_edit_q == "true"
+    if inline_edit:
+        if form.is_valid():
+            return HttpResponse(
+                escape(showing.post_showing_notes),
+                content_type="text/plain",
             )
-        )
+        else:
+            return HttpResponse(
+                "Error saving notes", status=400, content_type="text/plain"
+            )
     else:
-        return render(
-            request,
-            "view_historic_showing.html",
-            {
-                "showing": showing,
-                "event": showing.event,
-                "post_showing_notes_form": form,
-            },
-        )
+        if form.is_valid():
+            messages.success(request, "Post-booking notes updated.")
+            return HttpResponseRedirect(
+                reverse(
+                    "view-historic-showing",
+                    fragment="notes",
+                    kwargs={"showing_id": showing_id},
+                )
+            )
+        else:
+            return render(
+                request,
+                "view_historic_showing.html",
+                {
+                    "showing": showing,
+                    "event": showing.event,
+                    "post_showing_notes_form": form,
+                },
+            )
 
 
 def _adjust_colour_historic(colour):
@@ -1206,12 +1222,20 @@ class EditRotaView(PermissionRequiredMixin, View):
         )
         showing_notes_url_prefix = url_with_id[: url_with_id.find("999")]
 
+        post_showing_notes_url_with_id = reverse(
+            "edit-post-showing-notes", kwargs={"showing_id": 999}
+        )
+        post_showing_notes_url_prefix = post_showing_notes_url_with_id[
+            : post_showing_notes_url_with_id.find("999")
+        ]
+
         context = {
             "start_date": start_date,
             "end_date": end_date,
             "days_ahead": days_ahead,
             "showings": showings,
             "edit_showing_notes_url_prefix": showing_notes_url_prefix,
+            "edit_post_showing_notes_url_prefix": post_showing_notes_url_prefix,
         }
 
         return render(request, "edit_rota.html", context)

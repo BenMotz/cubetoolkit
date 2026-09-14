@@ -505,6 +505,7 @@ class ToolkitUsersFixture(fixtures.Fixture):
         # Set user permissions, r/w:
         user_rw.user_permissions.add(write_permission)
         user_rw.user_permissions.add(read_permission)
+        user_rw.user_permissions.add(edit_rota_permission)
         # read only:
         user_r.user_permissions.add(read_permission)
         # rota_editor:

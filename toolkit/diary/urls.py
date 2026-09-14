@@ -203,7 +203,7 @@ diary_urls = [
         name="edit-showing",
     ),
     path(
-        "edit/showing/id/<int:showing_id>/post-showing-notes",
+        "edit/showing/id/<int:showing_id>/post-showing-notes/",
         edit_showing_post_showing_notes,
         name="edit-post-showing-notes",
     ),
