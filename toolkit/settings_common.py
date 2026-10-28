@@ -176,6 +176,9 @@ WAGTAIL_USER_TIME_ZONES = ["Europe/London"]
 # request.site.root_url or to the request’s host name.
 WAGTAILADMIN_BASE_URL = "https://cubecinema.com/cms"
 
+# Wagtail 7.3 lowered the default from 85 to 76 - keep the old value:
+WAGTAILIMAGES_JPEG_QUALITY = 85
+
 ###############################################################################
 #
 # Below here are Django settings
