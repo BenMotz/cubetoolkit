@@ -1,4 +1,4 @@
-FROM debian:bookworm AS base
+FROM debian:trixie AS base
 
 ## passed in from commandline
 ARG ENV_NAME
@@ -45,7 +45,7 @@ RUN python3 -m venv /venv \
 COPY . /site/
 RUN ln -s /site/toolkit/settings_$ENV_NAME.py /site/toolkit/settings.py
 ## create container account with UID+GID of server account or localhost user
-RUN adduser --uid $TOOLKIT_UID --no-create-home --disabled-login --gecos x toolkit
+RUN useradd --uid $TOOLKIT_UID --user-group --no-create-home toolkit
 RUN chown -R toolkit:toolkit /site/
 
 # app/service user, which runs...
