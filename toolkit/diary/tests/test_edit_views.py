@@ -2265,7 +2265,8 @@ class ViewTermsReportCsvTests(DiaryTestsMixin, TestCase):
             'attachment; filename="terms-1990-01-15.csv"',
         )
         self.assertEqual(
-            response.content.decode("utf-8"), "date,time,title,terms\r\n"
+            response.content.decode("utf-8"),
+            "date,time,title,terms,post-showing-notes\r\n",
         )
 
     def test_showings(self):
@@ -2284,9 +2285,9 @@ class ViewTermsReportCsvTests(DiaryTestsMixin, TestCase):
         self.assertIsNone(self.e1.terms)
         self.assertEqual(
             response.content.decode("utf-8"),
-            "date,time,title,terms\r\n"
-            f"2013-02-14,18:00,{self.e5.name},{self.e5.terms}\r\n"
-            f"2013-02-15,18:00,{self.e1.name},\r\n",
+            "date,time,title,terms,post-showing-notes\r\n"
+            f'2013-02-14,18:00,{self.e5.name},{self.e5.terms},"{self.e5.showings.all()[0].post_showing_notes}"\r\n'
+            f"2013-02-15,18:00,{self.e1.name},,\r\n",
         )
 
 

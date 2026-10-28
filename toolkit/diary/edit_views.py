@@ -934,7 +934,7 @@ def view_terms_report_csv(
         },
     )
     writer = csv.writer(response)
-    writer.writerow(["date", "time", "title", "terms"])
+    writer.writerow(["date", "time", "title", "terms", "post-showing-notes"])
     for showing in showings:
         writer.writerow(
             [
@@ -942,6 +942,7 @@ def view_terms_report_csv(
                 showing.start.time().isoformat(timespec="minutes"),
                 showing.event.name,
                 showing.event.terms,
+                showing.post_showing_notes,
             ]
         )
 

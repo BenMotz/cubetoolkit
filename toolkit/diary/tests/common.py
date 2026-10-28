@@ -348,6 +348,7 @@ class DiaryTestsMixin(fixtures.TestWithFixtures):
             event=self.e5,
             booked_by="Yet another user",
             confirmed=True,
+            post_showing_notes="Some notes, recorded afterwards",
         )
         self.s5.save(force=True)
 

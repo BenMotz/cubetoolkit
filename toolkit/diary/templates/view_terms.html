@@ -43,6 +43,10 @@
         <p>{{ showing.event.name|upper }}</p>
         <p class="flags">{% if showing.cancelled %}CANCELLED / {% endif %}{% if showing.event.outside_hire %}External event{% else %}Cube event{% endif %} / {% if showing.event.private or showing.hide_in_programme %}Private event{% else %}Public event{% endif %} / {% if showing.confirmed %}Confirmed{% else %}Unconfirmed{% endif %}{% if showing.discounted %} / Discounted{% endif %}</p>
         <p class="terms">{{ showing.event.terms.strip }}</p>
+        {% if showing.post_showing_notes %}
+          <p><i>Post-showing notes, may contain updated terms:</i></p>
+          <p class="terms">{{ showing.post_showing_notes.strip }}</p>
+        {% endif %}
       {% endspaceless %}
 
     {% endfor %}
